@@ -14,7 +14,6 @@ Public Class frmFuncionarioBuscar
 
     Private Const LIMITE_FILAS As Integer = 500
 
-    Private debounce As New DebounceDispatcherAsync()
     Public Property ResultadosFiltrados As List(Of FuncionarioMin)
 
     ' Asegurá que dgvResultados esté inicializado y no sea Nothing antes de usarlo
@@ -31,19 +30,41 @@ Public Class frmFuncionarioBuscar
             .RowTemplate.MinimumHeight = 40
             .Columns.Clear()
 
-            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Id", .DataPropertyName = "Id", .Visible = False})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "CI", .HeaderText = "CI"})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Nombre", .HeaderText = "Nombre"})
+            '–– Id (oculto) ––
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "Id",
+            .DataPropertyName = "Id",
+            .Visible = False
+        })
+
+            '–– CI ––
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "CI",                  ' ← nombre de la columna
+            .DataPropertyName = "CI",
+            .HeaderText = "CI",
+            .Width = 90
+        })
+
+            '–– Nombre ––
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "Nombre",              ' ← nombre de la columna
+            .DataPropertyName = "Nombre",
+            .HeaderText = "Nombre",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+        })
         End With
 
+        ' Eventos
         AddHandler dgvResultados.SelectionChanged, AddressOf MostrarDetalle
         AddHandler dgvResultados.CellDoubleClick, AddressOf OnDgvDoubleClick
         AddHandler dgvResultados.DataError, Sub(s, ev) ev.ThrowException = False
     End Sub
 #End Region
 
+
 #Region "Búsqueda con Full-Text y CONTAINS"
-    Private Async Function BuscarAsync(tok As CancellationToken) As Task
+    Private Async Function BuscarAsync() As Task
+        LoadingHelper.MostrarCargando(Me)
         btnBuscar.Enabled = False
 
         Try
@@ -52,16 +73,17 @@ Public Class frmFuncionarioBuscar
                 Dim filtro As String = txtBusqueda.Text.Trim()
 
                 '–– Condición mínima de 3 letras ––
-                If filtro.Length < 3 OrElse tok.IsCancellationRequested Then
+                If filtro.Length < 3 Then
                     dgvResultados.DataSource = Nothing
                     ResultadosFiltrados = New List(Of FuncionarioMin)
+                    LimpiarDetalle()
                     Return
                 End If
 
                 '–– Construir patrón FTS por término ––
                 Dim terminos = filtro.Split(" "c) _
-                                .Where(Function(w) Not String.IsNullOrWhiteSpace(w)) _
-                                .Select(Function(w) $"""{w}*""")
+                                  .Where(Function(w) Not String.IsNullOrWhiteSpace(w)) _
+                                  .Select(Function(w) $"""{w}*""")
                 Dim expresionFts = String.Join(" AND ", terminos)
 
                 '–– SQL dinámico ––
@@ -69,9 +91,9 @@ Public Class frmFuncionarioBuscar
                 sb.AppendLine("SELECT TOP (@limite)")
                 sb.AppendLine("       Id, CI, Nombre")
                 sb.AppendLine("FROM   dbo.Funcionario WITH (NOLOCK)")
-                sb.AppendLine("WHERE  1 = 1")
+                sb.AppendLine("WHERE 1 = 1")
                 sb.AppendLine("  AND (CI LIKE '%' + @filtro + '%'")
-                sb.AppendLine("   OR  CONTAINS(Nombre, @patron))")
+                sb.AppendLine("   OR CONTAINS(Nombre, @patron))")
                 sb.AppendLine("ORDER BY Nombre;")
 
                 Dim sql = sb.ToString()
@@ -79,22 +101,23 @@ Public Class frmFuncionarioBuscar
                 Dim pFiltro = New SqlParameter("@filtro", filtro)
                 Dim pPatron = New SqlParameter("@patron", expresionFts)
 
-                tok.ThrowIfCancellationRequested()
-
-                '–– EJECUTO sin token para evitar cancelación en mitad del Open ––
+                '–– Ejecutar consulta
                 Dim lista = Await ctx.Database _
-                            .SqlQuery(Of FuncionarioMin)(sql, pLimite, pFiltro, pPatron) _
-                            .ToListAsync()
+                                .SqlQuery(Of FuncionarioMin)(sql, pLimite, pFiltro, pPatron) _
+                                .ToListAsync()
 
-                If tok.IsCancellationRequested Then Return
-
-                '–– Actualizo la grilla en hilo UI ––
+                '–– Actualizar grilla
                 dgvResultados.DataSource = Nothing
-                If lista.Any() Then
-                    dgvResultados.DataSource = lista
-                    dgvResultados.ClearSelection()
-                End If
+                dgvResultados.DataSource = lista
                 ResultadosFiltrados = lista
+
+                If lista.Any() Then
+                    dgvResultados.ClearSelection()
+                    dgvResultados.Rows(0).Selected = True
+                    dgvResultados.CurrentCell = dgvResultados.Rows(0).Cells("CI")
+                Else
+                    LimpiarDetalle()
+                End If
 
                 If lista.Count = LIMITE_FILAS Then
                     MessageBox.Show($"Mostrando los primeros {LIMITE_FILAS} resultados. " &
@@ -104,37 +127,66 @@ Public Class frmFuncionarioBuscar
                 End If
             End Using
 
-        Catch ex As OperationCanceledException
-            ' Silencioso
         Catch ex As SqlException When ex.Number = -2
             MessageBox.Show("La consulta excedió el tiempo de espera. Refiná los filtros o intentá nuevamente.",
                         "Timeout", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+
+        Catch ex As Exception
+            MessageBox.Show("Ocurrió un error inesperado: " & ex.Message,
+                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+
         Finally
+            LoadingHelper.OcultarCargando(Me)
             btnBuscar.Enabled = True
         End Try
     End Function
+
+
+    Private Async Sub txtBusqueda_KeyDown(sender As Object, e As KeyEventArgs) _
+    Handles txtBusqueda.KeyDown
+
+        If e.KeyCode = Keys.Enter Then
+            e.Handled = True
+            e.SuppressKeyPress = True
+            Await BuscarAsync()
+            Return
+        End If
+
+        If dgvResultados.Rows.Count = 0 Then Return
+
+        Select Case e.KeyCode
+            Case Keys.Down : MoverSeleccion(+1) : e.Handled = True
+            Case Keys.Up : MoverSeleccion(-1) : e.Handled = True
+        End Select
+    End Sub
+
+    Private Sub MoverSeleccion(direccion As Integer)
+        Dim total = dgvResultados.Rows.Count
+        If total = 0 Then
+            LimpiarDetalle()        ' ← por las dudas
+            Exit Sub
+        End If
+
+        Dim indexActual As Integer =
+        If(dgvResultados.CurrentRow Is Nothing, -1, dgvResultados.CurrentRow.Index)
+
+        Dim nuevoIndex = Math.Max(0, Math.Min(total - 1, indexActual + direccion))
+
+        dgvResultados.ClearSelection()
+        dgvResultados.Rows(nuevoIndex).Selected = True
+        dgvResultados.CurrentCell = dgvResultados.Rows(nuevoIndex).Cells("CI")
+
+        '— Forzamos refresco del detalle (por si el evento no se dispara)
+        MostrarDetalle(Nothing, EventArgs.Empty)
+    End Sub
+
+
 #End Region
 
     Private Async Sub btnBuscar_Click(sender As Object, e As EventArgs) Handles btnBuscar.Click
         ' Ejecuta búsqueda "manual" sin cancelación (si querés cancelar, usá un token)
-        Await BuscarAsync(CancellationToken.None)
+        Await BuscarAsync()
     End Sub
-
-#Region "Debounce en el TextBox"
-    Private Sub txtBusqueda_TextChanged(sender As Object, e As EventArgs) Handles txtBusqueda.TextChanged
-        If txtBusqueda.Text.Trim().Length >= 3 Then
-            debounce.Debounce(400, Async Function(token)
-                                       Await BuscarAsync(token)
-                                   End Function)
-        Else
-            debounce.Cancel()
-            If dgvResultados.DataSource IsNot Nothing Then
-                dgvResultados.DataSource = Nothing
-            End If
-            ResultadosFiltrados = New List(Of FuncionarioMin)
-        End If
-    End Sub
-#End Region
 
 #Region "Detalle lateral (Foto on-demand)"
     Private Async Sub MostrarDetalle(sender As Object, e As EventArgs)
@@ -157,6 +209,10 @@ Public Class frmFuncionarioBuscar
                                  x.FechaIngreso,
                                  x.Activo
                              }).FirstOrDefaultAsync()
+            If dgvResultados.CurrentRow Is Nothing _
+           OrElse dgvResultados.CurrentRow.DataBoundItem Is Nothing _
+           OrElse CInt(dgvResultados.CurrentRow.Cells("Id").Value) <> id Then Return
+
             If f Is Nothing Then Return
 
             lblCI.Text = f.CI
@@ -184,7 +240,7 @@ Public Class frmFuncionarioBuscar
         Dim id = CInt(dgvResultados.CurrentRow.Cells("Id").Value)
         Using frm As New frmFuncionarioCrear(id)
             If frm.ShowDialog() = DialogResult.OK Then
-                Await BuscarAsync(CancellationToken.None)
+                Await BuscarAsync()
             End If
         End Using
     End Sub
@@ -205,6 +261,20 @@ Public Class frmFuncionarioBuscar
             Return If(presencia, "-")
         End Using
     End Function
+    '--- Panel lateral  -------------------------------------------------
+    Private Sub LimpiarDetalle()
+        lblCI.Text = ""
+        lblNombreCompleto.Text = ""
+        lblCargo.Text = ""
+        lblTipo.Text = ""
+        lblFechaIngreso.Text = ""
+        chkActivoDetalle.Checked = False
+        lblPresencia.Text = ""
+        pbFotoDetalle.Image = Nothing
+    End Sub
+
+
+
 #End Region
 
 #Region "DTO ligero"
