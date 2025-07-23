@@ -31,11 +31,18 @@ Partial Public Class Funcionario
     Public Property SemanaId As Nullable(Of Integer)
     Public Property HorarioId As Nullable(Of Integer)
     Public Property LastPictureId As Nullable(Of Integer)
+    Public Property FechaNacimiento As Nullable(Of Date)
+    Public Property Domicilio As String
+    Public Property Email As String
+    Public Property EscalafonId As Nullable(Of Integer)
+    Public Property FuncionId As Nullable(Of Integer)
 
     Public Overridable Property Cargo As Cargo
+    Public Overridable Property Escalafon As Escalafon
     Public Overridable Property Estado As Estado
     Public Overridable Property EstadoCivil As EstadoCivil
     Public Overridable Property EstadoTransitorio As ICollection(Of EstadoTransitorio) = New HashSet(Of EstadoTransitorio)
+    Public Overridable Property Funcion As Funcion
     Public Overridable Property FuncionarioDotacion As ICollection(Of FuncionarioDotacion) = New HashSet(Of FuncionarioDotacion)
     Public Overridable Property FuncionarioSalud As ICollection(Of FuncionarioSalud) = New HashSet(Of FuncionarioSalud)
     Public Overridable Property Genero As Genero

@@ -39,6 +39,13 @@
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="Nombre" Type="nvarchar" MaxLength="30" Nullable="false" />
         </EntityType>
+        <EntityType Name="Escalafon">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Nombre" Type="nvarchar" MaxLength="100" Nullable="false" />
+        </EntityType>
         <EntityType Name="Estado">
           <Key>
             <PropertyRef Name="Id" />
@@ -69,6 +76,13 @@
           <Property Name="CreatedAt" Type="datetime2" Precision="7" Nullable="false" />
           <Property Name="UpdatedAt" Type="datetime2" Precision="7" />
         </EntityType>
+        <EntityType Name="Funcion">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Nombre" Type="nvarchar" MaxLength="100" Nullable="false" />
+        </EntityType>
         <EntityType Name="Funcionario">
           <Key>
             <PropertyRef Name="Id" />
@@ -93,6 +107,11 @@
           <Property Name="SemanaId" Type="int" />
           <Property Name="HorarioId" Type="int" />
           <Property Name="LastPictureId" Type="int" />
+          <Property Name="FechaNacimiento" Type="date" />
+          <Property Name="Domicilio" Type="nvarchar" MaxLength="250" />
+          <Property Name="Email" Type="nvarchar" MaxLength="255" />
+          <Property Name="EscalafonId" Type="int" />
+          <Property Name="FuncionId" Type="int" />
         </EntityType>
         <EntityType Name="FuncionarioArma">
           <Key>
@@ -137,7 +156,7 @@
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="FuncionarioId" Type="int" Nullable="false" />
           <Property Name="Item" Type="nvarchar" MaxLength="50" Nullable="false" />
-          <Property Name="Talla" Type="nvarchar" MaxLength="20" />
+          <Property Name="Talla" Type="nvarchar" MaxLength="100" />
           <Property Name="FechaAsign" Type="datetime2" Precision="7" Nullable="false" />
           <Property Name="Observaciones" Type="nvarchar" MaxLength="250" />
         </EntityType>
@@ -682,6 +701,30 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Funcionario_Escalafon">
+          <End Role="Escalafon" Type="Self.Escalafon" Multiplicity="0..1" />
+          <End Role="Funcionario" Type="Self.Funcionario" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Escalafon">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Funcionario">
+              <PropertyRef Name="EscalafonId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Funcionario_Funcion">
+          <End Role="Funcion" Type="Self.Funcion" Multiplicity="0..1" />
+          <End Role="Funcionario" Type="Self.Funcionario" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Funcion">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Funcionario">
+              <PropertyRef Name="FuncionId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Funcionario_TipoFuncionario">
           <End Role="TipoFuncionario" Type="Self.TipoFuncionario" Multiplicity="1" />
           <End Role="Funcionario" Type="Self.Funcionario" Multiplicity="*" />
@@ -1055,9 +1098,11 @@
           <EntitySet Name="Arma" EntityType="Self.Arma" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Cargo" EntityType="Self.Cargo" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="CategoriaAusencia" EntityType="Self.CategoriaAusencia" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Escalafon" EntityType="Self.Escalafon" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Estado" EntityType="Self.Estado" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="EstadoCivil" EntityType="Self.EstadoCivil" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="EstadoTransitorio" EntityType="Self.EstadoTransitorio" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Funcion" EntityType="Self.Funcion" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Funcionario" EntityType="Self.Funcionario" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="FuncionarioArma" EntityType="Self.FuncionarioArma" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="FuncionarioChaleco" EntityType="Self.FuncionarioChaleco" Schema="dbo" store:Type="Tables" />
@@ -1155,6 +1200,14 @@
           </AssociationSet>
           <AssociationSet Name="FK_Funcionario_Cargo" Association="Self.FK_Funcionario_Cargo">
             <End Role="Cargo" EntitySet="Cargo" />
+            <End Role="Funcionario" EntitySet="Funcionario" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Funcionario_Escalafon" Association="Self.FK_Funcionario_Escalafon">
+            <End Role="Escalafon" EntitySet="Escalafon" />
+            <End Role="Funcionario" EntitySet="Funcionario" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Funcionario_Funcion" Association="Self.FK_Funcionario_Funcion">
+            <End Role="Funcion" EntitySet="Funcion" />
             <End Role="Funcionario" EntitySet="Funcionario" />
           </AssociationSet>
           <AssociationSet Name="FK_Funcionario_TipoFuncionario" Association="Self.FK_Funcionario_TipoFuncionario">
@@ -1317,6 +1370,14 @@
           <Property Name="Nombre" Type="String" MaxLength="30" FixedLength="false" Unicode="true" Nullable="false" />
           <NavigationProperty Name="TipoLicencia" Relationship="Self.FK_TipoLicencia_CategoriaAusencia" FromRole="CategoriaAusencia" ToRole="TipoLicencia" />
         </EntityType>
+        <EntityType Name="Escalafon">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Nombre" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Funcionario" Relationship="Self.FK_Funcionario_Escalafon" FromRole="Escalafon" ToRole="Funcionario" />
+        </EntityType>
         <EntityType Name="Estado">
           <Key>
             <PropertyRef Name="Id" />
@@ -1352,6 +1413,14 @@
           <NavigationProperty Name="Funcionario" Relationship="Self.FK_EstadoTransitorio_Funcionario" FromRole="EstadoTransitorio" ToRole="Funcionario" />
           <NavigationProperty Name="TipoEstadoTransitorio" Relationship="Self.FK_EstadoTransitorio_Tipo" FromRole="EstadoTransitorio" ToRole="TipoEstadoTransitorio" />
         </EntityType>
+        <EntityType Name="Funcion">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Nombre" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Funcionario" Relationship="Self.FK_Funcionario_Funcion" FromRole="Funcion" ToRole="Funcionario" />
+        </EntityType>
         <EntityType Name="Funcionario">
           <Key>
             <PropertyRef Name="Id" />
@@ -1376,10 +1445,17 @@
           <Property Name="SemanaId" Type="Int32" />
           <Property Name="HorarioId" Type="Int32" />
           <Property Name="LastPictureId" Type="Int32" />
+          <Property Name="FechaNacimiento" Type="DateTime" Precision="0" />
+          <Property Name="Domicilio" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="Email" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="EscalafonId" Type="Int32" />
+          <Property Name="FuncionId" Type="Int32" />
           <NavigationProperty Name="Cargo" Relationship="Self.FK_Funcionario_Cargo" FromRole="Funcionario" ToRole="Cargo" />
+          <NavigationProperty Name="Escalafon" Relationship="Self.FK_Funcionario_Escalafon" FromRole="Funcionario" ToRole="Escalafon" />
           <NavigationProperty Name="Estado" Relationship="Self.FK__Funcionar__Estad__29221CFB" FromRole="Funcionario" ToRole="Estado" />
           <NavigationProperty Name="EstadoCivil" Relationship="Self.FK__Funcionar__Estad__282DF8C2" FromRole="Funcionario" ToRole="EstadoCivil" />
           <NavigationProperty Name="EstadoTransitorio" Relationship="Self.FK_EstadoTransitorio_Funcionario" FromRole="Funcionario" ToRole="EstadoTransitorio" />
+          <NavigationProperty Name="Funcion" Relationship="Self.FK_Funcionario_Funcion" FromRole="Funcionario" ToRole="Funcion" />
           <NavigationProperty Name="FuncionarioDotacion" Relationship="Self.FK__Funcionar__Funci__367C1819" FromRole="Funcionario" ToRole="FuncionarioDotacion" />
           <NavigationProperty Name="FuncionarioSalud" Relationship="Self.FK__Funcionar__Funci__3A4CA8FD" FromRole="Funcionario" ToRole="FuncionarioSalud" />
           <NavigationProperty Name="Genero" Relationship="Self.FK__Funcionar__Gener__2A164134" FromRole="Funcionario" ToRole="Genero" />
@@ -1453,7 +1529,7 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="FuncionarioId" Type="Int32" Nullable="false" />
           <Property Name="Item" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="Talla" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="Talla" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
           <Property Name="FechaAsign" Type="DateTime" Nullable="false" Precision="7" />
           <Property Name="Observaciones" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="Funcionario" Relationship="Self.FK__Funcionar__Funci__367C1819" FromRole="FuncionarioDotacion" ToRole="Funcionario" />
@@ -1912,6 +1988,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Funcionario_Escalafon">
+          <End Role="Escalafon" Type="Self.Escalafon" Multiplicity="0..1" />
+          <End Role="Funcionario" Type="Self.Funcionario" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Escalafon">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Funcionario">
+              <PropertyRef Name="EscalafonId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK__Funcionar__Estad__29221CFB">
           <End Role="Estado" Type="Self.Estado" Multiplicity="0..1" />
           <End Role="Funcionario" Type="Self.Funcionario" Multiplicity="*" />
@@ -1969,6 +2057,18 @@
             </Principal>
             <Dependent Role="EstadoTransitorio">
               <PropertyRef Name="TipoEstadoTransitorioId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Funcionario_Funcion">
+          <End Role="Funcion" Type="Self.Funcion" Multiplicity="0..1" />
+          <End Role="Funcionario" Type="Self.Funcionario" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Funcion">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Funcionario">
+              <PropertyRef Name="FuncionId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -2397,9 +2497,11 @@
           <EntitySet Name="Arma" EntityType="Self.Arma" />
           <EntitySet Name="Cargo" EntityType="Self.Cargo" />
           <EntitySet Name="CategoriaAusencia" EntityType="Self.CategoriaAusencia" />
+          <EntitySet Name="Escalafon" EntityType="Self.Escalafon" />
           <EntitySet Name="Estado" EntityType="Self.Estado" />
           <EntitySet Name="EstadoCivil" EntityType="Self.EstadoCivil" />
           <EntitySet Name="EstadoTransitorio" EntityType="Self.EstadoTransitorio" />
+          <EntitySet Name="Funcion" EntityType="Self.Funcion" />
           <EntitySet Name="Funcionario" EntityType="Self.Funcionario" />
           <EntitySet Name="FuncionarioArma" EntityType="Self.FuncionarioArma" />
           <EntitySet Name="FuncionarioChaleco" EntityType="Self.FuncionarioChaleco" />
@@ -2455,6 +2557,10 @@
             <End Role="CategoriaAusencia" EntitySet="CategoriaAusencia" />
             <End Role="TipoLicencia" EntitySet="TipoLicencia" />
           </AssociationSet>
+          <AssociationSet Name="FK_Funcionario_Escalafon" Association="Self.FK_Funcionario_Escalafon">
+            <End Role="Escalafon" EntitySet="Escalafon" />
+            <End Role="Funcionario" EntitySet="Funcionario" />
+          </AssociationSet>
           <AssociationSet Name="FK__Funcionar__Estad__29221CFB" Association="Self.FK__Funcionar__Estad__29221CFB">
             <End Role="Estado" EntitySet="Estado" />
             <End Role="Funcionario" EntitySet="Funcionario" />
@@ -2474,6 +2580,10 @@
           <AssociationSet Name="FK_EstadoTransitorio_Tipo" Association="Self.FK_EstadoTransitorio_Tipo">
             <End Role="TipoEstadoTransitorio" EntitySet="TipoEstadoTransitorio" />
             <End Role="EstadoTransitorio" EntitySet="EstadoTransitorio" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Funcionario_Funcion" Association="Self.FK_Funcionario_Funcion">
+            <End Role="Funcion" EntitySet="Funcion" />
+            <End Role="Funcionario" EntitySet="Funcionario" />
           </AssociationSet>
           <AssociationSet Name="FK__Funcionar__Funci__367C1819" Association="Self.FK__Funcionar__Funci__367C1819">
             <End Role="Funcionario" EntitySet="Funcionario" />
@@ -2699,6 +2809,14 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="Escalafon">
+            <EntityTypeMapping TypeName="ApexModel.Escalafon">
+              <MappingFragment StoreEntitySet="Escalafon">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="Estado">
             <EntityTypeMapping TypeName="ApexModel.Estado">
               <MappingFragment StoreEntitySet="Estado">
@@ -2732,6 +2850,14 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="Funcion">
+            <EntityTypeMapping TypeName="ApexModel.Funcion">
+              <MappingFragment StoreEntitySet="Funcion">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="Funcionario">
             <EntityTypeMapping TypeName="ApexModel.Funcionario">
               <MappingFragment StoreEntitySet="Funcionario">
@@ -2755,6 +2881,11 @@
                 <ScalarProperty Name="SemanaId" ColumnName="SemanaId" />
                 <ScalarProperty Name="HorarioId" ColumnName="HorarioId" />
                 <ScalarProperty Name="LastPictureId" ColumnName="LastPictureId" />
+                <ScalarProperty Name="FechaNacimiento" ColumnName="FechaNacimiento" />
+                <ScalarProperty Name="Domicilio" ColumnName="Domicilio" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="EscalafonId" ColumnName="EscalafonId" />
+                <ScalarProperty Name="FuncionId" ColumnName="FuncionId" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

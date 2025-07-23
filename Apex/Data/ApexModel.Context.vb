@@ -18,7 +18,6 @@ Partial Public Class ApexEntities
 
     Public Sub New()
         MyBase.New("name=ApexEntities")
-        Me.Database.CommandTimeout = 180 ' Establece el tiempo de espera de comandos a 3 minutos
     End Sub
 
     Protected Overrides Sub OnModelCreating(modelBuilder As DbModelBuilder)
@@ -29,9 +28,11 @@ Partial Public Class ApexEntities
     Public Overridable Property Arma() As DbSet(Of Arma)
     Public Overridable Property Cargo() As DbSet(Of Cargo)
     Public Overridable Property CategoriaAusencia() As DbSet(Of CategoriaAusencia)
+    Public Overridable Property Escalafon() As DbSet(Of Escalafon)
     Public Overridable Property Estado() As DbSet(Of Estado)
     Public Overridable Property EstadoCivil() As DbSet(Of EstadoCivil)
     Public Overridable Property EstadoTransitorio() As DbSet(Of EstadoTransitorio)
+    Public Overridable Property Funcion() As DbSet(Of Funcion)
     Public Overridable Property Funcionario() As DbSet(Of Funcionario)
     Public Overridable Property FuncionarioArma() As DbSet(Of FuncionarioArma)
     Public Overridable Property FuncionarioChaleco() As DbSet(Of FuncionarioChaleco)

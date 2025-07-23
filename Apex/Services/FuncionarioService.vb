@@ -11,51 +11,79 @@ Public Class FuncionarioService
         MyBase.New(unitOfWork)
     End Sub
 
+    ' --- Método nuevo para cargar un funcionario con todos sus datos relacionados ---
+    Public Async Function GetByIdCompletoAsync(id As Integer) As Task(Of Funcionario)
+        Return Await _unitOfWork.Repository(Of Funcionario)().
+            GetAll().
+            Include(Function(f) f.FuncionarioDotacion).
+            Include(Function(f) f.FuncionarioObservacion).
+            Include(Function(f) f.FuncionarioEstadoLegal).
+            Include(Function(f) f.FuncionarioDispositivo).
+            FirstOrDefaultAsync(Function(f) f.Id = id)
+    End Function
+
+    ' --- Métodos para poblar los ComboBox (Catálogos) ---
+
     Public Async Function ObtenerCargosAsync() As Task(Of List(Of KeyValuePair(Of Integer, String)))
         Dim lista = Await _unitOfWork.Repository(Of Cargo)().
-        GetAll().
-        AsNoTracking().
-        OrderBy(Function(c) c.Nombre).
-        ToListAsync() ' 👈 materializamos la consulta
+            GetAll().
+            AsNoTracking().
+            OrderBy(Function(c) c.Nombre).
+            ToListAsync()
 
         Return lista.Select(Function(c) New KeyValuePair(Of Integer, String)(c.Id, c.Nombre)).ToList()
     End Function
-
 
     Public Async Function ObtenerTiposFuncionarioAsync() As Task(Of List(Of KeyValuePair(Of Integer, String)))
         Dim lista = Await _unitOfWork.Repository(Of TipoFuncionario)().
             GetAll().
             AsNoTracking().
             OrderBy(Function(t) t.Nombre).
-            ToListAsync() ' 👈 Materializás en memoria
+            ToListAsync()
 
         Return lista.Select(Function(t) New KeyValuePair(Of Integer, String)(t.Id, t.Nombre)).ToList()
     End Function
 
-    ''' <summary>
-    ''' Devuelve una consulta base de funcionarios con Include y AsNoTracking.
-    ''' </summary>
-    Public Function ObtenerQueryBase() As IQueryable(Of Funcionario)
-        Return _unitOfWork.
-            Repository(Of Funcionario)().
-            GetAll().
-            Include(Function(f) f.Cargo).
-            Include(Function(f) f.TipoFuncionario).
-            AsNoTracking()
+    Public Async Function ObtenerEscalafonesAsync() As Task(Of List(Of KeyValuePair(Of Integer, String)))
+        Dim lista = Await _unitOfWork.Repository(Of Escalafon)().GetAll().AsNoTracking().OrderBy(Function(e) e.Nombre).ToListAsync()
+
+        Return lista.Select(Function(e) New KeyValuePair(Of Integer, String)(e.Id, e.Nombre)).ToList()
     End Function
-    Public Async Function ObtenerListaFiltradaAsync(legajo As Integer?, ci As String) As Task(Of List(Of Funcionario))
 
-        Using uow As New UnitOfWork()
-            Dim q = uow.Repository(Of Funcionario)() _
-                   .GetAll() _
-                   .Include(Function(f) f.Cargo) _
-                   .Include(Function(f) f.TipoFuncionario) _
-                   .AsNoTracking()
+    Public Async Function ObtenerFuncionesAsync() As Task(Of List(Of KeyValuePair(Of Integer, String)))
+        Dim lista = Await _unitOfWork.Repository(Of Funcion)().GetAll().AsNoTracking().OrderBy(Function(f) f.Nombre).ToListAsync()
 
-            If Not String.IsNullOrEmpty(ci) Then q = q.Where(Function(f) f.CI.Contains(ci))
+        Return lista.Select(Function(f) New KeyValuePair(Of Integer, String)(f.Id, f.Nombre)).ToList()
+    End Function
 
-            Return Await q.OrderBy(Function(f) f.Nombre).ToListAsync()
-        End Using
+    Public Async Function ObtenerEstadosCivilesAsync() As Task(Of List(Of KeyValuePair(Of Integer, String)))
+        Dim lista = Await _unitOfWork.Repository(Of EstadoCivil)().
+            GetAll().
+            AsNoTracking().
+            OrderBy(Function(ec) ec.Nombre).
+            ToListAsync()
+
+        Return lista.Select(Function(ec) New KeyValuePair(Of Integer, String)(ec.Id, ec.Nombre)).ToList()
+    End Function
+
+    Public Async Function ObtenerGenerosAsync() As Task(Of List(Of KeyValuePair(Of Integer, String)))
+        Dim lista = Await _unitOfWork.Repository(Of Genero)().
+            GetAll().
+            AsNoTracking().
+            OrderBy(Function(g) g.Nombre).
+            ToListAsync()
+
+        Return lista.Select(Function(g) New KeyValuePair(Of Integer, String)(g.Id, g.Nombre)).ToList()
+    End Function
+
+    Public Async Function ObtenerNivelesEstudioAsync() As Task(Of List(Of KeyValuePair(Of Integer, String)))
+        Dim lista = Await _unitOfWork.Repository(Of NivelEstudio)().
+            GetAll().
+            AsNoTracking().
+            OrderBy(Function(ne) ne.Nombre).
+            ToListAsync()
+
+        Return lista.Select(Function(ne) New KeyValuePair(Of Integer, String)(ne.Id, ne.Nombre)).ToList()
     End Function
 
 End Class
