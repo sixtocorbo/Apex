@@ -1,5 +1,4 @@
-﻿
-Option Strict On
+﻿Option Strict On
 Option Explicit On
 
 Imports System.Data.Entity
@@ -48,7 +47,7 @@ Public Class frmFuncionarioBuscar
 
             '–– Nombre ––
             .Columns.Add(New DataGridViewTextBoxColumn With {
-            .Name = "Nombre",              ' ← nombre de la columna
+            .Name = "Nombre",
             .DataPropertyName = "Nombre",
             .HeaderText = "Nombre",
             .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
@@ -121,7 +120,7 @@ Public Class frmFuncionarioBuscar
                 End If
 
                 If lista.Count = LIMITE_FILAS Then
-                    MessageBox.Show($"Mostrando los primeros {LIMITE_FILAS} resultados. " &
+                    MessageBox.Show($"Mostrando los primeros {LIMITE_FILAS} resultados." &
                                 "Refiná la búsqueda para ver más.",
                                 "Aviso",
                                 MessageBoxButtons.OK, MessageBoxIcon.Information)
@@ -199,6 +198,7 @@ Public Class frmFuncionarioBuscar
                              .GetAll() _
                              .Include(Function(x) x.Cargo) _
                              .Include(Function(x) x.TipoFuncionario) _
+                             .Include(Function(x) x.EstadoTransitorio.Select(Function(et) et.TipoEstadoTransitorio)) _
                              .AsNoTracking() _
                              .Where(Function(x) x.Id = id) _
                              .Select(Function(x) New With {
@@ -208,7 +208,8 @@ Public Class frmFuncionarioBuscar
                                  x.Cargo,
                                  x.TipoFuncionario,
                                  x.FechaIngreso,
-                                 x.Activo
+                                 x.Activo,
+                                 .EstadoTransitorioReciente = x.EstadoTransitorio.OrderByDescending(Function(et) et.FechaDesde).FirstOrDefault()
                              }).FirstOrDefaultAsync()
             If dgvResultados.CurrentRow Is Nothing _
            OrElse dgvResultados.CurrentRow.DataBoundItem Is Nothing _
@@ -222,6 +223,12 @@ Public Class frmFuncionarioBuscar
             lblTipo.Text = f.TipoFuncionario.Nombre
             lblFechaIngreso.Text = f.FechaIngreso.ToShortDateString()
             chkActivoDetalle.Checked = f.Activo
+
+            If f.EstadoTransitorioReciente IsNot Nothing Then
+                lblEstadoTransitorio.Text = f.EstadoTransitorioReciente.TipoEstadoTransitorio.Nombre
+            Else
+                lblEstadoTransitorio.Text = "Normal"
+            End If
 
             If f.Foto Is Nothing OrElse f.Foto.Length = 0 Then
                 pbFotoDetalle.Image = My.Resources.Police
@@ -257,7 +264,7 @@ Public Class frmFuncionarioBuscar
                 "EXEC dbo.usp_PresenciaFecha_Apex @Fecha", pFecha
             ).ToListAsync()
             Dim presencia = lista.Where(Function(r) r.FuncionarioId = id).
-                             Select(Function(r) r.Resultado).
+                Select(Function(r) r.Resultado).
                              FirstOrDefault()
             Return If(presencia, "-")
         End Using
@@ -271,6 +278,7 @@ Public Class frmFuncionarioBuscar
         lblFechaIngreso.Text = ""
         chkActivoDetalle.Checked = False
         lblPresencia.Text = ""
+        lblEstadoTransitorio.Text = ""
         pbFotoDetalle.Image = Nothing
     End Sub
 
@@ -292,5 +300,3 @@ Public Class frmFuncionarioBuscar
 #End Region
 
 End Class
-
-

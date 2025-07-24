@@ -23,6 +23,8 @@ Public Class frmFuncionarioCrear
     ' --- Colecciones para manejar los datos en el formulario ---
     Private _dotaciones As BindingList(Of FuncionarioDotacion)
     Private _observaciones As BindingList(Of FuncionarioObservacion)
+    Private _estadosTransitorios As BindingList(Of EstadoTransitorio)
+
 
     '-------------------- Constructores ----------------------
     Public Sub New()
@@ -30,6 +32,7 @@ Public Class frmFuncionarioCrear
         _modo = ModoFormulario.Crear
         _dotaciones = New BindingList(Of FuncionarioDotacion)()
         _observaciones = New BindingList(Of FuncionarioObservacion)()
+        _estadosTransitorios = New BindingList(Of EstadoTransitorio)()
     End Sub
 
     Public Sub New(id As Integer)
@@ -46,8 +49,11 @@ Public Class frmFuncionarioCrear
         ' --- Configurar DataGridViews ---
         ConfigurarGrillaDotacion()
         ConfigurarGrillaObservaciones()
+        ConfigurarGrillaEstados()
         dgvDotacion.DataSource = _dotaciones
         dgvObservaciones.DataSource = _observaciones
+        dgvEstadosTransitorios.DataSource = _estadosTransitorios
+
 
         If _modo = ModoFormulario.Editar Then
             Me.Text = "Editar Funcionario"
@@ -74,14 +80,14 @@ Public Class frmFuncionarioCrear
             .DataPropertyName = "Categoria",
             .HeaderText = "Categoría",
             .Width = 150
-        })
+         })
             .Columns.Add(New DataGridViewTextBoxColumn With {
             .DataPropertyName = "Texto",
             .HeaderText = "Texto",
             .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill ' Hacemos que esta columna ocupe el espacio restante
         })
             .Columns.Add(New DataGridViewTextBoxColumn With {
-            .DataPropertyName = "FechaRegistro",
+             .DataPropertyName = "FechaRegistro",
             .HeaderText = "Fecha de Registro",
             .Width = 120
         })
@@ -99,13 +105,13 @@ Public Class frmFuncionarioCrear
             .Visible = False ' Oculta si no es necesario
         })
             .Columns.Add(New DataGridViewTextBoxColumn With {
-            .DataPropertyName = "Item",
-            .HeaderText = "Ítem",
-            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-        })
+           .DataPropertyName = "Item",
+           .HeaderText = "Ítem",
+           .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+       })
             .Columns.Add(New DataGridViewTextBoxColumn With {
             .DataPropertyName = "Talla",
-            .HeaderText = "Talla"
+             .HeaderText = "Talla"
         })
             .Columns.Add(New DataGridViewTextBoxColumn With {
             .DataPropertyName = "Observaciones",
@@ -113,9 +119,34 @@ Public Class frmFuncionarioCrear
             .Width = 200
         })
             .Columns.Add(New DataGridViewTextBoxColumn With {
-            .DataPropertyName = "FechaAsign",
+             .DataPropertyName = "FechaAsign",
             .HeaderText = "Fecha Asignación"
         })
+        End With
+    End Sub
+
+    Private Sub ConfigurarGrillaEstados()
+        With dgvEstadosTransitorios
+            .AutoGenerateColumns = False
+            .Columns.Clear()
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+                .DataPropertyName = "TipoEstadoTransitorio.Nombre",
+                .HeaderText = "Tipo de Estado",
+                .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+            })
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+                .DataPropertyName = "FechaDesde",
+                .HeaderText = "Desde"
+            })
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+                .DataPropertyName = "FechaHasta",
+                .HeaderText = "Hasta"
+            })
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+                .DataPropertyName = "Observaciones",
+                .HeaderText = "Observaciones",
+                .Width = 300
+            })
         End With
     End Sub
 
@@ -197,8 +228,10 @@ Public Class frmFuncionarioCrear
         ' --- Cargar DataGridViews ---
         _dotaciones = New BindingList(Of FuncionarioDotacion)(f.FuncionarioDotacion.ToList())
         _observaciones = New BindingList(Of FuncionarioObservacion)(f.FuncionarioObservacion.ToList())
+        _estadosTransitorios = New BindingList(Of EstadoTransitorio)(f.EstadoTransitorio.ToList())
         dgvDotacion.DataSource = _dotaciones
         dgvObservaciones.DataSource = _observaciones
+        dgvEstadosTransitorios.DataSource = _estadosTransitorios
     End Function
 
     '------------------- Guardar / Actualizar ----------------
@@ -230,6 +263,7 @@ Public Class frmFuncionarioCrear
                     funcionario = Await uow.Context.Set(Of Funcionario)() _
                     .Include(Function(f) f.FuncionarioDotacion) _
                     .Include(Function(f) f.FuncionarioObservacion) _
+                    .Include(Function(f) f.EstadoTransitorio) _
                     .FirstOrDefaultAsync(Function(f) f.Id = _idFuncionario)
 
                     If funcionario Is Nothing Then
@@ -262,6 +296,8 @@ Public Class frmFuncionarioCrear
                 ' --- Sincronizar colecciones ---
                 SincronizarColeccion(funcionario.FuncionarioDotacion, _dotaciones, uow.Context)
                 SincronizarColeccion(funcionario.FuncionarioObservacion, _observaciones, uow.Context)
+                SincronizarColeccion(funcionario.EstadoTransitorio, _estadosTransitorios, uow.Context)
+
 
                 ' --- Guardar todos los cambios en una sola transacción ---
                 Await uow.CommitAsync()
@@ -376,5 +412,35 @@ Public Class frmFuncionarioCrear
         End If
     End Sub
 #End Region
+
+#Region "CRUD Estados Transitorios"
+    Private Sub btnAñadirEstado_Click(sender As Object, e As EventArgs) Handles btnAñadirEstado.Click
+        Dim nuevoEstado = New EstadoTransitorio()
+        Using frm As New frmFuncionarioEstadoTransitorio(nuevoEstado)
+            If frm.ShowDialog() = DialogResult.OK Then
+                _estadosTransitorios.Add(frm.Estado)
+            End If
+        End Using
+    End Sub
+
+    Private Sub btnEditarEstado_Click(sender As Object, e As EventArgs) Handles btnEditarEstado.Click
+        If dgvEstadosTransitorios.CurrentRow Is Nothing Then Return
+        Dim estadoSeleccionado = CType(dgvEstadosTransitorios.CurrentRow.DataBoundItem, EstadoTransitorio)
+        Using frm As New frmFuncionarioEstadoTransitorio(estadoSeleccionado)
+            If frm.ShowDialog() = DialogResult.OK Then
+                _estadosTransitorios.ResetBindings() ' Refresca la grilla
+            End If
+        End Using
+    End Sub
+
+    Private Sub btnQuitarEstado_Click(sender As Object, e As EventArgs) Handles btnQuitarEstado.Click
+        If dgvEstadosTransitorios.CurrentRow Is Nothing Then Return
+        If MessageBox.Show("¿Está seguro de que desea quitar este estado transitorio?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
+            Dim estadoSeleccionado = CType(dgvEstadosTransitorios.CurrentRow.DataBoundItem, EstadoTransitorio)
+            _estadosTransitorios.Remove(estadoSeleccionado)
+        End If
+    End Sub
+#End Region
+
 
 End Class

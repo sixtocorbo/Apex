@@ -93,4 +93,13 @@ Public Class FuncionarioService
         Return lista.Select(Function(ne) New KeyValuePair(Of Integer, String)(ne.Id, ne.Nombre)).ToList()
     End Function
 
+    Public Async Function ObtenerTiposEstadoTransitorioAsync() As Task(Of List(Of KeyValuePair(Of Integer, String)))
+        Dim lista = Await _unitOfWork.Repository(Of TipoEstadoTransitorio)().
+            GetAll().
+            AsNoTracking().
+            OrderBy(Function(t) t.Nombre).
+            ToListAsync()
+
+        Return lista.Select(Function(t) New KeyValuePair(Of Integer, String)(t.Id, t.Nombre)).ToList()
+    End Function
 End Class

@@ -25,7 +25,7 @@ Partial Class frmFuncionarioCrear
     Private components As System.ComponentModel.IContainer
 
     'NOTA: el Diseñador de Windows Forms necesita el siguiente procedimiento
-    'Se puede modificar usando el Diseñador de Windows Forms.  
+    'Se puede modificar usando el Diseñador de Windows Forms.
     'No lo modifique con el editor de código.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
@@ -109,7 +109,7 @@ Partial Class frmFuncionarioCrear
         Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Bottom
         Me.FlowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
         Me.FlowLayoutPanel1.Location = New System.Drawing.Point(0, 510)
-        Me.FlowLayoutPanel1.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.FlowLayoutPanel1.Margin = New System.Windows.Forms.Padding(4)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
         Me.FlowLayoutPanel1.Padding = New System.Windows.Forms.Padding(0, 6, 20, 6)
         Me.FlowLayoutPanel1.Size = New System.Drawing.Size(1045, 57)
@@ -119,7 +119,7 @@ Partial Class frmFuncionarioCrear
         '
         Me.btnGuardar.AutoSize = True
         Me.btnGuardar.Location = New System.Drawing.Point(904, 10)
-        Me.btnGuardar.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.btnGuardar.Margin = New System.Windows.Forms.Padding(4)
         Me.btnGuardar.Name = "btnGuardar"
         Me.btnGuardar.Padding = New System.Windows.Forms.Padding(13, 2, 13, 2)
         Me.btnGuardar.Size = New System.Drawing.Size(117, 37)
@@ -131,7 +131,7 @@ Partial Class frmFuncionarioCrear
         '
         Me.btnCancelar.AutoSize = True
         Me.btnCancelar.Location = New System.Drawing.Point(775, 10)
-        Me.btnCancelar.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.btnCancelar.Margin = New System.Windows.Forms.Padding(4)
         Me.btnCancelar.Name = "btnCancelar"
         Me.btnCancelar.Padding = New System.Windows.Forms.Padding(13, 2, 13, 2)
         Me.btnCancelar.Size = New System.Drawing.Size(121, 37)
@@ -147,7 +147,7 @@ Partial Class frmFuncionarioCrear
         Me.TabControlMain.Controls.Add(Me.TabPageObservaciones)
         Me.TabControlMain.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TabControlMain.Location = New System.Drawing.Point(0, 0)
-        Me.TabControlMain.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.TabControlMain.Margin = New System.Windows.Forms.Padding(4)
         Me.TabControlMain.Name = "TabControlMain"
         Me.TabControlMain.SelectedIndex = 0
         Me.TabControlMain.Size = New System.Drawing.Size(1045, 510)
@@ -157,7 +157,7 @@ Partial Class frmFuncionarioCrear
         '
         Me.TabPageGeneral.Controls.Add(Me.TableLayoutPanelGeneral)
         Me.TabPageGeneral.Location = New System.Drawing.Point(4, 25)
-        Me.TabPageGeneral.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.TabPageGeneral.Margin = New System.Windows.Forms.Padding(4)
         Me.TabPageGeneral.Name = "TabPageGeneral"
         Me.TabPageGeneral.Padding = New System.Windows.Forms.Padding(13, 12, 13, 12)
         Me.TabPageGeneral.Size = New System.Drawing.Size(1037, 481)
@@ -175,7 +175,7 @@ Partial Class frmFuncionarioCrear
         Me.TableLayoutPanelGeneral.Controls.Add(Me.TableLayoutPanelDatosGenerales, 1, 0)
         Me.TableLayoutPanelGeneral.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TableLayoutPanelGeneral.Location = New System.Drawing.Point(13, 12)
-        Me.TableLayoutPanelGeneral.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.TableLayoutPanelGeneral.Margin = New System.Windows.Forms.Padding(4)
         Me.TableLayoutPanelGeneral.Name = "TableLayoutPanelGeneral"
         Me.TableLayoutPanelGeneral.RowCount = 2
         Me.TableLayoutPanelGeneral.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
@@ -188,7 +188,7 @@ Partial Class frmFuncionarioCrear
         Me.pbFoto.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.pbFoto.Dock = System.Windows.Forms.DockStyle.Fill
         Me.pbFoto.Location = New System.Drawing.Point(4, 4)
-        Me.pbFoto.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.pbFoto.Margin = New System.Windows.Forms.Padding(4)
         Me.pbFoto.Name = "pbFoto"
         Me.pbFoto.Size = New System.Drawing.Size(259, 413)
         Me.pbFoto.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
@@ -199,7 +199,7 @@ Partial Class frmFuncionarioCrear
         '
         Me.btnSeleccionarFoto.Anchor = System.Windows.Forms.AnchorStyles.Top
         Me.btnSeleccionarFoto.Location = New System.Drawing.Point(79, 425)
-        Me.btnSeleccionarFoto.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.btnSeleccionarFoto.Margin = New System.Windows.Forms.Padding(4)
         Me.btnSeleccionarFoto.Name = "btnSeleccionarFoto"
         Me.btnSeleccionarFoto.Size = New System.Drawing.Size(109, 28)
         Me.btnSeleccionarFoto.TabIndex = 1
@@ -228,7 +228,7 @@ Partial Class frmFuncionarioCrear
         Me.TableLayoutPanelDatosGenerales.Controls.Add(Me.chkActivo, 1, 7)
         Me.TableLayoutPanelDatosGenerales.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TableLayoutPanelDatosGenerales.Location = New System.Drawing.Point(271, 4)
-        Me.TableLayoutPanelDatosGenerales.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.TableLayoutPanelDatosGenerales.Margin = New System.Windows.Forms.Padding(4)
         Me.TableLayoutPanelDatosGenerales.Name = "TableLayoutPanelDatosGenerales"
         Me.TableLayoutPanelDatosGenerales.RowCount = 8
         Me.TableLayoutPanelGeneral.SetRowSpan(Me.TableLayoutPanelDatosGenerales, 2)
@@ -258,7 +258,7 @@ Partial Class frmFuncionarioCrear
         '
         Me.txtCI.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtCI.Location = New System.Drawing.Point(123, 17)
-        Me.txtCI.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.txtCI.Margin = New System.Windows.Forms.Padding(4)
         Me.txtCI.Name = "txtCI"
         Me.txtCI.Size = New System.Drawing.Size(609, 22)
         Me.txtCI.TabIndex = 1
@@ -278,7 +278,7 @@ Partial Class frmFuncionarioCrear
         '
         Me.txtNombre.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtNombre.Location = New System.Drawing.Point(123, 73)
-        Me.txtNombre.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.txtNombre.Margin = New System.Windows.Forms.Padding(4)
         Me.txtNombre.Name = "txtNombre"
         Me.txtNombre.Size = New System.Drawing.Size(609, 22)
         Me.txtNombre.TabIndex = 3
@@ -299,7 +299,7 @@ Partial Class frmFuncionarioCrear
         Me.dtpFechaIngreso.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.dtpFechaIngreso.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
         Me.dtpFechaIngreso.Location = New System.Drawing.Point(123, 129)
-        Me.dtpFechaIngreso.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.dtpFechaIngreso.Margin = New System.Windows.Forms.Padding(4)
         Me.dtpFechaIngreso.Name = "dtpFechaIngreso"
         Me.dtpFechaIngreso.Size = New System.Drawing.Size(199, 22)
         Me.dtpFechaIngreso.TabIndex = 5
@@ -321,7 +321,7 @@ Partial Class frmFuncionarioCrear
         Me.cboTipoFuncionario.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboTipoFuncionario.FormattingEnabled = True
         Me.cboTipoFuncionario.Location = New System.Drawing.Point(123, 184)
-        Me.cboTipoFuncionario.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.cboTipoFuncionario.Margin = New System.Windows.Forms.Padding(4)
         Me.cboTipoFuncionario.Name = "cboTipoFuncionario"
         Me.cboTipoFuncionario.Size = New System.Drawing.Size(609, 24)
         Me.cboTipoFuncionario.TabIndex = 7
@@ -343,7 +343,7 @@ Partial Class frmFuncionarioCrear
         Me.cboCargo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboCargo.FormattingEnabled = True
         Me.cboCargo.Location = New System.Drawing.Point(123, 240)
-        Me.cboCargo.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.cboCargo.Margin = New System.Windows.Forms.Padding(4)
         Me.cboCargo.Name = "cboCargo"
         Me.cboCargo.Size = New System.Drawing.Size(609, 24)
         Me.cboCargo.TabIndex = 9
@@ -365,7 +365,7 @@ Partial Class frmFuncionarioCrear
         Me.cboEscalafon.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboEscalafon.FormattingEnabled = True
         Me.cboEscalafon.Location = New System.Drawing.Point(123, 296)
-        Me.cboEscalafon.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.cboEscalafon.Margin = New System.Windows.Forms.Padding(4)
         Me.cboEscalafon.Name = "cboEscalafon"
         Me.cboEscalafon.Size = New System.Drawing.Size(609, 24)
         Me.cboEscalafon.TabIndex = 11
@@ -387,7 +387,7 @@ Partial Class frmFuncionarioCrear
         Me.cboFuncion.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboFuncion.FormattingEnabled = True
         Me.cboFuncion.Location = New System.Drawing.Point(123, 352)
-        Me.cboFuncion.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.cboFuncion.Margin = New System.Windows.Forms.Padding(4)
         Me.cboFuncion.Name = "cboFuncion"
         Me.cboFuncion.Size = New System.Drawing.Size(609, 24)
         Me.cboFuncion.TabIndex = 13
@@ -399,7 +399,7 @@ Partial Class frmFuncionarioCrear
         Me.chkActivo.Checked = True
         Me.chkActivo.CheckState = System.Windows.Forms.CheckState.Checked
         Me.chkActivo.Location = New System.Drawing.Point(123, 410)
-        Me.chkActivo.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.chkActivo.Margin = New System.Windows.Forms.Padding(4)
         Me.chkActivo.Name = "chkActivo"
         Me.chkActivo.Size = New System.Drawing.Size(66, 20)
         Me.chkActivo.TabIndex = 14
@@ -410,7 +410,7 @@ Partial Class frmFuncionarioCrear
         '
         Me.TabPageDatosPersonales.Controls.Add(Me.TableLayoutPanelDatosPersonales)
         Me.TabPageDatosPersonales.Location = New System.Drawing.Point(4, 25)
-        Me.TabPageDatosPersonales.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.TabPageDatosPersonales.Margin = New System.Windows.Forms.Padding(4)
         Me.TabPageDatosPersonales.Name = "TabPageDatosPersonales"
         Me.TabPageDatosPersonales.Padding = New System.Windows.Forms.Padding(13, 12, 13, 12)
         Me.TabPageDatosPersonales.Size = New System.Drawing.Size(1037, 481)
@@ -439,7 +439,7 @@ Partial Class frmFuncionarioCrear
         Me.TableLayoutPanelDatosPersonales.Controls.Add(Me.cboNivelEstudio, 1, 6)
         Me.TableLayoutPanelDatosPersonales.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TableLayoutPanelDatosPersonales.Location = New System.Drawing.Point(13, 12)
-        Me.TableLayoutPanelDatosPersonales.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.TableLayoutPanelDatosPersonales.Margin = New System.Windows.Forms.Padding(4)
         Me.TableLayoutPanelDatosPersonales.Name = "TableLayoutPanelDatosPersonales"
         Me.TableLayoutPanelDatosPersonales.RowCount = 8
         Me.TableLayoutPanelDatosPersonales.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 37.0!))
@@ -469,7 +469,7 @@ Partial Class frmFuncionarioCrear
         Me.dtpFechaNacimiento.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.dtpFechaNacimiento.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
         Me.dtpFechaNacimiento.Location = New System.Drawing.Point(164, 7)
-        Me.dtpFechaNacimiento.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.dtpFechaNacimiento.Margin = New System.Windows.Forms.Padding(4)
         Me.dtpFechaNacimiento.Name = "dtpFechaNacimiento"
         Me.dtpFechaNacimiento.Size = New System.Drawing.Size(199, 22)
         Me.dtpFechaNacimiento.TabIndex = 1
@@ -490,7 +490,7 @@ Partial Class frmFuncionarioCrear
         Me.txtDomicilio.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtDomicilio.Location = New System.Drawing.Point(164, 41)
-        Me.txtDomicilio.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.txtDomicilio.Margin = New System.Windows.Forms.Padding(4)
         Me.txtDomicilio.Multiline = True
         Me.txtDomicilio.Name = "txtDomicilio"
         Me.txtDomicilio.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
@@ -512,7 +512,7 @@ Partial Class frmFuncionarioCrear
         '
         Me.txtTelefono.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.txtTelefono.Location = New System.Drawing.Point(164, 118)
-        Me.txtTelefono.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.txtTelefono.Margin = New System.Windows.Forms.Padding(4)
         Me.txtTelefono.Name = "txtTelefono"
         Me.txtTelefono.Size = New System.Drawing.Size(332, 22)
         Me.txtTelefono.TabIndex = 5
@@ -532,7 +532,7 @@ Partial Class frmFuncionarioCrear
         '
         Me.txtEmail.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtEmail.Location = New System.Drawing.Point(164, 155)
-        Me.txtEmail.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.txtEmail.Margin = New System.Windows.Forms.Padding(4)
         Me.txtEmail.Name = "txtEmail"
         Me.txtEmail.Size = New System.Drawing.Size(843, 22)
         Me.txtEmail.TabIndex = 7
@@ -554,7 +554,7 @@ Partial Class frmFuncionarioCrear
         Me.cboEstadoCivil.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboEstadoCivil.FormattingEnabled = True
         Me.cboEstadoCivil.Location = New System.Drawing.Point(164, 191)
-        Me.cboEstadoCivil.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.cboEstadoCivil.Margin = New System.Windows.Forms.Padding(4)
         Me.cboEstadoCivil.Name = "cboEstadoCivil"
         Me.cboEstadoCivil.Size = New System.Drawing.Size(332, 24)
         Me.cboEstadoCivil.TabIndex = 9
@@ -576,7 +576,7 @@ Partial Class frmFuncionarioCrear
         Me.cboGenero.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboGenero.FormattingEnabled = True
         Me.cboGenero.Location = New System.Drawing.Point(164, 228)
-        Me.cboGenero.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.cboGenero.Margin = New System.Windows.Forms.Padding(4)
         Me.cboGenero.Name = "cboGenero"
         Me.cboGenero.Size = New System.Drawing.Size(332, 24)
         Me.cboGenero.TabIndex = 11
@@ -598,7 +598,7 @@ Partial Class frmFuncionarioCrear
         Me.cboNivelEstudio.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboNivelEstudio.FormattingEnabled = True
         Me.cboNivelEstudio.Location = New System.Drawing.Point(164, 265)
-        Me.cboNivelEstudio.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.cboNivelEstudio.Margin = New System.Windows.Forms.Padding(4)
         Me.cboNivelEstudio.Name = "cboNivelEstudio"
         Me.cboNivelEstudio.Size = New System.Drawing.Size(332, 24)
         Me.cboNivelEstudio.TabIndex = 13
@@ -607,7 +607,7 @@ Partial Class frmFuncionarioCrear
         '
         Me.TabPageDotacion.Controls.Add(Me.TableLayoutPanelDotacion)
         Me.TabPageDotacion.Location = New System.Drawing.Point(4, 25)
-        Me.TabPageDotacion.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.TabPageDotacion.Margin = New System.Windows.Forms.Padding(4)
         Me.TabPageDotacion.Name = "TabPageDotacion"
         Me.TabPageDotacion.Padding = New System.Windows.Forms.Padding(13, 12, 13, 12)
         Me.TabPageDotacion.Size = New System.Drawing.Size(1037, 481)
@@ -623,7 +623,7 @@ Partial Class frmFuncionarioCrear
         Me.TableLayoutPanelDotacion.Controls.Add(Me.FlowLayoutPanelDotacion, 0, 1)
         Me.TableLayoutPanelDotacion.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TableLayoutPanelDotacion.Location = New System.Drawing.Point(13, 12)
-        Me.TableLayoutPanelDotacion.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.TableLayoutPanelDotacion.Margin = New System.Windows.Forms.Padding(4)
         Me.TableLayoutPanelDotacion.Name = "TableLayoutPanelDotacion"
         Me.TableLayoutPanelDotacion.RowCount = 2
         Me.TableLayoutPanelDotacion.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
@@ -638,7 +638,7 @@ Partial Class frmFuncionarioCrear
         Me.dgvDotacion.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvDotacion.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgvDotacion.Location = New System.Drawing.Point(4, 4)
-        Me.dgvDotacion.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.dgvDotacion.Margin = New System.Windows.Forms.Padding(4)
         Me.dgvDotacion.Name = "dgvDotacion"
         Me.dgvDotacion.ReadOnly = True
         Me.dgvDotacion.RowHeadersWidth = 51
@@ -655,7 +655,7 @@ Partial Class frmFuncionarioCrear
         Me.FlowLayoutPanelDotacion.Dock = System.Windows.Forms.DockStyle.Fill
         Me.FlowLayoutPanelDotacion.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
         Me.FlowLayoutPanelDotacion.Location = New System.Drawing.Point(4, 417)
-        Me.FlowLayoutPanelDotacion.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.FlowLayoutPanelDotacion.Margin = New System.Windows.Forms.Padding(4)
         Me.FlowLayoutPanelDotacion.Name = "FlowLayoutPanelDotacion"
         Me.FlowLayoutPanelDotacion.Size = New System.Drawing.Size(1003, 36)
         Me.FlowLayoutPanelDotacion.TabIndex = 1
@@ -663,7 +663,7 @@ Partial Class frmFuncionarioCrear
         'btnQuitarDotacion
         '
         Me.btnQuitarDotacion.Location = New System.Drawing.Point(899, 4)
-        Me.btnQuitarDotacion.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.btnQuitarDotacion.Margin = New System.Windows.Forms.Padding(4)
         Me.btnQuitarDotacion.Name = "btnQuitarDotacion"
         Me.btnQuitarDotacion.Size = New System.Drawing.Size(100, 28)
         Me.btnQuitarDotacion.TabIndex = 0
@@ -673,7 +673,7 @@ Partial Class frmFuncionarioCrear
         'btnEditarDotacion
         '
         Me.btnEditarDotacion.Location = New System.Drawing.Point(791, 4)
-        Me.btnEditarDotacion.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.btnEditarDotacion.Margin = New System.Windows.Forms.Padding(4)
         Me.btnEditarDotacion.Name = "btnEditarDotacion"
         Me.btnEditarDotacion.Size = New System.Drawing.Size(100, 28)
         Me.btnEditarDotacion.TabIndex = 1
@@ -683,7 +683,7 @@ Partial Class frmFuncionarioCrear
         'btnAñadirDotacion
         '
         Me.btnAñadirDotacion.Location = New System.Drawing.Point(683, 4)
-        Me.btnAñadirDotacion.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.btnAñadirDotacion.Margin = New System.Windows.Forms.Padding(4)
         Me.btnAñadirDotacion.Name = "btnAñadirDotacion"
         Me.btnAñadirDotacion.Size = New System.Drawing.Size(100, 28)
         Me.btnAñadirDotacion.TabIndex = 2
@@ -694,7 +694,7 @@ Partial Class frmFuncionarioCrear
         '
         Me.TabPageObservaciones.Controls.Add(Me.TableLayoutPanelObservaciones)
         Me.TabPageObservaciones.Location = New System.Drawing.Point(4, 25)
-        Me.TabPageObservaciones.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.TabPageObservaciones.Margin = New System.Windows.Forms.Padding(4)
         Me.TabPageObservaciones.Name = "TabPageObservaciones"
         Me.TabPageObservaciones.Padding = New System.Windows.Forms.Padding(13, 12, 13, 12)
         Me.TabPageObservaciones.Size = New System.Drawing.Size(1037, 481)
@@ -710,7 +710,7 @@ Partial Class frmFuncionarioCrear
         Me.TableLayoutPanelObservaciones.Controls.Add(Me.FlowLayoutPanelObservaciones, 0, 1)
         Me.TableLayoutPanelObservaciones.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TableLayoutPanelObservaciones.Location = New System.Drawing.Point(13, 12)
-        Me.TableLayoutPanelObservaciones.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.TableLayoutPanelObservaciones.Margin = New System.Windows.Forms.Padding(4)
         Me.TableLayoutPanelObservaciones.Name = "TableLayoutPanelObservaciones"
         Me.TableLayoutPanelObservaciones.RowCount = 2
         Me.TableLayoutPanelObservaciones.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
@@ -725,7 +725,7 @@ Partial Class frmFuncionarioCrear
         Me.dgvObservaciones.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvObservaciones.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgvObservaciones.Location = New System.Drawing.Point(4, 4)
-        Me.dgvObservaciones.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.dgvObservaciones.Margin = New System.Windows.Forms.Padding(4)
         Me.dgvObservaciones.Name = "dgvObservaciones"
         Me.dgvObservaciones.ReadOnly = True
         Me.dgvObservaciones.RowHeadersWidth = 51
@@ -742,7 +742,7 @@ Partial Class frmFuncionarioCrear
         Me.FlowLayoutPanelObservaciones.Dock = System.Windows.Forms.DockStyle.Fill
         Me.FlowLayoutPanelObservaciones.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
         Me.FlowLayoutPanelObservaciones.Location = New System.Drawing.Point(4, 417)
-        Me.FlowLayoutPanelObservaciones.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.FlowLayoutPanelObservaciones.Margin = New System.Windows.Forms.Padding(4)
         Me.FlowLayoutPanelObservaciones.Name = "FlowLayoutPanelObservaciones"
         Me.FlowLayoutPanelObservaciones.Size = New System.Drawing.Size(1003, 36)
         Me.FlowLayoutPanelObservaciones.TabIndex = 1
@@ -750,7 +750,7 @@ Partial Class frmFuncionarioCrear
         'btnQuitarObservacion
         '
         Me.btnQuitarObservacion.Location = New System.Drawing.Point(899, 4)
-        Me.btnQuitarObservacion.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.btnQuitarObservacion.Margin = New System.Windows.Forms.Padding(4)
         Me.btnQuitarObservacion.Name = "btnQuitarObservacion"
         Me.btnQuitarObservacion.Size = New System.Drawing.Size(100, 28)
         Me.btnQuitarObservacion.TabIndex = 0
@@ -760,7 +760,7 @@ Partial Class frmFuncionarioCrear
         'btnEditarObservacion
         '
         Me.btnEditarObservacion.Location = New System.Drawing.Point(791, 4)
-        Me.btnEditarObservacion.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.btnEditarObservacion.Margin = New System.Windows.Forms.Padding(4)
         Me.btnEditarObservacion.Name = "btnEditarObservacion"
         Me.btnEditarObservacion.Size = New System.Drawing.Size(100, 28)
         Me.btnEditarObservacion.TabIndex = 1
@@ -770,7 +770,7 @@ Partial Class frmFuncionarioCrear
         'btnAñadirObservacion
         '
         Me.btnAñadirObservacion.Location = New System.Drawing.Point(683, 4)
-        Me.btnAñadirObservacion.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.btnAñadirObservacion.Margin = New System.Windows.Forms.Padding(4)
         Me.btnAñadirObservacion.Name = "btnAñadirObservacion"
         Me.btnAñadirObservacion.Size = New System.Drawing.Size(100, 28)
         Me.btnAñadirObservacion.TabIndex = 2
@@ -784,7 +784,7 @@ Partial Class frmFuncionarioCrear
         Me.ClientSize = New System.Drawing.Size(1045, 567)
         Me.Controls.Add(Me.TabControlMain)
         Me.Controls.Add(Me.FlowLayoutPanel1)
-        Me.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.Margin = New System.Windows.Forms.Padding(4)
         Me.MinimumSize = New System.Drawing.Size(1061, 605)
         Me.Name = "frmFuncionarioCrear"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
@@ -869,351 +869,11 @@ Partial Class frmFuncionarioCrear
     Friend WithEvents btnQuitarObservacion As Button
     Friend WithEvents btnEditarObservacion As Button
     Friend WithEvents btnAñadirObservacion As Button
+    Friend WithEvents TabPageEstadosTransitorios As TabPage
+    Friend WithEvents TableLayoutPanelEstados As TableLayoutPanel
+    Friend WithEvents dgvEstadosTransitorios As DataGridView
+    Friend WithEvents FlowLayoutPanelEstados As FlowLayoutPanel
+    Friend WithEvents btnQuitarEstado As Button
+    Friend WithEvents btnEditarEstado As Button
+    Friend WithEvents btnAñadirEstado As Button
 End Class
-''------------------------------------------------------------------------------
-'' <auto-generated>
-''     Modernized designer code for frmFuncionarioCrear.
-''     NOTE:  The Windows Forms designer can still regenerate this file. You should
-''     place custom logic in frmFuncionarioCrear.vb (code‑behind).
-'' </auto-generated>
-''------------------------------------------------------------------------------
-
-'<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
-'Partial Class frmFuncionarioCrear
-'    Inherits System.Windows.Forms.Form
-
-'    'Form overrides dispose to clean up the component list.
-'    <System.Diagnostics.DebuggerNonUserCode()>
-'    Protected Overrides Sub Dispose(ByVal disposing As Boolean)
-'        Try
-'            If disposing AndAlso (components IsNot Nothing) Then
-'                components.Dispose()
-'            End If
-'        Finally
-'            MyBase.Dispose(disposing)
-'        End Try
-'    End Sub
-
-'    'Required by the Windows Form Designer
-'    Private components As System.ComponentModel.IContainer
-
-'    'NOTE: The following procedure is required by the Windows Form Designer
-'    'It can be modified using the Windows Form Designer.  
-'    'Do not modify it using the code editor.
-'    <System.Diagnostics.DebuggerStepThrough()>
-'    Private Sub InitializeComponent()
-'        Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
-'        Me.lblCI = New System.Windows.Forms.Label()
-'        Me.txtCI = New System.Windows.Forms.TextBox()
-'        Me.lblNombre = New System.Windows.Forms.Label()
-'        Me.txtNombre = New System.Windows.Forms.TextBox()
-'        Me.lblFechaIngreso = New System.Windows.Forms.Label()
-'        Me.dtpFechaIngreso = New System.Windows.Forms.DateTimePicker()
-'        Me.lblTipoFuncionario = New System.Windows.Forms.Label()
-'        Me.lblCargo = New System.Windows.Forms.Label()
-'        Me.lblRutaFoto = New System.Windows.Forms.Label()
-'        Me.pnlFoto = New System.Windows.Forms.Panel()
-'        Me.txtRutaFoto = New System.Windows.Forms.TextBox()
-'        Me.btnSeleccionarFoto = New System.Windows.Forms.Button()
-'        Me.cboCargo = New System.Windows.Forms.ComboBox()
-'        Me.cboTipoFuncionario = New System.Windows.Forms.ComboBox()
-'        Me.pbFoto = New System.Windows.Forms.PictureBox()
-'        Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
-'        Me.btnGuardar = New System.Windows.Forms.Button()
-'        Me.btnCancelar = New System.Windows.Forms.Button()
-'        Me.chkActivo = New System.Windows.Forms.CheckBox()
-'        Me.TableLayoutPanel1.SuspendLayout()
-'        Me.pnlFoto.SuspendLayout()
-'        CType(Me.pbFoto, System.ComponentModel.ISupportInitialize).BeginInit()
-'        Me.FlowLayoutPanel1.SuspendLayout()
-'        Me.SuspendLayout()
-'        '
-'        'TableLayoutPanel1
-'        '
-'        Me.TableLayoutPanel1.ColumnCount = 2
-'        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-'        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-'        Me.TableLayoutPanel1.Controls.Add(Me.lblCI, 0, 1)
-'        Me.TableLayoutPanel1.Controls.Add(Me.txtCI, 1, 1)
-'        Me.TableLayoutPanel1.Controls.Add(Me.lblNombre, 0, 2)
-'        Me.TableLayoutPanel1.Controls.Add(Me.txtNombre, 1, 2)
-'        Me.TableLayoutPanel1.Controls.Add(Me.lblFechaIngreso, 0, 4)
-'        Me.TableLayoutPanel1.Controls.Add(Me.dtpFechaIngreso, 1, 4)
-'        Me.TableLayoutPanel1.Controls.Add(Me.lblTipoFuncionario, 0, 5)
-'        Me.TableLayoutPanel1.Controls.Add(Me.lblCargo, 0, 6)
-'        Me.TableLayoutPanel1.Controls.Add(Me.lblRutaFoto, 0, 7)
-'        Me.TableLayoutPanel1.Controls.Add(Me.pnlFoto, 1, 7)
-'        Me.TableLayoutPanel1.Controls.Add(Me.cboCargo, 1, 6)
-'        Me.TableLayoutPanel1.Controls.Add(Me.cboTipoFuncionario, 1, 5)
-'        Me.TableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Top
-'        Me.TableLayoutPanel1.Location = New System.Drawing.Point(17, 16)
-'        Me.TableLayoutPanel1.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
-'        Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
-'        Me.TableLayoutPanel1.RowCount = 8
-'        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle())
-'        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle())
-'        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle())
-'        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle())
-'        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle())
-'        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle())
-'        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle())
-'        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle())
-'        Me.TableLayoutPanel1.Size = New System.Drawing.Size(635, 351)
-'        Me.TableLayoutPanel1.TabIndex = 0
-'        '
-'        'lblCI
-'        '
-'        Me.lblCI.Anchor = System.Windows.Forms.AnchorStyles.Right
-'        Me.lblCI.AutoSize = True
-'        Me.lblCI.Font = New System.Drawing.Font("Segoe UI", 10.0!)
-'        Me.lblCI.Location = New System.Drawing.Point(149, 1)
-'        Me.lblCI.Name = "lblCI"
-'        Me.lblCI.Size = New System.Drawing.Size(38, 23)
-'        Me.lblCI.TabIndex = 1
-'        Me.lblCI.Text = "C.I.:"
-'        '
-'        'txtCI
-'        '
-'        Me.txtCI.Anchor = System.Windows.Forms.AnchorStyles.Left
-'        Me.txtCI.Location = New System.Drawing.Point(193, 2)
-'        Me.txtCI.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
-'        Me.txtCI.Name = "txtCI"
-'        Me.txtCI.Size = New System.Drawing.Size(228, 22)
-'        Me.txtCI.TabIndex = 2
-'        '
-'        'lblNombre
-'        '
-'        Me.lblNombre.Anchor = System.Windows.Forms.AnchorStyles.Right
-'        Me.lblNombre.AutoSize = True
-'        Me.lblNombre.Font = New System.Drawing.Font("Segoe UI", 10.0!)
-'        Me.lblNombre.Location = New System.Drawing.Point(110, 27)
-'        Me.lblNombre.Name = "lblNombre"
-'        Me.lblNombre.Size = New System.Drawing.Size(77, 23)
-'        Me.lblNombre.TabIndex = 2
-'        Me.lblNombre.Text = "Nombre:"
-'        '
-'        'txtNombre
-'        '
-'        Me.txtNombre.Anchor = System.Windows.Forms.AnchorStyles.Left
-'        Me.txtNombre.Location = New System.Drawing.Point(193, 28)
-'        Me.txtNombre.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
-'        Me.txtNombre.Name = "txtNombre"
-'        Me.txtNombre.Size = New System.Drawing.Size(304, 22)
-'        Me.txtNombre.TabIndex = 3
-'        '
-'        'lblFechaIngreso
-'        '
-'        Me.lblFechaIngreso.Anchor = System.Windows.Forms.AnchorStyles.Right
-'        Me.lblFechaIngreso.AutoSize = True
-'        Me.lblFechaIngreso.Font = New System.Drawing.Font("Segoe UI", 10.0!)
-'        Me.lblFechaIngreso.Location = New System.Drawing.Point(44, 53)
-'        Me.lblFechaIngreso.Name = "lblFechaIngreso"
-'        Me.lblFechaIngreso.Size = New System.Drawing.Size(143, 23)
-'        Me.lblFechaIngreso.TabIndex = 4
-'        Me.lblFechaIngreso.Text = "Fecha de ingreso:"
-'        '
-'        'dtpFechaIngreso
-'        '
-'        Me.dtpFechaIngreso.Anchor = System.Windows.Forms.AnchorStyles.Left
-'        Me.dtpFechaIngreso.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-'        Me.dtpFechaIngreso.Location = New System.Drawing.Point(193, 54)
-'        Me.dtpFechaIngreso.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
-'        Me.dtpFechaIngreso.Name = "dtpFechaIngreso"
-'        Me.dtpFechaIngreso.Size = New System.Drawing.Size(137, 22)
-'        Me.dtpFechaIngreso.TabIndex = 5
-'        '
-'        'lblTipoFuncionario
-'        '
-'        Me.lblTipoFuncionario.Anchor = System.Windows.Forms.AnchorStyles.Right
-'        Me.lblTipoFuncionario.AutoSize = True
-'        Me.lblTipoFuncionario.Font = New System.Drawing.Font("Segoe UI", 10.0!)
-'        Me.lblTipoFuncionario.Location = New System.Drawing.Point(3, 80)
-'        Me.lblTipoFuncionario.Name = "lblTipoFuncionario"
-'        Me.lblTipoFuncionario.Size = New System.Drawing.Size(184, 23)
-'        Me.lblTipoFuncionario.TabIndex = 5
-'        Me.lblTipoFuncionario.Text = "ID Tipo de funcionario:"
-'        '
-'        'lblCargo
-'        '
-'        Me.lblCargo.Anchor = System.Windows.Forms.AnchorStyles.Right
-'        Me.lblCargo.AutoSize = True
-'        Me.lblCargo.Font = New System.Drawing.Font("Segoe UI", 10.0!)
-'        Me.lblCargo.Location = New System.Drawing.Point(127, 108)
-'        Me.lblCargo.Name = "lblCargo"
-'        Me.lblCargo.Size = New System.Drawing.Size(60, 23)
-'        Me.lblCargo.TabIndex = 6
-'        Me.lblCargo.Text = "Cargo:"
-'        '
-'        'lblRutaFoto
-'        '
-'        Me.lblRutaFoto.Anchor = System.Windows.Forms.AnchorStyles.Right
-'        Me.lblRutaFoto.AutoSize = True
-'        Me.lblRutaFoto.Font = New System.Drawing.Font("Segoe UI", 10.0!)
-'        Me.lblRutaFoto.Location = New System.Drawing.Point(100, 231)
-'        Me.lblRutaFoto.Name = "lblRutaFoto"
-'        Me.lblRutaFoto.Size = New System.Drawing.Size(87, 23)
-'        Me.lblRutaFoto.TabIndex = 7
-'        Me.lblRutaFoto.Text = "Foto (op.):"
-'        '
-'        'pnlFoto
-'        '
-'        Me.pnlFoto.Controls.Add(Me.txtRutaFoto)
-'        Me.pnlFoto.Controls.Add(Me.btnSeleccionarFoto)
-'        Me.pnlFoto.Location = New System.Drawing.Point(190, 134)
-'        Me.pnlFoto.Margin = New System.Windows.Forms.Padding(0)
-'        Me.pnlFoto.Name = "pnlFoto"
-'        Me.pnlFoto.Size = New System.Drawing.Size(445, 32)
-'        Me.pnlFoto.TabIndex = 8
-'        '
-'        'txtRutaFoto
-'        '
-'        Me.txtRutaFoto.Location = New System.Drawing.Point(0, 2)
-'        Me.txtRutaFoto.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
-'        Me.txtRutaFoto.Name = "txtRutaFoto"
-'        Me.txtRutaFoto.ReadOnly = True
-'        Me.txtRutaFoto.Size = New System.Drawing.Size(324, 22)
-'        Me.txtRutaFoto.TabIndex = 0
-'        '
-'        'btnSeleccionarFoto
-'        '
-'        Me.btnSeleccionarFoto.Location = New System.Drawing.Point(331, 0)
-'        Me.btnSeleccionarFoto.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
-'        Me.btnSeleccionarFoto.Name = "btnSeleccionarFoto"
-'        Me.btnSeleccionarFoto.Size = New System.Drawing.Size(94, 32)
-'        Me.btnSeleccionarFoto.TabIndex = 15
-'        Me.btnSeleccionarFoto.Text = "Buscar…"
-'        Me.btnSeleccionarFoto.UseVisualStyleBackColor = True
-'        '
-'        'cboCargo
-'        '
-'        Me.cboCargo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-'        Me.cboCargo.FormattingEnabled = True
-'        Me.cboCargo.Location = New System.Drawing.Point(193, 108)
-'        Me.cboCargo.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
-'        Me.cboCargo.Name = "cboCargo"
-'        Me.cboCargo.Size = New System.Drawing.Size(149, 24)
-'        Me.cboCargo.TabIndex = 9
-'        '
-'        'cboTipoFuncionario
-'        '
-'        Me.cboTipoFuncionario.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-'        Me.cboTipoFuncionario.FormattingEnabled = True
-'        Me.cboTipoFuncionario.Location = New System.Drawing.Point(193, 80)
-'        Me.cboTipoFuncionario.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
-'        Me.cboTipoFuncionario.Name = "cboTipoFuncionario"
-'        Me.cboTipoFuncionario.Size = New System.Drawing.Size(149, 24)
-'        Me.cboTipoFuncionario.TabIndex = 10
-'        '
-'        'pbFoto
-'        '
-'        Me.pbFoto.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-'        Me.pbFoto.Location = New System.Drawing.Point(520, 18)
-'        Me.pbFoto.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
-'        Me.pbFoto.Name = "pbFoto"
-'        Me.pbFoto.Size = New System.Drawing.Size(129, 130)
-'        Me.pbFoto.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
-'        Me.pbFoto.TabIndex = 0
-'        Me.pbFoto.TabStop = False
-'        '
-'        'FlowLayoutPanel1
-'        '
-'        Me.FlowLayoutPanel1.AutoSize = True
-'        Me.FlowLayoutPanel1.Controls.Add(Me.btnGuardar)
-'        Me.FlowLayoutPanel1.Controls.Add(Me.btnCancelar)
-'        Me.FlowLayoutPanel1.Controls.Add(Me.chkActivo)
-'        Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Bottom
-'        Me.FlowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
-'        Me.FlowLayoutPanel1.Location = New System.Drawing.Point(17, 388)
-'        Me.FlowLayoutPanel1.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
-'        Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
-'        Me.FlowLayoutPanel1.Padding = New System.Windows.Forms.Padding(0, 5, 17, 0)
-'        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(635, 46)
-'        Me.FlowLayoutPanel1.TabIndex = 1
-'        '
-'        'btnGuardar
-'        '
-'        Me.btnGuardar.AutoSize = True
-'        Me.btnGuardar.Location = New System.Drawing.Point(506, 7)
-'        Me.btnGuardar.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
-'        Me.btnGuardar.Name = "btnGuardar"
-'        Me.btnGuardar.Padding = New System.Windows.Forms.Padding(11, 2, 11, 2)
-'        Me.btnGuardar.Size = New System.Drawing.Size(109, 37)
-'        Me.btnGuardar.TabIndex = 16
-'        Me.btnGuardar.Text = "Guardar"
-'        Me.btnGuardar.UseVisualStyleBackColor = True
-'        '
-'        'btnCancelar
-'        '
-'        Me.btnCancelar.AutoSize = True
-'        Me.btnCancelar.Location = New System.Drawing.Point(384, 7)
-'        Me.btnCancelar.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
-'        Me.btnCancelar.Name = "btnCancelar"
-'        Me.btnCancelar.Padding = New System.Windows.Forms.Padding(11, 2, 11, 2)
-'        Me.btnCancelar.Size = New System.Drawing.Size(116, 37)
-'        Me.btnCancelar.TabIndex = 17
-'        Me.btnCancelar.Text = "Cancelar"
-'        Me.btnCancelar.UseVisualStyleBackColor = True
-'        '
-'        'chkActivo
-'        '
-'        Me.chkActivo.AutoSize = True
-'        Me.chkActivo.Checked = True
-'        Me.chkActivo.CheckState = System.Windows.Forms.CheckState.Checked
-'        Me.chkActivo.Location = New System.Drawing.Point(240, 7)
-'        Me.chkActivo.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
-'        Me.chkActivo.Name = "chkActivo"
-'        Me.chkActivo.Size = New System.Drawing.Size(138, 20)
-'        Me.chkActivo.TabIndex = 18
-'        Me.chkActivo.Text = "Funcionario activo"
-'        Me.chkActivo.UseVisualStyleBackColor = True
-'        '
-'        'frmFuncionarioCrear
-'        '
-'        Me.AcceptButton = Me.btnGuardar
-'        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
-'        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-'        Me.ClientSize = New System.Drawing.Size(669, 450)
-'        Me.Controls.Add(Me.pbFoto)
-'        Me.Controls.Add(Me.FlowLayoutPanel1)
-'        Me.Controls.Add(Me.TableLayoutPanel1)
-'        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
-'        Me.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
-'        Me.MaximizeBox = False
-'        Me.MinimizeBox = False
-'        Me.Name = "frmFuncionarioCrear"
-'        Me.Padding = New System.Windows.Forms.Padding(17, 16, 17, 16)
-'        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
-'        Me.Text = "Nuevo funcionario"
-'        Me.TableLayoutPanel1.ResumeLayout(False)
-'        Me.TableLayoutPanel1.PerformLayout()
-'        Me.pnlFoto.ResumeLayout(False)
-'        Me.pnlFoto.PerformLayout()
-'        CType(Me.pbFoto, System.ComponentModel.ISupportInitialize).EndInit()
-'        Me.FlowLayoutPanel1.ResumeLayout(False)
-'        Me.FlowLayoutPanel1.PerformLayout()
-'        Me.ResumeLayout(False)
-'        Me.PerformLayout()
-
-'    End Sub
-
-'    Friend WithEvents TableLayoutPanel1 As System.Windows.Forms.TableLayoutPanel
-'    Friend WithEvents lblCI As System.Windows.Forms.Label
-'    Friend WithEvents txtCI As System.Windows.Forms.TextBox
-'    Friend WithEvents lblNombre As System.Windows.Forms.Label
-'    Friend WithEvents txtNombre As System.Windows.Forms.TextBox
-'    Friend WithEvents lblFechaIngreso As System.Windows.Forms.Label
-'    Friend WithEvents dtpFechaIngreso As System.Windows.Forms.DateTimePicker
-'    Friend WithEvents lblTipoFuncionario As System.Windows.Forms.Label
-'    Friend WithEvents lblCargo As System.Windows.Forms.Label
-'    Friend WithEvents lblRutaFoto As System.Windows.Forms.Label
-'    Friend WithEvents pnlFoto As System.Windows.Forms.Panel
-'    Friend WithEvents txtRutaFoto As System.Windows.Forms.TextBox
-'    Friend WithEvents btnSeleccionarFoto As System.Windows.Forms.Button
-'    Friend WithEvents pbFoto As System.Windows.Forms.PictureBox
-'    Friend WithEvents FlowLayoutPanel1 As System.Windows.Forms.FlowLayoutPanel
-'    Friend WithEvents btnGuardar As System.Windows.Forms.Button
-'    Friend WithEvents btnCancelar As System.Windows.Forms.Button
-'    Friend WithEvents cboCargo As ComboBox
-'    Friend WithEvents cboTipoFuncionario As ComboBox
-'    Friend WithEvents chkActivo As CheckBox
-'End Class
