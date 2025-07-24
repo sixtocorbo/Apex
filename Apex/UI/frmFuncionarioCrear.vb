@@ -24,6 +24,7 @@ Public Class frmFuncionarioCrear
     Private _dotaciones As BindingList(Of FuncionarioDotacion)
     Private _observaciones As BindingList(Of FuncionarioObservacion)
     Private _estadosTransitorios As BindingList(Of EstadoTransitorio)
+    Private _tiposEstadoTransitorio As List(Of TipoEstadoTransitorio)
 
 
     '-------------------- Constructores ----------------------
@@ -46,6 +47,9 @@ Public Class frmFuncionarioCrear
         _svc = New FuncionarioService()
         Await CargarCombosAsync()
 
+        ' --- Cargar lista de tipos de estado para usarla después ---
+        _tiposEstadoTransitorio = Await _svc.ObtenerTiposEstadoTransitorioCompletosAsync()
+
         ' --- Configurar DataGridViews ---
         ConfigurarGrillaDotacion()
         ConfigurarGrillaObservaciones()
@@ -53,6 +57,9 @@ Public Class frmFuncionarioCrear
         dgvDotacion.DataSource = _dotaciones
         dgvObservaciones.DataSource = _observaciones
         dgvEstadosTransitorios.DataSource = _estadosTransitorios
+
+        ' --- Añadir manejador de evento para formateo ---
+        AddHandler dgvEstadosTransitorios.CellFormatting, AddressOf dgvEstadosTransitorios_CellFormatting
 
 
         If _modo = ModoFormulario.Editar Then
@@ -129,20 +136,33 @@ Public Class frmFuncionarioCrear
         With dgvEstadosTransitorios
             .AutoGenerateColumns = False
             .Columns.Clear()
+
+            ' Columna para el nombre del tipo de estado (se llenará manualmente)
             .Columns.Add(New DataGridViewTextBoxColumn With {
-                .DataPropertyName = "TipoEstadoTransitorio.Nombre",
+                .Name = "TipoEstado",
                 .HeaderText = "Tipo de Estado",
                 .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
             })
+
+            ' Columna para la fecha de inicio
             .Columns.Add(New DataGridViewTextBoxColumn With {
+                .Name = "FechaDesde",
                 .DataPropertyName = "FechaDesde",
-                .HeaderText = "Desde"
+                .HeaderText = "Desde",
+                .DefaultCellStyle = New DataGridViewCellStyle With {.Format = "dd/MM/yyyy"}
             })
+
+            ' Columna para la fecha de fin
             .Columns.Add(New DataGridViewTextBoxColumn With {
+                .Name = "FechaHasta",
                 .DataPropertyName = "FechaHasta",
-                .HeaderText = "Hasta"
+                .HeaderText = "Hasta",
+                .DefaultCellStyle = New DataGridViewCellStyle With {.Format = "dd/MM/yyyy"}
             })
+
+            ' Columna para las observaciones
             .Columns.Add(New DataGridViewTextBoxColumn With {
+                .Name = "Observaciones",
                 .DataPropertyName = "Observaciones",
                 .HeaderText = "Observaciones",
                 .Width = 300
@@ -416,7 +436,7 @@ Public Class frmFuncionarioCrear
 #Region "CRUD Estados Transitorios"
     Private Sub btnAñadirEstado_Click(sender As Object, e As EventArgs) Handles btnAñadirEstado.Click
         Dim nuevoEstado = New EstadoTransitorio()
-        Using frm As New frmFuncionarioEstadoTransitorio(nuevoEstado)
+        Using frm As New frmFuncionarioEstadoTransitorio(nuevoEstado, _tiposEstadoTransitorio)
             If frm.ShowDialog() = DialogResult.OK Then
                 _estadosTransitorios.Add(frm.Estado)
             End If
@@ -426,7 +446,7 @@ Public Class frmFuncionarioCrear
     Private Sub btnEditarEstado_Click(sender As Object, e As EventArgs) Handles btnEditarEstado.Click
         If dgvEstadosTransitorios.CurrentRow Is Nothing Then Return
         Dim estadoSeleccionado = CType(dgvEstadosTransitorios.CurrentRow.DataBoundItem, EstadoTransitorio)
-        Using frm As New frmFuncionarioEstadoTransitorio(estadoSeleccionado)
+        Using frm As New frmFuncionarioEstadoTransitorio(estadoSeleccionado, _tiposEstadoTransitorio)
             If frm.ShowDialog() = DialogResult.OK Then
                 _estadosTransitorios.ResetBindings() ' Refresca la grilla
             End If
@@ -442,5 +462,35 @@ Public Class frmFuncionarioCrear
     End Sub
 #End Region
 
+#Region "Formateo Manual de Grillas"
+
+    Private Sub dgvEstadosTransitorios_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
+        If e.RowIndex < 0 OrElse e.ColumnIndex < 0 Then Return
+
+        Dim dgv = CType(sender, DataGridView)
+        Dim colName = dgv.Columns(e.ColumnIndex).Name
+
+        ' Obtener el objeto EstadoTransitorio subyacente de la fila
+        Dim estado = CType(dgv.Rows(e.RowIndex).DataBoundItem, EstadoTransitorio)
+        If estado Is Nothing Then Return
+
+        ' Formatear la columna "TipoEstado" para mostrar el nombre
+        If colName = "TipoEstado" Then
+            If estado.TipoEstadoTransitorio IsNot Nothing Then
+                e.Value = estado.TipoEstadoTransitorio.Nombre
+                e.FormattingApplied = True
+            End If
+        End If
+
+        ' Formatear la columna "FechaHasta" para que no muestre nada si es nula
+        If colName = "FechaHasta" Then
+            If e.Value Is Nothing Then
+                e.Value = String.Empty
+                e.FormattingApplied = True
+            End If
+        End If
+    End Sub
+
+#End Region
 
 End Class

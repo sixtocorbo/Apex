@@ -1,15 +1,16 @@
 ﻿Public Class frmFuncionarioEstadoTransitorio
     Public Estado As EstadoTransitorio
-    Private _svc As FuncionarioService ' Reutilizamos el servicio
+    Private _tiposEstado As List(Of TipoEstadoTransitorio)
 
-    Public Sub New(estado As EstadoTransitorio)
+    ' Constructor modificado para recibir la lista de tipos
+    Public Sub New(estado As EstadoTransitorio, tiposEstado As List(Of TipoEstadoTransitorio))
         InitializeComponent()
         Me.Estado = estado
-        _svc = New FuncionarioService()
+        _tiposEstado = tiposEstado ' Recibir la lista
     End Sub
 
-    Private Async Sub frmFuncionarioEstadoTransitorio_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Await CargarCombosAsync()
+    Private Sub frmFuncionarioEstadoTransitorio_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        CargarCombos() ' Ya no necesita ser asíncrono
         If Estado IsNot Nothing AndAlso Estado.Id > 0 Then
             ' Modo Edición
             cboTipoEstado.SelectedValue = Estado.TipoEstadoTransitorioId
@@ -26,14 +27,16 @@
         Else
             ' Modo Creación
             chkFechaHasta.Checked = True
+            cboTipoEstado.SelectedIndex = -1
         End If
     End Sub
 
-    Private Async Function CargarCombosAsync() As Task
-        cboTipoEstado.DataSource = Await _svc.ObtenerTiposEstadoTransitorioAsync()
-        cboTipoEstado.DisplayMember = "Value"
-        cboTipoEstado.ValueMember = "Key"
-    End Function
+    Private Sub CargarCombos()
+        ' Usar la lista pasada a través del constructor
+        cboTipoEstado.DataSource = _tiposEstado
+        cboTipoEstado.DisplayMember = "Nombre"
+        cboTipoEstado.ValueMember = "Id"
+    End Sub
 
     Private Sub chkFechaHasta_CheckedChanged(sender As Object, e As EventArgs) Handles chkFechaHasta.CheckedChanged
         dtpFechaHasta.Enabled = Not chkFechaHasta.Checked
@@ -49,7 +52,11 @@
             Return
         End If
 
+        ' *** LA CLAVE DE LA CORRECCIÓN ESTÁ AQUÍ ***
+        ' Asignamos tanto el ID como el objeto de navegación completo
         Estado.TipoEstadoTransitorioId = CInt(cboTipoEstado.SelectedValue)
+        Estado.TipoEstadoTransitorio = CType(cboTipoEstado.SelectedItem, TipoEstadoTransitorio)
+
         Estado.FechaDesde = dtpFechaDesde.Value.Date
         Estado.FechaHasta = If(chkFechaHasta.Checked, CType(Nothing, Date?), dtpFechaHasta.Value.Date)
         Estado.Observaciones = txtObservaciones.Text.Trim()
