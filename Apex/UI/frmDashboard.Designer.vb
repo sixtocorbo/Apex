@@ -25,6 +25,7 @@ Partial Class frmDashboard
         Me.panelNavegacion = New System.Windows.Forms.Panel()
         Me.btnConfiguracion = New System.Windows.Forms.Button()
         Me.btnReportes = New System.Windows.Forms.Button()
+        Me.btnNotificaciones = New System.Windows.Forms.Button() ' <-- AÑADIDO
         Me.btnFuncionarios = New System.Windows.Forms.Button()
         Me.panelLogo = New System.Windows.Forms.Panel()
         Me.lblAppName = New System.Windows.Forms.Label()
@@ -38,6 +39,7 @@ Partial Class frmDashboard
         Me.panelNavegacion.BackColor = System.Drawing.Color.FromArgb(CType(CType(51, Byte), Integer), CType(CType(51, Byte), Integer), CType(CType(76, Byte), Integer))
         Me.panelNavegacion.Controls.Add(Me.btnConfiguracion)
         Me.panelNavegacion.Controls.Add(Me.btnReportes)
+        Me.panelNavegacion.Controls.Add(Me.btnNotificaciones) ' <-- AÑADIDO
         Me.panelNavegacion.Controls.Add(Me.btnFuncionarios)
         Me.panelNavegacion.Controls.Add(Me.panelLogo)
         Me.panelNavegacion.Dock = System.Windows.Forms.DockStyle.Left
@@ -53,11 +55,11 @@ Partial Class frmDashboard
         Me.btnConfiguracion.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnConfiguracion.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnConfiguracion.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnConfiguracion.Location = New System.Drawing.Point(0, 200)
+        Me.btnConfiguracion.Location = New System.Drawing.Point(0, 260) ' <-- CAMBIADO
         Me.btnConfiguracion.Name = "btnConfiguracion"
         Me.btnConfiguracion.Padding = New System.Windows.Forms.Padding(12, 0, 0, 0)
         Me.btnConfiguracion.Size = New System.Drawing.Size(220, 60)
-        Me.btnConfiguracion.TabIndex = 3
+        Me.btnConfiguracion.TabIndex = 4 ' <-- CAMBIADO
         Me.btnConfiguracion.Text = "   ⚙️ Configuración"
         Me.btnConfiguracion.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.btnConfiguracion.UseVisualStyleBackColor = True
@@ -69,14 +71,30 @@ Partial Class frmDashboard
         Me.btnReportes.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnReportes.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnReportes.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnReportes.Location = New System.Drawing.Point(0, 140)
+        Me.btnReportes.Location = New System.Drawing.Point(0, 200) ' <-- CAMBIADO
         Me.btnReportes.Name = "btnReportes"
         Me.btnReportes.Padding = New System.Windows.Forms.Padding(12, 0, 0, 0)
         Me.btnReportes.Size = New System.Drawing.Size(220, 60)
-        Me.btnReportes.TabIndex = 2
+        Me.btnReportes.TabIndex = 3 ' <-- CAMBIADO
         Me.btnReportes.Text = "   📈 Reportes"
         Me.btnReportes.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.btnReportes.UseVisualStyleBackColor = True
+        '
+        'btnNotificaciones ' <-- NUEVO BOTÓN
+        '
+        Me.btnNotificaciones.Dock = System.Windows.Forms.DockStyle.Top
+        Me.btnNotificaciones.FlatAppearance.BorderSize = 0
+        Me.btnNotificaciones.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnNotificaciones.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnNotificaciones.ForeColor = System.Drawing.Color.Gainsboro
+        Me.btnNotificaciones.Location = New System.Drawing.Point(0, 140)
+        Me.btnNotificaciones.Name = "btnNotificaciones"
+        Me.btnNotificaciones.Padding = New System.Windows.Forms.Padding(12, 0, 0, 0)
+        Me.btnNotificaciones.Size = New System.Drawing.Size(220, 60)
+        Me.btnNotificaciones.TabIndex = 2
+        Me.btnNotificaciones.Text = "   🔔 Notificaciones"
+        Me.btnNotificaciones.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnNotificaciones.UseVisualStyleBackColor = True
         '
         'btnFuncionarios
         '
@@ -144,6 +162,7 @@ Partial Class frmDashboard
     Friend WithEvents panelNavegacion As System.Windows.Forms.Panel
     Friend WithEvents panelLogo As System.Windows.Forms.Panel
     Friend WithEvents btnFuncionarios As System.Windows.Forms.Button
+    Friend WithEvents btnNotificaciones As System.Windows.Forms.Button ' <-- AÑADIDO
     Friend WithEvents btnReportes As System.Windows.Forms.Button
     Friend WithEvents btnConfiguracion As System.Windows.Forms.Button
     Friend WithEvents lblAppName As System.Windows.Forms.Label

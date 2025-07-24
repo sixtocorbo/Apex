@@ -1,12 +1,13 @@
 ﻿Public Class frmDashboard
 
     Private currentBtn As Button
-    Private activeForm As Form
+    Private Shadows activeForm As Form
 
     Public Sub New()
         InitializeComponent()
         ' Asociar los manejadores de eventos a los botones de navegación
         AddHandler btnFuncionarios.Click, AddressOf ActivateButton
+        AddHandler btnNotificaciones.Click, AddressOf ActivateButton
         AddHandler btnReportes.Click, AddressOf ActivateButton
         AddHandler btnConfiguracion.Click, AddressOf ActivateButton
     End Sub
@@ -26,12 +27,20 @@
         Select Case currentBtn.Name
             Case "btnFuncionarios"
                 AbrirFormEnPanel(New frmFuncionarioBuscar())
+
+            ' --- LÍNEA CORREGIDA ---
+            Case "btnNotificaciones"
+                AbrirFormEnPanel(New frmNotificaciones()) ' Ahora abre el formulario correcto.
+
             Case "btnReportes"
                 ' Aquí abrirías tu formulario de reportes en el futuro
                 ' AbrirFormEnPanel(New frmReportes())
+                MessageBox.Show("Formulario de reportes aún no implementado.", "En desarrollo", MessageBoxButtons.OK, MessageBoxIcon.Information)
+
             Case "btnConfiguracion"
                 ' Aquí abrirías tu formulario de configuración
                 ' AbrirFormEnPanel(New frmConfiguracion())
+                MessageBox.Show("Formulario de configuración aún no implementado.", "En desarrollo", MessageBoxButtons.OK, MessageBoxIcon.Information)
         End Select
     End Sub
 

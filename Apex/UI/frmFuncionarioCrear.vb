@@ -44,6 +44,8 @@ Public Class frmFuncionarioCrear
         Await CargarCombosAsync()
 
         ' --- Configurar DataGridViews ---
+        ConfigurarGrillaDotacion()
+        ConfigurarGrillaObservaciones()
         dgvDotacion.DataSource = _dotaciones
         dgvObservaciones.DataSource = _observaciones
 
@@ -56,6 +58,65 @@ Public Class frmFuncionarioCrear
             btnGuardar.Text = "Guardar"
             pbFoto.Image = My.Resources.Police
         End If
+    End Sub
+    Private Sub ConfigurarGrillaObservaciones()
+        With dgvObservaciones
+            .AutoGenerateColumns = False ' Deshabilita la creación automática de columnas
+            .Columns.Clear()
+
+            ' Añade solo las columnas que necesitas
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .DataPropertyName = "Id",
+            .HeaderText = "Id",
+            .Visible = False ' Ocultamos la columna Id
+        })
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .DataPropertyName = "Categoria",
+            .HeaderText = "Categoría",
+            .Width = 150
+        })
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .DataPropertyName = "Texto",
+            .HeaderText = "Texto",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill ' Hacemos que esta columna ocupe el espacio restante
+        })
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .DataPropertyName = "FechaRegistro",
+            .HeaderText = "Fecha de Registro",
+            .Width = 120
+        })
+        End With
+    End Sub
+    Private Sub ConfigurarGrillaDotacion()
+        With dgvDotacion
+            .AutoGenerateColumns = False ' <-- MUY IMPORTANTE
+            .Columns.Clear()
+
+            ' Añadir solo las columnas que quieres ver
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .DataPropertyName = "Id",
+            .HeaderText = "Id",
+            .Visible = False ' Oculta si no es necesario
+        })
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .DataPropertyName = "Item",
+            .HeaderText = "Ítem",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+        })
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .DataPropertyName = "Talla",
+            .HeaderText = "Talla"
+        })
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .DataPropertyName = "Observaciones",
+            .HeaderText = "Observaciones",
+            .Width = 200
+        })
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .DataPropertyName = "FechaAsign",
+            .HeaderText = "Fecha Asignación"
+        })
+        End With
     End Sub
 
     '----------------- Combos Look-ups -----------------------
