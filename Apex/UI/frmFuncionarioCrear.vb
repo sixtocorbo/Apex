@@ -89,8 +89,8 @@ Public Class frmFuncionarioCrear
     '------------------ Cargar datos (edición) ---------------
 
     Private Async Function CargarDatosAsync() As Task
-        ' NOTA: Deberás crear un método en tu servicio que incluya las relaciones (Include)
-        Dim f = Await _svc.GetByIdAsync(_idFuncionario) ' Usamos el método simple por ahora
+        ' Cambiar la llamada para usar GetByIdCompletoAsync
+        Dim f = Await _svc.GetByIdCompletoAsync(_idFuncionario)
 
         If f Is Nothing Then
             MessageBox.Show("No se encontró el registro.")
@@ -102,7 +102,7 @@ Public Class frmFuncionarioCrear
         txtCI.Text = f.CI
         txtNombre.Text = f.Nombre
         dtpFechaIngreso.Value = f.FechaIngreso
-        cboTipoFuncionario.SelectedValue = f.TipoFuncionarioId
+        cboTipoFuncionario.SelectedValue = CInt(f.TipoFuncionarioId)
         cboCargo.SelectedValue = If(f.CargoId.HasValue, CInt(f.CargoId), -1)
         chkActivo.Checked = f.Activo
         cboEscalafon.SelectedValue = If(f.EscalafonId.HasValue, CInt(f.EscalafonId), -1)
@@ -117,10 +117,15 @@ Public Class frmFuncionarioCrear
         dtpFechaNacimiento.Value = If(f.FechaNacimiento.HasValue, f.FechaNacimiento.Value, dtpFechaNacimiento.MinDate)
         txtDomicilio.Text = f.Domicilio
         txtEmail.Text = f.Email
-        txtTelefono.Text = "" ' <-- Lógica pendiente para leer de FuncionarioDispositivo
+        ' Aquí podrías implementar la lógica para txtTelefono usando f.FuncionarioDispositivo
         cboEstadoCivil.SelectedValue = If(f.EstadoCivilId.HasValue, CInt(f.EstadoCivilId), -1)
         cboGenero.SelectedValue = If(f.GeneroId.HasValue, CInt(f.GeneroId), -1)
         cboNivelEstudio.SelectedValue = If(f.NivelEstudioId.HasValue, CInt(f.NivelEstudioId), -1)
+
+        ' --- Cargar DataGridViews de Dotación y Observaciones ---
+        ' Asegúrate de que las propiedades de navegación FuncionarioDotacion y FuncionarioObservacion se hayan incluido
+        dgvDotacion.DataSource = f.FuncionarioDotacion.ToList()
+        dgvObservaciones.DataSource = f.FuncionarioObservacion.ToList()
 
     End Function
 

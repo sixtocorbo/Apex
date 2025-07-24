@@ -14,12 +14,19 @@ Public Class FuncionarioService
     ' --- Método nuevo para cargar un funcionario con todos sus datos relacionados ---
     Public Async Function GetByIdCompletoAsync(id As Integer) As Task(Of Funcionario)
         Return Await _unitOfWork.Repository(Of Funcionario)().
-            GetAll().
-            Include(Function(f) f.FuncionarioDotacion).
-            Include(Function(f) f.FuncionarioObservacion).
-            Include(Function(f) f.FuncionarioEstadoLegal).
-            Include(Function(f) f.FuncionarioDispositivo).
-            FirstOrDefaultAsync(Function(f) f.Id = id)
+        GetAll().
+        Include(Function(f) f.Cargo).               ' Añadir para cargar el objeto Cargo
+        Include(Function(f) f.Escalafon).           ' Añadir para cargar el objeto Escalafon
+        Include(Function(f) f.Funcion).             ' Añadir para cargar el objeto Funcion
+        Include(Function(f) f.TipoFuncionario).     ' Añadir para cargar el objeto TipoFuncionario
+        Include(Function(f) f.EstadoCivil).         ' Añadir para cargar el objeto EstadoCivil
+        Include(Function(f) f.Genero).              ' Añadir para cargar el objeto Genero
+        Include(Function(f) f.NivelEstudio).        ' Añadir para cargar el objeto NivelEstudio
+        Include(Function(f) f.FuncionarioDotacion).
+        Include(Function(f) f.FuncionarioObservacion).
+        Include(Function(f) f.FuncionarioEstadoLegal).
+        Include(Function(f) f.FuncionarioDispositivo).
+        FirstOrDefaultAsync(Function(f) f.Id = id)
     End Function
 
     ' --- Métodos para poblar los ComboBox (Catálogos) ---
