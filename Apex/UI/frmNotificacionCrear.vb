@@ -12,7 +12,7 @@ Public Class frmNotificacionCrear
         Editar
     End Enum
 
-    ' Constructor para crear una nueva notificación
+    ' Constructor para crear
     Public Sub New()
         InitializeComponent()
         _modo = ModoFormulario.Crear
@@ -20,7 +20,7 @@ Public Class frmNotificacionCrear
         Me.Text = "Nueva Notificación"
     End Sub
 
-    ' Constructor para editar una notificación existente
+    ' Constructor para editar
     Public Sub New(id As Integer)
         Me.New()
         _modo = ModoFormulario.Editar
@@ -38,19 +38,23 @@ Public Class frmNotificacionCrear
     End Sub
 
     Private Async Function CargarCombosAsync() As Task
-        ' Cargar Funcionarios
+        ' Cargar Funcionarios llamando al servicio
         cboFuncionario.DisplayMember = "Value"
         cboFuncionario.ValueMember = "Key"
-        cboFuncionario.DataSource = Await ObtenerFuncionariosAsync()
+        cboFuncionario.DataSource = Await _svc.ObtenerFuncionariosParaComboAsync()
 
-        ' Cargar Tipos de Notificación
+        ' Cargar Tipos de Notificación llamando al servicio
         cboTipoNotificacion.DisplayMember = "Value"
         cboTipoNotificacion.ValueMember = "Key"
-        cboTipoNotificacion.DataSource = Await ObtenerTiposNotificacionAsync()
+        cboTipoNotificacion.DataSource = Await _svc.ObtenerTiposNotificacionParaComboAsync()
+
+        ' Limpiar selección inicial
+        cboFuncionario.SelectedIndex = -1
+        cboTipoNotificacion.SelectedIndex = -1
     End Function
 
     Private Async Function CargarDatosAsync() As Task
-        _notificacion = Await _svc.GetByIdAsync(_idNotificacion)
+        _notificacion = Await _svc.GetByIdParaEdicionAsync(_idNotificacion)
 
         If _notificacion Is Nothing Then
             MessageBox.Show("No se encontró la notificación.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -74,7 +78,6 @@ Public Class frmNotificacionCrear
             Return
         End If
 
-        ' Mapear datos del formulario al objeto
         _notificacion.FuncionarioId = CInt(cboFuncionario.SelectedValue)
         _notificacion.TipoNotificacionId = CByte(cboTipoNotificacion.SelectedValue)
         _notificacion.FechaProgramada = dtpFechaProgramada.Value
@@ -105,22 +108,4 @@ Public Class frmNotificacionCrear
         DialogResult = DialogResult.Cancel
         Close()
     End Sub
-
-    ' --- Funciones auxiliares para cargar ComboBoxes ---
-    Private Async Function ObtenerFuncionariosAsync() As Task(Of List(Of KeyValuePair(Of Integer, String)))
-        Using uow As New UnitOfWork()
-            Dim repo = uow.Repository(Of Funcionario)()
-            Dim lista = Await repo.GetAll().AsNoTracking().OrderBy(Function(f) f.Nombre).ToListAsync()
-            Return lista.Select(Function(f) New KeyValuePair(Of Integer, String)(f.Id, f.Nombre)).ToList()
-        End Using
-    End Function
-
-    Private Async Function ObtenerTiposNotificacionAsync() As Task(Of List(Of KeyValuePair(Of Byte, String)))
-        Using uow As New UnitOfWork()
-            Dim repo = uow.Repository(Of TipoNotificacion)()
-            Dim lista = Await repo.GetAll().AsNoTracking().OrderBy(Function(t) t.Orden).ToListAsync()
-            Return lista.Select(Function(t) New KeyValuePair(Of Byte, String)(t.Id, t.Nombre)).ToList()
-        End Using
-    End Function
-
 End Class

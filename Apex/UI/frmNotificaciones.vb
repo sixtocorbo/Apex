@@ -29,16 +29,12 @@ Public Class frmNotificaciones
                 .HeaderText = "Tipo", .Width = 120
             })
 
-            ' --- INICIO DE LA CORRECCIÓN ---
-            ' 1. Crear la columna de fecha
             Dim fechaColumn As New DataGridViewTextBoxColumn With {
                 .Name = "FechaProgramada", .DataPropertyName = "FechaProgramada",
                 .HeaderText = "Fecha Programada", .Width = 150
             }
-            ' 2. Asignar el formato a su estilo por defecto
             fechaColumn.DefaultCellStyle.Format = "dd/MM/yyyy HH:mm"
             .Columns.Add(fechaColumn)
-            ' --- FIN DE LA CORRECCIÓN ---
 
             .Columns.Add(New DataGridViewTextBoxColumn With {
                 .Name = "Estado", .DataPropertyName = "Estado",

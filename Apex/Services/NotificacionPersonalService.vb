@@ -12,10 +12,19 @@ Public Class NotificacionPersonalService
     End Sub
 
     ''' <summary>
-    ''' Obtiene una lista de notificaciones para mostrar en la grilla principal,
-    ''' incluyendo detalles del funcionario, tipo, estado y el texto de la notificación.
+    ''' Obtiene una notificación por su ID para edición, incluyendo las entidades relacionadas.
     ''' </summary>
-    ''' <param name="filtroNombreFuncionario">Texto para filtrar por nombre de funcionario.</param>
+    Public Async Function GetByIdParaEdicionAsync(id As Integer) As Task(Of NotificacionPersonal)
+        Return Await _unitOfWork.Repository(Of NotificacionPersonal)().
+            GetAll().
+            Include(Function(n) n.Funcionario).
+            Include(Function(n) n.TipoNotificacion).
+            FirstOrDefaultAsync(Function(n) n.Id = id)
+    End Function
+
+    ''' <summary>
+    ''' Obtiene una lista de notificaciones para la grilla principal.
+    ''' </summary>
     Public Async Function GetAllConDetallesAsync(Optional filtroNombreFuncionario As String = "") As Task(Of List(Of NotificacionParaVista))
         Dim query = _unitOfWork.Repository(Of NotificacionPersonal)().
             GetAll().
@@ -24,27 +33,23 @@ Public Class NotificacionPersonalService
             Include(Function(n) n.NotificacionEstado).
             AsNoTracking()
 
-        ' Aplicar filtro si se proporcionó
         If Not String.IsNullOrWhiteSpace(filtroNombreFuncionario) Then
             query = query.Where(Function(n) n.Funcionario.Nombre.Contains(filtroNombreFuncionario))
         End If
 
-        ' Proyectar a un DTO para la vista
         Return Await query.Select(Function(n) New NotificacionParaVista With {
             .Id = n.Id,
             .NombreFuncionario = n.Funcionario.Nombre,
             .TipoNotificacion = n.TipoNotificacion.Nombre,
             .FechaProgramada = n.FechaProgramada,
             .Estado = n.NotificacionEstado.Nombre,
-            .Texto = n.Medio ' Se obtiene el texto/medio de la notificación
+            .Texto = n.Medio
         }).OrderByDescending(Function(n) n.FechaProgramada).ToListAsync()
     End Function
 
     ''' <summary>
-    ''' Actualiza únicamente el estado de una notificación específica.
+    ''' Actualiza el estado de una notificación.
     ''' </summary>
-    ''' <param name="notificacionId">ID de la notificación a actualizar.</param>
-    ''' <param name="nuevoEstadoId">ID del nuevo estado (de la tabla NotificacionEstado).</param>
     Public Async Function UpdateEstadoAsync(notificacionId As Integer, nuevoEstadoId As Byte) As Task
         Dim notificacion = Await _unitOfWork.Repository(Of NotificacionPersonal)().GetByIdAsync(notificacionId)
         If notificacion IsNot Nothing Then
@@ -55,16 +60,26 @@ Public Class NotificacionPersonalService
         End If
     End Function
 
-    ''' <summary>
-    ''' DTO (Data Transfer Object) para simplificar los datos mostrados en la grilla.
-    ''' </summary>
+    ' --- MÉTODOS PARA POBLAR COMBOS ---
+    Public Async Function ObtenerFuncionariosParaComboAsync() As Task(Of List(Of KeyValuePair(Of Integer, String)))
+        Dim repo = _unitOfWork.Repository(Of Funcionario)()
+        Dim lista = Await repo.GetAll().AsNoTracking().Where(Function(f) f.Activo).OrderBy(Function(f) f.Nombre).ToListAsync()
+        Return lista.Select(Function(f) New KeyValuePair(Of Integer, String)(f.Id, f.Nombre)).ToList()
+    End Function
+
+    Public Async Function ObtenerTiposNotificacionParaComboAsync() As Task(Of List(Of KeyValuePair(Of Byte, String)))
+        Dim repo = _unitOfWork.Repository(Of TipoNotificacion)()
+        Dim lista = Await repo.GetAll().AsNoTracking().OrderBy(Function(t) t.Orden).ToListAsync()
+        Return lista.Select(Function(t) New KeyValuePair(Of Byte, String)(t.Id, t.Nombre)).ToList()
+    End Function
+
     Public Class NotificacionParaVista
         Public Property Id As Integer
         Public Property NombreFuncionario As String
         Public Property TipoNotificacion As String
         Public Property FechaProgramada As Date
         Public Property Estado As String
-        Public Property Texto As String ' Propiedad para el texto de la notificación
+        Public Property Texto As String
     End Class
 
 End Class
