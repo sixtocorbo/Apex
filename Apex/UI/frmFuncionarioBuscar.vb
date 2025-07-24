@@ -288,6 +288,7 @@ Public Class frmFuncionarioBuscar
         Public Property FuncionarioId As Integer
         Public Property Resultado As String
     End Class
+
 #End Region
 
 End Class

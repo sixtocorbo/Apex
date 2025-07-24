@@ -62,26 +62,25 @@ Public Class frmFuncionarioCrear
         cboCargo.DisplayMember = "Value"
         cboCargo.ValueMember = "Key"
 
-        ' cboEscalafon.DataSource = Await _svc.ObtenerEscalafonesAsync() ' <-- Deberás crear este método en tu servicio
-        ' cboEscalafon.DisplayMember = "Value"
-        ' cboEscalafon.ValueMember = "Key"
-        '
-        ' cboFuncion.DataSource = Await _svc.ObtenerFuncionesAsync() ' <-- Deberás crear este método en tu servicio
-        ' cboFuncion.DisplayMember = "Value"
-        ' cboFuncion.ValueMember = "Key"
+        cboEscalafon.DataSource = Await _svc.ObtenerEscalafonesAsync()
+        cboEscalafon.DisplayMember = "Value"
+        cboEscalafon.ValueMember = "Key"
 
-        ' Pestaña Datos Personales
-        ' cboEstadoCivil.DataSource = Await _svc.ObtenerEstadosCivilesAsync() ' <-- Deberás crear este método en tu servicio
-        ' cboEstadoCivil.DisplayMember = "Value"
-        ' cboEstadoCivil.ValueMember = "Key"
-        '
-        ' cboGenero.DataSource = Await _svc.ObtenerGenerosAsync() ' <-- Deberás crear este método en tu servicio
-        ' cboGenero.DisplayMember = "Value"
-        ' cboGenero.ValueMember = "Key"
-        '
-        ' cboNivelEstudio.DataSource = Await _svc.ObtenerNivelesEstudioAsync() ' <-- Deberás crear este método en tu servicio
-        ' cboNivelEstudio.DisplayMember = "Value"
-        ' cboNivelEstudio.ValueMember = "Key"
+        cboFuncion.DataSource = Await _svc.ObtenerFuncionesAsync()
+        cboFuncion.DisplayMember = "Value"
+        cboFuncion.ValueMember = "Key"
+
+        cboEstadoCivil.DataSource = Await _svc.ObtenerEstadosCivilesAsync()
+        cboEstadoCivil.DisplayMember = "Value"
+        cboEstadoCivil.ValueMember = "Key"
+
+        cboGenero.DataSource = Await _svc.ObtenerGenerosAsync()
+        cboGenero.DisplayMember = "Value"
+        cboGenero.ValueMember = "Key"
+
+        cboNivelEstudio.DataSource = Await _svc.ObtenerNivelesEstudioAsync()
+        cboNivelEstudio.DisplayMember = "Value"
+        cboNivelEstudio.ValueMember = "Key"
 
         ' Asignar -1 para que no haya selección inicial
         cboCargo.SelectedIndex = -1
