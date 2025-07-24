@@ -145,8 +145,8 @@ Public Class frmFuncionarioCrear
         Try
             ' --- Validaciones básicas ---
             If String.IsNullOrWhiteSpace(txtCI.Text) OrElse
-               String.IsNullOrWhiteSpace(txtNombre.Text) OrElse
-               cboTipoFuncionario.SelectedIndex = -1 Then
+           String.IsNullOrWhiteSpace(txtNombre.Text) OrElse
+           cboTipoFuncionario.SelectedIndex = -1 Then
                 MessageBox.Show("Los campos CI, Nombre y Tipo de Funcionario son obligatorios.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
                 Return
             End If
@@ -165,10 +165,11 @@ Public Class frmFuncionarioCrear
                     uow.Repository(Of Funcionario).Add(funcionario)
                 Else
                     ' Se carga la entidad CON TRACKING para poder actualizarla
-                    funcionario = Await uow.Repository(Of Funcionario).GetAll() _
-                        .Include(Function(f) f.FuncionarioDotacion) _
-                        .Include(Function(f) f.FuncionarioObservacion) _
-                        .FirstOrDefaultAsync(Function(f) f.Id = _idFuncionario)
+                    ' ********* CAMBIO CLAVE AQUÍ *********
+                    funcionario = Await uow.Context.Set(Of Funcionario)() _
+                    .Include(Function(f) f.FuncionarioDotacion) _
+                    .Include(Function(f) f.FuncionarioObservacion) _
+                    .FirstOrDefaultAsync(Function(f) f.Id = _idFuncionario)
 
                     If funcionario Is Nothing Then
                         MessageBox.Show("No se pudo encontrar el funcionario para actualizar.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
