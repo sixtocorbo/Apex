@@ -56,6 +56,7 @@ Public Class frmFuncionarioCrear
         Else
             Me.Text = "Nuevo Funcionario"
             btnGuardar.Text = "Guardar"
+            pbFoto.Image = My.Resources.Police
         End If
     End Sub
 
@@ -134,7 +135,7 @@ Public Class frmFuncionarioCrear
         cboGenero.SelectedValue = If(f.GeneroId.HasValue, CInt(f.GeneroId), -1)
         cboNivelEstudio.SelectedValue = If(f.NivelEstudioId.HasValue, CInt(f.NivelEstudioId), -1)
 
-        ' --- Cargar DataGridViews de Dotación y Observaciones ---
+        ' --- Cargar DataGridViews ---
         _dotaciones = New BindingList(Of FuncionarioDotacion)(f.FuncionarioDotacion.ToList())
         _observaciones = New BindingList(Of FuncionarioObservacion)(f.FuncionarioObservacion.ToList())
         dgvDotacion.DataSource = _dotaciones
@@ -162,62 +163,105 @@ Public Class frmFuncionarioCrear
                 Return
             End If
 
-            ' --- Preparar el objeto Funcionario ---
-            Dim f As Funcionario
+            ' --- Lógica para CREAR un nuevo funcionario ---
             If _modo = ModoFormulario.Crear Then
-                f = New Funcionario()
-                f.CreatedAt = DateTime.Now
-            Else
-                f = Await _svc.GetByIdCompletoAsync(_idFuncionario)
-                If f Is Nothing Then
-                    MessageBox.Show("Funcionario no encontrado.")
-                    Return
+                Dim nuevoFuncionario = New Funcionario With {
+                    .CreatedAt = DateTime.Now,
+                    .CI = txtCI.Text.Trim(),
+                    .Nombre = txtNombre.Text.Trim(),
+                    .FechaIngreso = dtpFechaIngreso.Value.Date,
+                    .TipoFuncionarioId = CInt(cboTipoFuncionario.SelectedValue),
+                    .CargoId = If(cboCargo.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboCargo.SelectedValue)),
+                    .Activo = chkActivo.Checked,
+                    .EscalafonId = If(cboEscalafon.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboEscalafon.SelectedValue)),
+                    .FuncionId = If(cboFuncion.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboFuncion.SelectedValue)),
+                    .FechaNacimiento = If(dtpFechaNacimiento.Value = dtpFechaNacimiento.MinDate, CType(Nothing, Date?), dtpFechaNacimiento.Value.Date),
+                    .Domicilio = txtDomicilio.Text.Trim(),
+                    .Email = txtEmail.Text.Trim(),
+                    .EstadoCivilId = If(cboEstadoCivil.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboEstadoCivil.SelectedValue)),
+                    .GeneroId = If(cboGenero.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboGenero.SelectedValue)),
+                    .NivelEstudioId = If(cboNivelEstudio.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboNivelEstudio.SelectedValue)),
+                    .FuncionarioDotacion = _dotaciones.ToList(),
+                    .FuncionarioObservacion = _observaciones.ToList()
+                }
+
+                If Not String.IsNullOrWhiteSpace(_rutaFotoSeleccionada) Then
+                    nuevoFuncionario.Foto = File.ReadAllBytes(_rutaFotoSeleccionada)
                 End If
-                f.UpdatedAt = DateTime.Now
-            End If
 
-            ' --- Mapear datos desde el formulario al objeto ---
-            f.CI = txtCI.Text.Trim()
-            f.Nombre = txtNombre.Text.Trim()
-            f.FechaIngreso = dtpFechaIngreso.Value.Date
-            f.TipoFuncionarioId = CInt(cboTipoFuncionario.SelectedValue)
-            f.CargoId = If(cboCargo.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboCargo.SelectedValue))
-            f.Activo = chkActivo.Checked
-            f.EscalafonId = If(cboEscalafon.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboEscalafon.SelectedValue))
-            f.FuncionId = If(cboFuncion.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboFuncion.SelectedValue))
-            f.FechaNacimiento = If(dtpFechaNacimiento.Value = dtpFechaNacimiento.MinDate, CType(Nothing, Date?), dtpFechaNacimiento.Value.Date)
-            f.Domicilio = txtDomicilio.Text.Trim()
-            f.Email = txtEmail.Text.Trim()
-            f.EstadoCivilId = If(cboEstadoCivil.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboEstadoCivil.SelectedValue))
-            f.GeneroId = If(cboGenero.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboGenero.SelectedValue))
-            f.NivelEstudioId = If(cboNivelEstudio.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboNivelEstudio.SelectedValue))
+                Await _svc.CreateAsync(nuevoFuncionario)
+                MessageBox.Show("Funcionario creado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
 
-            ' Foto
-            If Not String.IsNullOrWhiteSpace(_rutaFotoSeleccionada) Then
-                f.Foto = File.ReadAllBytes(_rutaFotoSeleccionada)
-            End If
-
-            ' --- Actualizar colecciones ---
-            f.FuncionarioDotacion = _dotaciones.ToList()
-            f.FuncionarioObservacion = _observaciones.ToList()
-
-            ' --- Guardar en la base de datos ---
-            If _modo = ModoFormulario.Crear Then
-                Await _svc.CreateAsync(f)
-                MessageBox.Show("Funcionario creado correctamente.")
+                ' --- Lógica para ACTUALIZAR un funcionario existente ---
             Else
                 Using uow As New UnitOfWork()
-                    ' Eliminar registros marcados
-                    If _dotacionesEliminadas.Any() Then
-                        uow.Repository(Of FuncionarioDotacion).RemoveRange(_dotacionesEliminadas)
+                    ' Cargar el funcionario existente con sus colecciones
+                    Dim funcionarioInDb = Await uow.Repository(Of Funcionario).GetAll() _
+                        .Include(Function(f) f.FuncionarioDotacion) _
+                        .Include(Function(f) f.FuncionarioObservacion) _
+                        .FirstOrDefaultAsync(Function(f) f.Id = _idFuncionario)
+
+                    If funcionarioInDb Is Nothing Then
+                        MessageBox.Show("No se pudo encontrar el funcionario para actualizar.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                        Return
                     End If
-                    If _observacionesEliminadas.Any() Then
-                        uow.Repository(Of FuncionarioObservacion).RemoveRange(_observacionesEliminadas)
+
+                    ' Mapear propiedades escalares
+                    funcionarioInDb.UpdatedAt = DateTime.Now
+                    funcionarioInDb.CI = txtCI.Text.Trim()
+                    funcionarioInDb.Nombre = txtNombre.Text.Trim()
+                    funcionarioInDb.FechaIngreso = dtpFechaIngreso.Value.Date
+                    funcionarioInDb.TipoFuncionarioId = CInt(cboTipoFuncionario.SelectedValue)
+                    funcionarioInDb.CargoId = If(cboCargo.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboCargo.SelectedValue))
+                    funcionarioInDb.Activo = chkActivo.Checked
+                    funcionarioInDb.EscalafonId = If(cboEscalafon.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboEscalafon.SelectedValue))
+                    funcionarioInDb.FuncionId = If(cboFuncion.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboFuncion.SelectedValue))
+                    funcionarioInDb.FechaNacimiento = If(dtpFechaNacimiento.Value = dtpFechaNacimiento.MinDate, CType(Nothing, Date?), dtpFechaNacimiento.Value.Date)
+                    funcionarioInDb.Domicilio = txtDomicilio.Text.Trim()
+                    funcionarioInDb.Email = txtEmail.Text.Trim()
+                    funcionarioInDb.EstadoCivilId = If(cboEstadoCivil.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboEstadoCivil.SelectedValue))
+                    funcionarioInDb.GeneroId = If(cboGenero.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboGenero.SelectedValue))
+                    funcionarioInDb.NivelEstudioId = If(cboNivelEstudio.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboNivelEstudio.SelectedValue))
+
+                    If Not String.IsNullOrWhiteSpace(_rutaFotoSeleccionada) Then
+                        funcionarioInDb.Foto = File.ReadAllBytes(_rutaFotoSeleccionada)
                     End If
+
+                    ' Sincronizar Dotaciones
+                    For Each item In _dotacionesEliminadas
+                        uow.Repository(Of FuncionarioDotacion).RemoveById(item.Id)
+                    Next
+
+                    For Each item In _dotaciones
+                        If item.Id = 0 Then ' Nuevo
+                            funcionarioInDb.FuncionarioDotacion.Add(item)
+                        Else ' Existente
+                            Dim dotacionInDb = funcionarioInDb.FuncionarioDotacion.FirstOrDefault(Function(d) d.Id = item.Id)
+                            If dotacionInDb IsNot Nothing Then
+                                uow.Context.Entry(dotacionInDb).CurrentValues.SetValues(item)
+                            End If
+                        End If
+                    Next
+
+                    ' Sincronizar Observaciones
+                    For Each item In _observacionesEliminadas
+                        uow.Repository(Of FuncionarioObservacion).RemoveById(item.Id)
+                    Next
+
+                    For Each item In _observaciones
+                        If item.Id = 0 Then ' Nuevo
+                            funcionarioInDb.FuncionarioObservacion.Add(item)
+                        Else ' Existente
+                            Dim obsInDb = funcionarioInDb.FuncionarioObservacion.FirstOrDefault(Function(o) o.Id = item.Id)
+                            If obsInDb IsNot Nothing Then
+                                uow.Context.Entry(obsInDb).CurrentValues.SetValues(item)
+                            End If
+                        End If
+                    Next
+
                     Await uow.CommitAsync()
+                    MessageBox.Show("Funcionario actualizado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 End Using
-                Await _svc.UpdateAsync(f)
-                MessageBox.Show("Funcionario actualizado correctamente.")
             End If
 
             DialogResult = DialogResult.OK
@@ -259,7 +303,7 @@ Public Class frmFuncionarioCrear
         Dim dotacionSeleccionada = CType(dgvDotacion.CurrentRow.DataBoundItem, FuncionarioDotacion)
         Using frm As New frmFuncionarioDotacion(dotacionSeleccionada)
             frm.ShowDialog()
-            _dotaciones.ResetBindings() ' Refresca la grilla
+            _dotaciones.ResetBindings()
         End Using
     End Sub
 
@@ -290,7 +334,7 @@ Public Class frmFuncionarioCrear
         Dim observacionSeleccionada = CType(dgvObservaciones.CurrentRow.DataBoundItem, FuncionarioObservacion)
         Using frm As New frmFuncionarioObservacion(observacionSeleccionada)
             frm.ShowDialog()
-            _observaciones.ResetBindings() ' Refresca la grilla
+            _observaciones.ResetBindings()
         End Using
     End Sub
 
