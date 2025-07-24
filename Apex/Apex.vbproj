@@ -325,6 +325,18 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Services\FuncionarioService.vb" />
+    <Compile Include="UI\frmFuncionarioDotacion.Designer.vb">
+      <DependentUpon>frmFuncionarioDotacion.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmFuncionarioDotacion.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\frmFuncionarioObservacion.Designer.vb">
+      <DependentUpon>frmFuncionarioObservacion.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmFuncionarioObservacion.vb">
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="UI\frmFuncionarioBuscar.resx">
