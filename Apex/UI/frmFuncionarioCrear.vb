@@ -105,8 +105,8 @@ Public Class frmFuncionarioCrear
         cboTipoFuncionario.SelectedValue = f.TipoFuncionarioId
         cboCargo.SelectedValue = If(f.CargoId.HasValue, CInt(f.CargoId), -1)
         chkActivo.Checked = f.Activo
-        ' cboEscalafon.SelectedValue = If(f.EscalafonId.HasValue, CInt(f.EscalafonId), -1)
-        ' cboFuncion.SelectedValue = If(f.FuncionId.HasValue, CInt(f.FuncionId), -1)
+        cboEscalafon.SelectedValue = If(f.EscalafonId.HasValue, CInt(f.EscalafonId), -1)
+        cboFuncion.SelectedValue = If(f.FuncionId.HasValue, CInt(f.FuncionId), -1)
 
         _fotoOriginal = f.Foto
         If _fotoOriginal IsNot Nothing AndAlso _fotoOriginal.Length > 0 Then
@@ -114,13 +114,13 @@ Public Class frmFuncionarioCrear
         End If
 
         ' --- Cargar Pestaña Datos Personales ---
-        ' dtpFechaNacimiento.Value = If(f.FechaNacimiento.HasValue, f.FechaNacimiento.Value, dtpFechaNacimiento.MinDate)
-        ' txtDomicilio.Text = f.Domicilio
-        ' txtEmail.Text = f.Email
-        ' txtTelefono.Text = "" ' <-- Lógica pendiente para leer de FuncionarioDispositivo
-        ' cboEstadoCivil.SelectedValue = If(f.EstadoCivilId.HasValue, CInt(f.EstadoCivilId), -1)
-        ' cboGenero.SelectedValue = If(f.GeneroId.HasValue, CInt(f.GeneroId), -1)
-        ' cboNivelEstudio.SelectedValue = If(f.NivelEstudioId.HasValue, CInt(f.NivelEstudioId), -1)
+        dtpFechaNacimiento.Value = If(f.FechaNacimiento.HasValue, f.FechaNacimiento.Value, dtpFechaNacimiento.MinDate)
+        txtDomicilio.Text = f.Domicilio
+        txtEmail.Text = f.Email
+        txtTelefono.Text = "" ' <-- Lógica pendiente para leer de FuncionarioDispositivo
+        cboEstadoCivil.SelectedValue = If(f.EstadoCivilId.HasValue, CInt(f.EstadoCivilId), -1)
+        cboGenero.SelectedValue = If(f.GeneroId.HasValue, CInt(f.GeneroId), -1)
+        cboNivelEstudio.SelectedValue = If(f.NivelEstudioId.HasValue, CInt(f.NivelEstudioId), -1)
 
     End Function
 
@@ -168,8 +168,8 @@ Public Class frmFuncionarioCrear
             f.TipoFuncionarioId = CInt(cboTipoFuncionario.SelectedValue)
             f.CargoId = If(cboCargo.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboCargo.SelectedValue))
             f.Activo = chkActivo.Checked
-            ' f.EscalafonId = If(cboEscalafon.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboEscalafon.SelectedValue))
-            ' f.FuncionId = If(cboFuncion.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboFuncion.SelectedValue))
+            f.EscalafonId = If(cboEscalafon.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboEscalafon.SelectedValue))
+            f.FuncionId = If(cboFuncion.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboFuncion.SelectedValue))
 
 
             ' Foto: usa la variable en lugar del textbox
@@ -178,12 +178,12 @@ Public Class frmFuncionarioCrear
             End If
 
             ' Pestaña Datos Personales
-            ' f.FechaNacimiento = If(dtpFechaNacimiento.Value = dtpFechaNacimiento.MinDate, CType(Nothing, Date?), dtpFechaNacimiento.Value.Date)
-            ' f.Domicilio = txtDomicilio.Text.Trim()
-            ' f.Email = txtEmail.Text.Trim()
-            ' f.EstadoCivilId = If(cboEstadoCivil.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboEstadoCivil.SelectedValue))
-            ' f.GeneroId = If(cboGenero.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboGenero.SelectedValue))
-            ' f.NivelEstudioId = If(cboNivelEstudio.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboNivelEstudio.SelectedValue))
+            f.FechaNacimiento = If(dtpFechaNacimiento.Value = dtpFechaNacimiento.MinDate, CType(Nothing, Date?), dtpFechaNacimiento.Value.Date)
+            f.Domicilio = txtDomicilio.Text.Trim()
+            f.Email = txtEmail.Text.Trim()
+            f.EstadoCivilId = If(cboEstadoCivil.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboEstadoCivil.SelectedValue))
+            f.GeneroId = If(cboGenero.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboGenero.SelectedValue))
+            f.NivelEstudioId = If(cboNivelEstudio.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboNivelEstudio.SelectedValue))
 
 
             ' --- Guardar en la base de datos ---
