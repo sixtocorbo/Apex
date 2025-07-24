@@ -146,20 +146,14 @@ Public Class frmFuncionarioCrear
     Private Async Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
         Try
             ' --- Validaciones básicas ---
-            If String.IsNullOrWhiteSpace(txtCI.Text) Then
-                MessageBox.Show("El CI es obligatorio.")
-                Return
-            End If
-            If String.IsNullOrWhiteSpace(txtNombre.Text) Then
-                MessageBox.Show("El nombre es obligatorio.")
-                Return
-            End If
-            If cboTipoFuncionario.SelectedIndex = -1 Then
-                MessageBox.Show("Debe seleccionar un tipo de funcionario.")
+            If String.IsNullOrWhiteSpace(txtCI.Text) OrElse
+               String.IsNullOrWhiteSpace(txtNombre.Text) OrElse
+               cboTipoFuncionario.SelectedIndex = -1 Then
+                MessageBox.Show("Los campos CI, Nombre y Tipo de Funcionario son obligatorios.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
                 Return
             End If
             If dtpFechaIngreso.Value > DateTime.Now Then
-                MessageBox.Show("La fecha de ingreso no puede ser futura.")
+                MessageBox.Show("La fecha de ingreso no puede ser futura.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
                 Return
             End If
 
@@ -206,7 +200,7 @@ Public Class frmFuncionarioCrear
                         Return
                     End If
 
-                    ' Mapear propiedades escalares
+                    ' Mapear propiedades escalares del formulario al objeto de la BD
                     funcionarioInDb.UpdatedAt = DateTime.Now
                     funcionarioInDb.CI = txtCI.Text.Trim()
                     funcionarioInDb.Nombre = txtNombre.Text.Trim()
@@ -227,34 +221,52 @@ Public Class frmFuncionarioCrear
                         funcionarioInDb.Foto = File.ReadAllBytes(_rutaFotoSeleccionada)
                     End If
 
-                    ' Sincronizar Dotaciones
+                    ' --- Sincronizar Dotaciones ---
+                    ' 1. Eliminar
                     For Each item In _dotacionesEliminadas
-                        uow.Repository(Of FuncionarioDotacion).RemoveById(item.Id)
-                    Next
-
-                    For Each item In _dotaciones
-                        If item.Id = 0 Then ' Nuevo
-                            funcionarioInDb.FuncionarioDotacion.Add(item)
-                        Else ' Existente
-                            Dim dotacionInDb = funcionarioInDb.FuncionarioDotacion.FirstOrDefault(Function(d) d.Id = item.Id)
-                            If dotacionInDb IsNot Nothing Then
-                                uow.Context.Entry(dotacionInDb).CurrentValues.SetValues(item)
+                        If item.Id > 0 Then
+                            Dim dotacionParaBorrar = funcionarioInDb.FuncionarioDotacion.FirstOrDefault(Function(d) d.Id = item.Id)
+                            If dotacionParaBorrar IsNot Nothing Then
+                                uow.Context.Set(Of FuncionarioDotacion).Remove(dotacionParaBorrar)
                             End If
                         End If
                     Next
 
-                    ' Sincronizar Observaciones
-                    For Each item In _observacionesEliminadas
-                        uow.Repository(Of FuncionarioObservacion).RemoveById(item.Id)
+                    ' 2. Actualizar y Agregar
+                    For Each itemForm In _dotaciones
+                        If itemForm.Id = 0 Then ' Nuevo
+                            funcionarioInDb.FuncionarioDotacion.Add(itemForm)
+                        Else ' Existente
+                            Dim dotacionInDb = funcionarioInDb.FuncionarioDotacion.FirstOrDefault(Function(d) d.Id = itemForm.Id)
+                            If dotacionInDb IsNot Nothing Then
+                                ' Actualizar manualmente para evitar el error de CurrentValues
+                                dotacionInDb.Item = itemForm.Item
+                                dotacionInDb.Talla = itemForm.Talla
+                                dotacionInDb.Observaciones = itemForm.Observaciones
+                            End If
+                        End If
                     Next
 
-                    For Each item In _observaciones
-                        If item.Id = 0 Then ' Nuevo
-                            funcionarioInDb.FuncionarioObservacion.Add(item)
+                    ' --- Sincronizar Observaciones ---
+                    ' 1. Eliminar
+                    For Each item In _observacionesEliminadas
+                        If item.Id > 0 Then
+                            Dim obsParaBorrar = funcionarioInDb.FuncionarioObservacion.FirstOrDefault(Function(o) o.Id = item.Id)
+                            If obsParaBorrar IsNot Nothing Then
+                                uow.Context.Set(Of FuncionarioObservacion).Remove(obsParaBorrar)
+                            End If
+                        End If
+                    Next
+
+                    ' 2. Actualizar y Agregar
+                    For Each itemForm In _observaciones
+                        If itemForm.Id = 0 Then ' Nuevo
+                            funcionarioInDb.FuncionarioObservacion.Add(itemForm)
                         Else ' Existente
-                            Dim obsInDb = funcionarioInDb.FuncionarioObservacion.FirstOrDefault(Function(o) o.Id = item.Id)
+                            Dim obsInDb = funcionarioInDb.FuncionarioObservacion.FirstOrDefault(Function(o) o.Id = itemForm.Id)
                             If obsInDb IsNot Nothing Then
-                                uow.Context.Entry(obsInDb).CurrentValues.SetValues(item)
+                                obsInDb.Categoria = itemForm.Categoria
+                                obsInDb.Texto = itemForm.Texto
                             End If
                         End If
                     Next
@@ -302,8 +314,9 @@ Public Class frmFuncionarioCrear
         If dgvDotacion.CurrentRow Is Nothing Then Return
         Dim dotacionSeleccionada = CType(dgvDotacion.CurrentRow.DataBoundItem, FuncionarioDotacion)
         Using frm As New frmFuncionarioDotacion(dotacionSeleccionada)
-            frm.ShowDialog()
-            _dotaciones.ResetBindings()
+            If frm.ShowDialog() = DialogResult.OK Then
+                _dotaciones.ResetBindings() ' Refresca la grilla
+            End If
         End Using
     End Sub
 
@@ -333,8 +346,9 @@ Public Class frmFuncionarioCrear
         If dgvObservaciones.CurrentRow Is Nothing Then Return
         Dim observacionSeleccionada = CType(dgvObservaciones.CurrentRow.DataBoundItem, FuncionarioObservacion)
         Using frm As New frmFuncionarioObservacion(observacionSeleccionada)
-            frm.ShowDialog()
-            _observaciones.ResetBindings()
+            If frm.ShowDialog() = DialogResult.OK Then
+                _observaciones.ResetBindings() ' Refresca la grilla
+            End If
         End Using
     End Sub
 
