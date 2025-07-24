@@ -96,7 +96,8 @@ Partial Class frmNotificacionCrear
         'cboFuncionario
         '
         Me.cboFuncionario.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboFuncionario.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        ' --- CAMBIO CLAVE: Permite escribir en el ComboBox ---
+        Me.cboFuncionario.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown
         Me.cboFuncionario.FormattingEnabled = True
         Me.cboFuncionario.Location = New System.Drawing.Point(121, 3)
         Me.cboFuncionario.Name = "cboFuncionario"

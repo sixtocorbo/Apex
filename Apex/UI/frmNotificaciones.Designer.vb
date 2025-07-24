@@ -25,7 +25,7 @@ Partial Class frmNotificaciones
         Me.btnNueva = New System.Windows.Forms.Button()
         Me.btnEditar = New System.Windows.Forms.Button()
         Me.btnEliminar = New System.Windows.Forms.Button()
-        Me.btnMarcarFirmada = New System.Windows.Forms.Button()
+        Me.btnCambiarEstado = New System.Windows.Forms.Button()
         Me.splitContenedor = New System.Windows.Forms.SplitContainer()
         Me.dgvNotificaciones = New System.Windows.Forms.DataGridView()
         Me.txtTextoNotificacion = New System.Windows.Forms.TextBox()
@@ -80,7 +80,7 @@ Partial Class frmNotificaciones
         Me.panelAcciones.Controls.Add(Me.btnNueva)
         Me.panelAcciones.Controls.Add(Me.btnEditar)
         Me.panelAcciones.Controls.Add(Me.btnEliminar)
-        Me.panelAcciones.Controls.Add(Me.btnMarcarFirmada)
+        Me.panelAcciones.Controls.Add(Me.btnCambiarEstado)
         Me.panelAcciones.Dock = System.Windows.Forms.DockStyle.Bottom
         Me.panelAcciones.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
         Me.panelAcciones.Location = New System.Drawing.Point(0, 520)
@@ -116,14 +116,14 @@ Partial Class frmNotificaciones
         Me.btnEliminar.Text = "Eliminar"
         Me.btnEliminar.UseVisualStyleBackColor = True
         '
-        'btnMarcarFirmada
+        'btnCambiarEstado
         '
-        Me.btnMarcarFirmada.Location = New System.Drawing.Point(595, 13)
-        Me.btnMarcarFirmada.Name = "btnMarcarFirmada"
-        Me.btnMarcarFirmada.Size = New System.Drawing.Size(123, 23)
-        Me.btnMarcarFirmada.TabIndex = 3
-        Me.btnMarcarFirmada.Text = "Marcar como Firmada"
-        Me.btnMarcarFirmada.UseVisualStyleBackColor = True
+        Me.btnCambiarEstado.Location = New System.Drawing.Point(534, 13)
+        Me.btnCambiarEstado.Name = "btnCambiarEstado"
+        Me.btnCambiarEstado.Size = New System.Drawing.Size(184, 23)
+        Me.btnCambiarEstado.TabIndex = 3
+        Me.btnCambiarEstado.Text = "Cambiar Estado..."
+        Me.btnCambiarEstado.UseVisualStyleBackColor = True
         '
         'splitContenedor
         '
@@ -208,7 +208,7 @@ Partial Class frmNotificaciones
     Friend WithEvents btnNueva As Button
     Friend WithEvents btnEditar As Button
     Friend WithEvents btnEliminar As Button
-    Friend WithEvents btnMarcarFirmada As Button
+    Friend WithEvents btnCambiarEstado As Button
     Friend WithEvents splitContenedor As SplitContainer
     Friend WithEvents txtTextoNotificacion As TextBox
 End Class

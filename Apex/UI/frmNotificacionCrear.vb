@@ -42,6 +42,9 @@ Public Class frmNotificacionCrear
         cboFuncionario.DisplayMember = "Value"
         cboFuncionario.ValueMember = "Key"
         cboFuncionario.DataSource = Await _svc.ObtenerFuncionariosParaComboAsync()
+        ' --- LÍNEAS AÑADIDAS: Se activa la magia del autocompletado ---
+        cboFuncionario.AutoCompleteMode = AutoCompleteMode.SuggestAppend
+        cboFuncionario.AutoCompleteSource = AutoCompleteSource.ListItems
 
         ' Cargar Tipos de Notificación llamando al servicio
         cboTipoNotificacion.DisplayMember = "Value"

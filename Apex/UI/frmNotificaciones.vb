@@ -113,18 +113,40 @@ Public Class frmNotificaciones
         End If
     End Sub
 
-    Private Async Sub btnMarcarFirmada_Click(sender As Object, e As EventArgs) Handles btnMarcarFirmada.Click
+
+    Private Async Sub btnCambiarEstado_Click_1(sender As Object, e As EventArgs) Handles btnCambiarEstado.Click
         If dgvNotificaciones.CurrentRow Is Nothing Then Return
+
         Dim idSeleccionado = CInt(dgvNotificaciones.CurrentRow.Cells("Id").Value)
+        Dim notificacionSeleccionada = _listaNotificaciones.FirstOrDefault(Function(n) n.Id = idSeleccionado)
 
-        Const ESTADO_FIRMADA As Byte = 3 ' Asumiendo que el ID de "Firmada" es 3
+        If notificacionSeleccionada Is Nothing Then Return
 
-        Try
-            Await _svc.UpdateEstadoAsync(idSeleccionado, ESTADO_FIRMADA)
-            Await CargarNotificacionesAsync()
-        Catch ex As Exception
-            MessageBox.Show("Error al actualizar el estado: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-        End Try
+        ' Abrimos el nuevo formulario de diálogo
+        Using frm As New frmCambiarEstadoNotificacion()
+            If frm.ShowDialog() = DialogResult.OK Then
+                Dim nuevoEstadoId = frm.SelectedEstadoId
+
+                ' --- Lógica de Validación ---
+                Const ESTADO_VENCIDA As Byte = 2 ' Asumiendo que el ID de "Vencida" es 2
+
+                ' Regla 1: No se puede marcar como "Vencida" si la fecha programada es futura.
+                If nuevoEstadoId = ESTADO_VENCIDA AndAlso notificacionSeleccionada.FechaProgramada.Date > Date.Today Then
+                    MessageBox.Show("No se puede marcar una notificación como 'Vencida' antes de su fecha programada.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                    Return
+                End If
+
+                ' Aquí puedes añadir más reglas de validación si lo necesitas...
+
+
+                ' Si todas las validaciones pasan, actualizamos el estado.
+                Try
+                    Await _svc.UpdateEstadoAsync(idSeleccionado, nuevoEstadoId)
+                    Await CargarNotificacionesAsync() ' Recargar la grilla para ver el cambio
+                Catch ex As Exception
+                    MessageBox.Show("Error al actualizar el estado: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                End Try
+            End If
+        End Using
     End Sub
-
 End Class

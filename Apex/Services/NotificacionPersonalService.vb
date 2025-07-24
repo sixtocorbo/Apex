@@ -72,6 +72,11 @@ Public Class NotificacionPersonalService
         Dim lista = Await repo.GetAll().AsNoTracking().OrderBy(Function(t) t.Orden).ToListAsync()
         Return lista.Select(Function(t) New KeyValuePair(Of Byte, String)(t.Id, t.Nombre)).ToList()
     End Function
+    Public Async Function ObtenerEstadosParaComboAsync() As Task(Of List(Of KeyValuePair(Of Byte, String)))
+        Dim repo = _unitOfWork.Repository(Of NotificacionEstado)()
+        Dim lista = Await repo.GetAll().AsNoTracking().OrderBy(Function(e) e.Orden).ToListAsync()
+        Return lista.Select(Function(e) New KeyValuePair(Of Byte, String)(e.Id, e.Nombre)).ToList()
+    End Function
 
     Public Class NotificacionParaVista
         Public Property Id As Integer
