@@ -20,11 +20,9 @@ Public Class frmFuncionarioCrear
     Private _fotoOriginal As Byte()
     Private _rutaFotoSeleccionada As String
 
-    ' --- Colecciones para manejar los cambios en Dotación y Observaciones ---
+    ' --- Colecciones para manejar los datos en el formulario ---
     Private _dotaciones As BindingList(Of FuncionarioDotacion)
     Private _observaciones As BindingList(Of FuncionarioObservacion)
-    Private _dotacionesEliminadas As New List(Of FuncionarioDotacion)
-    Private _observacionesEliminadas As New List(Of FuncionarioObservacion)
 
     '-------------------- Constructores ----------------------
     Public Sub New()
@@ -157,124 +155,56 @@ Public Class frmFuncionarioCrear
                 Return
             End If
 
-            ' --- Lógica para CREAR un nuevo funcionario ---
-            If _modo = ModoFormulario.Crear Then
-                Dim nuevoFuncionario = New Funcionario With {
-                    .CreatedAt = DateTime.Now,
-                    .CI = txtCI.Text.Trim(),
-                    .Nombre = txtNombre.Text.Trim(),
-                    .FechaIngreso = dtpFechaIngreso.Value.Date,
-                    .TipoFuncionarioId = CInt(cboTipoFuncionario.SelectedValue),
-                    .CargoId = If(cboCargo.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboCargo.SelectedValue)),
-                    .Activo = chkActivo.Checked,
-                    .EscalafonId = If(cboEscalafon.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboEscalafon.SelectedValue)),
-                    .FuncionId = If(cboFuncion.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboFuncion.SelectedValue)),
-                    .FechaNacimiento = If(dtpFechaNacimiento.Value = dtpFechaNacimiento.MinDate, CType(Nothing, Date?), dtpFechaNacimiento.Value.Date),
-                    .Domicilio = txtDomicilio.Text.Trim(),
-                    .Email = txtEmail.Text.Trim(),
-                    .EstadoCivilId = If(cboEstadoCivil.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboEstadoCivil.SelectedValue)),
-                    .GeneroId = If(cboGenero.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboGenero.SelectedValue)),
-                    .NivelEstudioId = If(cboNivelEstudio.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboNivelEstudio.SelectedValue)),
-                    .FuncionarioDotacion = _dotaciones.ToList(),
-                    .FuncionarioObservacion = _observaciones.ToList()
-                }
+            Using uow As New UnitOfWork()
+                Dim funcionario As Funcionario
 
-                If Not String.IsNullOrWhiteSpace(_rutaFotoSeleccionada) Then
-                    nuevoFuncionario.Foto = File.ReadAllBytes(_rutaFotoSeleccionada)
-                End If
-
-                Await _svc.CreateAsync(nuevoFuncionario)
-                MessageBox.Show("Funcionario creado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
-
-                ' --- Lógica para ACTUALIZAR un funcionario existente ---
-            Else
-                Using uow As New UnitOfWork()
-                    ' Cargar el funcionario existente con sus colecciones
-                    Dim funcionarioInDb = Await uow.Repository(Of Funcionario).GetAll() _
+                ' --- Lógica para CREAR o CARGAR el funcionario ---
+                If _modo = ModoFormulario.Crear Then
+                    funcionario = New Funcionario()
+                    funcionario.CreatedAt = DateTime.Now
+                    uow.Repository(Of Funcionario).Add(funcionario)
+                Else
+                    ' Se carga la entidad CON TRACKING para poder actualizarla
+                    funcionario = Await uow.Repository(Of Funcionario).GetAll() _
                         .Include(Function(f) f.FuncionarioDotacion) _
                         .Include(Function(f) f.FuncionarioObservacion) _
                         .FirstOrDefaultAsync(Function(f) f.Id = _idFuncionario)
 
-                    If funcionarioInDb Is Nothing Then
+                    If funcionario Is Nothing Then
                         MessageBox.Show("No se pudo encontrar el funcionario para actualizar.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
                         Return
                     End If
+                    funcionario.UpdatedAt = DateTime.Now
+                End If
 
-                    ' Mapear propiedades escalares del formulario al objeto de la BD
-                    funcionarioInDb.UpdatedAt = DateTime.Now
-                    funcionarioInDb.CI = txtCI.Text.Trim()
-                    funcionarioInDb.Nombre = txtNombre.Text.Trim()
-                    funcionarioInDb.FechaIngreso = dtpFechaIngreso.Value.Date
-                    funcionarioInDb.TipoFuncionarioId = CInt(cboTipoFuncionario.SelectedValue)
-                    funcionarioInDb.CargoId = If(cboCargo.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboCargo.SelectedValue))
-                    funcionarioInDb.Activo = chkActivo.Checked
-                    funcionarioInDb.EscalafonId = If(cboEscalafon.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboEscalafon.SelectedValue))
-                    funcionarioInDb.FuncionId = If(cboFuncion.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboFuncion.SelectedValue))
-                    funcionarioInDb.FechaNacimiento = If(dtpFechaNacimiento.Value = dtpFechaNacimiento.MinDate, CType(Nothing, Date?), dtpFechaNacimiento.Value.Date)
-                    funcionarioInDb.Domicilio = txtDomicilio.Text.Trim()
-                    funcionarioInDb.Email = txtEmail.Text.Trim()
-                    funcionarioInDb.EstadoCivilId = If(cboEstadoCivil.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboEstadoCivil.SelectedValue))
-                    funcionarioInDb.GeneroId = If(cboGenero.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboGenero.SelectedValue))
-                    funcionarioInDb.NivelEstudioId = If(cboNivelEstudio.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboNivelEstudio.SelectedValue))
+                ' --- Mapear datos escalares del formulario al objeto ---
+                funcionario.CI = txtCI.Text.Trim()
+                funcionario.Nombre = txtNombre.Text.Trim()
+                funcionario.FechaIngreso = dtpFechaIngreso.Value.Date
+                funcionario.TipoFuncionarioId = CInt(cboTipoFuncionario.SelectedValue)
+                funcionario.CargoId = If(cboCargo.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboCargo.SelectedValue))
+                funcionario.Activo = chkActivo.Checked
+                funcionario.EscalafonId = If(cboEscalafon.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboEscalafon.SelectedValue))
+                funcionario.FuncionId = If(cboFuncion.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboFuncion.SelectedValue))
+                funcionario.FechaNacimiento = If(dtpFechaNacimiento.Value = dtpFechaNacimiento.MinDate, CType(Nothing, Date?), dtpFechaNacimiento.Value.Date)
+                funcionario.Domicilio = txtDomicilio.Text.Trim()
+                funcionario.Email = txtEmail.Text.Trim()
+                funcionario.EstadoCivilId = If(cboEstadoCivil.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboEstadoCivil.SelectedValue))
+                funcionario.GeneroId = If(cboGenero.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboGenero.SelectedValue))
+                funcionario.NivelEstudioId = If(cboNivelEstudio.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboNivelEstudio.SelectedValue))
 
-                    If Not String.IsNullOrWhiteSpace(_rutaFotoSeleccionada) Then
-                        funcionarioInDb.Foto = File.ReadAllBytes(_rutaFotoSeleccionada)
-                    End If
+                If Not String.IsNullOrWhiteSpace(_rutaFotoSeleccionada) Then
+                    funcionario.Foto = File.ReadAllBytes(_rutaFotoSeleccionada)
+                End If
 
-                    ' --- Sincronizar Dotaciones ---
-                    ' 1. Eliminar
-                    For Each item In _dotacionesEliminadas
-                        If item.Id > 0 Then
-                            Dim dotacionParaBorrar = funcionarioInDb.FuncionarioDotacion.FirstOrDefault(Function(d) d.Id = item.Id)
-                            If dotacionParaBorrar IsNot Nothing Then
-                                uow.Context.Set(Of FuncionarioDotacion).Remove(dotacionParaBorrar)
-                            End If
-                        End If
-                    Next
+                ' --- Sincronizar colecciones ---
+                SincronizarColeccion(funcionario.FuncionarioDotacion, _dotaciones, uow.Context)
+                SincronizarColeccion(funcionario.FuncionarioObservacion, _observaciones, uow.Context)
 
-                    ' 2. Actualizar y Agregar
-                    For Each itemForm In _dotaciones
-                        If itemForm.Id = 0 Then ' Nuevo
-                            funcionarioInDb.FuncionarioDotacion.Add(itemForm)
-                        Else ' Existente
-                            Dim dotacionInDb = funcionarioInDb.FuncionarioDotacion.FirstOrDefault(Function(d) d.Id = itemForm.Id)
-                            If dotacionInDb IsNot Nothing Then
-                                ' Actualizar manualmente para evitar el error de CurrentValues
-                                dotacionInDb.Item = itemForm.Item
-                                dotacionInDb.Talla = itemForm.Talla
-                                dotacionInDb.Observaciones = itemForm.Observaciones
-                            End If
-                        End If
-                    Next
-
-                    ' --- Sincronizar Observaciones ---
-                    ' 1. Eliminar
-                    For Each item In _observacionesEliminadas
-                        If item.Id > 0 Then
-                            Dim obsParaBorrar = funcionarioInDb.FuncionarioObservacion.FirstOrDefault(Function(o) o.Id = item.Id)
-                            If obsParaBorrar IsNot Nothing Then
-                                uow.Context.Set(Of FuncionarioObservacion).Remove(obsParaBorrar)
-                            End If
-                        End If
-                    Next
-
-                    ' 2. Actualizar y Agregar
-                    For Each itemForm In _observaciones
-                        If itemForm.Id = 0 Then ' Nuevo
-                            funcionarioInDb.FuncionarioObservacion.Add(itemForm)
-                        Else ' Existente
-                            Dim obsInDb = funcionarioInDb.FuncionarioObservacion.FirstOrDefault(Function(o) o.Id = itemForm.Id)
-                            If obsInDb IsNot Nothing Then
-                                obsInDb.Categoria = itemForm.Categoria
-                                obsInDb.Texto = itemForm.Texto
-                            End If
-                        End If
-                    Next
-
-                    Await uow.CommitAsync()
-                    MessageBox.Show("Funcionario actualizado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
-                End Using
-            End If
+                ' --- Guardar todos los cambios en una sola transacción ---
+                Await uow.CommitAsync()
+                MessageBox.Show(If(_modo = ModoFormulario.Crear, "Funcionario creado", "Funcionario actualizado") & " correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            End Using
 
             DialogResult = DialogResult.OK
             Close()
@@ -283,6 +213,33 @@ Public Class frmFuncionarioCrear
             MessageBox.Show("Ocurrió un error al guardar: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
     End Sub
+
+    Private Sub SincronizarColeccion(Of T As {Class, New})(dbCollection As ICollection(Of T), formCollection As BindingList(Of T), ctx As DbContext)
+        ' 1. Eliminar los que ya no están en la lista del formulario
+        Dim itemsParaBorrar = dbCollection.Where(Function(dbItem)
+                                                     Dim dbId = CInt(dbItem.GetType().GetProperty("Id").GetValue(dbItem))
+                                                     Return dbId > 0 AndAlso Not formCollection.Any(Function(formItem) CInt(formItem.GetType().GetProperty("Id").GetValue(formItem)) = dbId)
+                                                 End Function).ToList()
+
+        For Each item In itemsParaBorrar
+            ctx.Entry(item).State = EntityState.Deleted
+        Next
+
+        ' 2. Actualizar los existentes y agregar los nuevos
+        For Each itemForm In formCollection
+            Dim id = CInt(itemForm.GetType().GetProperty("Id").GetValue(itemForm))
+            If id = 0 Then ' Nuevo
+                dbCollection.Add(itemForm)
+            Else ' Existente
+                Dim itemInDb = dbCollection.FirstOrDefault(Function(x) CInt(x.GetType().GetProperty("Id").GetValue(x)) = id)
+                If itemInDb IsNot Nothing Then
+                    ' Copia los valores del objeto del formulario al objeto que está siendo rastreado por el contexto
+                    ctx.Entry(itemInDb).CurrentValues.SetValues(itemForm)
+                End If
+            End If
+        Next
+    End Sub
+
 
     '-------------------- Cancelar ---------------------------
     Private Sub btnCancelar_Click(sender As Object, e As EventArgs) Handles btnCancelar.Click
@@ -324,9 +281,6 @@ Public Class frmFuncionarioCrear
         If dgvDotacion.CurrentRow Is Nothing Then Return
         If MessageBox.Show("¿Está seguro de que desea quitar este elemento de dotación?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
             Dim dotacionSeleccionada = CType(dgvDotacion.CurrentRow.DataBoundItem, FuncionarioDotacion)
-            If dotacionSeleccionada.Id > 0 Then
-                _dotacionesEliminadas.Add(dotacionSeleccionada)
-            End If
             _dotaciones.Remove(dotacionSeleccionada)
         End If
     End Sub
@@ -356,9 +310,6 @@ Public Class frmFuncionarioCrear
         If dgvObservaciones.CurrentRow Is Nothing Then Return
         If MessageBox.Show("¿Está seguro de que desea quitar esta observación?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
             Dim observacionSeleccionada = CType(dgvObservaciones.CurrentRow.DataBoundItem, FuncionarioObservacion)
-            If observacionSeleccionada.Id > 0 Then
-                _observacionesEliminadas.Add(observacionSeleccionada)
-            End If
             _observaciones.Remove(observacionSeleccionada)
         End If
     End Sub
