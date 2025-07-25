@@ -8,7 +8,8 @@
         ' Asociar los manejadores de eventos a los botones de navegación
         AddHandler btnFuncionarios.Click, AddressOf ActivateButton
         AddHandler btnNotificaciones.Click, AddressOf ActivateButton
-        AddHandler btnLicencias.Click, AddressOf ActivateButton ' <-- AÑADIR ESTA LÍNEA
+        AddHandler btnLicencias.Click, AddressOf ActivateButton
+        AddHandler btnFiltros.Click, AddressOf ActivateButton
         AddHandler btnReportes.Click, AddressOf ActivateButton
         AddHandler btnConfiguracion.Click, AddressOf ActivateButton
     End Sub
@@ -29,10 +30,12 @@
             Case "btnFuncionarios"
                 AbrirFormEnPanel(New frmFuncionarioBuscar())
 
+            Case "btnFiltros"
+                AbrirFormEnPanel(New frmFiltroAvanzado())
+
             Case "btnNotificaciones"
                 AbrirFormEnPanel(New frmNotificaciones())
 
-            ' --- NUEVO CASO AÑADIDO ---
             Case "btnLicencias"
                 AbrirFormEnPanel(New frmLicencias())
 
