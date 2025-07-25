@@ -103,7 +103,7 @@ Public Class frmFuncionarioBuscar
 
                 '–– Ejecutar consulta
                 Dim lista = Await ctx.Database _
-                                .SqlQuery(Of FuncionarioMin)(sql, pLimite, pFiltro, pPatron) _
+                                 .SqlQuery(Of FuncionarioMin)(sql, pLimite, pFiltro, pPatron) _
                                 .ToListAsync()
 
                 '–– Actualizar grilla
@@ -192,6 +192,7 @@ Public Class frmFuncionarioBuscar
     Private Async Sub MostrarDetalle(sender As Object, e As EventArgs)
         If dgvResultados.CurrentRow Is Nothing OrElse dgvResultados.CurrentRow.DataBoundItem Is Nothing Then Return
         Dim id = CInt(dgvResultados.CurrentRow.Cells("Id").Value)
+        Dim fechaActual = Date.Today ' <-- Obtenemos la fecha actual para la consulta
 
         Using uow As New UnitOfWork()
             Dim f = Await uow.Repository(Of Funcionario)() _
@@ -209,8 +210,13 @@ Public Class frmFuncionarioBuscar
                                  x.TipoFuncionario,
                                  x.FechaIngreso,
                                  x.Activo,
-                                 .EstadoTransitorioReciente = x.EstadoTransitorio.OrderByDescending(Function(et) et.FechaDesde).FirstOrDefault()
+                                 .EstadosTransitoriosActivos = x.EstadoTransitorio.Where(
+                                     Function(et) et.FechaDesde <= fechaActual AndAlso
+                                                  (Not et.FechaHasta.HasValue OrElse et.FechaHasta.Value >= fechaActual)
+                                 ).Select(Function(et) et.TipoEstadoTransitorio.Nombre).ToList()
                              }).FirstOrDefaultAsync()
+
+            ' Doble chequeo por si la selección cambió mientras se ejecutaba la consulta
             If dgvResultados.CurrentRow Is Nothing _
            OrElse dgvResultados.CurrentRow.DataBoundItem Is Nothing _
            OrElse CInt(dgvResultados.CurrentRow.Cells("Id").Value) <> id Then Return
@@ -224,8 +230,8 @@ Public Class frmFuncionarioBuscar
             lblFechaIngreso.Text = f.FechaIngreso.ToShortDateString()
             chkActivoDetalle.Checked = f.Activo
 
-            If f.EstadoTransitorioReciente IsNot Nothing Then
-                lblEstadoTransitorio.Text = f.EstadoTransitorioReciente.TipoEstadoTransitorio.Nombre
+            If f.EstadosTransitoriosActivos.Any() Then
+                lblEstadoTransitorio.Text = String.Join(", ", f.EstadosTransitoriosActivos)
             Else
                 lblEstadoTransitorio.Text = "Normal"
             End If
@@ -264,7 +270,7 @@ Public Class frmFuncionarioBuscar
                 "EXEC dbo.usp_PresenciaFecha_Apex @Fecha", pFecha
             ).ToListAsync()
             Dim presencia = lista.Where(Function(r) r.FuncionarioId = id).
-                Select(Function(r) r.Resultado).
+                             Select(Function(r) r.Resultado).
                              FirstOrDefault()
             Return If(presencia, "-")
         End Using
