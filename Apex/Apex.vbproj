@@ -289,6 +289,7 @@
     <Compile Include="Data\Usuario.vb">
       <DependentUpon>ApexModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Services\LicenciaService.vb" />
     <Compile Include="Services\LoadingHelper.vb" />
     <Compile Include="Services\NotificacionPersonalService.vb" />
     <Compile Include="UI\frmCambiarEstadoNotificacion.Designer.vb">
@@ -301,6 +302,12 @@
       <DependentUpon>frmDashboard.vb</DependentUpon>
     </Compile>
     <Compile Include="UI\frmDashboard.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\frmFiltros.Designer.vb">
+      <DependentUpon>frmFiltros.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmFiltros.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="UI\frmFuncionarioBuscar.Designer.vb">
@@ -348,6 +355,12 @@
       <DependentUpon>frmFuncionarioObservacion.vb</DependentUpon>
     </Compile>
     <Compile Include="UI\frmFuncionarioObservacion.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\frmLicencias.Designer.vb">
+      <DependentUpon>frmLicencias.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmLicencias.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="UI\frmNotificacionCrear.Designer.vb">

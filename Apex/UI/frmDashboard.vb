@@ -8,6 +8,7 @@
         ' Asociar los manejadores de eventos a los botones de navegación
         AddHandler btnFuncionarios.Click, AddressOf ActivateButton
         AddHandler btnNotificaciones.Click, AddressOf ActivateButton
+        AddHandler btnLicencias.Click, AddressOf ActivateButton ' <-- AÑADIR ESTA LÍNEA
         AddHandler btnReportes.Click, AddressOf ActivateButton
         AddHandler btnConfiguracion.Click, AddressOf ActivateButton
     End Sub
@@ -28,22 +29,20 @@
             Case "btnFuncionarios"
                 AbrirFormEnPanel(New frmFuncionarioBuscar())
 
-            ' --- LÍNEA CORREGIDA ---
             Case "btnNotificaciones"
-                AbrirFormEnPanel(New frmNotificaciones()) ' Ahora abre el formulario correcto.
+                AbrirFormEnPanel(New frmNotificaciones())
+
+            ' --- NUEVO CASO AÑADIDO ---
+            Case "btnLicencias"
+                AbrirFormEnPanel(New frmLicencias())
 
             Case "btnReportes"
-                ' Aquí abrirías tu formulario de reportes en el futuro
-                ' AbrirFormEnPanel(New frmReportes())
                 MessageBox.Show("Formulario de reportes aún no implementado.", "En desarrollo", MessageBoxButtons.OK, MessageBoxIcon.Information)
 
             Case "btnConfiguracion"
-                ' Aquí abrirías tu formulario de configuración
-                ' AbrirFormEnPanel(New frmConfiguracion())
                 MessageBox.Show("Formulario de configuración aún no implementado.", "En desarrollo", MessageBoxButtons.OK, MessageBoxIcon.Information)
         End Select
     End Sub
-
     Private Sub DisableButton()
         If currentBtn IsNot Nothing Then
             currentBtn.BackColor = Color.FromArgb(51, 51, 76) ' Color original del panel
