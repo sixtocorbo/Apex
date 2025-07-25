@@ -112,10 +112,16 @@ Partial Public Class frmFiltroAvanzado
     Private dtOriginal As DataTable = Nothing
     Private dvDatos As DataView = Nothing
     Private ReadOnly filtros As New GestorFiltros()
+    ' --- AÑADIDO: Servicios para las acciones ---
+    Private _licenciaService As LicenciaService
+    Private _notificacionService As NotificacionPersonalService
 #End Region
 
 #Region "Constructor / Load"
     Private Sub frmFiltroAvanzado_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        _licenciaService = New LicenciaService()
+        _notificacionService = New NotificacionPersonalService()
+
         cmbOrigenDatos.DataSource = [Enum].GetValues(GetType(ConsultasGenericas.TipoOrigenDatos))
         cmbOrigenDatos.SelectedIndex = 0
         dtpFechaInicio.Value = Date.Today.AddMonths(-1)
@@ -127,7 +133,12 @@ Partial Public Class frmFiltroAvanzado
         AddHandler cmbOrigenDatos.SelectedIndexChanged, AddressOf cmbOrigenDatos_SelectedIndexChanged
         AddHandler txtBusquedaGlobal.TextChanged, AddressOf txtBusquedaGlobal_TextChanged_Handler
 
+        ' Acciones
+        AddHandler btnNuevaLicencia.Click, AddressOf btnNuevaLicencia_Click
+        ' (Los otros handlers de acciones se pueden dejar en el diseñador o añadirlos aquí)
+
         cmbOrigenDatos_SelectedIndexChanged(cmbOrigenDatos, EventArgs.Empty)
+        ActualizarAccionesDisponibles() ' Ocultar todos los botones al inicio
     End Sub
 #End Region
 
@@ -181,6 +192,7 @@ Partial Public Class frmFiltroAvanzado
             AplicarFiltros()
 
             gbxFiltros.Enabled = True
+            ActualizarAccionesDisponibles()
 
         Catch ex As Exception
             MessageBox.Show($"Error al cargar datos: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -199,6 +211,7 @@ Partial Public Class frmFiltroAvanzado
         filtros.Limpiar()
         gbxFiltros.Enabled = False
         lblConteoRegistros.Text = "Registros encontrados: 0"
+        ActualizarAccionesDisponibles()
     End Sub
 #End Region
 
@@ -221,6 +234,8 @@ Partial Public Class frmFiltroAvanzado
 
     Private Sub cmbOrigenDatos_SelectedIndexChanged(sender As Object, e As EventArgs)
         Dim origenSeleccionado = CType(cmbOrigenDatos.SelectedItem, ConsultasGenericas.TipoOrigenDatos)
+
+        ' Lógica para ajustar las fechas
         If origenSeleccionado = ConsultasGenericas.TipoOrigenDatos.Funcionarios Then
             dtpFechaInicio.Value = Date.Today
             dtpFechaFin.Value = Date.Today
@@ -230,6 +245,11 @@ Partial Public Class frmFiltroAvanzado
             dtpFechaFin.Value = Date.Today
             dtpFechaFin.Enabled = True
         End If
+
+        ' --- CORRECCIÓN AÑADIDA ---
+        ' Llama a la función que muestra/oculta los botones correctos
+        ' cada vez que cambia la selección del origen de datos.
+        ActualizarAccionesDisponibles()
     End Sub
 
     Private Sub BtnAgregar_Click(sender As Object, e As EventArgs) Handles btnAgregar.Click
@@ -443,6 +463,105 @@ Partial Public Class frmFiltroAvanzado
             cb.DroppedDown = True
         End If
     End Sub
+#End Region
+
+#Region "Acciones Dinámicas"
+
+    Private Sub ActualizarAccionesDisponibles()
+        Dim origenSeleccionado = CType(cmbOrigenDatos.SelectedItem, ConsultasGenericas.TipoOrigenDatos)
+
+        ' Ocultar todos los botones de acción específicos por defecto
+        btnNuevaLicencia.Visible = False
+        btnEditarLicencia.Visible = False
+        btnEliminarLicencia.Visible = False
+        btnNuevaNotificacion.Visible = False
+        btnEditarNotificacion.Visible = False
+        btnEliminarNotificacion.Visible = False
+        btnCambiarEstado.Visible = False
+        Separator1.Visible = False
+
+        If dgvDatos.DataSource Is Nothing Then Return ' Si no hay datos, no mostrar acciones
+
+        ' Mostrar botones según el origen de datos
+        Select Case origenSeleccionado
+            Case ConsultasGenericas.TipoOrigenDatos.Licencias
+                btnNuevaLicencia.Visible = True
+                btnEditarLicencia.Visible = True
+                btnEliminarLicencia.Visible = True
+                Separator1.Visible = True
+
+            Case ConsultasGenericas.TipoOrigenDatos.Notificaciones
+                btnNuevaNotificacion.Visible = True
+                btnEditarNotificacion.Visible = True
+                btnEliminarNotificacion.Visible = True
+                btnCambiarEstado.Visible = True
+                Separator1.Visible = True
+        End Select
+    End Sub
+
+    ' --- Acciones para Licencias ---
+    Private Sub btnNuevaLicencia_Click(sender As Object, e As EventArgs) Handles btnNuevaLicencia.Click
+        Using frm As New frmLicenciaCrear()
+            If frm.ShowDialog() = DialogResult.OK Then
+                btnCargar.PerformClick() ' Recargar los datos para ver la nueva licencia
+            End If
+        End Using
+    End Sub
+
+    ' --- Acciones para Notificaciones ---
+    Private Sub btnNuevaNotificacion_Click(sender As Object, e As EventArgs) Handles btnNuevaNotificacion.Click
+        Using frm As New frmNotificacionCrear()
+            If frm.ShowDialog() = DialogResult.OK Then
+                btnCargar.PerformClick() ' Recargar datos
+            End If
+        End Using
+    End Sub
+
+    Private Sub btnEditarNotificacion_Click(sender As Object, e As EventArgs) Handles btnEditarNotificacion.Click
+        If dgvDatos.CurrentRow Is Nothing Then Return
+        Dim idSeleccionado = CInt(dgvDatos.CurrentRow.Cells("Id").Value)
+
+        Using frm As New frmNotificacionCrear(idSeleccionado)
+            If frm.ShowDialog() = DialogResult.OK Then
+                btnCargar.PerformClick() ' Recargar datos
+            End If
+        End Using
+    End Sub
+
+    Private Async Sub btnEliminarNotificacion_Click(sender As Object, e As EventArgs) Handles btnEliminarNotificacion.Click
+        If dgvDatos.CurrentRow Is Nothing Then Return
+        Dim idSeleccionado = CInt(dgvDatos.CurrentRow.Cells("Id").Value)
+        Dim nombre = dgvDatos.CurrentRow.Cells("Funcionario").Value.ToString()
+
+        If MessageBox.Show($"¿Está seguro de que desea eliminar la notificación para '{nombre}'?", "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
+            Try
+                Await _notificacionService.DeleteAsync(idSeleccionado)
+                btnCargar.PerformClick() ' Recargar datos
+            Catch ex As Exception
+                MessageBox.Show("Error al eliminar: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            End Try
+        End If
+    End Sub
+
+    Private Async Sub btnCambiarEstado_Click(sender As Object, e As EventArgs) Handles btnCambiarEstado.Click
+        If dgvDatos.CurrentRow Is Nothing Then Return
+
+        Dim idSeleccionado = CInt(dgvDatos.CurrentRow.Cells("Id").Value)
+
+        ' Abrimos el nuevo formulario de diálogo
+        Using frm As New frmCambiarEstadoNotificacion()
+            If frm.ShowDialog() = DialogResult.OK Then
+                Dim nuevoEstadoId = frm.SelectedEstadoId
+                Try
+                    Await _notificacionService.UpdateEstadoAsync(idSeleccionado, nuevoEstadoId)
+                    btnCargar.PerformClick() ' Recargar la grilla para ver el cambio
+                Catch ex As Exception
+                    MessageBox.Show("Error al actualizar el estado: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                End Try
+            End If
+        End Using
+    End Sub
+
 #End Region
 
 End Class

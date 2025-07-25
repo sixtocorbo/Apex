@@ -1,4 +1,5 @@
-﻿Public Class frmDashboard
+﻿' Reemplaza el contenido de este archivo.
+Public Class frmDashboard
 
     Private currentBtn As Button
     Private Shadows activeForm As Form
@@ -7,9 +8,7 @@
         InitializeComponent()
         ' Asociar los manejadores de eventos a los botones de navegación
         AddHandler btnFuncionarios.Click, AddressOf ActivateButton
-        AddHandler btnNotificaciones.Click, AddressOf ActivateButton
-        AddHandler btnLicencias.Click, AddressOf ActivateButton
-        AddHandler btnFiltros.Click, AddressOf ActivateButton
+        AddHandler btnFiltros.Click, AddressOf ActivateButton ' Mantenemos este
         AddHandler btnReportes.Click, AddressOf ActivateButton
         AddHandler btnConfiguracion.Click, AddressOf ActivateButton
     End Sub
@@ -33,12 +32,6 @@
             Case "btnFiltros"
                 AbrirFormEnPanel(New frmFiltroAvanzado())
 
-            Case "btnNotificaciones"
-                AbrirFormEnPanel(New frmNotificaciones())
-
-            Case "btnLicencias"
-                AbrirFormEnPanel(New frmLicencias())
-
             Case "btnReportes"
                 MessageBox.Show("Formulario de reportes aún no implementado.", "En desarrollo", MessageBoxButtons.OK, MessageBoxIcon.Information)
 
@@ -46,6 +39,7 @@
                 MessageBox.Show("Formulario de configuración aún no implementado.", "En desarrollo", MessageBoxButtons.OK, MessageBoxIcon.Information)
         End Select
     End Sub
+
     Private Sub DisableButton()
         If currentBtn IsNot Nothing Then
             currentBtn.BackColor = Color.FromArgb(51, 51, 76) ' Color original del panel

@@ -6,7 +6,7 @@ Option Explicit On
 Partial Class frmFiltroAvanzado
     Inherits System.Windows.Forms.Form
 
-    '--- Declaración de controles -------------------------------------------------
+    '--- Declaración de controles ---
     Private components As System.ComponentModel.IContainer
     Private WithEvents splitContenedorPrincipal As SplitContainer
     Private WithEvents pnlIzquierdo As Panel
@@ -36,6 +36,15 @@ Partial Class frmFiltroAvanzado
     Friend WithEvents btnExportarFichasPDF As Button
     Friend WithEvents lblConteoRegistros As Label
     Friend WithEvents btnCopiarCorreos As Button
+    Friend WithEvents Separator1 As Label
+    Friend WithEvents btnNuevaNotificacion As Button
+    Friend WithEvents btnEditarNotificacion As Button
+    Friend WithEvents btnEliminarNotificacion As Button
+    Friend WithEvents btnCambiarEstado As Button
+    Friend WithEvents btnNuevaLicencia As Button
+    Friend WithEvents btnEditarLicencia As Button
+    Friend WithEvents btnEliminarLicencia As Button
+
 
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
@@ -64,6 +73,14 @@ Partial Class frmFiltroAvanzado
         Me.btnCopiarCorreos = New System.Windows.Forms.Button()
         Me.btnExportarFichasPDF = New System.Windows.Forms.Button()
         Me.lblConteoRegistros = New System.Windows.Forms.Label()
+        Me.Separator1 = New System.Windows.Forms.Label()
+        Me.btnNuevaNotificacion = New System.Windows.Forms.Button()
+        Me.btnEditarNotificacion = New System.Windows.Forms.Button()
+        Me.btnEliminarNotificacion = New System.Windows.Forms.Button()
+        Me.btnCambiarEstado = New System.Windows.Forms.Button()
+        Me.btnNuevaLicencia = New System.Windows.Forms.Button()
+        Me.btnEditarLicencia = New System.Windows.Forms.Button()
+        Me.btnEliminarLicencia = New System.Windows.Forms.Button()
         Me.flpChips = New System.Windows.Forms.FlowLayoutPanel()
         Me.gbxBusquedaGlobal = New System.Windows.Forms.GroupBox()
         Me.txtBusquedaGlobal = New System.Windows.Forms.TextBox()
@@ -332,6 +349,14 @@ Partial Class frmFiltroAvanzado
         Me.pnlAcciones.Controls.Add(Me.btnCopiarCorreos)
         Me.pnlAcciones.Controls.Add(Me.btnExportarFichasPDF)
         Me.pnlAcciones.Controls.Add(Me.lblConteoRegistros)
+        Me.pnlAcciones.Controls.Add(Me.Separator1)
+        Me.pnlAcciones.Controls.Add(Me.btnNuevaNotificacion)
+        Me.pnlAcciones.Controls.Add(Me.btnEditarNotificacion)
+        Me.pnlAcciones.Controls.Add(Me.btnEliminarNotificacion)
+        Me.pnlAcciones.Controls.Add(Me.btnCambiarEstado)
+        Me.pnlAcciones.Controls.Add(Me.btnNuevaLicencia)
+        Me.pnlAcciones.Controls.Add(Me.btnEditarLicencia)
+        Me.pnlAcciones.Controls.Add(Me.btnEliminarLicencia)
         Me.pnlAcciones.Dock = System.Windows.Forms.DockStyle.Bottom
         Me.pnlAcciones.Location = New System.Drawing.Point(10, 688)
         Me.pnlAcciones.Name = "pnlAcciones"
@@ -377,15 +402,89 @@ Partial Class frmFiltroAvanzado
         Me.lblConteoRegistros.TabIndex = 3
         Me.lblConteoRegistros.Text = "Registros encontrados: 0"
         '
+        'Separator1
+        '
+        Me.Separator1.Anchor = System.Windows.Forms.AnchorStyles.Left
+        Me.Separator1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
+        Me.Separator1.Location = New System.Drawing.Point(556, 8)
+        Me.Separator1.Name = "Separator1"
+        Me.Separator1.Size = New System.Drawing.Size(2, 30)
+        Me.Separator1.TabIndex = 4
+        '
+        'btnNuevaNotificacion
+        '
+        Me.btnNuevaNotificacion.Location = New System.Drawing.Point(564, 8)
+        Me.btnNuevaNotificacion.Name = "btnNuevaNotificacion"
+        Me.btnNuevaNotificacion.Size = New System.Drawing.Size(75, 30)
+        Me.btnNuevaNotificacion.TabIndex = 5
+        Me.btnNuevaNotificacion.Text = "Nueva"
+        Me.btnNuevaNotificacion.UseVisualStyleBackColor = True
+        '
+        'btnEditarNotificacion
+        '
+        Me.btnEditarNotificacion.Location = New System.Drawing.Point(645, 8)
+        Me.btnEditarNotificacion.Name = "btnEditarNotificacion"
+        Me.btnEditarNotificacion.Size = New System.Drawing.Size(75, 30)
+        Me.btnEditarNotificacion.TabIndex = 6
+        Me.btnEditarNotificacion.Text = "Editar"
+        Me.btnEditarNotificacion.UseVisualStyleBackColor = True
+        '
+        'btnEliminarNotificacion
+        '
+        Me.btnEliminarNotificacion.Location = New System.Drawing.Point(726, 8)
+        Me.btnEliminarNotificacion.Name = "btnEliminarNotificacion"
+        Me.btnEliminarNotificacion.Size = New System.Drawing.Size(75, 30)
+        Me.btnEliminarNotificacion.TabIndex = 7
+        Me.btnEliminarNotificacion.Text = "Eliminar"
+        Me.btnEliminarNotificacion.UseVisualStyleBackColor = True
+        '
+        'btnCambiarEstado
+        '
+        Me.btnCambiarEstado.Location = New System.Drawing.Point(807, 8)
+        Me.btnCambiarEstado.Name = "btnCambiarEstado"
+        Me.btnCambiarEstado.Size = New System.Drawing.Size(130, 30)
+        Me.btnCambiarEstado.TabIndex = 8
+        Me.btnCambiarEstado.Text = "Cambiar Estado"
+        Me.btnCambiarEstado.UseVisualStyleBackColor = True
+        '
+        'btnNuevaLicencia
+        '
+        Me.pnlAcciones.SetFlowBreak(Me.btnNuevaLicencia, True)
+        Me.btnNuevaLicencia.Location = New System.Drawing.Point(564, 8)
+        Me.btnNuevaLicencia.Name = "btnNuevaLicencia"
+        Me.btnNuevaLicencia.Size = New System.Drawing.Size(75, 30)
+        Me.btnNuevaLicencia.TabIndex = 9
+        Me.btnNuevaLicencia.Text = "Nueva"
+        Me.btnNuevaLicencia.UseVisualStyleBackColor = True
+        '
+        'btnEditarLicencia
+        '
+        Me.btnEditarLicencia.Location = New System.Drawing.Point(645, 8)
+        Me.btnEditarLicencia.Name = "btnEditarLicencia"
+        Me.btnEditarLicencia.Size = New System.Drawing.Size(75, 30)
+        Me.btnEditarLicencia.TabIndex = 10
+        Me.btnEditarLicencia.Text = "Editar"
+        Me.btnEditarLicencia.UseVisualStyleBackColor = True
+        '
+        'btnEliminarLicencia
+        '
+        Me.btnEliminarLicencia.Location = New System.Drawing.Point(726, 8)
+        Me.btnEliminarLicencia.Name = "btnEliminarLicencia"
+        Me.btnEliminarLicencia.Size = New System.Drawing.Size(75, 30)
+        Me.btnEliminarLicencia.TabIndex = 11
+        Me.btnEliminarLicencia.Text = "Eliminar"
+        Me.btnEliminarLicencia.UseVisualStyleBackColor = True
+        '
         'flpChips
         '
-        Me.flpChips.AutoSize = True
+        Me.flpChips.AutoScroll = True
         Me.flpChips.Dock = System.Windows.Forms.DockStyle.Top
         Me.flpChips.Location = New System.Drawing.Point(10, 72)
         Me.flpChips.Name = "flpChips"
         Me.flpChips.Padding = New System.Windows.Forms.Padding(5)
         Me.flpChips.Size = New System.Drawing.Size(1019, 42)
         Me.flpChips.TabIndex = 2
+        Me.flpChips.WrapContents = False
         '
         'gbxBusquedaGlobal
         '
@@ -436,6 +535,7 @@ Partial Class frmFiltroAvanzado
         Me.gbxBusquedaGlobal.ResumeLayout(False)
         Me.gbxBusquedaGlobal.PerformLayout()
         Me.ResumeLayout(False)
+
     End Sub
 
 End Class

@@ -28,7 +28,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>28</ApplicationRevision>
+    <ApplicationRevision>36</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -365,6 +365,12 @@
     <Compile Include="UI\frmFuncionarioObservacion.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="UI\frmLicenciaCrear.Designer.vb">
+      <DependentUpon>frmLicenciaCrear.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmLicenciaCrear.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="UI\frmLicencias.Designer.vb">
       <DependentUpon>frmLicencias.vb</DependentUpon>
     </Compile>
@@ -402,6 +408,9 @@
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmLicenciaCrear.resx">
+      <DependentUpon>frmLicenciaCrear.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmNotificacionCrear.resx">
       <DependentUpon>frmNotificacionCrear.vb</DependentUpon>

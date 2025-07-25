@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="ApexModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="ApexModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="AreaTrabajo">
           <Key>
             <PropertyRef Name="Id" />
@@ -326,7 +326,6 @@
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="Id" Type="int" Nullable="false" />
           <Property Name="FuncionarioId" Type="int" Nullable="false" />
           <Property Name="FechaProgramada" Type="datetime2" Precision="0" Nullable="false" />
           <Property Name="FechaRegistro" Type="datetime2" Precision="0" />
@@ -339,6 +338,7 @@
           <Property Name="UpdatedAt" Type="datetime2" Precision="7" />
           <Property Name="TipoNotificacionId" Type="tinyint" Nullable="false" />
           <Property Name="EstadoId" Type="tinyint" Nullable="false" />
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
         </EntityType>
         <EntityType Name="Novedad">
           <Key>
@@ -1327,8 +1327,7 @@
             <End Role="Usuario" EntitySet="Usuario" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="ApexModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -2727,19 +2726,19 @@
           </AssociationSet>
           <FunctionImport Name="usp_CargarHistoricosPolicia" />
           <FunctionImport Name="usp_DeleteFuncionario">
-            <Parameter Name="FuncionarioId" Mode="In" Type="Int32" />
+          <Parameter Name="FuncionarioId" Mode="In" Type="Int32" />
           </FunctionImport>
           <FunctionImport Name="usp_MigrarArmas" ReturnType="Collection(ApexModel.usp_MigrarArmas_Result)" />
           <FunctionImport Name="usp_MigrarArmasYAsignaciones" ReturnType="Collection(ApexModel.usp_MigrarArmasYAsignaciones_Result)" />
           <FunctionImport Name="usp_MigrarEstadosUnificados" ReturnType="Collection(Int32)" />
           <FunctionImport Name="usp_MigrarFuncionariosDesdePersonal">
-            <Parameter Name="RefrescarCatalogos" Mode="In" Type="Boolean" />
+          <Parameter Name="RefrescarCatalogos" Mode="In" Type="Boolean" />
           </FunctionImport>
           <FunctionImport Name="usp_MigrarNotificaciones" ReturnType="Collection(Int32)" />
           <FunctionImport Name="usp_MigrarNovedadesDesdePersonal" />
           <FunctionImport Name="usp_MigrarUsuarios" ReturnType="Collection(Int32)" />
           <FunctionImport Name="usp_PresenciaFecha_Apex" ReturnType="Collection(ApexModel.usp_PresenciaFecha_Apex_Result)">
-            <Parameter Name="Fecha" Mode="In" Type="DateTime" />
+          <Parameter Name="Fecha" Mode="In" Type="DateTime" />
           </FunctionImport>
           <FunctionImport Name="usp_ProcesarEstadoNotificaciones" />
         </EntityContainer>
