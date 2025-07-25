@@ -107,5 +107,50 @@ Public Class FuncionarioService
             OrderBy(Function(t) t.Nombre).
             ToListAsync()
     End Function
+    Public Async Function BuscarConFiltrosDinamicosAsync(
+       textoLibre As String,
+       filtros As Dictionary(Of String, String)
+   ) As Task(Of List(Of FuncionarioVistaDTO))
 
+        Dim query = _unitOfWork.Repository(Of Funcionario)().GetAll().AsNoTracking()
+
+        ' 1. Filtro de texto libre (busca en Nombre y CI)
+        If Not String.IsNullOrWhiteSpace(textoLibre) Then
+            Dim palabrasLibres = textoLibre.Split({" "c}, StringSplitOptions.RemoveEmptyEntries)
+            For Each palabra In palabrasLibres
+                query = query.Where(Function(f) f.Nombre.Contains(palabra) Or f.CI.Contains(palabra))
+            Next
+        End If
+
+        ' 2. Aplicar filtros estructurados
+        For Each filtro In filtros
+            Select Case filtro.Key.ToLower()
+                Case "cargo"
+                    query = query.Where(Function(f) f.Cargo IsNot Nothing AndAlso f.Cargo.Nombre.Contains(filtro.Value))
+                Case "ci"
+                    query = query.Where(Function(f) f.CI.Contains(filtro.Value))
+                Case "activo"
+                    Dim esActivo As Boolean = (filtro.Value.ToLower() = "si" OrElse filtro.Value.ToLower() = "true")
+                    query = query.Where(Function(f) f.Activo = esActivo)
+                    ' ... Agrega más casos para otras columnas: "seccion", "tipo", etc.
+            End Select
+        Next
+
+        ' 3. Proyectar al DTO para la vista y limitar resultados
+        Return Await query.Select(Function(f) New FuncionarioVistaDTO With {
+            .Id = f.Id,
+            .CI = f.CI,
+            .Nombre = f.Nombre,
+            .CargoNombre = If(f.Cargo IsNot Nothing, f.Cargo.Nombre, "N/A"),
+            .Activo = f.Activo
+        }).OrderBy(Function(f) f.Nombre).Take(500).ToListAsync()
+
+    End Function
+End Class
+Public Class FuncionarioVistaDTO
+    Public Property Id As Integer
+    Public Property CI As String
+    Public Property Nombre As String
+    Public Property CargoNombre As String
+    Public Property Activo As Boolean
 End Class

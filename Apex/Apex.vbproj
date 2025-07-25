@@ -312,6 +312,12 @@
     <Compile Include="UI\frmFiltroAvanzado.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="UI\frmFiltroUnificado_Legacy.Designer.vb">
+      <DependentUpon>frmFiltroUnificado_Legacy.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmFiltroUnificado_Legacy.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="UI\frmFuncionarioBuscar.Designer.vb">
       <DependentUpon>frmFuncionarioBuscar.vb</DependentUpon>
     </Compile>

@@ -119,18 +119,20 @@ Public Module ConsultasGenericas
         End Using
     End Function
 
+    ' Services/ConsultasGenericas.vb
+
     Private Async Function ConsultarFuncionarios(fecha As Date) As Task(Of DataTable)
         Using uow As New UnitOfWork()
             Dim query = uow.Repository(Of Funcionario)().GetAll().
-                Select(Function(f) New With {
-                    f.Nombre,
-                    f.CI,
-                    f.Cargo,
-                    f.TipoFuncionario,
-                    f.FechaIngreso,
-                    f.Activo,
-                    .Correo = f.Email
-                })
+        Select(Function(f) New With {
+            f.Nombre,
+            f.CI,            ' CORRECCIÓN: Usar una expresión condicional para obtener el nombre o un guion si es nulo.
+            .Cargo = If(f.Cargo IsNot Nothing, f.Cargo.Nombre, "-"),
+            .TipoFuncionario = If(f.TipoFuncionario IsNot Nothing, f.TipoFuncionario.Nombre, "-"),
+            f.FechaIngreso,
+            f.Activo,
+            .Correo = f.Email
+        })
             Dim result = Await query.ToListAsync()
             Return ToDataTable(result)
         End Using
