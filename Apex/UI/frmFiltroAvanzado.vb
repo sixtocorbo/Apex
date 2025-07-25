@@ -246,9 +246,7 @@ Partial Public Class frmFiltroAvanzado
             dtpFechaFin.Enabled = True
         End If
 
-        ' --- CORRECCIÓN AÑADIDA ---
         ' Llama a la función que muestra/oculta los botones correctos
-        ' cada vez que cambia la selección del origen de datos.
         ActualizarAccionesDisponibles()
     End Sub
 
@@ -480,7 +478,8 @@ Partial Public Class frmFiltroAvanzado
         btnCambiarEstado.Visible = False
         Separator1.Visible = False
 
-        If dgvDatos.DataSource Is Nothing Then Return ' Si no hay datos, no mostrar acciones
+        ' --- CORRECCIÓN ---
+        ' Se eliminó la línea "If dgvDatos.DataSource Is Nothing Then Return"
 
         ' Mostrar botones según el origen de datos
         Select Case origenSeleccionado
@@ -500,7 +499,7 @@ Partial Public Class frmFiltroAvanzado
     End Sub
 
     ' --- Acciones para Licencias ---
-    Private Sub btnNuevaLicencia_Click(sender As Object, e As EventArgs) Handles btnNuevaLicencia.Click
+    Private Sub btnNuevaLicencia_Click(sender As Object, e As EventArgs)
         Using frm As New frmLicenciaCrear()
             If frm.ShowDialog() = DialogResult.OK Then
                 btnCargar.PerformClick() ' Recargar los datos para ver la nueva licencia
