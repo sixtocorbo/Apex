@@ -52,10 +52,12 @@
             Return
         End If
 
-        ' *** LA CLAVE DE LA CORRECCIÓN ESTÁ AQUÍ ***
-        ' Asignamos tanto el ID como el objeto de navegación completo
+        ' ================== INICIO DE LA CORRECCIÓN ==================
+        ' Asignamos únicamente el ID. Entity Framework se encargará de la relación.
         Estado.TipoEstadoTransitorioId = CInt(cboTipoEstado.SelectedValue)
-        Estado.TipoEstadoTransitorio = CType(cboTipoEstado.SelectedItem, TipoEstadoTransitorio)
+        ' La siguiente línea fue eliminada para evitar el error:
+        ' Estado.TipoEstadoTransitorio = CType(cboTipoEstado.SelectedItem, TipoEstadoTransitorio)
+        ' =================== FIN DE LA CORRECCIÓN ====================
 
         Estado.FechaDesde = dtpFechaDesde.Value.Date
         Estado.FechaHasta = If(chkFechaHasta.Checked, CType(Nothing, Date?), dtpFechaHasta.Value.Date)

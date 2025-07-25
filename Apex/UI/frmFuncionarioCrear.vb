@@ -94,7 +94,7 @@ Public Class frmFuncionarioCrear
             .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill ' Hacemos que esta columna ocupe el espacio restante
         })
             .Columns.Add(New DataGridViewTextBoxColumn With {
-             .DataPropertyName = "FechaRegistro",
+            .DataPropertyName = "FechaRegistro",
             .HeaderText = "Fecha de Registro",
             .Width = 120
         })
@@ -118,7 +118,7 @@ Public Class frmFuncionarioCrear
        })
             .Columns.Add(New DataGridViewTextBoxColumn With {
             .DataPropertyName = "Talla",
-             .HeaderText = "Talla"
+            .HeaderText = "Talla"
         })
             .Columns.Add(New DataGridViewTextBoxColumn With {
             .DataPropertyName = "Observaciones",
@@ -126,7 +126,7 @@ Public Class frmFuncionarioCrear
             .Width = 200
         })
             .Columns.Add(New DataGridViewTextBoxColumn With {
-             .DataPropertyName = "FechaAsign",
+            .DataPropertyName = "FechaAsign",
             .HeaderText = "Fecha Asignación"
         })
         End With
@@ -259,8 +259,8 @@ Public Class frmFuncionarioCrear
         Try
             ' --- Validaciones básicas ---
             If String.IsNullOrWhiteSpace(txtCI.Text) OrElse
-           String.IsNullOrWhiteSpace(txtNombre.Text) OrElse
-           cboTipoFuncionario.SelectedIndex = -1 Then
+               String.IsNullOrWhiteSpace(txtNombre.Text) OrElse
+               cboTipoFuncionario.SelectedIndex = -1 Then
                 MessageBox.Show("Los campos CI, Nombre y Tipo de Funcionario son obligatorios.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
                 Return
             End If
@@ -279,7 +279,6 @@ Public Class frmFuncionarioCrear
                     uow.Repository(Of Funcionario).Add(funcionario)
                 Else
                     ' Se carga la entidad CON TRACKING para poder actualizarla
-                    ' ********* CAMBIO CLAVE AQUÍ *********
                     funcionario = Await uow.Context.Set(Of Funcionario)() _
                     .Include(Function(f) f.FuncionarioDotacion) _
                     .Include(Function(f) f.FuncionarioObservacion) _
@@ -346,9 +345,22 @@ Public Class frmFuncionarioCrear
         ' 2. Actualizar los existentes y agregar los nuevos
         For Each itemForm In formCollection
             Dim id = CInt(itemForm.GetType().GetProperty("Id").GetValue(itemForm))
-            If id = 0 Then ' Nuevo
+            If id = 0 Then ' Es un item nuevo
+
+                ' ================== INICIO DE LA CORRECCIÓN ==================
+                ' Si el nuevo item es un EstadoTransitorio, debemos asegurarnos de que
+                ' su entidad relacionada (TipoEstadoTransitorio) no se intente insertar de nuevo.
+                ' La marcamos como 'Unchanged' para que EF sepa que ya existe.
+                If GetType(T) Is GetType(EstadoTransitorio) Then
+                    Dim estado = CType(CType(itemForm, Object), EstadoTransitorio)
+                    If estado.TipoEstadoTransitorio IsNot Nothing Then
+                        ctx.Entry(estado.TipoEstadoTransitorio).State = EntityState.Unchanged
+                    End If
+                End If
+                ' =================== FIN DE LA CORRECCIÓN ====================
+
                 dbCollection.Add(itemForm)
-            Else ' Existente
+            Else ' Es un item existente
                 Dim itemInDb = dbCollection.FirstOrDefault(Function(x) CInt(x.GetType().GetProperty("Id").GetValue(x)) = id)
                 If itemInDb IsNot Nothing Then
                     ' Copia los valores del objeto del formulario al objeto que está siendo rastreado por el contexto
@@ -381,6 +393,7 @@ Public Class frmFuncionarioCrear
         Using frm As New frmFuncionarioDotacion(nuevaDotacion)
             If frm.ShowDialog() = DialogResult.OK Then
                 _dotaciones.Add(frm.Dotacion)
+                _dotaciones.ResetBindings() ' Refrescar grilla
             End If
         End Using
     End Sub
@@ -410,6 +423,7 @@ Public Class frmFuncionarioCrear
         Using frm As New frmFuncionarioObservacion(nuevaObservacion)
             If frm.ShowDialog() = DialogResult.OK Then
                 _observaciones.Add(frm.Observacion)
+                _observaciones.ResetBindings() ' Refrescar grilla
             End If
         End Using
     End Sub
@@ -438,7 +452,14 @@ Public Class frmFuncionarioCrear
         Dim nuevoEstado = New EstadoTransitorio()
         Using frm As New frmFuncionarioEstadoTransitorio(nuevoEstado, _tiposEstadoTransitorio)
             If frm.ShowDialog() = DialogResult.OK Then
-                _estadosTransitorios.Add(frm.Estado)
+                Dim tipoSeleccionado = _tiposEstadoTransitorio.FirstOrDefault(Function(t) t.Id = nuevoEstado.TipoEstadoTransitorioId)
+
+                If tipoSeleccionado IsNot Nothing Then
+                    nuevoEstado.TipoEstadoTransitorio = tipoSeleccionado
+                End If
+
+                _estadosTransitorios.Add(nuevoEstado)
+                _estadosTransitorios.ResetBindings()
             End If
         End Using
     End Sub
