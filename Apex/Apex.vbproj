@@ -305,12 +305,6 @@
     <Compile Include="UI\frmDashboard.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\frmFiltros.Designer.vb">
-      <DependentUpon>frmFiltros.vb</DependentUpon>
-    </Compile>
-    <Compile Include="UI\frmFiltros.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="UI\frmFiltroAvanzado.Designer.vb">
       <DependentUpon>frmFiltroAvanzado.vb</DependentUpon>
     </Compile>
