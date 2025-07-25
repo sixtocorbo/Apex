@@ -100,42 +100,4 @@ Public Class LicenciaService
                 Return New List(Of String)()
         End Select
     End Function
-
-    ''' <summary>
-    ''' Obtiene licencias aplicando una lista dinámica de filtros.
-    ''' </summary>
-    Public Async Function GetWithAdvancedFilterAsync(reglas As List(Of frmFiltros.ReglaFiltro)) As Task(Of List(Of LicenciaParaVista))
-        Dim query = _unitOfWork.Repository(Of HistoricoLicencia)().
-            GetAll().
-            Include(Function(l) l.Funcionario).
-            Include(Function(l) l.TipoLicencia).
-            AsNoTracking()
-
-        ' Aplicar cada regla a la consulta
-        For Each regla In reglas
-            Dim valor = regla.Valor.ToString()
-            Select Case regla.Columna
-                Case "Funcionario.Nombre"
-                    query = query.Where(Function(l) l.Funcionario.Nombre = valor)
-                Case "Funcionario.CI"
-                    query = query.Where(Function(l) l.Funcionario.CI = valor)
-                Case "TipoLicencia.Nombre"
-                    query = query.Where(Function(l) l.TipoLicencia.Nombre = valor)
-                Case "estado"
-                    query = query.Where(Function(l) l.estado = valor)
-            End Select
-        Next
-
-        ' Proyectar el resultado al DTO para la vista
-        Return Await query.Select(Function(l) New LicenciaParaVista With {
-            .Id = l.Id,
-            .NombreFuncionario = l.Funcionario.Nombre,
-            .CI = l.Funcionario.CI,
-            .TipoLicencia = l.TipoLicencia.Nombre,
-            .FechaInicio = l.inicio,
-            .FechaFin = l.finaliza,
-            .Estado = l.estado,
-            .Comentario = l.Comentario
-        }).OrderByDescending(Function(l) l.FechaInicio).ToListAsync()
-    End Function
 End Class
