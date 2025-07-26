@@ -70,13 +70,12 @@ Public Module ConsultasGenericas
 
     Private Async Function ConsultarNotificaciones(fechaInicio As Date, fechaFin As Date) As Task(Of DataTable)
         Using uow As New UnitOfWork()
-            ' --- CORRECCIÓN DE FECHA ---
-            ' Se suma un día a la fecha de fin y se usa "<" para incluir el día completo.
             Dim fechaFinInclusive = fechaFin.AddDays(1)
 
             Dim query = uow.Repository(Of NotificacionPersonal)().GetAll().
             Where(Function(n) n.FechaProgramada >= fechaInicio And n.FechaProgramada < fechaFinInclusive).
             Select(Function(n) New With {
+                .Id = n.Id, ' <-- CORRECCIÓN AÑADIDA
                 .Funcionario = If(n.Funcionario IsNot Nothing, n.Funcionario.Nombre, "N/A"),
                 .CI = If(n.Funcionario IsNot Nothing, n.Funcionario.CI, "N/A"),
                 .Tipo = If(n.TipoNotificacion IsNot Nothing, n.TipoNotificacion.Nombre, "N/A"),
@@ -91,11 +90,10 @@ Public Module ConsultasGenericas
 
     Private Async Function ConsultarLicencias(fechaInicio As Date, fechaFin As Date) As Task(Of DataTable)
         Using uow As New UnitOfWork()
-            ' --- CORRECCIÓN DE LÓGICA DE RANGO ---
-            ' La lógica ahora busca cualquier licencia que se solape con el rango seleccionado.
             Dim query = uow.Repository(Of HistoricoLicencia)().GetAll().
             Where(Function(l) l.inicio <= fechaFin And l.finaliza >= fechaInicio).
             Select(Function(l) New With {
+                .Id = l.Id, ' <-- CORRECCIÓN AÑADIDA
                 .Funcionario = If(l.Funcionario IsNot Nothing, l.Funcionario.Nombre, "FUNCIONARIO NO ENCONTRADO"),
                 .CI = If(l.Funcionario IsNot Nothing, l.Funcionario.CI, "N/A"),
                 .Tipo = If(l.TipoLicencia IsNot Nothing, l.TipoLicencia.Nombre, "TIPO NO ENCONTRADO"),
@@ -108,7 +106,6 @@ Public Module ConsultasGenericas
             Return ToDataTable(result)
         End Using
     End Function
-
     Private Async Function ConsultarNovedades(fechaInicio As Date, fechaFin As Date) As Task(Of DataTable)
         Using uow As New UnitOfWork()
             Dim query = uow.Repository(Of Novedad)().GetAll().

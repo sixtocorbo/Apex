@@ -33,11 +33,7 @@ Public Class LicenciaService
         Optional fechaHasta As Date? = Nothing
     ) As Task(Of List(Of LicenciaParaVista))
 
-        Dim query = _unitOfWork.Repository(Of HistoricoLicencia)().
-            GetAll().
-            Include(Function(l) l.Funcionario).
-            Include(Function(l) l.TipoLicencia).
-            AsNoTracking()
+        Dim query = _unitOfWork.Repository(Of HistoricoLicencia)().GetAll().Include(Function(l) l.Funcionario).Include(Function(l) l.TipoLicencia).AsNoTracking()
 
         ' Aplicar filtros
         If Not String.IsNullOrWhiteSpace(filtroNombre) Then
@@ -75,11 +71,27 @@ Public Class LicenciaService
         Return lista.Select(Function(t) New KeyValuePair(Of Integer, String)(t.Id, t.Nombre)).ToList()
     End Function
 
+    ''' <summary>
+    ''' Obtiene los funcionarios activos para el combo de nueva licencia.
+    ''' La implementación original devolvía la entidad completa, incluyendo campos pesados como la foto y todas sus relaciones.  
+    ''' Esta versión proyecta únicamente el Id y el Nombre, lo que evita traer datos innecesarios del modelo Funcionario y mejora significativamente el rendimiento.
+    ''' </summary>
+
     Public Async Function ObtenerFuncionariosParaComboAsync() As Task(Of List(Of KeyValuePair(Of Integer, String)))
-        Dim repo = _unitOfWork.Repository(Of Funcionario)()
-        Dim lista = Await repo.GetAll().AsNoTracking().Where(Function(f) f.Activo).OrderBy(Function(f) f.Nombre).ToListAsync()
-        Return lista.Select(Function(f) New KeyValuePair(Of Integer, String)(f.Id, f.Nombre)).ToList()
+        ' 1. Traer solo los datos necesarios a la memoria
+        Dim funcionariosData = Await _unitOfWork.Repository(Of Funcionario)().GetAll().AsNoTracking() _
+        .Where(Function(f) f.Activo) _
+        .OrderBy(Function(f) f.Nombre) _
+        .Select(Function(f) New With {
+            Key .Id = f.Id,
+            Key .Nombre = f.Nombre
+        }) _
+        .ToListAsync()
+
+        ' 2. Convertir los datos en memoria a KeyValuePair
+        Return funcionariosData.Select(Function(f) New KeyValuePair(Of Integer, String)(f.Id, f.Nombre)).ToList()
     End Function
+
     ''' <summary>
     ''' Obtiene los valores distintos de una columna específica para llenar los combos de filtros.
     ''' </summary>
