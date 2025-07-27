@@ -78,9 +78,6 @@ Public Class frmFuncionarioCrear
                 .Visible = False
             })
 
-            ' ✅ CORRECCIÓN CLAVE 1:
-            ' Ya no usamos DataPropertyName para el Ítem.
-            ' Le damos un nombre único para identificar la columna en el evento CellFormatting.
             .Columns.Add(New DataGridViewTextBoxColumn With {
                .Name = "colItem",
                .HeaderText = "Ítem",
@@ -238,8 +235,8 @@ Public Class frmFuncionarioCrear
                     funcionario.Foto = File.ReadAllBytes(_rutaFotoSeleccionada)
                 End If
                 ' --- Sincronizar colecciones ---
-                SincronizarDotaciones(funcionario.FuncionarioDotacion, _dotaciones, uow.Context) ' <-- LLAMADA AL NUEVO MÉTODO
-                SincronizarColeccion(funcionario.EstadoTransitorio, _estadosTransitorios, uow.Context) ' <-- Esta se mantiene igual
+                SincronizarDotaciones(funcionario.FuncionarioDotacion, _dotaciones, uow.Context)
+                SincronizarColeccion(funcionario.EstadoTransitorio, _estadosTransitorios, uow.Context)
                 Await uow.CommitAsync()
                 MessageBox.Show(If(_modo = ModoFormulario.Crear, "Funcionario creado", "Funcionario actualizado") & " correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
             End Using
@@ -376,7 +373,6 @@ Public Class frmFuncionarioCrear
 
 #Region "Formateo Manual de Grillas"
 
-    ' ✅ CORRECCIÓN CLAVE 2: Este es el evento que llenará la celda del Ítem manualmente.
     Private Sub dgvDotacion_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
         If e.RowIndex < 0 OrElse e.ColumnIndex < 0 Then Return
 
