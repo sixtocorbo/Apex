@@ -30,12 +30,12 @@ Partial Public Class Funcionario
     Public Property TurnoId As Nullable(Of Integer)
     Public Property SemanaId As Nullable(Of Integer)
     Public Property HorarioId As Nullable(Of Integer)
-    Public Property LastPictureId As Nullable(Of Integer)
     Public Property FechaNacimiento As Nullable(Of Date)
     Public Property Domicilio As String
     Public Property Email As String
     Public Property EscalafonId As Nullable(Of Integer)
     Public Property FuncionId As Nullable(Of Integer)
+    Public Property LastPictureId As Nullable(Of Integer)
 
     Public Overridable Property Cargo As Cargo
     Public Overridable Property Escalafon As Escalafon
@@ -58,7 +58,6 @@ Partial Public Class Funcionario
     Public Overridable Property FuncionarioChaleco As ICollection(Of FuncionarioChaleco) = New HashSet(Of FuncionarioChaleco)
     Public Overridable Property FuncionarioDispositivo As ICollection(Of FuncionarioDispositivo) = New HashSet(Of FuncionarioDispositivo)
     Public Overridable Property FuncionarioEstadoLegal As ICollection(Of FuncionarioEstadoLegal) = New HashSet(Of FuncionarioEstadoLegal)
-    Public Overridable Property FuncionarioObservacion As ICollection(Of FuncionarioObservacion) = New HashSet(Of FuncionarioObservacion)
     Public Overridable Property HistoricoCustodia As ICollection(Of HistoricoCustodia) = New HashSet(Of HistoricoCustodia)
     Public Overridable Property HistoricoLicencia As ICollection(Of HistoricoLicencia) = New HashSet(Of HistoricoLicencia)
     Public Overridable Property HistoricoNocturnidad As ICollection(Of HistoricoNocturnidad) = New HashSet(Of HistoricoNocturnidad)

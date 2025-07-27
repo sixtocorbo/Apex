@@ -10,13 +10,12 @@
 Imports System
 Imports System.Collections.Generic
 
-Partial Public Class FuncionarioObservacion
+Partial Public Class DotacionItem
     Public Property Id As Integer
-    Public Property FuncionarioId As Integer
-    Public Property Categoria As String
-    Public Property Texto As String
-    Public Property FechaRegistro As Date
+    Public Property Nombre As String
+    Public Property Activo As Boolean
+    Public Property CreatedAt As Date
 
-    Public Overridable Property Funcionario As Funcionario
+    Public Overridable Property FuncionarioDotacion As ICollection(Of FuncionarioDotacion) = New HashSet(Of FuncionarioDotacion)
 
 End Class

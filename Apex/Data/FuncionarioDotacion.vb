@@ -13,11 +13,12 @@ Imports System.Collections.Generic
 Partial Public Class FuncionarioDotacion
     Public Property Id As Integer
     Public Property FuncionarioId As Integer
-    Public Property Item As String
     Public Property Talla As String
     Public Property FechaAsign As Date
     Public Property Observaciones As String
+    Public Property DotacionItemId As Integer
 
+    Public Overridable Property DotacionItem As DotacionItem
     Public Overridable Property Funcionario As Funcionario
 
 End Class

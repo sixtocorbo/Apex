@@ -28,6 +28,7 @@ Partial Public Class ApexEntities
     Public Overridable Property Arma() As DbSet(Of Arma)
     Public Overridable Property Cargo() As DbSet(Of Cargo)
     Public Overridable Property CategoriaAusencia() As DbSet(Of CategoriaAusencia)
+    Public Overridable Property DotacionItem() As DbSet(Of DotacionItem)
     Public Overridable Property Escalafon() As DbSet(Of Escalafon)
     Public Overridable Property Estado() As DbSet(Of Estado)
     Public Overridable Property EstadoCivil() As DbSet(Of EstadoCivil)
@@ -40,7 +41,6 @@ Partial Public Class ApexEntities
     Public Overridable Property FuncionarioDotacion() As DbSet(Of FuncionarioDotacion)
     Public Overridable Property FuncionarioEstadoLegal() As DbSet(Of FuncionarioEstadoLegal)
     Public Overridable Property FuncionarioFotoHistorico() As DbSet(Of FuncionarioFotoHistorico)
-    Public Overridable Property FuncionarioObservacion() As DbSet(Of FuncionarioObservacion)
     Public Overridable Property FuncionarioSalud() As DbSet(Of FuncionarioSalud)
     Public Overridable Property Genero() As DbSet(Of Genero)
     Public Overridable Property HistoricoCustodia() As DbSet(Of HistoricoCustodia)
@@ -83,12 +83,20 @@ Partial Public Class ApexEntities
         Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_DeleteFuncionario", funcionarioIdParameter)
     End Function
 
+    Public Overridable Function usp_LimpiarDatosDeApex() As Integer
+        Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_LimpiarDatosDeApex")
+    End Function
+
     Public Overridable Function usp_MigrarArmas() As ObjectResult(Of usp_MigrarArmas_Result)
         Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction(Of usp_MigrarArmas_Result)("usp_MigrarArmas")
     End Function
 
     Public Overridable Function usp_MigrarArmasYAsignaciones() As ObjectResult(Of usp_MigrarArmasYAsignaciones_Result)
         Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction(Of usp_MigrarArmasYAsignaciones_Result)("usp_MigrarArmasYAsignaciones")
+    End Function
+
+    Public Overridable Function usp_MigrarEstadosTransitoriosDesdePersonal() As ObjectResult(Of Nullable(Of Integer))
+        Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction(Of Nullable(Of Integer))("usp_MigrarEstadosTransitoriosDesdePersonal")
     End Function
 
     Public Overridable Function usp_MigrarEstadosUnificados() As ObjectResult(Of Nullable(Of Integer))
@@ -99,6 +107,10 @@ Partial Public Class ApexEntities
         Dim refrescarCatalogosParameter As ObjectParameter = If(refrescarCatalogos.HasValue, New ObjectParameter("RefrescarCatalogos", refrescarCatalogos), New ObjectParameter("RefrescarCatalogos", GetType(Boolean)))
 
         Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_MigrarFuncionariosDesdePersonal", refrescarCatalogosParameter)
+    End Function
+
+    Public Overridable Function usp_MigrarLicencias() As Integer
+        Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_MigrarLicencias")
     End Function
 
     Public Overridable Function usp_MigrarNotificaciones() As ObjectResult(Of Nullable(Of Integer))
@@ -113,10 +125,10 @@ Partial Public Class ApexEntities
         Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction(Of Nullable(Of Integer))("usp_MigrarUsuarios")
     End Function
 
-    Public Overridable Function usp_PresenciaFecha_Apex(fecha As Nullable(Of Date)) As ObjectResult(Of usp_PresenciaFecha_Apex_Result)
+    Public Overridable Function usp_PresenciaFecha_Apex(fecha As Nullable(Of Date)) As Integer
         Dim fechaParameter As ObjectParameter = If(fecha.HasValue, New ObjectParameter("Fecha", fecha), New ObjectParameter("Fecha", GetType(Date)))
 
-        Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction(Of usp_PresenciaFecha_Apex_Result)("usp_PresenciaFecha_Apex", fechaParameter)
+        Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_PresenciaFecha_Apex", fechaParameter)
     End Function
 
     Public Overridable Function usp_ProcesarEstadoNotificaciones() As Integer

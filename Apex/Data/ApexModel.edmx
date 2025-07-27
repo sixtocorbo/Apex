@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="ApexModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+      <Schema Namespace="ApexModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="AreaTrabajo">
           <Key>
             <PropertyRef Name="Id" />
@@ -38,6 +38,15 @@
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="Nombre" Type="nvarchar" MaxLength="30" Nullable="false" />
+        </EntityType>
+        <EntityType Name="DotacionItem">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Nombre" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="Activo" Type="bit" Nullable="false" />
+          <Property Name="CreatedAt" Type="datetime2" Precision="7" Nullable="false" />
         </EntityType>
         <EntityType Name="Escalafon">
           <Key>
@@ -106,12 +115,12 @@
           <Property Name="TurnoId" Type="int" />
           <Property Name="SemanaId" Type="int" />
           <Property Name="HorarioId" Type="int" />
-          <Property Name="LastPictureId" Type="int" />
           <Property Name="FechaNacimiento" Type="date" />
           <Property Name="Domicilio" Type="nvarchar" MaxLength="250" />
           <Property Name="Email" Type="nvarchar" MaxLength="255" />
           <Property Name="EscalafonId" Type="int" />
           <Property Name="FuncionId" Type="int" />
+          <Property Name="LastPictureId" Type="int" />
         </EntityType>
         <EntityType Name="FuncionarioArma">
           <Key>
@@ -155,10 +164,10 @@
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="FuncionarioId" Type="int" Nullable="false" />
-          <Property Name="Item" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="Talla" Type="nvarchar" MaxLength="100" />
           <Property Name="FechaAsign" Type="datetime2" Precision="7" Nullable="false" />
           <Property Name="Observaciones" Type="nvarchar" MaxLength="250" />
+          <Property Name="DotacionItemId" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="FuncionarioEstadoLegal">
           <Key>
@@ -180,16 +189,6 @@
           <Property Name="Foto" Type="varbinary(max)" Nullable="false" />
           <Property Name="FileName" Type="varchar(max)" />
           <Property Name="CreatedAt" Type="datetime2" Precision="7" Nullable="false" />
-        </EntityType>
-        <EntityType Name="FuncionarioObservacion">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="FuncionarioId" Type="int" Nullable="false" />
-          <Property Name="Categoria" Type="nvarchar" MaxLength="50" />
-          <Property Name="Texto" Type="nvarchar(max)" Nullable="false" />
-          <Property Name="FechaRegistro" Type="datetime2" Precision="7" Nullable="false" />
         </EntityType>
         <EntityType Name="FuncionarioSalud">
           <Key>
@@ -785,6 +784,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_FuncionarioDotacion_DotacionItem">
+          <End Role="DotacionItem" Type="Self.DotacionItem" Multiplicity="1" />
+          <End Role="FuncionarioDotacion" Type="Self.FuncionarioDotacion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="DotacionItem">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="FuncionarioDotacion">
+              <PropertyRef Name="DotacionItemId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_FuncionarioEstadoLegal_Funcionario">
           <End Role="Funcionario" Type="Self.Funcionario" Multiplicity="1" />
           <End Role="FuncionarioEstadoLegal" Type="Self.FuncionarioEstadoLegal" Multiplicity="*" />
@@ -793,18 +804,6 @@
               <PropertyRef Name="Id" />
             </Principal>
             <Dependent Role="FuncionarioEstadoLegal">
-              <PropertyRef Name="FuncionarioId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_FuncionarioObservacion_Funcionario">
-          <End Role="Funcionario" Type="Self.Funcionario" Multiplicity="1" />
-          <End Role="FuncionarioObservacion" Type="Self.FuncionarioObservacion" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Funcionario">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="FuncionarioObservacion">
               <PropertyRef Name="FuncionarioId" />
             </Dependent>
           </ReferentialConstraint>
@@ -1080,12 +1079,15 @@
         <Function Name="usp_DeleteFuncionario" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="FuncionarioId" Type="int" Mode="In" />
         </Function>
+        <Function Name="usp_LimpiarDatosDeApex" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="usp_MigrarArmas" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="usp_MigrarArmasYAsignaciones" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <Function Name="usp_MigrarEstadosTransitoriosDesdePersonal" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="usp_MigrarEstadosUnificados" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="usp_MigrarFuncionariosDesdePersonal" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="RefrescarCatalogos" Type="bit" Mode="In" />
         </Function>
+        <Function Name="usp_MigrarLicencias" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="usp_MigrarNotificaciones" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="usp_MigrarNovedadesDesdePersonal" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="usp_MigrarUsuarios" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
@@ -1098,6 +1100,7 @@
           <EntitySet Name="Arma" EntityType="Self.Arma" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Cargo" EntityType="Self.Cargo" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="CategoriaAusencia" EntityType="Self.CategoriaAusencia" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="DotacionItem" EntityType="Self.DotacionItem" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Escalafon" EntityType="Self.Escalafon" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Estado" EntityType="Self.Estado" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="EstadoCivil" EntityType="Self.EstadoCivil" Schema="dbo" store:Type="Tables" />
@@ -1110,7 +1113,6 @@
           <EntitySet Name="FuncionarioDotacion" EntityType="Self.FuncionarioDotacion" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="FuncionarioEstadoLegal" EntityType="Self.FuncionarioEstadoLegal" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="FuncionarioFotoHistorico" EntityType="Self.FuncionarioFotoHistorico" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="FuncionarioObservacion" EntityType="Self.FuncionarioObservacion" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="FuncionarioSalud" EntityType="Self.FuncionarioSalud" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Genero" EntityType="Self.Genero" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="HistoricoCustodia" EntityType="Self.HistoricoCustodia" Schema="dbo" store:Type="Tables" />
@@ -1230,13 +1232,13 @@
             <End Role="Funcionario" EntitySet="Funcionario" />
             <End Role="FuncionarioDispositivo" EntitySet="FuncionarioDispositivo" />
           </AssociationSet>
+          <AssociationSet Name="FK_FuncionarioDotacion_DotacionItem" Association="Self.FK_FuncionarioDotacion_DotacionItem">
+            <End Role="DotacionItem" EntitySet="DotacionItem" />
+            <End Role="FuncionarioDotacion" EntitySet="FuncionarioDotacion" />
+          </AssociationSet>
           <AssociationSet Name="FK_FuncionarioEstadoLegal_Funcionario" Association="Self.FK_FuncionarioEstadoLegal_Funcionario">
             <End Role="Funcionario" EntitySet="Funcionario" />
             <End Role="FuncionarioEstadoLegal" EntitySet="FuncionarioEstadoLegal" />
-          </AssociationSet>
-          <AssociationSet Name="FK_FuncionarioObservacion_Funcionario" Association="Self.FK_FuncionarioObservacion_Funcionario">
-            <End Role="Funcionario" EntitySet="Funcionario" />
-            <End Role="FuncionarioObservacion" EntitySet="FuncionarioObservacion" />
           </AssociationSet>
           <AssociationSet Name="FK_HistCust_Func" Association="Self.FK_HistCust_Func">
             <End Role="Funcionario" EntitySet="Funcionario" />
@@ -1327,7 +1329,8 @@
             <End Role="Usuario" EntitySet="Usuario" />
           </AssociationSet>
         </EntityContainer>
-      </Schema></edmx:StorageModels>
+      </Schema>
+    </edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="ApexModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -1368,6 +1371,16 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Nombre" Type="String" MaxLength="30" FixedLength="false" Unicode="true" Nullable="false" />
           <NavigationProperty Name="TipoLicencia" Relationship="Self.FK_TipoLicencia_CategoriaAusencia" FromRole="CategoriaAusencia" ToRole="TipoLicencia" />
+        </EntityType>
+        <EntityType Name="DotacionItem">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Nombre" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Activo" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="FuncionarioDotacion" Relationship="Self.FK_FuncionarioDotacion_DotacionItem" FromRole="DotacionItem" ToRole="FuncionarioDotacion" />
         </EntityType>
         <EntityType Name="Escalafon">
           <Key>
@@ -1443,12 +1456,12 @@
           <Property Name="TurnoId" Type="Int32" />
           <Property Name="SemanaId" Type="Int32" />
           <Property Name="HorarioId" Type="Int32" />
-          <Property Name="LastPictureId" Type="Int32" />
           <Property Name="FechaNacimiento" Type="DateTime" Precision="0" />
           <Property Name="Domicilio" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
           <Property Name="Email" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
           <Property Name="EscalafonId" Type="Int32" />
           <Property Name="FuncionId" Type="Int32" />
+          <Property Name="LastPictureId" Type="Int32" />
           <NavigationProperty Name="Cargo" Relationship="Self.FK_Funcionario_Cargo" FromRole="Funcionario" ToRole="Cargo" />
           <NavigationProperty Name="Escalafon" Relationship="Self.FK_Funcionario_Escalafon" FromRole="Funcionario" ToRole="Escalafon" />
           <NavigationProperty Name="Estado" Relationship="Self.FK__Funcionar__Estad__29221CFB" FromRole="Funcionario" ToRole="Estado" />
@@ -1470,7 +1483,6 @@
           <NavigationProperty Name="FuncionarioChaleco" Relationship="Self.FK_FuncionarioChaleco_Funcionario" FromRole="Funcionario" ToRole="FuncionarioChaleco" />
           <NavigationProperty Name="FuncionarioDispositivo" Relationship="Self.FK_FuncionarioDispositivo_Funcionario" FromRole="Funcionario" ToRole="FuncionarioDispositivo" />
           <NavigationProperty Name="FuncionarioEstadoLegal" Relationship="Self.FK_FuncionarioEstadoLegal_Funcionario" FromRole="Funcionario" ToRole="FuncionarioEstadoLegal" />
-          <NavigationProperty Name="FuncionarioObservacion" Relationship="Self.FK_FuncionarioObservacion_Funcionario" FromRole="Funcionario" ToRole="FuncionarioObservacion" />
           <NavigationProperty Name="HistoricoCustodia" Relationship="Self.FK_HistCust_Func" FromRole="Funcionario" ToRole="HistoricoCustodia" />
           <NavigationProperty Name="HistoricoLicencia" Relationship="Self.FK_HistLic_Funcionario" FromRole="Funcionario" ToRole="HistoricoLicencia" />
           <NavigationProperty Name="HistoricoNocturnidad" Relationship="Self.FK_HistNoc_Func" FromRole="Funcionario" ToRole="HistoricoNocturnidad" />
@@ -1527,10 +1539,11 @@
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="FuncionarioId" Type="Int32" Nullable="false" />
-          <Property Name="Item" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Talla" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
           <Property Name="FechaAsign" Type="DateTime" Nullable="false" Precision="7" />
           <Property Name="Observaciones" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="DotacionItemId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="DotacionItem" Relationship="Self.FK_FuncionarioDotacion_DotacionItem" FromRole="FuncionarioDotacion" ToRole="DotacionItem" />
           <NavigationProperty Name="Funcionario" Relationship="Self.FK__Funcionar__Funci__367C1819" FromRole="FuncionarioDotacion" ToRole="Funcionario" />
         </EntityType>
         <EntityType Name="FuncionarioEstadoLegal">
@@ -1555,17 +1568,6 @@
           <Property Name="FileName" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
           <NavigationProperty Name="Funcionario" Relationship="Self.FK_FuncFotoHist_Func" FromRole="FuncionarioFotoHistorico" ToRole="Funcionario" />
-        </EntityType>
-        <EntityType Name="FuncionarioObservacion">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="FuncionarioId" Type="Int32" Nullable="false" />
-          <Property Name="Categoria" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="Texto" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="FechaRegistro" Type="DateTime" Nullable="false" Precision="7" />
-          <NavigationProperty Name="Funcionario" Relationship="Self.FK_FuncionarioObservacion_Funcionario" FromRole="FuncionarioObservacion" ToRole="Funcionario" />
         </EntityType>
         <EntityType Name="FuncionarioSalud">
           <Key>
@@ -1716,7 +1718,6 @@
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" />
           <Property Name="FuncionarioId" Type="Int32" Nullable="false" />
           <Property Name="FechaProgramada" Type="DateTime" Nullable="false" Precision="0" />
           <Property Name="FechaRegistro" Type="DateTime" Precision="0" />
@@ -1729,6 +1730,7 @@
           <Property Name="UpdatedAt" Type="DateTime" Precision="7" />
           <Property Name="TipoNotificacionId" Type="Byte" Nullable="false" />
           <Property Name="EstadoId" Type="Byte" Nullable="false" />
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <NavigationProperty Name="Funcionario" Relationship="Self.FK_NotifPers_Func" FromRole="NotificacionPersonal" ToRole="Funcionario" />
           <NavigationProperty Name="NotificacionEstado" Relationship="Self.FK_NotifPers_Estado" FromRole="NotificacionPersonal" ToRole="NotificacionEstado" />
           <NavigationProperty Name="TipoNotificacion" Relationship="Self.FK_NotifPers_Tipo" FromRole="NotificacionPersonal" ToRole="TipoNotificacion" />
@@ -1984,6 +1986,18 @@
             </Principal>
             <Dependent Role="TipoLicencia">
               <PropertyRef Name="CategoriaAusenciaId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FuncionarioDotacion_DotacionItem">
+          <End Role="DotacionItem" Type="Self.DotacionItem" Multiplicity="1" />
+          <End Role="FuncionarioDotacion" Type="Self.FuncionarioDotacion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="DotacionItem">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="FuncionarioDotacion">
+              <PropertyRef Name="DotacionItemId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -2251,18 +2265,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_FuncionarioObservacion_Funcionario">
-          <End Role="Funcionario" Type="Self.Funcionario" Multiplicity="1" />
-          <End Role="FuncionarioObservacion" Type="Self.FuncionarioObservacion" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Funcionario">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="FuncionarioObservacion">
-              <PropertyRef Name="FuncionarioId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_HistCust_Func">
           <End Role="Funcionario" Type="Self.Funcionario" Multiplicity="1" />
           <End Role="HistoricoCustodia" Type="Self.HistoricoCustodia" Multiplicity="*" />
@@ -2496,6 +2498,7 @@
           <EntitySet Name="Arma" EntityType="Self.Arma" />
           <EntitySet Name="Cargo" EntityType="Self.Cargo" />
           <EntitySet Name="CategoriaAusencia" EntityType="Self.CategoriaAusencia" />
+          <EntitySet Name="DotacionItem" EntityType="Self.DotacionItem" />
           <EntitySet Name="Escalafon" EntityType="Self.Escalafon" />
           <EntitySet Name="Estado" EntityType="Self.Estado" />
           <EntitySet Name="EstadoCivil" EntityType="Self.EstadoCivil" />
@@ -2508,7 +2511,6 @@
           <EntitySet Name="FuncionarioDotacion" EntityType="Self.FuncionarioDotacion" />
           <EntitySet Name="FuncionarioEstadoLegal" EntityType="Self.FuncionarioEstadoLegal" />
           <EntitySet Name="FuncionarioFotoHistorico" EntityType="Self.FuncionarioFotoHistorico" />
-          <EntitySet Name="FuncionarioObservacion" EntityType="Self.FuncionarioObservacion" />
           <EntitySet Name="FuncionarioSalud" EntityType="Self.FuncionarioSalud" />
           <EntitySet Name="Genero" EntityType="Self.Genero" />
           <EntitySet Name="HistoricoCustodia" EntityType="Self.HistoricoCustodia" />
@@ -2555,6 +2557,10 @@
           <AssociationSet Name="FK_TipoLicencia_CategoriaAusencia" Association="Self.FK_TipoLicencia_CategoriaAusencia">
             <End Role="CategoriaAusencia" EntitySet="CategoriaAusencia" />
             <End Role="TipoLicencia" EntitySet="TipoLicencia" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FuncionarioDotacion_DotacionItem" Association="Self.FK_FuncionarioDotacion_DotacionItem">
+            <End Role="DotacionItem" EntitySet="DotacionItem" />
+            <End Role="FuncionarioDotacion" EntitySet="FuncionarioDotacion" />
           </AssociationSet>
           <AssociationSet Name="FK_Funcionario_Escalafon" Association="Self.FK_Funcionario_Escalafon">
             <End Role="Escalafon" EntitySet="Escalafon" />
@@ -2644,10 +2650,6 @@
             <End Role="Funcionario" EntitySet="Funcionario" />
             <End Role="FuncionarioEstadoLegal" EntitySet="FuncionarioEstadoLegal" />
           </AssociationSet>
-          <AssociationSet Name="FK_FuncionarioObservacion_Funcionario" Association="Self.FK_FuncionarioObservacion_Funcionario">
-            <End Role="Funcionario" EntitySet="Funcionario" />
-            <End Role="FuncionarioObservacion" EntitySet="FuncionarioObservacion" />
-          </AssociationSet>
           <AssociationSet Name="FK_HistCust_Func" Association="Self.FK_HistCust_Func">
             <End Role="Funcionario" EntitySet="Funcionario" />
             <End Role="HistoricoCustodia" EntitySet="HistoricoCustodia" />
@@ -2726,19 +2728,22 @@
           </AssociationSet>
           <FunctionImport Name="usp_CargarHistoricosPolicia" />
           <FunctionImport Name="usp_DeleteFuncionario">
-          <Parameter Name="FuncionarioId" Mode="In" Type="Int32" />
+            <Parameter Name="FuncionarioId" Mode="In" Type="Int32" />
           </FunctionImport>
+          <FunctionImport Name="usp_LimpiarDatosDeApex" />
           <FunctionImport Name="usp_MigrarArmas" ReturnType="Collection(ApexModel.usp_MigrarArmas_Result)" />
           <FunctionImport Name="usp_MigrarArmasYAsignaciones" ReturnType="Collection(ApexModel.usp_MigrarArmasYAsignaciones_Result)" />
+          <FunctionImport Name="usp_MigrarEstadosTransitoriosDesdePersonal" ReturnType="Collection(Int32)" />
           <FunctionImport Name="usp_MigrarEstadosUnificados" ReturnType="Collection(Int32)" />
           <FunctionImport Name="usp_MigrarFuncionariosDesdePersonal">
-          <Parameter Name="RefrescarCatalogos" Mode="In" Type="Boolean" />
+            <Parameter Name="RefrescarCatalogos" Mode="In" Type="Boolean" />
           </FunctionImport>
+          <FunctionImport Name="usp_MigrarLicencias" />
           <FunctionImport Name="usp_MigrarNotificaciones" ReturnType="Collection(Int32)" />
           <FunctionImport Name="usp_MigrarNovedadesDesdePersonal" />
           <FunctionImport Name="usp_MigrarUsuarios" ReturnType="Collection(Int32)" />
-          <FunctionImport Name="usp_PresenciaFecha_Apex" ReturnType="Collection(ApexModel.usp_PresenciaFecha_Apex_Result)">
-          <Parameter Name="Fecha" Mode="In" Type="DateTime" />
+          <FunctionImport Name="usp_PresenciaFecha_Apex">
+            <Parameter Name="Fecha" Mode="In" Type="DateTime" />
           </FunctionImport>
           <FunctionImport Name="usp_ProcesarEstadoNotificaciones" />
         </EntityContainer>
@@ -2751,18 +2756,6 @@
           <Property Type="Int32" Name="AsignacionesInsertadas" Nullable="true" />
           <Property Type="Int32" Name="TotalArmas" Nullable="true" />
           <Property Type="Int32" Name="TotalAsignaciones" Nullable="true" />
-        </ComplexType>
-        <ComplexType Name="usp_PresenciaFecha_Apex_Result">
-          <Property Type="Int32" Name="FuncionarioId" Nullable="false" />
-          <Property Type="String" Name="NomFuncionario" Nullable="false" MaxLength="60" />
-          <Property Type="String" Name="CI" Nullable="true" MaxLength="8" />
-          <Property Type="String" Name="Resultado" Nullable="true" MaxLength="109" />
-          <Property Type="String" Name="NomSemana" Nullable="true" MaxLength="60" />
-          <Property Type="String" Name="Turno" Nullable="true" MaxLength="60" />
-          <Property Type="String" Name="Puesto" Nullable="true" MaxLength="80" />
-          <Property Type="String" Name="Cargo" Nullable="true" MaxLength="100" />
-          <Property Type="String" Name="Seccion" Nullable="true" MaxLength="20" />
-          <Property Type="String" Name="Horario" Nullable="true" MaxLength="60" />
         </ComplexType>
       </Schema>
     </edmx:ConceptualModels>
@@ -2805,6 +2798,16 @@
               <MappingFragment StoreEntitySet="CategoriaAusencia">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="DotacionItem">
+            <EntityTypeMapping TypeName="ApexModel.DotacionItem">
+              <MappingFragment StoreEntitySet="DotacionItem">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+                <ScalarProperty Name="Activo" ColumnName="Activo" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -2879,12 +2882,12 @@
                 <ScalarProperty Name="TurnoId" ColumnName="TurnoId" />
                 <ScalarProperty Name="SemanaId" ColumnName="SemanaId" />
                 <ScalarProperty Name="HorarioId" ColumnName="HorarioId" />
-                <ScalarProperty Name="LastPictureId" ColumnName="LastPictureId" />
                 <ScalarProperty Name="FechaNacimiento" ColumnName="FechaNacimiento" />
                 <ScalarProperty Name="Domicilio" ColumnName="Domicilio" />
                 <ScalarProperty Name="Email" ColumnName="Email" />
                 <ScalarProperty Name="EscalafonId" ColumnName="EscalafonId" />
                 <ScalarProperty Name="FuncionId" ColumnName="FuncionId" />
+                <ScalarProperty Name="LastPictureId" ColumnName="LastPictureId" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -2932,10 +2935,10 @@
               <MappingFragment StoreEntitySet="FuncionarioDotacion">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="FuncionarioId" ColumnName="FuncionarioId" />
-                <ScalarProperty Name="Item" ColumnName="Item" />
                 <ScalarProperty Name="Talla" ColumnName="Talla" />
                 <ScalarProperty Name="FechaAsign" ColumnName="FechaAsign" />
                 <ScalarProperty Name="Observaciones" ColumnName="Observaciones" />
+                <ScalarProperty Name="DotacionItemId" ColumnName="DotacionItemId" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -2959,17 +2962,6 @@
                 <ScalarProperty Name="Foto" ColumnName="Foto" />
                 <ScalarProperty Name="FileName" ColumnName="FileName" />
                 <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="FuncionarioObservacion">
-            <EntityTypeMapping TypeName="ApexModel.FuncionarioObservacion">
-              <MappingFragment StoreEntitySet="FuncionarioObservacion">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="FuncionarioId" ColumnName="FuncionarioId" />
-                <ScalarProperty Name="Categoria" ColumnName="Categoria" />
-                <ScalarProperty Name="Texto" ColumnName="Texto" />
-                <ScalarProperty Name="FechaRegistro" ColumnName="FechaRegistro" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -3112,7 +3104,6 @@
           <EntitySetMapping Name="NotificacionPersonal">
             <EntityTypeMapping TypeName="ApexModel.NotificacionPersonal">
               <MappingFragment StoreEntitySet="NotificacionPersonal">
-                <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="FuncionarioId" ColumnName="FuncionarioId" />
                 <ScalarProperty Name="FechaProgramada" ColumnName="FechaProgramada" />
                 <ScalarProperty Name="FechaRegistro" ColumnName="FechaRegistro" />
@@ -3125,6 +3116,7 @@
                 <ScalarProperty Name="UpdatedAt" ColumnName="UpdatedAt" />
                 <ScalarProperty Name="TipoNotificacionId" ColumnName="TipoNotificacionId" />
                 <ScalarProperty Name="EstadoId" ColumnName="EstadoId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -3329,6 +3321,7 @@
           </EntitySetMapping>
           <FunctionImportMapping FunctionImportName="usp_CargarHistoricosPolicia" FunctionName="ApexModel.Store.usp_CargarHistoricosPolicia" />
           <FunctionImportMapping FunctionImportName="usp_DeleteFuncionario" FunctionName="ApexModel.Store.usp_DeleteFuncionario" />
+          <FunctionImportMapping FunctionImportName="usp_LimpiarDatosDeApex" FunctionName="ApexModel.Store.usp_LimpiarDatosDeApex" />
           <FunctionImportMapping FunctionImportName="usp_MigrarArmas" FunctionName="ApexModel.Store.usp_MigrarArmas">
             <ResultMapping>
               <ComplexTypeMapping TypeName="ApexModel.usp_MigrarArmas_Result">
@@ -3347,27 +3340,14 @@
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="usp_MigrarEstadosTransitoriosDesdePersonal" FunctionName="ApexModel.Store.usp_MigrarEstadosTransitoriosDesdePersonal" />
           <FunctionImportMapping FunctionImportName="usp_MigrarEstadosUnificados" FunctionName="ApexModel.Store.usp_MigrarEstadosUnificados" />
           <FunctionImportMapping FunctionImportName="usp_MigrarFuncionariosDesdePersonal" FunctionName="ApexModel.Store.usp_MigrarFuncionariosDesdePersonal" />
+          <FunctionImportMapping FunctionImportName="usp_MigrarLicencias" FunctionName="ApexModel.Store.usp_MigrarLicencias" />
           <FunctionImportMapping FunctionImportName="usp_MigrarNotificaciones" FunctionName="ApexModel.Store.usp_MigrarNotificaciones" />
           <FunctionImportMapping FunctionImportName="usp_MigrarNovedadesDesdePersonal" FunctionName="ApexModel.Store.usp_MigrarNovedadesDesdePersonal" />
           <FunctionImportMapping FunctionImportName="usp_MigrarUsuarios" FunctionName="ApexModel.Store.usp_MigrarUsuarios" />
-          <FunctionImportMapping FunctionImportName="usp_PresenciaFecha_Apex" FunctionName="ApexModel.Store.usp_PresenciaFecha_Apex">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="ApexModel.usp_PresenciaFecha_Apex_Result">
-                <ScalarProperty Name="FuncionarioId" ColumnName="FuncionarioId" />
-                <ScalarProperty Name="NomFuncionario" ColumnName="NomFuncionario" />
-                <ScalarProperty Name="CI" ColumnName="CI" />
-                <ScalarProperty Name="Resultado" ColumnName="Resultado" />
-                <ScalarProperty Name="NomSemana" ColumnName="NomSemana" />
-                <ScalarProperty Name="Turno" ColumnName="Turno" />
-                <ScalarProperty Name="Puesto" ColumnName="Puesto" />
-                <ScalarProperty Name="Cargo" ColumnName="Cargo" />
-                <ScalarProperty Name="Seccion" ColumnName="Seccion" />
-                <ScalarProperty Name="Horario" ColumnName="Horario" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="usp_PresenciaFecha_Apex" FunctionName="ApexModel.Store.usp_PresenciaFecha_Apex" />
           <FunctionImportMapping FunctionImportName="usp_ProcesarEstadoNotificaciones" FunctionName="ApexModel.Store.usp_ProcesarEstadoNotificaciones" />
         </EntityContainerMapping>
       </Mapping>

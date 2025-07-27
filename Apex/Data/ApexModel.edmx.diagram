@@ -4,59 +4,60 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="531887b0ce794381bc751bc833c2d2e1" Name="Diagram1">
-        <EntityTypeShape EntityType="ApexModel.AreaTrabajo" Width="1.5" PointX="1.5" PointY="44.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.Arma" Width="1.5" PointX="6" PointY="22.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.Cargo" Width="1.5" PointX="0.75" PointY="18.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.CategoriaAusencia" Width="1.5" PointX="3.75" PointY="15.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.Escalafon" Width="1.5" PointX="0.75" PointY="21.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.Estado" Width="1.5" PointX="0.75" PointY="33.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.EstadoCivil" Width="1.5" PointX="0.75" PointY="23.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.EstadoTransitorio" Width="1.5" PointX="8.25" PointY="33" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.Funcion" Width="1.5" PointX="0.75" PointY="26" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.Funcionario" Width="1.5" PointX="3" PointY="28.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.FuncionarioArma" Width="1.5" PointX="8.25" PointY="29" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.FuncionarioChaleco" Width="1.5" PointX="5.25" PointY="25.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.FuncionarioDispositivo" Width="1.5" PointX="5.25" PointY="29" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.FuncionarioDotacion" Width="1.5" PointX="5.25" PointY="32" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.FuncionarioEstadoLegal" Width="1.5" PointX="5.25" PointY="35.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.FuncionarioFotoHistorico" Width="1.5" PointX="5.25" PointY="38" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.FuncionarioObservacion" Width="1.5" PointX="5.25" PointY="41.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.FuncionarioSalud" Width="1.5" PointX="5.25" PointY="44" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.Genero" Width="1.5" PointX="0.75" PointY="28.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.HistoricoCustodia" Width="1.5" PointX="5.25" PointY="47.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.HistoricoLicencia" Width="1.5" PointX="8.25" PointY="36.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.HistoricoNocturnidad" Width="1.5" PointX="5.25" PointY="49.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.HistoricoPresentismo" Width="1.5" PointX="5.25" PointY="58.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.HistoricoViatico" Width="1.5" PointX="5.25" PointY="61.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.Horario" Width="1.5" PointX="0.75" PointY="30.75" IsExpanded="true" />
+      <Diagram DiagramId="97eec5118663492f87d78fe30daba8da" Name="Diagram1">
+        <EntityTypeShape EntityType="ApexModel.AreaTrabajo" Width="1.5" PointX="1.5" PointY="43.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.Arma" Width="1.5" PointX="6" PointY="20.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.Cargo" Width="1.5" PointX="0.75" PointY="16.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.CategoriaAusencia" Width="1.5" PointX="6.75" PointY="14.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.DotacionItem" Width="1.5" PointX="6" PointY="51.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.Escalafon" Width="1.5" PointX="0.75" PointY="19.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.Estado" Width="1.5" PointX="0.75" PointY="31.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.EstadoCivil" Width="1.5" PointX="0.75" PointY="22.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.EstadoTransitorio" Width="1.5" PointX="8.25" PointY="31.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.Funcion" Width="1.5" PointX="0.75" PointY="24.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.Funcionario" Width="1.5" PointX="3" PointY="27.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.FuncionarioArma" Width="1.5" PointX="8.25" PointY="27.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.FuncionarioChaleco" Width="1.5" PointX="5.25" PointY="27" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.FuncionarioDispositivo" Width="1.5" PointX="5.25" PointY="30.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.FuncionarioDotacion" Width="1.5" PointX="8.25" PointY="35.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.FuncionarioEstadoLegal" Width="1.5" PointX="5.25" PointY="36.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.FuncionarioFotoHistorico" Width="1.5" PointX="5.25" PointY="39.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.FuncionarioSalud" Width="1.5" PointX="5.25" PointY="42.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.Genero" Width="1.5" PointX="0.75" PointY="26.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.HistoricoCustodia" Width="1.5" PointX="5.25" PointY="46.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.HistoricoLicencia" Width="1.5" PointX="11.25" PointY="30.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.HistoricoNocturnidad" Width="1.5" PointX="5.25" PointY="48.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.HistoricoPresentismo" Width="1.5" PointX="5.25" PointY="57.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.HistoricoViatico" Width="1.5" PointX="5.25" PointY="60.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.Horario" Width="1.5" PointX="0.75" PointY="29.25" IsExpanded="true" />
         <EntityTypeShape EntityType="ApexModel.MapPoliciaFunc" Width="1.5" PointX="5.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.Movimiento" Width="1.5" PointX="11.25" PointY="33.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.NivelEstudio" Width="1.5" PointX="0.75" PointY="37.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.NotificacionEstado" Width="1.5" PointX="9" PointY="26.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.NotificacionPersonal" Width="1.5" PointX="11.25" PointY="27.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.Novedad" Width="1.5" PointX="9" PointY="53" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.NovedadFoto" Width="1.5" PointX="9" PointY="57.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.NovedadFuncionario" Width="1.5" PointX="11.25" PointY="36.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.NovedadGenerada" Width="1.5" PointX="6.75" PointY="53.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.PuestoTrabajo" Width="1.5" PointX="0.75" PointY="40.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.Movimiento" Width="1.5" PointX="11.25" PointY="26.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.NivelEstudio" Width="1.5" PointX="0.75" PointY="35.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.NotificacionEstado" Width="1.5" PointX="0.75" PointY="10.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.NotificacionPersonal" Width="1.5" PointX="11.25" PointY="36.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.Novedad" Width="1.5" PointX="3" PointY="11.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.NovedadFoto" Width="1.5" PointX="3" PointY="15.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.NovedadFuncionario" Width="1.5" PointX="5.25" PointY="33.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.NovedadGenerada" Width="1.5" PointX="0.75" PointY="13.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.PuestoTrabajo" Width="1.5" PointX="0.75" PointY="39" IsExpanded="true" />
         <EntityTypeShape EntityType="ApexModel.RegimenAlternancia" Width="1.5" PointX="0.75" PointY="5.75" IsExpanded="true" />
         <EntityTypeShape EntityType="ApexModel.RegimenDetalle" Width="1.5" PointX="3" PointY="1" IsExpanded="true" />
         <EntityTypeShape EntityType="ApexModel.RegimenTrabajo" Width="1.5" PointX="0.75" PointY="1.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.RolUsuario" Width="1.5" PointX="9" PointY="43.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.Seccion" Width="1.5" PointX="0.75" PointY="49.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.Semana" Width="1.5" PointX="0.75" PointY="52.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.TipoEstadoTransitorio" Width="1.5" PointX="6" PointY="19.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.TipoFuncionario" Width="1.5" PointX="0.75" PointY="54.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.TipoLicencia" Width="1.5" PointX="6" PointY="14.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.TipoNotificacion" Width="1.5" PointX="9" PointY="22.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.TipoViatico" Width="1.5" PointX="1.5" PointY="47.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.Turno" Width="1.5" PointX="0.75" PointY="57.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.Usuario" Width="1.5" PointX="11.25" PointY="39.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.RolUsuario" Width="1.5" PointX="6" PointY="24" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.Seccion" Width="1.5" PointX="0.75" PointY="48.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.Semana" Width="1.5" PointX="0.75" PointY="50.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.TipoEstadoTransitorio" Width="1.5" PointX="6" PointY="17.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.TipoFuncionario" Width="1.5" PointX="0.75" PointY="53.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.TipoLicencia" Width="1.5" PointX="9" PointY="13.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.TipoNotificacion" Width="1.5" PointX="9" PointY="39" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.TipoViatico" Width="1.5" PointX="1.5" PointY="45.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.Turno" Width="1.5" PointX="0.75" PointY="56.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.Usuario" Width="1.5" PointX="8.25" PointY="23.125" IsExpanded="true" />
         <AssociationConnector Association="ApexModel.FK_PuestoTrabajo_AreaTrabajo" ManuallyRouted="false" />
         <AssociationConnector Association="ApexModel.FK_FuncionarioArma_Arma" ManuallyRouted="false" />
         <AssociationConnector Association="ApexModel.FK_Funcionario_Cargo" ManuallyRouted="false" />
         <AssociationConnector Association="ApexModel.FK_TipoLicencia_CategoriaAusencia" ManuallyRouted="false" />
+        <AssociationConnector Association="ApexModel.FK_FuncionarioDotacion_DotacionItem" ManuallyRouted="false" />
         <AssociationConnector Association="ApexModel.FK_Funcionario_Escalafon" ManuallyRouted="false" />
         <AssociationConnector Association="ApexModel.FK__Funcionar__Estad__29221CFB" ManuallyRouted="false" />
         <AssociationConnector Association="ApexModel.FK_Movimiento_Estado" ManuallyRouted="false" />
@@ -79,7 +80,6 @@
         <AssociationConnector Association="ApexModel.FK_FuncionarioChaleco_Funcionario" ManuallyRouted="false" />
         <AssociationConnector Association="ApexModel.FK_FuncionarioDispositivo_Funcionario" ManuallyRouted="false" />
         <AssociationConnector Association="ApexModel.FK_FuncionarioEstadoLegal_Funcionario" ManuallyRouted="false" />
-        <AssociationConnector Association="ApexModel.FK_FuncionarioObservacion_Funcionario" ManuallyRouted="false" />
         <AssociationConnector Association="ApexModel.FK_HistCust_Func" ManuallyRouted="false" />
         <AssociationConnector Association="ApexModel.FK_HistLic_Funcionario" ManuallyRouted="false" />
         <AssociationConnector Association="ApexModel.FK_HistNoc_Func" ManuallyRouted="false" />

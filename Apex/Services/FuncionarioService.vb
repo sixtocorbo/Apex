@@ -94,10 +94,14 @@ Public Class FuncionarioService
         Return lista.Select(Function(ne) New KeyValuePair(Of Integer, String)(ne.Id, ne.Nombre)).ToList()
     End Function
 
-    ' -- Métodos para Estados Transitorios --
-    Public Async Function ObtenerTiposEstadoTransitorioAsync() As Task(Of List(Of KeyValuePair(Of Integer, String)))
-        Dim lista = Await ObtenerTiposEstadoTransitorioCompletosAsync()
-        Return lista.Select(Function(t) New KeyValuePair(Of Integer, String)(t.Id, t.Nombre)).ToList()
+    Public Async Function ObtenerItemsDotacionAsync() As Task(Of List(Of KeyValuePair(Of Integer, String)))
+        Dim lista = Await _unitOfWork.Repository(Of DotacionItem)().
+        GetAll().
+        AsNoTracking().
+        OrderBy(Function(di) di.Nombre).
+        ToListAsync()
+
+        Return lista.Select(Function(di) New KeyValuePair(Of Integer, String)(di.Id, di.Nombre)).ToList()
     End Function
 
     Public Async Function ObtenerTiposEstadoTransitorioCompletosAsync() As Task(Of List(Of TipoEstadoTransitorio))
@@ -146,6 +150,12 @@ Public Class FuncionarioService
         }).OrderBy(Function(f) f.Nombre).Take(500).ToListAsync()
 
     End Function
+    ' -- Métodos para Estados Transitorios --
+    Public Async Function ObtenerTiposEstadoTransitorioAsync() As Task(Of List(Of KeyValuePair(Of Integer, String)))
+        Dim lista = Await ObtenerTiposEstadoTransitorioCompletosAsync()
+        Return lista.Select(Function(t) New KeyValuePair(Of Integer, String)(t.Id, t.Nombre)).ToList()
+    End Function
+
 End Class
 Public Class FuncionarioVistaDTO
     Public Property Id As Integer

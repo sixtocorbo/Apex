@@ -1,4 +1,5 @@
-﻿Option Strict On
+﻿' Apex/UI/frmFuncionarioCrear.vb
+Option Strict On
 Option Explicit On
 
 Imports System.IO
@@ -22,7 +23,6 @@ Public Class frmFuncionarioCrear
 
     ' --- Colecciones para manejar los datos en el formulario ---
     Private _dotaciones As BindingList(Of FuncionarioDotacion)
-    Private _observaciones As BindingList(Of FuncionarioObservacion)
     Private _estadosTransitorios As BindingList(Of EstadoTransitorio)
     Private _tiposEstadoTransitorio As List(Of TipoEstadoTransitorio)
 
@@ -32,7 +32,6 @@ Public Class frmFuncionarioCrear
         InitializeComponent()
         _modo = ModoFormulario.Crear
         _dotaciones = New BindingList(Of FuncionarioDotacion)()
-        _observaciones = New BindingList(Of FuncionarioObservacion)()
         _estadosTransitorios = New BindingList(Of EstadoTransitorio)()
     End Sub
 
@@ -52,10 +51,8 @@ Public Class frmFuncionarioCrear
 
         ' --- Configurar DataGridViews ---
         ConfigurarGrillaDotacion()
-        ConfigurarGrillaObservaciones()
         ConfigurarGrillaEstados()
         dgvDotacion.DataSource = _dotaciones
-        dgvObservaciones.DataSource = _observaciones
         dgvEstadosTransitorios.DataSource = _estadosTransitorios
 
         ' --- Añadir manejador de evento para formateo ---
@@ -71,34 +68,6 @@ Public Class frmFuncionarioCrear
             btnGuardar.Text = "Guardar"
             pbFoto.Image = My.Resources.Police
         End If
-    End Sub
-    Private Sub ConfigurarGrillaObservaciones()
-        With dgvObservaciones
-            .AutoGenerateColumns = False ' Deshabilita la creación automática de columnas
-            .Columns.Clear()
-
-            ' Añade solo las columnas que necesitas
-            .Columns.Add(New DataGridViewTextBoxColumn With {
-            .DataPropertyName = "Id",
-            .HeaderText = "Id",
-            .Visible = False ' Ocultamos la columna Id
-        })
-            .Columns.Add(New DataGridViewTextBoxColumn With {
-            .DataPropertyName = "Categoria",
-            .HeaderText = "Categoría",
-            .Width = 150
-         })
-            .Columns.Add(New DataGridViewTextBoxColumn With {
-            .DataPropertyName = "Texto",
-            .HeaderText = "Texto",
-            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill ' Hacemos que esta columna ocupe el espacio restante
-        })
-            .Columns.Add(New DataGridViewTextBoxColumn With {
-            .DataPropertyName = "FechaRegistro",
-            .HeaderText = "Fecha de Registro",
-            .Width = 120
-        })
-        End With
     End Sub
     Private Sub ConfigurarGrillaDotacion()
         With dgvDotacion
@@ -247,10 +216,8 @@ Public Class frmFuncionarioCrear
 
         ' --- Cargar DataGridViews ---
         _dotaciones = New BindingList(Of FuncionarioDotacion)(f.FuncionarioDotacion.ToList())
-        _observaciones = New BindingList(Of FuncionarioObservacion)(f.FuncionarioObservacion.ToList())
         _estadosTransitorios = New BindingList(Of EstadoTransitorio)(f.EstadoTransitorio.ToList())
         dgvDotacion.DataSource = _dotaciones
-        dgvObservaciones.DataSource = _observaciones
         dgvEstadosTransitorios.DataSource = _estadosTransitorios
     End Function
 
@@ -314,7 +281,6 @@ Public Class frmFuncionarioCrear
 
                 ' --- Sincronizar colecciones ---
                 SincronizarColeccion(funcionario.FuncionarioDotacion, _dotaciones, uow.Context)
-                SincronizarColeccion(funcionario.FuncionarioObservacion, _observaciones, uow.Context)
                 SincronizarColeccion(funcionario.EstadoTransitorio, _estadosTransitorios, uow.Context)
 
 
@@ -347,17 +313,12 @@ Public Class frmFuncionarioCrear
             Dim id = CInt(itemForm.GetType().GetProperty("Id").GetValue(itemForm))
             If id = 0 Then ' Es un item nuevo
 
-                ' ================== INICIO DE LA CORRECCIÓN ==================
-                ' Si el nuevo item es un EstadoTransitorio, debemos asegurarnos de que
-                ' su entidad relacionada (TipoEstadoTransitorio) no se intente insertar de nuevo.
-                ' La marcamos como 'Unchanged' para que EF sepa que ya existe.
                 If GetType(T) Is GetType(EstadoTransitorio) Then
                     Dim estado = CType(CType(itemForm, Object), EstadoTransitorio)
                     If estado.TipoEstadoTransitorio IsNot Nothing Then
                         ctx.Entry(estado.TipoEstadoTransitorio).State = EntityState.Unchanged
                     End If
                 End If
-                ' =================== FIN DE LA CORRECCIÓN ====================
 
                 dbCollection.Add(itemForm)
             Else ' Es un item existente
@@ -413,36 +374,6 @@ Public Class frmFuncionarioCrear
         If MessageBox.Show("¿Está seguro de que desea quitar este elemento de dotación?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
             Dim dotacionSeleccionada = CType(dgvDotacion.CurrentRow.DataBoundItem, FuncionarioDotacion)
             _dotaciones.Remove(dotacionSeleccionada)
-        End If
-    End Sub
-#End Region
-
-#Region "CRUD Observaciones"
-    Private Sub btnAñadirObservacion_Click(sender As Object, e As EventArgs) Handles btnAñadirObservacion.Click
-        Dim nuevaObservacion = New FuncionarioObservacion()
-        Using frm As New frmFuncionarioObservacion(nuevaObservacion)
-            If frm.ShowDialog() = DialogResult.OK Then
-                _observaciones.Add(frm.Observacion)
-                _observaciones.ResetBindings() ' Refrescar grilla
-            End If
-        End Using
-    End Sub
-
-    Private Sub btnEditarObservacion_Click(sender As Object, e As EventArgs) Handles btnEditarObservacion.Click
-        If dgvObservaciones.CurrentRow Is Nothing Then Return
-        Dim observacionSeleccionada = CType(dgvObservaciones.CurrentRow.DataBoundItem, FuncionarioObservacion)
-        Using frm As New frmFuncionarioObservacion(observacionSeleccionada)
-            If frm.ShowDialog() = DialogResult.OK Then
-                _observaciones.ResetBindings() ' Refresca la grilla
-            End If
-        End Using
-    End Sub
-
-    Private Sub btnQuitarObservacion_Click(sender As Object, e As EventArgs) Handles btnQuitarObservacion.Click
-        If dgvObservaciones.CurrentRow Is Nothing Then Return
-        If MessageBox.Show("¿Está seguro de que desea quitar esta observación?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
-            Dim observacionSeleccionada = CType(dgvObservaciones.CurrentRow.DataBoundItem, FuncionarioObservacion)
-            _observaciones.Remove(observacionSeleccionada)
         End If
     End Sub
 #End Region

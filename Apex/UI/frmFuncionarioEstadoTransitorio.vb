@@ -1,4 +1,5 @@
-﻿Public Class frmFuncionarioEstadoTransitorio
+﻿' Apex/UI/frmFuncionarioEstadoTransitorio.vb
+Public Class frmFuncionarioEstadoTransitorio
     Public Estado As EstadoTransitorio
     Private _tiposEstado As List(Of TipoEstadoTransitorio)
 
@@ -52,12 +53,8 @@
             Return
         End If
 
-        ' ================== INICIO DE LA CORRECCIÓN ==================
         ' Asignamos únicamente el ID. Entity Framework se encargará de la relación.
         Estado.TipoEstadoTransitorioId = CInt(cboTipoEstado.SelectedValue)
-        ' La siguiente línea fue eliminada para evitar el error:
-        ' Estado.TipoEstadoTransitorio = CType(cboTipoEstado.SelectedItem, TipoEstadoTransitorio)
-        ' =================== FIN DE LA CORRECCIÓN ====================
 
         Estado.FechaDesde = dtpFechaDesde.Value.Date
         Estado.FechaHasta = If(chkFechaHasta.Checked, CType(Nothing, Date?), dtpFechaHasta.Value.Date)

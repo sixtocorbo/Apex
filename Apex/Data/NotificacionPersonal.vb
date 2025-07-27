@@ -11,7 +11,6 @@ Imports System
 Imports System.Collections.Generic
 
 Partial Public Class NotificacionPersonal
-    Public Property Id As Integer
     Public Property FuncionarioId As Integer
     Public Property FechaProgramada As Date
     Public Property FechaRegistro As Nullable(Of Date)
@@ -24,6 +23,7 @@ Partial Public Class NotificacionPersonal
     Public Property UpdatedAt As Nullable(Of Date)
     Public Property TipoNotificacionId As Byte
     Public Property EstadoId As Byte
+    Public Property Id As Integer
 
     Public Overridable Property Funcionario As Funcionario
     Public Overridable Property NotificacionEstado As NotificacionEstado
