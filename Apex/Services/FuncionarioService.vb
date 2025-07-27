@@ -154,7 +154,14 @@ Public Class FuncionarioService
         Dim lista = Await ObtenerTiposEstadoTransitorioCompletosAsync()
         Return lista.Select(Function(t) New KeyValuePair(Of Integer, String)(t.Id, t.Nombre)).ToList()
     End Function
-
+    ' Renombra o crea este nuevo método para mayor claridad.
+    Public Async Function ObtenerItemsDotacionCompletosAsync() As Task(Of List(Of DotacionItem))
+        Return Await _unitOfWork.Repository(Of DotacionItem)().
+            GetAll().
+            AsNoTracking().
+            OrderBy(Function(di) di.Nombre).
+            ToListAsync()
+    End Function
 End Class
 Public Class FuncionarioVistaDTO
     Public Property Id As Integer

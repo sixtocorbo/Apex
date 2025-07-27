@@ -71,7 +71,7 @@ Public Class frmFuncionarioCrear
     End Sub
     Private Sub ConfigurarGrillaDotacion()
         With dgvDotacion
-            .AutoGenerateColumns = False ' <-- MUY IMPORTANTE
+            .AutoGenerateColumns = False
             .Columns.Clear()
 
             ' Añadir solo las columnas que quieres ver
@@ -81,7 +81,7 @@ Public Class frmFuncionarioCrear
             .Visible = False ' Oculta si no es necesario
         })
             .Columns.Add(New DataGridViewTextBoxColumn With {
-           .DataPropertyName = "Item",
+            .DataPropertyName = "DotacionItem.Nombre", ' <-- RUTA CORRECTA
            .HeaderText = "Ítem",
            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
        })
@@ -352,6 +352,9 @@ Public Class frmFuncionarioCrear
         Dim nuevaDotacion = New FuncionarioDotacion()
         Using frm As New frmFuncionarioDotacion(nuevaDotacion)
             If frm.ShowDialog() = DialogResult.OK Then
+                ' CORRECCIÓN: Asigna el objeto de navegación completo.
+                frm.Dotacion.DotacionItem = frm.ItemSeleccionado
+
                 _dotaciones.Add(frm.Dotacion)
                 _dotaciones.ResetBindings() ' Refrescar grilla
             End If

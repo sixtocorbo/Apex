@@ -3,9 +3,15 @@
 Public Class frmFuncionarioDotacion
 
     Public Dotacion As FuncionarioDotacion
-    ' Se añade una instancia del servicio para poder cargar el catálogo de ítems.
+    ' Almacenará la lista completa de ítems, no solo pares de clave/valor.
+    Private _itemsDotacion As List(Of DotacionItem)
+    ' Expone el ítem seleccionado para que el formulario padre pueda acceder a él.
+    Public ReadOnly Property ItemSeleccionado As DotacionItem
+        Get
+            Return CType(cboItem.SelectedItem, DotacionItem)
+        End Get
+    End Property
     Private _svc As New FuncionarioService()
-
     Public Sub New(dotacion As FuncionarioDotacion)
         InitializeComponent()
         Me.Dotacion = dotacion
@@ -13,12 +19,11 @@ Public Class frmFuncionarioDotacion
 
     ' Evento que se dispara al cargar el formulario.
     Private Async Sub frmFuncionarioDotacion_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        ' Carga los ítems de dotación en el menú desplegable.
         Await CargarComboItems()
 
-        ' Si estamos en modo "Editar", selecciona el ítem actual y carga los demás datos.
         If Dotacion IsNot Nothing AndAlso Dotacion.Id > 0 Then
-            cboItem.SelectedValue = Dotacion.DotacionItemId
+            ' Para la edición, busca y selecciona el objeto completo en el ComboBox.
+            cboItem.SelectedItem = _itemsDotacion.FirstOrDefault(Function(i) i.Id = Dotacion.DotacionItemId)
             txtTalla.Text = Dotacion.Talla
             txtObservaciones.Text = Dotacion.Observaciones
         End If
@@ -26,10 +31,12 @@ Public Class frmFuncionarioDotacion
 
     ' Nuevo método para poblar el ComboBox desde la base de datos.
     Private Async Function CargarComboItems() As Task
-        cboItem.DataSource = Await _svc.ObtenerItemsDotacionAsync()
-        cboItem.DisplayMember = "Value"
-        cboItem.ValueMember = "Key"
-        cboItem.SelectedIndex = -1 ' Asegura que no haya nada seleccionado al inicio.
+        ' Carga la lista de objetos completos.
+        _itemsDotacion = Await _svc.ObtenerItemsDotacionCompletosAsync() ' Necesitarás crear este método en tu servicio.
+        cboItem.DataSource = _itemsDotacion
+        cboItem.DisplayMember = "Nombre" ' Muestra la propiedad Nombre.
+        cboItem.ValueMember = "Id" ' El valor sigue siendo el Id.
+        cboItem.SelectedIndex = -1
     End Function
 
     ' Lógica actualizada del botón Guardar para usar el ComboBox.
@@ -39,7 +46,7 @@ Public Class frmFuncionarioDotacion
             Return
         End If
 
-        Dotacion.DotacionItemId = CInt(cboItem.SelectedValue) ' Guarda el ID del ítem seleccionado.
+        Dotacion.DotacionItemId = CInt(cboItem.SelectedValue)
         Dotacion.Talla = txtTalla.Text.Trim()
         Dotacion.Observaciones = txtObservaciones.Text.Trim()
         Dotacion.FechaAsign = DateTime.Now
