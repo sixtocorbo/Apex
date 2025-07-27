@@ -71,33 +71,33 @@ Public Class frmFuncionarioCrear
     End Sub
     Private Sub ConfigurarGrillaDotacion()
         With dgvDotacion
-            .AutoGenerateColumns = False
+            .AutoGenerateColumns = False ' <-- MUY IMPORTANTE
             .Columns.Clear()
 
-            ' Añadir solo las columnas que quieres ver
             .Columns.Add(New DataGridViewTextBoxColumn With {
-            .DataPropertyName = "Id",
-            .HeaderText = "Id",
-            .Visible = False ' Oculta si no es necesario
-        })
+                .DataPropertyName = "Id",
+                .HeaderText = "Id",
+                .Visible = False
+            })
+            ' ✅ CORRECCIÓN 1: La propiedad correcta es "DotacionItem.Nombre"
             .Columns.Add(New DataGridViewTextBoxColumn With {
-            .DataPropertyName = "DotacionItem.Nombre", ' <-- RUTA CORRECTA
-           .HeaderText = "Ítem",
-           .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-       })
+               .DataPropertyName = "DotacionItem.Nombre",
+               .HeaderText = "Ítem",
+               .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+           })
             .Columns.Add(New DataGridViewTextBoxColumn With {
-            .DataPropertyName = "Talla",
-            .HeaderText = "Talla"
-        })
+                .DataPropertyName = "Talla",
+                .HeaderText = "Talla"
+            })
             .Columns.Add(New DataGridViewTextBoxColumn With {
-            .DataPropertyName = "Observaciones",
-            .HeaderText = "Observaciones",
-            .Width = 200
-        })
+                .DataPropertyName = "Observaciones",
+                .HeaderText = "Observaciones",
+                .Width = 200
+            })
             .Columns.Add(New DataGridViewTextBoxColumn With {
-            .DataPropertyName = "FechaAsign",
-            .HeaderText = "Fecha Asignación"
-        })
+                 .DataPropertyName = "FechaAsign",
+                .HeaderText = "Fecha Asignación"
+            })
         End With
     End Sub
 
@@ -106,30 +106,23 @@ Public Class frmFuncionarioCrear
             .AutoGenerateColumns = False
             .Columns.Clear()
 
-            ' Columna para el nombre del tipo de estado (se llenará manualmente)
             .Columns.Add(New DataGridViewTextBoxColumn With {
                 .Name = "TipoEstado",
                 .HeaderText = "Tipo de Estado",
                 .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
             })
-
-            ' Columna para la fecha de inicio
             .Columns.Add(New DataGridViewTextBoxColumn With {
                 .Name = "FechaDesde",
                 .DataPropertyName = "FechaDesde",
                 .HeaderText = "Desde",
                 .DefaultCellStyle = New DataGridViewCellStyle With {.Format = "dd/MM/yyyy"}
             })
-
-            ' Columna para la fecha de fin
             .Columns.Add(New DataGridViewTextBoxColumn With {
                 .Name = "FechaHasta",
                 .DataPropertyName = "FechaHasta",
                 .HeaderText = "Hasta",
                 .DefaultCellStyle = New DataGridViewCellStyle With {.Format = "dd/MM/yyyy"}
             })
-
-            ' Columna para las observaciones
             .Columns.Add(New DataGridViewTextBoxColumn With {
                 .Name = "Observaciones",
                 .DataPropertyName = "Observaciones",
@@ -141,7 +134,6 @@ Public Class frmFuncionarioCrear
 
     '----------------- Combos Look-ups -----------------------
     Private Async Function CargarCombosAsync() As Task
-        ' Pestaña General
         cboTipoFuncionario.DataSource = Await _svc.ObtenerTiposFuncionarioAsync()
         cboTipoFuncionario.DisplayMember = "Value"
         cboTipoFuncionario.ValueMember = "Key"
@@ -170,7 +162,6 @@ Public Class frmFuncionarioCrear
         cboNivelEstudio.DisplayMember = "Value"
         cboNivelEstudio.ValueMember = "Key"
 
-        ' Asignar -1 para que no haya selección inicial
         cboCargo.SelectedIndex = -1
         cboEscalafon.SelectedIndex = -1
         cboFuncion.SelectedIndex = -1
@@ -189,7 +180,6 @@ Public Class frmFuncionarioCrear
             Return
         End If
 
-        ' --- Cargar Pestaña General ---
         txtCI.Text = f.CI
         txtNombre.Text = f.Nombre
         dtpFechaIngreso.Value = f.FechaIngreso
@@ -206,7 +196,6 @@ Public Class frmFuncionarioCrear
             pbFoto.Image = My.Resources.Police
         End If
 
-        ' --- Cargar Pestaña Datos Personales ---
         dtpFechaNacimiento.Value = If(f.FechaNacimiento.HasValue, f.FechaNacimiento.Value, dtpFechaNacimiento.MinDate)
         txtDomicilio.Text = f.Domicilio
         txtEmail.Text = f.Email
@@ -214,7 +203,6 @@ Public Class frmFuncionarioCrear
         cboGenero.SelectedValue = If(f.GeneroId.HasValue, CInt(f.GeneroId), -1)
         cboNivelEstudio.SelectedValue = If(f.NivelEstudioId.HasValue, CInt(f.NivelEstudioId), -1)
 
-        ' --- Cargar DataGridViews ---
         _dotaciones = New BindingList(Of FuncionarioDotacion)(f.FuncionarioDotacion.ToList())
         _estadosTransitorios = New BindingList(Of EstadoTransitorio)(f.EstadoTransitorio.ToList())
         dgvDotacion.DataSource = _dotaciones
@@ -224,7 +212,6 @@ Public Class frmFuncionarioCrear
     '------------------- Guardar / Actualizar ----------------
     Private Async Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
         Try
-            ' --- Validaciones básicas ---
             If String.IsNullOrWhiteSpace(txtCI.Text) OrElse
                String.IsNullOrWhiteSpace(txtNombre.Text) OrElse
                cboTipoFuncionario.SelectedIndex = -1 Then
@@ -239,16 +226,14 @@ Public Class frmFuncionarioCrear
             Using uow As New UnitOfWork()
                 Dim funcionario As Funcionario
 
-                ' --- Lógica para CREAR o CARGAR el funcionario ---
                 If _modo = ModoFormulario.Crear Then
                     funcionario = New Funcionario()
                     funcionario.CreatedAt = DateTime.Now
                     uow.Repository(Of Funcionario).Add(funcionario)
                 Else
-                    ' Se carga la entidad CON TRACKING para poder actualizarla
                     funcionario = Await uow.Context.Set(Of Funcionario)() _
-                    .Include(Function(f) f.FuncionarioDotacion) _
-                    .Include(Function(f) f.EstadoTransitorio) _
+                    .Include(Function(f) f.FuncionarioDotacion.Select(Function(fd) fd.DotacionItem)) _
+                    .Include(Function(f) f.EstadoTransitorio.Select(Function(et) et.TipoEstadoTransitorio)) _
                     .FirstOrDefaultAsync(Function(f) f.Id = _idFuncionario)
 
                     If funcionario Is Nothing Then
@@ -258,7 +243,6 @@ Public Class frmFuncionarioCrear
                     funcionario.UpdatedAt = DateTime.Now
                 End If
 
-                ' --- Mapear datos escalares del formulario al objeto ---
                 funcionario.CI = txtCI.Text.Trim()
                 funcionario.Nombre = txtNombre.Text.Trim()
                 funcionario.FechaIngreso = dtpFechaIngreso.Value.Date
@@ -278,12 +262,9 @@ Public Class frmFuncionarioCrear
                     funcionario.Foto = File.ReadAllBytes(_rutaFotoSeleccionada)
                 End If
 
-                ' --- Sincronizar colecciones ---
                 SincronizarColeccion(funcionario.FuncionarioDotacion, _dotaciones, uow.Context)
                 SincronizarColeccion(funcionario.EstadoTransitorio, _estadosTransitorios, uow.Context)
 
-
-                ' --- Guardar todos los cambios en una sola transacción ---
                 Await uow.CommitAsync()
                 MessageBox.Show(If(_modo = ModoFormulario.Crear, "Funcionario creado", "Funcionario actualizado") & " correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
             End Using
@@ -297,7 +278,6 @@ Public Class frmFuncionarioCrear
     End Sub
 
     Private Sub SincronizarColeccion(Of T As {Class, New})(dbCollection As ICollection(Of T), formCollection As BindingList(Of T), ctx As DbContext)
-        ' 1. Eliminar los que ya no están en la lista del formulario
         Dim itemsParaBorrar = dbCollection.Where(Function(dbItem)
                                                      Dim dbId = CInt(dbItem.GetType().GetProperty("Id").GetValue(dbItem))
                                                      Return dbId > 0 AndAlso Not formCollection.Any(Function(formItem) CInt(formItem.GetType().GetProperty("Id").GetValue(formItem)) = dbId)
@@ -307,11 +287,17 @@ Public Class frmFuncionarioCrear
             ctx.Entry(item).State = EntityState.Deleted
         Next
 
-        ' 2. Actualizar los existentes y agregar los nuevos
         For Each itemForm In formCollection
             Dim id = CInt(itemForm.GetType().GetProperty("Id").GetValue(itemForm))
             If id = 0 Then ' Es un item nuevo
 
+                ' ✅ CORRECCIÓN 4: Evita el error de clave duplicada al guardar.
+                If GetType(T) Is GetType(FuncionarioDotacion) Then
+                    Dim dotacion = CType(CType(itemForm, Object), FuncionarioDotacion)
+                    If dotacion.DotacionItem IsNot Nothing AndAlso dotacion.DotacionItem.Id > 0 Then
+                        ctx.Entry(dotacion.DotacionItem).State = EntityState.Unchanged
+                    End If
+                End If
                 If GetType(T) Is GetType(EstadoTransitorio) Then
                     Dim estado = CType(CType(itemForm, Object), EstadoTransitorio)
                     If estado.TipoEstadoTransitorio IsNot Nothing Then
@@ -323,21 +309,17 @@ Public Class frmFuncionarioCrear
             Else ' Es un item existente
                 Dim itemInDb = dbCollection.FirstOrDefault(Function(x) CInt(x.GetType().GetProperty("Id").GetValue(x)) = id)
                 If itemInDb IsNot Nothing Then
-                    ' Copia los valores del objeto del formulario al objeto que está siendo rastreado por el contexto
                     ctx.Entry(itemInDb).CurrentValues.SetValues(itemForm)
                 End If
             End If
         Next
     End Sub
 
-
-    '-------------------- Cancelar ---------------------------
     Private Sub btnCancelar_Click(sender As Object, e As EventArgs) Handles btnCancelar.Click
         DialogResult = DialogResult.Cancel
         Close()
     End Sub
 
-    '------------------ Seleccionar Foto ---------------------
     Private Sub btnSeleccionarFoto_Click(sender As Object, e As EventArgs) Handles btnSeleccionarFoto.Click
         Using ofd As New OpenFileDialog() With {.Filter = "Imágenes|*.jpg;*.jpeg;*.png;*.bmp"}
             If ofd.ShowDialog() = DialogResult.OK Then
@@ -352,11 +334,23 @@ Public Class frmFuncionarioCrear
         Dim nuevaDotacion = New FuncionarioDotacion()
         Using frm As New frmFuncionarioDotacion(nuevaDotacion)
             If frm.ShowDialog() = DialogResult.OK Then
-                ' CORRECCIÓN: Asigna el objeto de navegación completo.
+                ' ✅ CORRECCIÓN 5: Validación para evitar duplicados en la grilla.
+                Dim existe = _dotaciones.Any(Function(d)
+                                                 Return d.DotacionItemId = frm.Dotacion.DotacionItemId AndAlso
+                                                        String.Equals(d.Talla, frm.Dotacion.Talla, StringComparison.OrdinalIgnoreCase) AndAlso
+                                                        String.Equals(d.Observaciones, frm.Dotacion.Observaciones, StringComparison.OrdinalIgnoreCase)
+                                             End Function)
+
+                If existe Then
+                    MessageBox.Show("Esta combinación de ítem, talla y observaciones ya ha sido añadida.", "Registro Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                    Return
+                End If
+
+                ' Asigna el objeto de navegación completo para que la grilla muestre el nombre.
                 frm.Dotacion.DotacionItem = frm.ItemSeleccionado
 
                 _dotaciones.Add(frm.Dotacion)
-                _dotaciones.ResetBindings() ' Refrescar grilla
+                _dotaciones.ResetBindings()
             End If
         End Using
     End Sub
@@ -366,7 +360,8 @@ Public Class frmFuncionarioCrear
         Dim dotacionSeleccionada = CType(dgvDotacion.CurrentRow.DataBoundItem, FuncionarioDotacion)
         Using frm As New frmFuncionarioDotacion(dotacionSeleccionada)
             If frm.ShowDialog() = DialogResult.OK Then
-                _dotaciones.ResetBindings() ' Refresca la grilla
+                dotacionSeleccionada.DotacionItem = frm.ItemSeleccionado
+                _dotaciones.ResetBindings()
             End If
         End Using
     End Sub
@@ -402,7 +397,7 @@ Public Class frmFuncionarioCrear
         Dim estadoSeleccionado = CType(dgvEstadosTransitorios.CurrentRow.DataBoundItem, EstadoTransitorio)
         Using frm As New frmFuncionarioEstadoTransitorio(estadoSeleccionado, _tiposEstadoTransitorio)
             If frm.ShowDialog() = DialogResult.OK Then
-                _estadosTransitorios.ResetBindings() ' Refresca la grilla
+                _estadosTransitorios.ResetBindings()
             End If
         End Using
     End Sub
@@ -417,18 +412,15 @@ Public Class frmFuncionarioCrear
 #End Region
 
 #Region "Formateo Manual de Grillas"
-
     Private Sub dgvEstadosTransitorios_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
         If e.RowIndex < 0 OrElse e.ColumnIndex < 0 Then Return
 
         Dim dgv = CType(sender, DataGridView)
         Dim colName = dgv.Columns(e.ColumnIndex).Name
 
-        ' Obtener el objeto EstadoTransitorio subyacente de la fila
         Dim estado = CType(dgv.Rows(e.RowIndex).DataBoundItem, EstadoTransitorio)
         If estado Is Nothing Then Return
 
-        ' Formatear la columna "TipoEstado" para mostrar el nombre
         If colName = "TipoEstado" Then
             If estado.TipoEstadoTransitorio IsNot Nothing Then
                 e.Value = estado.TipoEstadoTransitorio.Nombre
@@ -436,7 +428,6 @@ Public Class frmFuncionarioCrear
             End If
         End If
 
-        ' Formatear la columna "FechaHasta" para que no muestre nada si es nula
         If colName = "FechaHasta" Then
             If e.Value Is Nothing Then
                 e.Value = String.Empty
@@ -444,7 +435,6 @@ Public Class frmFuncionarioCrear
             End If
         End If
     End Sub
-
 #End Region
 
 End Class
