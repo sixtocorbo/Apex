@@ -46,9 +46,13 @@ Public Class frmFuncionarioDotacion
         Dotacion.Observaciones = txtObservaciones.Text.Trim()
         Dotacion.FechaAsign = DateTime.Now
 
+        ' ✅ Asegura que el objeto de navegación esté presente
+        Dotacion.DotacionItem = ItemSeleccionado
+
         DialogResult = DialogResult.OK
         Close()
     End Sub
+
 
     Private Sub btnCancelar_Click(sender As Object, e As EventArgs) Handles btnCancelar.Click
         DialogResult = DialogResult.Cancel
