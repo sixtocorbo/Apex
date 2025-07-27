@@ -248,7 +248,6 @@ Public Class frmFuncionarioCrear
                     ' Se carga la entidad CON TRACKING para poder actualizarla
                     funcionario = Await uow.Context.Set(Of Funcionario)() _
                     .Include(Function(f) f.FuncionarioDotacion) _
-                    .Include(Function(f) f.FuncionarioObservacion) _
                     .Include(Function(f) f.EstadoTransitorio) _
                     .FirstOrDefaultAsync(Function(f) f.Id = _idFuncionario)
 

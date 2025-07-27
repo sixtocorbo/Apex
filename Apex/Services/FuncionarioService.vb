@@ -23,7 +23,6 @@ Public Class FuncionarioService
         Include(Function(f) f.Genero).
         Include(Function(f) f.NivelEstudio).
         Include(Function(f) f.FuncionarioDotacion).
-        Include(Function(f) f.FuncionarioObservacion).
         Include(Function(f) f.FuncionarioEstadoLegal).
         Include(Function(f) f.FuncionarioDispositivo).
         Include(Function(f) f.EstadoTransitorio.Select(Function(et) et.TipoEstadoTransitorio)).
