@@ -18,6 +18,7 @@ Partial Public Class ApexEntities
 
     Public Sub New()
         MyBase.New("name=ApexEntities")
+        Me.Database.CommandTimeout = 180
     End Sub
 
     Protected Overrides Sub OnModelCreating(modelBuilder As DbModelBuilder)

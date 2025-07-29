@@ -1,4 +1,5 @@
-﻿' Reemplaza todo el contenido de tu archivo Apex/UI/frmFiltroAvanzado.Designer.vb con este código.
+﻿' Apex/UI/frmFiltroAvanzado.Designer.vb
+' VERSIÓN CORREGIDA CON LAYOUT AJUSTADO Y AUTO-SCROLL
 Option Strict On
 Option Explicit On
 
@@ -6,7 +7,7 @@ Option Explicit On
 Partial Class frmFiltroAvanzado
     Inherits System.Windows.Forms.Form
 
-    ' --- Declaración de controles ---
+    ' --- Declaraciones de Controles ---
     Private components As System.ComponentModel.IContainer
     Private WithEvents splitContenedorPrincipal As SplitContainer
     Private WithEvents pnlIzquierdo As Panel
@@ -44,11 +45,9 @@ Partial Class frmFiltroAvanzado
     Friend WithEvents btnNuevaLicencia As Button
     Friend WithEvents btnEditarLicencia As Button
     Friend WithEvents btnEliminarLicencia As Button
-    ' --- INICIO DE NUEVAS DECLARACIONES ---
     Friend WithEvents btnSiguiente As Button
     Friend WithEvents lblPaginacion As Label
     Friend WithEvents btnAnterior As Button
-    ' --- FIN DE NUEVAS DECLARACIONES ---
 
 
     <System.Diagnostics.DebuggerStepThrough()>
@@ -86,14 +85,12 @@ Partial Class frmFiltroAvanzado
         Me.btnNuevaLicencia = New System.Windows.Forms.Button()
         Me.btnEditarLicencia = New System.Windows.Forms.Button()
         Me.btnEliminarLicencia = New System.Windows.Forms.Button()
-        Me.flpChips = New System.Windows.Forms.FlowLayoutPanel()
-        Me.gbxBusquedaGlobal = New System.Windows.Forms.GroupBox()
-        Me.txtBusquedaGlobal = New System.Windows.Forms.TextBox()
-        ' --- INICIO DE NUEVAS DECLARACIONES ---
         Me.btnSiguiente = New System.Windows.Forms.Button()
         Me.lblPaginacion = New System.Windows.Forms.Label()
         Me.btnAnterior = New System.Windows.Forms.Button()
-        ' --- FIN DE NUEVAS DECLARACIONES ---
+        Me.flpChips = New System.Windows.Forms.FlowLayoutPanel()
+        Me.gbxBusquedaGlobal = New System.Windows.Forms.GroupBox()
+        Me.txtBusquedaGlobal = New System.Windows.Forms.TextBox()
         CType(Me.splitContenedorPrincipal, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.splitContenedorPrincipal.Panel1.SuspendLayout()
         Me.splitContenedorPrincipal.Panel2.SuspendLayout()
@@ -120,17 +117,19 @@ Partial Class frmFiltroAvanzado
         'splitContenedorPrincipal.Panel1
         '
         Me.splitContenedorPrincipal.Panel1.Controls.Add(Me.pnlIzquierdo)
-        Me.splitContenedorPrincipal.Panel1MinSize = 450
+        Me.splitContenedorPrincipal.Panel1MinSize = 350 ' Ajustado
         '
         'splitContenedorPrincipal.Panel2
         '
         Me.splitContenedorPrincipal.Panel2.Controls.Add(Me.pnlDerecho)
+        Me.splitContenedorPrincipal.Panel2MinSize = 400 ' Ajustado
         Me.splitContenedorPrincipal.Size = New System.Drawing.Size(1493, 749)
         Me.splitContenedorPrincipal.SplitterDistance = 450
         Me.splitContenedorPrincipal.TabIndex = 0
         '
         'pnlIzquierdo
         '
+        Me.pnlIzquierdo.AutoScroll = True ' Habilitado
         Me.pnlIzquierdo.Controls.Add(Me.gbxFiltros)
         Me.pnlIzquierdo.Controls.Add(Me.gbxOrigenDatos)
         Me.pnlIzquierdo.Dock = System.Windows.Forms.DockStyle.Fill
@@ -171,23 +170,27 @@ Partial Class frmFiltroAvanzado
         '
         'lstColumnas
         '
-        Me.lstColumnas.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.lstColumnas.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstColumnas.FormattingEnabled = True
         Me.lstColumnas.ItemHeight = 16
         Me.lstColumnas.Location = New System.Drawing.Point(3, 3)
         Me.lstColumnas.Name = "lstColumnas"
-        Me.lstColumnas.Size = New System.Drawing.Size(199, 491)
+        Me.lstColumnas.Size = New System.Drawing.Size(199, 484)
         Me.lstColumnas.TabIndex = 0
         '
         'lstValores
         '
-        Me.lstValores.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.lstValores.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstValores.FormattingEnabled = True
         Me.lstValores.ItemHeight = 16
         Me.lstValores.Location = New System.Drawing.Point(208, 3)
         Me.lstValores.Name = "lstValores"
         Me.lstValores.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended
-        Me.lstValores.Size = New System.Drawing.Size(199, 491)
+        Me.lstValores.Size = New System.Drawing.Size(199, 484)
         Me.lstValores.TabIndex = 1
         '
         'pnlFiltroBotones
@@ -325,6 +328,7 @@ Partial Class frmFiltroAvanzado
         '
         'pnlDerecho
         '
+        Me.pnlDerecho.AutoScroll = True ' Habilitado
         Me.pnlDerecho.Controls.Add(Me.dgvDatos)
         Me.pnlDerecho.Controls.Add(Me.pnlAcciones)
         Me.pnlDerecho.Controls.Add(Me.flpChips)
@@ -354,7 +358,8 @@ Partial Class frmFiltroAvanzado
         '
         'pnlAcciones
         '
-        Me.pnlAcciones.AutoSize = True
+        Me.pnlAcciones.AutoSize = False ' CAMBIO CLAVE
+        Me.pnlAcciones.Height = 85      ' CAMBIO CLAVE: Altura fija para dos filas
         Me.pnlAcciones.Controls.Add(Me.btnExportarExcel)
         Me.pnlAcciones.Controls.Add(Me.btnCopiarCorreos)
         Me.pnlAcciones.Controls.Add(Me.btnExportarFichasPDF)
@@ -371,10 +376,11 @@ Partial Class frmFiltroAvanzado
         Me.pnlAcciones.Controls.Add(Me.lblPaginacion)
         Me.pnlAcciones.Controls.Add(Me.btnAnterior)
         Me.pnlAcciones.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.pnlAcciones.FlowDirection = System.Windows.Forms.FlowDirection.LeftToRight
         Me.pnlAcciones.Location = New System.Drawing.Point(10, 698)
         Me.pnlAcciones.Name = "pnlAcciones"
         Me.pnlAcciones.Padding = New System.Windows.Forms.Padding(5)
-        Me.pnlAcciones.Size = New System.Drawing.Size(1019, 41)
+        Me.pnlAcciones.Size = New System.Drawing.Size(1019, 85)
         Me.pnlAcciones.TabIndex = 3
         '
         'btnExportarExcel
@@ -463,7 +469,7 @@ Partial Class frmFiltroAvanzado
         'btnNuevaLicencia
         '
         Me.pnlAcciones.SetFlowBreak(Me.btnNuevaLicencia, True)
-        Me.btnNuevaLicencia.Location = New System.Drawing.Point(564, 8)
+        Me.btnNuevaLicencia.Location = New System.Drawing.Point(8, 44)
         Me.btnNuevaLicencia.Name = "btnNuevaLicencia"
         Me.btnNuevaLicencia.Size = New System.Drawing.Size(75, 30)
         Me.btnNuevaLicencia.TabIndex = 9
@@ -472,7 +478,7 @@ Partial Class frmFiltroAvanzado
         '
         'btnEditarLicencia
         '
-        Me.btnEditarLicencia.Location = New System.Drawing.Point(645, 8)
+        Me.btnEditarLicencia.Location = New System.Drawing.Point(89, 44)
         Me.btnEditarLicencia.Name = "btnEditarLicencia"
         Me.btnEditarLicencia.Size = New System.Drawing.Size(75, 30)
         Me.btnEditarLicencia.TabIndex = 10
@@ -481,7 +487,7 @@ Partial Class frmFiltroAvanzado
         '
         'btnEliminarLicencia
         '
-        Me.btnEliminarLicencia.Location = New System.Drawing.Point(726, 8)
+        Me.btnEliminarLicencia.Location = New System.Drawing.Point(170, 44)
         Me.btnEliminarLicencia.Name = "btnEliminarLicencia"
         Me.btnEliminarLicencia.Size = New System.Drawing.Size(75, 30)
         Me.btnEliminarLicencia.TabIndex = 11
@@ -490,7 +496,7 @@ Partial Class frmFiltroAvanzado
         '
         'btnSiguiente
         '
-        Me.btnSiguiente.Location = New System.Drawing.Point(807, 8)
+        Me.btnSiguiente.Location = New System.Drawing.Point(251, 44)
         Me.btnSiguiente.Name = "btnSiguiente"
         Me.btnSiguiente.Size = New System.Drawing.Size(94, 30)
         Me.btnSiguiente.TabIndex = 12
@@ -502,7 +508,7 @@ Partial Class frmFiltroAvanzado
         Me.lblPaginacion.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.lblPaginacion.AutoSize = True
         Me.lblPaginacion.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblPaginacion.Location = New System.Drawing.Point(907, 15)
+        Me.lblPaginacion.Location = New System.Drawing.Point(351, 51)
         Me.lblPaginacion.Name = "lblPaginacion"
         Me.lblPaginacion.Size = New System.Drawing.Size(95, 16)
         Me.lblPaginacion.TabIndex = 13
@@ -510,8 +516,7 @@ Partial Class frmFiltroAvanzado
         '
         'btnAnterior
         '
-        Me.pnlAcciones.SetFlowBreak(Me.btnAnterior, True)
-        Me.btnAnterior.Location = New System.Drawing.Point(1008, 8)
+        Me.btnAnterior.Location = New System.Drawing.Point(452, 44)
         Me.btnAnterior.Name = "btnAnterior"
         Me.btnAnterior.Size = New System.Drawing.Size(94, 30)
         Me.btnAnterior.TabIndex = 14
@@ -555,6 +560,7 @@ Partial Class frmFiltroAvanzado
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1493, 749)
         Me.Controls.Add(Me.splitContenedorPrincipal)
+        Me.MinimumSize = New System.Drawing.Size(900, 600) ' Tamaño mínimo
         Me.Name = "frmFiltroAvanzado"
         Me.Text = "Filtro Avanzado"
         Me.WindowState = System.Windows.Forms.FormWindowState.Maximized
