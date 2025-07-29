@@ -1,4 +1,6 @@
-﻿Imports System.Data
+﻿' Apex/Services/ConsultasGenericas.vb
+
+Imports System.Data
 Imports System.Data.Entity
 Imports System.Threading.Tasks
 Imports System.Reflection
@@ -50,9 +52,7 @@ Public Module ConsultasGenericas
             Case TipoOrigenDatos.Notificaciones
                 Return Await ConsultarNotificaciones(fechaInicio, fechaFin)
             Case TipoOrigenDatos.Licencias
-                ' La llamada a la versión paginada se haría desde el formulario.
-                ' Por compatibilidad, mantenemos la llamada original que trae todo.
-                Return Await ConsultarLicencias(fechaInicio, fechaFin)
+                Return Await ConsultarLicencias(fechaInicio, fechaFin) ' Mantenemos esto por compatibilidad si se usa en otro lado
             Case TipoOrigenDatos.Novedades
                 Return Await ConsultarNovedades(fechaInicio, fechaFin)
             Case TipoOrigenDatos.Funcionarios
@@ -104,6 +104,7 @@ Public Module ConsultasGenericas
         End Using
     End Function
 
+    ' --- El resto de las funciones de consulta se mantienen igual ---
 
     Private Async Function ConsultarEstadoTransitorio(fechaInicio As Date, fechaFin As Date, tipoEstado As String) As Task(Of DataTable)
         Using uow As New UnitOfWork()

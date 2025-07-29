@@ -1,13 +1,9 @@
-﻿' Reemplaza todo el contenido de tu archivo Apex/UI/frmFiltroAvanzado.vb con este código.
+﻿' Apex/UI/frmFiltroAvanzado.vb
 Option Strict On
 Option Explicit On
 
 Imports System.ComponentModel
 Imports System.Data
-Imports System.Globalization
-Imports System.IO
-Imports System.Runtime.InteropServices
-Imports System.Text
 
 Partial Public Class frmFiltroAvanzado
 
@@ -38,20 +34,18 @@ Partial Public Class frmFiltroAvanzado
                        $"{Columna} {op} {Valor1}")
         End Function
 
-        Private Const FORMAT_DATE As String = "#yyyy-MM-dd#"
-
         Private Shared Function Esc(s As String) As String
             Return s.Replace("'", "''")
         End Function
 
         Private Shared Function Formatear(valor As String) As String
             If DateTime.TryParse(valor, Nothing) Then
-                Return CDate(valor).ToString(FORMAT_DATE, CultureInfo.InvariantCulture)
+                Return $"'{CDate(valor):yyyy-MM-dd}'"
             End If
 
             Dim n As Double
-            If Double.TryParse(valor, NumberStyles.Any, CultureInfo.InvariantCulture, n) Then
-                Return n.ToString(CultureInfo.InvariantCulture)
+            If Double.TryParse(valor, n) Then
+                Return n.ToString()
             End If
 
             Return $"'{Esc(valor)}'"
@@ -62,18 +56,10 @@ Partial Public Class frmFiltroAvanzado
 
             Select Case Operador
                 Case OperadorComparacion.Igual
-                    If DateTime.TryParse(Valor1, Nothing) Then
-                        Dim fecha As Date = CDate(Valor1).Date
-                        Dim siguienteDia As Date = fecha.AddDays(1)
-                        Return $"{col} >= #{fecha.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}# AND {col} < #{siguienteDia.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}#"
-                    Else
-                        Return $"{col} = {Formatear(Valor1)}"
-                    End If
-
+                    Return $"{col} = {Formatear(Valor1)}"
                 Case OperadorComparacion.EnLista
                     Dim items = Valor1.Split("|"c).Select(AddressOf Formatear)
                     Return $"{col} IN ({String.Join(",", items)})"
-
                 Case Else
                     Throw New NotSupportedException($"Operador {Operador} aún no implementado.")
             End Select
@@ -114,6 +100,10 @@ Partial Public Class frmFiltroAvanzado
     Private ReadOnly filtros As New GestorFiltros()
     Private _licenciaService As LicenciaService
     Private _notificacionService As NotificacionPersonalService
+    ' --- Variables para paginación ---
+    Private _paginaActual As Integer = 1
+    Private _tamañoPagina As Integer = 100 ' Cargar de a 100 registros
+    Private _totalRegistros As Integer = 0
 #End Region
 
 #Region "Constructor / Load"
@@ -137,6 +127,10 @@ Partial Public Class frmFiltroAvanzado
         AddHandler btnEditarLicencia.Click, AddressOf btnEditarLicencia_Click
         AddHandler btnEliminarLicencia.Click, AddressOf btnEliminarLicencia_Click
 
+        ' --- Añadir handlers para paginación ---
+        AddHandler btnAnterior.Click, AddressOf btnAnterior_Click
+        AddHandler btnSiguiente.Click, AddressOf btnSiguiente_Click
+
         cmbOrigenDatos_SelectedIndexChanged(cmbOrigenDatos, EventArgs.Empty)
         ActualizarAccionesDisponibles()
     End Sub
@@ -144,18 +138,18 @@ Partial Public Class frmFiltroAvanzado
 
 #Region "Carga de datos"
     Private Async Sub btnCargar_Click(sender As Object, e As EventArgs) Handles btnCargar.Click
+        _paginaActual = 1 ' Siempre reiniciar a la página 1 al cargar nuevos datos
+        Await CargarDatos()
+    End Sub
+
+    Private Async Function CargarDatos() As Task
         Dim origenSeleccionado = CType(cmbOrigenDatos.SelectedItem, ConsultasGenericas.TipoOrigenDatos)
         Dim fechaInicio = dtpFechaInicio.Value.Date
-        Dim fechaFin As Date
+        Dim fechaFin = dtpFechaFin.Value.Date
 
-        If origenSeleccionado = ConsultasGenericas.TipoOrigenDatos.Funcionarios Then
-            fechaFin = fechaInicio
-        Else
-            fechaFin = dtpFechaFin.Value.Date
-            If fechaInicio > fechaFin Then
-                MessageBox.Show("La fecha de inicio no puede ser mayor que la fecha de fin.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-                Return
-            End If
+        If origenSeleccionado <> ConsultasGenericas.TipoOrigenDatos.Funcionarios AndAlso fechaInicio > fechaFin Then
+            MessageBox.Show("La fecha de inicio no puede ser mayor que la fecha de fin.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return
         End If
 
         btnCargar.Enabled = False
@@ -164,11 +158,22 @@ Partial Public Class frmFiltroAvanzado
 
         Try
             Using wait As New WaitCursor()
-                dtOriginal = Await ConsultasGenericas.ObtenerDatosGenericosAsync(origenSeleccionado, fechaInicio, fechaFin)
+                If origenSeleccionado = ConsultasGenericas.TipoOrigenDatos.Licencias Then
+                    ' --- LÓGICA PAGINADA ---
+                    Dim resultado = Await ConsultasGenericas.ConsultarLicenciasPaginado(fechaInicio, fechaFin, _paginaActual, _tamañoPagina)
+                    dtOriginal = ToDataTable(resultado.Items)
+                    _totalRegistros = resultado.TotalItems
+                Else
+                    ' --- LÓGICA ANTERIOR (SIN PAGINAR) ---
+                    _totalRegistros = 0 ' Reiniciar para que no se muestre la paginación
+                    dtOriginal = Await ConsultasGenericas.ObtenerDatosGenericosAsync(origenSeleccionado, fechaInicio, fechaFin)
+                End If
             End Using
 
             If dtOriginal Is Nothing OrElse dtOriginal.Rows.Count = 0 Then
-                MessageBox.Show("No se encontraron datos para los criterios seleccionados.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                If _paginaActual = 1 Then ' Solo mostrar mensaje si es la primera carga
+                    MessageBox.Show("No se encontraron datos para los criterios seleccionados.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                End If
                 LimpiarTodo()
                 Return
             End If
@@ -176,30 +181,28 @@ Partial Public Class frmFiltroAvanzado
             dvDatos = New DataView(dtOriginal)
             dgvDatos.DataSource = dvDatos
 
-            If origenSeleccionado = ConsultasGenericas.TipoOrigenDatos.Notificaciones Then
-                AgregarColumnaEstadoTransitorio()
+            If _paginaActual = 1 Then ' Solo recargar columnas en la primera carga
+                lstColumnas.Items.Clear()
+                For Each col As DataColumn In dtOriginal.Columns
+                    lstColumnas.Items.Add(col.ColumnName)
+                Next
+                If lstColumnas.Items.Count > 0 Then lstColumnas.SelectedIndex = 0
+
+                filtros.Limpiar()
+                flpChips.Controls.Clear()
+                txtBusquedaGlobal.Clear()
             End If
 
-            lstColumnas.Items.Clear()
-            For Each col As DataColumn In dtOriginal.Columns
-                lstColumnas.Items.Add(col.ColumnName)
-            Next
-            If lstColumnas.Items.Count > 0 Then lstColumnas.SelectedIndex = 0
-
-            filtros.Limpiar()
-            flpChips.Controls.Clear()
-            txtBusquedaGlobal.Clear()
             AplicarFiltros()
-
             gbxFiltros.Enabled = True
-            ActualizarAccionesDisponibles()
 
         Catch ex As Exception
             MessageBox.Show($"Error al cargar datos: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         Finally
             btnCargar.Enabled = True
+            ActualizarAccionesDisponibles() ' Llama a esto para mostrar/ocultar paginación
         End Try
-    End Sub
+    End Function
 
     Private Sub LimpiarTodo()
         dgvDatos.DataSource = Nothing
@@ -210,12 +213,13 @@ Partial Public Class frmFiltroAvanzado
         flpChips.Controls.Clear()
         filtros.Limpiar()
         gbxFiltros.Enabled = False
-        lblConteoRegistros.Text = "Registros encontrados: 0"
-        ActualizarAccionesDisponibles()
+        _totalRegistros = 0
+        _paginaActual = 1
+        ActualizarAccionesDisponibles() ' Actualiza para ocultar todo
     End Sub
 #End Region
 
-#Region "Eventos principales"
+#Region "Eventos principales y Paginación"
     Private Sub ColumnaCambiada(sender As Object, e As EventArgs)
         lstValores.Items.Clear()
         If lstColumnas.SelectedItem Is Nothing OrElse dvDatos Is Nothing Then Exit Sub
@@ -234,18 +238,8 @@ Partial Public Class frmFiltroAvanzado
 
     Private Sub cmbOrigenDatos_SelectedIndexChanged(sender As Object, e As EventArgs)
         Dim origenSeleccionado = CType(cmbOrigenDatos.SelectedItem, ConsultasGenericas.TipoOrigenDatos)
-
-        If origenSeleccionado = ConsultasGenericas.TipoOrigenDatos.Funcionarios Then
-            dtpFechaInicio.Value = Date.Today
-            dtpFechaFin.Value = Date.Today
-            dtpFechaFin.Enabled = False
-        Else
-            dtpFechaInicio.Value = Date.Today.AddMonths(-1)
-            dtpFechaFin.Value = Date.Today
-            dtpFechaFin.Enabled = True
-        End If
-
-        ActualizarAccionesDisponibles()
+        dtpFechaFin.Enabled = (origenSeleccionado <> ConsultasGenericas.TipoOrigenDatos.Funcionarios)
+        LimpiarTodo()
     End Sub
 
     Private Sub BtnAgregar_Click(sender As Object, e As EventArgs) Handles btnAgregar.Click
@@ -257,30 +251,10 @@ Partial Public Class frmFiltroAvanzado
 
         If selCount > 1 Then
             Dim valores = lstValores.SelectedItems.Cast(Of Object)().Select(Function(v) v.ToString()).ToArray()
-            nuevaRegla = New ReglaFiltro With {
-                .Columna = col,
-                .Operador = OperadorComparacion.EnLista,
-                .Valor1 = String.Join("|", valores)
-            }
+            nuevaRegla = New ReglaFiltro With {.Columna = col, .Operador = OperadorComparacion.EnLista, .Valor1 = String.Join("|", valores)}
         Else
             Dim v As String = lstValores.SelectedItem.ToString()
-            nuevaRegla = New ReglaFiltro With {
-                .Columna = col,
-                .Operador = OperadorComparacion.Igual,
-                .Valor1 = v
-            }
-        End If
-
-        Dim filtroYaExiste As Boolean = filtros.Reglas.Any(
-            Function(reglaExistente)
-                Return reglaExistente.Columna.Equals(nuevaRegla.Columna, StringComparison.InvariantCultureIgnoreCase) AndAlso
-                       reglaExistente.Operador = nuevaRegla.Operador AndAlso
-                       reglaExistente.Valor1.Equals(nuevaRegla.Valor1, StringComparison.InvariantCultureIgnoreCase)
-            End Function)
-
-        If filtroYaExiste Then
-            MessageBox.Show("Ese filtro ya ha sido aplicado.", "Filtro Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Information)
-            Return
+            nuevaRegla = New ReglaFiltro With {.Columna = col, .Operador = OperadorComparacion.Igual, .Valor1 = v}
         End If
 
         filtros.Agregar(nuevaRegla)
@@ -290,6 +264,22 @@ Partial Public Class frmFiltroAvanzado
 
     Private Sub txtBusquedaGlobal_TextChanged_Handler(sender As Object, e As EventArgs)
         AplicarFiltros()
+    End Sub
+
+    ' --- Eventos de los nuevos botones de paginación ---
+    Private Async Sub btnAnterior_Click(sender As Object, e As EventArgs)
+        If _paginaActual > 1 Then
+            _paginaActual -= 1
+            Await CargarDatos()
+        End If
+    End Sub
+
+    Private Async Sub btnSiguiente_Click(sender As Object, e As EventArgs)
+        Dim totalPaginas = CInt(Math.Ceiling(_totalRegistros / CDbl(_tamañoPagina)))
+        If _paginaActual < totalPaginas Then
+            _paginaActual += 1
+            Await CargarDatos()
+        End If
     End Sub
 #End Region
 
@@ -301,7 +291,12 @@ Partial Public Class frmFiltroAvanzado
         Dim globalF = ConstruirFiltroGlobal()
         dvDatos.RowFilter = String.Join(" AND ", {rf, globalF}.Where(Function(s) Not String.IsNullOrWhiteSpace(s)))
 
-        lblConteoRegistros.Text = $"Registros encontrados: {dvDatos.Count}"
+        If CType(cmbOrigenDatos.SelectedItem, ConsultasGenericas.TipoOrigenDatos) = ConsultasGenericas.TipoOrigenDatos.Licencias Then
+            ActualizarControlesPaginacion()
+        Else
+            lblConteoRegistros.Text = $"Registros encontrados: {dvDatos.Count}"
+        End If
+
         ColumnaCambiada(Nothing, EventArgs.Empty)
     End Sub
 
@@ -326,53 +321,21 @@ Partial Public Class frmFiltroAvanzado
 
 #Region "Chips UI"
     Private Sub CrearChip(regla As ReglaFiltro)
-        Dim descripcionValores As String = If(regla.Operador = OperadorComparacion.EnLista,
-                                         regla.Valor1.Replace("|", ", "),
-                                         regla.Valor1)
-
+        Dim descripcionValores As String = If(regla.Operador = OperadorComparacion.EnLista, regla.Valor1.Replace("|", ", "), regla.Valor1)
         Dim reglaDesc As String = $"{regla.Columna}: {descripcionValores}"
-
-        Dim chipContainer As New FlowLayoutPanel() With {
-            .AutoSize = True,
-            .AutoSizeMode = AutoSizeMode.GrowAndShrink,
-            .Margin = New Padding(3),
-            .BackColor = Color.FromArgb(220, 235, 255),
-            .BorderStyle = BorderStyle.FixedSingle,
-            .FlowDirection = FlowDirection.LeftToRight,
-            .WrapContents = False
-        }
-
-        Dim lblTexto As New Label() With {
-            .Text = reglaDesc,
-            .AutoSize = True,
-            .MaximumSize = New Size(450, 0),
-            .Margin = New Padding(3),
-            .TextAlign = ContentAlignment.MiddleLeft
-        }
-
-        Dim btnCerrar As New Button() With {
-            .Text = "×",
-            .Font = New Font("Segoe UI", 8, FontStyle.Bold),
-            .ForeColor = Color.DarkRed,
-            .FlatStyle = FlatStyle.Flat,
-            .Size = New Size(22, 22),
-            .Tag = regla,
-            .Margin = New Padding(3, 1, 1, 1)
-        }
+        Dim chipContainer As New FlowLayoutPanel() With {.AutoSize = True, .AutoSizeMode = AutoSizeMode.GrowAndShrink, .Margin = New Padding(3), .BackColor = Color.FromArgb(220, 235, 255), .BorderStyle = BorderStyle.FixedSingle, .FlowDirection = FlowDirection.LeftToRight, .WrapContents = False}
+        Dim lblTexto As New Label() With {.Text = reglaDesc, .AutoSize = True, .MaximumSize = New Size(450, 0), .Margin = New Padding(3), .TextAlign = ContentAlignment.MiddleLeft}
+        Dim btnCerrar As New Button() With {.Text = "×", .Font = New Font("Segoe UI", 8, FontStyle.Bold), .ForeColor = Color.DarkRed, .FlatStyle = FlatStyle.Flat, .Size = New Size(22, 22), .Tag = regla, .Margin = New Padding(3, 1, 1, 1)}
         btnCerrar.FlatAppearance.BorderSize = 0
-
         AddHandler btnCerrar.Click, AddressOf ChipCerrar_Click
-
         chipContainer.Controls.Add(lblTexto)
         chipContainer.Controls.Add(btnCerrar)
-
         flpChips.Controls.Add(chipContainer)
     End Sub
 
     Private Sub ChipCerrar_Click(sender As Object, e As EventArgs)
         Dim btn = CType(sender, Button)
         Dim reglaParaQuitar = CType(btn.Tag, ReglaFiltro)
-
         If reglaParaQuitar IsNot Nothing Then
             filtros.Quitar(reglaParaQuitar)
             flpChips.Controls.Remove(btn.Parent)
@@ -388,7 +351,13 @@ Partial Public Class frmFiltroAvanzado
     End Sub
 #End Region
 
+    '=========================================================================='
+    '==                       AQUÍ EMPIEZA LA SOLUCIÓN                         =='
+    '=========================================================================='
 #Region "Utilidades y Exportación"
+    ''' <summary>
+    ''' Clase de ayuda para mostrar un cursor de espera durante operaciones largas.
+    ''' </summary>
     Private NotInheritable Class WaitCursor
         Implements IDisposable
         Private ReadOnly _old As Cursor
@@ -427,69 +396,49 @@ Partial Public Class frmFiltroAvanzado
         Clipboard.SetText(textoCorreos)
 
         MessageBox.Show($"Se copiaron {correos.Length} correos al portapapeles." &
-                        $"{Environment.NewLine}Ya puedes pegarlos en tu cliente de correo.",
+                       $"{Environment.NewLine}Ya puedes pegarlos en tu cliente de correo.",
                         "Correos copiados",
                         MessageBoxButtons.OK, MessageBoxIcon.Information)
     End Sub
-
-    Private Sub AgregarColumnaEstadoTransitorio()
-        If dgvDatos.Columns.Contains("colEstadoTransitorio") Then Exit Sub
-
-        Dim cmb As New DataGridViewComboBoxColumn() With {
-            .Name = "colEstadoTransitorio",
-            .HeaderText = "Estado transitorio",
-            .DisplayStyle = DataGridViewComboBoxDisplayStyle.DropDownButton,
-            .FlatStyle = FlatStyle.Flat,
-            .ReadOnly = False
-        }
-        cmb.Items.AddRange(New String() {
-            "Designación", "Sanción", "Sumario",
-            "Orden 5", "Enfermedad", "Retén"
-        })
-        dgvDatos.Columns.Insert(0, cmb)
-    End Sub
-
-    Private Sub dgvDatos_CellClick(sender As Object, e As DataGridViewCellEventArgs) Handles dgvDatos.CellClick
-        If e.RowIndex < 0 Then Return
-        If dgvDatos.Columns(e.ColumnIndex).Name <> "colEstadoTransitorio" Then Return
-
-        dgvDatos.BeginEdit(True)
-        Dim cb = TryCast(dgvDatos.EditingControl, DataGridViewComboBoxEditingControl)
-        If cb IsNot Nothing Then
-            cb.DroppedDown = True
-        End If
-    End Sub
 #End Region
+    '=========================================================================='
+    '==                        AQUÍ TERMINA LA SOLUCIÓN                        =='
+    '=========================================================================='
+
 
 #Region "Acciones Dinámicas"
 
+    Private Sub ActualizarControlesPaginacion()
+        Dim esPaginable = CType(cmbOrigenDatos.SelectedItem, ConsultasGenericas.TipoOrigenDatos) = ConsultasGenericas.TipoOrigenDatos.Licencias AndAlso _totalRegistros > 0
+        btnAnterior.Visible = esPaginable
+        btnSiguiente.Visible = esPaginable
+        lblPaginacion.Visible = esPaginable
+
+        If esPaginable Then
+            Dim totalPaginas = CInt(Math.Ceiling(_totalRegistros / CDbl(_tamañoPagina)))
+            If totalPaginas = 0 Then totalPaginas = 1
+            lblPaginacion.Text = $"Página {_paginaActual} de {totalPaginas}"
+            btnAnterior.Enabled = _paginaActual > 1
+            btnSiguiente.Enabled = _paginaActual < totalPaginas
+            lblConteoRegistros.Text = $"Mostrando {dvDatos.Count} de {_totalRegistros} registros"
+        Else
+            lblConteoRegistros.Text = If(dvDatos IsNot Nothing, $"Registros encontrados: {dvDatos.Count}", "Registros encontrados: 0")
+        End If
+    End Sub
+
     Private Sub ActualizarAccionesDisponibles()
         Dim origenSeleccionado = CType(cmbOrigenDatos.SelectedItem, ConsultasGenericas.TipoOrigenDatos)
-
-        ' Ocultar todos los botones de acción específicos por defecto
-        btnNuevaLicencia.Visible = False
-        btnEditarLicencia.Visible = False
-        btnEliminarLicencia.Visible = False
-        btnNuevaNotificacion.Visible = False
-        btnEditarNotificacion.Visible = False
-        btnEliminarNotificacion.Visible = False
+        btnNuevaLicencia.Visible = False : btnEditarLicencia.Visible = False : btnEliminarLicencia.Visible = False
+        btnNuevaNotificacion.Visible = False : btnEditarNotificacion.Visible = False : btnEliminarNotificacion.Visible = False
         btnCambiarEstado.Visible = False
-        Separator1.Visible = False
+        Separator1.Visible = (dtOriginal IsNot Nothing AndAlso dtOriginal.Rows.Count > 0)
+        ActualizarControlesPaginacion()
 
-        ' Mostrar botones según el origen de datos
         Select Case origenSeleccionado
             Case ConsultasGenericas.TipoOrigenDatos.Licencias
-                btnNuevaLicencia.Visible = True
-                btnEditarLicencia.Visible = True
-                btnEliminarLicencia.Visible = True
-                Separator1.Visible = True
-
+                btnNuevaLicencia.Visible = True : btnEditarLicencia.Visible = True : btnEliminarLicencia.Visible = True
             Case ConsultasGenericas.TipoOrigenDatos.Notificaciones
-                btnNuevaNotificacion.Visible = True
-                btnEditarNotificacion.Visible = True
-                btnEliminarNotificacion.Visible = True
-                btnCambiarEstado.Visible = True
-                Separator1.Visible = True
+                btnNuevaNotificacion.Visible = True : btnEditarNotificacion.Visible = True : btnEliminarNotificacion.Visible = True : btnCambiarEstado.Visible = True
         End Select
     End Sub
 
@@ -502,53 +451,35 @@ Partial Public Class frmFiltroAvanzado
         End Using
     End Sub
 
-    Private Sub btnEditarLicencia_Click(sender As Object, e As EventArgs)
+    Private Async Sub btnEditarLicencia_Click(sender As Object, e As EventArgs)
         If dgvDatos.CurrentRow Is Nothing Then Return
         Dim drv = CType(dgvDatos.CurrentRow.DataBoundItem, DataRowView)
         Dim idSeleccionado = CInt(drv("Id"))
-
         Using frm As New frmLicenciaCrear(idSeleccionado)
             If frm.ShowDialog() = DialogResult.OK Then
-                btnCargar.PerformClick()
+                Await CargarDatos()
             End If
         End Using
     End Sub
 
     Private Async Sub btnEliminarLicencia_Click(sender As Object, e As EventArgs)
         If dgvDatos.CurrentRow Is Nothing Then Return
-
-        ' --- CORRECCIÓN ---
-        ' Obtenemos el DataRowView y luego accedemos a los campos por su nombre
         Dim drv = CType(dgvDatos.CurrentRow.DataBoundItem, DataRowView)
         Dim idSeleccionado = CInt(drv("Id"))
         Dim nombre = drv("Funcionario").ToString()
-
         If MessageBox.Show($"¿Está seguro de que desea eliminar la licencia para '{nombre}'?", "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
             Try
                 Await _licenciaService.DeleteAsync(idSeleccionado)
-                btnCargar.PerformClick()
+                Await CargarDatos()
             Catch ex As Exception
                 MessageBox.Show("Error al eliminar: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
         End If
     End Sub
 
-
     ' --- Acciones para Notificaciones ---
     Private Sub btnNuevaNotificacion_Click(sender As Object, e As EventArgs) Handles btnNuevaNotificacion.Click
         Using frm As New frmNotificacionCrear()
-            If frm.ShowDialog() = DialogResult.OK Then
-                btnCargar.PerformClick()
-            End If
-        End Using
-    End Sub
-
-    Private Sub btnEditarNotificacion_Click(sender As Object, e As EventArgs) Handles btnEditarNotificacion.Click
-        If dgvDatos.CurrentRow Is Nothing Then Return
-        Dim drv = CType(dgvDatos.CurrentRow.DataBoundItem, DataRowView)
-        Dim idSeleccionado = CInt(drv("Id"))
-
-        Using frm As New frmNotificacionCrear(idSeleccionado)
             If frm.ShowDialog() = DialogResult.OK Then
                 btnCargar.PerformClick()
             End If
@@ -588,7 +519,17 @@ Partial Public Class frmFiltroAvanzado
             End If
         End Using
     End Sub
+    Private Sub btnEditarNotificacion_Click(sender As Object, e As EventArgs) Handles btnEditarNotificacion.Click
+        If dgvDatos.CurrentRow Is Nothing Then Return
+        Dim drv = CType(dgvDatos.CurrentRow.DataBoundItem, DataRowView)
+        Dim idSeleccionado = CInt(drv("Id"))
 
+        Using frm As New frmNotificacionCrear(idSeleccionado)
+            If frm.ShowDialog() = DialogResult.OK Then
+                btnCargar.PerformClick()
+            End If
+        End Using
+    End Sub
 #End Region
 
 End Class

@@ -6,7 +6,7 @@ Option Explicit On
 Partial Class frmFiltroAvanzado
     Inherits System.Windows.Forms.Form
 
-    '--- Declaración de controles ---
+    ' --- Declaración de controles ---
     Private components As System.ComponentModel.IContainer
     Private WithEvents splitContenedorPrincipal As SplitContainer
     Private WithEvents pnlIzquierdo As Panel
@@ -44,6 +44,11 @@ Partial Class frmFiltroAvanzado
     Friend WithEvents btnNuevaLicencia As Button
     Friend WithEvents btnEditarLicencia As Button
     Friend WithEvents btnEliminarLicencia As Button
+    ' --- INICIO DE NUEVAS DECLARACIONES ---
+    Friend WithEvents btnSiguiente As Button
+    Friend WithEvents lblPaginacion As Label
+    Friend WithEvents btnAnterior As Button
+    ' --- FIN DE NUEVAS DECLARACIONES ---
 
 
     <System.Diagnostics.DebuggerStepThrough()>
@@ -84,6 +89,11 @@ Partial Class frmFiltroAvanzado
         Me.flpChips = New System.Windows.Forms.FlowLayoutPanel()
         Me.gbxBusquedaGlobal = New System.Windows.Forms.GroupBox()
         Me.txtBusquedaGlobal = New System.Windows.Forms.TextBox()
+        ' --- INICIO DE NUEVAS DECLARACIONES ---
+        Me.btnSiguiente = New System.Windows.Forms.Button()
+        Me.lblPaginacion = New System.Windows.Forms.Label()
+        Me.btnAnterior = New System.Windows.Forms.Button()
+        ' --- FIN DE NUEVAS DECLARACIONES ---
         CType(Me.splitContenedorPrincipal, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.splitContenedorPrincipal.Panel1.SuspendLayout()
         Me.splitContenedorPrincipal.Panel2.SuspendLayout()
@@ -339,7 +349,7 @@ Partial Class frmFiltroAvanzado
         Me.dgvDatos.RowHeadersWidth = 51
         Me.dgvDatos.RowTemplate.Height = 24
         Me.dgvDatos.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgvDatos.Size = New System.Drawing.Size(1019, 574)
+        Me.dgvDatos.Size = New System.Drawing.Size(1019, 584)
         Me.dgvDatos.TabIndex = 4
         '
         'pnlAcciones
@@ -357,11 +367,14 @@ Partial Class frmFiltroAvanzado
         Me.pnlAcciones.Controls.Add(Me.btnNuevaLicencia)
         Me.pnlAcciones.Controls.Add(Me.btnEditarLicencia)
         Me.pnlAcciones.Controls.Add(Me.btnEliminarLicencia)
+        Me.pnlAcciones.Controls.Add(Me.btnSiguiente)
+        Me.pnlAcciones.Controls.Add(Me.lblPaginacion)
+        Me.pnlAcciones.Controls.Add(Me.btnAnterior)
         Me.pnlAcciones.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.pnlAcciones.Location = New System.Drawing.Point(10, 688)
+        Me.pnlAcciones.Location = New System.Drawing.Point(10, 698)
         Me.pnlAcciones.Name = "pnlAcciones"
         Me.pnlAcciones.Padding = New System.Windows.Forms.Padding(5)
-        Me.pnlAcciones.Size = New System.Drawing.Size(1019, 51)
+        Me.pnlAcciones.Size = New System.Drawing.Size(1019, 41)
         Me.pnlAcciones.TabIndex = 3
         '
         'btnExportarExcel
@@ -474,6 +487,36 @@ Partial Class frmFiltroAvanzado
         Me.btnEliminarLicencia.TabIndex = 11
         Me.btnEliminarLicencia.Text = "Eliminar"
         Me.btnEliminarLicencia.UseVisualStyleBackColor = True
+        '
+        'btnSiguiente
+        '
+        Me.btnSiguiente.Location = New System.Drawing.Point(807, 8)
+        Me.btnSiguiente.Name = "btnSiguiente"
+        Me.btnSiguiente.Size = New System.Drawing.Size(94, 30)
+        Me.btnSiguiente.TabIndex = 12
+        Me.btnSiguiente.Text = "Siguiente >"
+        Me.btnSiguiente.UseVisualStyleBackColor = True
+        '
+        'lblPaginacion
+        '
+        Me.lblPaginacion.Anchor = System.Windows.Forms.AnchorStyles.Left
+        Me.lblPaginacion.AutoSize = True
+        Me.lblPaginacion.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblPaginacion.Location = New System.Drawing.Point(907, 15)
+        Me.lblPaginacion.Name = "lblPaginacion"
+        Me.lblPaginacion.Size = New System.Drawing.Size(95, 16)
+        Me.lblPaginacion.TabIndex = 13
+        Me.lblPaginacion.Text = "Página 0 de 0"
+        '
+        'btnAnterior
+        '
+        Me.pnlAcciones.SetFlowBreak(Me.btnAnterior, True)
+        Me.btnAnterior.Location = New System.Drawing.Point(1008, 8)
+        Me.btnAnterior.Name = "btnAnterior"
+        Me.btnAnterior.Size = New System.Drawing.Size(94, 30)
+        Me.btnAnterior.TabIndex = 14
+        Me.btnAnterior.Text = "< Anterior"
+        Me.btnAnterior.UseVisualStyleBackColor = True
         '
         'flpChips
         '

@@ -1,4 +1,6 @@
-﻿Imports System.Data.Entity
+﻿' Apex/Services/LicenciaService.vb
+
+Imports System.Data.Entity
 
 Public Class LicenciaService
     Inherits GenericService(Of HistoricoLicencia)
@@ -24,18 +26,28 @@ Public Class LicenciaService
     End Class
 
     ''' <summary>
-    ''' Obtiene una lista de licencias para la grilla principal, con filtros.
+    ''' DTO para devolver resultados paginados.
     ''' </summary>
-    Public Async Function GetAllConDetallesAsync(
+    Public Class ResultadoPaginadoLicencias
+        Public Property Licencias As List(Of LicenciaParaVista)
+        Public Property TotalRegistros As Integer
+    End Class
+
+    ''' <summary>
+    ''' Obtiene una lista paginada de licencias para la grilla principal, con filtros.
+    ''' </summary>
+    Public Async Function GetAllPaginadoConDetallesAsync(
+        paginaActual As Integer,
+        tamañoPagina As Integer,
         Optional filtroNombre As String = "",
         Optional filtroTipoId As Integer? = Nothing,
         Optional fechaDesde As Date? = Nothing,
         Optional fechaHasta As Date? = Nothing
-    ) As Task(Of List(Of LicenciaParaVista))
+    ) As Task(Of ResultadoPaginadoLicencias)
 
-        Dim query = _unitOfWork.Repository(Of HistoricoLicencia)().GetAll().Include(Function(l) l.Funcionario).Include(Function(l) l.TipoLicencia).AsNoTracking()
+        Dim query = _unitOfWork.Repository(Of HistoricoLicencia)().GetAll().AsNoTracking()
 
-        ' Aplicar filtros
+        ' --- Aplicar filtros ---
         If Not String.IsNullOrWhiteSpace(filtroNombre) Then
             query = query.Where(Function(l) l.Funcionario.Nombre.Contains(filtroNombre) Or l.Funcionario.CI.Contains(filtroNombre))
         End If
@@ -44,25 +56,39 @@ Public Class LicenciaService
             query = query.Where(Function(l) l.TipoLicenciaId = filtroTipoId.Value)
         End If
 
+        ' **LÓGICA DE FECHA CORREGIDA** para encontrar licencias que se solapan con el rango.
         If fechaDesde.HasValue Then
-            query = query.Where(Function(l) l.inicio >= fechaDesde.Value)
+            query = query.Where(Function(l) l.finaliza >= fechaDesde.Value)
         End If
 
         If fechaHasta.HasValue Then
-            query = query.Where(Function(l) l.finaliza <= fechaHasta.Value)
+            query = query.Where(Function(l) l.inicio <= fechaHasta.Value)
         End If
 
-        Return Await query.Select(Function(l) New LicenciaParaVista With {
-            .Id = l.Id,
-            .NombreFuncionario = l.Funcionario.Nombre,
-            .CI = l.Funcionario.CI,
-            .TipoLicencia = l.TipoLicencia.Nombre,
-            .FechaInicio = l.inicio,
-            .FechaFin = l.finaliza,
-            .Estado = l.estado,
-            .Comentario = l.Comentario
-        }).OrderByDescending(Function(l) l.FechaInicio).ToListAsync()
+        ' --- Contar el total de registros ANTES de paginar ---
+        Dim totalRegistros = Await query.CountAsync()
+
+        ' --- Aplicar orden y paginación ---
+        Dim licenciasPaginadas = Await query.OrderByDescending(Function(l) l.inicio) _
+            .Skip((paginaActual - 1) * tamañoPagina) _
+            .Take(tamañoPagina) _
+            .Select(Function(l) New LicenciaParaVista With {
+                .Id = l.Id,
+                .NombreFuncionario = l.Funcionario.Nombre,
+                .CI = l.Funcionario.CI,
+                .TipoLicencia = l.TipoLicencia.Nombre,
+                .FechaInicio = l.inicio,
+                .FechaFin = l.finaliza,
+                .Estado = l.estado,
+                .Comentario = l.Comentario
+            }).ToListAsync()
+
+        Return New ResultadoPaginadoLicencias With {
+            .Licencias = licenciasPaginadas,
+            .TotalRegistros = totalRegistros
+        }
     End Function
+
 
     ' --- MÉTODOS PARA POBLAR COMBOS ---
     Public Async Function ObtenerTiposLicenciaParaComboAsync() As Task(Of List(Of KeyValuePair(Of Integer, String)))
@@ -71,14 +97,7 @@ Public Class LicenciaService
         Return lista.Select(Function(t) New KeyValuePair(Of Integer, String)(t.Id, t.Nombre)).ToList()
     End Function
 
-    ''' <summary>
-    ''' Obtiene los funcionarios activos para el combo de nueva licencia.
-    ''' La implementación original devolvía la entidad completa, incluyendo campos pesados como la foto y todas sus relaciones.  
-    ''' Esta versión proyecta únicamente el Id y el Nombre, lo que evita traer datos innecesarios del modelo Funcionario y mejora significativamente el rendimiento.
-    ''' </summary>
-
     Public Async Function ObtenerFuncionariosParaComboAsync() As Task(Of List(Of KeyValuePair(Of Integer, String)))
-        ' 1. Traer solo los datos necesarios a la memoria
         Dim funcionariosData = Await _unitOfWork.Repository(Of Funcionario)().GetAll().AsNoTracking() _
         .Where(Function(f) f.Activo) _
         .OrderBy(Function(f) f.Nombre) _
@@ -87,29 +106,7 @@ Public Class LicenciaService
             Key .Nombre = f.Nombre
         }) _
         .ToListAsync()
-
-        ' 2. Convertir los datos en memoria a KeyValuePair
         Return funcionariosData.Select(Function(f) New KeyValuePair(Of Integer, String)(f.Id, f.Nombre)).ToList()
     End Function
 
-    ''' <summary>
-    ''' Obtiene los valores distintos de una columna específica para llenar los combos de filtros.
-    ''' </summary>
-    Public Async Function ObtenerValoresDistintosAsync(propiedad As String) As Task(Of List(Of String))
-        Dim query = _unitOfWork.Repository(Of HistoricoLicencia)().GetAll()
-
-        ' Mapeo de propiedades a las entidades correspondientes
-        Select Case propiedad
-            Case "Funcionario.Nombre"
-                Return Await query.Select(Function(l) l.Funcionario.Nombre).Distinct().OrderBy(Function(x) x).ToListAsync()
-            Case "Funcionario.CI"
-                Return Await query.Select(Function(l) l.Funcionario.CI).Distinct().OrderBy(Function(x) x).ToListAsync()
-            Case "TipoLicencia.Nombre"
-                Return Await query.Select(Function(l) l.TipoLicencia.Nombre).Distinct().OrderBy(Function(x) x).ToListAsync()
-            Case "estado"
-                Return Await query.Select(Function(l) l.estado).Distinct().OrderBy(Function(x) x).ToListAsync()
-            Case Else
-                Return New List(Of String)()
-        End Select
-    End Function
 End Class

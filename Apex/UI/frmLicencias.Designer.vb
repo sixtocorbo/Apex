@@ -18,6 +18,12 @@ Partial Class frmLicencias
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.panelFiltros = New System.Windows.Forms.Panel()
+        Me.chkHasta = New System.Windows.Forms.CheckBox()
+        Me.chkDesde = New System.Windows.Forms.CheckBox()
+        Me.dtpHasta = New System.Windows.Forms.DateTimePicker()
+        Me.dtpDesde = New System.Windows.Forms.DateTimePicker()
+        Me.cboTipoLicencia = New System.Windows.Forms.ComboBox()
+        Me.lblTipo = New System.Windows.Forms.Label()
         Me.btnBuscar = New System.Windows.Forms.Button()
         Me.txtBusqueda = New System.Windows.Forms.TextBox()
         Me.lblFuncionario = New System.Windows.Forms.Label()
@@ -26,12 +32,9 @@ Partial Class frmLicencias
         Me.btnNueva = New System.Windows.Forms.Button()
         Me.btnEditar = New System.Windows.Forms.Button()
         Me.btnEliminar = New System.Windows.Forms.Button()
-        Me.lblTipo = New System.Windows.Forms.Label()
-        Me.cboTipoLicencia = New System.Windows.Forms.ComboBox()
-        Me.dtpDesde = New System.Windows.Forms.DateTimePicker()
-        Me.dtpHasta = New System.Windows.Forms.DateTimePicker()
-        Me.chkDesde = New System.Windows.Forms.CheckBox()
-        Me.chkHasta = New System.Windows.Forms.CheckBox()
+        Me.btnSiguiente = New System.Windows.Forms.Button()
+        Me.lblPaginacion = New System.Windows.Forms.Label()
+        Me.btnAnterior = New System.Windows.Forms.Button()
         Me.panelFiltros.SuspendLayout()
         CType(Me.dgvLicencias, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.panelAcciones.SuspendLayout()
@@ -54,6 +57,62 @@ Partial Class frmLicencias
         Me.panelFiltros.Name = "panelFiltros"
         Me.panelFiltros.Size = New System.Drawing.Size(984, 100)
         Me.panelFiltros.TabIndex = 2
+        '
+        'chkHasta
+        '
+        Me.chkHasta.AutoSize = True
+        Me.chkHasta.Location = New System.Drawing.Point(340, 59)
+        Me.chkHasta.Name = "chkHasta"
+        Me.chkHasta.Size = New System.Drawing.Size(72, 24)
+        Me.chkHasta.TabIndex = 8
+        Me.chkHasta.Text = "Hasta:"
+        Me.chkHasta.UseVisualStyleBackColor = True
+        '
+        'chkDesde
+        '
+        Me.chkDesde.AutoSize = True
+        Me.chkDesde.Location = New System.Drawing.Point(340, 22)
+        Me.chkDesde.Name = "chkDesde"
+        Me.chkDesde.Size = New System.Drawing.Size(76, 24)
+        Me.chkDesde.TabIndex = 7
+        Me.chkDesde.Text = "Desde:"
+        Me.chkDesde.UseVisualStyleBackColor = True
+        '
+        'dtpHasta
+        '
+        Me.dtpHasta.Enabled = False
+        Me.dtpHasta.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
+        Me.dtpHasta.Location = New System.Drawing.Point(420, 57)
+        Me.dtpHasta.Name = "dtpHasta"
+        Me.dtpHasta.Size = New System.Drawing.Size(120, 27)
+        Me.dtpHasta.TabIndex = 6
+        '
+        'dtpDesde
+        '
+        Me.dtpDesde.Enabled = False
+        Me.dtpDesde.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
+        Me.dtpDesde.Location = New System.Drawing.Point(420, 20)
+        Me.dtpDesde.Name = "dtpDesde"
+        Me.dtpDesde.Size = New System.Drawing.Size(120, 27)
+        Me.dtpDesde.TabIndex = 5
+        '
+        'cboTipoLicencia
+        '
+        Me.cboTipoLicencia.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboTipoLicencia.FormattingEnabled = True
+        Me.cboTipoLicencia.Location = New System.Drawing.Point(107, 57)
+        Me.cboTipoLicencia.Name = "cboTipoLicencia"
+        Me.cboTipoLicencia.Size = New System.Drawing.Size(225, 28)
+        Me.cboTipoLicencia.TabIndex = 4
+        '
+        'lblTipo
+        '
+        Me.lblTipo.AutoSize = True
+        Me.lblTipo.Location = New System.Drawing.Point(12, 60)
+        Me.lblTipo.Name = "lblTipo"
+        Me.lblTipo.Size = New System.Drawing.Size(42, 20)
+        Me.lblTipo.TabIndex = 3
+        Me.lblTipo.Text = "Tipo:"
         '
         'btnBuscar
         '
@@ -103,6 +162,9 @@ Partial Class frmLicencias
         Me.panelAcciones.Controls.Add(Me.btnNueva)
         Me.panelAcciones.Controls.Add(Me.btnEditar)
         Me.panelAcciones.Controls.Add(Me.btnEliminar)
+        Me.panelAcciones.Controls.Add(Me.btnSiguiente)
+        Me.panelAcciones.Controls.Add(Me.lblPaginacion)
+        Me.panelAcciones.Controls.Add(Me.btnAnterior)
         Me.panelAcciones.Dock = System.Windows.Forms.DockStyle.Bottom
         Me.panelAcciones.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
         Me.panelAcciones.Location = New System.Drawing.Point(0, 520)
@@ -138,61 +200,37 @@ Partial Class frmLicencias
         Me.btnEliminar.Text = "Eliminar"
         Me.btnEliminar.UseVisualStyleBackColor = True
         '
-        'lblTipo
+        'btnSiguiente
         '
-        Me.lblTipo.AutoSize = True
-        Me.lblTipo.Location = New System.Drawing.Point(12, 60)
-        Me.lblTipo.Name = "lblTipo"
-        Me.lblTipo.Size = New System.Drawing.Size(42, 20)
-        Me.lblTipo.TabIndex = 3
-        Me.lblTipo.Text = "Tipo:"
+        Me.btnSiguiente.Enabled = False
+        Me.btnSiguiente.Location = New System.Drawing.Point(630, 13)
+        Me.btnSiguiente.Name = "btnSiguiente"
+        Me.btnSiguiente.Size = New System.Drawing.Size(88, 23)
+        Me.btnSiguiente.TabIndex = 3
+        Me.btnSiguiente.Text = "Siguiente >"
+        Me.btnSiguiente.UseVisualStyleBackColor = True
         '
-        'cboTipoLicencia
+        'lblPaginacion
         '
-        Me.cboTipoLicencia.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboTipoLicencia.FormattingEnabled = True
-        Me.cboTipoLicencia.Location = New System.Drawing.Point(107, 57)
-        Me.cboTipoLicencia.Name = "cboTipoLicencia"
-        Me.cboTipoLicencia.Size = New System.Drawing.Size(225, 28)
-        Me.cboTipoLicencia.TabIndex = 4
+        Me.lblPaginacion.Anchor = System.Windows.Forms.AnchorStyles.None
+        Me.lblPaginacion.AutoSize = True
+        Me.lblPaginacion.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.lblPaginacion.Location = New System.Drawing.Point(521, 14)
+        Me.lblPaginacion.Name = "lblPaginacion"
+        Me.lblPaginacion.Size = New System.Drawing.Size(103, 20)
+        Me.lblPaginacion.TabIndex = 5
+        Me.lblPaginacion.Text = "Página 1 de 1"
+        Me.lblPaginacion.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
-        'dtpDesde
+        'btnAnterior
         '
-        Me.dtpDesde.Enabled = False
-        Me.dtpDesde.Format = System.Windows.Forms.DateTimePickerFormat.Short
-        Me.dtpDesde.Location = New System.Drawing.Point(420, 20)
-        Me.dtpDesde.Name = "dtpDesde"
-        Me.dtpDesde.Size = New System.Drawing.Size(120, 27)
-        Me.dtpDesde.TabIndex = 5
-        '
-        'dtpHasta
-        '
-        Me.dtpHasta.Enabled = False
-        Me.dtpHasta.Format = System.Windows.Forms.DateTimePickerFormat.Short
-        Me.dtpHasta.Location = New System.Drawing.Point(420, 57)
-        Me.dtpHasta.Name = "dtpHasta"
-        Me.dtpHasta.Size = New System.Drawing.Size(120, 27)
-        Me.dtpHasta.TabIndex = 6
-        '
-        'chkDesde
-        '
-        Me.chkDesde.AutoSize = True
-        Me.chkDesde.Location = New System.Drawing.Point(340, 22)
-        Me.chkDesde.Name = "chkDesde"
-        Me.chkDesde.Size = New System.Drawing.Size(74, 24)
-        Me.chkDesde.TabIndex = 7
-        Me.chkDesde.Text = "Desde:"
-        Me.chkDesde.UseVisualStyleBackColor = True
-        '
-        'chkHasta
-        '
-        Me.chkHasta.AutoSize = True
-        Me.chkHasta.Location = New System.Drawing.Point(340, 59)
-        Me.chkHasta.Name = "chkHasta"
-        Me.chkHasta.Size = New System.Drawing.Size(70, 24)
-        Me.chkHasta.TabIndex = 8
-        Me.chkHasta.Text = "Hasta:"
-        Me.chkHasta.UseVisualStyleBackColor = True
+        Me.btnAnterior.Enabled = False
+        Me.btnAnterior.Location = New System.Drawing.Point(427, 13)
+        Me.btnAnterior.Name = "btnAnterior"
+        Me.btnAnterior.Size = New System.Drawing.Size(88, 23)
+        Me.btnAnterior.TabIndex = 4
+        Me.btnAnterior.Text = "< Anterior"
+        Me.btnAnterior.UseVisualStyleBackColor = True
         '
         'frmLicencias
         '
@@ -209,6 +247,7 @@ Partial Class frmLicencias
         Me.panelFiltros.PerformLayout()
         CType(Me.dgvLicencias, System.ComponentModel.ISupportInitialize).EndInit()
         Me.panelAcciones.ResumeLayout(False)
+        Me.panelAcciones.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -228,4 +267,8 @@ Partial Class frmLicencias
     Friend WithEvents dtpDesde As DateTimePicker
     Friend WithEvents chkHasta As CheckBox
     Friend WithEvents chkDesde As CheckBox
+    ' --- Añade estas líneas ---
+    Friend WithEvents btnSiguiente As Button
+    Friend WithEvents lblPaginacion As Label
+    Friend WithEvents btnAnterior As Button
 End Class
