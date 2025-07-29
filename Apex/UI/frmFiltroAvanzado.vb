@@ -126,7 +126,7 @@ Partial Public Class frmFiltroAvanzado
     Private Sub frmFiltroAvanzado_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         _licenciaService = New LicenciaService()
         _notificacionService = New NotificacionPersonalService()
-
+        dgvDatos.SendToBack()
         cmbOrigenDatos.DataSource = [Enum].GetValues(GetType(ConsultasGenericas.TipoOrigenDatos))
         cmbOrigenDatos.SelectedIndex = -1
 
