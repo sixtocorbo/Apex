@@ -89,6 +89,7 @@ Partial Class frmFiltroAvanzado
         Me.flpChips = New System.Windows.Forms.FlowLayoutPanel()
         Me.gbxBusquedaGlobal = New System.Windows.Forms.GroupBox()
         Me.txtBusquedaGlobal = New System.Windows.Forms.TextBox()
+        Me.Panel1 = New System.Windows.Forms.Panel()
         CType(Me.splitContenedorPrincipal, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.splitContenedorPrincipal.Panel1.SuspendLayout()
         Me.splitContenedorPrincipal.Panel2.SuspendLayout()
@@ -103,6 +104,7 @@ Partial Class frmFiltroAvanzado
         CType(Me.dgvDatos, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.pnlAcciones.SuspendLayout()
         Me.gbxBusquedaGlobal.SuspendLayout()
+        Me.Panel1.SuspendLayout()
         Me.SuspendLayout()
         '
         'splitContenedorPrincipal
@@ -328,7 +330,7 @@ Partial Class frmFiltroAvanzado
         '
         'pnlDerecho
         '
-        Me.pnlDerecho.Controls.Add(Me.dgvDatos)
+        Me.pnlDerecho.Controls.Add(Me.Panel1)
         Me.pnlDerecho.Controls.Add(Me.pnlAcciones)
         Me.pnlDerecho.Controls.Add(Me.flpChips)
         Me.pnlDerecho.Controls.Add(Me.gbxBusquedaGlobal)
@@ -345,18 +347,16 @@ Partial Class frmFiltroAvanzado
         Me.dgvDatos.AllowUserToDeleteRows = False
         Me.dgvDatos.AllowUserToResizeColumns = False
         Me.dgvDatos.AllowUserToResizeRows = False
-        Me.dgvDatos.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.dgvDatos.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells
         Me.dgvDatos.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.dgvDatos.Location = New System.Drawing.Point(10, 124)
+        Me.dgvDatos.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.dgvDatos.Location = New System.Drawing.Point(0, 0)
         Me.dgvDatos.Name = "dgvDatos"
         Me.dgvDatos.ReadOnly = True
         Me.dgvDatos.RowHeadersWidth = 51
         Me.dgvDatos.RowTemplate.Height = 24
         Me.dgvDatos.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgvDatos.Size = New System.Drawing.Size(1019, 568)
+        Me.dgvDatos.Size = New System.Drawing.Size(1015, 473)
         Me.dgvDatos.TabIndex = 4
         '
         'pnlAcciones
@@ -378,10 +378,10 @@ Partial Class frmFiltroAvanzado
         Me.pnlAcciones.Controls.Add(Me.btnSiguiente)
         Me.pnlAcciones.Controls.Add(Me.lblPaginacion)
         Me.pnlAcciones.Controls.Add(Me.btnAnterior)
-        Me.pnlAcciones.Location = New System.Drawing.Point(10, 698)
+        Me.pnlAcciones.Location = New System.Drawing.Point(10, 604)
         Me.pnlAcciones.Name = "pnlAcciones"
         Me.pnlAcciones.Padding = New System.Windows.Forms.Padding(5)
-        Me.pnlAcciones.Size = New System.Drawing.Size(1019, 85)
+        Me.pnlAcciones.Size = New System.Drawing.Size(1019, 133)
         Me.pnlAcciones.TabIndex = 3
         '
         'btnExportarExcel
@@ -555,6 +555,17 @@ Partial Class frmFiltroAvanzado
         Me.txtBusquedaGlobal.Size = New System.Drawing.Size(999, 22)
         Me.txtBusquedaGlobal.TabIndex = 0
         '
+        'Panel1
+        '
+        Me.Panel1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Panel1.Controls.Add(Me.dgvDatos)
+        Me.Panel1.Location = New System.Drawing.Point(12, 125)
+        Me.Panel1.Name = "Panel1"
+        Me.Panel1.Size = New System.Drawing.Size(1015, 473)
+        Me.Panel1.TabIndex = 5
+        '
         'frmFiltroAvanzado
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
@@ -583,7 +594,10 @@ Partial Class frmFiltroAvanzado
         Me.pnlAcciones.PerformLayout()
         Me.gbxBusquedaGlobal.ResumeLayout(False)
         Me.gbxBusquedaGlobal.PerformLayout()
+        Me.Panel1.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub
+
+    Friend WithEvents Panel1 As Panel
 End Class
