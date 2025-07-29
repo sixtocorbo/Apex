@@ -63,44 +63,57 @@ Public Module ConsultasGenericas
     End Function
 
     ''' <summary>
-    ''' NUEVA FUNCIÓN: Consulta de licencias con paginación.
+    ''' NUEVA FUNCIÓN: Consulta de licencias con paginación. (VERSIÓN CORREGIDA)
     ''' </summary>
     Public Async Function ConsultarLicenciasPaginado(
-        fechaInicio As Date,
-        fechaFin As Date,
-        pagina As Integer,
-        tamañoPagina As Integer
-    ) As Task(Of ResultadoPaginado(Of Object))
+    fechaInicio As Date,
+    fechaFin As Date,
+    pagina As Integer,
+    tamañoPagina As Integer,
+    Optional filtroGlobal As String = "" ' <--- PARÁMETRO NUEVO
+) As Task(Of ResultadoPaginado(Of Object))
 
         Using uow As New UnitOfWork()
-            ' 1. Construir la consulta base con los filtros
             Dim queryBase = uow.Repository(Of HistoricoLicencia)().GetAll().
-                Where(Function(l) l.inicio <= fechaFin And l.finaliza >= fechaInicio)
+            Where(Function(l) l.inicio <= fechaFin And l.finaliza >= fechaInicio)
 
-            ' 2. Contar el total de registros SIN paginar
+            ' --- INICIO DE LA CORRECCIÓN ---
+            ' Aplicar el filtro de texto global directamente en la consulta a la base de datos
+            If Not String.IsNullOrWhiteSpace(filtroGlobal) Then
+                Dim palabras = filtroGlobal.Split({" "c}, StringSplitOptions.RemoveEmptyEntries)
+                For Each palabra In palabras
+                    queryBase = queryBase.Where(Function(l) (l.Funcionario IsNot Nothing AndAlso l.Funcionario.Nombre.Contains(palabra)) OrElse
+                    (l.Funcionario IsNot Nothing AndAlso l.Funcionario.CI.Contains(palabra)) OrElse
+                    (l.TipoLicencia IsNot Nothing AndAlso l.TipoLicencia.Nombre.Contains(palabra)) OrElse
+                    (l.estado IsNot Nothing AndAlso l.estado.Contains(palabra)) OrElse
+                    (l.Comentario IsNot Nothing AndAlso l.Comentario.Contains(palabra))
+                )
+                Next
+            End If
+            ' --- FIN DE LA CORRECCIÓN ---
+
+            ' El resto de la lógica no cambia: primero cuenta y luego pagina
             Dim totalItems = Await queryBase.CountAsync()
 
-            ' 3. Aplicar ordenamiento, paginación y seleccionar los datos
             Dim itemsPaginados = Await queryBase.
-                OrderByDescending(Function(l) l.inicio).
-                Skip((pagina - 1) * tamañoPagina).
-                Take(tamañoPagina).
-                Select(Function(l) New With {
-                    .Id = l.Id,
-                    .Funcionario = If(l.Funcionario IsNot Nothing, l.Funcionario.Nombre, "N/A"),
-                    .CI = If(l.Funcionario IsNot Nothing, l.Funcionario.CI, "N/A"),
-                    .Tipo = If(l.TipoLicencia IsNot Nothing, l.TipoLicencia.Nombre, "N/A"),
-                    .Desde = l.inicio,
-                    .Hasta = l.finaliza,
-                    l.estado,
-                    .Comentario = l.Comentario
-                }).ToListAsync()
+            OrderByDescending(Function(l) l.inicio).
+            Skip((pagina - 1) * tamañoPagina).
+            Take(tamañoPagina).
+            Select(Function(l) New With {
+                .Id = l.Id,
+                .Funcionario = If(l.Funcionario IsNot Nothing, l.Funcionario.Nombre, "N/A"),
+                .CI = If(l.Funcionario IsNot Nothing, l.Funcionario.CI, "N/A"),
+                .Tipo = If(l.TipoLicencia IsNot Nothing, l.TipoLicencia.Nombre, "N/A"),
+                .Desde = l.inicio,
+                .Hasta = l.finaliza,
+                l.estado,
+                .Comentario = l.Comentario
+            }).ToListAsync()
 
-            ' 4. Devolver el resultado paginado
             Return New ResultadoPaginado(Of Object) With {
-                .Items = itemsPaginados.Cast(Of Object).ToList(),
-                .TotalItems = totalItems
-            }
+            .Items = itemsPaginados.Cast(Of Object).ToList(),
+            .TotalItems = totalItems
+        }
         End Using
     End Function
 

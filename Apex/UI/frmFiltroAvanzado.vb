@@ -1,5 +1,5 @@
 ﻿' Apex/UI/frmFiltroAvanzado.vb
-' VERSIÓN COMPLETA Y FINAL
+' VERSIÓN COMPLETA Y FINAL - CORREGIDA
 
 Option Strict On
 Option Explicit On
@@ -46,22 +46,16 @@ Partial Public Class frmFiltroAvanzado
         End Function
 
         Private Shared Function Formatear(valor As String) As String
-            ' 1) Intentamos parsear a DateTime, usando una variable auxiliar
             Dim fecha As DateTime
             If DateTime.TryParse(valor, CultureInfo.InvariantCulture, DateTimeStyles.None, fecha) Then
                 Return $"'{fecha:yyyy-MM-dd}'"
             End If
 
-            ' 2) Intentamos parsear a Double, con InvariantCulture
             Dim n As Double
-            If Double.TryParse(valor,
-                       NumberStyles.Any,
-                       CultureInfo.InvariantCulture,
-                       n) Then
+            If Double.TryParse(valor, NumberStyles.Any, CultureInfo.InvariantCulture, n) Then
                 Return n.ToString(CultureInfo.InvariantCulture)
             End If
 
-            ' 3) Si no es fecha ni número, escapamos y devolvemos como string
             Return $"'{Esc(valor)}'"
         End Function
 
@@ -118,15 +112,13 @@ Partial Public Class frmFiltroAvanzado
 #End Region
 
 #Region "Campos del Formulario"
-    Private dtOriginal As DataTable = New DataTable() ' Inicializar para evitar nulos
+    Private dtOriginal As DataTable = New DataTable()
     Private dvDatos As DataView = Nothing
     Private ReadOnly filtros As New GestorFiltros()
     Private _licenciaService As LicenciaService
     Private _notificacionService As NotificacionPersonalService
-
-    ' --- Variables para paginación ---
     Private _paginaActual As Integer = 1
-    Private _tamañoPagina As Integer = 100 ' Registros por página
+    Private _tamañoPagina As Integer = 100
     Private _totalRegistros As Integer = 0
 #End Region
 
@@ -136,9 +128,8 @@ Partial Public Class frmFiltroAvanzado
         _notificacionService = New NotificacionPersonalService()
 
         cmbOrigenDatos.DataSource = [Enum].GetValues(GetType(ConsultasGenericas.TipoOrigenDatos))
-        cmbOrigenDatos.SelectedIndex = -1 ' Forzar selección inicial para disparar el evento
+        cmbOrigenDatos.SelectedIndex = -1
 
-        ' Handlers
         AddHandler cmbOrigenDatos.SelectedIndexChanged, AddressOf cmbOrigenDatos_SelectedIndexChanged
         AddHandler btnCargar.Click, AddressOf btnCargar_Click
         AddHandler btnAnterior.Click, AddressOf btnAnterior_Click
@@ -149,7 +140,6 @@ Partial Public Class frmFiltroAvanzado
         AddHandler btnEditarLicencia.Click, AddressOf btnEditarLicencia_Click
         AddHandler btnEliminarLicencia.Click, AddressOf btnEliminarLicencia_Click
 
-        ' Llama al evento para configurar el estado inicial
         cmbOrigenDatos_SelectedIndexChanged(Nothing, EventArgs.Empty)
     End Sub
 #End Region
@@ -157,8 +147,28 @@ Partial Public Class frmFiltroAvanzado
 #Region "Lógica de Carga de Datos y Paginación"
 
     Private Async Sub btnCargar_Click(sender As Object, e As EventArgs)
-        _paginaActual = 1 ' Siempre reiniciar al buscar
+        _paginaActual = 1
         Await CargarPagina()
+    End Sub
+
+    Private Sub ConfigurarGrilla(dt As DataTable)
+        dgvDatos.DataSource = Nothing ' Desvincular antes de cambiar columnas
+        dgvDatos.Columns.Clear()
+        dgvDatos.AutoGenerateColumns = False
+
+        If dt Is Nothing Then Return
+
+        For Each col As DataColumn In dt.Columns
+            Dim dgvCol As New DataGridViewTextBoxColumn With {
+                .DataPropertyName = col.ColumnName,
+                .HeaderText = col.ColumnName,
+                .Name = col.ColumnName
+            }
+            If col.DataType = GetType(Date) OrElse col.DataType = GetType(DateTime) Then
+                dgvCol.DefaultCellStyle.Format = "dd/MM/yyyy"
+            End If
+            dgvDatos.Columns.Add(dgvCol)
+        Next
     End Sub
 
     Private Async Function CargarPagina() As Task
@@ -179,14 +189,13 @@ Partial Public Class frmFiltroAvanzado
         Try
             Using wait As New WaitCursor()
                 If origen = ConsultasGenericas.TipoOrigenDatos.Licencias Then
-                    ' --- PAGINACIÓN EN BASE DE DATOS (eficiente) ---
-                    Dim resultado = Await ConsultasGenericas.ConsultarLicenciasPaginado(fechaI, fechaF, _paginaActual, _tamañoPagina)
+                    Dim filtroGlobal = txtBusquedaGlobal.Text.Trim()
+                    Dim resultado = Await ConsultasGenericas.ConsultarLicenciasPaginado(fechaI, fechaF, _paginaActual, _tamañoPagina, filtroGlobal)
                     dtOriginal = ToDataTable(resultado.Items)
                     _totalRegistros = resultado.TotalItems
                     dvDatos = dtOriginal.DefaultView
                 Else
-                    ' --- PAGINACIÓN EN MEMORIA (para los demás) ---
-                    If _paginaActual = 1 OrElse dtOriginal.Rows.Count = 0 Then ' Cargar solo si es la primera página o no hay datos
+                    If _paginaActual = 1 OrElse dtOriginal Is Nothing OrElse dtOriginal.Rows.Count = 0 Then
                         dtOriginal = Await ConsultasGenericas.ObtenerDatosGenericosAsync(origen, fechaI, fechaF)
                         _totalRegistros = If(dtOriginal IsNot Nothing, dtOriginal.Rows.Count, 0)
                     End If
@@ -194,16 +203,17 @@ Partial Public Class frmFiltroAvanzado
                 End If
             End Using
 
-            dgvDatos.DataSource = dvDatos
-
             If _paginaActual = 1 Then
+                ConfigurarGrilla(dtOriginal)
                 ActualizarListaColumnas()
                 filtros.Limpiar()
                 flpChips.Controls.Clear()
             End If
 
+            dgvDatos.DataSource = dvDatos
             AplicarFiltros()
-            gbxFiltros.Enabled = dvDatos IsNot Nothing AndAlso dvDatos.Count > 0
+
+            gbxFiltros.Enabled = dtOriginal IsNot Nothing AndAlso dtOriginal.Rows.Count > 0
 
         Catch ex As Exception
             MessageBox.Show($"Error al cargar datos: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -217,7 +227,7 @@ Partial Public Class frmFiltroAvanzado
 
     Private Sub AplicarPaginacionEnMemoria()
         If dtOriginal Is Nothing OrElse dtOriginal.Rows.Count = 0 Then
-            dvDatos = New DataView()
+            dvDatos = New DataView(dtOriginal)
             Return
         End If
 
@@ -272,6 +282,7 @@ Partial Public Class frmFiltroAvanzado
 
     Private Sub LimpiarTodo()
         dgvDatos.DataSource = Nothing
+        dgvDatos.Columns.Clear()
         dtOriginal = New DataTable()
         dvDatos = Nothing
         lstColumnas.Items.Clear()
@@ -290,7 +301,10 @@ Partial Public Class frmFiltroAvanzado
 
         Dim colName = lstColumnas.SelectedItem.ToString()
 
-        Dim valores = dtOriginal.AsEnumerable() _
+        ' Usar la tabla original (completa) para poblar la lista de valores
+        Dim tablaFuente As DataTable = If(CType(cmbOrigenDatos.SelectedItem, ConsultasGenericas.TipoOrigenDatos) = ConsultasGenericas.TipoOrigenDatos.Licencias, dtOriginal, dtOriginal)
+
+        Dim valores = tablaFuente.AsEnumerable() _
                        .Select(Function(r) r(colName).ToString()) _
                        .Where(Function(v) Not String.IsNullOrEmpty(v)) _
                        .Distinct(StringComparer.CurrentCultureIgnoreCase) _
@@ -321,7 +335,11 @@ Partial Public Class frmFiltroAvanzado
     End Sub
 
     Private Sub txtBusquedaGlobal_TextChanged_Handler(sender As Object, e As EventArgs)
-        AplicarFiltros()
+        ' Solo aplicar filtro en tiempo real para orígenes que no son de base de datos
+        If cmbOrigenDatos.SelectedItem IsNot Nothing AndAlso
+           CType(cmbOrigenDatos.SelectedItem, ConsultasGenericas.TipoOrigenDatos) <> ConsultasGenericas.TipoOrigenDatos.Licencias Then
+            AplicarFiltros()
+        End If
     End Sub
 
 #End Region
@@ -335,14 +353,18 @@ Partial Public Class frmFiltroAvanzado
     End Sub
 
     Private Sub ActualizarAccionesDisponibles()
-        Dim origenSeleccionado = CType(cmbOrigenDatos.SelectedItem, ConsultasGenericas.TipoOrigenDatos)
+        Dim origenSeleccionado As ConsultasGenericas.TipoOrigenDatos?
+        If cmbOrigenDatos.SelectedItem IsNot Nothing Then
+            origenSeleccionado = CType(cmbOrigenDatos.SelectedItem, ConsultasGenericas.TipoOrigenDatos)
+        End If
+
         Dim hayDatos = _totalRegistros > 0
 
-        btnNuevaLicencia.Visible = hayDatos AndAlso origenSeleccionado = ConsultasGenericas.TipoOrigenDatos.Licencias
+        btnNuevaLicencia.Visible = hayDatos AndAlso origenSeleccionado.HasValue AndAlso origenSeleccionado.Value = ConsultasGenericas.TipoOrigenDatos.Licencias
         btnEditarLicencia.Visible = btnNuevaLicencia.Visible
         btnEliminarLicencia.Visible = btnNuevaLicencia.Visible
 
-        btnNuevaNotificacion.Visible = hayDatos AndAlso origenSeleccionado = ConsultasGenericas.TipoOrigenDatos.Notificaciones
+        btnNuevaNotificacion.Visible = hayDatos AndAlso origenSeleccionado.HasValue AndAlso origenSeleccionado.Value = ConsultasGenericas.TipoOrigenDatos.Notificaciones
         btnEditarNotificacion.Visible = btnNuevaNotificacion.Visible
         btnEliminarNotificacion.Visible = btnNuevaNotificacion.Visible
         btnCambiarEstado.Visible = btnNuevaNotificacion.Visible
@@ -371,6 +393,11 @@ Partial Public Class frmFiltroAvanzado
     Private Function ConstruirFiltroGlobal() As String
         Dim t = txtBusquedaGlobal.Text.Trim()
         If t = String.Empty Then Return String.Empty
+
+        If cmbOrigenDatos.SelectedItem IsNot Nothing AndAlso
+           CType(cmbOrigenDatos.SelectedItem, ConsultasGenericas.TipoOrigenDatos) = ConsultasGenericas.TipoOrigenDatos.Licencias Then
+            Return String.Empty
+        End If
 
         Dim palabras = t.Split({" "c}, StringSplitOptions.RemoveEmptyEntries)
         Dim cond As New List(Of String)()
@@ -451,7 +478,7 @@ Partial Public Class frmFiltroAvanzado
                       Select(Function(r) r.Field(Of String)("Correo")).
                       Where(Function(c) Not String.IsNullOrWhiteSpace(c)).
                       Distinct(StringComparer.InvariantCultureIgnoreCase).
-                      ToArray()
+                     ToArray()
 
         If correos.Length = 0 Then
             MessageBox.Show("No se encontraron correos en el resultado.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning)
@@ -462,7 +489,7 @@ Partial Public Class frmFiltroAvanzado
         Clipboard.SetText(textoCorreos)
 
         MessageBox.Show($"Se copiaron {correos.Length} correos al portapapeles." &
-                       $"{Environment.NewLine}Ya puedes pegarlos en tu cliente de correo.",
+                         $"{Environment.NewLine}Ya puedes pegarlos en tu cliente de correo.",
                         "Correos copiados",
                         MessageBoxButtons.OK, MessageBoxIcon.Information)
     End Sub
