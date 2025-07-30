@@ -106,7 +106,10 @@ Partial Class frmFiltroAvanzado
         Me.splitContenedorPrincipal.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.splitContenedorPrincipal.FixedPanel = System.Windows.Forms.FixedPanel.Panel1
+        ' Permitir que ambos paneles del SplitContainer se redimensionen de manera
+        ' proporcional al tamaño del formulario. Esto hace que el DataGridView y
+        ' los controles de la columna izquierda se adapten mejor a cambios de tamaño.
+        Me.splitContenedorPrincipal.FixedPanel = System.Windows.Forms.FixedPanel.None
         Me.splitContenedorPrincipal.Location = New System.Drawing.Point(0, 0)
         Me.splitContenedorPrincipal.Margin = New System.Windows.Forms.Padding(2)
         Me.splitContenedorPrincipal.Name = "splitContenedorPrincipal"
@@ -114,12 +117,16 @@ Partial Class frmFiltroAvanzado
         'splitContenedorPrincipal.Panel1
         '
         Me.splitContenedorPrincipal.Panel1.Controls.Add(Me.pnlIzquierdo)
-        Me.splitContenedorPrincipal.Panel1MinSize = 350
+        ' Reducir el tamaño mínimo del Panel1 para permitir que la interfaz se
+        ' ajuste a tamaños de ventana más pequeños.
+        Me.splitContenedorPrincipal.Panel1MinSize = 200
         '
         'splitContenedorPrincipal.Panel2
         '
         Me.splitContenedorPrincipal.Panel2.Controls.Add(Me.pnlDerecho)
-        Me.splitContenedorPrincipal.Panel2MinSize = 400
+        ' Reducir el tamaño mínimo del Panel2 para permitir que la interfaz se
+        ' ajuste a tamaños de ventana más pequeños.
+        Me.splitContenedorPrincipal.Panel2MinSize = 200
         Me.splitContenedorPrincipal.Size = New System.Drawing.Size(1028, 609)
         Me.splitContenedorPrincipal.SplitterDistance = 450
         Me.splitContenedorPrincipal.SplitterWidth = 3
@@ -372,7 +379,11 @@ Partial Class frmFiltroAvanzado
         Me.dgvDatos.AllowUserToDeleteRows = False
         Me.dgvDatos.AllowUserToResizeColumns = False
         Me.dgvDatos.AllowUserToResizeRows = False
-        Me.dgvDatos.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells
+        ' Ajustar el modo de ajuste de columnas para que las columnas ocupen de
+        ' manera proporcional el espacio disponible dentro del DataGridView. De esta
+        ' forma, al cambiar el tamaño del formulario, el grid se redimensionará de
+        ' forma automática sin afectar la funcionalidad existente.
+        Me.dgvDatos.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill
         Me.dgvDatos.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvDatos.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgvDatos.Location = New System.Drawing.Point(0, 0)
