@@ -32,9 +32,7 @@ Partial Class frmLicencias
         Me.btnNueva = New System.Windows.Forms.Button()
         Me.btnEditar = New System.Windows.Forms.Button()
         Me.btnEliminar = New System.Windows.Forms.Button()
-        Me.btnSiguiente = New System.Windows.Forms.Button()
-        Me.lblPaginacion = New System.Windows.Forms.Label()
-        Me.btnAnterior = New System.Windows.Forms.Button()
+        Me.lblPaginacion = New System.Windows.Forms.Label() ' Mantenemos la etiqueta para el conteo
         Me.panelFiltros.SuspendLayout()
         CType(Me.dgvLicencias, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.panelAcciones.SuspendLayout()
@@ -81,7 +79,7 @@ Partial Class frmLicencias
         'dtpHasta
         '
         Me.dtpHasta.Enabled = False
-        Me.dtpHasta.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
+        Me.dtpHasta.Format = System.Windows.Forms.DateTimePickerFormat.Short
         Me.dtpHasta.Location = New System.Drawing.Point(420, 57)
         Me.dtpHasta.Name = "dtpHasta"
         Me.dtpHasta.Size = New System.Drawing.Size(120, 27)
@@ -90,7 +88,7 @@ Partial Class frmLicencias
         'dtpDesde
         '
         Me.dtpDesde.Enabled = False
-        Me.dtpDesde.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
+        Me.dtpDesde.Format = System.Windows.Forms.DateTimePickerFormat.Short
         Me.dtpDesde.Location = New System.Drawing.Point(420, 20)
         Me.dtpDesde.Name = "dtpDesde"
         Me.dtpDesde.Size = New System.Drawing.Size(120, 27)
@@ -162,9 +160,7 @@ Partial Class frmLicencias
         Me.panelAcciones.Controls.Add(Me.btnNueva)
         Me.panelAcciones.Controls.Add(Me.btnEditar)
         Me.panelAcciones.Controls.Add(Me.btnEliminar)
-        Me.panelAcciones.Controls.Add(Me.btnSiguiente)
-        Me.panelAcciones.Controls.Add(Me.lblPaginacion)
-        Me.panelAcciones.Controls.Add(Me.btnAnterior)
+        Me.panelAcciones.Controls.Add(Me.lblPaginacion) ' Renombrado a lblConteoRegistros en el .vb
         Me.panelAcciones.Dock = System.Windows.Forms.DockStyle.Bottom
         Me.panelAcciones.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
         Me.panelAcciones.Location = New System.Drawing.Point(0, 520)
@@ -200,37 +196,17 @@ Partial Class frmLicencias
         Me.btnEliminar.Text = "Eliminar"
         Me.btnEliminar.UseVisualStyleBackColor = True
         '
-        'btnSiguiente
-        '
-        Me.btnSiguiente.Enabled = False
-        Me.btnSiguiente.Location = New System.Drawing.Point(630, 13)
-        Me.btnSiguiente.Name = "btnSiguiente"
-        Me.btnSiguiente.Size = New System.Drawing.Size(88, 23)
-        Me.btnSiguiente.TabIndex = 3
-        Me.btnSiguiente.Text = "Siguiente >"
-        Me.btnSiguiente.UseVisualStyleBackColor = True
-        '
         'lblPaginacion
         '
         Me.lblPaginacion.Anchor = System.Windows.Forms.AnchorStyles.None
         Me.lblPaginacion.AutoSize = True
         Me.lblPaginacion.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.lblPaginacion.Location = New System.Drawing.Point(521, 14)
+        Me.lblPaginacion.Location = New System.Drawing.Point(544, 14)
         Me.lblPaginacion.Name = "lblPaginacion"
-        Me.lblPaginacion.Size = New System.Drawing.Size(103, 20)
+        Me.lblPaginacion.Size = New System.Drawing.Size(174, 20)
         Me.lblPaginacion.TabIndex = 5
-        Me.lblPaginacion.Text = "Página 1 de 1"
+        Me.lblPaginacion.Text = "Registros encontrados: 0"
         Me.lblPaginacion.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
-        '
-        'btnAnterior
-        '
-        Me.btnAnterior.Enabled = False
-        Me.btnAnterior.Location = New System.Drawing.Point(427, 13)
-        Me.btnAnterior.Name = "btnAnterior"
-        Me.btnAnterior.Size = New System.Drawing.Size(88, 23)
-        Me.btnAnterior.TabIndex = 4
-        Me.btnAnterior.Text = "< Anterior"
-        Me.btnAnterior.UseVisualStyleBackColor = True
         '
         'frmLicencias
         '
@@ -267,8 +243,6 @@ Partial Class frmLicencias
     Friend WithEvents dtpDesde As DateTimePicker
     Friend WithEvents chkHasta As CheckBox
     Friend WithEvents chkDesde As CheckBox
-    ' --- Añade estas líneas ---
-    Friend WithEvents btnSiguiente As Button
     Friend WithEvents lblPaginacion As Label
-    Friend WithEvents btnAnterior As Button
+
 End Class

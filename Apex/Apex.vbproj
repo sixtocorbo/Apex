@@ -28,7 +28,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>55</ApplicationRevision>
+    <ApplicationRevision>64</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -289,6 +289,7 @@
     <Compile Include="Services\ConsultasGenericas.vb" />
     <Compile Include="Services\LicenciaService.vb" />
     <Compile Include="Services\LoadingHelper.vb" />
+    <Compile Include="Services\ModernTheme.vb" />
     <Compile Include="Services\ModuloExtensions.vb" />
     <Compile Include="Services\NotificacionPersonalService.vb" />
     <Compile Include="UI\frmCambiarEstadoNotificacion.Designer.vb">

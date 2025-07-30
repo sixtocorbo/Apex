@@ -1,5 +1,4 @@
 ﻿' Apex/Services/LicenciaService.vb
-
 Imports System.Data.Entity
 
 Public Class LicenciaService
@@ -26,24 +25,14 @@ Public Class LicenciaService
     End Class
 
     ''' <summary>
-    ''' DTO para devolver resultados paginados.
+    ''' Obtiene TODAS las licencias para la grilla principal, con filtros. (VERSIÓN MODIFICADA SIN PAGINACIÓN)
     ''' </summary>
-    Public Class ResultadoPaginadoLicencias
-        Public Property Licencias As List(Of LicenciaParaVista)
-        Public Property TotalRegistros As Integer
-    End Class
-
-    ''' <summary>
-    ''' Obtiene una lista paginada de licencias para la grilla principal, con filtros.
-    ''' </summary>
-    Public Async Function GetAllPaginadoConDetallesAsync(
-        paginaActual As Integer,
-        tamañoPagina As Integer,
+    Public Async Function GetAllConDetallesAsync(
         Optional filtroNombre As String = "",
         Optional filtroTipoId As Integer? = Nothing,
         Optional fechaDesde As Date? = Nothing,
         Optional fechaHasta As Date? = Nothing
-    ) As Task(Of ResultadoPaginadoLicencias)
+    ) As Task(Of List(Of LicenciaParaVista))
 
         Dim query = _unitOfWork.Repository(Of HistoricoLicencia)().GetAll().AsNoTracking()
 
@@ -65,13 +54,8 @@ Public Class LicenciaService
             query = query.Where(Function(l) l.inicio <= fechaHasta.Value)
         End If
 
-        ' --- Contar el total de registros ANTES de paginar ---
-        Dim totalRegistros = Await query.CountAsync()
-
-        ' --- Aplicar orden y paginación ---
-        Dim licenciasPaginadas = Await query.OrderByDescending(Function(l) l.inicio) _
-            .Skip((paginaActual - 1) * tamañoPagina) _
-            .Take(tamañoPagina) _
+        ' --- Aplicar orden y devolver la lista completa ---
+        Dim licencias = Await query.OrderByDescending(Function(l) l.inicio) _
             .Select(Function(l) New LicenciaParaVista With {
                 .Id = l.Id,
                 .NombreFuncionario = l.Funcionario.Nombre,
@@ -83,12 +67,8 @@ Public Class LicenciaService
                 .Comentario = l.Comentario
             }).ToListAsync()
 
-        Return New ResultadoPaginadoLicencias With {
-            .Licencias = licenciasPaginadas,
-            .TotalRegistros = totalRegistros
-        }
+        Return licencias
     End Function
-
 
     ' --- MÉTODOS PARA POBLAR COMBOS ---
     Public Async Function ObtenerTiposLicenciaParaComboAsync() As Task(Of List(Of KeyValuePair(Of Integer, String)))

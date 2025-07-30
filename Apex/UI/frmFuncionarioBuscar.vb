@@ -63,6 +63,7 @@ Public Class frmFuncionarioBuscar
 
 
 #Region "Búsqueda con Full-Text y CONTAINS"
+    'aprovechando la funcionalidad de búsqueda Full-Text de SQL Server
     Private Async Function BuscarAsync() As Task
         LoadingHelper.MostrarCargando(Me)
         btnBuscar.Enabled = False
@@ -82,28 +83,26 @@ Public Class frmFuncionarioBuscar
 
                 '–– Construir patrón FTS por término ––
                 Dim terminos = filtro.Split(" "c) _
-                                  .Where(Function(w) Not String.IsNullOrWhiteSpace(w)) _
-                                  .Select(Function(w) $"""{w}*""")
+                               .Where(Function(w) Not String.IsNullOrWhiteSpace(w)) _
+                               .Select(Function(w) $"""{w}*""")
                 Dim expresionFts = String.Join(" AND ", terminos)
 
-                '–– SQL dinámico ––
+                '–– SQL dinámico (CORREGIDO) ––
                 Dim sb As New StringBuilder()
                 sb.AppendLine("SELECT TOP (@limite)")
                 sb.AppendLine("       Id, CI, Nombre")
                 sb.AppendLine("FROM   dbo.Funcionario WITH (NOLOCK)")
-                sb.AppendLine("WHERE 1 = 1")
-                sb.AppendLine("  AND (CI LIKE '%' + @filtro + '%'")
-                sb.AppendLine("   OR CONTAINS(Nombre, @patron))")
+                sb.AppendLine("WHERE  CONTAINS((CI, Nombre), @patron)") ' <-- LÍNEA MODIFICADA
                 sb.AppendLine("ORDER BY Nombre;")
 
                 Dim sql = sb.ToString()
                 Dim pLimite = New SqlParameter("@limite", LIMITE_FILAS)
-                Dim pFiltro = New SqlParameter("@filtro", filtro)
+                ' El parámetro @filtro ya no es necesario
                 Dim pPatron = New SqlParameter("@patron", expresionFts)
 
-                '–– Ejecutar consulta
+                '–– Ejecutar consulta (CORREGIDO)
                 Dim lista = Await ctx.Database _
-                                 .SqlQuery(Of FuncionarioMin)(sql, pLimite, pFiltro, pPatron) _
+                                .SqlQuery(Of FuncionarioMin)(sql, pLimite, pPatron) _ ' <-- Parámetro @filtro eliminado
                                 .ToListAsync()
 
                 '–– Actualizar grilla
@@ -121,25 +120,102 @@ Public Class frmFuncionarioBuscar
 
                 If lista.Count = LIMITE_FILAS Then
                     MessageBox.Show($"Mostrando los primeros {LIMITE_FILAS} resultados." &
-                                "Refiná la búsqueda para ver más.",
-                                "Aviso",
-                                MessageBoxButtons.OK, MessageBoxIcon.Information)
+                            "Refiná la búsqueda para ver más.",
+                            "Aviso",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information)
                 End If
             End Using
 
         Catch ex As SqlException When ex.Number = -2
             MessageBox.Show("La consulta excedió el tiempo de espera. Refiná los filtros o intentá nuevamente.",
-                        "Timeout", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                    "Timeout", MessageBoxButtons.OK, MessageBoxIcon.Warning)
 
         Catch ex As Exception
             MessageBox.Show("Ocurrió un error inesperado: " & ex.Message,
-                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
 
         Finally
             LoadingHelper.OcultarCargando(Me)
             btnBuscar.Enabled = True
         End Try
     End Function
+    'Private Async Function BuscarAsync() As Task
+    '    LoadingHelper.MostrarCargando(Me)
+    '    btnBuscar.Enabled = False
+
+    '    Try
+    '        Using uow As New UnitOfWork()
+    '            Dim ctx = uow.Context
+    '            Dim filtro As String = txtBusqueda.Text.Trim()
+
+    '            '–– Condición mínima de 3 letras ––
+    '            If filtro.Length < 3 Then
+    '                dgvResultados.DataSource = Nothing
+    '                ResultadosFiltrados = New List(Of FuncionarioMin)
+    '                LimpiarDetalle()
+    '                Return
+    '            End If
+
+    '            '–– Construir patrón FTS por término ––
+    '            Dim terminos = filtro.Split(" "c) _
+    '                              .Where(Function(w) Not String.IsNullOrWhiteSpace(w)) _
+    '                              .Select(Function(w) $"""{w}*""")
+    '            Dim expresionFts = String.Join(" AND ", terminos)
+
+    '            '–– SQL dinámico ––
+    '            Dim sb As New StringBuilder()
+    '            sb.AppendLine("SELECT TOP (@limite)")
+    '            sb.AppendLine("       Id, CI, Nombre")
+    '            sb.AppendLine("FROM   dbo.Funcionario WITH (NOLOCK)")
+    '            sb.AppendLine("WHERE 1 = 1")
+    '            sb.AppendLine("  AND (CI LIKE '%' + @filtro + '%'")
+    '            sb.AppendLine("   OR CONTAINS(Nombre, @patron))")
+    '            sb.AppendLine("ORDER BY Nombre;")
+
+    '            Dim sql = sb.ToString()
+    '            Dim pLimite = New SqlParameter("@limite", LIMITE_FILAS)
+    '            Dim pFiltro = New SqlParameter("@filtro", filtro)
+    '            Dim pPatron = New SqlParameter("@patron", expresionFts)
+
+    '            '–– Ejecutar consulta
+    '            Dim lista = Await ctx.Database _
+    '                             .SqlQuery(Of FuncionarioMin)(sql, pLimite, pFiltro, pPatron) _
+    '                            .ToListAsync()
+
+    '            '–– Actualizar grilla
+    '            dgvResultados.DataSource = Nothing
+    '            dgvResultados.DataSource = lista
+    '            ResultadosFiltrados = lista
+
+    '            If lista.Any() Then
+    '                dgvResultados.ClearSelection()
+    '                dgvResultados.Rows(0).Selected = True
+    '                dgvResultados.CurrentCell = dgvResultados.Rows(0).Cells("CI")
+    '            Else
+    '                LimpiarDetalle()
+    '            End If
+
+    '            If lista.Count = LIMITE_FILAS Then
+    '                MessageBox.Show($"Mostrando los primeros {LIMITE_FILAS} resultados." &
+    '                            "Refiná la búsqueda para ver más.",
+    '                            "Aviso",
+    '                            MessageBoxButtons.OK, MessageBoxIcon.Information)
+    '            End If
+    '        End Using
+
+    '    Catch ex As SqlException When ex.Number = -2
+    '        MessageBox.Show("La consulta excedió el tiempo de espera. Refiná los filtros o intentá nuevamente.",
+    '                    "Timeout", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+
+    '    Catch ex As Exception
+    '        MessageBox.Show("Ocurrió un error inesperado: " & ex.Message,
+    '                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+
+    '    Finally
+    '        LoadingHelper.OcultarCargando(Me)
+    '        btnBuscar.Enabled = True
+    '    End Try
+    'End Function
 
 
     Private Async Sub txtBusqueda_KeyDown(sender As Object, e As KeyEventArgs) _
