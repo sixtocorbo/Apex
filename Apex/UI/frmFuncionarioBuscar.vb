@@ -268,34 +268,33 @@ Public Class frmFuncionarioBuscar
     Private Async Sub MostrarDetalle(sender As Object, e As EventArgs)
         If dgvResultados.CurrentRow Is Nothing OrElse dgvResultados.CurrentRow.DataBoundItem Is Nothing Then Return
         Dim id = CInt(dgvResultados.CurrentRow.Cells("Id").Value)
-        Dim fechaActual = Date.Today ' <-- Obtenemos la fecha actual para la consulta
+        Dim fechaActual = Date.Today
 
         Using uow As New UnitOfWork()
             Dim f = Await uow.Repository(Of Funcionario)() _
-                             .GetAll() _
-                             .Include(Function(x) x.Cargo) _
-                             .Include(Function(x) x.TipoFuncionario) _
-                             .Include(Function(x) x.EstadoTransitorio.Select(Function(et) et.TipoEstadoTransitorio)) _
-                             .AsNoTracking() _
-                             .Where(Function(x) x.Id = id) _
-                             .Select(Function(x) New With {
-                                 x.Foto,
-                                 x.Nombre,
-                                 x.CI,
-                                 x.Cargo,
-                                 x.TipoFuncionario,
-                                 x.FechaIngreso,
-                                 x.Activo,
-                                 .EstadosTransitoriosActivos = x.EstadoTransitorio.Where(
-                                     Function(et) et.FechaDesde <= fechaActual AndAlso
-                                                  (Not et.FechaHasta.HasValue OrElse et.FechaHasta.Value >= fechaActual)
-                                 ).Select(Function(et) et.TipoEstadoTransitorio.Nombre).ToList()
-                             }).FirstOrDefaultAsync()
+                         .GetAll() _
+                         .Include(Function(x) x.Cargo) _
+                         .Include(Function(x) x.TipoFuncionario) _
+                         .Include(Function(x) x.EstadoTransitorio.Select(Function(et) et.TipoEstadoTransitorio)) _
+                         .AsNoTracking() _
+                         .Where(Function(x) x.Id = id) _
+                         .Select(Function(x) New With {
+                             x.Foto,
+                             x.Nombre,
+                             x.CI,
+                             x.Cargo,
+                             x.TipoFuncionario,
+                             x.FechaIngreso,
+                             x.Activo,
+                             .EstadosTransitoriosActivos = x.EstadoTransitorio.Where(
+                                 Function(et) et.FechaDesde <= fechaActual AndAlso
+                                              (Not et.FechaHasta.HasValue OrElse et.FechaHasta.Value >= fechaActual)
+                             ).Select(Function(et) et.TipoEstadoTransitorio.Nombre).ToList()
+                         }).FirstOrDefaultAsync()
 
-            ' Doble chequeo por si la selección cambió mientras se ejecutaba la consulta
             If dgvResultados.CurrentRow Is Nothing _
-           OrElse dgvResultados.CurrentRow.DataBoundItem Is Nothing _
-           OrElse CInt(dgvResultados.CurrentRow.Cells("Id").Value) <> id Then Return
+       OrElse dgvResultados.CurrentRow.DataBoundItem Is Nothing _
+       OrElse CInt(dgvResultados.CurrentRow.Cells("Id").Value) <> id Then Return
 
             If f Is Nothing Then Return
 
@@ -306,11 +305,34 @@ Public Class frmFuncionarioBuscar
             lblFechaIngreso.Text = f.FechaIngreso.ToShortDateString()
             chkActivoDetalle.Checked = f.Activo
 
-            If f.EstadosTransitoriosActivos.Any() Then
-                lblEstadoTransitorio.Text = String.Join(", ", f.EstadosTransitoriosActivos)
+            ' --- LÓGICA MEJORADA PARA MOSTRAR ESTADOS Y LICENCIAS ---
+            Dim licenciasActivas = Await uow.Repository(Of HistoricoLicencia)() _
+            .GetAll() _
+            .Where(Function(l) l.FuncionarioId = id AndAlso
+                               l.inicio <= fechaActual AndAlso
+                               l.finaliza >= fechaActual AndAlso
+                               l.estado IsNot Nothing AndAlso l.estado <> "Rechazado" AndAlso l.estado <> "Anulado") _
+            .Select(Function(l) l.TipoLicencia.Nombre) _
+            .ToListAsync()
+
+            Dim todosLosEstados As New List(Of String)
+            If f.EstadosTransitoriosActivos IsNot Nothing Then
+                todosLosEstados.AddRange(f.EstadosTransitoriosActivos)
+            End If
+
+            If licenciasActivas IsNot Nothing AndAlso licenciasActivas.Any() Then
+                Dim yaTieneLicencia = todosLosEstados.Any(Function(st) st.ToLower().Contains("licencia"))
+                If Not yaTieneLicencia Then
+                    todosLosEstados.AddRange(licenciasActivas)
+                End If
+            End If
+
+            If todosLosEstados.Any() Then
+                lblEstadoTransitorio.Text = String.Join(", ", todosLosEstados)
             Else
                 lblEstadoTransitorio.Text = "Normal"
             End If
+            ' --- FIN DE LA LÓGICA MEJORADA ---
 
             If f.Foto Is Nothing OrElse f.Foto.Length = 0 Then
                 pbFotoDetalle.Image = My.Resources.Police

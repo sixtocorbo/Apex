@@ -18,7 +18,6 @@ Partial Public Class ApexEntities
 
     Public Sub New()
         MyBase.New("name=ApexEntities")
-        Me.Database.CommandTimeout = 180
     End Sub
 
     Protected Overrides Sub OnModelCreating(modelBuilder As DbModelBuilder)
@@ -73,6 +72,7 @@ Partial Public Class ApexEntities
     Public Overridable Property TipoViatico() As DbSet(Of TipoViatico)
     Public Overridable Property Turno() As DbSet(Of Turno)
     Public Overridable Property Usuario() As DbSet(Of Usuario)
+    Public Overridable Property vw_FuncionarioEstadosConsolidados() As DbSet(Of vw_FuncionarioEstadosConsolidados)
 
     Public Overridable Function usp_CargarHistoricosPolicia() As Integer
         Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_CargarHistoricosPolicia")

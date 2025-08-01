@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="ApexModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="ApexModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="AreaTrabajo">
           <Key>
             <PropertyRef Name="Id" />
@@ -142,9 +142,9 @@
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="FuncionarioId" Type="int" Nullable="false" />
           <Property Name="Modelo" Type="nvarchar" MaxLength="100" />
-          <Property Name="Marca" Type="nvarchar" MaxLength="50" />
-          <Property Name="Serie" Type="nvarchar" MaxLength="50" />
-          <Property Name="Tipo" Type="nvarchar" MaxLength="50" />
+          <Property Name="Marca" Type="nvarchar" MaxLength="100" />
+          <Property Name="Serie" Type="nvarchar" MaxLength="100" />
+          <Property Name="Tipo" Type="nvarchar" MaxLength="100" />
           <Property Name="Observaciones" Type="nvarchar(max)" />
           <Property Name="FechaAsign" Type="datetime2" Precision="7" Nullable="false" />
         </EntityType>
@@ -519,6 +519,25 @@
           <Property Name="LastLoginAt" Type="datetime2" Precision="7" />
           <Property Name="CreatedAt" Type="datetime2" Precision="7" Nullable="false" />
           <Property Name="UpdatedAt" Type="datetime2" Precision="7" />
+        </EntityType>
+        <!--Errores durante la generación:
+advertencia 6002: La tabla o vista 'Apex.dbo.vw_FuncionarioEstadosConsolidados' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
+        <EntityType Name="vw_FuncionarioEstadosConsolidados">
+          <Key>
+            <PropertyRef Name="FuncionarioId" />
+            <PropertyRef Name="TipoEstadoNombre" />
+            <PropertyRef Name="FechaDesde" />
+            <PropertyRef Name="Origen" />
+            <PropertyRef Name="TipoEstadoTransitorioId" />
+          </Key>
+          <Property Name="Id" Type="int" />
+          <Property Name="FuncionarioId" Type="int" Nullable="false" />
+          <Property Name="TipoEstadoNombre" Type="nvarchar" MaxLength="60" Nullable="false" />
+          <Property Name="FechaDesde" Type="date" Nullable="false" />
+          <Property Name="FechaHasta" Type="date" />
+          <Property Name="Observaciones" Type="nvarchar(max)" />
+          <Property Name="Origen" Type="varchar" MaxLength="8" Nullable="false" />
+          <Property Name="TipoEstadoTransitorioId" Type="int" Nullable="false" />
         </EntityType>
         <Association Name="FK__Funcionar__Estad__282DF8C2">
           <End Role="EstadoCivil" Type="Self.EstadoCivil" Multiplicity="0..1" />
@@ -1144,6 +1163,18 @@
           <EntitySet Name="TipoViatico" EntityType="Self.TipoViatico" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Turno" EntityType="Self.Turno" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Usuario" EntityType="Self.Usuario" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="vw_FuncionarioEstadosConsolidados" EntityType="Self.vw_FuncionarioEstadosConsolidados" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [vw_FuncionarioEstadosConsolidados].[Id] AS [Id], 
+    [vw_FuncionarioEstadosConsolidados].[FuncionarioId] AS [FuncionarioId], 
+    [vw_FuncionarioEstadosConsolidados].[TipoEstadoNombre] AS [TipoEstadoNombre], 
+    [vw_FuncionarioEstadosConsolidados].[FechaDesde] AS [FechaDesde], 
+    [vw_FuncionarioEstadosConsolidados].[FechaHasta] AS [FechaHasta], 
+    [vw_FuncionarioEstadosConsolidados].[Observaciones] AS [Observaciones], 
+    [vw_FuncionarioEstadosConsolidados].[Origen] AS [Origen], 
+    [vw_FuncionarioEstadosConsolidados].[TipoEstadoTransitorioId] AS [TipoEstadoTransitorioId]
+    FROM [dbo].[vw_FuncionarioEstadosConsolidados] AS [vw_FuncionarioEstadosConsolidados]</DefiningQuery>
+          </EntitySet>
           <AssociationSet Name="FK__Funcionar__Estad__282DF8C2" Association="Self.FK__Funcionar__Estad__282DF8C2">
             <End Role="EstadoCivil" EntitySet="EstadoCivil" />
             <End Role="Funcionario" EntitySet="Funcionario" />
@@ -1329,8 +1360,7 @@
             <End Role="Usuario" EntitySet="Usuario" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="ApexModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -1515,9 +1545,9 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="FuncionarioId" Type="Int32" Nullable="false" />
           <Property Name="Modelo" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
-          <Property Name="Marca" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="Serie" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="Tipo" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Marca" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Serie" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Tipo" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
           <Property Name="Observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="FechaAsign" Type="DateTime" Nullable="false" Precision="7" />
           <NavigationProperty Name="Funcionario" Relationship="Self.FK_FuncionarioChaleco_Funcionario" FromRole="FuncionarioChaleco" ToRole="Funcionario" />
@@ -2728,7 +2758,7 @@
           </AssociationSet>
           <FunctionImport Name="usp_CargarHistoricosPolicia" />
           <FunctionImport Name="usp_DeleteFuncionario">
-            <Parameter Name="FuncionarioId" Mode="In" Type="Int32" />
+          <Parameter Name="FuncionarioId" Mode="In" Type="Int32" />
           </FunctionImport>
           <FunctionImport Name="usp_LimpiarDatosDeApex" />
           <FunctionImport Name="usp_MigrarArmas" ReturnType="Collection(ApexModel.usp_MigrarArmas_Result)" />
@@ -2736,16 +2766,17 @@
           <FunctionImport Name="usp_MigrarEstadosTransitoriosDesdePersonal" ReturnType="Collection(Int32)" />
           <FunctionImport Name="usp_MigrarEstadosUnificados" ReturnType="Collection(Int32)" />
           <FunctionImport Name="usp_MigrarFuncionariosDesdePersonal">
-            <Parameter Name="RefrescarCatalogos" Mode="In" Type="Boolean" />
+          <Parameter Name="RefrescarCatalogos" Mode="In" Type="Boolean" />
           </FunctionImport>
           <FunctionImport Name="usp_MigrarLicencias" />
           <FunctionImport Name="usp_MigrarNotificaciones" ReturnType="Collection(Int32)" />
           <FunctionImport Name="usp_MigrarNovedadesDesdePersonal" />
           <FunctionImport Name="usp_MigrarUsuarios" ReturnType="Collection(Int32)" />
           <FunctionImport Name="usp_PresenciaFecha_Apex">
-            <Parameter Name="Fecha" Mode="In" Type="DateTime" />
+          <Parameter Name="Fecha" Mode="In" Type="DateTime" />
           </FunctionImport>
           <FunctionImport Name="usp_ProcesarEstadoNotificaciones" />
+          <EntitySet Name="vw_FuncionarioEstadosConsolidados" EntityType="ApexModel.vw_FuncionarioEstadosConsolidados" />
         </EntityContainer>
         <ComplexType Name="usp_MigrarArmas_Result">
           <Property Type="Int32" Name="ArmasInsertadas" Nullable="true" />
@@ -2757,6 +2788,23 @@
           <Property Type="Int32" Name="TotalArmas" Nullable="true" />
           <Property Type="Int32" Name="TotalAsignaciones" Nullable="true" />
         </ComplexType>
+        <EntityType Name="vw_FuncionarioEstadosConsolidados">
+          <Key>
+            <PropertyRef Name="FuncionarioId" />
+            <PropertyRef Name="TipoEstadoNombre" />
+            <PropertyRef Name="FechaDesde" />
+            <PropertyRef Name="Origen" />
+            <PropertyRef Name="TipoEstadoTransitorioId" />
+          </Key>
+          <Property Name="Id" Type="Int32" />
+          <Property Name="FuncionarioId" Type="Int32" Nullable="false" />
+          <Property Name="TipoEstadoNombre" Type="String" Nullable="false" MaxLength="60" FixedLength="false" Unicode="true" />
+          <Property Name="FechaDesde" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="FechaHasta" Type="DateTime" Precision="0" />
+          <Property Name="Observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Origen" Type="String" Nullable="false" MaxLength="8" FixedLength="false" Unicode="false" />
+          <Property Name="TipoEstadoTransitorioId" Type="Int32" Nullable="false" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -3349,6 +3397,20 @@
           <FunctionImportMapping FunctionImportName="usp_MigrarUsuarios" FunctionName="ApexModel.Store.usp_MigrarUsuarios" />
           <FunctionImportMapping FunctionImportName="usp_PresenciaFecha_Apex" FunctionName="ApexModel.Store.usp_PresenciaFecha_Apex" />
           <FunctionImportMapping FunctionImportName="usp_ProcesarEstadoNotificaciones" FunctionName="ApexModel.Store.usp_ProcesarEstadoNotificaciones" />
+          <EntitySetMapping Name="vw_FuncionarioEstadosConsolidados">
+            <EntityTypeMapping TypeName="ApexModel.vw_FuncionarioEstadosConsolidados">
+              <MappingFragment StoreEntitySet="vw_FuncionarioEstadosConsolidados">
+                <ScalarProperty Name="TipoEstadoTransitorioId" ColumnName="TipoEstadoTransitorioId" />
+                <ScalarProperty Name="Origen" ColumnName="Origen" />
+                <ScalarProperty Name="Observaciones" ColumnName="Observaciones" />
+                <ScalarProperty Name="FechaHasta" ColumnName="FechaHasta" />
+                <ScalarProperty Name="FechaDesde" ColumnName="FechaDesde" />
+                <ScalarProperty Name="TipoEstadoNombre" ColumnName="TipoEstadoNombre" />
+                <ScalarProperty Name="FuncionarioId" ColumnName="FuncionarioId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

@@ -55,6 +55,7 @@ Public Class frmFuncionarioCrear
 
         ' --- Añadir manejadores de eventos para formateo manual ---
         AddHandler dgvDotacion.CellFormatting, AddressOf dgvDotacion_CellFormatting
+        AddHandler chkVerHistorial.CheckedChanged, AddressOf chkVerHistorial_CheckedChanged
         AddHandler dgvEstadosTransitorios.CellFormatting, AddressOf dgvEstadosTransitorios_CellFormatting
 
 
@@ -167,6 +168,8 @@ Public Class frmFuncionarioCrear
             Close()
             Return
         End If
+
+        ' (Carga de datos de funcionario se mantiene igual...)
         txtCI.Text = f.CI
         txtNombre.Text = f.Nombre
         dtpFechaIngreso.Value = f.FechaIngreso
@@ -187,10 +190,55 @@ Public Class frmFuncionarioCrear
         cboEstadoCivil.SelectedValue = If(f.EstadoCivilId.HasValue, CInt(f.EstadoCivilId), -1)
         cboGenero.SelectedValue = If(f.GeneroId.HasValue, CInt(f.GeneroId), -1)
         cboNivelEstudio.SelectedValue = If(f.NivelEstudioId.HasValue, CInt(f.NivelEstudioId), -1)
+
         _dotaciones = New BindingList(Of FuncionarioDotacion)(f.FuncionarioDotacion.ToList())
-        _estadosTransitorios = New BindingList(Of EstadoTransitorio)(f.EstadoTransitorio.ToList())
         dgvDotacion.DataSource = _dotaciones
-        dgvEstadosTransitorios.DataSource = _estadosTransitorios
+
+        ' Llama al nuevo método para poblar la grilla de estados
+        Await PoblarGrillaEstados()
+    End Function
+    Private Async Sub chkVerHistorial_CheckedChanged(sender As Object, e As EventArgs)
+        ' Cuando el checkbox cambia, vuelve a poblar la grilla con el filtro correspondiente
+        Await PoblarGrillaEstados()
+    End Sub
+
+    Private Async Function PoblarGrillaEstados() As Task
+        Using uow As New UnitOfWork()
+            Dim fechaActual = Date.Today
+            Dim verTodo = chkVerHistorial.Checked
+
+            Dim query = "SELECT * FROM vw_FuncionarioEstadosConsolidados WHERE FuncionarioId = @p0"
+
+            ' Si el checkbox no está marcado, se aplica el filtro de fecha
+            If Not verTodo Then
+                query &= " AND (FechaHasta IS NULL OR FechaHasta >= @p1)"
+            End If
+
+            query &= " ORDER BY FechaDesde DESC"
+
+            Dim params As New List(Of Object) From {_idFuncionario}
+            If Not verTodo Then
+                params.Add(fechaActual)
+            End If
+
+            Dim estadosConsolidados = Await uow.Context.Database.SqlQuery(Of EstadoConsolidadoDTO)(
+                query, params.ToArray()
+            ).ToListAsync()
+
+            _estadosTransitorios = New BindingList(Of EstadoTransitorio)(
+                estadosConsolidados.Select(Function(dto) New EstadoTransitorio With {
+                    .Id = dto.Id,
+                    .FuncionarioId = dto.FuncionarioId,
+                    .TipoEstadoTransitorioId = dto.TipoEstadoTransitorioId,
+                    .TipoEstadoTransitorio = _tiposEstadoTransitorio.FirstOrDefault(Function(t) t.Id = dto.TipoEstadoTransitorioId),
+                    .FechaDesde = dto.FechaDesde,
+                    .FechaHasta = dto.FechaHasta,
+                    .Observaciones = dto.Observaciones
+                }).ToList()
+            )
+
+            dgvEstadosTransitorios.DataSource = _estadosTransitorios
+        End Using
     End Function
 
     Private Async Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
@@ -355,6 +403,14 @@ Public Class frmFuncionarioCrear
     Private Sub btnEditarEstado_Click(sender As Object, e As EventArgs) Handles btnEditarEstado.Click
         If dgvEstadosTransitorios.CurrentRow Is Nothing Then Return
         Dim estadoSeleccionado = CType(dgvEstadosTransitorios.CurrentRow.DataBoundItem, EstadoTransitorio)
+
+        ' --- LÓGICA DE PROTECCIÓN ---
+        If estadoSeleccionado.Id < 0 Then ' Los ID de licencia son negativos en la vista
+            MessageBox.Show("Las licencias no se pueden editar desde esta pantalla. Deben gestionarse desde el módulo de licencias.", "Acción no permitida", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return
+        End If
+        ' --- FIN ---
+
         Using frm As New frmFuncionarioEstadoTransitorio(estadoSeleccionado, _tiposEstadoTransitorio)
             If frm.ShowDialog() = DialogResult.OK Then
                 _estadosTransitorios.ResetBindings()
@@ -364,8 +420,16 @@ Public Class frmFuncionarioCrear
 
     Private Sub btnQuitarEstado_Click(sender As Object, e As EventArgs) Handles btnQuitarEstado.Click
         If dgvEstadosTransitorios.CurrentRow Is Nothing Then Return
+        Dim estadoSeleccionado = CType(dgvEstadosTransitorios.CurrentRow.DataBoundItem, EstadoTransitorio)
+
+        ' --- LÓGICA DE PROTECCIÓN ---
+        If estadoSeleccionado.Id < 0 Then
+            MessageBox.Show("Las licencias no se pueden eliminar desde esta pantalla.", "Acción no permitida", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return
+        End If
+        ' --- FIN ---
+
         If MessageBox.Show("¿Está seguro de que desea quitar este estado transitorio?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
-            Dim estadoSeleccionado = CType(dgvEstadosTransitorios.CurrentRow.DataBoundItem, EstadoTransitorio)
             _estadosTransitorios.Remove(estadoSeleccionado)
         End If
     End Sub
@@ -440,5 +504,14 @@ Public Class frmFuncionarioCrear
         Next
     End Sub
 #End Region
-
+    Public Class EstadoConsolidadoDTO
+        Public Property Id As Integer
+        Public Property FuncionarioId As Integer
+        Public Property TipoEstadoNombre As String
+        Public Property FechaDesde As Date
+        Public Property FechaHasta As Date?
+        Public Property Observaciones As String
+        Public Property Origen As String
+        Public Property TipoEstadoTransitorioId As Integer
+    End Class
 End Class

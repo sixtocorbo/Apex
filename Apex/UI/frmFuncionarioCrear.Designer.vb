@@ -27,18 +27,19 @@ Partial Class frmFuncionarioCrear
         Me.btnCancelar = New System.Windows.Forms.Button()
         Me.TabPageEstadosTransitorios = New System.Windows.Forms.TabPage()
         Me.TableLayoutPanelEstados = New System.Windows.Forms.TableLayoutPanel()
-        Me.FlowLayoutPanelEstados = New System.Windows.Forms.FlowLayoutPanel()
-        Me.btnAñadirEstado = New System.Windows.Forms.Button()
-        Me.btnEditarEstado = New System.Windows.Forms.Button()
-        Me.btnQuitarEstado = New System.Windows.Forms.Button()
         Me.dgvEstadosTransitorios = New System.Windows.Forms.DataGridView()
+        Me.chkVerHistorial = New System.Windows.Forms.CheckBox()
+        Me.FlowLayoutPanelEstados = New System.Windows.Forms.FlowLayoutPanel()
+        Me.btnQuitarEstado = New System.Windows.Forms.Button()
+        Me.btnEditarEstado = New System.Windows.Forms.Button()
+        Me.btnAñadirEstado = New System.Windows.Forms.Button()
         Me.TabPageDotacion = New System.Windows.Forms.TabPage()
         Me.TableLayoutPanelDotacion = New System.Windows.Forms.TableLayoutPanel()
-        Me.FlowLayoutPanelDotacion = New System.Windows.Forms.FlowLayoutPanel()
-        Me.btnAñadirDotacion = New System.Windows.Forms.Button()
-        Me.btnEditarDotacion = New System.Windows.Forms.Button()
-        Me.btnQuitarDotacion = New System.Windows.Forms.Button()
         Me.dgvDotacion = New System.Windows.Forms.DataGridView()
+        Me.FlowLayoutPanelDotacion = New System.Windows.Forms.FlowLayoutPanel()
+        Me.btnQuitarDotacion = New System.Windows.Forms.Button()
+        Me.btnEditarDotacion = New System.Windows.Forms.Button()
+        Me.btnAñadirDotacion = New System.Windows.Forms.Button()
         Me.TabPageDatosPersonales = New System.Windows.Forms.TabPage()
         Me.TableLayoutPanelDatosPersonales = New System.Windows.Forms.TableLayoutPanel()
         Me.cboNivelEstudio = New System.Windows.Forms.ComboBox()
@@ -79,8 +80,8 @@ Partial Class frmFuncionarioCrear
         Me.FlowLayoutPanel1.SuspendLayout()
         Me.TabPageEstadosTransitorios.SuspendLayout()
         Me.TableLayoutPanelEstados.SuspendLayout()
-        Me.FlowLayoutPanelEstados.SuspendLayout()
         CType(Me.dgvEstadosTransitorios, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.FlowLayoutPanelEstados.SuspendLayout()
         Me.TabPageDotacion.SuspendLayout()
         Me.TableLayoutPanelDotacion.SuspendLayout()
         Me.FlowLayoutPanelDotacion.SuspendLayout()
@@ -148,55 +149,17 @@ Partial Class frmFuncionarioCrear
         Me.TableLayoutPanelEstados.ColumnCount = 1
         Me.TableLayoutPanelEstados.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
         Me.TableLayoutPanelEstados.Controls.Add(Me.dgvEstadosTransitorios, 0, 0)
-        Me.TableLayoutPanelEstados.Controls.Add(Me.FlowLayoutPanelEstados, 0, 1)
+        Me.TableLayoutPanelEstados.Controls.Add(Me.chkVerHistorial, 0, 1)
+        Me.TableLayoutPanelEstados.Controls.Add(Me.FlowLayoutPanelEstados, 0, 2)
         Me.TableLayoutPanelEstados.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TableLayoutPanelEstados.Location = New System.Drawing.Point(10, 10)
         Me.TableLayoutPanelEstados.Name = "TableLayoutPanelEstados"
-        Me.TableLayoutPanelEstados.RowCount = 2
+        Me.TableLayoutPanelEstados.RowCount = 3
         Me.TableLayoutPanelEstados.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+        Me.TableLayoutPanelEstados.RowStyles.Add(New System.Windows.Forms.RowStyle())
         Me.TableLayoutPanelEstados.RowStyles.Add(New System.Windows.Forms.RowStyle())
         Me.TableLayoutPanelEstados.Size = New System.Drawing.Size(1017, 461)
         Me.TableLayoutPanelEstados.TabIndex = 0
-        '
-        'FlowLayoutPanelEstados
-        '
-        Me.FlowLayoutPanelEstados.AutoSize = True
-        Me.FlowLayoutPanelEstados.Controls.Add(Me.btnQuitarEstado)
-        Me.FlowLayoutPanelEstados.Controls.Add(Me.btnEditarEstado)
-        Me.FlowLayoutPanelEstados.Controls.Add(Me.btnAñadirEstado)
-        Me.FlowLayoutPanelEstados.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.FlowLayoutPanelEstados.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
-        Me.FlowLayoutPanelEstados.Location = New System.Drawing.Point(3, 420)
-        Me.FlowLayoutPanelEstados.Name = "FlowLayoutPanelEstados"
-        Me.FlowLayoutPanelEstados.Size = New System.Drawing.Size(1011, 38)
-        Me.FlowLayoutPanelEstados.TabIndex = 1
-        '
-        'btnAñadirEstado
-        '
-        Me.btnAñadirEstado.Location = New System.Drawing.Point(696, 3)
-        Me.btnAñadirEstado.Name = "btnAñadirEstado"
-        Me.btnAñadirEstado.Size = New System.Drawing.Size(100, 32)
-        Me.btnAñadirEstado.TabIndex = 2
-        Me.btnAñadirEstado.Text = "Añadir..."
-        Me.btnAñadirEstado.UseVisualStyleBackColor = True
-        '
-        'btnEditarEstado
-        '
-        Me.btnEditarEstado.Location = New System.Drawing.Point(802, 3)
-        Me.btnEditarEstado.Name = "btnEditarEstado"
-        Me.btnEditarEstado.Size = New System.Drawing.Size(100, 32)
-        Me.btnEditarEstado.TabIndex = 1
-        Me.btnEditarEstado.Text = "Editar..."
-        Me.btnEditarEstado.UseVisualStyleBackColor = True
-        '
-        'btnQuitarEstado
-        '
-        Me.btnQuitarEstado.Location = New System.Drawing.Point(908, 3)
-        Me.btnQuitarEstado.Name = "btnQuitarEstado"
-        Me.btnQuitarEstado.Size = New System.Drawing.Size(100, 32)
-        Me.btnQuitarEstado.TabIndex = 0
-        Me.btnQuitarEstado.Text = "Quitar"
-        Me.btnQuitarEstado.UseVisualStyleBackColor = True
         '
         'dgvEstadosTransitorios
         '
@@ -209,8 +172,59 @@ Partial Class frmFuncionarioCrear
         Me.dgvEstadosTransitorios.ReadOnly = True
         Me.dgvEstadosTransitorios.RowHeadersWidth = 51
         Me.dgvEstadosTransitorios.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgvEstadosTransitorios.Size = New System.Drawing.Size(1011, 411)
+        Me.dgvEstadosTransitorios.Size = New System.Drawing.Size(1011, 381)
         Me.dgvEstadosTransitorios.TabIndex = 0
+        '
+        'chkVerHistorial
+        '
+        Me.chkVerHistorial.Anchor = System.Windows.Forms.AnchorStyles.Left
+        Me.chkVerHistorial.AutoSize = True
+        Me.chkVerHistorial.Location = New System.Drawing.Point(3, 390)
+        Me.chkVerHistorial.Name = "chkVerHistorial"
+        Me.chkVerHistorial.Size = New System.Drawing.Size(157, 20)
+        Me.chkVerHistorial.TabIndex = 2
+        Me.chkVerHistorial.Text = "Ver historial completo"
+        Me.chkVerHistorial.UseVisualStyleBackColor = True
+        '
+        'FlowLayoutPanelEstados
+        '
+        Me.FlowLayoutPanelEstados.AutoSize = True
+        Me.FlowLayoutPanelEstados.Controls.Add(Me.btnQuitarEstado)
+        Me.FlowLayoutPanelEstados.Controls.Add(Me.btnEditarEstado)
+        Me.FlowLayoutPanelEstados.Controls.Add(Me.btnAñadirEstado)
+        Me.FlowLayoutPanelEstados.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.FlowLayoutPanelEstados.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
+        Me.FlowLayoutPanelEstados.Location = New System.Drawing.Point(3, 416)
+        Me.FlowLayoutPanelEstados.Name = "FlowLayoutPanelEstados"
+        Me.FlowLayoutPanelEstados.Size = New System.Drawing.Size(1011, 42)
+        Me.FlowLayoutPanelEstados.TabIndex = 1
+        '
+        'btnQuitarEstado
+        '
+        Me.btnQuitarEstado.Location = New System.Drawing.Point(908, 3)
+        Me.btnQuitarEstado.Name = "btnQuitarEstado"
+        Me.btnQuitarEstado.Size = New System.Drawing.Size(100, 32)
+        Me.btnQuitarEstado.TabIndex = 0
+        Me.btnQuitarEstado.Text = "Quitar"
+        Me.btnQuitarEstado.UseVisualStyleBackColor = True
+        '
+        'btnEditarEstado
+        '
+        Me.btnEditarEstado.Location = New System.Drawing.Point(802, 3)
+        Me.btnEditarEstado.Name = "btnEditarEstado"
+        Me.btnEditarEstado.Size = New System.Drawing.Size(100, 32)
+        Me.btnEditarEstado.TabIndex = 1
+        Me.btnEditarEstado.Text = "Editar..."
+        Me.btnEditarEstado.UseVisualStyleBackColor = True
+        '
+        'btnAñadirEstado
+        '
+        Me.btnAñadirEstado.Location = New System.Drawing.Point(696, 3)
+        Me.btnAñadirEstado.Name = "btnAñadirEstado"
+        Me.btnAñadirEstado.Size = New System.Drawing.Size(100, 32)
+        Me.btnAñadirEstado.TabIndex = 2
+        Me.btnAñadirEstado.Text = "Añadir..."
+        Me.btnAñadirEstado.UseVisualStyleBackColor = True
         '
         'TabPageDotacion
         '
@@ -240,50 +254,6 @@ Partial Class frmFuncionarioCrear
         Me.TableLayoutPanelDotacion.Size = New System.Drawing.Size(1011, 457)
         Me.TableLayoutPanelDotacion.TabIndex = 0
         '
-        'FlowLayoutPanelDotacion
-        '
-        Me.FlowLayoutPanelDotacion.AutoSize = True
-        Me.FlowLayoutPanelDotacion.Controls.Add(Me.btnQuitarDotacion)
-        Me.FlowLayoutPanelDotacion.Controls.Add(Me.btnEditarDotacion)
-        Me.FlowLayoutPanelDotacion.Controls.Add(Me.btnAñadirDotacion)
-        Me.FlowLayoutPanelDotacion.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.FlowLayoutPanelDotacion.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
-        Me.FlowLayoutPanelDotacion.Location = New System.Drawing.Point(4, 417)
-        Me.FlowLayoutPanelDotacion.Margin = New System.Windows.Forms.Padding(4)
-        Me.FlowLayoutPanelDotacion.Name = "FlowLayoutPanelDotacion"
-        Me.FlowLayoutPanelDotacion.Size = New System.Drawing.Size(1003, 36)
-        Me.FlowLayoutPanelDotacion.TabIndex = 1
-        '
-        'btnAñadirDotacion
-        '
-        Me.btnAñadirDotacion.Location = New System.Drawing.Point(683, 4)
-        Me.btnAñadirDotacion.Margin = New System.Windows.Forms.Padding(4)
-        Me.btnAñadirDotacion.Name = "btnAñadirDotacion"
-        Me.btnAñadirDotacion.Size = New System.Drawing.Size(100, 28)
-        Me.btnAñadirDotacion.TabIndex = 2
-        Me.btnAñadirDotacion.Text = "Añadir..."
-        Me.btnAñadirDotacion.UseVisualStyleBackColor = True
-        '
-        'btnEditarDotacion
-        '
-        Me.btnEditarDotacion.Location = New System.Drawing.Point(791, 4)
-        Me.btnEditarDotacion.Margin = New System.Windows.Forms.Padding(4)
-        Me.btnEditarDotacion.Name = "btnEditarDotacion"
-        Me.btnEditarDotacion.Size = New System.Drawing.Size(100, 28)
-        Me.btnEditarDotacion.TabIndex = 1
-        Me.btnEditarDotacion.Text = "Editar..."
-        Me.btnEditarDotacion.UseVisualStyleBackColor = True
-        '
-        'btnQuitarDotacion
-        '
-        Me.btnQuitarDotacion.Location = New System.Drawing.Point(899, 4)
-        Me.btnQuitarDotacion.Margin = New System.Windows.Forms.Padding(4)
-        Me.btnQuitarDotacion.Name = "btnQuitarDotacion"
-        Me.btnQuitarDotacion.Size = New System.Drawing.Size(100, 28)
-        Me.btnQuitarDotacion.TabIndex = 0
-        Me.btnQuitarDotacion.Text = "Quitar"
-        Me.btnQuitarDotacion.UseVisualStyleBackColor = True
-        '
         'dgvDotacion
         '
         Me.dgvDotacion.AllowUserToAddRows = False
@@ -298,6 +268,50 @@ Partial Class frmFuncionarioCrear
         Me.dgvDotacion.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
         Me.dgvDotacion.Size = New System.Drawing.Size(1003, 405)
         Me.dgvDotacion.TabIndex = 0
+        '
+        'FlowLayoutPanelDotacion
+        '
+        Me.FlowLayoutPanelDotacion.AutoSize = True
+        Me.FlowLayoutPanelDotacion.Controls.Add(Me.btnQuitarDotacion)
+        Me.FlowLayoutPanelDotacion.Controls.Add(Me.btnEditarDotacion)
+        Me.FlowLayoutPanelDotacion.Controls.Add(Me.btnAñadirDotacion)
+        Me.FlowLayoutPanelDotacion.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.FlowLayoutPanelDotacion.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
+        Me.FlowLayoutPanelDotacion.Location = New System.Drawing.Point(4, 417)
+        Me.FlowLayoutPanelDotacion.Margin = New System.Windows.Forms.Padding(4)
+        Me.FlowLayoutPanelDotacion.Name = "FlowLayoutPanelDotacion"
+        Me.FlowLayoutPanelDotacion.Size = New System.Drawing.Size(1003, 36)
+        Me.FlowLayoutPanelDotacion.TabIndex = 1
+        '
+        'btnQuitarDotacion
+        '
+        Me.btnQuitarDotacion.Location = New System.Drawing.Point(899, 4)
+        Me.btnQuitarDotacion.Margin = New System.Windows.Forms.Padding(4)
+        Me.btnQuitarDotacion.Name = "btnQuitarDotacion"
+        Me.btnQuitarDotacion.Size = New System.Drawing.Size(100, 28)
+        Me.btnQuitarDotacion.TabIndex = 0
+        Me.btnQuitarDotacion.Text = "Quitar"
+        Me.btnQuitarDotacion.UseVisualStyleBackColor = True
+        '
+        'btnEditarDotacion
+        '
+        Me.btnEditarDotacion.Location = New System.Drawing.Point(791, 4)
+        Me.btnEditarDotacion.Margin = New System.Windows.Forms.Padding(4)
+        Me.btnEditarDotacion.Name = "btnEditarDotacion"
+        Me.btnEditarDotacion.Size = New System.Drawing.Size(100, 28)
+        Me.btnEditarDotacion.TabIndex = 1
+        Me.btnEditarDotacion.Text = "Editar..."
+        Me.btnEditarDotacion.UseVisualStyleBackColor = True
+        '
+        'btnAñadirDotacion
+        '
+        Me.btnAñadirDotacion.Location = New System.Drawing.Point(683, 4)
+        Me.btnAñadirDotacion.Margin = New System.Windows.Forms.Padding(4)
+        Me.btnAñadirDotacion.Name = "btnAñadirDotacion"
+        Me.btnAñadirDotacion.Size = New System.Drawing.Size(100, 28)
+        Me.btnAñadirDotacion.TabIndex = 2
+        Me.btnAñadirDotacion.Text = "Añadir..."
+        Me.btnAñadirDotacion.UseVisualStyleBackColor = True
         '
         'TabPageDatosPersonales
         '
@@ -780,21 +794,21 @@ Partial Class frmFuncionarioCrear
         Me.TabPageEstadosTransitorios.ResumeLayout(False)
         Me.TableLayoutPanelEstados.ResumeLayout(False)
         Me.TableLayoutPanelEstados.PerformLayout()
-        Me.FlowLayoutPanelEstados.ResumeLayout(False)
         CType(Me.dgvEstadosTransitorios, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.FlowLayoutPanelEstados.ResumeLayout(False)
         Me.TabPageDotacion.ResumeLayout(False)
         Me.TableLayoutPanelDotacion.ResumeLayout(False)
         Me.TableLayoutPanelDotacion.PerformLayout()
-        Me.FlowLayoutPanelDotacion.ResumeLayout(False)
         CType(Me.dgvDotacion, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.FlowLayoutPanelDotacion.ResumeLayout(False)
         Me.TabPageDatosPersonales.ResumeLayout(False)
         Me.TableLayoutPanelDatosPersonales.ResumeLayout(False)
         Me.TableLayoutPanelDatosPersonales.PerformLayout()
         Me.TabPageGeneral.ResumeLayout(False)
         Me.TableLayoutPanelGeneral.ResumeLayout(False)
+        CType(Me.pbFoto, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TableLayoutPanelDatosGenerales.ResumeLayout(False)
         Me.TableLayoutPanelDatosGenerales.PerformLayout()
-        CType(Me.pbFoto, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TabControlMain.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
@@ -855,4 +869,5 @@ Partial Class frmFuncionarioCrear
     Friend WithEvents cboFuncion As ComboBox
     Friend WithEvents chkActivo As CheckBox
     Friend WithEvents TabControlMain As TabControl
+    Friend WithEvents chkVerHistorial As CheckBox
 End Class
