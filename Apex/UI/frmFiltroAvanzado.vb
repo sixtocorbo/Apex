@@ -1,5 +1,5 @@
 ﻿' Apex/UI/frmFiltroAvanzado.vb
-' VERSIÓN CORREGIDA CON FILTROS EN CASCADA
+' VERSIÓN CORREGIDA CON FILTROS EN CASCADA Y PANEL DE CHIPS DINÁMICO
 
 Option Strict On
 Option Explicit On
@@ -38,8 +38,8 @@ Partial Public Class frmFiltroAvanzado
         Public Overrides Function ToString() As String
             Dim op = [Enum].GetName(GetType(OperadorComparacion), Operador)
             Return If(Operador = OperadorComparacion.Entre,
-                       $"{Columna} {op} ({Valor1} – {Valor2})",
-                       $"{Columna} {op} {Valor1}")
+                            $"{Columna} {op} ({Valor1} – {Valor2})",
+                            $"{Columna} {op} {Valor1}")
         End Function
 
         Private Shared Function Esc(s As String) As String
@@ -128,6 +128,14 @@ Partial Public Class frmFiltroAvanzado
         cmbOrigenDatos.DataSource = [Enum].GetValues(GetType(ConsultasGenericas.TipoOrigenDatos))
         cmbOrigenDatos.SelectedIndex = -1
 
+        ' **INICIO DE CORRECCIÓN DE LAYOUT**
+        flpChips.Dock = DockStyle.None
+        flpChips.AutoSize = False
+        flpChips.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
+        flpChips.WrapContents = True ' Permitir que los chips se ajusten a la siguiente línea.
+        Panel1.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right Or AnchorStyles.Bottom
+        ' **FIN DE CORRECCIÓN DE LAYOUT**
+
         AddHandler cmbOrigenDatos.SelectedIndexChanged, AddressOf cmbOrigenDatos_SelectedIndexChanged
         AddHandler btnCargar.Click, AddressOf btnCargar_Click
         AddHandler lstColumnas.SelectedIndexChanged, AddressOf ColumnaCambiada
@@ -137,6 +145,7 @@ Partial Public Class frmFiltroAvanzado
         AddHandler btnEliminarLicencia.Click, AddressOf btnEliminarLicencia_Click
 
         cmbOrigenDatos_SelectedIndexChanged(Nothing, EventArgs.Empty)
+        UpdateFiltrosPanelHeight()
     End Sub
 #End Region
 
@@ -191,6 +200,7 @@ Partial Public Class frmFiltroAvanzado
             ActualizarListaColumnas()
             filtros.Limpiar()
             flpChips.Controls.Clear()
+            UpdateFiltrosPanelHeight()
 
             dgvDatos.DataSource = dvDatos
             AplicarFiltros()
@@ -241,29 +251,24 @@ Partial Public Class frmFiltroAvanzado
         filtros.Limpiar()
         gbxFiltros.Enabled = False
         ActualizarAccionesDisponibles()
+        UpdateFiltrosPanelHeight()
     End Sub
 
     Private Sub ColumnaCambiada(sender As Object, e As EventArgs)
         ActualizarListaDeValores()
     End Sub
 
-    ' ESTA ES LA FUNCIÓN CORREGIDA
     Private Sub ActualizarListaDeValores()
         lstValores.Items.Clear()
         If lstColumnas.SelectedItem Is Nothing OrElse dvDatos Is Nothing OrElse dvDatos.Table Is Nothing Then Exit Sub
 
         Dim colName = lstColumnas.SelectedItem.ToString()
-
-        ' Obtener los valores únicos DESDE LA VISTA FILTRADA (dvDatos)
-        ' ToTable(True, colName) crea una tabla con valores distintos para la columna especificada
         Dim valoresUnicosTbl As DataTable = dvDatos.ToTable(True, colName)
-
-        ' Convertir la tabla a una lista de strings para ordenar
         Dim valores = valoresUnicosTbl.AsEnumerable() _
-                       .Select(Function(r) r(colName).ToString()) _
-                       .Where(Function(v) Not String.IsNullOrWhiteSpace(v)) _
-                       .OrderBy(Function(v) v, StringComparer.CurrentCultureIgnoreCase) _
-                       .ToArray()
+                            .Select(Function(r) r(colName).ToString()) _
+                            .Where(Function(v) Not String.IsNullOrWhiteSpace(v)) _
+                            .OrderBy(Function(v) v, StringComparer.CurrentCultureIgnoreCase) _
+                            .ToArray()
 
         lstValores.Items.AddRange(valores)
     End Sub
@@ -300,8 +305,6 @@ Partial Public Class frmFiltroAvanzado
     Private Sub AplicarFiltros()
         If dvDatos Is Nothing Then Return
         dvDatos.RowFilter = String.Join(" AND ", {filtros.RowFilter(), ConstruirFiltroGlobal()}.Where(Function(s) Not String.IsNullOrWhiteSpace(s)))
-
-        ' Actualizar las listas de valores después de aplicar el filtro
         ActualizarListaDeValores()
         ActualizarAccionesDisponibles()
     End Sub
@@ -359,14 +362,51 @@ Partial Public Class frmFiltroAvanzado
     Private Sub CrearChip(regla As ReglaFiltro)
         Dim descripcionValores As String = If(regla.Operador = OperadorComparacion.EnLista, regla.Valor1.Replace("|", ", "), regla.Valor1)
         Dim reglaDesc As String = $"{regla.Columna}: {descripcionValores}"
-        Dim chipContainer As New FlowLayoutPanel() With {.AutoSize = True, .AutoSizeMode = AutoSizeMode.GrowAndShrink, .Margin = New Padding(3), .BackColor = Color.FromArgb(220, 235, 255), .BorderStyle = BorderStyle.FixedSingle, .FlowDirection = FlowDirection.LeftToRight, .WrapContents = False}
-        Dim lblTexto As New Label() With {.Text = reglaDesc, .AutoSize = True, .MaximumSize = New Size(450, 0), .Margin = New Padding(3), .TextAlign = ContentAlignment.MiddleLeft}
-        Dim btnCerrar As New Button() With {.Text = "×", .Font = New Font("Segoe UI", 8, FontStyle.Bold), .ForeColor = Color.DarkRed, .FlatStyle = FlatStyle.Flat, .Size = New Size(22, 22), .Tag = regla, .Margin = New Padding(3, 1, 1, 1)}
+
+        ' **CORRECCIÓN FINAL**: Usamos un FlowLayoutPanel para cada chip.
+        ' Es la forma más robusta de alinear controles simples horizontalmente.
+        Dim chipContainer As New FlowLayoutPanel() With {
+            .AutoSize = True,
+            .AutoSizeMode = AutoSizeMode.GrowAndShrink,
+            .Margin = New Padding(3),
+            .BackColor = Color.FromArgb(220, 235, 255),
+            .BorderStyle = BorderStyle.FixedSingle,
+            .FlowDirection = FlowDirection.LeftToRight,
+            .WrapContents = False ' No queremos que el botón "x" se vaya abajo
+        }
+
+        ' Etiqueta con el texto del filtro
+        Dim lblTexto As New Label() With {
+            .Text = reglaDesc,
+            .AutoSize = True,
+            .Margin = New Padding(3), ' Margen simple
+            .TextAlign = ContentAlignment.MiddleLeft
+        }
+
+        ' Botón para cerrar/quitar el chip
+        Dim btnCerrar As New Button() With {
+            .Text = "×",
+            .Font = New Font("Segoe UI", 8.0F, FontStyle.Bold),
+            .ForeColor = Color.DarkRed,
+            .FlatStyle = FlatStyle.Flat,
+            .Size = New Size(22, 22),
+            .Tag = regla,
+            .Margin = New Padding(1, 0, 1, 0) ' Ajustar margen vertical
+        }
         btnCerrar.FlatAppearance.BorderSize = 0
         AddHandler btnCerrar.Click, AddressOf ChipCerrar_Click
+
+        ' Centrar el botón verticalmente con la etiqueta
+        ' La propiedad Anchor no funciona bien en FlowLayoutPanel, así que ajustamos el margen
+        Dim topMargin = (lblTexto.Height - btnCerrar.Height) \ 2
+        btnCerrar.Margin = New Padding(btnCerrar.Margin.Left, topMargin, btnCerrar.Margin.Right, topMargin)
+
+
         chipContainer.Controls.Add(lblTexto)
         chipContainer.Controls.Add(btnCerrar)
+
         flpChips.Controls.Add(chipContainer)
+        UpdateFiltrosPanelHeight()
     End Sub
 
     Private Sub ChipCerrar_Click(sender As Object, e As EventArgs)
@@ -376,7 +416,44 @@ Partial Public Class frmFiltroAvanzado
             filtros.Quitar(reglaParaQuitar)
             flpChips.Controls.Remove(btn.Parent)
             AplicarFiltros()
+            UpdateFiltrosPanelHeight()
         End If
+    End Sub
+
+    Private Sub UpdateFiltrosPanelHeight()
+        Const MIN_HEIGHT As Integer = 40
+        Const MAX_HEIGHT As Integer = 120
+        Const MARGIN_VERTICAL As Integer = 6
+
+        If flpChips.Controls.Count = 0 Then
+            flpChips.Visible = False
+            flpChips.Height = 0
+        Else
+            flpChips.Visible = True
+            flpChips.PerformLayout()
+
+            Dim maxBottom As Integer = 0
+            For Each ctrl As Control In flpChips.Controls
+                If ctrl.Bottom > maxBottom Then
+                    maxBottom = ctrl.Bottom
+                End If
+            Next
+
+            Dim requiredHeight As Integer = maxBottom + flpChips.Padding.Bottom
+
+            If requiredHeight < MIN_HEIGHT Then requiredHeight = MIN_HEIGHT
+
+            If requiredHeight > MAX_HEIGHT Then
+                flpChips.Height = MAX_HEIGHT
+                flpChips.AutoScroll = True
+            Else
+                flpChips.Height = requiredHeight
+                flpChips.AutoScroll = False
+            End If
+        End If
+
+        Panel1.Top = flpChips.Bottom + MARGIN_VERTICAL
+        Panel1.Height = pnlAcciones.Top - Panel1.Top - MARGIN_VERTICAL
     End Sub
 
     Private Sub BtnLimpiar_Click(sender As Object, e As EventArgs) Handles btnLimpiar.Click
@@ -384,6 +461,7 @@ Partial Public Class frmFiltroAvanzado
         flpChips.Controls.Clear()
         txtBusquedaGlobal.Clear()
         AplicarFiltros()
+        UpdateFiltrosPanelHeight()
     End Sub
 #End Region
 
@@ -412,10 +490,10 @@ Partial Public Class frmFiltroAvanzado
         End If
 
         Dim correos = dvDatos.ToTable().AsEnumerable().
-                      Select(Function(r) r.Field(Of String)("Correo")).
-                      Where(Function(c) Not String.IsNullOrWhiteSpace(c)).
-                      Distinct(StringComparer.InvariantCultureIgnoreCase).
-                     ToArray()
+                        Select(Function(r) r.Field(Of String)("Correo")).
+                        Where(Function(c) Not String.IsNullOrWhiteSpace(c)).
+                        Distinct(StringComparer.InvariantCultureIgnoreCase).
+                        ToArray()
 
         If correos.Length = 0 Then
             MessageBox.Show("No se encontraron correos en el resultado.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning)

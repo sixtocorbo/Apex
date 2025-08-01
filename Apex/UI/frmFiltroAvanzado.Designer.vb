@@ -398,14 +398,19 @@ Partial Class frmFiltroAvanzado
         '
         'flpChips
         '
-        Me.flpChips.AutoScroll = True
+        Me.flpChips.AutoSize = True
+        Me.flpChips.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
         Me.flpChips.Dock = System.Windows.Forms.DockStyle.Top
         Me.flpChips.Location = New System.Drawing.Point(8, 58)
         Me.flpChips.Margin = New System.Windows.Forms.Padding(2)
+        ' Establecemos una altura máxima para que no crezca indefinidamente
+        Me.flpChips.MaximumSize = New System.Drawing.Size(0, 250)
         Me.flpChips.Name = "flpChips"
         Me.flpChips.Padding = New System.Windows.Forms.Padding(4)
-        Me.flpChips.Size = New System.Drawing.Size(561, 42)
+        ' La altura inicial puede ser pequeña, ya que crecerá sola
+        Me.flpChips.Size = New System.Drawing.Size(561, 12)
         Me.flpChips.TabIndex = 2
+        ' WrapContents se mantiene en False, ya que cada chip es un panel que se apila verticalmente.
         Me.flpChips.WrapContents = False
         '
         'gbxBusquedaGlobal

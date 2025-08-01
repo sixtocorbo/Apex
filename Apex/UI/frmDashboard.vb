@@ -30,7 +30,7 @@ Public Class frmDashboard
                 AbrirFormEnPanel(New frmFuncionarioBuscar())
 
             Case "btnFiltros"
-                AbrirFormEnPanel(New frmFiltroAvanzado2())
+                AbrirFormEnPanel(New frmFiltroAvanzado())
 
             Case "btnReportes"
                 MessageBox.Show("Formulario de reportes aún no implementado.", "En desarrollo", MessageBoxButtons.OK, MessageBoxIcon.Information)
