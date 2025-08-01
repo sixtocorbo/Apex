@@ -129,10 +129,14 @@ Partial Public Class frmFiltroAvanzado
         cmbOrigenDatos.DataSource = [Enum].GetValues(GetType(ConsultasGenericas.TipoOrigenDatos))
         cmbOrigenDatos.SelectedIndex = -1
 
-        flpChips.Dock = DockStyle.None
-        flpChips.AutoSize = False
-        flpChips.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
-        flpChips.WrapContents = True
+        ' --- CONFIGURACIÓN CORREGIDA DEL FLOWLAYOUTPANEL ---
+        flpChips.Dock = DockStyle.Top
+        flpChips.AutoSize = True
+        flpChips.AutoSizeMode = AutoSizeMode.GrowAndShrink
+        flpChips.WrapContents = False ' Falso para apilado vertical
+        flpChips.FlowDirection = FlowDirection.TopDown ' Apilado de arriba hacia abajo
+        ' ---------------------------------------------------
+
         Panel1.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right Or AnchorStyles.Bottom
 
         AddHandler cmbOrigenDatos.SelectedIndexChanged, AddressOf cmbOrigenDatos_SelectedIndexChanged
@@ -398,37 +402,23 @@ Partial Public Class frmFiltroAvanzado
     ' <-- NOTA: El antiguo método 'ChipCerrar_Click' fue eliminado.
 
     Private Sub UpdateFiltrosPanelHeight()
-        Const MIN_HEIGHT As Integer = 40
-        Const MAX_HEIGHT As Integer = 120
+        Const MAX_HEIGHT As Integer = 120 ' Altura máxima antes de mostrar la barra de scroll
         Const MARGIN_VERTICAL As Integer = 6
 
         If flpChips.Controls.Count = 0 Then
             flpChips.Visible = False
-            flpChips.Height = 0
         Else
             flpChips.Visible = True
-            flpChips.PerformLayout()
-
-            Dim maxBottom As Integer = 0
-            For Each ctrl As Control In flpChips.Controls
-                If ctrl.Bottom > maxBottom Then
-                    maxBottom = ctrl.Bottom
-                End If
-            Next
-
-            Dim requiredHeight As Integer = maxBottom + flpChips.Padding.Bottom
-
-            If requiredHeight < MIN_HEIGHT Then requiredHeight = MIN_HEIGHT
-
-            If requiredHeight > MAX_HEIGHT Then
-                flpChips.Height = MAX_HEIGHT
+            ' Con AutoSize, la altura se calcula sola. Solo controlamos el scroll.
+            If flpChips.Height > MAX_HEIGHT Then
                 flpChips.AutoScroll = True
+                flpChips.Height = MAX_HEIGHT
             Else
-                flpChips.Height = requiredHeight
                 flpChips.AutoScroll = False
             End If
         End If
 
+        ' Ajustar la posición del panel de la grilla de datos
         Panel1.Top = flpChips.Bottom + MARGIN_VERTICAL
         Panel1.Height = pnlAcciones.Top - Panel1.Top - MARGIN_VERTICAL
     End Sub
