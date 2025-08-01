@@ -364,17 +364,27 @@ Partial Public Class frmFiltroAvanzado
 #Region "Chips UI"
 
     ' <-- 1. MÉTODO MODIFICADO PARA USAR ChipControl
+    'Private Sub CrearChip(regla As ReglaFiltro)
+    '    ' Crear una instancia de tu UserControl ChipControl pasándole la regla.
+    '    Dim nuevoChip As New ChipControl(regla)
+
+    '    ' Suscribirse a su evento público 'CerrarClick' para manejar la eliminación.
+    '    AddHandler nuevoChip.CerrarClick, AddressOf Chip_CerrarClick
+
+    '    ' Agregarlo directamente al FlowLayoutPanel principal.
+    '    flpChips.Controls.Add(nuevoChip)
+
+    '    ' Actualizar la altura del panel.
+    '    UpdateFiltrosPanelHeight()
+    'End Sub
     Private Sub CrearChip(regla As ReglaFiltro)
-        ' Crear una instancia de tu UserControl ChipControl pasándole la regla.
-        Dim nuevoChip As New ChipControl(regla)
+        ' --- LÍNEA CORREGIDA ---
+        ' Pasamos el ancho del panel contenedor al crear el chip
+        Dim nuevoChip As New ChipControl(regla, flpChips.Width)
+        ' ----------------------
 
-        ' Suscribirse a su evento público 'CerrarClick' para manejar la eliminación.
         AddHandler nuevoChip.CerrarClick, AddressOf Chip_CerrarClick
-
-        ' Agregarlo directamente al FlowLayoutPanel principal.
         flpChips.Controls.Add(nuevoChip)
-
-        ' Actualizar la altura del panel.
         UpdateFiltrosPanelHeight()
     End Sub
 

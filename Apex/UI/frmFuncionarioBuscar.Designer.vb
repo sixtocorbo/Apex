@@ -29,6 +29,8 @@ Partial Class frmFuncionarioBuscar
         Me.splitContenedor = New System.Windows.Forms.SplitContainer()
         Me.dgvResultados = New System.Windows.Forms.DataGridView()
         Me.panelDetalle = New System.Windows.Forms.Panel()
+        Me.lblEstadoTransitorio = New System.Windows.Forms.Label()
+        Me.lblEstadoTransitorioHeader = New System.Windows.Forms.Label()
         Me.chkActivoDetalle = New System.Windows.Forms.CheckBox()
         Me.lblPresencia = New System.Windows.Forms.Label()
         Me.lblPresenciaHeader = New System.Windows.Forms.Label()
@@ -41,8 +43,6 @@ Partial Class frmFuncionarioBuscar
         Me.lblNombreCompleto = New System.Windows.Forms.Label()
         Me.lblCI = New System.Windows.Forms.Label()
         Me.pbFotoDetalle = New System.Windows.Forms.PictureBox()
-        Me.lblEstadoTransitorio = New System.Windows.Forms.Label()
-        Me.lblEstadoTransitorioHeader = New System.Windows.Forms.Label()
         Me.panelFiltros.SuspendLayout()
         CType(Me.splitContenedor, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.splitContenedor.Panel1.SuspendLayout()
@@ -109,7 +109,7 @@ Partial Class frmFuncionarioBuscar
         '
         Me.splitContenedor.Panel2.Controls.Add(Me.panelDetalle)
         Me.splitContenedor.Size = New System.Drawing.Size(1499, 806)
-        Me.splitContenedor.SplitterDistance = 866
+        Me.splitContenedor.SplitterDistance = 525
         Me.splitContenedor.SplitterWidth = 5
         Me.splitContenedor.TabIndex = 1
         '
@@ -129,7 +129,7 @@ Partial Class frmFuncionarioBuscar
         Me.dgvResultados.ReadOnly = True
         Me.dgvResultados.RowHeadersWidth = 51
         Me.dgvResultados.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgvResultados.Size = New System.Drawing.Size(866, 806)
+        Me.dgvResultados.Size = New System.Drawing.Size(525, 806)
         Me.dgvResultados.TabIndex = 0
         '
         'panelDetalle
@@ -154,8 +154,31 @@ Partial Class frmFuncionarioBuscar
         Me.panelDetalle.Margin = New System.Windows.Forms.Padding(4)
         Me.panelDetalle.Name = "panelDetalle"
         Me.panelDetalle.Padding = New System.Windows.Forms.Padding(13, 12, 13, 12)
-        Me.panelDetalle.Size = New System.Drawing.Size(628, 806)
+        Me.panelDetalle.Size = New System.Drawing.Size(969, 806)
         Me.panelDetalle.TabIndex = 0
+        '
+        'lblEstadoTransitorio
+        '
+        Me.lblEstadoTransitorio.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.lblEstadoTransitorio.AutoSize = True
+        Me.lblEstadoTransitorio.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.lblEstadoTransitorio.ForeColor = System.Drawing.Color.Maroon
+        Me.lblEstadoTransitorio.Location = New System.Drawing.Point(160, 727)
+        Me.lblEstadoTransitorio.Name = "lblEstadoTransitorio"
+        Me.lblEstadoTransitorio.Size = New System.Drawing.Size(17, 23)
+        Me.lblEstadoTransitorio.TabIndex = 0
+        Me.lblEstadoTransitorio.Text = "-"
+        '
+        'lblEstadoTransitorioHeader
+        '
+        Me.lblEstadoTransitorioHeader.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.lblEstadoTransitorioHeader.AutoSize = True
+        Me.lblEstadoTransitorioHeader.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.lblEstadoTransitorioHeader.Location = New System.Drawing.Point(27, 727)
+        Me.lblEstadoTransitorioHeader.Name = "lblEstadoTransitorioHeader"
+        Me.lblEstadoTransitorioHeader.Size = New System.Drawing.Size(118, 23)
+        Me.lblEstadoTransitorioHeader.TabIndex = 1
+        Me.lblEstadoTransitorioHeader.Text = "Estado Actual:"
         '
         'chkActivoDetalle
         '
@@ -279,9 +302,9 @@ Partial Class frmFuncionarioBuscar
         Me.lblNombreCompleto.Location = New System.Drawing.Point(17, 561)
         Me.lblNombreCompleto.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblNombreCompleto.Name = "lblNombreCompleto"
-        Me.lblNombreCompleto.Size = New System.Drawing.Size(593, 31)
+        Me.lblNombreCompleto.Size = New System.Drawing.Size(934, 31)
         Me.lblNombreCompleto.TabIndex = 2
-        Me.lblNombreCompleto.Text = "Nombre del Funcionario"
+        Me.lblNombreCompleto.Text = "Nombre: -"
         Me.lblNombreCompleto.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
         'lblCI
@@ -293,9 +316,9 @@ Partial Class frmFuncionarioBuscar
         Me.lblCI.Location = New System.Drawing.Point(17, 536)
         Me.lblCI.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblCI.Name = "lblCI"
-        Me.lblCI.Size = New System.Drawing.Size(593, 25)
+        Me.lblCI.Size = New System.Drawing.Size(934, 25)
         Me.lblCI.TabIndex = 1
-        Me.lblCI.Text = "1234567-8"
+        Me.lblCI.Text = "CI: -"
         Me.lblCI.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
         'pbFotoDetalle
@@ -306,31 +329,10 @@ Partial Class frmFuncionarioBuscar
         Me.pbFotoDetalle.Location = New System.Drawing.Point(17, 16)
         Me.pbFotoDetalle.Margin = New System.Windows.Forms.Padding(4)
         Me.pbFotoDetalle.Name = "pbFotoDetalle"
-        Me.pbFotoDetalle.Size = New System.Drawing.Size(593, 503)
+        Me.pbFotoDetalle.Size = New System.Drawing.Size(934, 503)
         Me.pbFotoDetalle.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
         Me.pbFotoDetalle.TabIndex = 0
         Me.pbFotoDetalle.TabStop = False
-        '
-        'lblEstadoTransitorio
-        '
-        Me.lblEstadoTransitorio.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.lblEstadoTransitorio.AutoSize = True
-        Me.lblEstadoTransitorio.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.lblEstadoTransitorio.ForeColor = System.Drawing.Color.Maroon
-        Me.lblEstadoTransitorio.Location = New System.Drawing.Point(160, 727)
-        Me.lblEstadoTransitorio.Name = "lblEstadoTransitorio"
-        Me.lblEstadoTransitorio.Size = New System.Drawing.Size(17, 23)
-        Me.lblEstadoTransitorio.Text = "-"
-        '
-        'lblEstadoTransitorioHeader
-        '
-        Me.lblEstadoTransitorioHeader.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.lblEstadoTransitorioHeader.AutoSize = True
-        Me.lblEstadoTransitorioHeader.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.lblEstadoTransitorioHeader.Location = New System.Drawing.Point(27, 727)
-        Me.lblEstadoTransitorioHeader.Name = "lblEstadoTransitorioHeader"
-        Me.lblEstadoTransitorioHeader.Size = New System.Drawing.Size(115, 23)
-        Me.lblEstadoTransitorioHeader.Text = "Estado Actual:"
         '
         'frmFuncionarioBuscar
         '
