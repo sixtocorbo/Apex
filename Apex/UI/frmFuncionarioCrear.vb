@@ -114,7 +114,6 @@ Public Class frmFuncionarioCrear
         Else
             dgvEstadosTransitorios.DataSource = _estadosTransitorios
         End If
-        DgvEstadosTransitorios_SelectionChanged(Nothing, EventArgs.Empty)
     End Sub
 
     Private Async Function CargarHistorialCompleto() As Task
@@ -141,28 +140,42 @@ Public Class frmFuncionarioCrear
         End Try
     End Function
 
+    ' --- CÓDIGO CORREGIDO Y ROBUSTECIDO ---
     Private Sub DgvEstadosTransitorios_SelectionChanged(sender As Object, e As EventArgs)
         Dim editable = False
-        If dgvEstadosTransitorios.CurrentRow Is Nothing Then
+
+        ' Bloque de seguridad para manejar cambios de DataSource y selecciones vacías.
+        If dgvEstadosTransitorios.CurrentRow Is Nothing OrElse dgvEstadosTransitorios.CurrentRow.DataBoundItem Is Nothing Then
             btnEditarEstado.Enabled = False
             btnQuitarEstado.Enabled = False
             Return
         End If
 
+        Dim itemSeleccionado = dgvEstadosTransitorios.CurrentRow.DataBoundItem
+
         If Not chkVerHistorial.Checked Then
+            ' Modo edición: Los items son de tipo 'EstadoTransitorio' y siempre son editables.
             editable = True
         Else
-            Dim itemSeleccionado = dgvEstadosTransitorios.CurrentRow.DataBoundItem
-            If itemSeleccionado IsNot Nothing Then
-                Dim origen = itemSeleccionado.GetType().GetProperty("Origen").GetValue(itemSeleccionado, Nothing)?.ToString()
-                editable = (origen = "Estado")
+            ' Modo historial: Los items son de un tipo anónimo.
+            ' Verificamos de forma segura que la propiedad 'Origen' exista antes de leerla.
+            Dim origenProperty = itemSeleccionado.GetType().GetProperty("Origen")
+
+            If origenProperty IsNot Nothing Then
+                Dim origenValue = origenProperty.GetValue(itemSeleccionado, Nothing)
+                If origenValue IsNot Nothing Then
+                    editable = String.Equals(origenValue.ToString(), "Estado", StringComparison.OrdinalIgnoreCase)
+                End If
             End If
+            ' Si la propiedad no existe o es nula, 'editable' permanece False, lo cual es seguro.
         End If
 
+        ' Habilitar/deshabilitar botones según el contexto
         btnAñadirEstado.Enabled = Not chkVerHistorial.Checked
         btnEditarEstado.Enabled = editable
         btnQuitarEstado.Enabled = editable
     End Sub
+    ' --- FIN DE LA CORRECCIÓN ---
 
     Private Async Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
         Try
@@ -222,7 +235,7 @@ Public Class frmFuncionarioCrear
         Next
     End Sub
 
-
+    ' Resto del archivo sin cambios...
 #Region "Métodos Auxiliares y de UI"
     Private Async Function CargarCombosAsync() As Task
         cboTipoFuncionario.DataSource = Await _svc.ObtenerTiposFuncionarioAsync()

@@ -1,5 +1,6 @@
 ﻿' Apex/UI/frmFuncionarioEstadoTransitorio.vb
 Public Class frmFuncionarioEstadoTransitorio
+
     Public Estado As EstadoTransitorio
     Private _tiposEstado As List(Of TipoEstadoTransitorio)
 
@@ -13,6 +14,7 @@ Public Class frmFuncionarioEstadoTransitorio
     Private Sub frmFuncionarioEstadoTransitorio_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
         CargarCombos() ' Ya no necesita ser asíncrono
+
         If Estado IsNot Nothing AndAlso Estado.Id > 0 Then
             ' Modo Edición
             cboTipoEstado.SelectedValue = Estado.TipoEstadoTransitorioId
@@ -54,11 +56,12 @@ Public Class frmFuncionarioEstadoTransitorio
             Return
         End If
 
-        ' --- INICIO DE LA CORRECCIÓN ---
+        ' --- INICIO DE LA CORRECCIÓN CLAVE ---
         ' Asignamos el ID y también el objeto de navegación completo.
+        ' Esto asegura que Entity Framework entienda la relación correctamente.
         Estado.TipoEstadoTransitorioId = CInt(cboTipoEstado.SelectedValue)
         Estado.TipoEstadoTransitorio = CType(cboTipoEstado.SelectedItem, TipoEstadoTransitorio)
-        ' --- FIN DE LA CORRECCIÓN ---
+        ' --- FIN DE LA CORRECCIÓN CLAVE ---
 
         Estado.FechaDesde = dtpFechaDesde.Value.Date
         Estado.FechaHasta = If(chkFechaHasta.Checked, CType(Nothing, Date?), dtpFechaHasta.Value.Date)
@@ -71,6 +74,11 @@ Public Class frmFuncionarioEstadoTransitorio
         End If
 
         DialogResult = DialogResult.OK
+        Close()
+    End Sub
+
+    Private Sub btnCancelar_Click(sender As Object, e As EventArgs) Handles btnCancelar.Click
+        DialogResult = DialogResult.Cancel
         Close()
     End Sub
 End Class
