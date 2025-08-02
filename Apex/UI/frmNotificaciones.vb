@@ -1,9 +1,11 @@
-﻿Imports System.Data.Entity
+﻿' Apex/UI/frmNotificaciones.vb
+Imports System.Data.Entity
 
 Public Class frmNotificaciones
 
     Private _svc As NotificacionPersonalService
-    Private _listaNotificaciones As List(Of NotificacionPersonalService.NotificacionParaVista)
+    ' --- CAMBIO: Usamos la entidad de la vista en lugar del DTO ---
+    Private _listaNotificaciones As List(Of vw_NotificacionesCompletas)
 
     Private Async Sub frmNotificaciones_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         _svc = New NotificacionPersonalService()
@@ -17,17 +19,10 @@ Public Class frmNotificaciones
             .AutoGenerateColumns = False
             .Columns.Clear()
 
-            .Columns.Add(New DataGridViewTextBoxColumn With {
-                .Name = "Id", .DataPropertyName = "Id", .Visible = False
-            })
-            .Columns.Add(New DataGridViewTextBoxColumn With {
-                .Name = "NombreFuncionario", .DataPropertyName = "NombreFuncionario",
-                .HeaderText = "Funcionario", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-            })
-            .Columns.Add(New DataGridViewTextBoxColumn With {
-                .Name = "TipoNotificacion", .DataPropertyName = "TipoNotificacion",
-                .HeaderText = "Tipo", .Width = 120
-            })
+            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Id", .DataPropertyName = "Id", .Visible = False})
+            ' --- CAMBIO: Se ajusta el DataPropertyName para que coincida con la vista ---
+            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "NombreFuncionario", .DataPropertyName = "NombreFuncionario", .HeaderText = "Funcionario", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
+            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "TipoNotificacion", .DataPropertyName = "TipoNotificacion", .HeaderText = "Tipo", .Width = 120})
 
             Dim fechaColumn As New DataGridViewTextBoxColumn With {
                 .Name = "FechaProgramada", .DataPropertyName = "FechaProgramada",
@@ -66,9 +61,11 @@ Public Class frmNotificaciones
         If dgvNotificaciones.CurrentRow Is Nothing Then Return
 
         Dim idSeleccionado = CInt(dgvNotificaciones.CurrentRow.Cells("Id").Value)
+        ' --- CAMBIO: Buscamos en la nueva lista _listaNotificaciones ---
         Dim notificacionSeleccionada = _listaNotificaciones.FirstOrDefault(Function(n) n.Id = idSeleccionado)
 
         If notificacionSeleccionada IsNot Nothing Then
+            ' --- CAMBIO: La propiedad ahora se llama 'Texto' en la vista ---
             txtTextoNotificacion.Text = notificacionSeleccionada.Texto
         Else
             txtTextoNotificacion.Clear()

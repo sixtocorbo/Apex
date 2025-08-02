@@ -521,6 +521,31 @@
           <Property Name="UpdatedAt" Type="datetime2" Precision="7" />
         </EntityType>
         <!--Errores durante la generación:
+advertencia 6002: La tabla o vista 'Apex.dbo.vw_EstadosTransitoriosCompletos' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
+        <EntityType Name="vw_EstadosTransitoriosCompletos">
+          <Key>
+            <PropertyRef Name="Id" />
+            <PropertyRef Name="FuncionarioId" />
+            <PropertyRef Name="TipoEstadoTransitorioId" />
+            <PropertyRef Name="CI" />
+            <PropertyRef Name="NombreFuncionario" />
+            <PropertyRef Name="TipoEstadoNombre" />
+            <PropertyRef Name="FechaDesde" />
+            <PropertyRef Name="CreatedAt" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" />
+          <Property Name="FuncionarioId" Type="int" Nullable="false" />
+          <Property Name="TipoEstadoTransitorioId" Type="int" Nullable="false" />
+          <Property Name="CI" Type="char" MaxLength="8" Nullable="false" />
+          <Property Name="NombreFuncionario" Type="nvarchar" MaxLength="60" Nullable="false" />
+          <Property Name="TipoEstadoNombre" Type="nvarchar" MaxLength="60" Nullable="false" />
+          <Property Name="FechaDesde" Type="date" Nullable="false" />
+          <Property Name="FechaHasta" Type="date" />
+          <Property Name="Observaciones" Type="nvarchar(max)" />
+          <Property Name="CreatedAt" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="UpdatedAt" Type="datetime2" Precision="7" />
+        </EntityType>
+        <!--Errores durante la generación:
 advertencia 6002: La tabla o vista 'Apex.dbo.vw_FuncionarioEstadosConsolidados' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
         <EntityType Name="vw_FuncionarioEstadosConsolidados">
           <Key>
@@ -538,6 +563,81 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_FuncionarioEstadosConsolidados' 
           <Property Name="Observaciones" Type="nvarchar(max)" />
           <Property Name="Origen" Type="varchar" MaxLength="8" Nullable="false" />
           <Property Name="TipoEstadoTransitorioId" Type="int" Nullable="false" />
+        </EntityType>
+        <!--Errores durante la generación:
+advertencia 6002: La tabla o vista 'Apex.dbo.vw_LicenciasCompletas' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
+        <EntityType Name="vw_LicenciasCompletas">
+          <Key>
+            <PropertyRef Name="Id" />
+            <PropertyRef Name="FuncionarioId" />
+            <PropertyRef Name="TipoLicenciaId" />
+            <PropertyRef Name="CI" />
+            <PropertyRef Name="NombreFuncionario" />
+            <PropertyRef Name="TipoLicencia" />
+            <PropertyRef Name="FechaInicio" />
+            <PropertyRef Name="FechaFin" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" />
+          <Property Name="FuncionarioId" Type="int" Nullable="false" />
+          <Property Name="TipoLicenciaId" Type="int" Nullable="false" />
+          <Property Name="CI" Type="char" MaxLength="8" Nullable="false" />
+          <Property Name="NombreFuncionario" Type="nvarchar" MaxLength="60" Nullable="false" />
+          <Property Name="TipoLicencia" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="FechaInicio" Type="date" Nullable="false" />
+          <Property Name="FechaFin" Type="date" Nullable="false" />
+          <Property Name="Estado" Type="varchar(max)" />
+          <Property Name="Comentario" Type="varchar(max)" />
+        </EntityType>
+        <!--Errores durante la generación:
+advertencia 6002: La tabla o vista 'Apex.dbo.vw_NotificacionesCompletas' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
+        <EntityType Name="vw_NotificacionesCompletas">
+          <Key>
+            <PropertyRef Name="Id" />
+            <PropertyRef Name="FuncionarioId" />
+            <PropertyRef Name="TipoNotificacionId" />
+            <PropertyRef Name="EstadoId" />
+            <PropertyRef Name="NombreFuncionario" />
+            <PropertyRef Name="CI" />
+            <PropertyRef Name="TipoNotificacion" />
+            <PropertyRef Name="Estado" />
+            <PropertyRef Name="FechaProgramada" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" />
+          <Property Name="FuncionarioId" Type="int" Nullable="false" />
+          <Property Name="TipoNotificacionId" Type="tinyint" Nullable="false" />
+          <Property Name="EstadoId" Type="tinyint" Nullable="false" />
+          <Property Name="NombreFuncionario" Type="nvarchar" MaxLength="60" Nullable="false" />
+          <Property Name="CI" Type="char" MaxLength="8" Nullable="false" />
+          <Property Name="TipoNotificacion" Type="nvarchar" MaxLength="30" Nullable="false" />
+          <Property Name="Estado" Type="nvarchar" MaxLength="40" Nullable="false" />
+          <Property Name="FechaProgramada" Type="datetime2" Precision="0" Nullable="false" />
+          <Property Name="Texto" Type="nvarchar" MaxLength="1200" />
+          <Property Name="Documento" Type="nvarchar" MaxLength="100" />
+          <Property Name="ExpMinisterial" Type="nvarchar" MaxLength="50" />
+          <Property Name="ExpINR" Type="nvarchar" MaxLength="50" />
+          <Property Name="Oficina" Type="nvarchar" MaxLength="200" />
+        </EntityType>
+        <!--Errores durante la generación:
+advertencia 6002: La tabla o vista 'Apex.dbo.vw_NovedadesCompletas' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
+        <EntityType Name="vw_NovedadesCompletas">
+          <Key>
+            <PropertyRef Name="Id" />
+            <PropertyRef Name="NovedadGeneradaId" />
+            <PropertyRef Name="Fecha" />
+            <PropertyRef Name="Texto" />
+            <PropertyRef Name="NombreFuncionario" />
+            <PropertyRef Name="CI" />
+            <PropertyRef Name="Estado" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" />
+          <Property Name="NovedadGeneradaId" Type="int" Nullable="false" />
+          <Property Name="Fecha" Type="date" Nullable="false" />
+          <Property Name="Texto" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="EstadoId" Type="tinyint" />
+          <Property Name="FuncionarioId" Type="int" />
+          <Property Name="NombreFuncionario" Type="nvarchar" MaxLength="60" Nullable="false" />
+          <Property Name="CI" Type="char" MaxLength="8" Nullable="false" />
+          <Property Name="Estado" Type="nvarchar" MaxLength="40" Nullable="false" />
         </EntityType>
         <Association Name="FK__Funcionar__Estad__282DF8C2">
           <End Role="EstadoCivil" Type="Self.EstadoCivil" Multiplicity="0..1" />
@@ -1101,6 +1201,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_FuncionarioEstadosConsolidados' 
         <Function Name="usp_LimpiarDatosDeApex" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="usp_MigrarArmas" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="usp_MigrarArmasYAsignaciones" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <Function Name="usp_MigrarDotacionesCompletas" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="usp_MigrarEstadosTransitoriosDesdePersonal" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="usp_MigrarEstadosUnificados" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="usp_MigrarFuncionariosDesdePersonal" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
@@ -1163,6 +1264,21 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_FuncionarioEstadosConsolidados' 
           <EntitySet Name="TipoViatico" EntityType="Self.TipoViatico" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Turno" EntityType="Self.Turno" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Usuario" EntityType="Self.Usuario" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="vw_EstadosTransitoriosCompletos" EntityType="Self.vw_EstadosTransitoriosCompletos" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [vw_EstadosTransitoriosCompletos].[Id] AS [Id], 
+    [vw_EstadosTransitoriosCompletos].[FuncionarioId] AS [FuncionarioId], 
+    [vw_EstadosTransitoriosCompletos].[TipoEstadoTransitorioId] AS [TipoEstadoTransitorioId], 
+    [vw_EstadosTransitoriosCompletos].[CI] AS [CI], 
+    [vw_EstadosTransitoriosCompletos].[NombreFuncionario] AS [NombreFuncionario], 
+    [vw_EstadosTransitoriosCompletos].[TipoEstadoNombre] AS [TipoEstadoNombre], 
+    [vw_EstadosTransitoriosCompletos].[FechaDesde] AS [FechaDesde], 
+    [vw_EstadosTransitoriosCompletos].[FechaHasta] AS [FechaHasta], 
+    [vw_EstadosTransitoriosCompletos].[Observaciones] AS [Observaciones], 
+    [vw_EstadosTransitoriosCompletos].[CreatedAt] AS [CreatedAt], 
+    [vw_EstadosTransitoriosCompletos].[UpdatedAt] AS [UpdatedAt]
+    FROM [dbo].[vw_EstadosTransitoriosCompletos] AS [vw_EstadosTransitoriosCompletos]</DefiningQuery>
+          </EntitySet>
           <EntitySet Name="vw_FuncionarioEstadosConsolidados" EntityType="Self.vw_FuncionarioEstadosConsolidados" store:Type="Views" store:Schema="dbo">
             <DefiningQuery>SELECT 
     [vw_FuncionarioEstadosConsolidados].[Id] AS [Id], 
@@ -1174,6 +1290,51 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_FuncionarioEstadosConsolidados' 
     [vw_FuncionarioEstadosConsolidados].[Origen] AS [Origen], 
     [vw_FuncionarioEstadosConsolidados].[TipoEstadoTransitorioId] AS [TipoEstadoTransitorioId]
     FROM [dbo].[vw_FuncionarioEstadosConsolidados] AS [vw_FuncionarioEstadosConsolidados]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="vw_LicenciasCompletas" EntityType="Self.vw_LicenciasCompletas" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [vw_LicenciasCompletas].[Id] AS [Id], 
+    [vw_LicenciasCompletas].[FuncionarioId] AS [FuncionarioId], 
+    [vw_LicenciasCompletas].[TipoLicenciaId] AS [TipoLicenciaId], 
+    [vw_LicenciasCompletas].[CI] AS [CI], 
+    [vw_LicenciasCompletas].[NombreFuncionario] AS [NombreFuncionario], 
+    [vw_LicenciasCompletas].[TipoLicencia] AS [TipoLicencia], 
+    [vw_LicenciasCompletas].[FechaInicio] AS [FechaInicio], 
+    [vw_LicenciasCompletas].[FechaFin] AS [FechaFin], 
+    [vw_LicenciasCompletas].[Estado] AS [Estado], 
+    [vw_LicenciasCompletas].[Comentario] AS [Comentario]
+    FROM [dbo].[vw_LicenciasCompletas] AS [vw_LicenciasCompletas]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="vw_NotificacionesCompletas" EntityType="Self.vw_NotificacionesCompletas" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [vw_NotificacionesCompletas].[Id] AS [Id], 
+    [vw_NotificacionesCompletas].[FuncionarioId] AS [FuncionarioId], 
+    [vw_NotificacionesCompletas].[TipoNotificacionId] AS [TipoNotificacionId], 
+    [vw_NotificacionesCompletas].[EstadoId] AS [EstadoId], 
+    [vw_NotificacionesCompletas].[NombreFuncionario] AS [NombreFuncionario], 
+    [vw_NotificacionesCompletas].[CI] AS [CI], 
+    [vw_NotificacionesCompletas].[TipoNotificacion] AS [TipoNotificacion], 
+    [vw_NotificacionesCompletas].[Estado] AS [Estado], 
+    [vw_NotificacionesCompletas].[FechaProgramada] AS [FechaProgramada], 
+    [vw_NotificacionesCompletas].[Texto] AS [Texto], 
+    [vw_NotificacionesCompletas].[Documento] AS [Documento], 
+    [vw_NotificacionesCompletas].[ExpMinisterial] AS [ExpMinisterial], 
+    [vw_NotificacionesCompletas].[ExpINR] AS [ExpINR], 
+    [vw_NotificacionesCompletas].[Oficina] AS [Oficina]
+    FROM [dbo].[vw_NotificacionesCompletas] AS [vw_NotificacionesCompletas]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="vw_NovedadesCompletas" EntityType="Self.vw_NovedadesCompletas" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [vw_NovedadesCompletas].[Id] AS [Id], 
+    [vw_NovedadesCompletas].[NovedadGeneradaId] AS [NovedadGeneradaId], 
+    [vw_NovedadesCompletas].[Fecha] AS [Fecha], 
+    [vw_NovedadesCompletas].[Texto] AS [Texto], 
+    [vw_NovedadesCompletas].[EstadoId] AS [EstadoId], 
+    [vw_NovedadesCompletas].[FuncionarioId] AS [FuncionarioId], 
+    [vw_NovedadesCompletas].[NombreFuncionario] AS [NombreFuncionario], 
+    [vw_NovedadesCompletas].[CI] AS [CI], 
+    [vw_NovedadesCompletas].[Estado] AS [Estado]
+    FROM [dbo].[vw_NovedadesCompletas] AS [vw_NovedadesCompletas]</DefiningQuery>
           </EntitySet>
           <AssociationSet Name="FK__Funcionar__Estad__282DF8C2" Association="Self.FK__Funcionar__Estad__282DF8C2">
             <End Role="EstadoCivil" EntitySet="EstadoCivil" />
@@ -2777,6 +2938,11 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_FuncionarioEstadosConsolidados' 
           </FunctionImport>
           <FunctionImport Name="usp_ProcesarEstadoNotificaciones" />
           <EntitySet Name="vw_FuncionarioEstadosConsolidados" EntityType="ApexModel.vw_FuncionarioEstadosConsolidados" />
+          <EntitySet Name="vw_LicenciasCompletas" EntityType="ApexModel.vw_LicenciasCompletas" />
+          <EntitySet Name="vw_NotificacionesCompletas" EntityType="ApexModel.vw_NotificacionesCompletas" />
+          <EntitySet Name="vw_NovedadesCompletas" EntityType="ApexModel.vw_NovedadesCompletas" />
+          <EntitySet Name="vw_EstadosTransitoriosCompletos" EntityType="ApexModel.vw_EstadosTransitoriosCompletos" />
+          <FunctionImport Name="usp_MigrarDotacionesCompletas" />
         </EntityContainer>
         <ComplexType Name="usp_MigrarArmas_Result">
           <Property Type="Int32" Name="ArmasInsertadas" Nullable="true" />
@@ -2804,6 +2970,98 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_FuncionarioEstadosConsolidados' 
           <Property Name="Observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="Origen" Type="String" Nullable="false" MaxLength="8" FixedLength="false" Unicode="false" />
           <Property Name="TipoEstadoTransitorioId" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="vw_LicenciasCompletas">
+          <Key>
+            <PropertyRef Name="Id" />
+            <PropertyRef Name="FuncionarioId" />
+            <PropertyRef Name="TipoLicenciaId" />
+            <PropertyRef Name="CI" />
+            <PropertyRef Name="NombreFuncionario" />
+            <PropertyRef Name="TipoLicencia" />
+            <PropertyRef Name="FechaInicio" />
+            <PropertyRef Name="FechaFin" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" />
+          <Property Name="FuncionarioId" Type="Int32" Nullable="false" />
+          <Property Name="TipoLicenciaId" Type="Int32" Nullable="false" />
+          <Property Name="CI" Type="String" Nullable="false" MaxLength="8" FixedLength="true" Unicode="false" />
+          <Property Name="NombreFuncionario" Type="String" Nullable="false" MaxLength="60" FixedLength="false" Unicode="true" />
+          <Property Name="TipoLicencia" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="FechaInicio" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="FechaFin" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="Estado" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Comentario" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="vw_NotificacionesCompletas">
+          <Key>
+            <PropertyRef Name="Id" />
+            <PropertyRef Name="FuncionarioId" />
+            <PropertyRef Name="TipoNotificacionId" />
+            <PropertyRef Name="EstadoId" />
+            <PropertyRef Name="NombreFuncionario" />
+            <PropertyRef Name="CI" />
+            <PropertyRef Name="TipoNotificacion" />
+            <PropertyRef Name="Estado" />
+            <PropertyRef Name="FechaProgramada" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" />
+          <Property Name="FuncionarioId" Type="Int32" Nullable="false" />
+          <Property Name="TipoNotificacionId" Type="Byte" Nullable="false" />
+          <Property Name="EstadoId" Type="Byte" Nullable="false" />
+          <Property Name="NombreFuncionario" Type="String" Nullable="false" MaxLength="60" FixedLength="false" Unicode="true" />
+          <Property Name="CI" Type="String" Nullable="false" MaxLength="8" FixedLength="true" Unicode="false" />
+          <Property Name="TipoNotificacion" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="Estado" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="true" />
+          <Property Name="FechaProgramada" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="Texto" Type="String" MaxLength="1200" FixedLength="false" Unicode="true" />
+          <Property Name="Documento" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="ExpMinisterial" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ExpINR" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Oficina" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="vw_NovedadesCompletas">
+          <Key>
+            <PropertyRef Name="Id" />
+            <PropertyRef Name="NovedadGeneradaId" />
+            <PropertyRef Name="Fecha" />
+            <PropertyRef Name="Texto" />
+            <PropertyRef Name="NombreFuncionario" />
+            <PropertyRef Name="CI" />
+            <PropertyRef Name="Estado" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" />
+          <Property Name="NovedadGeneradaId" Type="Int32" Nullable="false" />
+          <Property Name="Fecha" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="Texto" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="EstadoId" Type="Byte" />
+          <Property Name="FuncionarioId" Type="Int32" />
+          <Property Name="NombreFuncionario" Type="String" Nullable="false" MaxLength="60" FixedLength="false" Unicode="true" />
+          <Property Name="CI" Type="String" Nullable="false" MaxLength="8" FixedLength="true" Unicode="false" />
+          <Property Name="Estado" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="vw_EstadosTransitoriosCompletos">
+          <Key>
+            <PropertyRef Name="Id" />
+            <PropertyRef Name="FuncionarioId" />
+            <PropertyRef Name="TipoEstadoTransitorioId" />
+            <PropertyRef Name="CI" />
+            <PropertyRef Name="NombreFuncionario" />
+            <PropertyRef Name="TipoEstadoNombre" />
+            <PropertyRef Name="FechaDesde" />
+            <PropertyRef Name="CreatedAt" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" />
+          <Property Name="FuncionarioId" Type="Int32" Nullable="false" />
+          <Property Name="TipoEstadoTransitorioId" Type="Int32" Nullable="false" />
+          <Property Name="CI" Type="String" Nullable="false" MaxLength="8" FixedLength="true" Unicode="false" />
+          <Property Name="NombreFuncionario" Type="String" Nullable="false" MaxLength="60" FixedLength="false" Unicode="true" />
+          <Property Name="TipoEstadoNombre" Type="String" Nullable="false" MaxLength="60" FixedLength="false" Unicode="true" />
+          <Property Name="FechaDesde" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="FechaHasta" Type="DateTime" Precision="0" />
+          <Property Name="Observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="UpdatedAt" Type="DateTime" Precision="7" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -3411,6 +3669,75 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_FuncionarioEstadosConsolidados' 
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="vw_LicenciasCompletas">
+            <EntityTypeMapping TypeName="ApexModel.vw_LicenciasCompletas">
+              <MappingFragment StoreEntitySet="vw_LicenciasCompletas">
+                <ScalarProperty Name="Comentario" ColumnName="Comentario" />
+                <ScalarProperty Name="Estado" ColumnName="Estado" />
+                <ScalarProperty Name="FechaFin" ColumnName="FechaFin" />
+                <ScalarProperty Name="FechaInicio" ColumnName="FechaInicio" />
+                <ScalarProperty Name="TipoLicencia" ColumnName="TipoLicencia" />
+                <ScalarProperty Name="NombreFuncionario" ColumnName="NombreFuncionario" />
+                <ScalarProperty Name="CI" ColumnName="CI" />
+                <ScalarProperty Name="TipoLicenciaId" ColumnName="TipoLicenciaId" />
+                <ScalarProperty Name="FuncionarioId" ColumnName="FuncionarioId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vw_NotificacionesCompletas">
+            <EntityTypeMapping TypeName="ApexModel.vw_NotificacionesCompletas">
+              <MappingFragment StoreEntitySet="vw_NotificacionesCompletas">
+                <ScalarProperty Name="Oficina" ColumnName="Oficina" />
+                <ScalarProperty Name="ExpINR" ColumnName="ExpINR" />
+                <ScalarProperty Name="ExpMinisterial" ColumnName="ExpMinisterial" />
+                <ScalarProperty Name="Documento" ColumnName="Documento" />
+                <ScalarProperty Name="Texto" ColumnName="Texto" />
+                <ScalarProperty Name="FechaProgramada" ColumnName="FechaProgramada" />
+                <ScalarProperty Name="Estado" ColumnName="Estado" />
+                <ScalarProperty Name="TipoNotificacion" ColumnName="TipoNotificacion" />
+                <ScalarProperty Name="CI" ColumnName="CI" />
+                <ScalarProperty Name="NombreFuncionario" ColumnName="NombreFuncionario" />
+                <ScalarProperty Name="EstadoId" ColumnName="EstadoId" />
+                <ScalarProperty Name="TipoNotificacionId" ColumnName="TipoNotificacionId" />
+                <ScalarProperty Name="FuncionarioId" ColumnName="FuncionarioId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vw_NovedadesCompletas">
+            <EntityTypeMapping TypeName="ApexModel.vw_NovedadesCompletas">
+              <MappingFragment StoreEntitySet="vw_NovedadesCompletas">
+                <ScalarProperty Name="Estado" ColumnName="Estado" />
+                <ScalarProperty Name="CI" ColumnName="CI" />
+                <ScalarProperty Name="NombreFuncionario" ColumnName="NombreFuncionario" />
+                <ScalarProperty Name="FuncionarioId" ColumnName="FuncionarioId" />
+                <ScalarProperty Name="EstadoId" ColumnName="EstadoId" />
+                <ScalarProperty Name="Texto" ColumnName="Texto" />
+                <ScalarProperty Name="Fecha" ColumnName="Fecha" />
+                <ScalarProperty Name="NovedadGeneradaId" ColumnName="NovedadGeneradaId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vw_EstadosTransitoriosCompletos">
+            <EntityTypeMapping TypeName="ApexModel.vw_EstadosTransitoriosCompletos">
+              <MappingFragment StoreEntitySet="vw_EstadosTransitoriosCompletos">
+                <ScalarProperty Name="UpdatedAt" ColumnName="UpdatedAt" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="Observaciones" ColumnName="Observaciones" />
+                <ScalarProperty Name="FechaHasta" ColumnName="FechaHasta" />
+                <ScalarProperty Name="FechaDesde" ColumnName="FechaDesde" />
+                <ScalarProperty Name="TipoEstadoNombre" ColumnName="TipoEstadoNombre" />
+                <ScalarProperty Name="NombreFuncionario" ColumnName="NombreFuncionario" />
+                <ScalarProperty Name="CI" ColumnName="CI" />
+                <ScalarProperty Name="TipoEstadoTransitorioId" ColumnName="TipoEstadoTransitorioId" />
+                <ScalarProperty Name="FuncionarioId" ColumnName="FuncionarioId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="usp_MigrarDotacionesCompletas" FunctionName="ApexModel.Store.usp_MigrarDotacionesCompletas" />
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

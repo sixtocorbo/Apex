@@ -73,6 +73,10 @@ Partial Public Class ApexEntities
     Public Overridable Property Turno() As DbSet(Of Turno)
     Public Overridable Property Usuario() As DbSet(Of Usuario)
     Public Overridable Property vw_FuncionarioEstadosConsolidados() As DbSet(Of vw_FuncionarioEstadosConsolidados)
+    Public Overridable Property vw_LicenciasCompletas() As DbSet(Of vw_LicenciasCompletas)
+    Public Overridable Property vw_NotificacionesCompletas() As DbSet(Of vw_NotificacionesCompletas)
+    Public Overridable Property vw_NovedadesCompletas() As DbSet(Of vw_NovedadesCompletas)
+    Public Overridable Property vw_EstadosTransitoriosCompletos() As DbSet(Of vw_EstadosTransitoriosCompletos)
 
     Public Overridable Function usp_CargarHistoricosPolicia() As Integer
         Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_CargarHistoricosPolicia")
@@ -134,6 +138,10 @@ Partial Public Class ApexEntities
 
     Public Overridable Function usp_ProcesarEstadoNotificaciones() As Integer
         Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_ProcesarEstadoNotificaciones")
+    End Function
+
+    Public Overridable Function usp_MigrarDotacionesCompletas() As Integer
+        Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_MigrarDotacionesCompletas")
     End Function
 
 End Class

@@ -28,7 +28,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>89</ApplicationRevision>
+    <ApplicationRevision>90</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -286,19 +286,33 @@
     <Compile Include="Data\Usuario.vb">
       <DependentUpon>ApexModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Data\vw_EstadosTransitoriosCompletos.vb">
+      <DependentUpon>ApexModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Data\vw_FuncionarioEstadosConsolidados.vb">
+      <DependentUpon>ApexModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\vw_LicenciasCompletas.vb">
+      <DependentUpon>ApexModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\vw_NotificacionesCompletas.vb">
+      <DependentUpon>ApexModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\vw_NovedadesCompletas.vb">
       <DependentUpon>ApexModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Services\ChipControl.vb">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Services\ConsultasGenericas.vb" />
+    <Compile Include="Services\EstadoTransitorioService.vb" />
     <Compile Include="Services\LicenciaService.vb" />
     <Compile Include="Services\LoadingHelper.vb" />
     <Compile Include="Services\ModernTheme.vb" />
     <Compile Include="Services\ModernUI.vb" />
     <Compile Include="Services\ModuloExtensions.vb" />
     <Compile Include="Services\NotificacionPersonalService.vb" />
+    <Compile Include="Services\NovedadService.vb" />
     <Compile Include="UI\frmCambiarEstadoNotificacion.Designer.vb">
       <DependentUpon>frmCambiarEstadoNotificacion.vb</DependentUpon>
     </Compile>

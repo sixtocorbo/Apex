@@ -100,6 +100,10 @@
         <AssociationConnector Association="ApexModel.FK_RegimenDetalle_RegimenTrabajo" ManuallyRouted="false" />
         <AssociationConnector Association="ApexModel.FK_Usuario_Rol" ManuallyRouted="false" />
         <EntityTypeShape EntityType="ApexModel.vw_FuncionarioEstadosConsolidados" Width="1.5" PointX="5.375" PointY="3.75" />
+        <EntityTypeShape EntityType="ApexModel.vw_LicenciasCompletas" Width="1.5" PointX="7.375" PointY="3.75" />
+        <EntityTypeShape EntityType="ApexModel.vw_NotificacionesCompletas" Width="1.5" PointX="5.375" PointY="7.75" />
+        <EntityTypeShape EntityType="ApexModel.vw_NovedadesCompletas" Width="1.5" PointX="7.375" PointY="7.75" />
+        <EntityTypeShape EntityType="ApexModel.vw_EstadosTransitoriosCompletos" Width="1.5" PointX="9.375" PointY="0.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

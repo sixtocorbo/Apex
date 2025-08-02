@@ -16,20 +16,18 @@ Public Class frmFuncionarioBuscar
 
     Public Property ResultadosFiltrados As List(Of FuncionarioMin)
 
-    ' Asegurá que dgvResultados esté inicializado y no sea Nothing antes de usarlo
-
     Private Sub frmFuncionarioBuscar_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         ConfigurarGrilla()
     End Sub
 
-    Private Sub frmFuncionarioBuscar_Activated(sender As Object, e As EventArgs) Handles Me.Activated
-        ' Usamos BeginInvoke para asegurarnos de que el foco se establezca
-        ' después de que el formulario esté completamente activo y visible.
-        Me.BeginInvoke(New Action(Sub()
-                                      txtBusqueda.Select()
-                                  End Sub))
+    ' --- CORRECCIÓN APLICADA AQUÍ ---
+    ' Se reemplaza el evento 'Activated' por el evento 'Shown' para garantizar
+    ' que el foco se establezca correctamente la primera vez que el formulario es visible.
+    Private Sub frmFuncionarioBuscar_Shown(sender As Object, e As EventArgs) Handles Me.Shown
+        ' Esta es una forma más directa y robusta de establecer el foco.
+        Me.ActiveControl = txtBusqueda
     End Sub
-    ' --- FIN DEL CÓDIGO AÑADIDO ---
+    ' --- FIN DE LA CORRECCIÓN ---
 
 #Region "Diseño de grilla"
     Private Sub ConfigurarGrilla()
@@ -220,7 +218,7 @@ Public Class frmFuncionarioBuscar
                                  .EstadosTransitoriosActivos = x.EstadoTransitorio.Where(
                                      Function(et) et.FechaDesde <= fechaActual AndAlso
                                                   (Not et.FechaHasta.HasValue OrElse et.FechaHasta.Value >= fechaActual)
-                                 ).Select(Function(et) et.TipoEstadoTransitorio.Nombre).ToList()
+                              ).Select(Function(et) et.TipoEstadoTransitorio.Nombre).ToList()
                              }).FirstOrDefaultAsync()
 
             ' Doble chequeo por si la selección cambió mientras se ejecutaba la consulta
@@ -275,9 +273,9 @@ Public Class frmFuncionarioBuscar
             Dim pFecha = New SqlParameter("@Fecha", fecha.Date)
             Dim lista = Await ctx.Database.SqlQuery(Of PresenciaDTO)(
                 "EXEC dbo.usp_PresenciaFecha_Apex @Fecha", pFecha
-            ).ToListAsync()
+             ).ToListAsync()
             Dim presencia = lista.Where(Function(r) r.FuncionarioId = id).
-                Select(Function(r) r.Resultado).
+            Select(Function(r) r.Resultado).
                              FirstOrDefault()
             Return If(presencia, "-")
         End Using
@@ -306,6 +304,7 @@ Public Class frmFuncionarioBuscar
         Public Property Nombre As String
     End Class
     Public Class PresenciaDTO
+
         Public Property FuncionarioId As Integer
         Public Property Resultado As String
     End Class

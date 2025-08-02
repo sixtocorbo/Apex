@@ -29,6 +29,28 @@ Public Class FuncionarioService
         FirstOrDefaultAsync(Function(f) f.Id = id)
     End Function
 
+    ' --- ¡NUEVO MÉTODO AÑADIDO! ---
+    ''' <summary>
+    ''' Obtiene una lista simplificada de funcionarios para vistas y reportes.
+    ''' </summary>
+    Public Async Function GetFuncionariosParaVistaAsync() As Task(Of List(Of Object))
+        Using uow As New UnitOfWork()
+            Dim query = uow.Repository(Of Funcionario)().GetAll().
+                Select(Function(f) New With {
+                    f.Nombre,
+                    f.CI,
+                    .Cargo = If(f.Cargo IsNot Nothing, f.Cargo.Nombre, "-"),
+                    .TipoFuncionario = If(f.TipoFuncionario IsNot Nothing, f.TipoFuncionario.Nombre, "-"),
+                    f.FechaIngreso,
+                    f.Activo,
+                    .Correo = f.Email
+                })
+            Dim result = Await query.ToListAsync()
+            Return result.Cast(Of Object).ToList()
+        End Using
+    End Function
+
+
     ' --- Métodos para poblar los ComboBox (Catálogos) ---
     Public Async Function ObtenerCargosAsync() As Task(Of List(Of KeyValuePair(Of Integer, String)))
         Dim lista = Await _unitOfWork.Repository(Of Cargo)().GetAll().AsNoTracking().OrderBy(Function(c) c.Nombre).ToListAsync()
@@ -65,10 +87,9 @@ Public Class FuncionarioService
         Return lista.Select(Function(ne) New KeyValuePair(Of Integer, String)(ne.Id, ne.Nombre)).ToList()
     End Function
 
-    ' ✅ NUEVO MÉTODO AÑADIDO
     Public Async Function ObtenerItemsDotacionCompletosAsync() As Task(Of List(Of DotacionItem))
         Return Await _unitOfWork.Repository(Of DotacionItem)().
-            GetAll().
+        GetAll().
             AsNoTracking().
             OrderBy(Function(di) di.Nombre).
             ToListAsync()
@@ -116,7 +137,7 @@ Public Class FuncionarioService
             .CI = f.CI,
             .Nombre = f.Nombre,
             .CargoNombre = If(f.Cargo IsNot Nothing, f.Cargo.Nombre, "N/A"),
-            .Activo = f.Activo
+             .Activo = f.Activo
         }).OrderBy(Function(f) f.Nombre).Take(500).ToListAsync()
 
     End Function
