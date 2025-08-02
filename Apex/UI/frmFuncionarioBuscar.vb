@@ -17,6 +17,7 @@ Public Class frmFuncionarioBuscar
     Public Property ResultadosFiltrados As List(Of FuncionarioMin)
 
     Private Sub frmFuncionarioBuscar_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        AppTheme.Aplicar(Me)
         ConfigurarGrilla()
     End Sub
 

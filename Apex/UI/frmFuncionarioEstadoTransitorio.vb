@@ -11,6 +11,7 @@ Public Class frmFuncionarioEstadoTransitorio
     End Sub
 
     Private Sub frmFuncionarioEstadoTransitorio_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        AppTheme.Aplicar(Me)
         CargarCombos() ' Ya no necesita ser asíncrono
         If Estado IsNot Nothing AndAlso Estado.Id > 0 Then
             ' Modo Edición

@@ -17,6 +17,7 @@ Public Class frmFuncionarioDotacion
     End Sub
 
     Private Async Sub frmFuncionarioDotacion_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        AppTheme.Aplicar(Me)
         Await CargarComboItems()
 
         If Dotacion IsNot Nothing AndAlso Dotacion.Id > 0 Then

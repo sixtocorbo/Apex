@@ -8,6 +8,7 @@ Public Class frmNotificaciones
     Private _listaNotificaciones As List(Of vw_NotificacionesCompletas)
 
     Private Async Sub frmNotificaciones_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        AppTheme.Aplicar(Me)
         _svc = New NotificacionPersonalService()
         ConfigurarGrilla()
         AddHandler dgvNotificaciones.SelectionChanged, AddressOf DgvNotificaciones_SelectionChanged

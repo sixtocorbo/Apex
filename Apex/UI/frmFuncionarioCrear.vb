@@ -43,6 +43,7 @@ Public Class frmFuncionarioCrear
 
     '------------------- Load form --------------------------
     Private Async Sub frmFuncionarioCrear_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        AppTheme.Aplicar(Me)
         _svc = New FuncionarioService()
         Await CargarCombosAsync()
 

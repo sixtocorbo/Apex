@@ -29,6 +29,7 @@ Public Class frmNotificacionCrear
     End Sub
 
     Private Async Sub frmNotificacionCrear_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        AppTheme.Aplicar(Me)
         _svc = New NotificacionPersonalService()
         Await CargarCombosAsync()
 

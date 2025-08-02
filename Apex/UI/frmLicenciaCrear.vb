@@ -27,6 +27,7 @@
     End Sub
 
     Private Async Sub frmLicenciaCrear_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        AppTheme.Aplicar(Me)
         _svc = New LicenciaService()
         Await CargarCombosAsync()
 
