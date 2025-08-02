@@ -54,8 +54,11 @@ Public Class frmFuncionarioEstadoTransitorio
             Return
         End If
 
-        ' Asignamos únicamente el ID. Entity Framework se encargará de la relación.
+        ' --- INICIO DE LA CORRECCIÓN ---
+        ' Asignamos el ID y también el objeto de navegación completo.
         Estado.TipoEstadoTransitorioId = CInt(cboTipoEstado.SelectedValue)
+        Estado.TipoEstadoTransitorio = CType(cboTipoEstado.SelectedItem, TipoEstadoTransitorio)
+        ' --- FIN DE LA CORRECCIÓN ---
 
         Estado.FechaDesde = dtpFechaDesde.Value.Date
         Estado.FechaHasta = If(chkFechaHasta.Checked, CType(Nothing, Date?), dtpFechaHasta.Value.Date)

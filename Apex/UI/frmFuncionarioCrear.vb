@@ -14,124 +14,216 @@ End Enum
 Public Class frmFuncionarioCrear
     Inherits Form
 
-    '-------------------- Variables --------------------------
+    ' --- Variables de la clase ---
+    Private _uow As UnitOfWork
+    Private _funcionario As Funcionario
     Private _svc As FuncionarioService
     Private _modo As ModoFormulario
     Private _idFuncionario As Integer
-    Private _fotoOriginal As Byte()
     Private _rutaFotoSeleccionada As String
-
-    ' --- Colecciones para manejar los datos en el formulario ---
+    Private _tiposEstadoTransitorio As List(Of TipoEstadoTransitorio)
     Private _dotaciones As BindingList(Of FuncionarioDotacion)
     Private _estadosTransitorios As BindingList(Of EstadoTransitorio)
-    Private _tiposEstadoTransitorio As List(Of TipoEstadoTransitorio)
-
+    Private _historialConsolidado As List(Of Object)
 
     '-------------------- Constructores ----------------------
     Public Sub New()
         InitializeComponent()
         _modo = ModoFormulario.Crear
-        _dotaciones = New BindingList(Of FuncionarioDotacion)()
-        _estadosTransitorios = New BindingList(Of EstadoTransitorio)()
+        _uow = New UnitOfWork()
+        _funcionario = New Funcionario() With {.FechaIngreso = DateTime.Now}
+        _uow.Context.Set(Of Funcionario).Add(_funcionario)
     End Sub
 
     Public Sub New(id As Integer)
-        Me.New()
+        InitializeComponent()
         _modo = ModoFormulario.Editar
         _idFuncionario = id
+        _uow = New UnitOfWork()
+        _funcionario = _uow.Context.Set(Of Funcionario)().
+                        Include(Function(f) f.FuncionarioDotacion.Select(Function(fd) fd.DotacionItem)).
+                        Include(Function(f) f.EstadoTransitorio.Select(Function(et) et.TipoEstadoTransitorio)).
+                        FirstOrDefault(Function(f) f.Id = id)
     End Sub
 
-    '------------------- Load form --------------------------
+    '------------------- Carga del Formulario --------------------------
     Private Async Sub frmFuncionarioCrear_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        AppTheme.Aplicar(Me)
-        _svc = New FuncionarioService()
+        _svc = New FuncionarioService(_uow)
         Await CargarCombosAsync()
 
         _tiposEstadoTransitorio = Await _svc.ObtenerTiposEstadoTransitorioCompletosAsync()
 
+        If _funcionario Is Nothing AndAlso _modo = ModoFormulario.Editar Then
+            MessageBox.Show("No se encontró el registro del funcionario.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Close()
+            Return
+        End If
+
+        _dotaciones = New BindingList(Of FuncionarioDotacion)(_funcionario.FuncionarioDotacion.ToList())
+        _estadosTransitorios = New BindingList(Of EstadoTransitorio)(_funcionario.EstadoTransitorio.ToList())
+
         ConfigurarGrillaDotacion()
         ConfigurarGrillaEstados()
+
         dgvDotacion.DataSource = _dotaciones
         dgvEstadosTransitorios.DataSource = _estadosTransitorios
 
-        ' --- Añadir manejadores de eventos para formateo manual ---
         AddHandler dgvDotacion.CellFormatting, AddressOf dgvDotacion_CellFormatting
         AddHandler chkVerHistorial.CheckedChanged, AddressOf chkVerHistorial_CheckedChanged
         AddHandler dgvEstadosTransitorios.CellFormatting, AddressOf dgvEstadosTransitorios_CellFormatting
-
+        AddHandler dgvEstadosTransitorios.SelectionChanged, AddressOf DgvEstadosTransitorios_SelectionChanged
 
         If _modo = ModoFormulario.Editar Then
             Me.Text = "Editar Funcionario"
             btnGuardar.Text = "Actualizar"
-            Await CargarDatosAsync()
+            CargarDatosEnControles()
         Else
             Me.Text = "Nuevo Funcionario"
             btnGuardar.Text = "Guardar"
             pbFoto.Image = My.Resources.Police
         End If
     End Sub
-    Private Sub ConfigurarGrillaDotacion()
-        With dgvDotacion
-            .AutoGenerateColumns = False
-            .Columns.Clear()
 
-            .Columns.Add(New DataGridViewTextBoxColumn With {
-                .DataPropertyName = "Id",
-                .Visible = False
-            })
+    Private Sub CargarDatosEnControles()
+        txtCI.Text = _funcionario.CI
+        txtNombre.Text = _funcionario.Nombre
+        dtpFechaIngreso.Value = _funcionario.FechaIngreso
+        cboTipoFuncionario.SelectedValue = CInt(_funcionario.TipoFuncionarioId)
+        cboCargo.SelectedValue = If(_funcionario.CargoId.HasValue, CInt(_funcionario.CargoId), -1)
+        chkActivo.Checked = _funcionario.Activo
+        cboEscalafon.SelectedValue = If(_funcionario.EscalafonId.HasValue, CInt(_funcionario.EscalafonId), -1)
+        cboFuncion.SelectedValue = If(_funcionario.FuncionId.HasValue, CInt(_funcionario.FuncionId), -1)
 
-            .Columns.Add(New DataGridViewTextBoxColumn With {
-               .Name = "colItem",
-               .HeaderText = "Ítem",
-               .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-           })
-            .Columns.Add(New DataGridViewTextBoxColumn With {
-                .DataPropertyName = "Talla",
-                .HeaderText = "Talla"
-            })
-            .Columns.Add(New DataGridViewTextBoxColumn With {
-                .DataPropertyName = "Observaciones",
-                .HeaderText = "Observaciones",
-                .Width = 200
-            })
-            .Columns.Add(New DataGridViewTextBoxColumn With {
-                 .DataPropertyName = "FechaAsign",
-                .HeaderText = "Fecha Asignación",
-                .DefaultCellStyle = New DataGridViewCellStyle With {.Format = "dd/MM/yyyy"}
-            })
-        End With
+        If _funcionario.Foto IsNot Nothing AndAlso _funcionario.Foto.Length > 0 Then
+            pbFoto.Image = New Bitmap(New MemoryStream(_funcionario.Foto))
+        Else
+            pbFoto.Image = My.Resources.Police
+        End If
+
+        dtpFechaNacimiento.Value = If(_funcionario.FechaNacimiento.HasValue, _funcionario.FechaNacimiento.Value, dtpFechaNacimiento.MinDate)
+        txtDomicilio.Text = _funcionario.Domicilio
+        txtEmail.Text = _funcionario.Email
+        cboEstadoCivil.SelectedValue = If(_funcionario.EstadoCivilId.HasValue, CInt(_funcionario.EstadoCivilId), -1)
+        cboGenero.SelectedValue = If(_funcionario.GeneroId.HasValue, CInt(_funcionario.GeneroId), -1)
+        cboNivelEstudio.SelectedValue = If(_funcionario.NivelEstudioId.HasValue, CInt(_funcionario.NivelEstudioId), -1)
     End Sub
 
-    Private Sub ConfigurarGrillaEstados()
-        With dgvEstadosTransitorios
-            .AutoGenerateColumns = False
-            .Columns.Clear()
-            .Columns.Add(New DataGridViewTextBoxColumn With {
-                .Name = "TipoEstado",
-                .HeaderText = "Tipo de Estado",
-                .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-            })
-            .Columns.Add(New DataGridViewTextBoxColumn With {
-                .Name = "FechaDesde",
-                .DataPropertyName = "FechaDesde",
-                .HeaderText = "Desde",
-                .DefaultCellStyle = New DataGridViewCellStyle With {.Format = "dd/MM/yyyy"}
-            })
-            .Columns.Add(New DataGridViewTextBoxColumn With {
-                .Name = "FechaHasta",
-                .DataPropertyName = "FechaHasta",
-                .HeaderText = "Hasta",
-                .DefaultCellStyle = New DataGridViewCellStyle With {.Format = "dd/MM/yyyy"}
-            })
-            .Columns.Add(New DataGridViewTextBoxColumn With {
-                .Name = "Observaciones",
-                .DataPropertyName = "Observaciones",
-                .HeaderText = "Observaciones",
-                .Width = 300
-            })
-        End With
+    Private Async Sub chkVerHistorial_CheckedChanged(sender As Object, e As EventArgs)
+        If chkVerHistorial.Checked Then
+            Await CargarHistorialCompleto()
+        Else
+            dgvEstadosTransitorios.DataSource = _estadosTransitorios
+        End If
+        DgvEstadosTransitorios_SelectionChanged(Nothing, EventArgs.Empty)
     End Sub
 
+    Private Async Function CargarHistorialCompleto() As Task
+        LoadingHelper.MostrarCargando(Me)
+        Try
+            Dim repo = _uow.Repository(Of vw_FuncionarioEstadosConsolidados)()
+            Dim historial = Await repo.GetAll().
+                                    Where(Function(h) h.FuncionarioId = _idFuncionario).
+                                    OrderByDescending(Function(h) h.FechaDesde).
+                                    ToListAsync()
+
+            _historialConsolidado = historial.Select(Function(h) New With {
+                .Id = h.Id,
+                .Origen = h.Origen,
+                .TipoEstado = h.TipoEstadoNombre,
+                .FechaDesde = h.FechaDesde,
+                .FechaHasta = h.FechaHasta,
+                .Observaciones = h.Observaciones
+            }).Cast(Of Object).ToList()
+
+            dgvEstadosTransitorios.DataSource = _historialConsolidado
+        Finally
+            LoadingHelper.OcultarCargando(Me)
+        End Try
+    End Function
+
+    Private Sub DgvEstadosTransitorios_SelectionChanged(sender As Object, e As EventArgs)
+        Dim editable = False
+        If dgvEstadosTransitorios.CurrentRow Is Nothing Then
+            btnEditarEstado.Enabled = False
+            btnQuitarEstado.Enabled = False
+            Return
+        End If
+
+        If Not chkVerHistorial.Checked Then
+            editable = True
+        Else
+            Dim itemSeleccionado = dgvEstadosTransitorios.CurrentRow.DataBoundItem
+            If itemSeleccionado IsNot Nothing Then
+                Dim origen = itemSeleccionado.GetType().GetProperty("Origen").GetValue(itemSeleccionado, Nothing)?.ToString()
+                editable = (origen = "Estado")
+            End If
+        End If
+
+        btnAñadirEstado.Enabled = Not chkVerHistorial.Checked
+        btnEditarEstado.Enabled = editable
+        btnQuitarEstado.Enabled = editable
+    End Sub
+
+    Private Async Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
+        Try
+            If String.IsNullOrWhiteSpace(txtCI.Text) OrElse String.IsNullOrWhiteSpace(txtNombre.Text) OrElse cboTipoFuncionario.SelectedIndex = -1 Then
+                MessageBox.Show("Los campos CI, Nombre y Tipo de Funcionario son obligatorios.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                Return
+            End If
+
+            _funcionario.CI = txtCI.Text.Trim()
+            _funcionario.Nombre = txtNombre.Text.Trim()
+            _funcionario.FechaIngreso = dtpFechaIngreso.Value.Date
+            _funcionario.TipoFuncionarioId = CInt(cboTipoFuncionario.SelectedValue)
+            _funcionario.CargoId = If(cboCargo.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboCargo.SelectedValue))
+            _funcionario.Activo = chkActivo.Checked
+            _funcionario.EscalafonId = If(cboEscalafon.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboEscalafon.SelectedValue))
+            _funcionario.FuncionId = If(cboFuncion.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboFuncion.SelectedValue))
+            _funcionario.FechaNacimiento = If(dtpFechaNacimiento.Value = dtpFechaNacimiento.MinDate, CType(Nothing, Date?), dtpFechaNacimiento.Value.Date)
+            _funcionario.Domicilio = txtDomicilio.Text.Trim()
+            _funcionario.Email = txtEmail.Text.Trim()
+            _funcionario.EstadoCivilId = If(cboEstadoCivil.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboEstadoCivil.SelectedValue))
+            _funcionario.GeneroId = If(cboGenero.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboGenero.SelectedValue))
+            _funcionario.NivelEstudioId = If(cboNivelEstudio.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboNivelEstudio.SelectedValue))
+
+            If Not String.IsNullOrWhiteSpace(_rutaFotoSeleccionada) Then
+                _funcionario.Foto = File.ReadAllBytes(_rutaFotoSeleccionada)
+            End If
+
+            If _modo = ModoFormulario.Crear Then
+                _funcionario.CreatedAt = DateTime.Now
+            Else
+                _funcionario.UpdatedAt = DateTime.Now
+            End If
+
+            SincronizarColeccion(_funcionario.FuncionarioDotacion, _dotaciones)
+            SincronizarColeccion(_funcionario.EstadoTransitorio, _estadosTransitorios)
+
+            Await _uow.CommitAsync()
+            MessageBox.Show(If(_modo = ModoFormulario.Crear, "Funcionario creado", "Funcionario actualizado") & " correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
+
+            DialogResult = DialogResult.OK
+            Close()
+
+        Catch ex As Exception
+            MessageBox.Show("Ocurrió un error al guardar: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
+
+    Private Sub SincronizarColeccion(Of T As Class)(dbCollection As ICollection(Of T), formCollection As BindingList(Of T))
+        Dim itemsParaBorrar = dbCollection.Except(formCollection).ToList()
+        For Each item In itemsParaBorrar
+            dbCollection.Remove(item)
+        Next
+
+        Dim itemsParaAnadir = formCollection.Except(dbCollection).ToList()
+        For Each item In itemsParaAnadir
+            dbCollection.Add(item)
+        Next
+    End Sub
+
+
+#Region "Métodos Auxiliares y de UI"
     Private Async Function CargarCombosAsync() As Task
         cboTipoFuncionario.DataSource = Await _svc.ObtenerTiposFuncionarioAsync()
         cboTipoFuncionario.DisplayMember = "Value"
@@ -162,171 +254,67 @@ Public Class frmFuncionarioCrear
         cboNivelEstudio.SelectedIndex = -1
     End Function
 
-    Private Async Function CargarDatosAsync() As Task
-        Dim f = Await _svc.GetByIdCompletoAsync(_idFuncionario)
-        If f Is Nothing Then
-            MessageBox.Show("No se encontró el registro del funcionario.")
-            Close()
-            Return
-        End If
+    Private Sub ConfigurarGrillaDotacion()
+        With dgvDotacion
+            .AutoGenerateColumns = False
+            .Columns.Clear()
+            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Id", .Visible = False})
+            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "colItem", .HeaderText = "Ítem", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
+            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Talla", .HeaderText = "Talla"})
+            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Observaciones", .HeaderText = "Observaciones", .Width = 200})
+            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "FechaAsign", .HeaderText = "Fecha Asignación", .DefaultCellStyle = New DataGridViewCellStyle With {.Format = "dd/MM/yyyy"}})
+        End With
+    End Sub
 
-        ' (Carga de datos de funcionario se mantiene igual...)
-        txtCI.Text = f.CI
-        txtNombre.Text = f.Nombre
-        dtpFechaIngreso.Value = f.FechaIngreso
-        cboTipoFuncionario.SelectedValue = CInt(f.TipoFuncionarioId)
-        cboCargo.SelectedValue = If(f.CargoId.HasValue, CInt(f.CargoId), -1)
-        chkActivo.Checked = f.Activo
-        cboEscalafon.SelectedValue = If(f.EscalafonId.HasValue, CInt(f.EscalafonId), -1)
-        cboFuncion.SelectedValue = If(f.FuncionId.HasValue, CInt(f.FuncionId), -1)
-        _fotoOriginal = f.Foto
-        If _fotoOriginal IsNot Nothing AndAlso _fotoOriginal.Length > 0 Then
-            pbFoto.Image = New Bitmap(New MemoryStream(_fotoOriginal))
+    Private Sub ConfigurarGrillaEstados()
+        With dgvEstadosTransitorios
+            .AutoGenerateColumns = False
+            .Columns.Clear()
+            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "TipoEstado", .DataPropertyName = "TipoEstado", .HeaderText = "Tipo de Estado", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
+            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "FechaDesde", .DataPropertyName = "FechaDesde", .HeaderText = "Desde", .DefaultCellStyle = New DataGridViewCellStyle With {.Format = "dd/MM/yyyy"}})
+            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "FechaHasta", .DataPropertyName = "FechaHasta", .HeaderText = "Hasta", .DefaultCellStyle = New DataGridViewCellStyle With {.Format = "dd/MM/yyyy"}})
+            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Observaciones", .DataPropertyName = "Observaciones", .HeaderText = "Observaciones", .Width = 300})
+        End With
+    End Sub
+
+    Private Sub dgvDotacion_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
+        If e.RowIndex < 0 OrElse e.ColumnIndex < 0 Then Return
+        Dim dgv = CType(sender, DataGridView)
+        Dim colName = dgv.Columns(e.ColumnIndex).Name
+        If colName = "colItem" Then
+            Dim dotacion = TryCast(dgv.Rows(e.RowIndex).DataBoundItem, FuncionarioDotacion)
+            If dotacion IsNot Nothing AndAlso dotacion.DotacionItem IsNot Nothing Then
+                e.Value = dotacion.DotacionItem.Nombre
+                e.FormattingApplied = True
+            End If
+        End If
+    End Sub
+
+    Private Sub dgvEstadosTransitorios_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
+        If e.RowIndex < 0 OrElse e.ColumnIndex < 0 Then Return
+        Dim dgv = CType(sender, DataGridView)
+        Dim colName = dgv.Columns(e.ColumnIndex).Name
+
+        If chkVerHistorial.Checked Then
+            ' No se necesita formateo especial, los datos vienen de la vista
         Else
-            pbFoto.Image = My.Resources.Police
+            ' Formateo para el modo edición (entidad EstadoTransitorio)
+            Dim estado = TryCast(dgv.Rows(e.RowIndex).DataBoundItem, EstadoTransitorio)
+            If estado Is Nothing Then Return
+            If colName = "TipoEstado" Then
+                If estado.TipoEstadoTransitorio IsNot Nothing Then
+                    e.Value = estado.TipoEstadoTransitorio.Nombre
+                    e.FormattingApplied = True
+                End If
+            End If
         End If
-        dtpFechaNacimiento.Value = If(f.FechaNacimiento.HasValue, f.FechaNacimiento.Value, dtpFechaNacimiento.MinDate)
-        txtDomicilio.Text = f.Domicilio
-        txtEmail.Text = f.Email
-        cboEstadoCivil.SelectedValue = If(f.EstadoCivilId.HasValue, CInt(f.EstadoCivilId), -1)
-        cboGenero.SelectedValue = If(f.GeneroId.HasValue, CInt(f.GeneroId), -1)
-        cboNivelEstudio.SelectedValue = If(f.NivelEstudioId.HasValue, CInt(f.NivelEstudioId), -1)
 
-        _dotaciones = New BindingList(Of FuncionarioDotacion)(f.FuncionarioDotacion.ToList())
-        dgvDotacion.DataSource = _dotaciones
-
-        ' Llama al nuevo método para poblar la grilla de estados
-        Await PoblarGrillaEstados()
-    End Function
-    Private Async Sub chkVerHistorial_CheckedChanged(sender As Object, e As EventArgs)
-        ' Cuando el checkbox cambia, vuelve a poblar la grilla con el filtro correspondiente
-        Await PoblarGrillaEstados()
-    End Sub
-
-    Private Async Function PoblarGrillaEstados() As Task
-        Using uow As New UnitOfWork()
-            Dim fechaActual = Date.Today
-            Dim verTodo = chkVerHistorial.Checked
-
-            Dim query = "SELECT * FROM vw_FuncionarioEstadosConsolidados WHERE FuncionarioId = @p0"
-
-            ' Si el checkbox no está marcado, se aplica el filtro de fecha
-            If Not verTodo Then
-                query &= " AND (FechaHasta IS NULL OR FechaHasta >= @p1)"
+        If colName = "FechaHasta" Then
+            If e.Value Is Nothing OrElse (TypeOf e.Value Is Date AndAlso CDate(e.Value) = Date.MinValue) Then
+                e.Value = String.Empty
+                e.FormattingApplied = True
             End If
-
-            query &= " ORDER BY FechaDesde DESC"
-
-            Dim params As New List(Of Object) From {_idFuncionario}
-            If Not verTodo Then
-                params.Add(fechaActual)
-            End If
-
-            Dim estadosConsolidados = Await uow.Context.Database.SqlQuery(Of EstadoConsolidadoDTO)(
-                query, params.ToArray()
-            ).ToListAsync()
-
-            _estadosTransitorios = New BindingList(Of EstadoTransitorio)(
-                estadosConsolidados.Select(Function(dto) New EstadoTransitorio With {
-                    .Id = dto.Id,
-                    .FuncionarioId = dto.FuncionarioId,
-                    .TipoEstadoTransitorioId = dto.TipoEstadoTransitorioId,
-                    .TipoEstadoTransitorio = _tiposEstadoTransitorio.FirstOrDefault(Function(t) t.Id = dto.TipoEstadoTransitorioId),
-                    .FechaDesde = dto.FechaDesde,
-                    .FechaHasta = dto.FechaHasta,
-                    .Observaciones = dto.Observaciones
-                }).ToList()
-            )
-
-            dgvEstadosTransitorios.DataSource = _estadosTransitorios
-        End Using
-    End Function
-
-    Private Async Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
-        Try
-            If String.IsNullOrWhiteSpace(txtCI.Text) OrElse String.IsNullOrWhiteSpace(txtNombre.Text) OrElse cboTipoFuncionario.SelectedIndex = -1 Then
-                MessageBox.Show("Los campos CI, Nombre y Tipo de Funcionario son obligatorios.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-                Return
-            End If
-            If dtpFechaIngreso.Value > DateTime.Now Then
-                MessageBox.Show("La fecha de ingreso no puede ser futura.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-                Return
-            End If
-            Using uow As New UnitOfWork()
-                Dim funcionario As Funcionario
-                If _modo = ModoFormulario.Crear Then
-                    funcionario = New Funcionario()
-                    funcionario.CreatedAt = DateTime.Now
-                    uow.Repository(Of Funcionario).Add(funcionario)
-                Else
-                    funcionario = Await uow.Context.Set(Of Funcionario)().Include(Function(f) f.FuncionarioDotacion.Select(Function(fd) fd.DotacionItem)).Include(Function(f) f.EstadoTransitorio.Select(Function(et) et.TipoEstadoTransitorio)).FirstOrDefaultAsync(Function(f) f.Id = _idFuncionario)
-                    If funcionario Is Nothing Then
-                        MessageBox.Show("No se pudo encontrar el funcionario para actualizar.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                        Return
-                    End If
-                    funcionario.UpdatedAt = DateTime.Now
-                End If
-                funcionario.CI = txtCI.Text.Trim()
-                funcionario.Nombre = txtNombre.Text.Trim()
-                funcionario.FechaIngreso = dtpFechaIngreso.Value.Date
-                funcionario.TipoFuncionarioId = CInt(cboTipoFuncionario.SelectedValue)
-                funcionario.CargoId = If(cboCargo.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboCargo.SelectedValue))
-                funcionario.Activo = chkActivo.Checked
-                funcionario.EscalafonId = If(cboEscalafon.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboEscalafon.SelectedValue))
-                funcionario.FuncionId = If(cboFuncion.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboFuncion.SelectedValue))
-                funcionario.FechaNacimiento = If(dtpFechaNacimiento.Value = dtpFechaNacimiento.MinDate, CType(Nothing, Date?), dtpFechaNacimiento.Value.Date)
-                funcionario.Domicilio = txtDomicilio.Text.Trim()
-                funcionario.Email = txtEmail.Text.Trim()
-                funcionario.EstadoCivilId = If(cboEstadoCivil.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboEstadoCivil.SelectedValue))
-                funcionario.GeneroId = If(cboGenero.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboGenero.SelectedValue))
-                funcionario.NivelEstudioId = If(cboNivelEstudio.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboNivelEstudio.SelectedValue))
-                If Not String.IsNullOrWhiteSpace(_rutaFotoSeleccionada) Then
-                    funcionario.Foto = File.ReadAllBytes(_rutaFotoSeleccionada)
-                End If
-                ' --- Sincronizar colecciones ---
-                SincronizarDotaciones(funcionario.FuncionarioDotacion, _dotaciones, uow.Context)
-                SincronizarColeccion(funcionario.EstadoTransitorio, _estadosTransitorios, uow.Context)
-                Await uow.CommitAsync()
-                MessageBox.Show(If(_modo = ModoFormulario.Crear, "Funcionario creado", "Funcionario actualizado") & " correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
-            End Using
-            DialogResult = DialogResult.OK
-            Close()
-        Catch ex As Exception
-            MessageBox.Show("Ocurrió un error al guardar: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-        End Try
-    End Sub
-
-    Private Sub SincronizarColeccion(Of T As {Class, New})(dbCollection As ICollection(Of T), formCollection As BindingList(Of T), ctx As DbContext)
-        Dim itemsParaBorrar = dbCollection.Where(Function(dbItem)
-                                                     Dim dbId = CInt(dbItem.GetType().GetProperty("Id").GetValue(dbItem))
-                                                     Return dbId > 0 AndAlso Not formCollection.Any(Function(formItem) CInt(formItem.GetType().GetProperty("Id").GetValue(formItem)) = dbId)
-                                                 End Function).ToList()
-        For Each item In itemsParaBorrar
-            ctx.Entry(item).State = EntityState.Deleted
-        Next
-        For Each itemForm In formCollection
-            Dim id = CInt(itemForm.GetType().GetProperty("Id").GetValue(itemForm))
-            If id = 0 Then
-                If GetType(T) Is GetType(FuncionarioDotacion) Then
-                    Dim dotacion = CType(CType(itemForm, Object), FuncionarioDotacion)
-                    If dotacion.DotacionItem IsNot Nothing AndAlso dotacion.DotacionItem.Id > 0 Then
-                        ctx.Entry(dotacion.DotacionItem).State = EntityState.Unchanged
-                    End If
-                End If
-                If GetType(T) Is GetType(EstadoTransitorio) Then
-                    Dim estado = CType(CType(itemForm, Object), EstadoTransitorio)
-                    If estado.TipoEstadoTransitorio IsNot Nothing Then
-                        ctx.Entry(estado.TipoEstadoTransitorio).State = EntityState.Unchanged
-                    End If
-                End If
-                dbCollection.Add(itemForm)
-            Else
-                Dim itemInDb = dbCollection.FirstOrDefault(Function(x) CInt(x.GetType().GetProperty("Id").GetValue(x)) = id)
-                If itemInDb IsNot Nothing Then
-                    ctx.Entry(itemInDb).CurrentValues.SetValues(itemForm)
-                End If
-            End If
-        Next
+        End If
     End Sub
 
     Private Sub btnCancelar_Click(sender As Object, e As EventArgs) Handles btnCancelar.Click
@@ -342,26 +330,14 @@ Public Class frmFuncionarioCrear
             End If
         End Using
     End Sub
+#End Region
 
 #Region "CRUD Dotación"
     Private Sub btnAñadirDotacion_Click(sender As Object, e As EventArgs) Handles btnAñadirDotacion.Click
         Dim nuevaDotacion = New FuncionarioDotacion()
         Using frm As New frmFuncionarioDotacion(nuevaDotacion)
             If frm.ShowDialog() = DialogResult.OK Then
-                Dim existe = _dotaciones.Any(Function(d)
-                                                 Return d.DotacionItemId = frm.Dotacion.DotacionItemId AndAlso
-                                                        String.Equals(d.Talla, frm.Dotacion.Talla, StringComparison.OrdinalIgnoreCase) AndAlso
-                                                        String.Equals(d.Observaciones, frm.Dotacion.Observaciones, StringComparison.OrdinalIgnoreCase)
-                                             End Function)
-
-                If existe Then
-                    MessageBox.Show("Esta combinación de ítem, talla y observaciones ya ha sido añadida.", "Registro Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-                    Return
-                End If
-
-                frm.Dotacion.DotacionItem = frm.ItemSeleccionado
                 _dotaciones.Add(frm.Dotacion)
-                _dotaciones.ResetBindings()
             End If
         End Using
     End Sub
@@ -371,7 +347,6 @@ Public Class frmFuncionarioCrear
         Dim dotacionSeleccionada = CType(dgvDotacion.CurrentRow.DataBoundItem, FuncionarioDotacion)
         Using frm As New frmFuncionarioDotacion(dotacionSeleccionada)
             If frm.ShowDialog() = DialogResult.OK Then
-                dotacionSeleccionada.DotacionItem = frm.ItemSeleccionado
                 _dotaciones.ResetBindings()
             End If
         End Using
@@ -391,28 +366,32 @@ Public Class frmFuncionarioCrear
         Dim nuevoEstado = New EstadoTransitorio()
         Using frm As New frmFuncionarioEstadoTransitorio(nuevoEstado, _tiposEstadoTransitorio)
             If frm.ShowDialog() = DialogResult.OK Then
-                Dim tipoSeleccionado = _tiposEstadoTransitorio.FirstOrDefault(Function(t) t.Id = nuevoEstado.TipoEstadoTransitorioId)
-                If tipoSeleccionado IsNot Nothing Then
-                    nuevoEstado.TipoEstadoTransitorio = tipoSeleccionado
-                End If
                 _estadosTransitorios.Add(nuevoEstado)
-                _estadosTransitorios.ResetBindings()
             End If
         End Using
     End Sub
 
     Private Sub btnEditarEstado_Click(sender As Object, e As EventArgs) Handles btnEditarEstado.Click
         If dgvEstadosTransitorios.CurrentRow Is Nothing Then Return
-        Dim estadoSeleccionado = CType(dgvEstadosTransitorios.CurrentRow.DataBoundItem, EstadoTransitorio)
 
-        ' --- LÓGICA DE PROTECCIÓN ---
-        If estadoSeleccionado.Id < 0 Then ' Los ID de licencia son negativos en la vista
-            MessageBox.Show("Las licencias no se pueden editar desde esta pantalla. Deben gestionarse desde el módulo de licencias.", "Acción no permitida", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        Dim estadoParaEditar As EstadoTransitorio = Nothing
+
+        If chkVerHistorial.Checked Then
+            ' Modo historial: Buscamos el estado en la lista original por su ID
+            Dim itemSeleccionado = dgvEstadosTransitorios.CurrentRow.DataBoundItem
+            Dim id = CInt(itemSeleccionado.GetType().GetProperty("Id").GetValue(itemSeleccionado, Nothing))
+            estadoParaEditar = _estadosTransitorios.FirstOrDefault(Function(et) et.Id = id)
+        Else
+            ' Modo edición: El item es el objeto que queremos
+            estadoParaEditar = TryCast(dgvEstadosTransitorios.CurrentRow.DataBoundItem, EstadoTransitorio)
+        End If
+
+        If estadoParaEditar Is Nothing Then
+            MessageBox.Show("El registro seleccionado no es un estado transitorio editable.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Return
         End If
-        ' --- FIN ---
 
-        Using frm As New frmFuncionarioEstadoTransitorio(estadoSeleccionado, _tiposEstadoTransitorio)
+        Using frm As New frmFuncionarioEstadoTransitorio(estadoParaEditar, _tiposEstadoTransitorio)
             If frm.ShowDialog() = DialogResult.OK Then
                 _estadosTransitorios.ResetBindings()
             End If
@@ -421,98 +400,26 @@ Public Class frmFuncionarioCrear
 
     Private Sub btnQuitarEstado_Click(sender As Object, e As EventArgs) Handles btnQuitarEstado.Click
         If dgvEstadosTransitorios.CurrentRow Is Nothing Then Return
-        Dim estadoSeleccionado = CType(dgvEstadosTransitorios.CurrentRow.DataBoundItem, EstadoTransitorio)
 
-        ' --- LÓGICA DE PROTECCIÓN ---
-        If estadoSeleccionado.Id < 0 Then
-            MessageBox.Show("Las licencias no se pueden eliminar desde esta pantalla.", "Acción no permitida", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        Dim estadoParaQuitar As EstadoTransitorio = Nothing
+
+        If chkVerHistorial.Checked Then
+            Dim itemSeleccionado = dgvEstadosTransitorios.CurrentRow.DataBoundItem
+            Dim id = CInt(itemSeleccionado.GetType().GetProperty("Id").GetValue(itemSeleccionado, Nothing))
+            estadoParaQuitar = _estadosTransitorios.FirstOrDefault(Function(et) et.Id = id)
+        Else
+            estadoParaQuitar = TryCast(dgvEstadosTransitorios.CurrentRow.DataBoundItem, EstadoTransitorio)
+        End If
+
+        If estadoParaQuitar Is Nothing Then
+            MessageBox.Show("El registro seleccionado no es un estado transitorio eliminable.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Return
         End If
-        ' --- FIN ---
 
         If MessageBox.Show("¿Está seguro de que desea quitar este estado transitorio?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
-            _estadosTransitorios.Remove(estadoSeleccionado)
+            _estadosTransitorios.Remove(estadoParaQuitar)
         End If
     End Sub
 #End Region
 
-#Region "Formateo Manual de Grillas"
-
-    Private Sub dgvDotacion_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
-        If e.RowIndex < 0 OrElse e.ColumnIndex < 0 Then Return
-
-        Dim dgv = CType(sender, DataGridView)
-        Dim colName = dgv.Columns(e.ColumnIndex).Name
-
-        If colName = "colItem" Then
-            Dim dotacion = TryCast(dgv.Rows(e.RowIndex).DataBoundItem, FuncionarioDotacion)
-            If dotacion IsNot Nothing AndAlso dotacion.DotacionItem IsNot Nothing Then
-                e.Value = dotacion.DotacionItem.Nombre
-                e.FormattingApplied = True
-            End If
-        End If
-    End Sub
-
-    Private Sub dgvEstadosTransitorios_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
-        If e.RowIndex < 0 OrElse e.ColumnIndex < 0 Then Return
-
-        Dim dgv = CType(sender, DataGridView)
-        Dim colName = dgv.Columns(e.ColumnIndex).Name
-        Dim estado = CType(dgv.Rows(e.RowIndex).DataBoundItem, EstadoTransitorio)
-        If estado Is Nothing Then Return
-
-        If colName = "TipoEstado" Then
-            If estado.TipoEstadoTransitorio IsNot Nothing Then
-                e.Value = estado.TipoEstadoTransitorio.Nombre
-                e.FormattingApplied = True
-            End If
-        End If
-
-        If colName = "FechaHasta" Then
-            If e.Value Is Nothing Then
-                e.Value = String.Empty
-                e.FormattingApplied = True
-            End If
-        End If
-    End Sub
-    Private Sub SincronizarDotaciones(dbCollection As ICollection(Of FuncionarioDotacion), formCollection As BindingList(Of FuncionarioDotacion), ctx As DbContext)
-        ' 1. Elementos para eliminar: Aquellos que están en la base de datos pero ya no en la lista del formulario.
-        Dim itemsParaBorrar = dbCollection.Where(Function(dbItem) Not formCollection.Any(Function(formItem) formItem.Id = dbItem.Id)).ToList()
-        For Each item In itemsParaBorrar
-            ctx.Entry(item).State = EntityState.Deleted
-        Next
-
-        ' 2. Elementos para añadir o actualizar.
-        For Each dotacionForm In formCollection
-            If dotacionForm.Id = 0 Then
-                ' AÑADIR: Es un registro nuevo.
-                ' Nos aseguramos de que su "DotacionItem" se trate como una entidad existente.
-                If dotacionForm.DotacionItem IsNot Nothing AndAlso dotacionForm.DotacionItem.Id > 0 Then
-                    ctx.Entry(dotacionForm.DotacionItem).State = EntityState.Unchanged
-                End If
-                dbCollection.Add(dotacionForm)
-            Else
-                ' ACTUALIZAR: Es un registro existente.
-                Dim dotacionEnDb = dbCollection.FirstOrDefault(Function(db) db.Id = dotacionForm.Id)
-                If dotacionEnDb IsNot Nothing Then
-                    ' Actualizamos manualmente las propiedades en lugar de usar SetValues para mayor control.
-                    dotacionEnDb.DotacionItemId = dotacionForm.DotacionItemId
-                    dotacionEnDb.Talla = dotacionForm.Talla
-                    dotacionEnDb.Observaciones = dotacionForm.Observaciones
-                    dotacionEnDb.FechaAsign = dotacionForm.FechaAsign
-                End If
-            End If
-        Next
-    End Sub
-#End Region
-    Public Class EstadoConsolidadoDTO
-        Public Property Id As Integer
-        Public Property FuncionarioId As Integer
-        Public Property TipoEstadoNombre As String
-        Public Property FechaDesde As Date
-        Public Property FechaHasta As Date?
-        Public Property Observaciones As String
-        Public Property Origen As String
-        Public Property TipoEstadoTransitorioId As Integer
-    End Class
 End Class
