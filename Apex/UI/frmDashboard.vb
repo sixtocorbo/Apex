@@ -4,11 +4,16 @@ Public Class frmDashboard
     Private currentBtn As Button
     Private Shadows activeForm As Form
 
+    ' --- Instancias de los formularios para mantener su estado ---
+    Private _funcionarioBuscarInstancia As frmFuncionarioBuscar
+    Private _filtroAvanzadoInstancia As frmFiltroAvanzado
+
+
     Public Sub New()
         InitializeComponent()
         ' Asociar los manejadores de eventos a los botones de navegación
         AddHandler btnFuncionarios.Click, AddressOf ActivateButton
-        AddHandler btnFiltros.Click, AddressOf ActivateButton ' Mantenemos este
+        AddHandler btnFiltros.Click, AddressOf ActivateButton
         AddHandler btnReportes.Click, AddressOf ActivateButton
         AddHandler btnConfiguracion.Click, AddressOf ActivateButton
     End Sub
@@ -27,10 +32,16 @@ Public Class frmDashboard
         ' Abrir el formulario correspondiente
         Select Case currentBtn.Name
             Case "btnFuncionarios"
-                AbrirFormEnPanel(New frmFuncionarioBuscar())
+                If _funcionarioBuscarInstancia Is Nothing OrElse _funcionarioBuscarInstancia.IsDisposed Then
+                    _funcionarioBuscarInstancia = New frmFuncionarioBuscar()
+                End If
+                AbrirFormEnPanel(_funcionarioBuscarInstancia)
 
             Case "btnFiltros"
-                AbrirFormEnPanel(New frmFiltroAvanzado())
+                If _filtroAvanzadoInstancia Is Nothing OrElse _filtroAvanzadoInstancia.IsDisposed Then
+                    _filtroAvanzadoInstancia = New frmFiltroAvanzado()
+                End If
+                AbrirFormEnPanel(_filtroAvanzadoInstancia)
 
             Case "btnReportes"
                 MessageBox.Show("Formulario de reportes aún no implementado.", "En desarrollo", MessageBoxButtons.OK, MessageBoxIcon.Information)
@@ -49,17 +60,24 @@ Public Class frmDashboard
     End Sub
 
     Private Sub AbrirFormEnPanel(childForm As Form)
-        ' Si ya hay un formulario abierto, lo cerramos
-        If activeForm IsNot Nothing Then
-            activeForm.Close()
+        ' Si hay un formulario activo y es diferente al que queremos abrir, lo ocultamos.
+        If activeForm IsNot Nothing AndAlso activeForm IsNot childForm Then
+            activeForm.Hide()
         End If
 
+        ' Establecemos el nuevo formulario como activo.
         activeForm = childForm
-        childForm.TopLevel = False ' Muy importante para poder anidar el form
-        childForm.FormBorderStyle = FormBorderStyle.None
-        childForm.Dock = DockStyle.Fill
-        Me.panelContenido.Controls.Add(childForm)
-        Me.panelContenido.Tag = childForm
+
+        ' Si el formulario aún no ha sido añadido al panel de contenido, lo configuramos y añadimos.
+        If Not Me.panelContenido.Controls.Contains(childForm) Then
+            childForm.TopLevel = False
+            childForm.FormBorderStyle = FormBorderStyle.None
+            childForm.Dock = DockStyle.Fill
+            Me.panelContenido.Controls.Add(childForm)
+            Me.panelContenido.Tag = childForm
+        End If
+
+        ' Finalmente, traemos el formulario al frente y nos aseguramos de que sea visible.
         childForm.BringToFront()
         childForm.Show()
     End Sub
