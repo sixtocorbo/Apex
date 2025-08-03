@@ -97,9 +97,7 @@ Public Class FuncionarioService
 
     Public Async Function ObtenerTiposEstadoTransitorioCompletosAsync() As Task(Of List(Of TipoEstadoTransitorio))
         Return Await _unitOfWork.Repository(Of TipoEstadoTransitorio)().
-        GetAll().
-            AsNoTracking().
-            OrderBy(Function(t) t.Nombre).
+        GetAll().OrderBy(Function(t) t.Nombre).
             ToListAsync()
     End Function
     Public Async Function BuscarConFiltrosDinamicosAsync(

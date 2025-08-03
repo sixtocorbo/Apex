@@ -140,7 +140,7 @@ Public Class frmFuncionarioCrear
         End Try
     End Function
 
-    ' --- CÓDIGO CORREGIDO Y ROBUSTECIDO ---
+    ' --- CORRECCIÓN #1: LÓGICA ROBUSTA PARA MANEJAR LA SELECCIÓN ---
     Private Sub DgvEstadosTransitorios_SelectionChanged(sender As Object, e As EventArgs)
         Dim editable = False
 
@@ -159,11 +159,12 @@ Public Class frmFuncionarioCrear
         Else
             ' Modo historial: Los items son de un tipo anónimo.
             ' Verificamos de forma segura que la propiedad 'Origen' exista antes de leerla.
-            Dim origenProperty = itemSeleccionado.GetType().GetProperty("Origen")
+            Dim origenProperty As System.Reflection.PropertyInfo = itemSeleccionado.GetType().GetProperty("Origen")
 
             If origenProperty IsNot Nothing Then
                 Dim origenValue = origenProperty.GetValue(itemSeleccionado, Nothing)
                 If origenValue IsNot Nothing Then
+                    ' Usamos una comparación que ignora mayúsculas/minúsculas para ser más seguro.
                     editable = String.Equals(origenValue.ToString(), "Estado", StringComparison.OrdinalIgnoreCase)
                 End If
             End If
@@ -175,7 +176,6 @@ Public Class frmFuncionarioCrear
         btnEditarEstado.Enabled = editable
         btnQuitarEstado.Enabled = editable
     End Sub
-    ' --- FIN DE LA CORRECCIÓN ---
 
     Private Async Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
         Try
@@ -223,19 +223,22 @@ Public Class frmFuncionarioCrear
         End Try
     End Sub
 
+    ' --- CORRECCIÓN #2: LÓGICA DE SINCRONIZACIÓN EXPLÍCITA ---
     Private Sub SincronizarColeccion(Of T As Class)(dbCollection As ICollection(Of T), formCollection As BindingList(Of T))
+        ' Items que están en la colección original de la BD pero ya no están en la lista del formulario.
         Dim itemsParaBorrar = dbCollection.Except(formCollection).ToList()
         For Each item In itemsParaBorrar
-            dbCollection.Remove(item)
+            ' En lugar de solo quitarlo de la colección, le decimos explícitamente al contexto de EF que debe borrarlo.
+            _uow.Context.Entry(item).State = EntityState.Deleted
         Next
 
+        ' Items que están en la lista del formulario pero aún no en la colección de la BD.
         Dim itemsParaAnadir = formCollection.Except(dbCollection).ToList()
         For Each item In itemsParaAnadir
             dbCollection.Add(item)
         Next
     End Sub
 
-    ' Resto del archivo sin cambios...
 #Region "Métodos Auxiliares y de UI"
     Private Async Function CargarCombosAsync() As Task
         cboTipoFuncionario.DataSource = Await _svc.ObtenerTiposFuncionarioAsync()

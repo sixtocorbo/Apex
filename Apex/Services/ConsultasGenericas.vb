@@ -1,5 +1,4 @@
-﻿' Apex/Services/ConsultasGenericas.vb
-Imports System.Data
+﻿Imports System.Data
 Imports System.Threading.Tasks
 
 Public Module ConsultasGenericas
