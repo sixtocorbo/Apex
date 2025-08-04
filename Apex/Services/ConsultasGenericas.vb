@@ -5,10 +5,6 @@ Public Module ConsultasGenericas
 
     Public Enum TipoOrigenDatos
         Funcionarios
-        ' Ya no se necesitan los otros orígenes de datos específicos
-        ' porque ahora se manejan a través de sus propios servicios.
-        ' Se pueden mantener por si se usan en otro lugar, pero
-        ' la idea es eliminarlos a futuro.
         Designaciones
         Sumarios
         OrdenCinco
@@ -49,7 +45,6 @@ Public Module ConsultasGenericas
                 Return novedades.ToDataTable()
 
             Case TipoOrigenDatos.Funcionarios
-                ' --- ¡CAMBIO APLICADO! Llama al nuevo método en FuncionarioService ---
                 Dim funcionarioService = New FuncionarioService()
                 Dim funcionarios = Await funcionarioService.GetFuncionariosParaVistaAsync()
                 Return funcionarios.ToDataTable()

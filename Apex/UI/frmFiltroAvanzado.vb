@@ -483,6 +483,7 @@ Partial Public Class frmFiltroAvanzado
     Private Sub btnGenerico_Extra_Click(sender As Object, e As EventArgs)
         _accionHandler?.ManejarBotonExtra(Me)
     End Sub
+
 #End Region
 
 End Class

@@ -106,10 +106,6 @@ Partial Class frmFiltroAvanzado
         Me.splitContenedorPrincipal.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        ' Permitir que ambos paneles del SplitContainer se redimensionen de manera
-        ' proporcional al tamaño del formulario. Esto hace que el DataGridView y
-        ' los controles de la columna izquierda se adapten mejor a cambios de tamaño.
-        Me.splitContenedorPrincipal.FixedPanel = System.Windows.Forms.FixedPanel.None
         Me.splitContenedorPrincipal.Location = New System.Drawing.Point(0, 0)
         Me.splitContenedorPrincipal.Margin = New System.Windows.Forms.Padding(2)
         Me.splitContenedorPrincipal.Name = "splitContenedorPrincipal"
@@ -117,15 +113,11 @@ Partial Class frmFiltroAvanzado
         'splitContenedorPrincipal.Panel1
         '
         Me.splitContenedorPrincipal.Panel1.Controls.Add(Me.pnlIzquierdo)
-        ' Reducir el tamaño mínimo del Panel1 para permitir que la interfaz se
-        ' ajuste a tamaños de ventana más pequeños.
         Me.splitContenedorPrincipal.Panel1MinSize = 200
         '
         'splitContenedorPrincipal.Panel2
         '
         Me.splitContenedorPrincipal.Panel2.Controls.Add(Me.pnlDerecho)
-        ' Reducir el tamaño mínimo del Panel2 para permitir que la interfaz se
-        ' ajuste a tamaños de ventana más pequeños.
         Me.splitContenedorPrincipal.Panel2MinSize = 200
         Me.splitContenedorPrincipal.Size = New System.Drawing.Size(1028, 609)
         Me.splitContenedorPrincipal.SplitterDistance = 450
@@ -150,7 +142,7 @@ Partial Class frmFiltroAvanzado
         'gbxFiltros
         '
         Me.gbxFiltros.Controls.Add(Me.TableLayoutPanel1)
-        Me.gbxFiltros.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.gbxFiltros.Dock = System.Windows.Forms.DockStyle.Top
         Me.gbxFiltros.Location = New System.Drawing.Point(8, 137)
         Me.gbxFiltros.Margin = New System.Windows.Forms.Padding(2)
         Me.gbxFiltros.Name = "gbxFiltros"
@@ -357,7 +349,7 @@ Partial Class frmFiltroAvanzado
         Me.pnlDerecho.Margin = New System.Windows.Forms.Padding(2)
         Me.pnlDerecho.Name = "pnlDerecho"
         Me.pnlDerecho.Padding = New System.Windows.Forms.Padding(8)
-        Me.pnlDerecho.Size = New System.Drawing.Size(577, 609)
+        Me.pnlDerecho.Size = New System.Drawing.Size(579, 609)
         Me.pnlDerecho.TabIndex = 0
         '
         'Panel1
@@ -369,7 +361,7 @@ Partial Class frmFiltroAvanzado
         Me.Panel1.Location = New System.Drawing.Point(8, 100)
         Me.Panel1.Margin = New System.Windows.Forms.Padding(2)
         Me.Panel1.Name = "Panel1"
-        Me.Panel1.Size = New System.Drawing.Size(560, 434)
+        Me.Panel1.Size = New System.Drawing.Size(562, 434)
         Me.Panel1.TabIndex = 5
         '
         'dgvDatos
@@ -377,12 +369,7 @@ Partial Class frmFiltroAvanzado
         Me.dgvDatos.AllowDrop = True
         Me.dgvDatos.AllowUserToAddRows = False
         Me.dgvDatos.AllowUserToDeleteRows = False
-        Me.dgvDatos.AllowUserToResizeColumns = False
         Me.dgvDatos.AllowUserToResizeRows = False
-        ' Ajustar el modo de ajuste de columnas para que las columnas ocupen de
-        ' manera proporcional el espacio disponible dentro del DataGridView. De esta
-        ' forma, al cambiar el tamaño del formulario, el grid se redimensionará de
-        ' forma automática sin afectar la funcionalidad existente.
         Me.dgvDatos.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill
         Me.dgvDatos.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvDatos.Dock = System.Windows.Forms.DockStyle.Fill
@@ -393,7 +380,7 @@ Partial Class frmFiltroAvanzado
         Me.dgvDatos.RowHeadersWidth = 51
         Me.dgvDatos.RowTemplate.Height = 24
         Me.dgvDatos.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgvDatos.Size = New System.Drawing.Size(560, 434)
+        Me.dgvDatos.Size = New System.Drawing.Size(562, 434)
         Me.dgvDatos.TabIndex = 4
         '
         'flpChips
@@ -403,14 +390,11 @@ Partial Class frmFiltroAvanzado
         Me.flpChips.Dock = System.Windows.Forms.DockStyle.Top
         Me.flpChips.Location = New System.Drawing.Point(8, 58)
         Me.flpChips.Margin = New System.Windows.Forms.Padding(2)
-        ' Establecemos una altura máxima para que no crezca indefinidamente
         Me.flpChips.MaximumSize = New System.Drawing.Size(0, 250)
         Me.flpChips.Name = "flpChips"
         Me.flpChips.Padding = New System.Windows.Forms.Padding(4)
-        ' La altura inicial puede ser pequeña, ya que crecerá sola
-        Me.flpChips.Size = New System.Drawing.Size(561, 12)
+        Me.flpChips.Size = New System.Drawing.Size(563, 8)
         Me.flpChips.TabIndex = 2
-        ' WrapContents se mantiene en False, ya que cada chip es un panel que se apila verticalmente.
         Me.flpChips.WrapContents = False
         '
         'gbxBusquedaGlobal
@@ -421,7 +405,7 @@ Partial Class frmFiltroAvanzado
         Me.gbxBusquedaGlobal.Margin = New System.Windows.Forms.Padding(2)
         Me.gbxBusquedaGlobal.Name = "gbxBusquedaGlobal"
         Me.gbxBusquedaGlobal.Padding = New System.Windows.Forms.Padding(8)
-        Me.gbxBusquedaGlobal.Size = New System.Drawing.Size(561, 50)
+        Me.gbxBusquedaGlobal.Size = New System.Drawing.Size(563, 50)
         Me.gbxBusquedaGlobal.TabIndex = 0
         Me.gbxBusquedaGlobal.TabStop = False
         Me.gbxBusquedaGlobal.Text = "Búsqueda Rápida en todos los campos de texto"
@@ -432,7 +416,7 @@ Partial Class frmFiltroAvanzado
         Me.txtBusquedaGlobal.Location = New System.Drawing.Point(8, 21)
         Me.txtBusquedaGlobal.Margin = New System.Windows.Forms.Padding(2)
         Me.txtBusquedaGlobal.Name = "txtBusquedaGlobal"
-        Me.txtBusquedaGlobal.Size = New System.Drawing.Size(545, 20)
+        Me.txtBusquedaGlobal.Size = New System.Drawing.Size(547, 20)
         Me.txtBusquedaGlobal.TabIndex = 0
         '
         'pnlAcciones
@@ -454,7 +438,7 @@ Partial Class frmFiltroAvanzado
         Me.pnlAcciones.Margin = New System.Windows.Forms.Padding(2)
         Me.pnlAcciones.Name = "pnlAcciones"
         Me.pnlAcciones.Padding = New System.Windows.Forms.Padding(4)
-        Me.pnlAcciones.Size = New System.Drawing.Size(561, 67)
+        Me.pnlAcciones.Size = New System.Drawing.Size(563, 67)
         Me.pnlAcciones.TabIndex = 3
         '
         'btnExportarExcel
@@ -604,6 +588,7 @@ Partial Class frmFiltroAvanzado
         Me.TableLayoutPanel2.ResumeLayout(False)
         Me.TableLayoutPanel2.PerformLayout()
         Me.pnlDerecho.ResumeLayout(False)
+        Me.pnlDerecho.PerformLayout()
         Me.Panel1.ResumeLayout(False)
         CType(Me.dgvDatos, System.ComponentModel.ISupportInitialize).EndInit()
         Me.gbxBusquedaGlobal.ResumeLayout(False)
