@@ -386,7 +386,6 @@ Partial Class frmFiltroAvanzado
         Me.flpChips.AutoSize = True
         Me.flpChips.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
         Me.flpChips.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.flpChips.FlowDirection = System.Windows.Forms.FlowDirection.BottomUp
         Me.flpChips.Location = New System.Drawing.Point(0, 0)
         Me.flpChips.Margin = New System.Windows.Forms.Padding(2)
         Me.flpChips.MaximumSize = New System.Drawing.Size(0, 250)
@@ -394,7 +393,6 @@ Partial Class frmFiltroAvanzado
         Me.flpChips.Padding = New System.Windows.Forms.Padding(4)
         Me.flpChips.Size = New System.Drawing.Size(865, 140)
         Me.flpChips.TabIndex = 2
-        Me.flpChips.WrapContents = False
         '
         'gbxBusquedaGlobal
         '

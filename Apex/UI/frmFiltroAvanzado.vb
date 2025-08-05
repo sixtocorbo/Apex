@@ -323,8 +323,26 @@ Partial Public Class frmFiltroAvanzado
     End Sub
 
 
+    ' En el archivo: Apex/UI/frmFiltroAvanzado.vb
+
     Private Sub BtnAgregar_Click(sender As Object, e As EventArgs) Handles btnAgregar.Click
         If lstColumnas.SelectedItem Is Nothing OrElse lstValores.SelectedItems.Count = 0 Then Return
+
+        ' --- INICIO DE LA CORRECCIÓN MEJORADA: Evitar filtros redundantes ---
+
+        ' Si el número de ítems seleccionados es igual al número total de ítems en la lista,
+        ' significa que el filtro es redundante, ya que abarca todos los valores posibles
+        ' en el conjunto de datos actual.
+        If lstValores.SelectedItems.Count = lstValores.Items.Count Then
+            MessageBox.Show(
+            "Ha seleccionado todos los valores disponibles para esta columna. El filtro es redundante y no se agregará.",
+            "Filtro Redundante",
+            MessageBoxButtons.OK,
+            MessageBoxIcon.Information
+        )
+            Return ' Salir para no agregar el filtro innecesario
+        End If
+        ' --- FIN DE LA CORRECCIÓN ---
 
         Dim col As String = lstColumnas.SelectedItem.ToString()
         Dim selCount As Integer = lstValores.SelectedItems.Count
@@ -338,10 +356,19 @@ Partial Public Class frmFiltroAvanzado
             nuevaRegla = New ReglaFiltro With {.Columna = col, .Operador = OperadorComparacion.Igual, .Valor1 = v}
         End If
 
+        ' (Se mantiene la comprobación de duplicados que hicimos antes)
+        Dim representacionNuevaRegla = nuevaRegla.ToString()
+        If filtros.Reglas.Any(Function(reglaExistente) reglaExistente.ToString() = representacionNuevaRegla) Then
+            MessageBox.Show("Este filtro ya ha sido agregado.", "Filtro Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return
+        End If
+
         filtros.Agregar(nuevaRegla)
         CrearChip(nuevaRegla)
         AplicarFiltros()
     End Sub
+
+
 
     Private Sub txtBusquedaGlobal_TextChanged_Handler(sender As Object, e As EventArgs)
         AplicarFiltros()
