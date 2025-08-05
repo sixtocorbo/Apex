@@ -266,17 +266,17 @@ Partial Class frmFiltroAvanzado
         Me.cmbOrigenDatos.Dock = System.Windows.Forms.DockStyle.Fill
         Me.cmbOrigenDatos.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cmbOrigenDatos.FormattingEnabled = True
-        Me.cmbOrigenDatos.Location = New System.Drawing.Point(47, 2)
+        Me.cmbOrigenDatos.Location = New System.Drawing.Point(53, 2)
         Me.cmbOrigenDatos.Margin = New System.Windows.Forms.Padding(2)
         Me.cmbOrigenDatos.Name = "cmbOrigenDatos"
-        Me.cmbOrigenDatos.Size = New System.Drawing.Size(369, 21)
+        Me.cmbOrigenDatos.Size = New System.Drawing.Size(363, 21)
         Me.cmbOrigenDatos.TabIndex = 0
         '
         'dtpFechaInicio
         '
         Me.dtpFechaInicio.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.dtpFechaInicio.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.dtpFechaInicio.Location = New System.Drawing.Point(47, 27)
+        Me.dtpFechaInicio.Location = New System.Drawing.Point(53, 29)
         Me.dtpFechaInicio.Margin = New System.Windows.Forms.Padding(2)
         Me.dtpFechaInicio.Name = "dtpFechaInicio"
         Me.dtpFechaInicio.Size = New System.Drawing.Size(89, 20)
@@ -286,7 +286,7 @@ Partial Class frmFiltroAvanzado
         '
         Me.dtpFechaFin.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.dtpFechaFin.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.dtpFechaFin.Location = New System.Drawing.Point(47, 51)
+        Me.dtpFechaFin.Location = New System.Drawing.Point(53, 53)
         Me.dtpFechaFin.Margin = New System.Windows.Forms.Padding(2)
         Me.dtpFechaFin.Name = "dtpFechaFin"
         Me.dtpFechaFin.Size = New System.Drawing.Size(89, 20)
@@ -295,7 +295,7 @@ Partial Class frmFiltroAvanzado
         'btnCargar
         '
         Me.btnCargar.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnCargar.Location = New System.Drawing.Point(345, 75)
+        Me.btnCargar.Location = New System.Drawing.Point(345, 77)
         Me.btnCargar.Margin = New System.Windows.Forms.Padding(2)
         Me.btnCargar.Name = "btnCargar"
         Me.btnCargar.Size = New System.Drawing.Size(71, 23)
@@ -310,7 +310,7 @@ Partial Class frmFiltroAvanzado
         Me.Label1.Location = New System.Drawing.Point(2, 6)
         Me.Label1.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(41, 13)
+        Me.Label1.Size = New System.Drawing.Size(47, 15)
         Me.Label1.TabIndex = 4
         Me.Label1.Text = "Origen:"
         '
@@ -318,10 +318,10 @@ Partial Class frmFiltroAvanzado
         '
         Me.Label2.Anchor = System.Windows.Forms.AnchorStyles.Right
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(2, 30)
+        Me.Label2.Location = New System.Drawing.Point(3, 31)
         Me.Label2.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(41, 13)
+        Me.Label2.Size = New System.Drawing.Size(46, 15)
         Me.Label2.TabIndex = 5
         Me.Label2.Text = "Desde:"
         '
@@ -329,18 +329,15 @@ Partial Class frmFiltroAvanzado
         '
         Me.Label3.Anchor = System.Windows.Forms.AnchorStyles.Right
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(5, 54)
+        Me.Label3.Location = New System.Drawing.Point(7, 55)
         Me.Label3.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(38, 13)
+        Me.Label3.Size = New System.Drawing.Size(42, 15)
         Me.Label3.TabIndex = 6
         Me.Label3.Text = "Hasta:"
         '
         'pnlDerecho
         '
-        Me.pnlDerecho.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.pnlDerecho.Controls.Add(Me.Panel1)
         Me.pnlDerecho.Controls.Add(Me.flpChips)
         Me.pnlDerecho.Controls.Add(Me.gbxBusquedaGlobal)
@@ -349,19 +346,17 @@ Partial Class frmFiltroAvanzado
         Me.pnlDerecho.Margin = New System.Windows.Forms.Padding(2)
         Me.pnlDerecho.Name = "pnlDerecho"
         Me.pnlDerecho.Padding = New System.Windows.Forms.Padding(8)
-        Me.pnlDerecho.Size = New System.Drawing.Size(579, 609)
+        Me.pnlDerecho.Size = New System.Drawing.Size(563, 609)
         Me.pnlDerecho.TabIndex = 0
         '
         'Panel1
         '
-        Me.Panel1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.Panel1.Controls.Add(Me.dgvDatos)
-        Me.Panel1.Location = New System.Drawing.Point(8, 100)
+        Me.Panel1.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.Panel1.Location = New System.Drawing.Point(8, 66)
         Me.Panel1.Margin = New System.Windows.Forms.Padding(2)
         Me.Panel1.Name = "Panel1"
-        Me.Panel1.Size = New System.Drawing.Size(562, 434)
+        Me.Panel1.Size = New System.Drawing.Size(547, 468)
         Me.Panel1.TabIndex = 5
         '
         'dgvDatos
@@ -380,7 +375,7 @@ Partial Class frmFiltroAvanzado
         Me.dgvDatos.RowHeadersWidth = 51
         Me.dgvDatos.RowTemplate.Height = 24
         Me.dgvDatos.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgvDatos.Size = New System.Drawing.Size(562, 434)
+        Me.dgvDatos.Size = New System.Drawing.Size(547, 468)
         Me.dgvDatos.TabIndex = 4
         '
         'flpChips
@@ -388,12 +383,13 @@ Partial Class frmFiltroAvanzado
         Me.flpChips.AutoSize = True
         Me.flpChips.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
         Me.flpChips.Dock = System.Windows.Forms.DockStyle.Top
+        Me.flpChips.FlowDirection = System.Windows.Forms.FlowDirection.TopDown
         Me.flpChips.Location = New System.Drawing.Point(8, 58)
         Me.flpChips.Margin = New System.Windows.Forms.Padding(2)
         Me.flpChips.MaximumSize = New System.Drawing.Size(0, 250)
         Me.flpChips.Name = "flpChips"
         Me.flpChips.Padding = New System.Windows.Forms.Padding(4)
-        Me.flpChips.Size = New System.Drawing.Size(563, 8)
+        Me.flpChips.Size = New System.Drawing.Size(547, 8)
         Me.flpChips.TabIndex = 2
         Me.flpChips.WrapContents = False
         '
@@ -405,7 +401,7 @@ Partial Class frmFiltroAvanzado
         Me.gbxBusquedaGlobal.Margin = New System.Windows.Forms.Padding(2)
         Me.gbxBusquedaGlobal.Name = "gbxBusquedaGlobal"
         Me.gbxBusquedaGlobal.Padding = New System.Windows.Forms.Padding(8)
-        Me.gbxBusquedaGlobal.Size = New System.Drawing.Size(563, 50)
+        Me.gbxBusquedaGlobal.Size = New System.Drawing.Size(547, 50)
         Me.gbxBusquedaGlobal.TabIndex = 0
         Me.gbxBusquedaGlobal.TabStop = False
         Me.gbxBusquedaGlobal.Text = "Búsqueda Rápida en todos los campos de texto"
@@ -416,7 +412,7 @@ Partial Class frmFiltroAvanzado
         Me.txtBusquedaGlobal.Location = New System.Drawing.Point(8, 21)
         Me.txtBusquedaGlobal.Margin = New System.Windows.Forms.Padding(2)
         Me.txtBusquedaGlobal.Name = "txtBusquedaGlobal"
-        Me.txtBusquedaGlobal.Size = New System.Drawing.Size(547, 20)
+        Me.txtBusquedaGlobal.Size = New System.Drawing.Size(531, 20)
         Me.txtBusquedaGlobal.TabIndex = 0
         '
         'pnlAcciones
@@ -438,7 +434,7 @@ Partial Class frmFiltroAvanzado
         Me.pnlAcciones.Margin = New System.Windows.Forms.Padding(2)
         Me.pnlAcciones.Name = "pnlAcciones"
         Me.pnlAcciones.Padding = New System.Windows.Forms.Padding(4)
-        Me.pnlAcciones.Size = New System.Drawing.Size(563, 67)
+        Me.pnlAcciones.Size = New System.Drawing.Size(547, 67)
         Me.pnlAcciones.TabIndex = 3
         '
         'btnExportarExcel
@@ -476,10 +472,10 @@ Partial Class frmFiltroAvanzado
         Me.lblConteoRegistros.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.lblConteoRegistros.AutoSize = True
         Me.lblConteoRegistros.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblConteoRegistros.Location = New System.Drawing.Point(291, 11)
+        Me.lblConteoRegistros.Location = New System.Drawing.Point(291, 10)
         Me.lblConteoRegistros.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lblConteoRegistros.Name = "lblConteoRegistros"
-        Me.lblConteoRegistros.Size = New System.Drawing.Size(149, 13)
+        Me.lblConteoRegistros.Size = New System.Drawing.Size(180, 16)
         Me.lblConteoRegistros.TabIndex = 3
         Me.lblConteoRegistros.Text = "Registros encontrados: 0"
         '
@@ -487,7 +483,7 @@ Partial Class frmFiltroAvanzado
         '
         Me.Separator1.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.Separator1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
-        Me.Separator1.Location = New System.Drawing.Point(444, 6)
+        Me.Separator1.Location = New System.Drawing.Point(475, 6)
         Me.Separator1.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Separator1.Name = "Separator1"
         Me.Separator1.Size = New System.Drawing.Size(2, 24)
@@ -495,7 +491,7 @@ Partial Class frmFiltroAvanzado
         '
         'btnNuevaNotificacion
         '
-        Me.btnNuevaNotificacion.Location = New System.Drawing.Point(450, 6)
+        Me.btnNuevaNotificacion.Location = New System.Drawing.Point(481, 6)
         Me.btnNuevaNotificacion.Margin = New System.Windows.Forms.Padding(2)
         Me.btnNuevaNotificacion.Name = "btnNuevaNotificacion"
         Me.btnNuevaNotificacion.Size = New System.Drawing.Size(56, 24)

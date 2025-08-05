@@ -127,13 +127,9 @@ Partial Public Class frmFiltroAvanzado
         cmbOrigenDatos.DataSource = [Enum].GetValues(GetType(ConsultasGenericas.TipoOrigenDatos))
         cmbOrigenDatos.SelectedIndex = -1
 
-        flpChips.Dock = DockStyle.Top
-        flpChips.AutoSize = True
-        flpChips.AutoSizeMode = AutoSizeMode.GrowAndShrink
-        flpChips.WrapContents = False
-        flpChips.FlowDirection = FlowDirection.TopDown
-
-        Panel1.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right Or AnchorStyles.Bottom
+        gbxBusquedaGlobal.BringToFront()
+        flpChips.BringToFront()
+        pnlAcciones.BringToFront()
 
         AddHandler cmbOrigenDatos.SelectedIndexChanged, AddressOf cmbOrigenDatos_SelectedIndexChanged
         AddHandler btnCargar.Click, AddressOf btnCargar_Click
@@ -209,17 +205,60 @@ Partial Public Class frmFiltroAvanzado
 
         If dt Is Nothing Then Return
 
-        For Each col As DataColumn In dt.Columns
-            Dim dgvCol As New DataGridViewTextBoxColumn With {
+        ' >>> CAMBIO CLAVE #1: Cambiamos el modo de auto-ajuste.
+        ' None permite que las barras de scroll aparezcan si el contenido es más ancho.
+        dgvDatos.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None
+
+        Dim origenSeleccionado = CType(cmbOrigenDatos.SelectedItem, ConsultasGenericas.TipoOrigenDatos)
+
+        If origenSeleccionado = ConsultasGenericas.TipoOrigenDatos.Funcionarios Then
+            ' Columnas específicas para Funcionarios
+            Dim columnasDeseadas As New Dictionary(Of String, String) From {
+            {"NombreCompleto", "Nombre"},
+            {"Cedula", "Cédula"},
+            {"Cargo", "Cargo"},
+            {"Escalafon", "Escalafón"},
+            {"Seccion", "Sección"},
+            {"Turno", "Turno"},
+            {"Semana", "Semana"},
+            {"PuestoDeTrabajo", "Puesto de Trabajo"}
+        }
+
+            For Each kvp In columnasDeseadas
+                If dt.Columns.Contains(kvp.Key) Then
+                    Dim dgvCol As New DataGridViewTextBoxColumn With {
+                    .DataPropertyName = kvp.Key,
+                    .HeaderText = kvp.Value,
+                    .Name = kvp.Key
+                }
+
+                    ' >>> CAMBIO CLAVE #2: Hacemos que la columna del nombre
+                    ' ocupe el espacio restante (Fill), mientras las otras
+                    ' se ajustan a su contenido.
+                    If kvp.Key = "NombreCompleto" Then
+                        dgvCol.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+                    Else
+                        dgvCol.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+                    End If
+
+                    dgvDatos.Columns.Add(dgvCol)
+                End If
+            Next
+        Else
+            ' Comportamiento para otros orígenes de datos
+            For Each col As DataColumn In dt.Columns
+                Dim dgvCol As New DataGridViewTextBoxColumn With {
                 .DataPropertyName = col.ColumnName,
                 .HeaderText = col.ColumnName,
-                .Name = col.ColumnName
+                .Name = col.ColumnName,
+                .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells ' Ajuste para otras vistas
             }
-            If col.DataType = GetType(Date) OrElse col.DataType = GetType(DateTime) Then
-                dgvCol.DefaultCellStyle.Format = "dd/MM/yyyy"
-            End If
-            dgvDatos.Columns.Add(dgvCol)
-        Next
+                If col.DataType = GetType(Date) OrElse col.DataType = GetType(DateTime) Then
+                    dgvCol.DefaultCellStyle.Format = "dd/MM/yyyy"
+                End If
+                dgvDatos.Columns.Add(dgvCol)
+            Next
+        End If
     End Sub
 
     Private Sub ActualizarListaColumnas()
@@ -397,7 +436,7 @@ Partial Public Class frmFiltroAvanzado
 
     Private Sub UpdateFiltrosPanelHeight()
         Const MAX_HEIGHT As Integer = 120
-        Const MARGIN_VERTICAL As Integer = 6
+        ' La constante MARGIN_VERTICAL ya no es necesaria aquí
 
         If flpChips.Controls.Count = 0 Then
             flpChips.Visible = False
@@ -411,8 +450,11 @@ Partial Public Class frmFiltroAvanzado
             End If
         End If
 
-        Panel1.Top = flpChips.Bottom + MARGIN_VERTICAL
-        'Panel1.Height = pnlAcciones.Top - Panel1.Top - MARGIN_VERTICAL
+        ' --- INICIO DE LA CORRECCIÓN ---
+        ' Estas líneas ya no son necesarias porque el Docking se encarga del layout.
+        ' Panel1.Top = flpChips.Bottom + MARGIN_VERTICAL
+        ' Panel1.Height = pnlAcciones.Top - Panel1.Top - MARGIN_VERTICAL
+        ' --- FIN DE LA CORRECCIÓN ---
     End Sub
 
     Private Sub BtnLimpiar_Click(sender As Object, e As EventArgs) Handles btnLimpiar.Click
