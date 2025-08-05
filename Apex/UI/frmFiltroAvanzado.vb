@@ -206,7 +206,7 @@ Partial Public Class frmFiltroAvanzado
         If dt Is Nothing Then Return
 
         ' >>> CAMBIO CLAVE #1: Cambiamos el modo de auto-ajuste.
-        ' None permite que las barras de scroll aparezcan si el contenido es más ancho.
+        ' 'None' permite que las barras de scroll aparezcan si el contenido es más ancho.
         dgvDatos.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None
 
         Dim origenSeleccionado = CType(cmbOrigenDatos.SelectedItem, ConsultasGenericas.TipoOrigenDatos)
@@ -232,14 +232,7 @@ Partial Public Class frmFiltroAvanzado
                     .Name = kvp.Key
                 }
 
-                    ' >>> CAMBIO CLAVE #2: Hacemos que la columna del nombre
-                    ' ocupe el espacio restante (Fill), mientras las otras
-                    ' se ajustan a su contenido.
-                    If kvp.Key = "NombreCompleto" Then
-                        dgvCol.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-                    Else
-                        dgvCol.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-                    End If
+                    dgvCol.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
 
                     dgvDatos.Columns.Add(dgvCol)
                 End If
