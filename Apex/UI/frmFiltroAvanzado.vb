@@ -409,7 +409,8 @@ Partial Public Class frmFiltroAvanzado
 
 #Region "Chips UI"
     Private Sub CrearChip(regla As ReglaFiltro)
-        Dim nuevoChip As New ChipControl(regla, flpChips.Width)
+        ' >>> CAMBIO CLAVE: Se llama al nuevo constructor sin el parámetro de ancho.
+        Dim nuevoChip As New ChipControl(regla)
         AddHandler nuevoChip.CerrarClick, AddressOf Chip_CerrarClick
         flpChips.Controls.Add(nuevoChip)
         UpdateFiltrosPanelHeight()

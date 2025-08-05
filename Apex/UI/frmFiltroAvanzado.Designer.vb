@@ -84,6 +84,7 @@ Partial Class frmFiltroAvanzado
         Me.btnNuevaLicencia = New System.Windows.Forms.Button()
         Me.btnEditarLicencia = New System.Windows.Forms.Button()
         Me.btnEliminarLicencia = New System.Windows.Forms.Button()
+        Me.Panel2 = New System.Windows.Forms.Panel()
         CType(Me.splitContenedorPrincipal, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.splitContenedorPrincipal.Panel1.SuspendLayout()
         Me.splitContenedorPrincipal.Panel2.SuspendLayout()
@@ -99,6 +100,7 @@ Partial Class frmFiltroAvanzado
         CType(Me.dgvDatos, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.gbxBusquedaGlobal.SuspendLayout()
         Me.pnlAcciones.SuspendLayout()
+        Me.Panel2.SuspendLayout()
         Me.SuspendLayout()
         '
         'splitContenedorPrincipal
@@ -335,8 +337,8 @@ Partial Class frmFiltroAvanzado
         '
         'pnlDerecho
         '
+        Me.pnlDerecho.Controls.Add(Me.Panel2)
         Me.pnlDerecho.Controls.Add(Me.Panel1)
-        Me.pnlDerecho.Controls.Add(Me.flpChips)
         Me.pnlDerecho.Controls.Add(Me.gbxBusquedaGlobal)
         Me.pnlDerecho.Controls.Add(Me.pnlAcciones)
         Me.pnlDerecho.Dock = System.Windows.Forms.DockStyle.Fill
@@ -349,12 +351,14 @@ Partial Class frmFiltroAvanzado
         '
         'Panel1
         '
+        Me.Panel1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.Panel1.Controls.Add(Me.dgvDatos)
-        Me.Panel1.Dock = System.Windows.Forms.DockStyle.Top
         Me.Panel1.Location = New System.Drawing.Point(8, 63)
         Me.Panel1.Margin = New System.Windows.Forms.Padding(2)
         Me.Panel1.Name = "Panel1"
-        Me.Panel1.Size = New System.Drawing.Size(865, 457)
+        Me.Panel1.Size = New System.Drawing.Size(865, 312)
         Me.Panel1.TabIndex = 5
         '
         'dgvDatos
@@ -362,6 +366,7 @@ Partial Class frmFiltroAvanzado
         Me.dgvDatos.AllowDrop = True
         Me.dgvDatos.AllowUserToAddRows = False
         Me.dgvDatos.AllowUserToDeleteRows = False
+        Me.dgvDatos.AllowUserToResizeColumns = False
         Me.dgvDatos.AllowUserToResizeRows = False
         Me.dgvDatos.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvDatos.Dock = System.Windows.Forms.DockStyle.Fill
@@ -372,21 +377,22 @@ Partial Class frmFiltroAvanzado
         Me.dgvDatos.RowHeadersWidth = 51
         Me.dgvDatos.RowTemplate.Height = 24
         Me.dgvDatos.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgvDatos.Size = New System.Drawing.Size(865, 457)
+        Me.dgvDatos.Size = New System.Drawing.Size(865, 312)
         Me.dgvDatos.TabIndex = 4
         '
         'flpChips
         '
+        Me.flpChips.AutoScroll = True
         Me.flpChips.AutoSize = True
         Me.flpChips.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-        Me.flpChips.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.flpChips.FlowDirection = System.Windows.Forms.FlowDirection.TopDown
-        Me.flpChips.Location = New System.Drawing.Point(8, 524)
+        Me.flpChips.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.flpChips.FlowDirection = System.Windows.Forms.FlowDirection.BottomUp
+        Me.flpChips.Location = New System.Drawing.Point(0, 0)
         Me.flpChips.Margin = New System.Windows.Forms.Padding(2)
         Me.flpChips.MaximumSize = New System.Drawing.Size(0, 250)
         Me.flpChips.Name = "flpChips"
         Me.flpChips.Padding = New System.Windows.Forms.Padding(4)
-        Me.flpChips.Size = New System.Drawing.Size(865, 8)
+        Me.flpChips.Size = New System.Drawing.Size(865, 140)
         Me.flpChips.TabIndex = 2
         Me.flpChips.WrapContents = False
         '
@@ -427,11 +433,11 @@ Partial Class frmFiltroAvanzado
         Me.pnlAcciones.Controls.Add(Me.btnEditarLicencia)
         Me.pnlAcciones.Controls.Add(Me.btnEliminarLicencia)
         Me.pnlAcciones.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.pnlAcciones.Location = New System.Drawing.Point(8, 532)
+        Me.pnlAcciones.Location = New System.Drawing.Point(8, 536)
         Me.pnlAcciones.Margin = New System.Windows.Forms.Padding(2)
         Me.pnlAcciones.Name = "pnlAcciones"
         Me.pnlAcciones.Padding = New System.Windows.Forms.Padding(4)
-        Me.pnlAcciones.Size = New System.Drawing.Size(865, 69)
+        Me.pnlAcciones.Size = New System.Drawing.Size(865, 65)
         Me.pnlAcciones.TabIndex = 3
         '
         'btnExportarExcel
@@ -557,6 +563,17 @@ Partial Class frmFiltroAvanzado
         Me.btnEliminarLicencia.Text = "Eliminar"
         Me.btnEliminarLicencia.UseVisualStyleBackColor = True
         '
+        'Panel2
+        '
+        Me.Panel2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Panel2.AutoScroll = True
+        Me.Panel2.Controls.Add(Me.flpChips)
+        Me.Panel2.Location = New System.Drawing.Point(8, 391)
+        Me.Panel2.Name = "Panel2"
+        Me.Panel2.Size = New System.Drawing.Size(865, 140)
+        Me.Panel2.TabIndex = 6
+        '
         'frmFiltroAvanzado
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -581,16 +598,18 @@ Partial Class frmFiltroAvanzado
         Me.TableLayoutPanel2.ResumeLayout(False)
         Me.TableLayoutPanel2.PerformLayout()
         Me.pnlDerecho.ResumeLayout(False)
-        Me.pnlDerecho.PerformLayout()
         Me.Panel1.ResumeLayout(False)
         CType(Me.dgvDatos, System.ComponentModel.ISupportInitialize).EndInit()
         Me.gbxBusquedaGlobal.ResumeLayout(False)
         Me.gbxBusquedaGlobal.PerformLayout()
         Me.pnlAcciones.ResumeLayout(False)
         Me.pnlAcciones.PerformLayout()
+        Me.Panel2.ResumeLayout(False)
+        Me.Panel2.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
 
     Friend WithEvents Panel1 As Panel
+    Friend WithEvents Panel2 As Panel
 End Class
