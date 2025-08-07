@@ -98,6 +98,7 @@ Public Class frmFuncionarioCrear
             btnGuardar.Text = "Guardar"
             pbFoto.Image = My.Resources.Police
         End If
+
     End Sub
 
     Private Sub CargarDatosEnControles()
@@ -332,24 +333,77 @@ Public Class frmFuncionarioCrear
         With dgvDotacion
             .AutoGenerateColumns = False
             .Columns.Clear()
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Id", .Visible = False})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "colItem", .HeaderText = "Ítem", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Talla", .HeaderText = "Talla"})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Observaciones", .HeaderText = "Observaciones", .Width = 200})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "FechaAsign", .HeaderText = "Fecha Asignación", .DefaultCellStyle = New DataGridViewCellStyle With {.Format = "dd/MM/yyyy"}})
+
+            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Id",
+                                                         .Visible = False})
+
+            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "colItem",
+                                                         .HeaderText = "Ítem",
+                                                         .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
+                                                         .ValueType = GetType(String)})      ' ← texto
+
+            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Talla",
+                                                         .HeaderText = "Talla",
+                                                         .ValueType = GetType(String)})      ' ← texto
+
+            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Observaciones",
+                                                         .HeaderText = "Observaciones",
+                                                         .Width = 200,
+                                                         .ValueType = GetType(String)})      ' ← texto
+
+            ' ------- Columna de fecha SIN formato integrado ----------
+            Dim colFecha As New DataGridViewTextBoxColumn With {
+            .Name = "FechaAsign",
+            .HeaderText = "Fecha Asignación",
+            .ValueType = GetType(String)                    ' ← texto
+        }
+            colFecha.DefaultCellStyle.NullValue = ""            ' no DBNull
+            .Columns.Add(colFecha)
         End With
     End Sub
+
 
     Private Sub ConfigurarGrillaEstados()
         With dgvEstadosTransitorios
             .AutoGenerateColumns = False
             .Columns.Clear()
-            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "TipoEstado", .HeaderText = "Tipo de Estado", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "FechaDesde", .HeaderText = "Desde"})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "FechaHasta", .HeaderText = "Hasta"})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Observaciones", .HeaderText = "Observaciones", .Width = 300})
+
+            '------------- Columna Tipo -----------------
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "TipoEstado",
+            .HeaderText = "Tipo de Estado",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
+            .ValueType = GetType(String)          ' ← fuerza a String
+        })
+
+            '------------- Columna Fecha Desde ---------
+            Dim colDesde As New DataGridViewTextBoxColumn With {
+            .Name = "FechaDesde",
+            .HeaderText = "Desde",
+            .ValueType = GetType(String)          ' ← fuerza a String
+        }
+            colDesde.DefaultCellStyle.NullValue = ""   ' evita DBNull
+            .Columns.Add(colDesde)
+
+            '------------- Columna Fecha Hasta ---------
+            Dim colHasta As New DataGridViewTextBoxColumn With {
+            .Name = "FechaHasta",
+            .HeaderText = "Hasta",
+            .ValueType = GetType(String)          ' ← fuerza a String
+        }
+            colHasta.DefaultCellStyle.NullValue = ""
+            .Columns.Add(colHasta)
+
+            '------------- Columna Observaciones -------
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "Observaciones",
+            .HeaderText = "Observaciones",
+            .Width = 300,
+            .ValueType = GetType(String)          ' ← fuerza a String
+        })
         End With
     End Sub
+
 
     Private Sub dgvDotacion_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
         If e.RowIndex < 0 OrElse e.ColumnIndex < 0 Then Return
@@ -372,90 +426,119 @@ Public Class frmFuncionarioCrear
         End If
     End Sub
 
-    Private Sub dgvEstadosTransitorios_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
+    ' -------------------------------------------------------------------------
+    '  Manejador de formateo para dgvEstadosTransitorios
+    ' -------------------------------------------------------------------------
+    Private Sub dgvEstadosTransitorios_CellFormatting(
+        sender As Object, e As DataGridViewCellFormattingEventArgs)
+
         If e.RowIndex < 0 OrElse e.ColumnIndex < 0 Then Return
+
         Dim dgv = CType(sender, DataGridView)
         Dim colName = dgv.Columns(e.ColumnIndex).Name
-
-        ' --- INICIO DE LA CORRECCIÓN ---
-        ' Lógica única y robusta para formatear la grilla de estados.
-
-        e.Value = "" ' Empezar con un valor vacío por defecto
-
         Dim dataItem = dgv.Rows(e.RowIndex).DataBoundItem
         If dataItem Is Nothing Then Return
 
-        If chkVerHistorial.Checked Then
-            ' MODO HISTORIAL: Los datos son de un tipo anónimo
-            Select Case colName
-                Case "TipoEstado" : e.Value = dataItem.GetType().GetProperty("TipoEstado")?.GetValue(dataItem, Nothing)
-                Case "Observaciones" : e.Value = dataItem.GetType().GetProperty("Observaciones")?.GetValue(dataItem, Nothing)
-                Case "FechaDesde"
-                    Dim fechaDesdeObj = dataItem.GetType().GetProperty("FechaDesde")?.GetValue(dataItem, Nothing)
-                    If fechaDesdeObj IsNot Nothing AndAlso Not DBNull.Value.Equals(fechaDesdeObj) Then
-                        e.Value = CDate(fechaDesdeObj).ToShortDateString()
-                    End If
-                Case "FechaHasta"
-                    Dim fechaHastaObj = dataItem.GetType().GetProperty("FechaHasta")?.GetValue(dataItem, Nothing)
-                    If fechaHastaObj IsNot Nothing AndAlso Not DBNull.Value.Equals(fechaHastaObj) Then
-                        e.Value = CDate(fechaHastaObj).ToShortDateString()
-                    End If
-            End Select
-        Else
-            ' MODO EDICIÓN: Los datos son del tipo EstadoTransitorio
-            Dim estado = TryCast(dataItem, EstadoTransitorio)
-            If estado Is Nothing Then Return
+        ' --- Lógica unificada ---
+        Dim tipoEstado As String = ""
+        Dim fechaDesde As Date? = Nothing
+        Dim fechaHasta As Date? = Nothing
+        Dim observaciones As String = ""
 
-            ' Si el Id del tipo no está seteado (fila nueva), no hacer nada
-            If estado.TipoEstadoTransitorioId = 0 Then
+        If chkVerHistorial.Checked Then
+            ' Historial (usa reflexión sobre tipo anónimo)
+            tipoEstado = CStr(dataItem.GetType().GetProperty("TipoEstado")? _
+                                         .GetValue(dataItem, Nothing))
+            observaciones = CStr(dataItem.GetType().GetProperty("Observaciones")? _
+                                         .GetValue(dataItem, Nothing))
+
+            Dim fechaDesdeObj = dataItem.GetType() _
+                                   .GetProperty("FechaDesde")? _
+                                   .GetValue(dataItem, Nothing)
+            If fechaDesdeObj IsNot Nothing AndAlso Not DBNull.Value.Equals(fechaDesdeObj) Then
+                fechaDesde = CDate(fechaDesdeObj)
+            End If
+
+            Dim fechaHastaObj = dataItem.GetType() _
+                                   .GetProperty("FechaHasta")? _
+                                   .GetValue(dataItem, Nothing)
+            If fechaHastaObj IsNot Nothing AndAlso Not DBNull.Value.Equals(fechaHastaObj) Then
+                fechaHasta = CDate(fechaHastaObj)
+            End If
+        Else
+            ' Modo edición (usa EstadoTransitorio)
+            Dim estado = TryCast(dataItem, EstadoTransitorio)
+            If estado Is Nothing OrElse estado.TipoEstadoTransitorioId = 0 Then
                 e.FormattingApplied = True
                 Return
             End If
 
-            If colName = "TipoEstado" Then
-                Dim tipo = _tiposEstadoTransitorio.FirstOrDefault(Function(t) t.Id = estado.TipoEstadoTransitorioId)
-                e.Value = If(tipo IsNot Nothing, tipo.Nombre, "")
-            Else
-                Dim fechaDesde, fechaHasta, observaciones As String
-                fechaDesde = "" : fechaHasta = "" : observaciones = ""
+            Dim tipo = _tiposEstadoTransitorio _
+                       .FirstOrDefault(Function(t) t.Id = estado.TipoEstadoTransitorioId)
+            tipoEstado = If(tipo IsNot Nothing, tipo.Nombre, "")
 
-                Select Case estado.TipoEstadoTransitorioId
-                    Case 1 ' Designación
-                        If estado.DesignacionDetalle IsNot Nothing Then
-                            fechaDesde = estado.DesignacionDetalle.FechaDesde.ToShortDateString()
-                            fechaHasta = If(estado.DesignacionDetalle.FechaHasta.HasValue, estado.DesignacionDetalle.FechaHasta.Value.ToShortDateString(), "")
-                            observaciones = estado.DesignacionDetalle.Observaciones
-                        End If
-                    Case 2 ' Enfermedad
-                        If estado.EnfermedadDetalle IsNot Nothing Then
-                            fechaDesde = estado.EnfermedadDetalle.FechaDesde.ToShortDateString()
-                            fechaHasta = If(estado.EnfermedadDetalle.FechaHasta.HasValue, estado.EnfermedadDetalle.FechaHasta.Value.ToShortDateString(), "")
-                            observaciones = estado.EnfermedadDetalle.Observaciones & " (" & estado.EnfermedadDetalle.Diagnostico & ")"
-                        End If
-                    Case 3 ' Sanción
-                        If estado.SancionDetalle IsNot Nothing Then
-                            fechaDesde = estado.SancionDetalle.FechaDesde.ToShortDateString()
-                            fechaHasta = If(estado.SancionDetalle.FechaHasta.HasValue, estado.SancionDetalle.FechaHasta.Value.ToShortDateString(), "")
-                            observaciones = estado.SancionDetalle.Observaciones
-                        End If
-                    Case 5 ' Retén
-                        If estado.RetenDetalle IsNot Nothing Then
-                            fechaDesde = estado.RetenDetalle.FechaReten.ToShortDateString()
-                            observaciones = estado.RetenDetalle.Observaciones
-                        End If
-                End Select
-
-                Select Case colName
-                    Case "FechaDesde" : e.Value = fechaDesde
-                    Case "FechaHasta" : e.Value = fechaHasta
-                    Case "Observaciones" : e.Value = observaciones
-                End Select
-            End If
+            Select Case estado.TipoEstadoTransitorioId
+                Case 1
+                    If estado.DesignacionDetalle IsNot Nothing Then
+                        fechaDesde = estado.DesignacionDetalle.FechaDesde
+                        fechaHasta = estado.DesignacionDetalle.FechaHasta
+                        observaciones = estado.DesignacionDetalle.Observaciones
+                    End If
+                Case 2
+                    If estado.EnfermedadDetalle IsNot Nothing Then
+                        fechaDesde = estado.EnfermedadDetalle.FechaDesde
+                        fechaHasta = estado.EnfermedadDetalle.FechaHasta
+                        observaciones = $"{estado.EnfermedadDetalle.Observaciones} " &
+                                    $"({estado.EnfermedadDetalle.Diagnostico})"
+                    End If
+                Case 3
+                    If estado.SancionDetalle IsNot Nothing Then
+                        fechaDesde = estado.SancionDetalle.FechaDesde
+                        fechaHasta = estado.SancionDetalle.FechaHasta
+                        observaciones = estado.SancionDetalle.Observaciones
+                    End If
+                Case 4
+                    If estado.OrdenCincoDetalle IsNot Nothing Then
+                        fechaDesde = estado.OrdenCincoDetalle.FechaDesde
+                        fechaHasta = estado.OrdenCincoDetalle.FechaHasta
+                        observaciones = estado.OrdenCincoDetalle.Observaciones
+                    End If
+                Case 5
+                    If estado.RetenDetalle IsNot Nothing Then
+                        fechaDesde = estado.RetenDetalle.FechaReten
+                        fechaHasta = Nothing
+                        observaciones = estado.RetenDetalle.Observaciones
+                    End If
+                Case 6
+                    If estado.SumarioDetalle IsNot Nothing Then
+                        fechaDesde = estado.SumarioDetalle.FechaDesde
+                        fechaHasta = estado.SumarioDetalle.FechaHasta
+                        observaciones = estado.SumarioDetalle.Observaciones
+                    End If
+            End Select
         End If
 
+        ' --- Asignación final a las celdas ---
+        Select Case colName
+            Case "TipoEstado"
+                e.Value = tipoEstado
+            Case "Observaciones"
+                e.Value = If(String.IsNullOrEmpty(observaciones),      ' ← línea nueva
+                     String.Empty,                             ' ← línea nueva
+                     observaciones)                            ' ← línea modificada
+            Case "FechaDesde"
+                e.Value = If(fechaDesde.HasValue,
+                         fechaDesde.Value.ToShortDateString(),
+                         String.Empty)   ' ← cambio
+            Case "FechaHasta"
+                e.Value = If(fechaHasta.HasValue,
+                         fechaHasta.Value.ToShortDateString(),
+                         String.Empty)   ' ← cambio
+        End Select
+
         e.FormattingApplied = True
-        ' --- FIN DE LA CORRECCIÓN ---
     End Sub
+
 
     Private Sub btnCancelar_Click(sender As Object, e As EventArgs) Handles btnCancelar.Click
         DialogResult = DialogResult.Cancel
@@ -559,5 +642,44 @@ Public Class frmFuncionarioCrear
         End If
     End Sub
 #End Region
+    ' -----------------------------------------------------------------
+    '  Engancha DataError, CellFormatting y CellParsing en un DGV
+    ' -----------------------------------------------------------------
+    Private Sub AttachDebugHandlers(dgv As DataGridView, Optional nombre As String = "")
+        If String.IsNullOrWhiteSpace(nombre) Then nombre = dgv.Name
+
+        ' Cuando el control captura una excepción interna ↓
+        AddHandler dgv.DataError,
+        Sub(s, eArgs)
+            Dim valor = TryCast(dgv.Rows(eArgs.RowIndex).Cells(eArgs.ColumnIndex).Value, Object)
+            Debug.WriteLine($"[DataError-{nombre}]  Fila {eArgs.RowIndex}, Col {eArgs.ColumnIndex} " &
+                            $"({dgv.Columns(eArgs.ColumnIndex).Name})  " &
+                            $"Valor = {If(valor Is Nothing, "<Nothing>", $"'{valor}' [{valor.GetType.Name}]")}  " &
+                            $"Excepción = {eArgs.Exception.Message}")
+            eArgs.ThrowException = False      ' quita el cuadro estándar
+        End Sub
+
+        ' Justo antes de pintar la celda ↓
+        AddHandler dgv.CellFormatting,
+        Sub(s, eArgs)
+            Try
+                ' Deja que siga tu lógica normal
+            Catch ex As Exception
+                Debug.WriteLine($"[Formatting-{nombre}]  Fila {eArgs.RowIndex}, Col {eArgs.ColumnIndex}: {ex.Message}")
+                Throw                                           ' para que VS se detenga aquí
+            End Try
+        End Sub
+
+        ' Cuando el usuario edita y el grid intenta convertir ↓
+        AddHandler dgv.CellParsing,
+        Sub(s, eArgs)
+            Try
+                ' Sin lógica especial – solo log
+            Catch ex As Exception
+                Debug.WriteLine($"[Parsing-{nombre}]  Fila {eArgs.RowIndex}, Col {eArgs.ColumnIndex}: {ex.Message}")
+                Throw
+            End Try
+        End Sub
+    End Sub
 
 End Class
