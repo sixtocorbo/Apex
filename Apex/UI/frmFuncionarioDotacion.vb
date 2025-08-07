@@ -42,13 +42,16 @@ Public Class frmFuncionarioDotacion
             Return
         End If
 
+        ' --- INICIO DE LA CORRECCIÓN CLAVE ---
+        ' Asignamos únicamente el ID del ítem de dotación.
+        ' Esto evita que Entity Framework intente insertar un nuevo DotacionItem duplicado.
         Dotacion.DotacionItemId = CInt(cboItem.SelectedValue)
+        ' La línea que asignaba el objeto completo ha sido eliminada.
+        ' --- FIN DE LA CORRECCIÓN CLAVE ---
+
         Dotacion.Talla = txtTalla.Text.Trim()
         Dotacion.Observaciones = txtObservaciones.Text.Trim()
         Dotacion.FechaAsign = DateTime.Now
-
-        ' ✅ Asegura que el objeto de navegación esté presente
-        Dotacion.DotacionItem = ItemSeleccionado
 
         DialogResult = DialogResult.OK
         Close()

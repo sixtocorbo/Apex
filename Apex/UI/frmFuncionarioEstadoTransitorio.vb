@@ -56,12 +56,14 @@ Public Class frmFuncionarioEstadoTransitorio
             Return
         End If
 
-        ' --- INICIO DE LA CORRECCIÓN CLAVE ---
-        ' Asignamos el ID y también el objeto de navegación completo.
-        ' Esto asegura que Entity Framework entienda la relación correctamente.
+        ' --- INICIO DE LA CORRECCIÓN ---
+        ' Asignamos únicamente el ID del tipo de estado.
+        ' Esto evita que Entity Framework intente insertar un nuevo TipoEstadoTransitorio duplicado.
         Estado.TipoEstadoTransitorioId = CInt(cboTipoEstado.SelectedValue)
-        Estado.TipoEstadoTransitorio = CType(cboTipoEstado.SelectedItem, TipoEstadoTransitorio)
-        ' --- FIN DE LA CORRECCIÓN CLAVE ---
+
+        ' La línea que asignaba el objeto completo ha sido eliminada, ya que era la causa del error.
+        ' Estado.TipoEstadoTransitorio = CType(cboTipoEstado.SelectedItem, TipoEstadoTransitorio)
+        ' --- FIN DE LA CORRECCIÓN ---
 
         Estado.FechaDesde = dtpFechaDesde.Value.Date
         Estado.FechaHasta = If(chkFechaHasta.Checked, CType(Nothing, Date?), dtpFechaHasta.Value.Date)

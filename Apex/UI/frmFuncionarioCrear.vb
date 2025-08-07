@@ -26,6 +26,11 @@ Public Class frmFuncionarioCrear
     Private _estadosTransitorios As BindingList(Of EstadoTransitorio)
     Private _historialConsolidado As List(Of Object)
 
+    ' --- INICIO DE LA CORRECCIÓN ---
+    Private _itemsDotacion As List(Of DotacionItem) ' Almacenará los tipos de dotación.
+    ' --- FIN DE LA CORRECCIÓN ---
+
+
     '-------------------- Constructores ----------------------
     Public Sub New()
         InitializeComponent()
@@ -52,6 +57,11 @@ Public Class frmFuncionarioCrear
         Await CargarCombosAsync()
 
         _tiposEstadoTransitorio = Await _svc.ObtenerTiposEstadoTransitorioCompletosAsync()
+
+        ' --- INICIO DE LA CORRECCIÓN ---
+        ' Cargamos la lista de dotaciones para usarla en el formateo de la grilla.
+        _itemsDotacion = Await _svc.ObtenerItemsDotacionCompletosAsync()
+        ' --- FIN DE LA CORRECCIÓN ---
 
         If _funcionario Is Nothing AndAlso _modo = ModoFormulario.Editar Then
             MessageBox.Show("No se encontró el registro del funcionario.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -140,11 +150,9 @@ Public Class frmFuncionarioCrear
         End Try
     End Function
 
-    ' --- CORRECCIÓN #1: LÓGICA ROBUSTA PARA MANEJAR LA SELECCIÓN ---
     Private Sub DgvEstadosTransitorios_SelectionChanged(sender As Object, e As EventArgs)
         Dim editable = False
 
-        ' Bloque de seguridad para manejar cambios de DataSource y selecciones vacías.
         If dgvEstadosTransitorios.CurrentRow Is Nothing OrElse dgvEstadosTransitorios.CurrentRow.DataBoundItem Is Nothing Then
             btnEditarEstado.Enabled = False
             btnQuitarEstado.Enabled = False
@@ -154,24 +162,18 @@ Public Class frmFuncionarioCrear
         Dim itemSeleccionado = dgvEstadosTransitorios.CurrentRow.DataBoundItem
 
         If Not chkVerHistorial.Checked Then
-            ' Modo edición: Los items son de tipo 'EstadoTransitorio' y siempre son editables.
             editable = True
         Else
-            ' Modo historial: Los items son de un tipo anónimo.
-            ' Verificamos de forma segura que la propiedad 'Origen' exista antes de leerla.
             Dim origenProperty As System.Reflection.PropertyInfo = itemSeleccionado.GetType().GetProperty("Origen")
 
             If origenProperty IsNot Nothing Then
                 Dim origenValue = origenProperty.GetValue(itemSeleccionado, Nothing)
                 If origenValue IsNot Nothing Then
-                    ' Usamos una comparación que ignora mayúsculas/minúsculas para ser más seguro.
                     editable = String.Equals(origenValue.ToString(), "Estado", StringComparison.OrdinalIgnoreCase)
                 End If
             End If
-            ' Si la propiedad no existe o es nula, 'editable' permanece False, lo cual es seguro.
         End If
 
-        ' Habilitar/deshabilitar botones según el contexto
         btnAñadirEstado.Enabled = Not chkVerHistorial.Checked
         btnEditarEstado.Enabled = editable
         btnQuitarEstado.Enabled = editable
@@ -223,16 +225,12 @@ Public Class frmFuncionarioCrear
         End Try
     End Sub
 
-    ' --- CORRECCIÓN #2: LÓGICA DE SINCRONIZACIÓN EXPLÍCITA ---
     Private Sub SincronizarColeccion(Of T As Class)(dbCollection As ICollection(Of T), formCollection As BindingList(Of T))
-        ' Items que están en la colección original de la BD pero ya no están en la lista del formulario.
         Dim itemsParaBorrar = dbCollection.Except(formCollection).ToList()
         For Each item In itemsParaBorrar
-            ' En lugar de solo quitarlo de la colección, le decimos explícitamente al contexto de EF que debe borrarlo.
             _uow.Context.Entry(item).State = EntityState.Deleted
         Next
 
-        ' Items que están en la lista del formulario pero aún no en la colección de la BD.
         Dim itemsParaAnadir = formCollection.Except(dbCollection).ToList()
         For Each item In itemsParaAnadir
             dbCollection.Add(item)
@@ -297,14 +295,27 @@ Public Class frmFuncionarioCrear
         If e.RowIndex < 0 OrElse e.ColumnIndex < 0 Then Return
         Dim dgv = CType(sender, DataGridView)
         Dim colName = dgv.Columns(e.ColumnIndex).Name
+
         If colName = "colItem" Then
             Dim dotacion = TryCast(dgv.Rows(e.RowIndex).DataBoundItem, FuncionarioDotacion)
-            If dotacion IsNot Nothing AndAlso dotacion.DotacionItem IsNot Nothing Then
-                e.Value = dotacion.DotacionItem.Nombre
+            If dotacion IsNot Nothing Then
+                ' --- INICIO DE LA CORRECCIÓN ---
+                If dotacion.DotacionItem IsNot Nothing Then
+                    ' Para items existentes, usamos la propiedad de navegación.
+                    e.Value = dotacion.DotacionItem.Nombre
+                ElseIf dotacion.DotacionItemId > 0 AndAlso _itemsDotacion IsNot Nothing Then
+                    ' Para items NUEVOS, buscamos el nombre en la lista en memoria.
+                    Dim item = _itemsDotacion.FirstOrDefault(Function(i) i.Id = dotacion.DotacionItemId)
+                    If item IsNot Nothing Then
+                        e.Value = item.Nombre
+                    End If
+                End If
                 e.FormattingApplied = True
+                ' --- FIN DE LA CORRECCIÓN ---
             End If
         End If
     End Sub
+
 
     Private Sub dgvEstadosTransitorios_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
         If e.RowIndex < 0 OrElse e.ColumnIndex < 0 Then Return
@@ -317,11 +328,17 @@ Public Class frmFuncionarioCrear
             ' Formateo para el modo edición (entidad EstadoTransitorio)
             Dim estado = TryCast(dgv.Rows(e.RowIndex).DataBoundItem, EstadoTransitorio)
             If estado Is Nothing Then Return
+
             If colName = "TipoEstado" Then
                 If estado.TipoEstadoTransitorio IsNot Nothing Then
                     e.Value = estado.TipoEstadoTransitorio.Nombre
-                    e.FormattingApplied = True
+                ElseIf estado.TipoEstadoTransitorioId > 0 AndAlso _tiposEstadoTransitorio IsNot Nothing Then
+                    Dim tipo = _tiposEstadoTransitorio.FirstOrDefault(Function(t) t.Id = estado.TipoEstadoTransitorioId)
+                    If tipo IsNot Nothing Then
+                        e.Value = tipo.Nombre
+                    End If
                 End If
+                e.FormattingApplied = True
             End If
         End If
 
@@ -332,6 +349,7 @@ Public Class frmFuncionarioCrear
             End If
         End If
     End Sub
+
 
     Private Sub btnCancelar_Click(sender As Object, e As EventArgs) Handles btnCancelar.Click
         DialogResult = DialogResult.Cancel
@@ -393,12 +411,10 @@ Public Class frmFuncionarioCrear
         Dim estadoParaEditar As EstadoTransitorio = Nothing
 
         If chkVerHistorial.Checked Then
-            ' Modo historial: Buscamos el estado en la lista original por su ID
             Dim itemSeleccionado = dgvEstadosTransitorios.CurrentRow.DataBoundItem
             Dim id = CInt(itemSeleccionado.GetType().GetProperty("Id").GetValue(itemSeleccionado, Nothing))
             estadoParaEditar = _estadosTransitorios.FirstOrDefault(Function(et) et.Id = id)
         Else
-            ' Modo edición: El item es el objeto que queremos
             estadoParaEditar = TryCast(dgvEstadosTransitorios.CurrentRow.DataBoundItem, EstadoTransitorio)
         End If
 
