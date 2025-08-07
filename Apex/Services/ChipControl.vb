@@ -22,7 +22,7 @@ Public Class ChipControl
         SuspendLayout()
 
         ' Configuración básica del Chip
-        AutoSize = True
+        AutoSize = True ' Puedes dejarlo en True o False, el ajuste manual lo controlará
         AutoSizeMode = AutoSizeMode.GrowAndShrink
         Margin = New Padding(3)
         BackColor = Color.FromArgb(220, 235, 255)
@@ -30,25 +30,23 @@ Public Class ChipControl
 
         ' Botón de cerrar
         _btnCerrar = New Button() With {
-          .Text = "×",
-            .Font = New Font("Segoe UI", 8.0F, FontStyle.Bold),
-            .ForeColor = Color.DarkRed,
-            .FlatStyle = FlatStyle.Flat,
-            .Size = New Size(22, 22),
-            .TabStop = False
-        }
+        .Text = "×",
+        .Font = New Font("Segoe UI", 8.0F, FontStyle.Bold),
+        .ForeColor = Color.DarkRed,
+        .FlatStyle = FlatStyle.Flat,
+        .Size = New Size(22, 22),
+        .TabStop = False
+    }
         _btnCerrar.FlatAppearance.BorderSize = 0
         AddHandler _btnCerrar.Click, AddressOf OnCerrarClick
 
         ' Label para el texto (configurado para auto-wrap con un máximo fijo)
         _lblTexto = New Label() With {
-            .AutoSize = True, ' Se deja en True para que calcule su tamaño
-            .Location = New Point(3, 3),
-            .Text = GetReglaDescripcion(regla),
+        .AutoSize = True,
+        .Location = New Point(3, 3),
+        .Text = GetReglaDescripcion(regla),
         .MaximumSize = New Size(350, 0)
-        }      ' >>> CAMBIO CLAVE: Se establece un ancho máximo fijo para el texto.
-        ' Esto fuerza el auto-wrap sin depender del contenedor.        ' Puedes ajustar este valor (350) si lo consideras necesario.
-
+    }
         Controls.Add(_lblTexto)
         Controls.Add(_btnCerrar)
 
