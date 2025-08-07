@@ -42,35 +42,23 @@ Public Class frmFuncionarioCrear
         _modo = ModoFormulario.Editar
         _idFuncionario = id
         _uow = New UnitOfWork()
-
-        ' --- INICIO DE LA CORRECCIÓN ---
-        ' Paso 1: Cargar el funcionario y sus relaciones principales, pero SIN los detalles de estado transitorio.
         _funcionario = _uow.Context.Set(Of Funcionario)().
                         Include(Function(f) f.FuncionarioDotacion.Select(Function(fd) fd.DotacionItem)).
                         Include(Function(f) f.EstadoTransitorio.Select(Function(et) et.TipoEstadoTransitorio)).
                         FirstOrDefault(Function(f) f.Id = id)
 
-        ' Paso 2: Cargar explícitamente los detalles para cada estado transitorio.
-        ' Esto evita que Entity Framework genere una única consulta SQL compleja y propensa a errores.
         If _funcionario IsNot Nothing AndAlso _funcionario.EstadoTransitorio IsNot Nothing Then
             For Each et In _funcionario.EstadoTransitorio
                 Select Case et.TipoEstadoTransitorioId
-                    Case 1 ' Designación
-                        _uow.Context.Entry(et).Reference(Function(x) x.DesignacionDetalle).Load()
-                    Case 2 ' Enfermedad
-                        _uow.Context.Entry(et).Reference(Function(x) x.EnfermedadDetalle).Load()
-                    Case 3 ' Sanción
-                        _uow.Context.Entry(et).Reference(Function(x) x.SancionDetalle).Load()
-                    Case 4 ' Orden Cinco
-                        _uow.Context.Entry(et).Reference(Function(x) x.OrdenCincoDetalle).Load()
-                    Case 5 ' Retén
-                        _uow.Context.Entry(et).Reference(Function(x) x.RetenDetalle).Load()
-                    Case 6 ' Sumario
-                        _uow.Context.Entry(et).Reference(Function(x) x.SumarioDetalle).Load()
+                    Case 1 : _uow.Context.Entry(et).Reference(Function(x) x.DesignacionDetalle).Load()
+                    Case 2 : _uow.Context.Entry(et).Reference(Function(x) x.EnfermedadDetalle).Load()
+                    Case 3 : _uow.Context.Entry(et).Reference(Function(x) x.SancionDetalle).Load()
+                    Case 4 : _uow.Context.Entry(et).Reference(Function(x) x.OrdenCincoDetalle).Load()
+                    Case 5 : _uow.Context.Entry(et).Reference(Function(x) x.RetenDetalle).Load()
+                    Case 6 : _uow.Context.Entry(et).Reference(Function(x) x.SumarioDetalle).Load()
                 End Select
             Next
         End If
-        ' --- FIN DE LA CORRECCIÓN ---
     End Sub
 
     '------------------- Carga del Formulario --------------------------
@@ -389,67 +377,84 @@ Public Class frmFuncionarioCrear
         Dim dgv = CType(sender, DataGridView)
         Dim colName = dgv.Columns(e.ColumnIndex).Name
 
-        If chkVerHistorial.Checked Then
-            Dim item = dgv.Rows(e.RowIndex).DataBoundItem
-            If item Is Nothing Then Return
+        ' --- INICIO DE LA CORRECCIÓN ---
+        ' Lógica única y robusta para formatear la grilla de estados.
 
+        e.Value = "" ' Empezar con un valor vacío por defecto
+
+        Dim dataItem = dgv.Rows(e.RowIndex).DataBoundItem
+        If dataItem Is Nothing Then Return
+
+        If chkVerHistorial.Checked Then
+            ' MODO HISTORIAL: Los datos son de un tipo anónimo
             Select Case colName
-                Case "TipoEstado"
-                    e.Value = item.GetType().GetProperty("TipoEstado").GetValue(item, Nothing)
+                Case "TipoEstado" : e.Value = dataItem.GetType().GetProperty("TipoEstado")?.GetValue(dataItem, Nothing)
+                Case "Observaciones" : e.Value = dataItem.GetType().GetProperty("Observaciones")?.GetValue(dataItem, Nothing)
                 Case "FechaDesde"
-                    Dim fechaDesdeObj = item.GetType().GetProperty("FechaDesde").GetValue(item, Nothing)
+                    Dim fechaDesdeObj = dataItem.GetType().GetProperty("FechaDesde")?.GetValue(dataItem, Nothing)
                     If fechaDesdeObj IsNot Nothing AndAlso Not DBNull.Value.Equals(fechaDesdeObj) Then
                         e.Value = CDate(fechaDesdeObj).ToShortDateString()
-                    Else
-                        e.Value = ""
                     End If
                 Case "FechaHasta"
-                    Dim fechaHastaObj = item.GetType().GetProperty("FechaHasta").GetValue(item, Nothing)
+                    Dim fechaHastaObj = dataItem.GetType().GetProperty("FechaHasta")?.GetValue(dataItem, Nothing)
                     If fechaHastaObj IsNot Nothing AndAlso Not DBNull.Value.Equals(fechaHastaObj) Then
                         e.Value = CDate(fechaHastaObj).ToShortDateString()
-                    Else
-                        e.Value = ""
                     End If
-                Case "Observaciones"
-                    e.Value = item.GetType().GetProperty("Observaciones").GetValue(item, Nothing)
             End Select
-            e.FormattingApplied = True
         Else
-            Dim estado = TryCast(dgv.Rows(e.RowIndex).DataBoundItem, EstadoTransitorio)
+            ' MODO EDICIÓN: Los datos son del tipo EstadoTransitorio
+            Dim estado = TryCast(dataItem, EstadoTransitorio)
             If estado Is Nothing Then Return
+
+            ' Si el Id del tipo no está seteado (fila nueva), no hacer nada
+            If estado.TipoEstadoTransitorioId = 0 Then
+                e.FormattingApplied = True
+                Return
+            End If
 
             If colName = "TipoEstado" Then
                 Dim tipo = _tiposEstadoTransitorio.FirstOrDefault(Function(t) t.Id = estado.TipoEstadoTransitorioId)
-                If tipo IsNot Nothing Then e.Value = tipo.Nombre
-            End If
+                e.Value = If(tipo IsNot Nothing, tipo.Nombre, "")
+            Else
+                Dim fechaDesde, fechaHasta, observaciones As String
+                fechaDesde = "" : fechaHasta = "" : observaciones = ""
 
-            Select Case estado.TipoEstadoTransitorioId
-                Case 1 ' Designación
-                    If estado.DesignacionDetalle IsNot Nothing Then
-                        If colName = "FechaDesde" Then e.Value = estado.DesignacionDetalle.FechaDesde.ToShortDateString()
-                        If colName = "FechaHasta" Then e.Value = If(estado.DesignacionDetalle.FechaHasta.HasValue, estado.DesignacionDetalle.FechaHasta.Value.ToShortDateString(), "")
-                        If colName = "Observaciones" Then e.Value = estado.DesignacionDetalle.Observaciones
-                    End If
-                Case 2 ' Enfermedad
-                    If estado.EnfermedadDetalle IsNot Nothing Then
-                        If colName = "FechaDesde" Then e.Value = estado.EnfermedadDetalle.FechaDesde.ToShortDateString()
-                        If colName = "FechaHasta" Then e.Value = If(estado.EnfermedadDetalle.FechaHasta.HasValue, estado.EnfermedadDetalle.FechaHasta.Value.ToShortDateString(), "")
-                        If colName = "Observaciones" Then e.Value = estado.EnfermedadDetalle.Observaciones & " (" & estado.EnfermedadDetalle.Diagnostico & ")"
-                    End If
-                Case 3 ' Sanción
-                    If estado.SancionDetalle IsNot Nothing Then
-                        If colName = "FechaDesde" Then e.Value = estado.SancionDetalle.FechaDesde.ToShortDateString()
-                        If colName = "FechaHasta" Then e.Value = If(estado.SancionDetalle.FechaHasta.HasValue, estado.SancionDetalle.FechaHasta.Value.ToShortDateString(), "")
-                        If colName = "Observaciones" Then e.Value = estado.SancionDetalle.Observaciones
-                    End If
-                Case 5 ' Retén
-                    If estado.RetenDetalle IsNot Nothing Then
-                        If colName = "FechaDesde" Then e.Value = estado.RetenDetalle.FechaReten.ToShortDateString()
-                        If colName = "Observaciones" Then e.Value = estado.RetenDetalle.Observaciones
-                    End If
-            End Select
-            e.FormattingApplied = True
+                Select Case estado.TipoEstadoTransitorioId
+                    Case 1 ' Designación
+                        If estado.DesignacionDetalle IsNot Nothing Then
+                            fechaDesde = estado.DesignacionDetalle.FechaDesde.ToShortDateString()
+                            fechaHasta = If(estado.DesignacionDetalle.FechaHasta.HasValue, estado.DesignacionDetalle.FechaHasta.Value.ToShortDateString(), "")
+                            observaciones = estado.DesignacionDetalle.Observaciones
+                        End If
+                    Case 2 ' Enfermedad
+                        If estado.EnfermedadDetalle IsNot Nothing Then
+                            fechaDesde = estado.EnfermedadDetalle.FechaDesde.ToShortDateString()
+                            fechaHasta = If(estado.EnfermedadDetalle.FechaHasta.HasValue, estado.EnfermedadDetalle.FechaHasta.Value.ToShortDateString(), "")
+                            observaciones = estado.EnfermedadDetalle.Observaciones & " (" & estado.EnfermedadDetalle.Diagnostico & ")"
+                        End If
+                    Case 3 ' Sanción
+                        If estado.SancionDetalle IsNot Nothing Then
+                            fechaDesde = estado.SancionDetalle.FechaDesde.ToShortDateString()
+                            fechaHasta = If(estado.SancionDetalle.FechaHasta.HasValue, estado.SancionDetalle.FechaHasta.Value.ToShortDateString(), "")
+                            observaciones = estado.SancionDetalle.Observaciones
+                        End If
+                    Case 5 ' Retén
+                        If estado.RetenDetalle IsNot Nothing Then
+                            fechaDesde = estado.RetenDetalle.FechaReten.ToShortDateString()
+                            observaciones = estado.RetenDetalle.Observaciones
+                        End If
+                End Select
+
+                Select Case colName
+                    Case "FechaDesde" : e.Value = fechaDesde
+                    Case "FechaHasta" : e.Value = fechaHasta
+                    Case "Observaciones" : e.Value = observaciones
+                End Select
+            End If
         End If
+
+        e.FormattingApplied = True
+        ' --- FIN DE LA CORRECCIÓN ---
     End Sub
 
     Private Sub btnCancelar_Click(sender As Object, e As EventArgs) Handles btnCancelar.Click

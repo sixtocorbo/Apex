@@ -4,7 +4,7 @@ Public Class frmFuncionarioEstadoTransitorio
     Public Estado As EstadoTransitorio
     Private _tiposEstado As List(Of TipoEstadoTransitorio)
 
-    ' --- Propiedades para los detalles ---
+    ' Propiedades para los nuevos detalles (inicializadas en el constructor)
     Public DesignacionDetalle As DesignacionDetalle
     Public SancionDetalle As SancionDetalle
     Public SumarioDetalle As SumarioDetalle
@@ -25,7 +25,7 @@ Public Class frmFuncionarioEstadoTransitorio
         If Estado IsNot Nothing AndAlso Estado.Id > 0 Then
             ' MODO EDICIÓN
             cboTipoEstado.SelectedValue = Estado.TipoEstadoTransitorioId
-            cboTipoEstado.Enabled = False ' No se puede cambiar el tipo de un estado existente
+            cboTipoEstado.Enabled = False
             CargarDatosDeDetalle()
         Else
             ' MODO CREACIÓN
@@ -35,45 +35,54 @@ Public Class frmFuncionarioEstadoTransitorio
         End If
 
         AddHandler cboTipoEstado.SelectedIndexChanged, AddressOf TipoEstado_Changed
-        TipoEstado_Changed(Nothing, EventArgs.Empty) ' Llamada inicial para configurar la UI
+        TipoEstado_Changed(Nothing, EventArgs.Empty)
     End Sub
 
     Private Sub CargarDatosDeDetalle()
+        Dim fechaHasta As Date? = Nothing
+        Dim observaciones As String = ""
+
+        ' Obtiene el detalle correcto y sus datos comunes
         Select Case Estado.TipoEstadoTransitorioId
             Case 1 ' Designación
                 DesignacionDetalle = Estado.DesignacionDetalle
                 dtpFechaDesde.Value = DesignacionDetalle.FechaDesde
-                txtObservaciones.Text = DesignacionDetalle.Observaciones
+                fechaHasta = DesignacionDetalle.FechaHasta
+                observaciones = DesignacionDetalle.Observaciones
                 txtResolucion.Text = DesignacionDetalle.DocResolucion
             Case 2 ' Enfermedad
                 EnfermedadDetalle = Estado.EnfermedadDetalle
                 dtpFechaDesde.Value = EnfermedadDetalle.FechaDesde
-                txtObservaciones.Text = EnfermedadDetalle.Observaciones
+                fechaHasta = EnfermedadDetalle.FechaHasta
+                observaciones = EnfermedadDetalle.Observaciones
                 txtDiagnostico.Text = EnfermedadDetalle.Diagnostico
             Case 3 ' Sanción
                 SancionDetalle = Estado.SancionDetalle
                 dtpFechaDesde.Value = SancionDetalle.FechaDesde
-                txtObservaciones.Text = SancionDetalle.Observaciones
+                fechaHasta = SancionDetalle.FechaHasta
+                observaciones = SancionDetalle.Observaciones
                 txtResolucion.Text = SancionDetalle.Resolucion
             Case 4 ' Orden Cinco
                 OrdenCincoDetalle = Estado.OrdenCincoDetalle
                 dtpFechaDesde.Value = OrdenCincoDetalle.FechaDesde
-                txtObservaciones.Text = OrdenCincoDetalle.Observaciones
+                fechaHasta = OrdenCincoDetalle.FechaHasta
+                observaciones = OrdenCincoDetalle.Observaciones
             Case 5 ' Retén
                 RetenDetalle = Estado.RetenDetalle
                 dtpFechaDesde.Value = RetenDetalle.FechaReten
-                txtObservaciones.Text = RetenDetalle.Observaciones
+                observaciones = RetenDetalle.Observaciones
                 txtTurnoReten.Text = RetenDetalle.Turno
             Case 6 ' Sumario
                 SumarioDetalle = Estado.SumarioDetalle
                 dtpFechaDesde.Value = SumarioDetalle.FechaDesde
-                txtObservaciones.Text = SumarioDetalle.Observaciones
-                txtResolucion.Text = SumarioDetalle.Expediente
+                fechaHasta = SumarioDetalle.FechaHasta
+                observaciones = SumarioDetalle.Observaciones
+                txtResolucion.Text = SumarioDetalle.Expediente ' Mapeado a Expediente
         End Select
 
-        ' Cargar FechaHasta común para la mayoría
+        ' Asignar valores a los controles comunes
+        txtObservaciones.Text = observaciones
         If Estado.TipoEstadoTransitorioId <> 5 Then ' Retén no tiene FechaHasta
-            Dim fechaHasta As Date? = CType(Estado, Object).GetType().GetProperty("FechaHasta").GetValue(Estado, Nothing)
             If fechaHasta.HasValue Then
                 dtpFechaHasta.Value = fechaHasta.Value
                 dtpFechaHasta.Enabled = True
@@ -85,21 +94,17 @@ Public Class frmFuncionarioEstadoTransitorio
         End If
     End Sub
 
-
     Private Sub TipoEstado_Changed(sender As Object, e As EventArgs)
-        ' Ocultar todos los campos específicos primero
-        lblResolucion.Visible = False
-        txtResolucion.Visible = False
-        lblDiagnostico.Visible = False
-        txtDiagnostico.Visible = False
-        lblTurnoReten.Visible = False
-        txtTurnoReten.Visible = False
+        ' Ocultar todos los campos específicos
+        lblResolucion.Visible = False : txtResolucion.Visible = False
+        lblDiagnostico.Visible = False : txtDiagnostico.Visible = False
+        lblTurnoReten.Visible = False : txtTurnoReten.Visible = False
 
-        ' Ocultar campos comunes que no aplican a todos
+        ' Restaurar visibilidad y texto por defecto de campos comunes
+        lblFechaDesde.Text = "Fecha Desde:"
         lblFechaHasta.Visible = True
         dtpFechaHasta.Visible = True
         chkFechaHasta.Visible = True
-
 
         If cboTipoEstado.SelectedIndex = -1 Then Return
 
@@ -115,7 +120,6 @@ Public Class frmFuncionarioEstadoTransitorio
             Case 5 ' Retén
                 lblTurnoReten.Visible = True
                 txtTurnoReten.Visible = True
-                ' Retén no tiene rango de fechas, solo una fecha
                 lblFechaDesde.Text = "Fecha Retén:"
                 lblFechaHasta.Visible = False
                 dtpFechaHasta.Visible = False
@@ -146,10 +150,8 @@ Public Class frmFuncionarioEstadoTransitorio
             Return
         End If
 
-        ' Asignar el ID del tipo al objeto principal
         Estado.TipoEstadoTransitorioId = tipoId
 
-        ' Rellenar y asociar el objeto de detalle correcto
         Select Case tipoId
             Case 1 ' Designación
                 Dim detalle = If(Estado.Id > 0, Estado.DesignacionDetalle, New DesignacionDetalle())
