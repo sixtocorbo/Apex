@@ -14,54 +14,64 @@ Public Class ChipControl
     Public ReadOnly Property Regla As ReglaFiltro
     Public Event CerrarClick As EventHandler
 
-    ' --- CONSTRUCTOR CORREGIDO: Ya no depende del ancho del padre ---
-    Public Sub New(regla As ReglaFiltro) ' Se elimina el parámetro parentWidth
+    Public Sub New(regla As ReglaFiltro)
         If regla Is Nothing Then Throw New ArgumentNullException(NameOf(regla))
         Me.Regla = regla
 
         SuspendLayout()
 
         ' Configuración básica del Chip
-        AutoSize = True ' Puedes dejarlo en True o False, el ajuste manual lo controlará
+        AutoSize = True
         AutoSizeMode = AutoSizeMode.GrowAndShrink
         Margin = New Padding(3)
         BackColor = Color.FromArgb(220, 235, 255)
         BorderStyle = BorderStyle.FixedSingle
 
-        ' Botón de cerrar
+        ' Botón de cerrar (con el carácter tipográfico '×' de multiplicación)
         _btnCerrar = New Button() With {
-        .Text = "×",
-        .Font = New Font("Segoe UI", 8.0F, FontStyle.Bold),
-        .ForeColor = Color.DarkRed,
-        .FlatStyle = FlatStyle.Flat,
-        .Size = New Size(22, 22),
-        .TabStop = False
-    }
+            .Text = "×",
+            .Font = New Font("Segoe UI", 8.0F, FontStyle.Bold),
+            .ForeColor = Color.DarkRed,
+            .FlatStyle = FlatStyle.Flat,
+            .Size = New Size(22, 22),
+            .TabStop = False,
+            .Cursor = Cursors.Hand ' Mejora la experiencia de usuario
+        }
         _btnCerrar.FlatAppearance.BorderSize = 0
         AddHandler _btnCerrar.Click, AddressOf OnCerrarClick
 
         ' Label para el texto (configurado para auto-wrap con un máximo fijo)
         _lblTexto = New Label() With {
-        .AutoSize = True,
-        .Location = New Point(3, 3),
-        .Text = GetReglaDescripcion(regla),
-        .MaximumSize = New Size(350, 0)
-    }
-        Controls.Add(_lblTexto)
+            .AutoSize = True,
+            .Text = GetReglaDescripcion(regla),
+            .MaximumSize = New Size(350, 0),
+            .TextAlign = ContentAlignment.MiddleLeft
+        }
+
+        ' Se añaden en el orden visual deseado (aunque la posición se define en el layout)
         Controls.Add(_btnCerrar)
+        Controls.Add(_lblTexto)
 
         ResumeLayout(False)
         AjustarLayout()
     End Sub
 
     Private Sub AjustarLayout()
-        ' Centra verticalmente el botón con respecto al label
-        Dim yBoton As Integer = _lblTexto.Location.Y + Math.Max(0, (_lblTexto.Height - _btnCerrar.Height) \ 2)
-        _btnCerrar.Location = New Point(_lblTexto.Right + 3, yBoton)
+        ' --- INICIO DE LA CORRECCIÓN: Botón a la izquierda ---
 
-        ' Ajusta el tamaño del propio UserControl (el chip) para que contenga todo
-        Width = _btnCerrar.Right + 3
-        Height = _lblTexto.Bottom + 3
+        ' 1. Posicionar el botón de cerrar primero, a la izquierda del control.
+        '    El 'Y' se calcula para centrarlo verticalmente respecto a la altura del texto.
+        Dim yBoton As Integer = 3 + Math.Max(0, (_lblTexto.Height - _btnCerrar.Height) \ 2)
+        _btnCerrar.Location = New Point(3, yBoton)
+
+        ' 2. Posicionar el texto a la derecha del botón, con un pequeño margen.
+        _lblTexto.Location = New Point(_btnCerrar.Right + 3, 3)
+
+        ' 3. Ajustar el tamaño total del control (el chip) para que contenga a ambos elementos.
+        Width = _lblTexto.Right + 3
+        Height = Math.Max(_btnCerrar.Bottom, _lblTexto.Bottom) + 3
+
+        ' --- FIN DE LA CORRECCIÓN ---
     End Sub
 
     Private Sub OnCerrarClick(sender As Object, e As EventArgs)
