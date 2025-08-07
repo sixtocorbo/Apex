@@ -15,8 +15,6 @@ Partial Public Class OrdenCincoDetalle
     Public Property FechaDesde As Date
     Public Property FechaHasta As Nullable(Of Date)
     Public Property Observaciones As String
-    Public Property DocResolucion As String
-    Public Property FechaResolucion As Nullable(Of Date)
 
     Public Overridable Property EstadoTransitorio As EstadoTransitorio
 

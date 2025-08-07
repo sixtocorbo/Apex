@@ -15,8 +15,7 @@ Partial Public Class SancionDetalle
     Public Property FechaDesde As Date
     Public Property FechaHasta As Nullable(Of Date)
     Public Property Observaciones As String
-    Public Property DocResolucion As String
-    Public Property FechaResolucion As Nullable(Of Date)
+    Public Property Resolucion As String
 
     Public Overridable Property EstadoTransitorio As EstadoTransitorio
 

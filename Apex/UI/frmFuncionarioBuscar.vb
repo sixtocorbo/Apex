@@ -21,14 +21,9 @@ Public Class frmFuncionarioBuscar
         ConfigurarGrilla()
     End Sub
 
-    ' --- CORRECCIÓN APLICADA AQUÍ ---
-    ' Se reemplaza el evento 'Activated' por el evento 'Shown' para garantizar
-    ' que el foco se establezca correctamente la primera vez que el formulario es visible.
     Private Sub frmFuncionarioBuscar_Shown(sender As Object, e As EventArgs) Handles Me.Shown
-        ' Esta es una forma más directa y robusta de establecer el foco.
         Me.ActiveControl = txtBusqueda
     End Sub
-    ' --- FIN DE LA CORRECCIÓN ---
 
 #Region "Diseño de grilla"
     Private Sub ConfigurarGrilla()
@@ -38,14 +33,12 @@ Public Class frmFuncionarioBuscar
             .RowTemplate.MinimumHeight = 40
             .Columns.Clear()
 
-            '–– Id (oculto) ––
             .Columns.Add(New DataGridViewTextBoxColumn With {
                 .Name = "Id",
                 .DataPropertyName = "Id",
                 .Visible = False
             })
 
-            '–– CI ––
             .Columns.Add(New DataGridViewTextBoxColumn With {
                 .Name = "CI",
                 .DataPropertyName = "CI",
@@ -53,7 +46,6 @@ Public Class frmFuncionarioBuscar
                 .Width = 90
             })
 
-            '–– Nombre ––
             .Columns.Add(New DataGridViewTextBoxColumn With {
                 .Name = "Nombre",
                 .DataPropertyName = "Nombre",
@@ -62,7 +54,6 @@ Public Class frmFuncionarioBuscar
             })
         End With
 
-        ' Eventos
         AddHandler dgvResultados.SelectionChanged, AddressOf MostrarDetalle
         AddHandler dgvResultados.CellDoubleClick, AddressOf OnDgvDoubleClick
         AddHandler dgvResultados.DataError, Sub(s, ev) ev.ThrowException = False
@@ -71,7 +62,6 @@ Public Class frmFuncionarioBuscar
 
 
 #Region "Búsqueda con Full-Text y CONTAINS"
-    'aprovechando la funcionalidad de búsqueda Full-Text de SQL Server
     Private Async Function BuscarAsync() As Task
         LoadingHelper.MostrarCargando(Me)
         btnBuscar.Enabled = False
@@ -81,7 +71,6 @@ Public Class frmFuncionarioBuscar
                 Dim ctx = uow.Context
                 Dim filtro As String = txtBusqueda.Text.Trim()
 
-                '–– Condición mínima de 3 letras ––
                 If filtro.Length < 3 Then
                     dgvResultados.DataSource = Nothing
                     ResultadosFiltrados = New List(Of FuncionarioMin)
@@ -89,31 +78,26 @@ Public Class frmFuncionarioBuscar
                     Return
                 End If
 
-                '–– Construir patrón FTS por término ––
                 Dim terminos = filtro.Split(" "c) _
-                                    .Where(Function(w) Not String.IsNullOrWhiteSpace(w)) _
+                                     .Where(Function(w) Not String.IsNullOrWhiteSpace(w)) _
                                     .Select(Function(w) $"""{w}*""")
                 Dim expresionFts = String.Join(" AND ", terminos)
 
-                '–– SQL dinámico (CORREGIDO) ––
                 Dim sb As New StringBuilder()
                 sb.AppendLine("SELECT TOP (@limite)")
                 sb.AppendLine("       Id, CI, Nombre")
                 sb.AppendLine("FROM   dbo.Funcionario WITH (NOLOCK)")
-                sb.AppendLine("WHERE  CONTAINS((CI, Nombre), @patron)") ' <-- LÍNEA MODIFICADA
+                sb.AppendLine("WHERE  CONTAINS((CI, Nombre), @patron)")
                 sb.AppendLine("ORDER BY Nombre;")
 
                 Dim sql = sb.ToString()
                 Dim pLimite = New SqlParameter("@limite", LIMITE_FILAS)
-                ' El parámetro @filtro ya no es necesario
                 Dim pPatron = New SqlParameter("@patron", expresionFts)
 
-                '–– Ejecutar consulta (CORREGIDO)
                 Dim lista = Await ctx.Database _
-                                .SqlQuery(Of FuncionarioMin)(sql, pLimite, pPatron) _ ' <-- Parámetro @filtro eliminado
+                                .SqlQuery(Of FuncionarioMin)(sql, pLimite, pPatron) _
                                 .ToListAsync()
 
-                '–– Actualizar grilla
                 dgvResultados.DataSource = Nothing
                 dgvResultados.DataSource = lista
                 ResultadosFiltrados = lista
@@ -129,7 +113,7 @@ Public Class frmFuncionarioBuscar
                 If lista.Count = LIMITE_FILAS Then
                     MessageBox.Show($"Mostrando los primeros {LIMITE_FILAS} resultados." &
                                 "Refiná la búsqueda para ver más.",
-                            "Aviso",
+                                "Aviso",
                             MessageBoxButtons.OK, MessageBoxIcon.Information)
                 End If
             End Using
@@ -169,7 +153,7 @@ Public Class frmFuncionarioBuscar
     Private Sub MoverSeleccion(direccion As Integer)
         Dim total = dgvResultados.Rows.Count
         If total = 0 Then
-            LimpiarDetalle()        ' ← por las dudas
+            LimpiarDetalle()
             Exit Sub
         End If
 
@@ -182,7 +166,6 @@ Public Class frmFuncionarioBuscar
         dgvResultados.Rows(nuevoIndex).Selected = True
         dgvResultados.CurrentCell = dgvResultados.Rows(nuevoIndex).Cells("CI")
 
-        '— Forzamos refresco del detalle (por si el evento no se dispara)
         MostrarDetalle(Nothing, EventArgs.Empty)
     End Sub
 
@@ -190,7 +173,6 @@ Public Class frmFuncionarioBuscar
 #End Region
 
     Private Async Sub btnBuscar_Click(sender As Object, e As EventArgs) Handles btnBuscar.Click
-        ' Ejecuta búsqueda "manual" sin cancelación (si querés cancelar, usá un token)
         Await BuscarAsync()
     End Sub
 
@@ -198,46 +180,77 @@ Public Class frmFuncionarioBuscar
     Private Async Sub MostrarDetalle(sender As Object, e As EventArgs)
         If dgvResultados.CurrentRow Is Nothing OrElse dgvResultados.CurrentRow.DataBoundItem Is Nothing Then Return
         Dim id = CInt(dgvResultados.CurrentRow.Cells("Id").Value)
-        Dim fechaActual = Date.Today ' <-- Obtenemos la fecha actual para la consulta
 
         Using uow As New UnitOfWork()
+            ' --- INICIO DE LA CORRECCIÓN ---
+            ' 1. Cargar el funcionario con todas sus relaciones de estado transitorio
             Dim f = Await uow.Repository(Of Funcionario)() _
-                             .GetAll() _
-                             .Include(Function(x) x.Cargo) _
-                             .Include(Function(x) x.TipoFuncionario) _
-                             .Include(Function(x) x.EstadoTransitorio.Select(Function(et) et.TipoEstadoTransitorio)) _
-                             .AsNoTracking() _
-                             .Where(Function(x) x.Id = id) _
-                             .Select(Function(x) New With {
-                                 x.Foto,
-                                 x.Nombre,
-                                 x.CI,
-                                 x.Cargo,
-                                 x.TipoFuncionario,
-                                 x.FechaIngreso,
-                                 x.Activo,
-                                 .EstadosTransitoriosActivos = x.EstadoTransitorio.Where(
-                                     Function(et) et.FechaDesde <= fechaActual AndAlso
-                                                  (Not et.FechaHasta.HasValue OrElse et.FechaHasta.Value >= fechaActual)
-                              ).Select(Function(et) et.TipoEstadoTransitorio.Nombre).ToList()
-                             }).FirstOrDefaultAsync()
+                .GetAll() _
+                .Include(Function(x) x.Cargo) _
+                .Include(Function(x) x.TipoFuncionario) _
+                .Include(Function(x) x.EstadoTransitorio.Select(Function(et) et.TipoEstadoTransitorio)) _
+                .Include(Function(x) x.EstadoTransitorio.Select(Function(et) et.DesignacionDetalle)) _
+                .Include(Function(x) x.EstadoTransitorio.Select(Function(et) et.SancionDetalle)) _
+                .Include(Function(x) x.EstadoTransitorio.Select(Function(et) et.SumarioDetalle)) _
+                .Include(Function(x) x.EstadoTransitorio.Select(Function(et) et.OrdenCincoDetalle)) _
+                .Include(Function(x) x.EstadoTransitorio.Select(Function(et) et.EnfermedadDetalle)) _
+                .Include(Function(x) x.EstadoTransitorio.Select(Function(et) et.RetenDetalle)) _
+                .AsNoTracking() _
+                .FirstOrDefaultAsync(Function(x) x.Id = id)
 
-            ' Doble chequeo por si la selección cambió mientras se ejecutaba la consulta
-            If dgvResultados.CurrentRow Is Nothing _
-           OrElse dgvResultados.CurrentRow.DataBoundItem Is Nothing _
-           OrElse CInt(dgvResultados.CurrentRow.Cells("Id").Value) <> id Then Return
-
+            ' Doble chequeo por si la selección cambió
+            If dgvResultados.CurrentRow Is Nothing OrElse CInt(dgvResultados.CurrentRow.Cells("Id").Value) <> id Then Return
             If f Is Nothing Then Return
 
+            ' 2. Procesar los estados activos en memoria
+            Dim fechaActual = Date.Today
+            Dim estadosActivos As New List(Of String)
+
+            For Each et In f.EstadoTransitorio
+                Dim esActivo As Boolean = False
+                Select Case et.TipoEstadoTransitorioId
+                    Case 1 ' Designación
+                        If et.DesignacionDetalle IsNot Nothing Then
+                            esActivo = fechaActual >= et.DesignacionDetalle.FechaDesde AndAlso (Not et.DesignacionDetalle.FechaHasta.HasValue OrElse fechaActual <= et.DesignacionDetalle.FechaHasta.Value)
+                        End If
+                    Case 2 ' Enfermedad
+                        If et.EnfermedadDetalle IsNot Nothing Then
+                            esActivo = fechaActual >= et.EnfermedadDetalle.FechaDesde AndAlso (Not et.EnfermedadDetalle.FechaHasta.HasValue OrElse fechaActual <= et.EnfermedadDetalle.FechaHasta.Value)
+                        End If
+                    Case 3 ' Sanción
+                        If et.SancionDetalle IsNot Nothing Then
+                            esActivo = fechaActual >= et.SancionDetalle.FechaDesde AndAlso (Not et.SancionDetalle.FechaHasta.HasValue OrElse fechaActual <= et.SancionDetalle.FechaHasta.Value)
+                        End If
+                    Case 4 ' Orden Cinco
+                        If et.OrdenCincoDetalle IsNot Nothing Then
+                            esActivo = fechaActual >= et.OrdenCincoDetalle.FechaDesde AndAlso (Not et.OrdenCincoDetalle.FechaHasta.HasValue OrElse fechaActual <= et.OrdenCincoDetalle.FechaHasta.Value)
+                        End If
+                    Case 5 ' Retén
+                        If et.RetenDetalle IsNot Nothing Then
+                            esActivo = fechaActual = et.RetenDetalle.FechaReten
+                        End If
+                    Case 6 ' Sumario
+                        If et.SumarioDetalle IsNot Nothing Then
+                            esActivo = fechaActual >= et.SumarioDetalle.FechaDesde AndAlso (Not et.SumarioDetalle.FechaHasta.HasValue OrElse fechaActual <= et.SumarioDetalle.FechaHasta.Value)
+                        End If
+                End Select
+
+                If esActivo Then
+                    estadosActivos.Add(et.TipoEstadoTransitorio.Nombre)
+                End If
+            Next
+            ' --- FIN DE LA CORRECCIÓN ---
+
+            ' 3. Rellenar los controles de la UI
             lblCI.Text = f.CI
-            lblNombreCompleto.Text = $"{f.Nombre}"
+            lblNombreCompleto.Text = f.Nombre
             lblCargo.Text = If(f.Cargo Is Nothing, "-", f.Cargo.Nombre)
             lblTipo.Text = f.TipoFuncionario.Nombre
             lblFechaIngreso.Text = f.FechaIngreso.ToShortDateString()
             chkActivoDetalle.Checked = f.Activo
 
-            If f.EstadosTransitoriosActivos.Any() Then
-                lblEstadoTransitorio.Text = String.Join(", ", f.EstadosTransitoriosActivos)
+            If estadosActivos.Any() Then
+                lblEstadoTransitorio.Text = String.Join(", ", estadosActivos)
             Else
                 lblEstadoTransitorio.Text = "Normal"
             End If
@@ -249,9 +262,8 @@ Public Class frmFuncionarioBuscar
                     pbFotoDetalle.Image = Image.FromStream(ms)
                 End Using
             End If
-            ' Mostrar presencia
-            Dim hoy As Date = Date.Today
-            lblPresencia.Text = Await ObtenerPresenciaAsync(id, hoy)
+
+            lblPresencia.Text = Await ObtenerPresenciaAsync(id, fechaActual)
         End Using
     End Sub
 
@@ -265,23 +277,20 @@ Public Class frmFuncionarioBuscar
         End Using
     End Sub
 
-    ''' <summary>
-    ''' Devuelve “Presente”, “Franco”, “COVID”, etc. para un funcionario y fecha dada.
-    ''' </summary>
     Private Async Function ObtenerPresenciaAsync(id As Integer, fecha As Date) As Task(Of String)
         Using uow As New UnitOfWork()
             Dim ctx = uow.Context
             Dim pFecha = New SqlParameter("@Fecha", fecha.Date)
             Dim lista = Await ctx.Database.SqlQuery(Of PresenciaDTO)(
                 "EXEC dbo.usp_PresenciaFecha_Apex @Fecha", pFecha
-             ).ToListAsync()
+            ).ToListAsync()
             Dim presencia = lista.Where(Function(r) r.FuncionarioId = id).
-            Select(Function(r) r.Resultado).
+                             Select(Function(r) r.Resultado).
                              FirstOrDefault()
             Return If(presencia, "-")
         End Using
     End Function
-    '--- Panel lateral  -------------------------------------------------
+
     Private Sub LimpiarDetalle()
         lblCI.Text = ""
         lblNombreCompleto.Text = ""

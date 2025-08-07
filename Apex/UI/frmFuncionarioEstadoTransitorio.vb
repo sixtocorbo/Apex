@@ -54,7 +54,7 @@ Public Class frmFuncionarioEstadoTransitorio
                 SancionDetalle = Estado.SancionDetalle
                 dtpFechaDesde.Value = SancionDetalle.FechaDesde
                 txtObservaciones.Text = SancionDetalle.Observaciones
-                txtResolucion.Text = SancionDetalle.DocResolucion
+                txtResolucion.Text = SancionDetalle.Resolucion
             Case 4 ' Orden Cinco
                 OrdenCincoDetalle = Estado.OrdenCincoDetalle
                 dtpFechaDesde.Value = OrdenCincoDetalle.FechaDesde
@@ -68,7 +68,7 @@ Public Class frmFuncionarioEstadoTransitorio
                 SumarioDetalle = Estado.SumarioDetalle
                 dtpFechaDesde.Value = SumarioDetalle.FechaDesde
                 txtObservaciones.Text = SumarioDetalle.Observaciones
-                txtResolucion.Text = SumarioDetalle.DocResolucion ' Asumiendo que usa el mismo campo que sanción
+                txtResolucion.Text = SumarioDetalle.Expediente
         End Select
 
         ' Cargar FechaHasta común para la mayoría
@@ -170,7 +170,7 @@ Public Class frmFuncionarioEstadoTransitorio
                 detalle.FechaDesde = dtpFechaDesde.Value.Date
                 detalle.FechaHasta = If(chkFechaHasta.Checked, CType(Nothing, Date?), dtpFechaHasta.Value.Date)
                 detalle.Observaciones = txtObservaciones.Text.Trim()
-                detalle.DocResolucion = txtResolucion.Text.Trim()
+                detalle.Resolucion = txtResolucion.Text.Trim()
                 Estado.SancionDetalle = detalle
             Case 4 ' Orden Cinco
                 Dim detalle = If(Estado.Id > 0, Estado.OrdenCincoDetalle, New OrdenCincoDetalle())
@@ -189,7 +189,7 @@ Public Class frmFuncionarioEstadoTransitorio
                 detalle.FechaDesde = dtpFechaDesde.Value.Date
                 detalle.FechaHasta = If(chkFechaHasta.Checked, CType(Nothing, Date?), dtpFechaHasta.Value.Date)
                 detalle.Observaciones = txtObservaciones.Text.Trim()
-                detalle.DocResolucion = txtResolucion.Text.Trim() ' Asumiendo que es un expediente/resolución
+                detalle.Expediente = txtResolucion.Text.Trim()
                 Estado.SumarioDetalle = detalle
         End Select
 

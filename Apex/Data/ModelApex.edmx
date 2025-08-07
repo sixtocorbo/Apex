@@ -402,8 +402,6 @@
           <Property Name="FechaDesde" Type="date" Nullable="false" />
           <Property Name="FechaHasta" Type="date" />
           <Property Name="Observaciones" Type="nvarchar(max)" />
-          <Property Name="DocResolucion" Type="nvarchar" MaxLength="200" />
-          <Property Name="FechaResolucion" Type="date" />
         </EntityType>
         <EntityType Name="PuestoTrabajo">
           <Key>
@@ -477,8 +475,7 @@
           <Property Name="FechaDesde" Type="date" Nullable="false" />
           <Property Name="FechaHasta" Type="date" />
           <Property Name="Observaciones" Type="nvarchar(max)" />
-          <Property Name="DocResolucion" Type="nvarchar" MaxLength="200" />
-          <Property Name="FechaResolucion" Type="date" />
+          <Property Name="Resolucion" Type="nvarchar" MaxLength="100" />
         </EntityType>
         <EntityType Name="Seccion">
           <Key>
@@ -504,8 +501,7 @@
           <Property Name="FechaDesde" Type="date" Nullable="false" />
           <Property Name="FechaHasta" Type="date" />
           <Property Name="Observaciones" Type="nvarchar(max)" />
-          <Property Name="DocResolucion" Type="nvarchar" MaxLength="200" />
-          <Property Name="FechaResolucion" Type="date" />
+          <Property Name="Expediente" Type="nvarchar" MaxLength="100" />
         </EntityType>
         <EntityType Name="TipoEstadoTransitorio">
           <Key>
@@ -2181,8 +2177,6 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_NovedadesCompletas' no tiene def
           <Property Name="FechaDesde" Type="DateTime" Nullable="false" Precision="0" />
           <Property Name="FechaHasta" Type="DateTime" Precision="0" />
           <Property Name="Observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="DocResolucion" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
-          <Property Name="FechaResolucion" Type="DateTime" Precision="0" />
           <NavigationProperty Name="EstadoTransitorio" Relationship="Self.FK_OrdenCincoDetalle_EstadoTransitorio" FromRole="OrdenCincoDetalle" ToRole="EstadoTransitorio" />
         </EntityType>
         <EntityType Name="PuestoTrabajo">
@@ -2264,8 +2258,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_NovedadesCompletas' no tiene def
           <Property Name="FechaDesde" Type="DateTime" Nullable="false" Precision="0" />
           <Property Name="FechaHasta" Type="DateTime" Precision="0" />
           <Property Name="Observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="DocResolucion" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
-          <Property Name="FechaResolucion" Type="DateTime" Precision="0" />
+          <Property Name="Resolucion" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="EstadoTransitorio" Relationship="Self.FK_SancionDetalle_EstadoTransitorio" FromRole="SancionDetalle" ToRole="EstadoTransitorio" />
         </EntityType>
         <EntityType Name="Seccion">
@@ -2294,8 +2287,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_NovedadesCompletas' no tiene def
           <Property Name="FechaDesde" Type="DateTime" Nullable="false" Precision="0" />
           <Property Name="FechaHasta" Type="DateTime" Precision="0" />
           <Property Name="Observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="DocResolucion" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
-          <Property Name="FechaResolucion" Type="DateTime" Precision="0" />
+          <Property Name="Expediente" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="EstadoTransitorio" Relationship="Self.FK_SumarioDetalle_EstadoTransitorio" FromRole="SumarioDetalle" ToRole="EstadoTransitorio" />
         </EntityType>
         <EntityType Name="TipoEstadoTransitorio">
@@ -3857,8 +3849,6 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_NovedadesCompletas' no tiene def
                 <ScalarProperty Name="FechaDesde" ColumnName="FechaDesde" />
                 <ScalarProperty Name="FechaHasta" ColumnName="FechaHasta" />
                 <ScalarProperty Name="Observaciones" ColumnName="Observaciones" />
-                <ScalarProperty Name="DocResolucion" ColumnName="DocResolucion" />
-                <ScalarProperty Name="FechaResolucion" ColumnName="FechaResolucion" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -3939,8 +3929,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_NovedadesCompletas' no tiene def
                 <ScalarProperty Name="FechaDesde" ColumnName="FechaDesde" />
                 <ScalarProperty Name="FechaHasta" ColumnName="FechaHasta" />
                 <ScalarProperty Name="Observaciones" ColumnName="Observaciones" />
-                <ScalarProperty Name="DocResolucion" ColumnName="DocResolucion" />
-                <ScalarProperty Name="FechaResolucion" ColumnName="FechaResolucion" />
+                <ScalarProperty Name="Resolucion" ColumnName="Resolucion" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -3969,8 +3958,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_NovedadesCompletas' no tiene def
                 <ScalarProperty Name="FechaDesde" ColumnName="FechaDesde" />
                 <ScalarProperty Name="FechaHasta" ColumnName="FechaHasta" />
                 <ScalarProperty Name="Observaciones" ColumnName="Observaciones" />
-                <ScalarProperty Name="DocResolucion" ColumnName="DocResolucion" />
-                <ScalarProperty Name="FechaResolucion" ColumnName="FechaResolucion" />
+                <ScalarProperty Name="Expediente" ColumnName="Expediente" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
