@@ -328,11 +328,6 @@ Partial Public Class frmFiltroAvanzado
     Private Sub BtnAgregar_Click(sender As Object, e As EventArgs) Handles btnAgregar.Click
         If lstColumnas.SelectedItem Is Nothing OrElse lstValores.SelectedItems.Count = 0 Then Return
 
-        ' --- INICIO DE LA CORRECCIÓN MEJORADA: Evitar filtros redundantes ---
-
-        ' Si el número de ítems seleccionados es igual al número total de ítems en la lista,
-        ' significa que el filtro es redundante, ya que abarca todos los valores posibles
-        ' en el conjunto de datos actual.
         If lstValores.SelectedItems.Count = lstValores.Items.Count Then
             MessageBox.Show(
             "Ha seleccionado todos los valores disponibles para esta columna. El filtro es redundante y no se agregará.",
