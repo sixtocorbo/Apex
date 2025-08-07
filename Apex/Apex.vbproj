@@ -143,7 +143,13 @@
     <Compile Include="Data\CategoriaAusencia.vb">
       <DependentUpon>ApexModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Data\DesignacionDetalle.vb">
+      <DependentUpon>ApexModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Data\DotacionItem.vb">
+      <DependentUpon>ApexModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\EnfermedadDetalle.vb">
       <DependentUpon>ApexModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\Escalafon.vb">
@@ -236,6 +242,9 @@
     <Compile Include="Data\NovedadGenerada.vb">
       <DependentUpon>ApexModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Data\OrdenCincoDetalle.vb">
+      <DependentUpon>ApexModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Data\PuestoTrabajo.vb">
       <DependentUpon>ApexModel.tt</DependentUpon>
     </Compile>
@@ -249,13 +258,22 @@
       <DependentUpon>ApexModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\Repository.vb" />
+    <Compile Include="Data\RetenDetalle.vb">
+      <DependentUpon>ApexModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Data\RolUsuario.vb">
+      <DependentUpon>ApexModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\SancionDetalle.vb">
       <DependentUpon>ApexModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\Seccion.vb">
       <DependentUpon>ApexModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\Semana.vb">
+      <DependentUpon>ApexModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\SumarioDetalle.vb">
       <DependentUpon>ApexModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\TipoEstadoTransitorio.vb">

@@ -28,7 +28,9 @@ Partial Public Class ApexEntities
     Public Overridable Property Arma() As DbSet(Of Arma)
     Public Overridable Property Cargo() As DbSet(Of Cargo)
     Public Overridable Property CategoriaAusencia() As DbSet(Of CategoriaAusencia)
+    Public Overridable Property DesignacionDetalle() As DbSet(Of DesignacionDetalle)
     Public Overridable Property DotacionItem() As DbSet(Of DotacionItem)
+    Public Overridable Property EnfermedadDetalle() As DbSet(Of EnfermedadDetalle)
     Public Overridable Property Escalafon() As DbSet(Of Escalafon)
     Public Overridable Property Estado() As DbSet(Of Estado)
     Public Overridable Property EstadoCivil() As DbSet(Of EstadoCivil)
@@ -58,13 +60,17 @@ Partial Public Class ApexEntities
     Public Overridable Property NovedadFoto() As DbSet(Of NovedadFoto)
     Public Overridable Property NovedadFuncionario() As DbSet(Of NovedadFuncionario)
     Public Overridable Property NovedadGenerada() As DbSet(Of NovedadGenerada)
+    Public Overridable Property OrdenCincoDetalle() As DbSet(Of OrdenCincoDetalle)
     Public Overridable Property PuestoTrabajo() As DbSet(Of PuestoTrabajo)
     Public Overridable Property RegimenAlternancia() As DbSet(Of RegimenAlternancia)
     Public Overridable Property RegimenDetalle() As DbSet(Of RegimenDetalle)
     Public Overridable Property RegimenTrabajo() As DbSet(Of RegimenTrabajo)
+    Public Overridable Property RetenDetalle() As DbSet(Of RetenDetalle)
     Public Overridable Property RolUsuario() As DbSet(Of RolUsuario)
+    Public Overridable Property SancionDetalle() As DbSet(Of SancionDetalle)
     Public Overridable Property Seccion() As DbSet(Of Seccion)
     Public Overridable Property Semana() As DbSet(Of Semana)
+    Public Overridable Property SumarioDetalle() As DbSet(Of SumarioDetalle)
     Public Overridable Property TipoEstadoTransitorio() As DbSet(Of TipoEstadoTransitorio)
     Public Overridable Property TipoFuncionario() As DbSet(Of TipoFuncionario)
     Public Overridable Property TipoLicencia() As DbSet(Of TipoLicencia)
@@ -72,11 +78,11 @@ Partial Public Class ApexEntities
     Public Overridable Property TipoViatico() As DbSet(Of TipoViatico)
     Public Overridable Property Turno() As DbSet(Of Turno)
     Public Overridable Property Usuario() As DbSet(Of Usuario)
+    Public Overridable Property vw_EstadosTransitoriosCompletos() As DbSet(Of vw_EstadosTransitoriosCompletos)
     Public Overridable Property vw_FuncionarioEstadosConsolidados() As DbSet(Of vw_FuncionarioEstadosConsolidados)
     Public Overridable Property vw_LicenciasCompletas() As DbSet(Of vw_LicenciasCompletas)
     Public Overridable Property vw_NotificacionesCompletas() As DbSet(Of vw_NotificacionesCompletas)
     Public Overridable Property vw_NovedadesCompletas() As DbSet(Of vw_NovedadesCompletas)
-    Public Overridable Property vw_EstadosTransitoriosCompletos() As DbSet(Of vw_EstadosTransitoriosCompletos)
 
     Public Overridable Function usp_CargarHistoricosPolicia() As Integer
         Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_CargarHistoricosPolicia")
@@ -100,12 +106,16 @@ Partial Public Class ApexEntities
         Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction(Of usp_MigrarArmasYAsignaciones_Result)("usp_MigrarArmasYAsignaciones")
     End Function
 
-    Public Overridable Function usp_MigrarEstadosTransitoriosDesdePersonal() As ObjectResult(Of Nullable(Of Integer))
-        Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction(Of Nullable(Of Integer))("usp_MigrarEstadosTransitoriosDesdePersonal")
+    Public Overridable Function usp_MigrarDotacionesCompletas() As Integer
+        Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_MigrarDotacionesCompletas")
     End Function
 
-    Public Overridable Function usp_MigrarEstadosUnificados() As ObjectResult(Of Nullable(Of Integer))
-        Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction(Of Nullable(Of Integer))("usp_MigrarEstadosUnificados")
+    Public Overridable Function usp_MigrarEstadosTransitoriosDesdePersonal() As Integer
+        Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_MigrarEstadosTransitoriosDesdePersonal")
+    End Function
+
+    Public Overridable Function usp_MigrarEstadosUnificados() As Integer
+        Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_MigrarEstadosUnificados")
     End Function
 
     Public Overridable Function usp_MigrarFuncionariosDesdePersonal(refrescarCatalogos As Nullable(Of Boolean)) As Integer
@@ -138,10 +148,6 @@ Partial Public Class ApexEntities
 
     Public Overridable Function usp_ProcesarEstadoNotificaciones() As Integer
         Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_ProcesarEstadoNotificaciones")
-    End Function
-
-    Public Overridable Function usp_MigrarDotacionesCompletas() As Integer
-        Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_MigrarDotacionesCompletas")
     End Function
 
 End Class

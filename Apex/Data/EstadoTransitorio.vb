@@ -14,13 +14,16 @@ Partial Public Class EstadoTransitorio
     Public Property Id As Integer
     Public Property FuncionarioId As Integer
     Public Property TipoEstadoTransitorioId As Integer
-    Public Property FechaDesde As Date
-    Public Property FechaHasta As Nullable(Of Date)
-    Public Property Observaciones As String
     Public Property CreatedAt As Date
     Public Property UpdatedAt As Nullable(Of Date)
 
+    Public Overridable Property DesignacionDetalle As DesignacionDetalle
+    Public Overridable Property EnfermedadDetalle As EnfermedadDetalle
     Public Overridable Property Funcionario As Funcionario
     Public Overridable Property TipoEstadoTransitorio As TipoEstadoTransitorio
+    Public Overridable Property OrdenCincoDetalle As OrdenCincoDetalle
+    Public Overridable Property RetenDetalle As RetenDetalle
+    Public Overridable Property SancionDetalle As SancionDetalle
+    Public Overridable Property SumarioDetalle As SumarioDetalle
 
 End Class
