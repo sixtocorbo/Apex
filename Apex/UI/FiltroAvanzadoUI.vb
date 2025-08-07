@@ -49,7 +49,7 @@ Public Class LicenciaAccionHandler
         If form.dgvDatos.CurrentRow Is Nothing Then Return
         Dim drv = CType(form.dgvDatos.CurrentRow.DataBoundItem, DataRowView)
         Dim id = CInt(drv("Id"))
-        Dim nombre = drv("Funcionario").ToString()
+        Dim nombre = drv("NombreFuncionario").ToString()
         If MessageBox.Show($"¿Está seguro de que desea eliminar la licencia para '{nombre}'?", "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
             Try
                 Await New LicenciaService().DeleteAsync(id)
@@ -104,7 +104,10 @@ Public Class NotificacionAccionHandler
         If form.dgvDatos.CurrentRow Is Nothing Then Return
         Dim drv = CType(form.dgvDatos.CurrentRow.DataBoundItem, DataRowView)
         Dim id = CInt(drv("Id"))
-        Dim nombre = drv("Funcionario").ToString()
+        ' --- INICIO DE LA CORRECCIÓN ---
+        ' Aplicamos la misma corrección aquí para las notificaciones.
+        Dim nombre = drv("NombreFuncionario").ToString()
+        ' --- FIN DE LA CORRECCIÓN ---
         If MessageBox.Show($"¿Está seguro de que desea eliminar la notificación para '{nombre}'?", "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
             Try
                 Await New NotificacionPersonalService().DeleteAsync(id)

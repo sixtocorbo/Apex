@@ -1,16 +1,19 @@
-﻿Imports System.Data
+﻿' Apex/Services/ConsultasGenericas.vb
+Imports System.Data
 Imports System.Threading.Tasks
 
 Public Module ConsultasGenericas
 
+    ' Se mantienen los nombres del Enum sin tildes para simplificar, 
+    ' pero la lógica de mapeo usará los valores correctos.
     Public Enum TipoOrigenDatos
         Funcionarios
-        Designaciones
-        Sumarios
+        Designacion
+        Sumario
         OrdenCinco
-        Sanciones
+        Sancion
         Enfermedad
-        Retenes
+        Reten
         Notificaciones
         Licencias
         Novedades
@@ -18,13 +21,31 @@ Public Module ConsultasGenericas
 
     Public Async Function ObtenerDatosGenericosAsync(tipo As TipoOrigenDatos, fechaInicio As Date, fechaFin As Date) As Task(Of DataTable)
         Select Case tipo
-            Case TipoOrigenDatos.Designaciones,
-                 TipoOrigenDatos.Sumarios,
+            Case TipoOrigenDatos.Designacion,
+                 TipoOrigenDatos.Sumario,
                  TipoOrigenDatos.OrdenCinco,
-                 TipoOrigenDatos.Sanciones,
+                 TipoOrigenDatos.Sancion,
                  TipoOrigenDatos.Enfermedad,
-                 TipoOrigenDatos.Retenes
-                Dim tipoEstado As String = tipo.ToString().Replace("OrdenCinco", "Orden Cinco")
+                 TipoOrigenDatos.Reten
+
+                ' --- INICIO DE LA CORRECCIÓN ---
+                ' Mapeo explícito a los valores exactos de la base de datos, incluyendo tildes.
+                Dim tipoEstado As String
+                Select Case tipo
+                    Case TipoOrigenDatos.Designacion
+                        tipoEstado = "Designación"
+                    Case TipoOrigenDatos.Sancion
+                        tipoEstado = "Sanción"
+                    Case TipoOrigenDatos.OrdenCinco
+                        tipoEstado = "Orden Cinco"
+                    Case TipoOrigenDatos.Reten
+                        tipoEstado = "Retén"
+                    Case Else
+                        ' Para Sumario y Enfermedad, que no llevan tilde.
+                        tipoEstado = tipo.ToString()
+                End Select
+                ' --- FIN DE LA CORRECCIÓN ---
+
                 Dim estadoService = New EstadoTransitorioService()
                 Dim estados = Await estadoService.GetAllConDetallesAsync(fechaInicio, fechaFin, tipoEstado)
                 Return estados.ToDataTable()
@@ -53,7 +74,4 @@ Public Module ConsultasGenericas
                 Throw New NotImplementedException($"Consulta no implementada para el tipo {tipo}")
         End Select
     End Function
-
-    ' --- Todas las funciones privadas de consulta han sido eliminadas ---
-
 End Module
