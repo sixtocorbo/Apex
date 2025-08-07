@@ -18,6 +18,8 @@ Public Class frmFuncionarioCrear
     Private _uow As UnitOfWork
     Private _funcionario As Funcionario
     Private _svc As FuncionarioService
+    ' --- SERVICIO AÑADIDO PARA MANEJAR ESTADOS ---
+    Private _estadoSvc As EstadoTransitorioService
     Private _modo As ModoFormulario
     Private _idFuncionario As Integer
     Private _rutaFotoSeleccionada As String
@@ -64,6 +66,9 @@ Public Class frmFuncionarioCrear
     '------------------- Carga del Formulario --------------------------
     Private Async Sub frmFuncionarioCrear_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         _svc = New FuncionarioService(_uow)
+        ' --- INICIALIZACIÓN DEL SERVICIO DE ESTADOS ---
+        _estadoSvc = New EstadoTransitorioService(_uow)
+
         Await CargarCombosAsync()
 
         _tiposEstadoTransitorio = Await _svc.ObtenerTiposEstadoTransitorioCompletosAsync()
@@ -166,7 +171,8 @@ Public Class frmFuncionarioCrear
                                                                  If h.EnfermedadDetalle IsNot Nothing Then
                                                                      fechaDesde = h.EnfermedadDetalle.FechaDesde
                                                                      fechaHasta = h.EnfermedadDetalle.FechaHasta
-                                                                     observaciones = h.EnfermedadDetalle.Observaciones
+                                                                     observaciones = $"{h.EnfermedadDetalle.Observaciones} " &
+                                                                                   $"({h.EnfermedadDetalle.Diagnostico})"
                                                                  End If
                                                              Case 3 ' Sanción
                                                                  If h.SancionDetalle IsNot Nothing Then
@@ -273,7 +279,7 @@ Public Class frmFuncionarioCrear
             End If
 
             SincronizarColeccion(_funcionario.FuncionarioDotacion, _dotaciones)
-            SincronizarColeccion(_funcionario.EstadoTransitorio, _estadosTransitorios)
+            ' La sincronización de Estados Transitorios ahora se maneja en los botones (Añadir/Quitar)
 
             Await _uow.CommitAsync()
             MessageBox.Show(If(_modo = ModoFormulario.Crear, "Funcionario creado", "Funcionario actualizado") & " correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
@@ -287,11 +293,8 @@ Public Class frmFuncionarioCrear
     End Sub
 
     Private Sub SincronizarColeccion(Of T As Class)(dbCollection As ICollection(Of T), formCollection As BindingList(Of T))
-        Dim itemsParaBorrar = dbCollection.Except(formCollection).ToList()
-        For Each item In itemsParaBorrar
-            _uow.Context.Entry(item).State = EntityState.Deleted
-        Next
-
+        ' Esta función ahora solo necesita sincronizar adiciones.
+        ' Las eliminaciones se manejan en los botones de "Quitar".
         Dim itemsParaAnadir = formCollection.Except(dbCollection).ToList()
         For Each item In itemsParaAnadir
             dbCollection.Add(item)
@@ -338,26 +341,25 @@ Public Class frmFuncionarioCrear
                                                          .Visible = False})
 
             .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "colItem",
-                                                         .HeaderText = "Ítem",
-                                                         .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
-                                                         .ValueType = GetType(String)})      ' ← texto
+                                                           .HeaderText = "Ítem",
+                                                           .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
+                                                           .ValueType = GetType(String)})
 
             .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Talla",
                                                          .HeaderText = "Talla",
-                                                         .ValueType = GetType(String)})      ' ← texto
+                                                         .ValueType = GetType(String)})
 
             .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Observaciones",
                                                          .HeaderText = "Observaciones",
                                                          .Width = 200,
-                                                         .ValueType = GetType(String)})      ' ← texto
+                                                         .ValueType = GetType(String)})
 
-            ' ------- Columna de fecha SIN formato integrado ----------
             Dim colFecha As New DataGridViewTextBoxColumn With {
-            .Name = "FechaAsign",
-            .HeaderText = "Fecha Asignación",
-            .ValueType = GetType(String)                    ' ← texto
-        }
-            colFecha.DefaultCellStyle.NullValue = ""            ' no DBNull
+                .Name = "FechaAsign",
+                .HeaderText = "Fecha Asignación",
+                .ValueType = GetType(String)
+            }
+            colFecha.DefaultCellStyle.NullValue = ""
             .Columns.Add(colFecha)
         End With
     End Sub
@@ -368,39 +370,35 @@ Public Class frmFuncionarioCrear
             .AutoGenerateColumns = False
             .Columns.Clear()
 
-            '------------- Columna Tipo -----------------
             .Columns.Add(New DataGridViewTextBoxColumn With {
-            .Name = "TipoEstado",
-            .HeaderText = "Tipo de Estado",
-            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
-            .ValueType = GetType(String)          ' ← fuerza a String
-        })
+                .Name = "TipoEstado",
+                .HeaderText = "Tipo de Estado",
+                .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
+                .ValueType = GetType(String)
+            })
 
-            '------------- Columna Fecha Desde ---------
             Dim colDesde As New DataGridViewTextBoxColumn With {
-            .Name = "FechaDesde",
-            .HeaderText = "Desde",
-            .ValueType = GetType(String)          ' ← fuerza a String
-        }
-            colDesde.DefaultCellStyle.NullValue = ""   ' evita DBNull
+                .Name = "FechaDesde",
+                .HeaderText = "Desde",
+                .ValueType = GetType(String)
+            }
+            colDesde.DefaultCellStyle.NullValue = ""
             .Columns.Add(colDesde)
 
-            '------------- Columna Fecha Hasta ---------
             Dim colHasta As New DataGridViewTextBoxColumn With {
-            .Name = "FechaHasta",
-            .HeaderText = "Hasta",
-            .ValueType = GetType(String)          ' ← fuerza a String
-        }
+                .Name = "FechaHasta",
+                .HeaderText = "Hasta",
+                .ValueType = GetType(String)
+            }
             colHasta.DefaultCellStyle.NullValue = ""
             .Columns.Add(colHasta)
 
-            '------------- Columna Observaciones -------
             .Columns.Add(New DataGridViewTextBoxColumn With {
-            .Name = "Observaciones",
-            .HeaderText = "Observaciones",
-            .Width = 300,
-            .ValueType = GetType(String)          ' ← fuerza a String
-        })
+                .Name = "Observaciones",
+                .HeaderText = "Observaciones",
+                .Width = 300,
+                .ValueType = GetType(String)
+            })
         End With
     End Sub
 
@@ -426,12 +424,7 @@ Public Class frmFuncionarioCrear
         End If
     End Sub
 
-    ' -------------------------------------------------------------------------
-    '  Manejador de formateo para dgvEstadosTransitorios
-    ' -------------------------------------------------------------------------
-    Private Sub dgvEstadosTransitorios_CellFormatting(
-        sender As Object, e As DataGridViewCellFormattingEventArgs)
-
+    Private Sub dgvEstadosTransitorios_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
         If e.RowIndex < 0 OrElse e.ColumnIndex < 0 Then Return
 
         Dim dgv = CType(sender, DataGridView)
@@ -439,42 +432,30 @@ Public Class frmFuncionarioCrear
         Dim dataItem = dgv.Rows(e.RowIndex).DataBoundItem
         If dataItem Is Nothing Then Return
 
-        ' --- Lógica unificada ---
         Dim tipoEstado As String = ""
         Dim fechaDesde As Date? = Nothing
         Dim fechaHasta As Date? = Nothing
         Dim observaciones As String = ""
 
         If chkVerHistorial.Checked Then
-            ' Historial (usa reflexión sobre tipo anónimo)
-            tipoEstado = CStr(dataItem.GetType().GetProperty("TipoEstado")? _
-                                         .GetValue(dataItem, Nothing))
-            observaciones = CStr(dataItem.GetType().GetProperty("Observaciones")? _
-                                         .GetValue(dataItem, Nothing))
-
-            Dim fechaDesdeObj = dataItem.GetType() _
-                                   .GetProperty("FechaDesde")? _
-                                   .GetValue(dataItem, Nothing)
+            tipoEstado = CStr(dataItem.GetType().GetProperty("TipoEstado")?.GetValue(dataItem, Nothing))
+            observaciones = CStr(dataItem.GetType().GetProperty("Observaciones")?.GetValue(dataItem, Nothing))
+            Dim fechaDesdeObj = dataItem.GetType().GetProperty("FechaDesde")?.GetValue(dataItem, Nothing)
             If fechaDesdeObj IsNot Nothing AndAlso Not DBNull.Value.Equals(fechaDesdeObj) Then
                 fechaDesde = CDate(fechaDesdeObj)
             End If
-
-            Dim fechaHastaObj = dataItem.GetType() _
-                                   .GetProperty("FechaHasta")? _
-                                   .GetValue(dataItem, Nothing)
+            Dim fechaHastaObj = dataItem.GetType().GetProperty("FechaHasta")?.GetValue(dataItem, Nothing)
             If fechaHastaObj IsNot Nothing AndAlso Not DBNull.Value.Equals(fechaHastaObj) Then
                 fechaHasta = CDate(fechaHastaObj)
             End If
         Else
-            ' Modo edición (usa EstadoTransitorio)
             Dim estado = TryCast(dataItem, EstadoTransitorio)
             If estado Is Nothing OrElse estado.TipoEstadoTransitorioId = 0 Then
                 e.FormattingApplied = True
                 Return
             End If
 
-            Dim tipo = _tiposEstadoTransitorio _
-                       .FirstOrDefault(Function(t) t.Id = estado.TipoEstadoTransitorioId)
+            Dim tipo = _tiposEstadoTransitorio.FirstOrDefault(Function(t) t.Id = estado.TipoEstadoTransitorioId)
             tipoEstado = If(tipo IsNot Nothing, tipo.Nombre, "")
 
             Select Case estado.TipoEstadoTransitorioId
@@ -488,8 +469,7 @@ Public Class frmFuncionarioCrear
                     If estado.EnfermedadDetalle IsNot Nothing Then
                         fechaDesde = estado.EnfermedadDetalle.FechaDesde
                         fechaHasta = estado.EnfermedadDetalle.FechaHasta
-                        observaciones = $"{estado.EnfermedadDetalle.Observaciones} " &
-                                    $"({estado.EnfermedadDetalle.Diagnostico})"
+                        observaciones = $"{estado.EnfermedadDetalle.Observaciones} ({estado.EnfermedadDetalle.Diagnostico})"
                     End If
                 Case 3
                     If estado.SancionDetalle IsNot Nothing Then
@@ -518,22 +498,15 @@ Public Class frmFuncionarioCrear
             End Select
         End If
 
-        ' --- Asignación final a las celdas ---
         Select Case colName
             Case "TipoEstado"
                 e.Value = tipoEstado
             Case "Observaciones"
-                e.Value = If(String.IsNullOrEmpty(observaciones),      ' ← línea nueva
-                     String.Empty,                             ' ← línea nueva
-                     observaciones)                            ' ← línea modificada
+                e.Value = If(String.IsNullOrEmpty(observaciones), String.Empty, observaciones)
             Case "FechaDesde"
-                e.Value = If(fechaDesde.HasValue,
-                         fechaDesde.Value.ToShortDateString(),
-                         String.Empty)   ' ← cambio
+                e.Value = If(fechaDesde.HasValue, fechaDesde.Value.ToShortDateString(), String.Empty)
             Case "FechaHasta"
-                e.Value = If(fechaHasta.HasValue,
-                         fechaHasta.Value.ToShortDateString(),
-                         String.Empty)   ' ← cambio
+                e.Value = If(fechaHasta.HasValue, fechaHasta.Value.ToShortDateString(), String.Empty)
         End Select
 
         e.FormattingApplied = True
@@ -577,9 +550,18 @@ Public Class frmFuncionarioCrear
 
     Private Sub btnQuitarDotacion_Click(sender As Object, e As EventArgs) Handles btnQuitarDotacion.Click
         If dgvDotacion.CurrentRow Is Nothing Then Return
+
         If MessageBox.Show("¿Está seguro de que desea quitar este elemento de dotación?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
             Dim dotacionSeleccionada = CType(dgvDotacion.CurrentRow.DataBoundItem, FuncionarioDotacion)
+
+            ' 1. Quitar de la lista para actualizar la UI
             _dotaciones.Remove(dotacionSeleccionada)
+
+            ' 2. (LÍNEA CLAVE AÑADIDA) Si el objeto ya existe en la BD (su Id > 0),
+            '    lo marcamos explícitamente para su eliminación.
+            If dotacionSeleccionada.Id > 0 Then
+                _uow.Context.Entry(dotacionSeleccionada).State = EntityState.Deleted
+            End If
         End If
     End Sub
 #End Region
@@ -638,17 +620,20 @@ Public Class frmFuncionarioCrear
 
 
         If MessageBox.Show("¿Está seguro de que desea quitar este estado transitorio?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
+            ' 1. Eliminar de la lista visual
             _estadosTransitorios.Remove(estadoParaQuitar)
+
+            ' 2. Si el objeto ya existía en la BD (Id > 0), delegamos su eliminación al servicio.
+            If estadoParaQuitar.Id > 0 Then
+                _estadoSvc.RemoveWithoutCommit(estadoParaQuitar)
+            End If
         End If
     End Sub
 #End Region
-    ' -----------------------------------------------------------------
-    '  Engancha DataError, CellFormatting y CellParsing en un DGV
-    ' -----------------------------------------------------------------
+
     Private Sub AttachDebugHandlers(dgv As DataGridView, Optional nombre As String = "")
         If String.IsNullOrWhiteSpace(nombre) Then nombre = dgv.Name
 
-        ' Cuando el control captura una excepción interna ↓
         AddHandler dgv.DataError,
         Sub(s, eArgs)
             Dim valor = TryCast(dgv.Rows(eArgs.RowIndex).Cells(eArgs.ColumnIndex).Value, Object)
@@ -656,25 +641,21 @@ Public Class frmFuncionarioCrear
                             $"({dgv.Columns(eArgs.ColumnIndex).Name})  " &
                             $"Valor = {If(valor Is Nothing, "<Nothing>", $"'{valor}' [{valor.GetType.Name}]")}  " &
                             $"Excepción = {eArgs.Exception.Message}")
-            eArgs.ThrowException = False      ' quita el cuadro estándar
+            eArgs.ThrowException = False
         End Sub
 
-        ' Justo antes de pintar la celda ↓
         AddHandler dgv.CellFormatting,
         Sub(s, eArgs)
             Try
-                ' Deja que siga tu lógica normal
             Catch ex As Exception
                 Debug.WriteLine($"[Formatting-{nombre}]  Fila {eArgs.RowIndex}, Col {eArgs.ColumnIndex}: {ex.Message}")
-                Throw                                           ' para que VS se detenga aquí
+                Throw
             End Try
         End Sub
 
-        ' Cuando el usuario edita y el grid intenta convertir ↓
         AddHandler dgv.CellParsing,
         Sub(s, eArgs)
             Try
-                ' Sin lógica especial – solo log
             Catch ex As Exception
                 Debug.WriteLine($"[Parsing-{nombre}]  Fila {eArgs.RowIndex}, Col {eArgs.ColumnIndex}: {ex.Message}")
                 Throw

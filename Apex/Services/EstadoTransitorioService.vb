@@ -6,10 +6,20 @@ Public Class EstadoTransitorioService
 
     Private Shadows ReadOnly _unitOfWork As IUnitOfWork
 
+    ' Este es el constructor original que se usa en otras partes de la app.
     Public Sub New()
         MyBase.New(New UnitOfWork())
         _unitOfWork = MyBase._unitOfWork
     End Sub
+
+    ' --- CONSTRUCTOR AÑADIDO ---
+    ' Este nuevo constructor acepta una UnitOfWork existente,
+    ' que es lo que necesitas en frmFuncionarioCrear.
+    Public Sub New(unitOfWork As IUnitOfWork)
+        MyBase.New(unitOfWork)
+        _unitOfWork = unitOfWork
+    End Sub
+    ' --- FIN DE LA CORRECCIÓN ---
 
     ''' <summary>
     ''' Obtiene una lista de estados transitorios desde la vista, con filtros.

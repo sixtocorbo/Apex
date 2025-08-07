@@ -36,4 +36,8 @@ Public Class GenericService(Of T As Class)
             Await _unitOfWork.CommitAsync()
         End If
     End Function
+    ' --- IMPLEMENTACIÓN DEL NUEVO MÉTODO ---
+    Public Sub RemoveWithoutCommit(entity As T) Implements IGenericService(Of T).RemoveWithoutCommit
+        _unitOfWork.Repository(Of T)().Remove(entity)
+    End Sub
 End Class
