@@ -139,6 +139,7 @@
           <Property Name="EscalafonId" Type="int" />
           <Property Name="FuncionId" Type="int" />
           <Property Name="LastPictureId" Type="int" />
+          <Property Name="Telefono" Type="nvarchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="FuncionarioArma">
           <Key>
@@ -1851,6 +1852,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_NovedadesCompletas' no tiene def
           <Property Name="EscalafonId" Type="Int32" />
           <Property Name="FuncionId" Type="Int32" />
           <Property Name="LastPictureId" Type="Int32" />
+          <Property Name="Telefono" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="Cargo" Relationship="Self.FK_Funcionario_Cargo" FromRole="Funcionario" ToRole="Cargo" />
           <NavigationProperty Name="Escalafon" Relationship="Self.FK_Funcionario_Escalafon" FromRole="Funcionario" ToRole="Escalafon" />
           <NavigationProperty Name="Estado" Relationship="Self.FK__Funcionar__Estad__29221CFB" FromRole="Funcionario" ToRole="Estado" />
@@ -3569,6 +3571,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_NovedadesCompletas' no tiene def
                 <ScalarProperty Name="EscalafonId" ColumnName="EscalafonId" />
                 <ScalarProperty Name="FuncionId" ColumnName="FuncionId" />
                 <ScalarProperty Name="LastPictureId" ColumnName="LastPictureId" />
+                <ScalarProperty Name="Telefono" ColumnName="Telefono" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

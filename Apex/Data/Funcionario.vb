@@ -36,6 +36,7 @@ Partial Public Class Funcionario
     Public Property EscalafonId As Nullable(Of Integer)
     Public Property FuncionId As Nullable(Of Integer)
     Public Property LastPictureId As Nullable(Of Integer)
+    Public Property Telefono As String
 
     Public Overridable Property Cargo As Cargo
     Public Overridable Property Escalafon As Escalafon
