@@ -511,7 +511,6 @@ Public Class frmFuncionarioCrear
         Dim observaciones As String = ""
 
         If chkVerHistorial.Checked Then
-            ' Esta parte ya funciona bien porque lee directamente de CargarHistorialCompleto
             tipoEstado = CStr(dataItem.GetType().GetProperty("TipoEstado")?.GetValue(dataItem, Nothing))
             observaciones = CStr(dataItem.GetType().GetProperty("Observaciones")?.GetValue(dataItem, Nothing))
             Dim fechaDesdeObj = dataItem.GetType().GetProperty("FechaDesde")?.GetValue(dataItem, Nothing)
@@ -519,7 +518,6 @@ Public Class frmFuncionarioCrear
             Dim fechaHastaObj = dataItem.GetType().GetProperty("FechaHasta")?.GetValue(dataItem, Nothing)
             If fechaHastaObj IsNot Nothing AndAlso Not DBNull.Value.Equals(fechaHastaObj) Then fechaHasta = CDate(fechaHastaObj)
         Else
-            ' --- INICIO DE LA MODIFICACIÓN ---
             Dim estado = TryCast(dataItem, EstadoTransitorio)
             If estado Is Nothing OrElse estado.TipoEstadoTransitorioId = 0 Then Return
             Dim tipo = _tiposEstadoTransitorio.FirstOrDefault(Function(t) t.Id = estado.TipoEstadoTransitorioId)
@@ -572,15 +570,23 @@ Public Class frmFuncionarioCrear
             End Select
 
             observaciones = If(String.IsNullOrWhiteSpace(detallePrincipal), observaciones, $"{detallePrincipal} | {observaciones}")
-            ' --- FIN DE LA MODIFICACIÓN ---
         End If
 
+        ' --- INICIO DE LA CORRECCIÓN CLAVE ---
         Select Case colName
-            Case "TipoEstado" : e.Value = tipoEstado
-            Case "Observaciones" : e.Value = If(String.IsNullOrEmpty(observaciones), String.Empty, observaciones)
-            Case "FechaDesde" : e.Value = If(fechaDesde.HasValue, CType(fechaDesde.Value, Object), Nothing)
-            Case "FechaHasta" : e.Value = If(fechaHasta.HasValue, CType(fechaHasta.Value, Object), Nothing)
+            Case "TipoEstado"
+                e.Value = tipoEstado
+            Case "Observaciones"
+                e.Value = If(String.IsNullOrEmpty(observaciones), String.Empty, observaciones)
+            Case "FechaDesde"
+                ' Se pasa el objeto Date directamente, o Nothing si es nulo.
+                e.Value = If(fechaDesde.HasValue, CType(fechaDesde.Value, Object), Nothing)
+            Case "FechaHasta"
+                ' Igual para la fecha de fin.
+                e.Value = If(fechaHasta.HasValue, CType(fechaHasta.Value, Object), Nothing)
         End Select
+        ' --- FIN DE LA CORRECCIÓN CLAVE ---
+
         e.FormattingApplied = True
     End Sub
 
