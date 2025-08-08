@@ -29,6 +29,7 @@ Public Class frmFuncionarioCrear
     Private _itemsDotacion As List(Of DotacionItem)
     Private _cambiandoOrigen As Boolean = False
     Private _estaCargandoHistorial As Boolean = False
+
     '-------------------- Constructores ----------------------
     Public Sub New()
         InitializeComponent()
@@ -79,7 +80,12 @@ Public Class frmFuncionarioCrear
         End If
 
         _dotaciones = New BindingList(Of FuncionarioDotacion)(_funcionario.FuncionarioDotacion.ToList())
-        _estadosTransitorios = New BindingList(Of EstadoTransitorio)(_funcionario.EstadoTransitorio.ToList())
+
+        ' --- INICIO DE LA MODIFICACIÓN CLAVE ---
+        ' Filtra los estados para mostrar solo los activos por defecto.
+        Dim estadosActivos = _funcionario.EstadoTransitorio.Where(Function(et) IsEstadoActivo(et)).ToList()
+        _estadosTransitorios = New BindingList(Of EstadoTransitorio)(estadosActivos)
+        ' --- FIN DE LA MODIFICACIÓN CLAVE ---
 
         ConfigurarGrillaDotacion()
         ConfigurarGrillaEstados()
@@ -104,6 +110,31 @@ Public Class frmFuncionarioCrear
         End If
     End Sub
 
+    ''' <summary>
+    ''' Función de ayuda para determinar si un estado transitorio está vigente a la fecha actual.
+    ''' </summary>
+    Private Function IsEstadoActivo(et As EstadoTransitorio) As Boolean
+        Dim fechaActual = Date.Today
+        Dim fechaDesde As Date? = Nothing
+        Dim fechaHasta As Date? = Nothing
+
+        Select Case et.TipoEstadoTransitorioId
+            Case 1 : If et.DesignacionDetalle IsNot Nothing Then fechaDesde = et.DesignacionDetalle.FechaDesde : fechaHasta = et.DesignacionDetalle.FechaHasta
+            Case 2 : If et.EnfermedadDetalle IsNot Nothing Then fechaDesde = et.EnfermedadDetalle.FechaDesde : fechaHasta = et.EnfermedadDetalle.FechaHasta
+            Case 3 : If et.SancionDetalle IsNot Nothing Then fechaDesde = et.SancionDetalle.FechaDesde : fechaHasta = et.SancionDetalle.FechaHasta
+            Case 4 : If et.OrdenCincoDetalle IsNot Nothing Then fechaDesde = et.OrdenCincoDetalle.FechaDesde : fechaHasta = et.OrdenCincoDetalle.FechaHasta
+            Case 5 : If et.RetenDetalle IsNot Nothing Then Return et.RetenDetalle.FechaReten.Date = fechaActual
+            Case 6 : If et.SumarioDetalle IsNot Nothing Then fechaDesde = et.SumarioDetalle.FechaDesde : fechaHasta = et.SumarioDetalle.FechaHasta
+            Case Else : Return False ' Si el tipo no es reconocido, no se considera activo.
+        End Select
+
+        If Not fechaDesde.HasValue Then Return False
+
+        ' La condición principal: debe haber empezado y no haber terminado aún.
+        Return fechaDesde.Value.Date <= fechaActual AndAlso (Not fechaHasta.HasValue OrElse fechaHasta.Value.Date >= fechaActual)
+    End Function
+
+
     Private Sub CargarDatosEnControles()
         txtCI.Text = _funcionario.CI
         txtNombre.Text = _funcionario.Nombre
@@ -113,15 +144,12 @@ Public Class frmFuncionarioCrear
         chkActivo.Checked = _funcionario.Activo
         cboEscalafon.SelectedValue = If(_funcionario.EscalafonId.HasValue, CInt(_funcionario.EscalafonId), -1)
         cboFuncion.SelectedValue = If(_funcionario.FuncionId.HasValue, CInt(_funcionario.FuncionId), -1)
-
-        ' --- INICIO: Carga de nuevos campos ---
         cboEstado.SelectedValue = If(_funcionario.EstadoId.HasValue, CInt(_funcionario.EstadoId), -1)
         cboSeccion.SelectedValue = If(_funcionario.SeccionId.HasValue, CInt(_funcionario.SeccionId), -1)
         cboPuestoTrabajo.SelectedValue = If(_funcionario.PuestoTrabajoId.HasValue, CInt(_funcionario.PuestoTrabajoId), -1)
         cboTurno.SelectedValue = If(_funcionario.TurnoId.HasValue, CInt(_funcionario.TurnoId), -1)
         cboSemana.SelectedValue = If(_funcionario.SemanaId.HasValue, CInt(_funcionario.SemanaId), -1)
         cboHorario.SelectedValue = If(_funcionario.HorarioId.HasValue, CInt(_funcionario.HorarioId), -1)
-        ' --- FIN: Carga de nuevos campos ---
 
         If _funcionario.Foto IsNot Nothing AndAlso _funcionario.Foto.Length > 0 Then
             pbFoto.Image = New Bitmap(New MemoryStream(_funcionario.Foto))
@@ -139,7 +167,6 @@ Public Class frmFuncionarioCrear
     End Sub
 
     Private Async Sub chkVerHistorial_CheckedChanged(sender As Object, e As EventArgs) Handles chkVerHistorial.CheckedChanged
-        ' Si ya está cargando, no hacemos nada.
         If _estaCargandoHistorial Then Return
 
         _estaCargandoHistorial = True
@@ -156,7 +183,6 @@ Public Class frmFuncionarioCrear
                 dgvEstadosTransitorios.DataSource = _estadosTransitorios
             End If
         Finally
-            ' Al finalizar, bajamos las banderas.
             _cambiandoOrigen = False
             _estaCargandoHistorial = False
         End Try
@@ -291,15 +317,12 @@ Public Class frmFuncionarioCrear
             _funcionario.EstadoCivilId = If(cboEstadoCivil.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboEstadoCivil.SelectedValue))
             _funcionario.GeneroId = If(cboGenero.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboGenero.SelectedValue))
             _funcionario.NivelEstudioId = If(cboNivelEstudio.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboNivelEstudio.SelectedValue))
-
-            ' --- INICIO: Guardado de nuevos campos ---
             _funcionario.EstadoId = If(cboEstado.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboEstado.SelectedValue))
             _funcionario.SeccionId = If(cboSeccion.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboSeccion.SelectedValue))
             _funcionario.PuestoTrabajoId = If(cboPuestoTrabajo.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboPuestoTrabajo.SelectedValue))
             _funcionario.TurnoId = If(cboTurno.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboTurno.SelectedValue))
             _funcionario.SemanaId = If(cboSemana.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboSemana.SelectedValue))
             _funcionario.HorarioId = If(cboHorario.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboHorario.SelectedValue))
-            ' --- FIN: Guardado de nuevos campos ---
 
             If Not String.IsNullOrWhiteSpace(_rutaFotoSeleccionada) Then
                 _funcionario.Foto = File.ReadAllBytes(_rutaFotoSeleccionada)
@@ -356,7 +379,6 @@ Public Class frmFuncionarioCrear
         cboNivelEstudio.DisplayMember = "Value"
         cboNivelEstudio.ValueMember = "Key"
 
-        ' --- INICIO: Carga de nuevos combos ---
         cboEstado.DataSource = Await _svc.ObtenerEstadosAsync()
         cboEstado.DisplayMember = "Value"
         cboEstado.ValueMember = "Key"
@@ -375,7 +397,6 @@ Public Class frmFuncionarioCrear
         cboHorario.DataSource = Await _svc.ObtenerHorariosAsync()
         cboHorario.DisplayMember = "Value"
         cboHorario.ValueMember = "Key"
-        ' --- FIN: Carga de nuevos combos ---
 
         cboCargo.SelectedIndex = -1
         cboEscalafon.SelectedIndex = -1
@@ -395,29 +416,11 @@ Public Class frmFuncionarioCrear
         With dgvDotacion
             .AutoGenerateColumns = False
             .Columns.Clear()
-
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Id",
-                                                             .Visible = False})
-
-            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "colItem",
-                                                             .HeaderText = "Ítem",
-                                                             .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
-                                                             .ValueType = GetType(String)})
-
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Talla",
-                                                             .HeaderText = "Talla",
-                                                             .ValueType = GetType(String)})
-
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Observaciones",
-                                                             .HeaderText = "Observaciones",
-                                                             .Width = 200,
-                                                             .ValueType = GetType(String)})
-
-            Dim colFecha As New DataGridViewTextBoxColumn With {
-                .DataPropertyName = "FechaAsignacion",
-                .Name = "FechaAsign",
-                .HeaderText = "Fecha Asignación"
-            }
+            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Id", .Visible = False})
+            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "colItem", .HeaderText = "Ítem", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, .ValueType = GetType(String)})
+            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Talla", .HeaderText = "Talla", .ValueType = GetType(String)})
+            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Observaciones", .HeaderText = "Observaciones", .Width = 200, .ValueType = GetType(String)})
+            Dim colFecha As New DataGridViewTextBoxColumn With {.DataPropertyName = "FechaAsign", .Name = "FechaAsign", .HeaderText = "Fecha Asignación"}
             colFecha.DefaultCellStyle.NullValue = ""
             colFecha.DefaultCellStyle.Format = "dd/MM/yyyy"
             .Columns.Add(colFecha)
@@ -428,58 +431,30 @@ Public Class frmFuncionarioCrear
         With dgvEstadosTransitorios
             .AutoGenerateColumns = False
             .Columns.Clear()
-
-            .Columns.Add(New DataGridViewTextBoxColumn With {
-                .Name = "TipoEstado",
-                .HeaderText = "Tipo de Estado",
-                .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
-                .ValueType = GetType(String)
-            })
-
-            Dim colDesde As New DataGridViewTextBoxColumn With {
-                .Name = "FechaDesde",
-                .HeaderText = "Desde"
-            }
+            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "TipoEstado", .HeaderText = "Tipo de Estado", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, .ValueType = GetType(String)})
+            Dim colDesde As New DataGridViewTextBoxColumn With {.Name = "FechaDesde", .HeaderText = "Desde"}
             colDesde.DefaultCellStyle.NullValue = ""
             colDesde.DefaultCellStyle.Format = "dd/MM/yyyy"
             .Columns.Add(colDesde)
-
-            Dim colHasta As New DataGridViewTextBoxColumn With {
-                .Name = "FechaHasta",
-                .HeaderText = "Hasta"
-            }
+            Dim colHasta As New DataGridViewTextBoxColumn With {.Name = "FechaHasta", .HeaderText = "Hasta"}
             colHasta.DefaultCellStyle.NullValue = ""
             colHasta.DefaultCellStyle.Format = "dd/MM/yyyy"
             .Columns.Add(colHasta)
-
-            .Columns.Add(New DataGridViewTextBoxColumn With {
-                .Name = "Observaciones",
-                .HeaderText = "Observaciones",
-                .Width = 300,
-                .ValueType = GetType(String)
-            })
+            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Observaciones", .HeaderText = "Observaciones", .Width = 300, .ValueType = GetType(String)})
         End With
     End Sub
 
     Private Sub dgvDotacion_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
         If e.RowIndex < 0 OrElse e.ColumnIndex < 0 Then Return
         Dim dgv = CType(sender, DataGridView)
-        Dim colName = dgv.Columns(e.ColumnIndex).Name
-
-        If colName = "colItem" Then
+        If dgv.Columns(e.ColumnIndex).Name = "colItem" Then
             Dim dotacion = TryCast(dgv.Rows(e.RowIndex).DataBoundItem, FuncionarioDotacion)
             If dotacion IsNot Nothing Then
                 If dotacion.DotacionItem IsNot Nothing Then
                     e.Value = dotacion.DotacionItem.Nombre
                 ElseIf dotacion.DotacionItemId > 0 AndAlso _itemsDotacion IsNot Nothing Then
-
-                    '--- SOLUCIÓN AQUÍ ---
-                    ' Asegúrate de que esta línea usa "=" para comparar los IDs.
                     Dim item = _itemsDotacion.FirstOrDefault(Function(i) i.Id = dotacion.DotacionItemId)
-
-                    If item IsNot Nothing Then
-                        e.Value = item.Nombre
-                    End If
+                    If item IsNot Nothing Then e.Value = item.Nombre
                 End If
                 e.FormattingApplied = True
             End If
@@ -487,13 +462,7 @@ Public Class frmFuncionarioCrear
     End Sub
 
     Private Sub dgvEstadosTransitorios_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
-        If _cambiandoOrigen Then
-            e.Value = Nothing
-            e.FormattingApplied = True
-            Return
-        End If
-
-        If e.RowIndex < 0 OrElse e.ColumnIndex < 0 Then Return
+        If _cambiandoOrigen OrElse e.RowIndex < 0 OrElse e.ColumnIndex < 0 Then Return
 
         Dim dgv = CType(sender, DataGridView)
         Dim colName = dgv.Columns(e.ColumnIndex).Name
@@ -509,74 +478,31 @@ Public Class frmFuncionarioCrear
             tipoEstado = CStr(dataItem.GetType().GetProperty("TipoEstado")?.GetValue(dataItem, Nothing))
             observaciones = CStr(dataItem.GetType().GetProperty("Observaciones")?.GetValue(dataItem, Nothing))
             Dim fechaDesdeObj = dataItem.GetType().GetProperty("FechaDesde")?.GetValue(dataItem, Nothing)
-            If fechaDesdeObj IsNot Nothing AndAlso Not DBNull.Value.Equals(fechaDesdeObj) Then
-                fechaDesde = CDate(fechaDesdeObj)
-            End If
+            If fechaDesdeObj IsNot Nothing AndAlso Not DBNull.Value.Equals(fechaDesdeObj) Then fechaDesde = CDate(fechaDesdeObj)
             Dim fechaHastaObj = dataItem.GetType().GetProperty("FechaHasta")?.GetValue(dataItem, Nothing)
-            If fechaHastaObj IsNot Nothing AndAlso Not DBNull.Value.Equals(fechaHastaObj) Then
-                fechaHasta = CDate(fechaHastaObj)
-            End If
+            If fechaHastaObj IsNot Nothing AndAlso Not DBNull.Value.Equals(fechaHastaObj) Then fechaHasta = CDate(fechaHastaObj)
         Else
             Dim estado = TryCast(dataItem, EstadoTransitorio)
-            If estado Is Nothing OrElse estado.TipoEstadoTransitorioId = 0 Then
-                e.FormattingApplied = True
-                Return
-            End If
-
+            If estado Is Nothing OrElse estado.TipoEstadoTransitorioId = 0 Then Return
             Dim tipo = _tiposEstadoTransitorio.FirstOrDefault(Function(t) t.Id = estado.TipoEstadoTransitorioId)
             tipoEstado = If(tipo IsNot Nothing, tipo.Nombre, "")
 
             Select Case estado.TipoEstadoTransitorioId
-                Case 1
-                    If estado.DesignacionDetalle IsNot Nothing Then
-                        fechaDesde = estado.DesignacionDetalle.FechaDesde
-                        fechaHasta = estado.DesignacionDetalle.FechaHasta
-                        observaciones = estado.DesignacionDetalle.Observaciones
-                    End If
-                Case 2
-                    If estado.EnfermedadDetalle IsNot Nothing Then
-                        fechaDesde = estado.EnfermedadDetalle.FechaDesde
-                        fechaHasta = estado.EnfermedadDetalle.FechaHasta
-                        observaciones = $"{estado.EnfermedadDetalle.Observaciones} ({estado.EnfermedadDetalle.Diagnostico})"
-                    End If
-                Case 3
-                    If estado.SancionDetalle IsNot Nothing Then
-                        fechaDesde = estado.SancionDetalle.FechaDesde
-                        fechaHasta = estado.SancionDetalle.FechaHasta
-                        observaciones = estado.SancionDetalle.Observaciones
-                    End If
-                Case 4
-                    If estado.OrdenCincoDetalle IsNot Nothing Then
-                        fechaDesde = estado.OrdenCincoDetalle.FechaDesde
-                        fechaHasta = estado.OrdenCincoDetalle.FechaHasta
-                        observaciones = estado.OrdenCincoDetalle.Observaciones
-                    End If
-                Case 5
-                    If estado.RetenDetalle IsNot Nothing Then
-                        fechaDesde = estado.RetenDetalle.FechaReten
-                        fechaHasta = Nothing
-                        observaciones = estado.RetenDetalle.Observaciones
-                    End If
-                Case 6
-                    If estado.SumarioDetalle IsNot Nothing Then
-                        fechaDesde = estado.SumarioDetalle.FechaDesde
-                        fechaHasta = estado.SumarioDetalle.FechaHasta
-                        observaciones = estado.SumarioDetalle.Observaciones
-                    End If
+                Case 1 : If estado.DesignacionDetalle IsNot Nothing Then fechaDesde = estado.DesignacionDetalle.FechaDesde : fechaHasta = estado.DesignacionDetalle.FechaHasta : observaciones = estado.DesignacionDetalle.Observaciones
+                Case 2 : If estado.EnfermedadDetalle IsNot Nothing Then fechaDesde = estado.EnfermedadDetalle.FechaDesde : fechaHasta = estado.EnfermedadDetalle.FechaHasta : observaciones = $"{estado.EnfermedadDetalle.Observaciones} ({estado.EnfermedadDetalle.Diagnostico})"
+                Case 3 : If estado.SancionDetalle IsNot Nothing Then fechaDesde = estado.SancionDetalle.FechaDesde : fechaHasta = estado.SancionDetalle.FechaHasta : observaciones = estado.SancionDetalle.Observaciones
+                Case 4 : If estado.OrdenCincoDetalle IsNot Nothing Then fechaDesde = estado.OrdenCincoDetalle.FechaDesde : fechaHasta = estado.OrdenCincoDetalle.FechaHasta : observaciones = estado.OrdenCincoDetalle.Observaciones
+                Case 5 : If estado.RetenDetalle IsNot Nothing Then fechaDesde = estado.RetenDetalle.FechaReten : fechaHasta = Nothing : observaciones = estado.RetenDetalle.Observaciones
+                Case 6 : If estado.SumarioDetalle IsNot Nothing Then fechaDesde = estado.SumarioDetalle.FechaDesde : fechaHasta = estado.SumarioDetalle.FechaHasta : observaciones = estado.SumarioDetalle.Observaciones
             End Select
         End If
 
         Select Case colName
-            Case "TipoEstado"
-                e.Value = tipoEstado
-            Case "Observaciones"
-                e.Value = If(String.IsNullOrEmpty(observaciones), String.Empty, observaciones)
-            Case "FechaDesde"
-                e.Value = If(fechaDesde.HasValue, CType(fechaDesde.Value, Object), Nothing)
-            Case "FechaHasta"
-                e.Value = If(fechaHasta.HasValue, CType(fechaHasta.Value, Object), Nothing)
+            Case "TipoEstado" : e.Value = tipoEstado
+            Case "Observaciones" : e.Value = If(String.IsNullOrEmpty(observaciones), String.Empty, observaciones)
+            Case "FechaDesde" : e.Value = If(fechaDesde.HasValue, CType(fechaDesde.Value, Object), Nothing)
+            Case "FechaHasta" : e.Value = If(fechaHasta.HasValue, CType(fechaHasta.Value, Object), Nothing)
         End Select
-
         e.FormattingApplied = True
     End Sub
 
@@ -617,13 +543,10 @@ Public Class frmFuncionarioCrear
 
     Private Sub btnQuitarDotacion_Click(sender As Object, e As EventArgs) Handles btnQuitarDotacion.Click
         If dgvDotacion.CurrentRow Is Nothing Then Return
-
         If MessageBox.Show("¿Está seguro de que desea quitar este elemento de dotación?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
             Dim dotacionSeleccionada = CType(dgvDotacion.CurrentRow.DataBoundItem, FuncionarioDotacion)
             _dotaciones.Remove(dotacionSeleccionada)
-            If dotacionSeleccionada.Id > 0 Then
-                _uow.Context.Entry(dotacionSeleccionada).State = EntityState.Deleted
-            End If
+            If dotacionSeleccionada.Id > 0 Then _uow.Context.Entry(dotacionSeleccionada).State = EntityState.Deleted
         End If
     End Sub
 #End Region
@@ -640,7 +563,6 @@ Public Class frmFuncionarioCrear
 
     Private Sub btnEditarEstado_Click(sender As Object, e As EventArgs) Handles btnEditarEstado.Click
         If dgvEstadosTransitorios.CurrentRow Is Nothing Then Return
-
         Dim estadoParaEditar As EstadoTransitorio = Nothing
         If chkVerHistorial.Checked Then
             Dim itemSeleccionado = dgvEstadosTransitorios.CurrentRow.DataBoundItem
@@ -649,12 +571,10 @@ Public Class frmFuncionarioCrear
         Else
             estadoParaEditar = TryCast(dgvEstadosTransitorios.CurrentRow.DataBoundItem, EstadoTransitorio)
         End If
-
         If estadoParaEditar Is Nothing Then
             MessageBox.Show("El registro seleccionado no puede ser editado desde esta vista.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Return
         End If
-
         Using frm As New frmFuncionarioEstadoTransitorio(estadoParaEditar, _tiposEstadoTransitorio)
             If frm.ShowDialog() = DialogResult.OK Then
                 _estadosTransitorios.ResetBindings()
@@ -664,7 +584,6 @@ Public Class frmFuncionarioCrear
 
     Private Sub btnQuitarEstado_Click(sender As Object, e As EventArgs) Handles btnQuitarEstado.Click
         If dgvEstadosTransitorios.CurrentRow Is Nothing Then Return
-
         Dim estadoParaQuitar As EstadoTransitorio = Nothing
         If chkVerHistorial.Checked Then
             Dim itemSeleccionado = dgvEstadosTransitorios.CurrentRow.DataBoundItem
@@ -673,17 +592,13 @@ Public Class frmFuncionarioCrear
         Else
             estadoParaQuitar = TryCast(dgvEstadosTransitorios.CurrentRow.DataBoundItem, EstadoTransitorio)
         End If
-
         If estadoParaQuitar Is Nothing Then
             MessageBox.Show("El registro seleccionado no puede ser eliminado desde esta vista.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Return
         End If
-
         If MessageBox.Show("¿Está seguro de que desea quitar este estado transitorio?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
             _estadosTransitorios.Remove(estadoParaQuitar)
-            If estadoParaQuitar.Id > 0 Then
-                _estadoSvc.RemoveWithoutCommit(estadoParaQuitar)
-            End If
+            If estadoParaQuitar.Id > 0 Then _estadoSvc.RemoveWithoutCommit(estadoParaQuitar)
         End If
     End Sub
 #End Region
