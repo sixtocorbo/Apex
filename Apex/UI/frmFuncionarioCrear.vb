@@ -28,7 +28,8 @@ Public Class frmFuncionarioCrear
     Private _estadosTransitorios As BindingList(Of EstadoTransitorio)
     Private _historialConsolidado As List(Of Object)
     Private _itemsDotacion As List(Of DotacionItem)
-
+    ' --- Evita formateo mientras cambio el origen de datos ---
+    Private _cambiandoOrigen As Boolean = False
 
     '-------------------- Constructores ----------------------
     Public Sub New()
@@ -93,6 +94,7 @@ Public Class frmFuncionarioCrear
         AddHandler chkVerHistorial.CheckedChanged, AddressOf chkVerHistorial_CheckedChanged
         AddHandler dgvEstadosTransitorios.CellFormatting, AddressOf dgvEstadosTransitorios_CellFormatting
         AddHandler dgvEstadosTransitorios.SelectionChanged, AddressOf DgvEstadosTransitorios_SelectionChanged
+        AddHandler dgvEstadosTransitorios.DataError, Sub(s, a) a.ThrowException = False
 
         If _modo = ModoFormulario.Editar Then
             Me.Text = "Editar Funcionario"
@@ -130,13 +132,25 @@ Public Class frmFuncionarioCrear
         cboNivelEstudio.SelectedValue = If(_funcionario.NivelEstudioId.HasValue, CInt(_funcionario.NivelEstudioId), -1)
     End Sub
 
-    Private Async Sub chkVerHistorial_CheckedChanged(sender As Object, e As EventArgs)
-        If chkVerHistorial.Checked Then
-            Await CargarHistorialCompleto()
-        Else
-            dgvEstadosTransitorios.DataSource = _estadosTransitorios
-        End If
+    Private Async Sub chkVerHistorial_CheckedChanged(sender As Object, e As EventArgs) Handles chkVerHistorial.CheckedChanged
+        _cambiandoOrigen = True
+        Try
+            ' Desconectar temporalmente el DataSource y columnas para que no dispare eventos con filas “a medias”
+            dgvEstadosTransitorios.DataSource = Nothing
+            dgvEstadosTransitorios.Columns.Clear()
+            ConfigurarGrillaEstados()
+
+            If chkVerHistorial.Checked Then
+                Await CargarHistorialCompleto()
+            Else
+                dgvEstadosTransitorios.DataSource = _estadosTransitorios
+            End If
+        Finally
+            _cambiandoOrigen = False
+        End Try
     End Sub
+
+
 
     Private Async Function CargarHistorialCompleto() As Task
         LoadingHelper.MostrarCargando(Me)
@@ -171,8 +185,7 @@ Public Class frmFuncionarioCrear
                                                                  If h.EnfermedadDetalle IsNot Nothing Then
                                                                      fechaDesde = h.EnfermedadDetalle.FechaDesde
                                                                      fechaHasta = h.EnfermedadDetalle.FechaHasta
-                                                                     observaciones = $"{h.EnfermedadDetalle.Observaciones} " &
-                                                                                   $"({h.EnfermedadDetalle.Diagnostico})"
+                                                                     observaciones = $"{h.EnfermedadDetalle.Observaciones} ({h.EnfermedadDetalle.Diagnostico})"
                                                                  End If
                                                              Case 3 ' Sanción
                                                                  If h.SancionDetalle IsNot Nothing Then
@@ -215,7 +228,6 @@ Public Class frmFuncionarioCrear
             LoadingHelper.OcultarCargando(Me)
         End Try
     End Function
-
 
     Private Sub DgvEstadosTransitorios_SelectionChanged(sender As Object, e As EventArgs)
         Dim editable = False
@@ -264,7 +276,7 @@ Public Class frmFuncionarioCrear
             _funcionario.FechaNacimiento = If(dtpFechaNacimiento.Value = dtpFechaNacimiento.MinDate, CType(Nothing, Date?), dtpFechaNacimiento.Value.Date)
             _funcionario.Domicilio = txtDomicilio.Text.Trim()
             _funcionario.Email = txtEmail.Text.Trim()
-            _funcionario.telefono = txtTelefono.Text.Trim()
+            _funcionario.Telefono = txtTelefono.Text.Trim()
             _funcionario.EstadoCivilId = If(cboEstadoCivil.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboEstadoCivil.SelectedValue))
             _funcionario.GeneroId = If(cboGenero.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboGenero.SelectedValue))
             _funcionario.NivelEstudioId = If(cboNivelEstudio.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboNivelEstudio.SelectedValue))
@@ -365,41 +377,38 @@ Public Class frmFuncionarioCrear
         End With
     End Sub
 
-
     Private Sub ConfigurarGrillaEstados()
         With dgvEstadosTransitorios
             .AutoGenerateColumns = False
             .Columns.Clear()
 
             .Columns.Add(New DataGridViewTextBoxColumn With {
-                .Name = "TipoEstado",
-                .HeaderText = "Tipo de Estado",
-                .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
-                .ValueType = GetType(String)
-            })
+            .Name = "TipoEstado",
+            .HeaderText = "Tipo de Estado",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill            ' (opcional) .ValueType = GetType(String)
+        })
 
             Dim colDesde As New DataGridViewTextBoxColumn With {
-                .Name = "FechaDesde",
-                .HeaderText = "Desde",
-                .ValueType = GetType(String)
-            }
+            .Name = "FechaDesde",
+            .HeaderText = "Desde"
+        }
+            colDesde.DefaultCellStyle.Format = "dd/MM/yyyy"
             colDesde.DefaultCellStyle.NullValue = ""
             .Columns.Add(colDesde)
 
             Dim colHasta As New DataGridViewTextBoxColumn With {
-                .Name = "FechaHasta",
-                .HeaderText = "Hasta",
-                .ValueType = GetType(String)
-            }
+            .Name = "FechaHasta",
+            .HeaderText = "Hasta"
+        }
+            colHasta.DefaultCellStyle.Format = "dd/MM/yyyy"
             colHasta.DefaultCellStyle.NullValue = ""
             .Columns.Add(colHasta)
 
             .Columns.Add(New DataGridViewTextBoxColumn With {
-                .Name = "Observaciones",
-                .HeaderText = "Observaciones",
-                .Width = 300,
-                .ValueType = GetType(String)
-            })
+            .Name = "Observaciones",
+            .HeaderText = "Observaciones",
+            .Width = 300            ' (opcional) .ValueType = GetType(String)
+        })
         End With
     End Sub
 
@@ -426,6 +435,13 @@ Public Class frmFuncionarioCrear
     End Sub
 
     Private Sub dgvEstadosTransitorios_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
+        If _cambiandoOrigen Then
+            ' Evita formatear valores “nulos” en pleno rebinding
+            e.Value = Nothing
+            e.FormattingApplied = True
+            Return
+        End If
+
         If e.RowIndex < 0 OrElse e.ColumnIndex < 0 Then Return
 
         Dim dgv = CType(sender, DataGridView)
@@ -512,7 +528,6 @@ Public Class frmFuncionarioCrear
 
         e.FormattingApplied = True
     End Sub
-
 
     Private Sub btnCancelar_Click(sender As Object, e As EventArgs) Handles btnCancelar.Click
         DialogResult = DialogResult.Cancel
@@ -618,7 +633,6 @@ Public Class frmFuncionarioCrear
             MessageBox.Show("El registro seleccionado no es un estado transitorio eliminable.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Return
         End If
-
 
         If MessageBox.Show("¿Está seguro de que desea quitar este estado transitorio?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
             ' 1. Eliminar de la lista visual
