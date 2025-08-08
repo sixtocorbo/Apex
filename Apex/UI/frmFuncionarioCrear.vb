@@ -193,22 +193,23 @@ Public Class frmFuncionarioCrear
         Try
             Dim repo = _uow.Repository(Of EstadoTransitorio)()
             Dim historial = Await repo.GetAll().
-                Include(Function(et) et.TipoEstadoTransitorio).
-                Include(Function(et) et.DesignacionDetalle).
-                Include(Function(et) et.SancionDetalle).
-                Include(Function(et) et.SumarioDetalle).
-                Include(Function(et) et.OrdenCincoDetalle).
-                Include(Function(et) et.EnfermedadDetalle).
-                Include(Function(et) et.RetenDetalle).
-                Where(Function(et) et.FuncionarioId = _idFuncionario).
-                OrderByDescending(Function(et) et.Id).
-                ToListAsync()
+            Include(Function(et) et.TipoEstadoTransitorio).
+            Include(Function(et) et.DesignacionDetalle).
+            Include(Function(et) et.SancionDetalle).
+            Include(Function(et) et.SumarioDetalle).
+            Include(Function(et) et.OrdenCincoDetalle).
+            Include(Function(et) et.EnfermedadDetalle).
+            Include(Function(et) et.RetenDetalle).
+            Where(Function(et) et.FuncionarioId = _idFuncionario).
+            OrderByDescending(Function(et) et.Id).
+            ToListAsync()
 
             _historialConsolidado = historial.Select(Function(h)
                                                          Dim fechaDesde As Date? = Nothing
                                                          Dim fechaHasta As Date? = Nothing
                                                          Dim observaciones As String = ""
                                                          Dim origen As String = "Estado"
+                                                         Dim detallePrincipal As String = "" '--- Variable para el detalle clave
 
                                                          Select Case h.TipoEstadoTransitorioId
                                                              Case 1 ' Designación
@@ -216,18 +217,21 @@ Public Class frmFuncionarioCrear
                                                                      fechaDesde = h.DesignacionDetalle.FechaDesde
                                                                      fechaHasta = h.DesignacionDetalle.FechaHasta
                                                                      observaciones = h.DesignacionDetalle.Observaciones
+                                                                     If Not String.IsNullOrWhiteSpace(h.DesignacionDetalle.DocResolucion) Then detallePrincipal = $"Resolución: {h.DesignacionDetalle.DocResolucion}"
                                                                  End If
                                                              Case 2 ' Enfermedad
                                                                  If h.EnfermedadDetalle IsNot Nothing Then
                                                                      fechaDesde = h.EnfermedadDetalle.FechaDesde
                                                                      fechaHasta = h.EnfermedadDetalle.FechaHasta
-                                                                     observaciones = $"{h.EnfermedadDetalle.Observaciones} ({h.EnfermedadDetalle.Diagnostico})"
+                                                                     observaciones = h.EnfermedadDetalle.Observaciones
+                                                                     If Not String.IsNullOrWhiteSpace(h.EnfermedadDetalle.Diagnostico) Then detallePrincipal = $"Diagnóstico: {h.EnfermedadDetalle.Diagnostico}"
                                                                  End If
                                                              Case 3 ' Sanción
                                                                  If h.SancionDetalle IsNot Nothing Then
                                                                      fechaDesde = h.SancionDetalle.FechaDesde
                                                                      fechaHasta = h.SancionDetalle.FechaHasta
                                                                      observaciones = h.SancionDetalle.Observaciones
+                                                                     If Not String.IsNullOrWhiteSpace(h.SancionDetalle.Resolucion) Then detallePrincipal = $"Resolución: {h.SancionDetalle.Resolucion}"
                                                                  End If
                                                              Case 4 ' Orden Cinco
                                                                  If h.OrdenCincoDetalle IsNot Nothing Then
@@ -240,23 +244,27 @@ Public Class frmFuncionarioCrear
                                                                      fechaDesde = h.RetenDetalle.FechaReten
                                                                      fechaHasta = Nothing
                                                                      observaciones = h.RetenDetalle.Observaciones
+                                                                     If Not String.IsNullOrWhiteSpace(h.RetenDetalle.Turno) Then detallePrincipal = $"Turno: {h.RetenDetalle.Turno}"
                                                                  End If
                                                              Case 6 ' Sumario
                                                                  If h.SumarioDetalle IsNot Nothing Then
                                                                      fechaDesde = h.SumarioDetalle.FechaDesde
                                                                      fechaHasta = h.SumarioDetalle.FechaHasta
                                                                      observaciones = h.SumarioDetalle.Observaciones
+                                                                     If Not String.IsNullOrWhiteSpace(h.SumarioDetalle.Expediente) Then detallePrincipal = $"Expediente: {h.SumarioDetalle.Expediente}"
                                                                  End If
                                                          End Select
 
+                                                         Dim obsFinal = If(String.IsNullOrWhiteSpace(detallePrincipal), observaciones, $"{detallePrincipal} | {observaciones}")
+
                                                          Return New With {
-                                                             .Id = h.Id,
-                                                             .Origen = origen,
-                                                             .TipoEstado = If(h.TipoEstadoTransitorio IsNot Nothing, h.TipoEstadoTransitorio.Nombre, "Desconocido"),
-                                                             .FechaDesde = fechaDesde,
-                                                             .FechaHasta = fechaHasta,
-                                                             .Observaciones = observaciones
-                                                         }
+                .Id = h.Id,
+                .Origen = origen,
+                .TipoEstado = If(h.TipoEstadoTransitorio IsNot Nothing, h.TipoEstadoTransitorio.Nombre, "Desconocido"),
+                .FechaDesde = fechaDesde,
+                .FechaHasta = fechaHasta,
+                .Observaciones = obsFinal '--- Usamos la observación enriquecida
+            }
                                                      End Function).Cast(Of Object).ToList()
 
             dgvEstadosTransitorios.DataSource = _historialConsolidado
@@ -431,16 +439,44 @@ Public Class frmFuncionarioCrear
         With dgvEstadosTransitorios
             .AutoGenerateColumns = False
             .Columns.Clear()
-            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "TipoEstado", .HeaderText = "Tipo de Estado", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, .ValueType = GetType(String)})
-            Dim colDesde As New DataGridViewTextBoxColumn With {.Name = "FechaDesde", .HeaderText = "Desde"}
+
+            ' --- INICIO DE LA CORRECCIÓN ---
+
+            ' 1. Columna TipoEstado: Cambiar Fill por AllCells para que se ajuste a su contenido.
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "TipoEstado",
+            .HeaderText = "Tipo de Estado",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells, ' <-- CAMBIO
+            .ValueType = GetType(String)
+        })
+
+            ' 2. Columnas de Fecha: Definir un ancho fijo para asegurar visibilidad.
+            Dim colDesde As New DataGridViewTextBoxColumn With {
+            .Name = "FechaDesde",
+            .HeaderText = "Desde",
+            .Width = 100 ' <-- AÑADIDO
+        }
             colDesde.DefaultCellStyle.NullValue = ""
             colDesde.DefaultCellStyle.Format = "dd/MM/yyyy"
             .Columns.Add(colDesde)
-            Dim colHasta As New DataGridViewTextBoxColumn With {.Name = "FechaHasta", .HeaderText = "Hasta"}
+
+            Dim colHasta As New DataGridViewTextBoxColumn With {
+            .Name = "FechaHasta",
+            .HeaderText = "Hasta",
+            .Width = 100 ' <-- AÑADIDO
+        }
             colHasta.DefaultCellStyle.NullValue = ""
             colHasta.DefaultCellStyle.Format = "dd/MM/yyyy"
             .Columns.Add(colHasta)
-            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Observaciones", .HeaderText = "Observaciones", .Width = 300, .ValueType = GetType(String)})
+
+            ' 3. Columna Observaciones: Esta es la que debe rellenar el espacio sobrante.
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "Observaciones",
+            .HeaderText = "Observaciones / Detalles",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, ' <-- CAMBIO
+            .ValueType = GetType(String)
+        })
+            ' --- FIN DE LA CORRECCIÓN ---
         End With
     End Sub
 
@@ -475,6 +511,7 @@ Public Class frmFuncionarioCrear
         Dim observaciones As String = ""
 
         If chkVerHistorial.Checked Then
+            ' Esta parte ya funciona bien porque lee directamente de CargarHistorialCompleto
             tipoEstado = CStr(dataItem.GetType().GetProperty("TipoEstado")?.GetValue(dataItem, Nothing))
             observaciones = CStr(dataItem.GetType().GetProperty("Observaciones")?.GetValue(dataItem, Nothing))
             Dim fechaDesdeObj = dataItem.GetType().GetProperty("FechaDesde")?.GetValue(dataItem, Nothing)
@@ -482,19 +519,60 @@ Public Class frmFuncionarioCrear
             Dim fechaHastaObj = dataItem.GetType().GetProperty("FechaHasta")?.GetValue(dataItem, Nothing)
             If fechaHastaObj IsNot Nothing AndAlso Not DBNull.Value.Equals(fechaHastaObj) Then fechaHasta = CDate(fechaHastaObj)
         Else
+            ' --- INICIO DE LA MODIFICACIÓN ---
             Dim estado = TryCast(dataItem, EstadoTransitorio)
             If estado Is Nothing OrElse estado.TipoEstadoTransitorioId = 0 Then Return
             Dim tipo = _tiposEstadoTransitorio.FirstOrDefault(Function(t) t.Id = estado.TipoEstadoTransitorioId)
             tipoEstado = If(tipo IsNot Nothing, tipo.Nombre, "")
 
+            Dim detallePrincipal As String = ""
+
             Select Case estado.TipoEstadoTransitorioId
-                Case 1 : If estado.DesignacionDetalle IsNot Nothing Then fechaDesde = estado.DesignacionDetalle.FechaDesde : fechaHasta = estado.DesignacionDetalle.FechaHasta : observaciones = estado.DesignacionDetalle.Observaciones
-                Case 2 : If estado.EnfermedadDetalle IsNot Nothing Then fechaDesde = estado.EnfermedadDetalle.FechaDesde : fechaHasta = estado.EnfermedadDetalle.FechaHasta : observaciones = $"{estado.EnfermedadDetalle.Observaciones} ({estado.EnfermedadDetalle.Diagnostico})"
-                Case 3 : If estado.SancionDetalle IsNot Nothing Then fechaDesde = estado.SancionDetalle.FechaDesde : fechaHasta = estado.SancionDetalle.FechaHasta : observaciones = estado.SancionDetalle.Observaciones
-                Case 4 : If estado.OrdenCincoDetalle IsNot Nothing Then fechaDesde = estado.OrdenCincoDetalle.FechaDesde : fechaHasta = estado.OrdenCincoDetalle.FechaHasta : observaciones = estado.OrdenCincoDetalle.Observaciones
-                Case 5 : If estado.RetenDetalle IsNot Nothing Then fechaDesde = estado.RetenDetalle.FechaReten : fechaHasta = Nothing : observaciones = estado.RetenDetalle.Observaciones
-                Case 6 : If estado.SumarioDetalle IsNot Nothing Then fechaDesde = estado.SumarioDetalle.FechaDesde : fechaHasta = estado.SumarioDetalle.FechaHasta : observaciones = estado.SumarioDetalle.Observaciones
+                Case 1 ' Designación
+                    If estado.DesignacionDetalle IsNot Nothing Then
+                        fechaDesde = estado.DesignacionDetalle.FechaDesde
+                        fechaHasta = estado.DesignacionDetalle.FechaHasta
+                        observaciones = estado.DesignacionDetalle.Observaciones
+                        If Not String.IsNullOrWhiteSpace(estado.DesignacionDetalle.DocResolucion) Then detallePrincipal = $"Resolución: {estado.DesignacionDetalle.DocResolucion}"
+                    End If
+                Case 2 ' Enfermedad
+                    If estado.EnfermedadDetalle IsNot Nothing Then
+                        fechaDesde = estado.EnfermedadDetalle.FechaDesde
+                        fechaHasta = estado.EnfermedadDetalle.FechaHasta
+                        observaciones = estado.EnfermedadDetalle.Observaciones
+                        If Not String.IsNullOrWhiteSpace(estado.EnfermedadDetalle.Diagnostico) Then detallePrincipal = $"Diagnóstico: {estado.EnfermedadDetalle.Diagnostico}"
+                    End If
+                Case 3 ' Sanción
+                    If estado.SancionDetalle IsNot Nothing Then
+                        fechaDesde = estado.SancionDetalle.FechaDesde
+                        fechaHasta = estado.SancionDetalle.FechaHasta
+                        observaciones = estado.SancionDetalle.Observaciones
+                        If Not String.IsNullOrWhiteSpace(estado.SancionDetalle.Resolucion) Then detallePrincipal = $"Resolución: {estado.SancionDetalle.Resolucion}"
+                    End If
+                Case 4 ' Orden Cinco
+                    If estado.OrdenCincoDetalle IsNot Nothing Then
+                        fechaDesde = estado.OrdenCincoDetalle.FechaDesde
+                        fechaHasta = estado.OrdenCincoDetalle.FechaHasta
+                        observaciones = estado.OrdenCincoDetalle.Observaciones
+                    End If
+                Case 5 ' Retén
+                    If estado.RetenDetalle IsNot Nothing Then
+                        fechaDesde = estado.RetenDetalle.FechaReten
+                        fechaHasta = Nothing
+                        observaciones = estado.RetenDetalle.Observaciones
+                        If Not String.IsNullOrWhiteSpace(estado.RetenDetalle.Turno) Then detallePrincipal = $"Turno: {estado.RetenDetalle.Turno}"
+                    End If
+                Case 6 ' Sumario
+                    If estado.SumarioDetalle IsNot Nothing Then
+                        fechaDesde = estado.SumarioDetalle.FechaDesde
+                        fechaHasta = estado.SumarioDetalle.FechaHasta
+                        observaciones = estado.SumarioDetalle.Observaciones
+                        If Not String.IsNullOrWhiteSpace(estado.SumarioDetalle.Expediente) Then detallePrincipal = $"Expediente: {estado.SumarioDetalle.Expediente}"
+                    End If
             End Select
+
+            observaciones = If(String.IsNullOrWhiteSpace(detallePrincipal), observaciones, $"{detallePrincipal} | {observaciones}")
+            ' --- FIN DE LA MODIFICACIÓN ---
         End If
 
         Select Case colName
