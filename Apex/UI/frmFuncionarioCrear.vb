@@ -646,37 +646,43 @@ Public Class frmFuncionarioCrear
     End Sub
 #End Region
 
+    ' Archivo: sixtocorbo/apex/Apex-fc6aea00b490b0ecd9d41ffbdafdc38b8add564e/Apex/UI/frmFuncionarioCrear.vb
+
 #Region "CRUD Estados Transitorios"
     Private Sub btnAñadirEstado_Click(sender As Object, e As EventArgs) Handles btnAñadirEstado.Click
         Dim nuevoEstado = New EstadoTransitorio()
 
         Using frm As New frmFuncionarioEstadoTransitorio(nuevoEstado, _tiposEstadoTransitorio)
             If frm.ShowDialog() = DialogResult.OK Then
-                ' Añadimos el nuevo estado a la colección principal del funcionario
+                ' Añadimos el nuevo estado a la colección principal del funcionario para el guardado final
                 _funcionario.EstadoTransitorio.Add(frm.Estado)
 
-                ' Forzamos la actualización de la grilla, sea cual sea la vista
-                chkVerHistorial_CheckedChanged(Nothing, EventArgs.Empty)
+                ' Si no estamos en la vista de historial y el nuevo estado está activo,
+                ' lo añadimos directamente a la lista enlazada para un refresco inmediato.
+                If Not chkVerHistorial.Checked AndAlso IsEstadoActivo(frm.Estado) Then
+                    _estadosTransitorios.Add(frm.Estado)
+                ElseIf chkVerHistorial.Checked Then
+                    ' Si estamos en vista de historial, es necesario recargar todo para mantener el orden y la consistencia.
+                    chkVerHistorial_CheckedChanged(Nothing, EventArgs.Empty)
+                End If
             End If
         End Using
     End Sub
 
     Private Sub btnEditarEstado_Click(sender As Object, e As EventArgs) Handles btnEditarEstado.Click
-        If dgvEstadosTransitorios.CurrentRow Is Nothing Then Return
+        If dgvEstadosTransitorios.CurrentRow Is Nothing OrElse dgvEstadosTransitorios.CurrentRow.DataBoundItem Is Nothing Then Return
 
         Dim estadoParaEditar As EstadoTransitorio = Nothing
         Dim id As Integer = 0
+        Dim index As Integer = dgvEstadosTransitorios.CurrentRow.Index
 
         If chkVerHistorial.Checked Then
             Dim itemSeleccionado = dgvEstadosTransitorios.CurrentRow.DataBoundItem
-            ' Asegurarse de que el objeto no es nulo y tiene la propiedad 'Id'
             If itemSeleccionado IsNot Nothing AndAlso itemSeleccionado.GetType().GetProperty("Id") IsNot Nothing Then
                 id = CInt(itemSeleccionado.GetType().GetProperty("Id").GetValue(itemSeleccionado, Nothing))
-                ' Buscamos en la colección completa del funcionario, no en la lista filtrada de la grilla
                 estadoParaEditar = _funcionario.EstadoTransitorio.FirstOrDefault(Function(et) et.Id = id)
             End If
         Else
-            ' Si no es vista historial, el item es directamente del tipo correcto
             estadoParaEditar = TryCast(dgvEstadosTransitorios.CurrentRow.DataBoundItem, EstadoTransitorio)
         End If
 
@@ -687,8 +693,17 @@ Public Class frmFuncionarioCrear
 
         Using frm As New frmFuncionarioEstadoTransitorio(estadoParaEditar, _tiposEstadoTransitorio)
             If frm.ShowDialog() = DialogResult.OK Then
-                ' Refrescar la vista actual, sea cual sea
-                chkVerHistorial_CheckedChanged(Nothing, EventArgs.Empty)
+                ' Si estamos en vista de historial, recargamos todo
+                If chkVerHistorial.Checked Then
+                    chkVerHistorial_CheckedChanged(Nothing, EventArgs.Empty)
+                Else
+                    ' Si estamos en la vista de activos, actualizamos la fila o la quitamos
+                    If IsEstadoActivo(estadoParaEditar) Then
+                        _estadosTransitorios.ResetItem(index)
+                    Else
+                        _estadosTransitorios.RemoveAt(index)
+                    End If
+                End If
             End If
         End Using
     End Sub
@@ -716,15 +731,15 @@ Public Class frmFuncionarioCrear
         End If
 
         If MessageBox.Show("¿Está seguro de que desea quitar este estado transitorio?", "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
-            ' Quita de la vista activa (si está ahí) para que el cambio visual sea inmediato
-            If _estadosTransitorios.Contains(estadoParaQuitar) Then
-                _estadosTransitorios.Remove(estadoParaQuitar)
+            ' Lo quitamos de la lista principal del funcionario
+            _funcionario.EstadoTransitorio.Remove(estadoParaQuitar)
+
+            ' Si el estado tiene ID, significa que existe en la BD y hay que marcarlo para borrar
+            If estadoParaQuitar.Id > 0 Then
+                _uow.Context.Entry(estadoParaQuitar).State = EntityState.Deleted
             End If
 
-            ' Quita del contexto de Entity Framework para que se borre de la base de datos al guardar
-            _uow.Context.Set(Of EstadoTransitorio)().Remove(estadoParaQuitar)
-
-            ' Refrescar la vista actual para que se vea el cambio
+            ' Finalmente, actualizamos la vista
             chkVerHistorial_CheckedChanged(Nothing, EventArgs.Empty)
         End If
     End Sub
