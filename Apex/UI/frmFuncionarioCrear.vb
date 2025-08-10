@@ -279,16 +279,21 @@ Public Class frmFuncionarioCrear
 
 
     Private Sub DgvEstadosTransitorios_SelectionChanged(sender As Object, e As EventArgs)
-        Dim puedeEditarOQuitar As Boolean = False
-
-        ' El botón de añadir siempre estará habilitado.
-        btnAñadirEstado.Enabled = True
-
+        ' --- INICIO DE LA CORRECCIÓN CLAVE ---
+        ' Se añade una comprobación exhaustiva para asegurar que la fila actual y su
+        ' DataBoundItem son válidos antes de proceder. Esto evita la excepción cuando
+        ' la selección se borra temporalmente al actualizar el DataSource.
         If dgvEstadosTransitorios.CurrentRow Is Nothing OrElse dgvEstadosTransitorios.CurrentRow.DataBoundItem Is Nothing Then
             btnEditarEstado.Enabled = False
             btnQuitarEstado.Enabled = False
             Return
         End If
+        ' --- FIN DE LA CORRECCIÓN CLAVE ---
+
+        Dim puedeEditarOQuitar As Boolean = False
+
+        ' El botón de añadir siempre estará habilitado.
+        btnAñadirEstado.Enabled = True
 
         Dim itemSeleccionado As Object = dgvEstadosTransitorios.CurrentRow.DataBoundItem
 
@@ -444,48 +449,63 @@ Public Class frmFuncionarioCrear
 
     Private Sub ConfigurarGrillaEstados()
         With dgvEstadosTransitorios
+            .SuspendLayout()
+
             .AutoGenerateColumns = False
             .Columns.Clear()
 
-            ' --- INICIO DE LA CORRECCIÓN ---
+            ' >>> defensivo
+            .AllowUserToAddRows = False   ' evita la "fila nueva" que dispara IndexOutOfRange
+            .AllowUserToDeleteRows = False
+            .ReadOnly = True
+            .SelectionMode = DataGridViewSelectionMode.FullRowSelect
+            .MultiSelect = False
+            .RowHeadersVisible = False
 
-            ' 1. Columna TipoEstado: Se mantiene como estaba, ajustándose al contenido.
+            ' Tipo de estado
             .Columns.Add(New DataGridViewTextBoxColumn With {
-                .Name = "TipoEstado",
-                .HeaderText = "Tipo de Estado",
-                .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
-                .ValueType = GetType(String)
-            })
+            .Name = "TipoEstado",
+            .HeaderText = "Tipo de Estado",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
+            .ValueType = GetType(String),
+            .SortMode = DataGridViewColumnSortMode.NotSortable
+        })
 
-            ' 2. Columnas de Fecha: Se añade ValueType = GetType(Date).
+            ' Desde
             Dim colDesde As New DataGridViewTextBoxColumn With {
-                .Name = "FechaDesde",
-                .HeaderText = "Desde",
-                .Width = 100,
-                .ValueType = GetType(Date) ' <-- Tip extra aplicado
-            }
-            colDesde.DefaultCellStyle.Format = "dd/MM/yyyy" ' El formato se aplicará automáticamente
+            .Name = "FechaDesde",
+            .HeaderText = "Desde",
+            .Width = 100,
+            .ValueType = GetType(Date)
+        }
+            colDesde.DefaultCellStyle.Format = "dd/MM/yyyy"
+            colDesde.DefaultCellStyle.NullValue = ""   ' muestra vacío si es Nothing
             .Columns.Add(colDesde)
 
+            ' Hasta
             Dim colHasta As New DataGridViewTextBoxColumn With {
-                .Name = "FechaHasta",
-                .HeaderText = "Hasta",
-                .Width = 100,
-                .ValueType = GetType(Date) ' <-- Tip extra aplicado
-            }
-            colHasta.DefaultCellStyle.Format = "dd/MM/yyyy" ' El formato se aplicará automáticamente
+            .Name = "FechaHasta",
+            .HeaderText = "Hasta",
+            .Width = 100,
+            .ValueType = GetType(Date)
+        }
+            colHasta.DefaultCellStyle.Format = "dd/MM/yyyy"
+            colHasta.DefaultCellStyle.NullValue = ""
             .Columns.Add(colHasta)
 
-            ' 3. Columna Observaciones: Rellena el espacio sobrante.
+            ' Observaciones
             .Columns.Add(New DataGridViewTextBoxColumn With {
-                .Name = "Observaciones",
-                .HeaderText = "Observaciones / Detalles",
-                .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
-                .ValueType = GetType(String)
-            })
-            ' --- FIN DE LA CORRECCIÓN ---
+            .Name = "Observaciones",
+            .HeaderText = "Observaciones / Detalles",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
+            .ValueType = GetType(String),
+            .SortMode = DataGridViewColumnSortMode.NotSortable
+        })
+
+            .ResumeLayout()
         End With
     End Sub
+
 
     Private Sub dgvDotacion_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
         If e.RowIndex < 0 OrElse e.ColumnIndex < 0 Then Return
@@ -505,23 +525,26 @@ Public Class frmFuncionarioCrear
     End Sub
 
     Private Sub dgvEstadosTransitorios_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
-        If _cambiandoOrigen OrElse e.RowIndex < 0 OrElse e.ColumnIndex < 0 Then Return
-
         Dim dgv = CType(sender, DataGridView)
+
+        ' --- INICIO DE LA CORRECCIÓN ---
+        ' Se añade una comprobación para asegurar que el índice de la fila es válido ANTES de intentar usarlo.
+        ' Esto previene el error "Index out of range" al eliminar la última fila.
+        If _cambiandoOrigen OrElse e.RowIndex < 0 OrElse e.RowIndex >= dgv.RowCount OrElse e.ColumnIndex < 0 Then Return
+        ' --- FIN DE LA CORRECCIÓN ---
+
         Dim colName = dgv.Columns(e.ColumnIndex).Name
         Dim dataItem = dgv.Rows(e.RowIndex).DataBoundItem
         If dataItem Is Nothing Then Return
 
-        ' --- INICIO DE LA CORRECCIÓN (Opción B) ---
-        ' Solo manejamos las columnas que NO son de fecha, o las que necesitan
-        ' una lógica de extracción de datos compleja.
+        ' Solo manejamos las columnas que necesitan una lógica de extracción de datos compleja.
         If colName = "TipoEstado" OrElse colName = "Observaciones" OrElse colName = "FechaDesde" OrElse colName = "FechaHasta" Then
             Dim tipoEstado As String = ""
             Dim fechaDesde As Date? = Nothing
             Dim fechaHasta As Date? = Nothing
             Dim observaciones As String = ""
 
-            ' (La lógica para obtener los valores se mantiene igual que en la versión anterior)
+            ' Lógica para obtener los valores según si la vista de historial está activa o no.
             If chkVerHistorial.Checked Then
                 tipoEstado = CStr(dataItem.GetType().GetProperty("TipoEstado")?.GetValue(dataItem, Nothing))
                 observaciones = CStr(dataItem.GetType().GetProperty("Observaciones")?.GetValue(dataItem, Nothing))
@@ -530,7 +553,6 @@ Public Class frmFuncionarioCrear
                 Dim fechaHastaObj = dataItem.GetType().GetProperty("FechaHasta")?.GetValue(dataItem, Nothing)
                 If fechaHastaObj IsNot Nothing AndAlso Not DBNull.Value.Equals(fechaHastaObj) Then fechaHasta = CDate(fechaHastaObj)
             Else
-                ' ... (toda la lógica del Select Case para obtener los detalles del estado transitorio) ...
                 Dim estado = TryCast(dataItem, EstadoTransitorio)
                 If estado Is Nothing OrElse estado.TipoEstadoTransitorioId = 0 Then Return
                 Dim tipo = _tiposEstadoTransitorio.FirstOrDefault(Function(t) t.Id = estado.TipoEstadoTransitorioId)
@@ -582,22 +604,20 @@ Public Class frmFuncionarioCrear
                 observaciones = If(String.IsNullOrWhiteSpace(detallePrincipal), observaciones, $"{detallePrincipal} | {observaciones}")
             End If
 
+            ' Asignar los valores a las celdas correspondientes.
             Select Case colName
                 Case "TipoEstado"
                     e.Value = tipoEstado
-                    e.FormattingApplied = True ' Aplicamos formato solo para el texto
+                    e.FormattingApplied = True
                 Case "Observaciones"
                     e.Value = If(String.IsNullOrEmpty(observaciones), String.Empty, observaciones)
-                    e.FormattingApplied = True ' Y para este otro texto
+                    e.FormattingApplied = True
                 Case "FechaDesde"
                     e.Value = If(fechaDesde.HasValue, CType(fechaDesde.Value, Object), Nothing)
-                    ' NO aplicamos formato, dejamos que la grilla lo haga
                 Case "FechaHasta"
                     e.Value = If(fechaHasta.HasValue, CType(fechaHasta.Value, Object), Nothing)
-                    ' NO aplicamos formato aquí tampoco
             End Select
         End If
-        ' --- FIN DE LA CORRECCIÓN ---
     End Sub
 
 
@@ -714,15 +734,19 @@ Public Class frmFuncionarioCrear
         Dim estadoParaQuitar As EstadoTransitorio = Nothing
         Dim id As Integer = 0
 
+        ' Obtiene el objeto EstadoTransitorio a eliminar, ya sea de la vista de activos o del historial.
         If chkVerHistorial.Checked Then
             Dim itemSeleccionado = dgvEstadosTransitorios.CurrentRow.DataBoundItem
             If itemSeleccionado IsNot Nothing AndAlso itemSeleccionado.GetType().GetProperty("Id") IsNot Nothing Then
                 id = CInt(itemSeleccionado.GetType().GetProperty("Id").GetValue(itemSeleccionado, Nothing))
-                ' Buscamos en la colección completa del funcionario
+                ' Busca en la colección completa del funcionario
                 estadoParaQuitar = _funcionario.EstadoTransitorio.FirstOrDefault(Function(et) et.Id = id)
             End If
         Else
             estadoParaQuitar = TryCast(dgvEstadosTransitorios.CurrentRow.DataBoundItem, EstadoTransitorio)
+            If estadoParaQuitar IsNot Nothing Then
+                id = estadoParaQuitar.Id
+            End If
         End If
 
         If estadoParaQuitar Is Nothing Then
@@ -731,16 +755,49 @@ Public Class frmFuncionarioCrear
         End If
 
         If MessageBox.Show("¿Está seguro de que desea quitar este estado transitorio?", "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
-            ' Lo quitamos de la lista principal del funcionario
-            _funcionario.EstadoTransitorio.Remove(estadoParaQuitar)
 
-            ' Si el estado tiene ID, significa que existe en la BD y hay que marcarlo para borrar
-            If estadoParaQuitar.Id > 0 Then
-                _uow.Context.Entry(estadoParaQuitar).State = EntityState.Deleted
+            ' --- INICIO DE LA CORRECCIÓN ---
+            ' 1. Quitar el elemento de la colección que está enlazada al DataGridView para un refresco visual inmediato.
+            If chkVerHistorial.Checked Then
+                Dim itemToRemoveFromHistory = _historialConsolidado.FirstOrDefault(Function(item)
+                                                                                       Dim itemId = CInt(item.GetType().GetProperty("Id").GetValue(item, Nothing))
+                                                                                       Return itemId = id
+                                                                                   End Function)
+                If itemToRemoveFromHistory IsNot Nothing Then
+                    _historialConsolidado.Remove(itemToRemoveFromHistory)
+                    ' Re-enlazar la lista modificada para refrescar la grilla
+                    dgvEstadosTransitorios.DataSource = Nothing
+                    dgvEstadosTransitorios.DataSource = _historialConsolidado
+                End If
+            Else
+                ' Al ser un BindingList, la grilla se actualiza automáticamente al quitar el elemento.
+                _estadosTransitorios.Remove(estadoParaQuitar)
             End If
 
-            ' Finalmente, actualizamos la vista
-            chkVerHistorial_CheckedChanged(Nothing, EventArgs.Empty)
+            ' 2. Quitar el elemento de la colección principal del funcionario que se guardará en la base de datos.
+            _funcionario.EstadoTransitorio.Remove(estadoParaQuitar)
+
+            ' 3. Si el estado existe en la BD, marcarlo para borrar (con sus detalles).
+            If estadoParaQuitar.Id > 0 Then
+                ' Se marca el detalle para eliminar
+                Select Case estadoParaQuitar.TipoEstadoTransitorioId
+                    Case 1 ' Designación
+                        If estadoParaQuitar.DesignacionDetalle IsNot Nothing Then _uow.Context.Entry(estadoParaQuitar.DesignacionDetalle).State = EntityState.Deleted
+                    Case 2 ' Enfermedad
+                        If estadoParaQuitar.EnfermedadDetalle IsNot Nothing Then _uow.Context.Entry(estadoParaQuitar.EnfermedadDetalle).State = EntityState.Deleted
+                    Case 3 ' Sanción
+                        If estadoParaQuitar.SancionDetalle IsNot Nothing Then _uow.Context.Entry(estadoParaQuitar.SancionDetalle).State = EntityState.Deleted
+                    Case 4 ' Orden Cinco
+                        If estadoParaQuitar.OrdenCincoDetalle IsNot Nothing Then _uow.Context.Entry(estadoParaQuitar.OrdenCincoDetalle).State = EntityState.Deleted
+                    Case 5 ' Retén
+                        If estadoParaQuitar.RetenDetalle IsNot Nothing Then _uow.Context.Entry(estadoParaQuitar.RetenDetalle).State = EntityState.Deleted
+                    Case 6 ' Sumario
+                        If estadoParaQuitar.SumarioDetalle IsNot Nothing Then _uow.Context.Entry(estadoParaQuitar.SumarioDetalle).State = EntityState.Deleted
+                End Select
+                ' Se marca el registro principal para eliminar
+                _uow.Context.Entry(estadoParaQuitar).State = EntityState.Deleted
+            End If
+            ' --- FIN DE LA CORRECCIÓN ---
         End If
     End Sub
 #End Region
