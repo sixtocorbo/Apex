@@ -29,6 +29,7 @@ Public Class frmFuncionarioCrear
     Private _itemsDotacion As List(Of DotacionItem)
     Private _cambiandoOrigen As Boolean = False
     Private _estaCargandoHistorial As Boolean = False
+    Private _silenciarEventosEstados As Boolean = False
 
     '-------------------- Constructores ----------------------
     Public Sub New()
@@ -279,30 +280,34 @@ Public Class frmFuncionarioCrear
 
 
     Private Sub DgvEstadosTransitorios_SelectionChanged(sender As Object, e As EventArgs)
-        ' --- INICIO DE LA CORRECCIÓN CLAVE ---
-        ' Se añade una comprobación exhaustiva para asegurar que la fila actual y su
-        ' DataBoundItem son válidos antes de proceder. Esto evita la excepción cuando
-        ' la selección se borra temporalmente al actualizar el DataSource.
-        If dgvEstadosTransitorios.CurrentRow Is Nothing OrElse dgvEstadosTransitorios.CurrentRow.DataBoundItem Is Nothing Then
+        If _silenciarEventosEstados Then Return
+
+        ' defensivo: puede no haber fila/índice válido durante refrescos
+        If dgvEstadosTransitorios.RowCount = 0 _
+       OrElse dgvEstadosTransitorios.CurrentCell Is Nothing _
+       OrElse dgvEstadosTransitorios.CurrentCell.RowIndex < 0 _
+       OrElse dgvEstadosTransitorios.CurrentCell.RowIndex >= dgvEstadosTransitorios.RowCount Then
+
+            btnEditarEstado.Enabled = False
+            btnQuitarEstado.Enabled = False
+            btnAñadirEstado.Enabled = True
+            Return
+        End If
+
+        Dim puedeEditarOQuitar As Boolean = False
+        btnAñadirEstado.Enabled = True
+
+        Dim itemSeleccionado As Object = dgvEstadosTransitorios.CurrentRow.DataBoundItem
+        If itemSeleccionado Is Nothing Then
             btnEditarEstado.Enabled = False
             btnQuitarEstado.Enabled = False
             Return
         End If
-        ' --- FIN DE LA CORRECCIÓN CLAVE ---
 
-        Dim puedeEditarOQuitar As Boolean = False
-
-        ' El botón de añadir siempre estará habilitado.
-        btnAñadirEstado.Enabled = True
-
-        Dim itemSeleccionado As Object = dgvEstadosTransitorios.CurrentRow.DataBoundItem
-
-        ' Si NO estamos en vista historial, cualquier item es un EstadoTransitorio y se puede editar/quitar.
         If Not chkVerHistorial.Checked Then
             puedeEditarOQuitar = True
         Else
-            ' Si estamos en vista historial, verificamos que el origen sea 'Estado' (y no 'Licencia')
-            Dim origenProperty As System.Reflection.PropertyInfo = itemSeleccionado.GetType().GetProperty("Origen")
+            Dim origenProperty = itemSeleccionado.GetType().GetProperty("Origen")
             If origenProperty IsNot Nothing Then
                 Dim origenValue = origenProperty.GetValue(itemSeleccionado, Nothing)
                 If origenValue IsNot Nothing Then
@@ -314,6 +319,7 @@ Public Class frmFuncionarioCrear
         btnEditarEstado.Enabled = puedeEditarOQuitar
         btnQuitarEstado.Enabled = puedeEditarOQuitar
     End Sub
+
 
     Private Async Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
         Try
@@ -523,74 +529,95 @@ Public Class frmFuncionarioCrear
             End If
         End If
     End Sub
-
     Private Sub dgvEstadosTransitorios_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
         Dim dgv = CType(sender, DataGridView)
 
+        ' >>> salir si estamos re-enlazando / cambiando origen o el evento no es válido
+        If _silenciarEventosEstados OrElse _cambiandoOrigen Then Return
+        If e.RowIndex < 0 OrElse e.ColumnIndex < 0 Then Return
+        If dgv.Columns Is Nothing OrElse e.ColumnIndex >= dgv.Columns.Count Then Return
 
-        If _cambiandoOrigen OrElse e.RowIndex < 0 OrElse e.RowIndex >= dgv.RowCount OrElse e.ColumnIndex < 0 Then Return
+        ' >>> usar CurrencyManager para validar el índice real de la lista enlazada
+        Dim cm As CurrencyManager = TryCast(dgv.BindingContext(dgv.DataSource), CurrencyManager)
+        If cm Is Nothing OrElse e.RowIndex >= cm.Count Then
+            ' índice fuera de rango durante transición de DataSource: no formatear
+            e.Value = Nothing
+            e.FormattingApplied = True
+            Return
+        End If
 
         Dim colName = dgv.Columns(e.ColumnIndex).Name
-        Dim dataItem = dgv.Rows(e.RowIndex).DataBoundItem
+
+        ' Ojo: DataBoundItem puede lanzar si el índice no existe; a esta altura ya validamos con cm.Count
+        Dim dataItem As Object = Nothing
+        Try
+            dataItem = dgv.Rows(e.RowIndex).DataBoundItem
+        Catch
+            ' Si igualmente falla, mejor salimos silenciosamente
+            e.Value = Nothing
+            e.FormattingApplied = True
+            Return
+        End Try
+
         If dataItem Is Nothing Then Return
 
-        ' Solo manejamos las columnas que necesitan una lógica de extracción de datos compleja.
         If colName = "TipoEstado" OrElse colName = "Observaciones" OrElse colName = "FechaDesde" OrElse colName = "FechaHasta" Then
             Dim tipoEstado As String = ""
             Dim fechaDesde As Date? = Nothing
             Dim fechaHasta As Date? = Nothing
             Dim observaciones As String = ""
 
-            ' Lógica para obtener los valores según si la vista de historial está activa o no.
             If chkVerHistorial.Checked Then
                 tipoEstado = CStr(dataItem.GetType().GetProperty("TipoEstado")?.GetValue(dataItem, Nothing))
                 observaciones = CStr(dataItem.GetType().GetProperty("Observaciones")?.GetValue(dataItem, Nothing))
-                Dim fechaDesdeObj = dataItem.GetType().GetProperty("FechaDesde")?.GetValue(dataItem, Nothing)
-                If fechaDesdeObj IsNot Nothing AndAlso Not DBNull.Value.Equals(fechaDesdeObj) Then fechaDesde = CDate(fechaDesdeObj)
-                Dim fechaHastaObj = dataItem.GetType().GetProperty("FechaHasta")?.GetValue(dataItem, Nothing)
-                If fechaHastaObj IsNot Nothing AndAlso Not DBNull.Value.Equals(fechaHastaObj) Then fechaHasta = CDate(fechaHastaObj)
+                Dim fd = dataItem.GetType().GetProperty("FechaDesde")?.GetValue(dataItem, Nothing)
+                If fd IsNot Nothing AndAlso Not DBNull.Value.Equals(fd) Then fechaDesde = CDate(fd)
+                Dim fh = dataItem.GetType().GetProperty("FechaHasta")?.GetValue(dataItem, Nothing)
+                If fh IsNot Nothing AndAlso Not DBNull.Value.Equals(fh) Then fechaHasta = CDate(fh)
             Else
                 Dim estado = TryCast(dataItem, EstadoTransitorio)
                 If estado Is Nothing OrElse estado.TipoEstadoTransitorioId = 0 Then Return
+
                 Dim tipo = _tiposEstadoTransitorio.FirstOrDefault(Function(t) t.Id = estado.TipoEstadoTransitorioId)
                 tipoEstado = If(tipo IsNot Nothing, tipo.Nombre, "")
                 Dim detallePrincipal As String = ""
+
                 Select Case estado.TipoEstadoTransitorioId
-                    Case 1 ' Designación
+                    Case 1
                         If estado.DesignacionDetalle IsNot Nothing Then
                             fechaDesde = estado.DesignacionDetalle.FechaDesde
                             fechaHasta = estado.DesignacionDetalle.FechaHasta
                             observaciones = estado.DesignacionDetalle.Observaciones
                             If Not String.IsNullOrWhiteSpace(estado.DesignacionDetalle.DocResolucion) Then detallePrincipal = $"Resolución: {estado.DesignacionDetalle.DocResolucion}"
                         End If
-                    Case 2 ' Enfermedad
+                    Case 2
                         If estado.EnfermedadDetalle IsNot Nothing Then
                             fechaDesde = estado.EnfermedadDetalle.FechaDesde
                             fechaHasta = estado.EnfermedadDetalle.FechaHasta
                             observaciones = estado.EnfermedadDetalle.Observaciones
                             If Not String.IsNullOrWhiteSpace(estado.EnfermedadDetalle.Diagnostico) Then detallePrincipal = $"Diagnóstico: {estado.EnfermedadDetalle.Diagnostico}"
                         End If
-                    Case 3 ' Sanción
+                    Case 3
                         If estado.SancionDetalle IsNot Nothing Then
                             fechaDesde = estado.SancionDetalle.FechaDesde
                             fechaHasta = estado.SancionDetalle.FechaHasta
                             observaciones = estado.SancionDetalle.Observaciones
                             If Not String.IsNullOrWhiteSpace(estado.SancionDetalle.Resolucion) Then detallePrincipal = $"Resolución: {estado.SancionDetalle.Resolucion}"
                         End If
-                    Case 4 ' Orden Cinco
+                    Case 4
                         If estado.OrdenCincoDetalle IsNot Nothing Then
                             fechaDesde = estado.OrdenCincoDetalle.FechaDesde
                             fechaHasta = estado.OrdenCincoDetalle.FechaHasta
                             observaciones = estado.OrdenCincoDetalle.Observaciones
                         End If
-                    Case 5 ' Retén
+                    Case 5
                         If estado.RetenDetalle IsNot Nothing Then
                             fechaDesde = estado.RetenDetalle.FechaReten
                             fechaHasta = Nothing
                             observaciones = estado.RetenDetalle.Observaciones
                             If Not String.IsNullOrWhiteSpace(estado.RetenDetalle.Turno) Then detallePrincipal = $"Turno: {estado.RetenDetalle.Turno}"
                         End If
-                    Case 6 ' Sumario
+                    Case 6
                         If estado.SumarioDetalle IsNot Nothing Then
                             fechaDesde = estado.SumarioDetalle.FechaDesde
                             fechaHasta = estado.SumarioDetalle.FechaHasta
@@ -598,10 +625,10 @@ Public Class frmFuncionarioCrear
                             If Not String.IsNullOrWhiteSpace(estado.SumarioDetalle.Expediente) Then detallePrincipal = $"Expediente: {estado.SumarioDetalle.Expediente}"
                         End If
                 End Select
+
                 observaciones = If(String.IsNullOrWhiteSpace(detallePrincipal), observaciones, $"{detallePrincipal} | {observaciones}")
             End If
 
-            ' Asignar los valores a las celdas correspondientes.
             Select Case colName
                 Case "TipoEstado"
                     e.Value = tipoEstado
@@ -616,6 +643,99 @@ Public Class frmFuncionarioCrear
             End Select
         End If
     End Sub
+
+    'Private Sub dgvEstadosTransitorios_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
+    '    Dim dgv = CType(sender, DataGridView)
+
+
+    '    If _cambiandoOrigen OrElse e.RowIndex < 0 OrElse e.RowIndex >= dgv.RowCount OrElse e.ColumnIndex < 0 Then Return
+
+    '    Dim colName = dgv.Columns(e.ColumnIndex).Name
+    '    Dim dataItem = dgv.Rows(e.RowIndex).DataBoundItem
+    '    If dataItem Is Nothing Then Return
+
+    '    ' Solo manejamos las columnas que necesitan una lógica de extracción de datos compleja.
+    '    If colName = "TipoEstado" OrElse colName = "Observaciones" OrElse colName = "FechaDesde" OrElse colName = "FechaHasta" Then
+    '        Dim tipoEstado As String = ""
+    '        Dim fechaDesde As Date? = Nothing
+    '        Dim fechaHasta As Date? = Nothing
+    '        Dim observaciones As String = ""
+
+    '        ' Lógica para obtener los valores según si la vista de historial está activa o no.
+    '        If chkVerHistorial.Checked Then
+    '            tipoEstado = CStr(dataItem.GetType().GetProperty("TipoEstado")?.GetValue(dataItem, Nothing))
+    '            observaciones = CStr(dataItem.GetType().GetProperty("Observaciones")?.GetValue(dataItem, Nothing))
+    '            Dim fechaDesdeObj = dataItem.GetType().GetProperty("FechaDesde")?.GetValue(dataItem, Nothing)
+    '            If fechaDesdeObj IsNot Nothing AndAlso Not DBNull.Value.Equals(fechaDesdeObj) Then fechaDesde = CDate(fechaDesdeObj)
+    '            Dim fechaHastaObj = dataItem.GetType().GetProperty("FechaHasta")?.GetValue(dataItem, Nothing)
+    '            If fechaHastaObj IsNot Nothing AndAlso Not DBNull.Value.Equals(fechaHastaObj) Then fechaHasta = CDate(fechaHastaObj)
+    '        Else
+    '            Dim estado = TryCast(dataItem, EstadoTransitorio)
+    '            If estado Is Nothing OrElse estado.TipoEstadoTransitorioId = 0 Then Return
+    '            Dim tipo = _tiposEstadoTransitorio.FirstOrDefault(Function(t) t.Id = estado.TipoEstadoTransitorioId)
+    '            tipoEstado = If(tipo IsNot Nothing, tipo.Nombre, "")
+    '            Dim detallePrincipal As String = ""
+    '            Select Case estado.TipoEstadoTransitorioId
+    '                Case 1 ' Designación
+    '                    If estado.DesignacionDetalle IsNot Nothing Then
+    '                        fechaDesde = estado.DesignacionDetalle.FechaDesde
+    '                        fechaHasta = estado.DesignacionDetalle.FechaHasta
+    '                        observaciones = estado.DesignacionDetalle.Observaciones
+    '                        If Not String.IsNullOrWhiteSpace(estado.DesignacionDetalle.DocResolucion) Then detallePrincipal = $"Resolución: {estado.DesignacionDetalle.DocResolucion}"
+    '                    End If
+    '                Case 2 ' Enfermedad
+    '                    If estado.EnfermedadDetalle IsNot Nothing Then
+    '                        fechaDesde = estado.EnfermedadDetalle.FechaDesde
+    '                        fechaHasta = estado.EnfermedadDetalle.FechaHasta
+    '                        observaciones = estado.EnfermedadDetalle.Observaciones
+    '                        If Not String.IsNullOrWhiteSpace(estado.EnfermedadDetalle.Diagnostico) Then detallePrincipal = $"Diagnóstico: {estado.EnfermedadDetalle.Diagnostico}"
+    '                    End If
+    '                Case 3 ' Sanción
+    '                    If estado.SancionDetalle IsNot Nothing Then
+    '                        fechaDesde = estado.SancionDetalle.FechaDesde
+    '                        fechaHasta = estado.SancionDetalle.FechaHasta
+    '                        observaciones = estado.SancionDetalle.Observaciones
+    '                        If Not String.IsNullOrWhiteSpace(estado.SancionDetalle.Resolucion) Then detallePrincipal = $"Resolución: {estado.SancionDetalle.Resolucion}"
+    '                    End If
+    '                Case 4 ' Orden Cinco
+    '                    If estado.OrdenCincoDetalle IsNot Nothing Then
+    '                        fechaDesde = estado.OrdenCincoDetalle.FechaDesde
+    '                        fechaHasta = estado.OrdenCincoDetalle.FechaHasta
+    '                        observaciones = estado.OrdenCincoDetalle.Observaciones
+    '                    End If
+    '                Case 5 ' Retén
+    '                    If estado.RetenDetalle IsNot Nothing Then
+    '                        fechaDesde = estado.RetenDetalle.FechaReten
+    '                        fechaHasta = Nothing
+    '                        observaciones = estado.RetenDetalle.Observaciones
+    '                        If Not String.IsNullOrWhiteSpace(estado.RetenDetalle.Turno) Then detallePrincipal = $"Turno: {estado.RetenDetalle.Turno}"
+    '                    End If
+    '                Case 6 ' Sumario
+    '                    If estado.SumarioDetalle IsNot Nothing Then
+    '                        fechaDesde = estado.SumarioDetalle.FechaDesde
+    '                        fechaHasta = estado.SumarioDetalle.FechaHasta
+    '                        observaciones = estado.SumarioDetalle.Observaciones
+    '                        If Not String.IsNullOrWhiteSpace(estado.SumarioDetalle.Expediente) Then detallePrincipal = $"Expediente: {estado.SumarioDetalle.Expediente}"
+    '                    End If
+    '            End Select
+    '            observaciones = If(String.IsNullOrWhiteSpace(detallePrincipal), observaciones, $"{detallePrincipal} | {observaciones}")
+    '        End If
+
+    '        ' Asignar los valores a las celdas correspondientes.
+    '        Select Case colName
+    '            Case "TipoEstado"
+    '                e.Value = tipoEstado
+    '                e.FormattingApplied = True
+    '            Case "Observaciones"
+    '                e.Value = If(String.IsNullOrEmpty(observaciones), String.Empty, observaciones)
+    '                e.FormattingApplied = True
+    '            Case "FechaDesde"
+    '                e.Value = If(fechaDesde.HasValue, CType(fechaDesde.Value, Object), Nothing)
+    '            Case "FechaHasta"
+    '                e.Value = If(fechaHasta.HasValue, CType(fechaHasta.Value, Object), Nothing)
+    '        End Select
+    '    End If
+    'End Sub
 
 
     Private Sub btnCancelar_Click(sender As Object, e As EventArgs) Handles btnCancelar.Click
@@ -726,73 +846,123 @@ Public Class frmFuncionarioCrear
     Private Sub btnQuitarEstado_Click(sender As Object, e As EventArgs) Handles btnQuitarEstado.Click
         If dgvEstadosTransitorios.CurrentRow Is Nothing Then Return
 
+        Dim oldIndex As Integer = dgvEstadosTransitorios.CurrentRow.Index
+
         Dim estadoParaQuitar As EstadoTransitorio = Nothing
         Dim id As Integer = 0
 
-        ' Obtiene el objeto EstadoTransitorio a eliminar, ya sea de la vista de activos o del historial.
+        ' --- Resolver el objeto según la vista ---
         If chkVerHistorial.Checked Then
-            Dim itemSeleccionado = dgvEstadosTransitorios.CurrentRow.DataBoundItem
-            If itemSeleccionado IsNot Nothing AndAlso itemSeleccionado.GetType().GetProperty("Id") IsNot Nothing Then
-                id = CInt(itemSeleccionado.GetType().GetProperty("Id").GetValue(itemSeleccionado, Nothing))
-                ' Busca en la colección completa del funcionario
-                estadoParaQuitar = _funcionario.EstadoTransitorio.FirstOrDefault(Function(et) et.Id = id)
+            Dim itemSel = dgvEstadosTransitorios.CurrentRow.DataBoundItem
+            If itemSel IsNot Nothing Then
+                Dim propId = itemSel.GetType().GetProperty("Id")
+                If propId IsNot Nothing Then
+                    id = CInt(propId.GetValue(itemSel, Nothing))
+                    estadoParaQuitar = _funcionario.EstadoTransitorio.FirstOrDefault(Function(et) et.Id = id)
+                End If
             End If
         Else
             estadoParaQuitar = TryCast(dgvEstadosTransitorios.CurrentRow.DataBoundItem, EstadoTransitorio)
-            If estadoParaQuitar IsNot Nothing Then
-                id = estadoParaQuitar.Id
-            End If
+            If estadoParaQuitar IsNot Nothing Then id = estadoParaQuitar.Id
         End If
 
         If estadoParaQuitar Is Nothing Then
-            MessageBox.Show("El registro seleccionado no se pudo encontrar para eliminar o no es editable.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            MessageBox.Show("El registro seleccionado no se pudo encontrar para eliminar o no es editable.",
+                            "Información", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Return
         End If
 
-        If MessageBox.Show("¿Está seguro de que desea quitar este estado transitorio?", "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
+        If MessageBox.Show("¿Está seguro de que desea quitar este estado transitorio?",
+                           "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then
+            Return
+        End If
 
+        _silenciarEventosEstados = True
+        Try
+            ' --- 1) Sacar de las listas que alimentan la grilla ---
             If chkVerHistorial.Checked Then
-                Dim itemToRemoveFromHistory = _historialConsolidado.FirstOrDefault(Function(item)
-                                                                                       Dim itemId = CInt(item.GetType().GetProperty("Id").GetValue(item, Nothing))
-                                                                                       Return itemId = id
-                                                                                   End Function)
-                If itemToRemoveFromHistory IsNot Nothing Then
-                    _historialConsolidado.Remove(itemToRemoveFromHistory)
-                    ' Re-enlazar la lista modificada para refrescar la grilla
+                Dim itemHistory = _historialConsolidado.FirstOrDefault(Function(item)
+                                                                           Dim p = item.GetType().GetProperty("Id")
+                                                                           Dim itemId As Integer = If(p Is Nothing OrElse p.GetValue(item, Nothing) Is Nothing, 0, CInt(p.GetValue(item, Nothing)))
+                                                                           Return itemId = id
+                                                                       End Function)
+                If itemHistory IsNot Nothing Then
+                    _historialConsolidado.Remove(itemHistory)
                     dgvEstadosTransitorios.DataSource = Nothing
                     dgvEstadosTransitorios.DataSource = _historialConsolidado
                 End If
             Else
-                ' Al ser un BindingList, la grilla se actualiza automáticamente al quitar el elemento.
-                _estadosTransitorios.Remove(estadoParaQuitar)
+                _estadosTransitorios.Remove(estadoParaQuitar) ' BindingList refresca sola
             End If
 
-            ' 2. Quitar el elemento de la colección principal del funcionario que se guardará en la base de datos.
-            _funcionario.EstadoTransitorio.Remove(estadoParaQuitar)
+            ' --- 2) Romper vínculos de navegación ANTES de tocar EF ---
+            ' (evita que EF intente "re-agregar" relaciones a una entidad borrada)
+            If estadoParaQuitar IsNot Nothing Then
+                ' Quitar de la colección del principal
+                If _funcionario.EstadoTransitorio.Contains(estadoParaQuitar) Then
+                    _funcionario.EstadoTransitorio.Remove(estadoParaQuitar)
+                End If
 
-            ' 3. Si el estado existe en la BD, marcarlo para borrar (con sus detalles).
-            If estadoParaQuitar.Id > 0 Then
-                ' Se marca el detalle para eliminar
-                Select Case estadoParaQuitar.TipoEstadoTransitorioId
-                    Case 1 ' Designación
-                        If estadoParaQuitar.DesignacionDetalle IsNot Nothing Then _uow.Context.Entry(estadoParaQuitar.DesignacionDetalle).State = EntityState.Deleted
-                    Case 2 ' Enfermedad
-                        If estadoParaQuitar.EnfermedadDetalle IsNot Nothing Then _uow.Context.Entry(estadoParaQuitar.EnfermedadDetalle).State = EntityState.Deleted
-                    Case 3 ' Sanción
-                        If estadoParaQuitar.SancionDetalle IsNot Nothing Then _uow.Context.Entry(estadoParaQuitar.SancionDetalle).State = EntityState.Deleted
-                    Case 4 ' Orden Cinco
-                        If estadoParaQuitar.OrdenCincoDetalle IsNot Nothing Then _uow.Context.Entry(estadoParaQuitar.OrdenCincoDetalle).State = EntityState.Deleted
-                    Case 5 ' Retén
-                        If estadoParaQuitar.RetenDetalle IsNot Nothing Then _uow.Context.Entry(estadoParaQuitar.RetenDetalle).State = EntityState.Deleted
-                    Case 6 ' Sumario
-                        If estadoParaQuitar.SumarioDetalle IsNot Nothing Then _uow.Context.Entry(estadoParaQuitar.SumarioDetalle).State = EntityState.Deleted
-                End Select
-                ' Se marca el registro principal para eliminar
-                _uow.Context.Entry(estadoParaQuitar).State = EntityState.Deleted
+                ' Eliminar detalles primero (si tus tipos difieren, cambiá los genéricos)
+                If estadoParaQuitar.DesignacionDetalle IsNot Nothing Then
+                    _uow.Context.Set(Of DesignacionDetalle)().Remove(estadoParaQuitar.DesignacionDetalle)
+                    estadoParaQuitar.DesignacionDetalle = Nothing
+                End If
+                If estadoParaQuitar.EnfermedadDetalle IsNot Nothing Then
+                    _uow.Context.Set(Of EnfermedadDetalle)().Remove(estadoParaQuitar.EnfermedadDetalle)
+                    estadoParaQuitar.EnfermedadDetalle = Nothing
+                End If
+                If estadoParaQuitar.SancionDetalle IsNot Nothing Then
+                    _uow.Context.Set(Of SancionDetalle)().Remove(estadoParaQuitar.SancionDetalle)
+                    estadoParaQuitar.SancionDetalle = Nothing
+                End If
+                If estadoParaQuitar.OrdenCincoDetalle IsNot Nothing Then
+                    _uow.Context.Set(Of OrdenCincoDetalle)().Remove(estadoParaQuitar.OrdenCincoDetalle)
+                    estadoParaQuitar.OrdenCincoDetalle = Nothing
+                End If
+                If estadoParaQuitar.RetenDetalle IsNot Nothing Then
+                    _uow.Context.Set(Of RetenDetalle)().Remove(estadoParaQuitar.RetenDetalle)
+                    estadoParaQuitar.RetenDetalle = Nothing
+                End If
+                If estadoParaQuitar.SumarioDetalle IsNot Nothing Then
+                    _uow.Context.Set(Of SumarioDetalle)().Remove(estadoParaQuitar.SumarioDetalle)
+                    estadoParaQuitar.SumarioDetalle = Nothing
+                End If
+
+                ' Romper referencias al principal/lookup para evitar fix-up
+                estadoParaQuitar.Funcionario = Nothing
+                estadoParaQuitar.TipoEstadoTransitorio = Nothing
+
+                ' --- 3) Eliminar el padre desde el DbSet (deja el State en Deleted correctamente) ---
+                _uow.Context.Set(Of EstadoTransitorio)().Remove(estadoParaQuitar)
             End If
-            ' --- FIN DE LA CORRECCIÓN ---
-        End If
+
+            ' --- 4) Reposicionar selección en una fila válida ---
+            If dgvEstadosTransitorios.RowCount > 0 AndAlso dgvEstadosTransitorios.Columns.Count > 0 Then
+                Dim nuevoIndex = Math.Min(oldIndex, dgvEstadosTransitorios.RowCount - 1)
+                Dim firstVisibleCol As Integer = 0
+                For i = 0 To dgvEstadosTransitorios.Columns.Count - 1
+                    If dgvEstadosTransitorios.Columns(i).Visible Then
+                        firstVisibleCol = i : Exit For
+                    End If
+                Next
+                dgvEstadosTransitorios.ClearSelection()
+                dgvEstadosTransitorios.CurrentCell = dgvEstadosTransitorios.Rows(nuevoIndex).Cells(firstVisibleCol)
+                dgvEstadosTransitorios.Rows(nuevoIndex).Selected = True
+            Else
+                btnEditarEstado.Enabled = False
+                btnQuitarEstado.Enabled = False
+            End If
+
+        Catch ex As Exception
+            MessageBox.Show("No se pudo eliminar el estado: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        Finally
+            _silenciarEventosEstados = False
+            BeginInvoke(CType(Sub() DgvEstadosTransitorios_SelectionChanged(Nothing, EventArgs.Empty), MethodInvoker))
+        End Try
     End Sub
+
+
 #End Region
 
 End Class
