@@ -440,18 +440,48 @@ Public Class frmFuncionarioCrear
 
     Private Sub ConfigurarGrillaDotacion()
         With dgvDotacion
+            .SuspendLayout()
+
             .AutoGenerateColumns = False
             .Columns.Clear()
+
+            .AllowUserToAddRows = False
+            .AllowUserToDeleteRows = False
+            .ReadOnly = True
+            .EditMode = DataGridViewEditMode.EditProgrammatically
+            .SelectionMode = DataGridViewSelectionMode.FullRowSelect
+            .MultiSelect = False
+            .RowHeadersVisible = False
+
             .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Id", .Visible = False})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "colItem", .HeaderText = "Ítem", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, .ValueType = GetType(String)})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Talla", .HeaderText = "Talla", .ValueType = GetType(String)})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Observaciones", .HeaderText = "Observaciones", .Width = 200, .ValueType = GetType(String)})
-            Dim colFecha As New DataGridViewTextBoxColumn With {.DataPropertyName = "FechaAsign", .Name = "FechaAsign", .HeaderText = "Fecha Asignación"}
-            colFecha.DefaultCellStyle.NullValue = ""
+
+            ' Unbound: el nombre del ítem lo resolvemos en CellFormatting
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "colItem",
+            .HeaderText = "Ítem",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
+            .ValueType = GetType(String)
+        })
+
+            ' Dejá que infiera el tipo real (no fuerces ValueType aquí)
+            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Talla", .HeaderText = "Talla"})
+            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Observaciones", .HeaderText = "Observaciones", .Width = 200})
+
+            ' Fecha: aclaramos que es Date para que no intente parsear strings
+            Dim colFecha As New DataGridViewTextBoxColumn With {
+            .DataPropertyName = "FechaAsign",
+            .Name = "FechaAsign",
+            .HeaderText = "Fecha Asignación",
+            .ValueType = GetType(Date)
+        }
             colFecha.DefaultCellStyle.Format = "dd/MM/yyyy"
+            colFecha.DefaultCellStyle.NullValue = Nothing
             .Columns.Add(colFecha)
+
+            .ResumeLayout()
         End With
     End Sub
+
 
     Private Sub ConfigurarGrillaEstados()
         With dgvEstadosTransitorios
@@ -514,21 +544,53 @@ Public Class frmFuncionarioCrear
 
 
     Private Sub dgvDotacion_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
-        If e.RowIndex < 0 OrElse e.ColumnIndex < 0 Then Return
         Dim dgv = CType(sender, DataGridView)
-        If dgv.Columns(e.ColumnIndex).Name = "colItem" Then
-            Dim dotacion = TryCast(dgv.Rows(e.RowIndex).DataBoundItem, FuncionarioDotacion)
-            If dotacion IsNot Nothing Then
-                If dotacion.DotacionItem IsNot Nothing Then
-                    e.Value = dotacion.DotacionItem.Nombre
-                ElseIf dotacion.DotacionItemId > 0 AndAlso _itemsDotacion IsNot Nothing Then
-                    Dim item = _itemsDotacion.FirstOrDefault(Function(i) i.Id = dotacion.DotacionItemId)
-                    If item IsNot Nothing Then e.Value = item.Nombre
-                End If
-                e.FormattingApplied = True
-            End If
+
+        ' Evitar correr mientras re-enlazás/quitás (reusá tu flag existente)
+        If _silenciarEventosEstados Then Return
+
+        ' Índices válidos
+        If e.RowIndex < 0 OrElse e.ColumnIndex < 0 Then Return
+        If dgv.Columns Is Nothing OrElse e.ColumnIndex >= dgv.Columns.Count Then Return
+
+        ' Validar contra la lista real (CurrencyManager) para evitar IndexOutOfRange
+        Dim cm As CurrencyManager = TryCast(dgv.BindingContext(dgv.DataSource), CurrencyManager)
+        If cm Is Nothing OrElse e.RowIndex >= cm.Count Then
+            e.Value = Nothing
+            e.FormattingApplied = True
+            Return
+        End If
+
+        ' Solo necesitamos formatear la columna colItem
+        If dgv.Columns(e.ColumnIndex).Name <> "colItem" Then Return
+
+        ' Obtener el item de forma segura
+        Dim dataItem As Object = Nothing
+        Try
+            dataItem = dgv.Rows(e.RowIndex).DataBoundItem
+        Catch
+            e.Value = Nothing
+            e.FormattingApplied = True
+            Return
+        End Try
+
+        Dim dotacion = TryCast(dataItem, FuncionarioDotacion)
+        If dotacion Is Nothing Then Return
+
+        ' Resolver el nombre del ítem
+        If dotacion.DotacionItem IsNot Nothing Then
+            e.Value = dotacion.DotacionItem.Nombre
+            e.FormattingApplied = True
+        ElseIf dotacion.DotacionItemId > 0 AndAlso _itemsDotacion IsNot Nothing Then
+            Dim item = _itemsDotacion.FirstOrDefault(Function(i) i.Id = dotacion.DotacionItemId)
+            e.Value = If(item IsNot Nothing, item.Nombre, String.Empty)
+            e.FormattingApplied = True
+        Else
+            e.Value = String.Empty
+            e.FormattingApplied = True
         End If
     End Sub
+
     Private Sub dgvEstadosTransitorios_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
         Dim dgv = CType(sender, DataGridView)
 
@@ -777,8 +839,19 @@ Public Class frmFuncionarioCrear
         If dgvDotacion.CurrentRow Is Nothing Then Return
         If MessageBox.Show("¿Está seguro de que desea quitar este elemento de dotación?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
             Dim dotacionSeleccionada = CType(dgvDotacion.CurrentRow.DataBoundItem, FuncionarioDotacion)
+
+            ' 1. Quitar de la lista de la UI
             _dotaciones.Remove(dotacionSeleccionada)
-            If dotacionSeleccionada.Id > 0 Then _uow.Context.Entry(dotacionSeleccionada).State = EntityState.Deleted
+
+            ' --- INICIO DE LA CORRECCIÓN ---
+            ' 2. Quitar de la colección de navegación del funcionario para mantener la consistencia
+            _funcionario.FuncionarioDotacion.Remove(dotacionSeleccionada)
+            ' --- FIN DE LA CORRECCIÓN ---
+
+            ' 3. Marcar la entidad para ser eliminada de la base de datos si ya existía
+            If dotacionSeleccionada.Id > 0 Then
+                _uow.Context.Entry(dotacionSeleccionada).State = EntityState.Deleted
+            End If
         End If
     End Sub
 #End Region
@@ -843,15 +916,14 @@ Public Class frmFuncionarioCrear
         End Using
     End Sub
 
-    Private Sub btnQuitarEstado_Click(sender As Object, e As EventArgs) Handles btnQuitarEstado.Click
+    Private Async Sub btnQuitarEstado_Click(sender As Object, e As EventArgs) Handles btnQuitarEstado.Click
         If dgvEstadosTransitorios.CurrentRow Is Nothing Then Return
 
         Dim oldIndex As Integer = dgvEstadosTransitorios.CurrentRow.Index
-
         Dim estadoParaQuitar As EstadoTransitorio = Nothing
         Dim id As Integer = 0
 
-        ' --- Resolver el objeto según la vista ---
+        ' Resolver seleccionado según vista
         If chkVerHistorial.Checked Then
             Dim itemSel = dgvEstadosTransitorios.CurrentRow.DataBoundItem
             If itemSel IsNot Nothing Then
@@ -873,13 +945,11 @@ Public Class frmFuncionarioCrear
         End If
 
         If MessageBox.Show("¿Está seguro de que desea quitar este estado transitorio?",
-                           "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then
-            Return
-        End If
+                           "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then Return
 
         _silenciarEventosEstados = True
         Try
-            ' --- 1) Sacar de las listas que alimentan la grilla ---
+            ' --- 1) Sacar de las fuentes de la grilla ---
             If chkVerHistorial.Checked Then
                 Dim itemHistory = _historialConsolidado.FirstOrDefault(Function(item)
                                                                            Dim p = item.GetType().GetProperty("Id")
@@ -895,56 +965,52 @@ Public Class frmFuncionarioCrear
                 _estadosTransitorios.Remove(estadoParaQuitar) ' BindingList refresca sola
             End If
 
-            ' --- 2) Romper vínculos de navegación ANTES de tocar EF ---
-            ' (evita que EF intente "re-agregar" relaciones a una entidad borrada)
-            If estadoParaQuitar IsNot Nothing Then
-                ' Quitar de la colección del principal
-                If _funcionario.EstadoTransitorio.Contains(estadoParaQuitar) Then
-                    _funcionario.EstadoTransitorio.Remove(estadoParaQuitar)
-                End If
-
-                ' Eliminar detalles primero (si tus tipos difieren, cambiá los genéricos)
-                If estadoParaQuitar.DesignacionDetalle IsNot Nothing Then
-                    _uow.Context.Set(Of DesignacionDetalle)().Remove(estadoParaQuitar.DesignacionDetalle)
-                    estadoParaQuitar.DesignacionDetalle = Nothing
-                End If
-                If estadoParaQuitar.EnfermedadDetalle IsNot Nothing Then
-                    _uow.Context.Set(Of EnfermedadDetalle)().Remove(estadoParaQuitar.EnfermedadDetalle)
-                    estadoParaQuitar.EnfermedadDetalle = Nothing
-                End If
-                If estadoParaQuitar.SancionDetalle IsNot Nothing Then
-                    _uow.Context.Set(Of SancionDetalle)().Remove(estadoParaQuitar.SancionDetalle)
-                    estadoParaQuitar.SancionDetalle = Nothing
-                End If
-                If estadoParaQuitar.OrdenCincoDetalle IsNot Nothing Then
-                    _uow.Context.Set(Of OrdenCincoDetalle)().Remove(estadoParaQuitar.OrdenCincoDetalle)
-                    estadoParaQuitar.OrdenCincoDetalle = Nothing
-                End If
-                If estadoParaQuitar.RetenDetalle IsNot Nothing Then
-                    _uow.Context.Set(Of RetenDetalle)().Remove(estadoParaQuitar.RetenDetalle)
-                    estadoParaQuitar.RetenDetalle = Nothing
-                End If
-                If estadoParaQuitar.SumarioDetalle IsNot Nothing Then
-                    _uow.Context.Set(Of SumarioDetalle)().Remove(estadoParaQuitar.SumarioDetalle)
-                    estadoParaQuitar.SumarioDetalle = Nothing
-                End If
-
-                ' Romper referencias al principal/lookup para evitar fix-up
-                estadoParaQuitar.Funcionario = Nothing
-                estadoParaQuitar.TipoEstadoTransitorio = Nothing
-
-                ' --- 3) Eliminar el padre desde el DbSet (deja el State en Deleted correctamente) ---
-                _uow.Context.Set(Of EstadoTransitorio)().Remove(estadoParaQuitar)
+            ' --- 2) Romper vínculos y eliminar detalles primero ---
+            If _funcionario.EstadoTransitorio.Contains(estadoParaQuitar) Then
+                _funcionario.EstadoTransitorio.Remove(estadoParaQuitar)
             End If
 
-            ' --- 4) Reposicionar selección en una fila válida ---
+            If estadoParaQuitar.DesignacionDetalle IsNot Nothing Then
+                _uow.Context.Set(Of DesignacionDetalle)().Remove(estadoParaQuitar.DesignacionDetalle)
+                estadoParaQuitar.DesignacionDetalle = Nothing
+            End If
+            If estadoParaQuitar.EnfermedadDetalle IsNot Nothing Then
+                _uow.Context.Set(Of EnfermedadDetalle)().Remove(estadoParaQuitar.EnfermedadDetalle)
+                estadoParaQuitar.EnfermedadDetalle = Nothing
+            End If
+            If estadoParaQuitar.SancionDetalle IsNot Nothing Then
+                _uow.Context.Set(Of SancionDetalle)().Remove(estadoParaQuitar.SancionDetalle)
+                estadoParaQuitar.SancionDetalle = Nothing
+            End If
+            If estadoParaQuitar.OrdenCincoDetalle IsNot Nothing Then
+                _uow.Context.Set(Of OrdenCincoDetalle)().Remove(estadoParaQuitar.OrdenCincoDetalle)
+                estadoParaQuitar.OrdenCincoDetalle = Nothing
+            End If
+            If estadoParaQuitar.RetenDetalle IsNot Nothing Then
+                _uow.Context.Set(Of RetenDetalle)().Remove(estadoParaQuitar.RetenDetalle)
+                estadoParaQuitar.RetenDetalle = Nothing
+            End If
+            If estadoParaQuitar.SumarioDetalle IsNot Nothing Then
+                _uow.Context.Set(Of SumarioDetalle)().Remove(estadoParaQuitar.SumarioDetalle)
+                estadoParaQuitar.SumarioDetalle = Nothing
+            End If
+
+            ' Cortar navs que podrían re-vincular
+            estadoParaQuitar.Funcionario = Nothing
+            estadoParaQuitar.TipoEstadoTransitorio = Nothing
+
+            ' --- 3) Eliminar el padre desde el DbSet ---
+            _uow.Context.Set(Of EstadoTransitorio)().Remove(estadoParaQuitar)
+
+            ' --- 4) Guardar YA para evitar re-fixup posterior ---
+            Await _uow.CommitAsync()
+
+            ' --- 5) Reposicionar selección si quedan filas ---
             If dgvEstadosTransitorios.RowCount > 0 AndAlso dgvEstadosTransitorios.Columns.Count > 0 Then
                 Dim nuevoIndex = Math.Min(oldIndex, dgvEstadosTransitorios.RowCount - 1)
                 Dim firstVisibleCol As Integer = 0
                 For i = 0 To dgvEstadosTransitorios.Columns.Count - 1
-                    If dgvEstadosTransitorios.Columns(i).Visible Then
-                        firstVisibleCol = i : Exit For
-                    End If
+                    If dgvEstadosTransitorios.Columns(i).Visible Then firstVisibleCol = i : Exit For
                 Next
                 dgvEstadosTransitorios.ClearSelection()
                 dgvEstadosTransitorios.CurrentCell = dgvEstadosTransitorios.Rows(nuevoIndex).Cells(firstVisibleCol)
@@ -961,6 +1027,7 @@ Public Class frmFuncionarioCrear
             BeginInvoke(CType(Sub() DgvEstadosTransitorios_SelectionChanged(Nothing, EventArgs.Empty), MethodInvoker))
         End Try
     End Sub
+
 
 
 #End Region
