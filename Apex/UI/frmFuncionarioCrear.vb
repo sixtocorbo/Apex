@@ -30,6 +30,10 @@ Public Class frmFuncionarioCrear
     Private _cambiandoOrigen As Boolean = False
     Private _estaCargandoHistorial As Boolean = False
     Private _silenciarEventosEstados As Boolean = False
+    ' Al nivel de clase:
+    Private _seGuardo As Boolean = False
+    Private _cerrandoPorCodigo As Boolean = False
+
 
     '-------------------- Constructores ----------------------
     Public Sub New()
@@ -323,14 +327,19 @@ Public Class frmFuncionarioCrear
         btnQuitarEstado.Enabled = puedeEditarOQuitar
     End Sub
 
-
-    Private Async Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
+    Private Async Function GuardarAsync() As Task(Of Boolean)
         Try
-            If String.IsNullOrWhiteSpace(txtCI.Text) OrElse String.IsNullOrWhiteSpace(txtNombre.Text) OrElse cboTipoFuncionario.SelectedIndex = -1 Then
-                MessageBox.Show("Los campos CI, Nombre y Tipo de Funcionario son obligatorios.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-                Return
+            ' --- Validaciones mínimas ---
+            If String.IsNullOrWhiteSpace(txtCI.Text) OrElse
+           String.IsNullOrWhiteSpace(txtNombre.Text) OrElse
+           cboTipoFuncionario.SelectedIndex = -1 Then
+
+                MessageBox.Show("Los campos CI, Nombre y Tipo de Funcionario son obligatorios.",
+                            "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                Return False
             End If
 
+            ' --- Asignaciones ---
             _funcionario.CI = txtCI.Text.Trim()
             _funcionario.Nombre = txtNombre.Text.Trim()
             _funcionario.FechaIngreso = dtpFechaIngreso.Value.Date
@@ -363,18 +372,60 @@ Public Class frmFuncionarioCrear
                 _funcionario.UpdatedAt = DateTime.Now
             End If
 
+            ' Sincroniza colecciones enlazadas (como ya hacías)
             SincronizarColeccion(_funcionario.FuncionarioDotacion, _dotaciones)
             SincronizarColeccion(_funcionario.EstadoTransitorio, _estadosTransitorios)
 
             Await _uow.CommitAsync()
-            MessageBox.Show(If(_modo = ModoFormulario.Crear, "Funcionario creado", "Funcionario actualizado") & " correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
-
-            DialogResult = DialogResult.OK
-            Close()
+            _seGuardo = True
+            Return True
 
         Catch ex As Exception
-            MessageBox.Show("Ocurrió un error al guardar: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            MessageBox.Show("Ocurrió un error al guardar: " & ex.Message, "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Return False
         End Try
+    End Function
+
+    Private Async Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
+        If Await GuardarAsync() Then
+            MessageBox.Show(If(_modo = ModoFormulario.Crear, "Funcionario creado", "Funcionario actualizado") &
+                        " correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Me.DialogResult = DialogResult.OK
+            Close()
+        End If
+    End Sub
+
+    Private Function HayCambiosPendientes() As Boolean
+        Return _uow.Context.ChangeTracker.Entries().
+        Any(Function(en) en.State = EntityState.Added OrElse
+                          en.State = EntityState.Modified OrElse
+                          en.State = EntityState.Deleted)
+    End Function
+
+    Private Async Sub frmFuncionarioCrear_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
+        If _cerrandoPorCodigo Then Return
+
+        ' Si ya se guardó (por botón, por ejemplo), aseguramos refresco del padre
+        If _seGuardo Then
+            Me.DialogResult = DialogResult.OK
+            Return
+        End If
+
+        ' Si hay cambios en EF, intentamos guardarlos antes de cerrar
+        If HayCambiosPendientes() Then
+            e.Cancel = True          ' interrumpimos el cierre mientras guardamos
+            If Await GuardarAsync() Then
+                Me.DialogResult = DialogResult.OK
+                _cerrandoPorCodigo = True
+                Me.Close()           ' ahora sí cerramos
+            Else
+                ' Guardado falló -> dejamos el form abierto para corregir
+            End If
+        Else
+            ' No hay cambios, pero marcamos OK para que el dashboard refresque igual
+            Me.DialogResult = DialogResult.OK
+        End If
     End Sub
 
     Private Sub SincronizarColeccion(Of T As Class)(dbCollection As ICollection(Of T), formCollection As IEnumerable(Of T))
@@ -1071,6 +1122,19 @@ Public Class frmFuncionarioCrear
 
             ' --- 4) Guardar YA para evitar re-fixup posterior ---
             Await _uow.CommitAsync()
+            ' --- Forzar que se repinte con datos (evita filas vacías) ---
+            If Not chkVerHistorial.Checked Then
+                _cambiandoOrigen = True
+                Try
+                    dgvEstadosTransitorios.DataSource = Nothing
+                    dgvEstadosTransitorios.DataSource = _estadosTransitorios
+                Finally
+                    _cambiandoOrigen = False
+                End Try
+            Else
+                ' en historial ya reasignaste el DataSource más arriba
+            End If
+
 
             ' --- 5) Reposicionar selección si quedan filas ---
             If dgvEstadosTransitorios.RowCount > 0 AndAlso dgvEstadosTransitorios.Columns.Count > 0 Then
