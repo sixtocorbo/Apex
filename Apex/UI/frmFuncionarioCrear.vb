@@ -527,11 +527,8 @@ Public Class frmFuncionarioCrear
     Private Sub dgvEstadosTransitorios_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
         Dim dgv = CType(sender, DataGridView)
 
-        ' --- INICIO DE LA CORRECCIÓN ---
-        ' Se añade una comprobación para asegurar que el índice de la fila es válido ANTES de intentar usarlo.
-        ' Esto previene el error "Index out of range" al eliminar la última fila.
+
         If _cambiandoOrigen OrElse e.RowIndex < 0 OrElse e.RowIndex >= dgv.RowCount OrElse e.ColumnIndex < 0 Then Return
-        ' --- FIN DE LA CORRECCIÓN ---
 
         Dim colName = dgv.Columns(e.ColumnIndex).Name
         Dim dataItem = dgv.Rows(e.RowIndex).DataBoundItem
@@ -666,8 +663,6 @@ Public Class frmFuncionarioCrear
     End Sub
 #End Region
 
-    ' Archivo: sixtocorbo/apex/Apex-fc6aea00b490b0ecd9d41ffbdafdc38b8add564e/Apex/UI/frmFuncionarioCrear.vb
-
 #Region "CRUD Estados Transitorios"
     Private Sub btnAñadirEstado_Click(sender As Object, e As EventArgs) Handles btnAñadirEstado.Click
         Dim nuevoEstado = New EstadoTransitorio()
@@ -756,8 +751,6 @@ Public Class frmFuncionarioCrear
 
         If MessageBox.Show("¿Está seguro de que desea quitar este estado transitorio?", "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
 
-            ' --- INICIO DE LA CORRECCIÓN ---
-            ' 1. Quitar el elemento de la colección que está enlazada al DataGridView para un refresco visual inmediato.
             If chkVerHistorial.Checked Then
                 Dim itemToRemoveFromHistory = _historialConsolidado.FirstOrDefault(Function(item)
                                                                                        Dim itemId = CInt(item.GetType().GetProperty("Id").GetValue(item, Nothing))
