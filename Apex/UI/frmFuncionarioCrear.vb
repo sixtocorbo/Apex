@@ -546,50 +546,59 @@ Public Class frmFuncionarioCrear
     Private Sub dgvDotacion_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
         Dim dgv = CType(sender, DataGridView)
 
-        ' Evitar correr mientras re-enlazás/quitás (reusá tu flag existente)
         If _silenciarEventosEstados Then Return
-
-        ' Índices válidos
         If e.RowIndex < 0 OrElse e.ColumnIndex < 0 Then Return
         If dgv.Columns Is Nothing OrElse e.ColumnIndex >= dgv.Columns.Count Then Return
 
-        ' Validar contra la lista real (CurrencyManager) para evitar IndexOutOfRange
         Dim cm As CurrencyManager = TryCast(dgv.BindingContext(dgv.DataSource), CurrencyManager)
         If cm Is Nothing OrElse e.RowIndex >= cm.Count Then
-            e.Value = Nothing
-            e.FormattingApplied = True
-            Return
+            e.Value = Nothing : e.FormattingApplied = True : Return
         End If
 
-        ' Solo necesitamos formatear la columna colItem
-        If dgv.Columns(e.ColumnIndex).Name <> "colItem" Then Return
+        Dim colName = dgv.Columns(e.ColumnIndex).Name
 
-        ' Obtener el item de forma segura
-        Dim dataItem As Object = Nothing
-        Try
-            dataItem = dgv.Rows(e.RowIndex).DataBoundItem
-        Catch
-            e.Value = Nothing
-            e.FormattingApplied = True
-            Return
-        End Try
-
-        Dim dotacion = TryCast(dataItem, FuncionarioDotacion)
-        If dotacion Is Nothing Then Return
-
-        ' Resolver el nombre del ítem
-        If dotacion.DotacionItem IsNot Nothing Then
-            e.Value = dotacion.DotacionItem.Nombre
-            e.FormattingApplied = True
-        ElseIf dotacion.DotacionItemId > 0 AndAlso _itemsDotacion IsNot Nothing Then
-            Dim item = _itemsDotacion.FirstOrDefault(Function(i) i.Id = dotacion.DotacionItemId)
+        ' --- Ítem (como ya tenías)
+        If colName = "colItem" Then
+            Dim dataItem = TryCast(dgv.Rows(e.RowIndex).DataBoundItem, FuncionarioDotacion)
+            If dataItem Is Nothing Then Return
+            Dim item = _itemsDotacion?.FirstOrDefault(Function(i) i.Id = dataItem.DotacionItemId)
             e.Value = If(item IsNot Nothing, item.Nombre, String.Empty)
             e.FormattingApplied = True
-        Else
-            e.Value = String.Empty
+            Return
+        End If
+
+        ' --- Fecha Asignación (nuevo)
+        If colName = "FechaAsign" Then
+            Dim raw = e.Value
+            If raw Is Nothing OrElse raw Is DBNull.Value Then
+                e.Value = "" : e.FormattingApplied = True : Return
+            End If
+
+            Dim dt As DateTime
+            If TypeOf raw Is DateTime Then
+                dt = CType(raw, DateTime)
+                e.Value = dt.ToString("dd/MM/yyyy")
+                e.FormattingApplied = True
+            Else
+                ' Intenta parsear string a fecha
+                If DateTime.TryParse(Convert.ToString(raw), dt) Then
+                    e.Value = dt.ToString("dd/MM/yyyy")
+                    e.FormattingApplied = True
+                Else
+                    e.Value = "" : e.FormattingApplied = True
+                End If
+            End If
+            Return
+        End If
+
+        ' --- (opcional) Talla tolerante si en el modelo fuera numérico y llega texto
+        If colName = "Talla" Then
+            e.Value = If(e.Value Is Nothing, "", e.Value.ToString())
             e.FormattingApplied = True
+            Return
         End If
     End Sub
+
 
     Private Sub dgvEstadosTransitorios_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
         Dim dgv = CType(sender, DataGridView)
@@ -835,23 +844,35 @@ Public Class frmFuncionarioCrear
         End Using
     End Sub
 
-    Private Sub btnQuitarDotacion_Click(sender As Object, e As EventArgs) Handles btnQuitarDotacion.Click
+    ' Reemplaza el método existente con este
+    Private Async Sub btnQuitarDotacion_Click(sender As Object, e As EventArgs) Handles btnQuitarDotacion.Click
         If dgvDotacion.CurrentRow Is Nothing Then Return
+        Dim dotacionSeleccionada = TryCast(dgvDotacion.CurrentRow.DataBoundItem, FuncionarioDotacion)
+        If dotacionSeleccionada Is Nothing Then Return
+
         If MessageBox.Show("¿Está seguro de que desea quitar este elemento de dotación?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
-            Dim dotacionSeleccionada = CType(dgvDotacion.CurrentRow.DataBoundItem, FuncionarioDotacion)
+            Try
+                ' 1. Quitar de la lista de la UI para un refresco visual inmediato.
+                _dotaciones.Remove(dotacionSeleccionada)
 
-            ' 1. Quitar de la lista de la UI
-            _dotaciones.Remove(dotacionSeleccionada)
+                ' 2. Si es un item que ya existe en la BD (Id > 0), eliminarlo de forma permanente.
+                ' Si es un item nuevo (Id = 0), simplemente se quita de la colección en memoria.
+                If dotacionSeleccionada.Id > 0 Then
+                    ' Se usa el servicio genérico para encapsular la lógica de eliminación y guardado.
+                    Dim svcDotacion As New GenericService(Of FuncionarioDotacion)(_uow)
+                    Await svcDotacion.DeleteAsync(dotacionSeleccionada.Id)
+                End If
 
-            ' --- INICIO DE LA CORRECCIÓN ---
-            ' 2. Quitar de la colección de navegación del funcionario para mantener la consistencia
-            _funcionario.FuncionarioDotacion.Remove(dotacionSeleccionada)
-            ' --- FIN DE LA CORRECCIÓN ---
+                ' 3. Asegurarse de quitarlo también de la colección principal del funcionario.
+                If _funcionario.FuncionarioDotacion.Contains(dotacionSeleccionada) Then
+                    _funcionario.FuncionarioDotacion.Remove(dotacionSeleccionada)
+                End If
 
-            ' 3. Marcar la entidad para ser eliminada de la base de datos si ya existía
-            If dotacionSeleccionada.Id > 0 Then
-                _uow.Context.Entry(dotacionSeleccionada).State = EntityState.Deleted
-            End If
+            Catch ex As Exception
+                MessageBox.Show("Ocurrió un error al quitar la dotación: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                ' Si la eliminación falla, volvemos a agregar el item a la lista para mantener la consistencia visual.
+                _dotaciones.Add(dotacionSeleccionada)
+            End Try
         End If
     End Sub
 #End Region
