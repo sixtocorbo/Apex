@@ -99,6 +99,9 @@ Public Class frmFuncionarioCrear
         AddHandler dgvEstadosTransitorios.CellFormatting, AddressOf dgvEstadosTransitorios_CellFormatting
         AddHandler dgvEstadosTransitorios.SelectionChanged, AddressOf DgvEstadosTransitorios_SelectionChanged
         AddHandler dgvEstadosTransitorios.DataError, Sub(s, a) a.ThrowException = False
+        AddHandler dgvDotacion.CellFormatting, AddressOf dgvDotacion_CellFormatting
+        AddHandler dgvDotacion.DataError, Sub(s, a) a.ThrowException = False   ' << clave
+
 
         If _modo = ModoFormulario.Editar Then
             Me.Text = "Editar Funcionario"
@@ -455,7 +458,7 @@ Public Class frmFuncionarioCrear
 
             .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Id", .Visible = False})
 
-            ' Unbound: el nombre del ítem lo resolvemos en CellFormatting
+            ' Ítem (unbound; se resuelve en CellFormatting)
             .Columns.Add(New DataGridViewTextBoxColumn With {
             .Name = "colItem",
             .HeaderText = "Ítem",
@@ -463,24 +466,37 @@ Public Class frmFuncionarioCrear
             .ValueType = GetType(String)
         })
 
-            ' Dejá que infiera el tipo real (no fuerces ValueType aquí)
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Talla", .HeaderText = "Talla"})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Observaciones", .HeaderText = "Observaciones", .Width = 200})
+            ' Talla (tolerante)
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .DataPropertyName = "Talla",
+            .Name = "Talla",
+            .HeaderText = "Talla",
+            .ValueType = GetType(Object)
+        })
 
-            ' Fecha: aclaramos que es Date para que no intente parsear strings
+            ' Observaciones
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .DataPropertyName = "Observaciones",
+            .Name = "Observaciones",
+            .HeaderText = "Observaciones",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
+            .ValueType = GetType(String)
+        })
+
+            ' Fecha Asignación (no forzar Date ni aplicar Format aquí)
             Dim colFecha As New DataGridViewTextBoxColumn With {
             .DataPropertyName = "FechaAsign",
             .Name = "FechaAsign",
             .HeaderText = "Fecha Asignación",
-            .ValueType = GetType(Date)
+            .ValueType = GetType(Object)
         }
-            colFecha.DefaultCellStyle.Format = "dd/MM/yyyy"
-            colFecha.DefaultCellStyle.NullValue = Nothing
+            colFecha.DefaultCellStyle.NullValue = ""
             .Columns.Add(colFecha)
 
             .ResumeLayout()
         End With
     End Sub
+
 
 
     Private Sub ConfigurarGrillaEstados()
@@ -557,7 +573,7 @@ Public Class frmFuncionarioCrear
 
         Dim colName = dgv.Columns(e.ColumnIndex).Name
 
-        ' --- Ítem (como ya tenías)
+        ' Ítem: buscar nombre en _itemsDotacion
         If colName = "colItem" Then
             Dim dataItem = TryCast(dgv.Rows(e.RowIndex).DataBoundItem, FuncionarioDotacion)
             If dataItem Is Nothing Then Return
@@ -567,37 +583,35 @@ Public Class frmFuncionarioCrear
             Return
         End If
 
-        ' --- Fecha Asignación (nuevo)
+        ' Fecha: formateo tolerante
         If colName = "FechaAsign" Then
             Dim raw = e.Value
             If raw Is Nothing OrElse raw Is DBNull.Value Then
                 e.Value = "" : e.FormattingApplied = True : Return
             End If
-
             Dim dt As DateTime
             If TypeOf raw Is DateTime Then
                 dt = CType(raw, DateTime)
                 e.Value = dt.ToString("dd/MM/yyyy")
-                e.FormattingApplied = True
             Else
-                ' Intenta parsear string a fecha
                 If DateTime.TryParse(Convert.ToString(raw), dt) Then
                     e.Value = dt.ToString("dd/MM/yyyy")
-                    e.FormattingApplied = True
                 Else
-                    e.Value = "" : e.FormattingApplied = True
+                    e.Value = ""
                 End If
             End If
+            e.FormattingApplied = True
             Return
         End If
 
-        ' --- (opcional) Talla tolerante si en el modelo fuera numérico y llega texto
+        ' Talla: por si el modelo fuera numérico y viene texto
         If colName = "Talla" Then
             e.Value = If(e.Value Is Nothing, "", e.Value.ToString())
             e.FormattingApplied = True
             Return
         End If
     End Sub
+
 
 
     Private Sub dgvEstadosTransitorios_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
@@ -825,21 +839,40 @@ Public Class frmFuncionarioCrear
 #End Region
 
 #Region "CRUD Dotación"
-    Private Sub btnAñadirDotacion_Click(sender As Object, e As EventArgs) Handles btnAñadirDotacion.Click
+    Private Async Sub btnAñadirDotacion_Click(sender As Object, e As EventArgs) Handles btnAñadirDotacion.Click
         Dim nuevaDotacion = New FuncionarioDotacion()
         Using frm As New frmFuncionarioDotacion(nuevaDotacion)
             If frm.ShowDialog() = DialogResult.OK Then
-                _dotaciones.Add(frm.Dotacion)
+                Try
+                    ' Añade el nuevo objeto a la colección del funcionario
+                    _funcionario.FuncionarioDotacion.Add(frm.Dotacion)
+                    ' Guarda el cambio en la base de datos
+                    Await _uow.CommitAsync()
+                    ' Refresca la lista de la UI
+                    _dotaciones.Add(frm.Dotacion)
+                Catch ex As Exception
+                    MessageBox.Show("Error al añadir la dotación: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                End Try
             End If
         End Using
     End Sub
 
-    Private Sub btnEditarDotacion_Click(sender As Object, e As EventArgs) Handles btnEditarDotacion.Click
+    Private Async Sub btnEditarDotacion_Click(sender As Object, e As EventArgs) Handles btnEditarDotacion.Click
         If dgvDotacion.CurrentRow Is Nothing Then Return
         Dim dotacionSeleccionada = CType(dgvDotacion.CurrentRow.DataBoundItem, FuncionarioDotacion)
+
         Using frm As New frmFuncionarioDotacion(dotacionSeleccionada)
             If frm.ShowDialog() = DialogResult.OK Then
-                _dotaciones.ResetBindings()
+                Try
+                    ' Marca la entidad como modificada
+                    _uow.Context.Entry(dotacionSeleccionada).State = EntityState.Modified
+                    ' Guarda el cambio en la base de datos
+                    Await _uow.CommitAsync()
+                    ' Refresca la grilla para mostrar el cambio
+                    _dotaciones.ResetBindings()
+                Catch ex As Exception
+                    MessageBox.Show("Error al actualizar la dotación: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                End Try
             End If
         End Using
     End Sub
@@ -878,27 +911,32 @@ Public Class frmFuncionarioCrear
 #End Region
 
 #Region "CRUD Estados Transitorios"
-    Private Sub btnAñadirEstado_Click(sender As Object, e As EventArgs) Handles btnAñadirEstado.Click
+    Private Async Sub btnAñadirEstado_Click(sender As Object, e As EventArgs) Handles btnAñadirEstado.Click
         Dim nuevoEstado = New EstadoTransitorio()
 
         Using frm As New frmFuncionarioEstadoTransitorio(nuevoEstado, _tiposEstadoTransitorio)
             If frm.ShowDialog() = DialogResult.OK Then
-                ' Añadimos el nuevo estado a la colección principal del funcionario para el guardado final
-                _funcionario.EstadoTransitorio.Add(frm.Estado)
+                Try
+                    ' Añade el nuevo estado a la colección principal del funcionario
+                    _funcionario.EstadoTransitorio.Add(frm.Estado)
+                    ' Guarda el nuevo estado y sus detalles en la base de datos
+                    Await _uow.CommitAsync()
 
-                ' Si no estamos en la vista de historial y el nuevo estado está activo,
-                ' lo añadimos directamente a la lista enlazada para un refresco inmediato.
-                If Not chkVerHistorial.Checked AndAlso IsEstadoActivo(frm.Estado) Then
-                    _estadosTransitorios.Add(frm.Estado)
-                ElseIf chkVerHistorial.Checked Then
-                    ' Si estamos en vista de historial, es necesario recargar todo para mantener el orden y la consistencia.
-                    chkVerHistorial_CheckedChanged(Nothing, EventArgs.Empty)
-                End If
+                    ' Actualiza la UI
+                    If Not chkVerHistorial.Checked AndAlso IsEstadoActivo(frm.Estado) Then
+                        _estadosTransitorios.Add(frm.Estado)
+                    ElseIf chkVerHistorial.Checked Then
+                        ' Recargamos el historial para que aparezca el nuevo registro
+                        Await CargarHistorialCompleto()
+                    End If
+                Catch ex As Exception
+                    MessageBox.Show("Error al añadir el estado: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                End Try
             End If
         End Using
     End Sub
 
-    Private Sub btnEditarEstado_Click(sender As Object, e As EventArgs) Handles btnEditarEstado.Click
+    Private Async Sub btnEditarEstado_Click(sender As Object, e As EventArgs) Handles btnEditarEstado.Click
         If dgvEstadosTransitorios.CurrentRow Is Nothing OrElse dgvEstadosTransitorios.CurrentRow.DataBoundItem Is Nothing Then Return
 
         Dim estadoParaEditar As EstadoTransitorio = Nothing
@@ -922,17 +960,25 @@ Public Class frmFuncionarioCrear
 
         Using frm As New frmFuncionarioEstadoTransitorio(estadoParaEditar, _tiposEstadoTransitorio)
             If frm.ShowDialog() = DialogResult.OK Then
-                ' Si estamos en vista de historial, recargamos todo
-                If chkVerHistorial.Checked Then
-                    chkVerHistorial_CheckedChanged(Nothing, EventArgs.Empty)
-                Else
-                    ' Si estamos en la vista de activos, actualizamos la fila o la quitamos
-                    If IsEstadoActivo(estadoParaEditar) Then
-                        _estadosTransitorios.ResetItem(index)
+                Try
+                    ' Marca la entidad principal como modificada
+                    _uow.Context.Entry(estadoParaEditar).State = EntityState.Modified
+                    ' Guarda los cambios en la base de datos
+                    Await _uow.CommitAsync()
+
+                    ' Actualiza la UI
+                    If chkVerHistorial.Checked Then
+                        Await CargarHistorialCompleto()
                     Else
-                        _estadosTransitorios.RemoveAt(index)
+                        If IsEstadoActivo(estadoParaEditar) Then
+                            _estadosTransitorios.ResetItem(index)
+                        Else
+                            _estadosTransitorios.RemoveAt(index)
+                        End If
                     End If
-                End If
+                Catch ex As Exception
+                    MessageBox.Show("Error al actualizar el estado: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                End Try
             End If
         End Using
     End Sub
