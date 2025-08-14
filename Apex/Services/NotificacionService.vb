@@ -1,5 +1,4 @@
-﻿' Apex/Services/NotificacionPersonalService.vb
-Imports System.Data.Entity
+﻿Imports System.Data.Entity
 Imports System.Data.SqlClient
 
 Public Class NotificacionService
