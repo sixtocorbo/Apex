@@ -8,12 +8,14 @@ Public Class frmDashboard
     Private _funcionarioBuscarInstancia As frmFuncionarioBuscar
     Private _filtroAvanzadoInstancia As frmFiltroAvanzado
     Private _gestionInstancia As frmGestion
+    Private _novedadesInstancia As frmNovedades ' <-- AÑADIR ESTA LÍNEA
 
     Public Sub New()
         InitializeComponent()
         ' Asociar los manejadores de eventos a los botones de navegación
         AddHandler btnFuncionarios.Click, AddressOf ActivateButton
         AddHandler btnFiltros.Click, AddressOf ActivateButton
+        AddHandler btnNovedades.Click, AddressOf ActivateButton ' <-- AÑADIR ESTA LÍNEA
         AddHandler btnGestion.Click, AddressOf ActivateButton
         AddHandler btnReportes.Click, AddressOf ActivateButton
         AddHandler btnConfiguracion.Click, AddressOf ActivateButton
@@ -44,6 +46,14 @@ Public Class frmDashboard
                 End If
                 AbrirFormEnPanel(_filtroAvanzadoInstancia)
 
+            ' V---- AÑADIR ESTE NUEVO CASO ----V
+            Case "btnNovedades"
+                If _novedadesInstancia Is Nothing OrElse _novedadesInstancia.IsDisposed Then
+                    _novedadesInstancia = New frmNovedades()
+                End If
+                AbrirFormEnPanel(_novedadesInstancia)
+            ' ^---- FIN DEL NUEVO CASO ----^
+
             Case "btnGestion"
                 If _gestionInstancia Is Nothing OrElse _gestionInstancia.IsDisposed Then
                     _gestionInstancia = New frmGestion()
@@ -67,15 +77,12 @@ Public Class frmDashboard
     End Sub
 
     Private Sub AbrirFormEnPanel(childForm As Form)
-        ' Si hay un formulario activo y es diferente al que queremos abrir, lo ocultamos.
         If activeForm IsNot Nothing AndAlso activeForm IsNot childForm Then
             activeForm.Hide()
         End If
 
-        ' Establecemos el nuevo formulario como activo.
         activeForm = childForm
 
-        ' Si el formulario aún no ha sido añadido al panel de contenido, lo configuramos y añadimos.
         If Not Me.panelContenido.Controls.Contains(childForm) Then
             childForm.TopLevel = False
             childForm.FormBorderStyle = FormBorderStyle.None
@@ -84,7 +91,6 @@ Public Class frmDashboard
             Me.panelContenido.Tag = childForm
         End If
 
-        ' Finalmente, traemos el formulario al frente y nos aseguramos de que sea visible.
         childForm.BringToFront()
         childForm.Show()
     End Sub

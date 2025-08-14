@@ -79,6 +79,8 @@ Partial Class frmGestion
         '
         Me.dgvLicencias.AllowUserToAddRows = False
         Me.dgvLicencias.AllowUserToDeleteRows = False
+        Me.dgvLicencias.AllowUserToResizeColumns = False
+        Me.dgvLicencias.AllowUserToResizeRows = False
         Me.dgvLicencias.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvLicencias.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgvLicencias.Location = New System.Drawing.Point(3, 66)
@@ -181,6 +183,8 @@ Partial Class frmGestion
         '
         Me.dgvNotificaciones.AllowUserToAddRows = False
         Me.dgvNotificaciones.AllowUserToDeleteRows = False
+        Me.dgvNotificaciones.AllowUserToResizeColumns = False
+        Me.dgvNotificaciones.AllowUserToResizeRows = False
         Me.dgvNotificaciones.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvNotificaciones.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgvNotificaciones.Location = New System.Drawing.Point(3, 66)
