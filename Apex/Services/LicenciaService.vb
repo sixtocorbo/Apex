@@ -11,40 +11,37 @@ Public Class LicenciaService
     Public Sub New(unitOfWork As IUnitOfWork)
         MyBase.New(unitOfWork)
     End Sub
-    ' V---- AÑADE ESTA PROPIEDAD ----V
+
     Public ReadOnly Property UnitOfWork As IUnitOfWork
         Get
             Return _unitOfWork
         End Get
     End Property
-    ' ^---- FIN DEL CÓDIGO AÑADIDO ----^
-    ' NOTA: La clase DTO 'LicenciaParaVista' ya no es necesaria,
-    ' porque la vista y su entidad generada la reemplazan.
 
     ''' <summary>
     ''' Obtiene TODAS las licencias desde la vista vw_LicenciasCompletas, aplicando filtros.
-    ''' (VERSIÓN REFACTORIZADA)
+    ''' (VERSIÓN CORREGIDA CON FILTRO DE NOMBRE)
     ''' </summary>
     Public Async Function GetAllConDetallesAsync(
         Optional filtroNombre As String = "",
         Optional filtroTipoId As Integer? = Nothing,
         Optional fechaDesde As Date? = Nothing,
         Optional fechaHasta As Date? = Nothing
-    ) As Task(Of List(Of vw_LicenciasCompletas)) ' Devuelve directamente el tipo de la vista
+    ) As Task(Of List(Of vw_LicenciasCompletas))
 
-        ' Apuntamos directamente a la nueva vista
         Dim query = _unitOfWork.Repository(Of vw_LicenciasCompletas)().GetAll().AsNoTracking()
 
-        ' --- Aplicar filtros (la lógica es más limpia) ---
+        ' --- INICIO DE LA MODIFICACIÓN ---
+        ' Aplicar filtro por nombre de funcionario o CI
         If Not String.IsNullOrWhiteSpace(filtroNombre) Then
             query = query.Where(Function(l) l.NombreFuncionario.Contains(filtroNombre) Or l.CI.Contains(filtroNombre))
         End If
+        ' --- FIN DE LA MODIFICACIÓN ---
 
         If filtroTipoId.HasValue AndAlso filtroTipoId.Value > 0 Then
             query = query.Where(Function(l) l.TipoLicenciaId = filtroTipoId.Value)
         End If
 
-        ' **LÓGICA DE FECHA CORREGIDA** para encontrar licencias que se solapan con el rango.
         If fechaDesde.HasValue Then
             query = query.Where(Function(l) l.FechaFin >= fechaDesde.Value)
         End If
@@ -53,7 +50,6 @@ Public Class LicenciaService
             query = query.Where(Function(l) l.FechaInicio <= fechaHasta.Value)
         End If
 
-        ' --- Ya no se necesita un .Select() para transformar los datos ---
         Dim licencias = Await query.OrderByDescending(Function(l) l.FechaInicio).ToListAsync()
 
         Return licencias

@@ -24,6 +24,9 @@ Partial Class frmGestion
         Me.btnEliminarLicencia = New System.Windows.Forms.Button()
         Me.btnEditarLicencia = New System.Windows.Forms.Button()
         Me.btnNuevaLicencia = New System.Windows.Forms.Button()
+        Me.PanelBusquedaLicencias = New System.Windows.Forms.Panel()
+        Me.txtBusquedaLicencia = New System.Windows.Forms.TextBox()
+        Me.Label1 = New System.Windows.Forms.Label()
         Me.TabPageNotificaciones = New System.Windows.Forms.TabPage()
         Me.dgvNotificaciones = New System.Windows.Forms.DataGridView()
         Me.PanelNotificaciones = New System.Windows.Forms.Panel()
@@ -31,13 +34,18 @@ Partial Class frmGestion
         Me.btnEliminarNotificacion = New System.Windows.Forms.Button()
         Me.btnEditarNotificacion = New System.Windows.Forms.Button()
         Me.btnNuevaNotificacion = New System.Windows.Forms.Button()
+        Me.PanelBusquedaNotificaciones = New System.Windows.Forms.Panel()
+        Me.txtBusquedaNotificacion = New System.Windows.Forms.TextBox()
+        Me.Label2 = New System.Windows.Forms.Label()
         Me.TabControlGestion.SuspendLayout()
         Me.TabPageLicencias.SuspendLayout()
         CType(Me.dgvLicencias, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.PanelLicencias.SuspendLayout()
+        Me.PanelBusquedaLicencias.SuspendLayout()
         Me.TabPageNotificaciones.SuspendLayout()
         CType(Me.dgvNotificaciones, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.PanelNotificaciones.SuspendLayout()
+        Me.PanelBusquedaNotificaciones.SuspendLayout()
         Me.SuspendLayout()
         '
         'TabControlGestion
@@ -57,6 +65,7 @@ Partial Class frmGestion
         '
         Me.TabPageLicencias.Controls.Add(Me.dgvLicencias)
         Me.TabPageLicencias.Controls.Add(Me.PanelLicencias)
+        Me.TabPageLicencias.Controls.Add(Me.PanelBusquedaLicencias)
         Me.TabPageLicencias.Location = New System.Drawing.Point(4, 37)
         Me.TabPageLicencias.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.TabPageLicencias.Name = "TabPageLicencias"
@@ -70,17 +79,15 @@ Partial Class frmGestion
         '
         Me.dgvLicencias.AllowUserToAddRows = False
         Me.dgvLicencias.AllowUserToDeleteRows = False
-        Me.dgvLicencias.AllowUserToResizeColumns = False
-        Me.dgvLicencias.AllowUserToResizeRows = False
         Me.dgvLicencias.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvLicencias.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.dgvLicencias.Location = New System.Drawing.Point(3, 4)
+        Me.dgvLicencias.Location = New System.Drawing.Point(3, 66)
         Me.dgvLicencias.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.dgvLicencias.Name = "dgvLicencias"
         Me.dgvLicencias.ReadOnly = True
         Me.dgvLicencias.RowHeadersWidth = 51
         Me.dgvLicencias.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgvLicencias.Size = New System.Drawing.Size(886, 451)
+        Me.dgvLicencias.Size = New System.Drawing.Size(886, 389)
         Me.dgvLicencias.TabIndex = 1
         '
         'PanelLicencias
@@ -128,10 +135,39 @@ Partial Class frmGestion
         Me.btnNuevaLicencia.Text = "Nueva..."
         Me.btnNuevaLicencia.UseVisualStyleBackColor = True
         '
+        'PanelBusquedaLicencias
+        '
+        Me.PanelBusquedaLicencias.Controls.Add(Me.txtBusquedaLicencia)
+        Me.PanelBusquedaLicencias.Controls.Add(Me.Label1)
+        Me.PanelBusquedaLicencias.Dock = System.Windows.Forms.DockStyle.Top
+        Me.PanelBusquedaLicencias.Location = New System.Drawing.Point(3, 4)
+        Me.PanelBusquedaLicencias.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.PanelBusquedaLicencias.Name = "PanelBusquedaLicencias"
+        Me.PanelBusquedaLicencias.Size = New System.Drawing.Size(886, 62)
+        Me.PanelBusquedaLicencias.TabIndex = 2
+        '
+        'txtBusquedaLicencia
+        '
+        Me.txtBusquedaLicencia.Location = New System.Drawing.Point(131, 14)
+        Me.txtBusquedaLicencia.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.txtBusquedaLicencia.Name = "txtBusquedaLicencia"
+        Me.txtBusquedaLicencia.Size = New System.Drawing.Size(380, 33)
+        Me.txtBusquedaLicencia.TabIndex = 1
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(6, 19)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(119, 28)
+        Me.Label1.TabIndex = 0
+        Me.Label1.Text = "Funcionario:"
+        '
         'TabPageNotificaciones
         '
         Me.TabPageNotificaciones.Controls.Add(Me.dgvNotificaciones)
         Me.TabPageNotificaciones.Controls.Add(Me.PanelNotificaciones)
+        Me.TabPageNotificaciones.Controls.Add(Me.PanelBusquedaNotificaciones)
         Me.TabPageNotificaciones.Location = New System.Drawing.Point(4, 37)
         Me.TabPageNotificaciones.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.TabPageNotificaciones.Name = "TabPageNotificaciones"
@@ -145,17 +181,15 @@ Partial Class frmGestion
         '
         Me.dgvNotificaciones.AllowUserToAddRows = False
         Me.dgvNotificaciones.AllowUserToDeleteRows = False
-        Me.dgvNotificaciones.AllowUserToResizeColumns = False
-        Me.dgvNotificaciones.AllowUserToResizeRows = False
         Me.dgvNotificaciones.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvNotificaciones.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.dgvNotificaciones.Location = New System.Drawing.Point(3, 4)
+        Me.dgvNotificaciones.Location = New System.Drawing.Point(3, 66)
         Me.dgvNotificaciones.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.dgvNotificaciones.Name = "dgvNotificaciones"
         Me.dgvNotificaciones.ReadOnly = True
         Me.dgvNotificaciones.RowHeadersWidth = 51
         Me.dgvNotificaciones.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgvNotificaciones.Size = New System.Drawing.Size(886, 451)
+        Me.dgvNotificaciones.Size = New System.Drawing.Size(886, 389)
         Me.dgvNotificaciones.TabIndex = 2
         '
         'PanelNotificaciones
@@ -215,6 +249,34 @@ Partial Class frmGestion
         Me.btnNuevaNotificacion.Text = "Nueva..."
         Me.btnNuevaNotificacion.UseVisualStyleBackColor = True
         '
+        'PanelBusquedaNotificaciones
+        '
+        Me.PanelBusquedaNotificaciones.Controls.Add(Me.txtBusquedaNotificacion)
+        Me.PanelBusquedaNotificaciones.Controls.Add(Me.Label2)
+        Me.PanelBusquedaNotificaciones.Dock = System.Windows.Forms.DockStyle.Top
+        Me.PanelBusquedaNotificaciones.Location = New System.Drawing.Point(3, 4)
+        Me.PanelBusquedaNotificaciones.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.PanelBusquedaNotificaciones.Name = "PanelBusquedaNotificaciones"
+        Me.PanelBusquedaNotificaciones.Size = New System.Drawing.Size(886, 62)
+        Me.PanelBusquedaNotificaciones.TabIndex = 3
+        '
+        'txtBusquedaNotificacion
+        '
+        Me.txtBusquedaNotificacion.Location = New System.Drawing.Point(131, 14)
+        Me.txtBusquedaNotificacion.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.txtBusquedaNotificacion.Name = "txtBusquedaNotificacion"
+        Me.txtBusquedaNotificacion.Size = New System.Drawing.Size(380, 33)
+        Me.txtBusquedaNotificacion.TabIndex = 1
+        '
+        'Label2
+        '
+        Me.Label2.AutoSize = True
+        Me.Label2.Location = New System.Drawing.Point(6, 19)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(119, 28)
+        Me.Label2.TabIndex = 0
+        Me.Label2.Text = "Funcionario:"
+        '
         'frmGestion
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -228,9 +290,13 @@ Partial Class frmGestion
         Me.TabPageLicencias.ResumeLayout(False)
         CType(Me.dgvLicencias, System.ComponentModel.ISupportInitialize).EndInit()
         Me.PanelLicencias.ResumeLayout(False)
+        Me.PanelBusquedaLicencias.ResumeLayout(False)
+        Me.PanelBusquedaLicencias.PerformLayout()
         Me.TabPageNotificaciones.ResumeLayout(False)
         CType(Me.dgvNotificaciones, System.ComponentModel.ISupportInitialize).EndInit()
         Me.PanelNotificaciones.ResumeLayout(False)
+        Me.PanelBusquedaNotificaciones.ResumeLayout(False)
+        Me.PanelBusquedaNotificaciones.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -249,4 +315,10 @@ Partial Class frmGestion
     Friend WithEvents btnEditarNotificacion As Button
     Friend WithEvents btnNuevaNotificacion As Button
     Friend WithEvents dgvNotificaciones As DataGridView
+    Friend WithEvents PanelBusquedaLicencias As Panel
+    Friend WithEvents txtBusquedaLicencia As TextBox
+    Friend WithEvents Label1 As Label
+    Friend WithEvents PanelBusquedaNotificaciones As Panel
+    Friend WithEvents txtBusquedaNotificacion As TextBox
+    Friend WithEvents Label2 As Label
 End Class

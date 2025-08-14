@@ -27,8 +27,6 @@ Public Class frmGestion
 #Region "Configuración y Carga de Datos"
 
     Private Sub ConfigurarGrillas()
-        ' --- INICIO DE LA CORRECCIÓN ---
-
         ' Configuración para la grilla de Licencias
         With dgvLicencias
             .AutoGenerateColumns = False
@@ -73,14 +71,14 @@ Public Class frmGestion
 
             .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Estado", .DataPropertyName = "Estado", .HeaderText = "Estado", .Width = 120})
         End With
-        ' --- FIN DE LA CORRECCIÓN ---
     End Sub
 
     Private Async Function CargarDatosLicenciasAsync() As Task
         LoadingHelper.MostrarCargando(Me)
         Try
             dgvLicencias.DataSource = Nothing
-            dgvLicencias.DataSource = Await _licenciaSvc.GetAllConDetallesAsync()
+            Dim filtro = txtBusquedaLicencia.Text.Trim()
+            dgvLicencias.DataSource = Await _licenciaSvc.GetAllConDetallesAsync(filtroNombre:=filtro)
         Catch ex As Exception
             MessageBox.Show("Error al cargar licencias: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         Finally
@@ -92,7 +90,8 @@ Public Class frmGestion
         LoadingHelper.MostrarCargando(Me)
         Try
             dgvNotificaciones.DataSource = Nothing
-            dgvNotificaciones.DataSource = Await _notificacionSvc.GetAllConDetallesAsync()
+            Dim filtro = txtBusquedaNotificacion.Text.Trim()
+            dgvNotificaciones.DataSource = Await _notificacionSvc.GetAllConDetallesAsync(filtro)
         Catch ex As Exception
             MessageBox.Show("Error al cargar notificaciones: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         Finally
@@ -102,10 +101,28 @@ Public Class frmGestion
 
 #End Region
 
+#Region "Manejo de Búsqueda (Estilo frmFuncionarioBuscar)"
+
+    Private Async Sub txtBusquedaLicencia_KeyDown(sender As Object, e As KeyEventArgs) Handles txtBusquedaLicencia.KeyDown
+        If e.KeyCode = Keys.Enter Then
+            e.SuppressKeyPress = True ' Evita el sonido 'ding' al presionar Enter
+            Await CargarDatosLicenciasAsync()
+        End If
+    End Sub
+
+    Private Async Sub txtBusquedaNotificacion_KeyDown(sender As Object, e As KeyEventArgs) Handles txtBusquedaNotificacion.KeyDown
+        If e.KeyCode = Keys.Enter Then
+            e.SuppressKeyPress = True
+            Await CargarDatosNotificacionesAsync()
+        End If
+    End Sub
+
+#End Region
+
 #Region "Acciones para Licencias"
 
     Private Async Sub btnNuevaLicencia_Click(sender As Object, e As EventArgs) Handles btnNuevaLicencia.Click
-        Using frm As New frmLicenciaCrear() ' Llama al formulario que ya tienes
+        Using frm As New frmLicenciaCrear()
             If frm.ShowDialog(Me) = DialogResult.OK Then
                 Await CargarDatosLicenciasAsync()
             End If
@@ -115,7 +132,7 @@ Public Class frmGestion
     Private Async Sub btnEditarLicencia_Click(sender As Object, e As EventArgs) Handles btnEditarLicencia.Click
         If dgvLicencias.CurrentRow Is Nothing Then Return
         Dim idSeleccionado = CInt(dgvLicencias.CurrentRow.Cells("Id").Value)
-        Using frm As New frmLicenciaCrear(idSeleccionado) ' Llama al constructor de edición
+        Using frm As New frmLicenciaCrear(idSeleccionado)
             If frm.ShowDialog(Me) = DialogResult.OK Then
                 Await CargarDatosLicenciasAsync()
             End If
