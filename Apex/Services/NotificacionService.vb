@@ -1,7 +1,8 @@
 ﻿' Apex/Services/NotificacionPersonalService.vb
 Imports System.Data.Entity
+Imports System.Data.SqlClient
 
-Public Class NotificacionPersonalService
+Public Class NotificacionService
     Inherits GenericService(Of NotificacionPersonal)
 
     Public Sub New()
@@ -12,36 +13,38 @@ Public Class NotificacionPersonalService
         MyBase.New(unitOfWork)
     End Sub
 
-    ''' <summary>
-    ''' Obtiene una notificación por su ID para edición, incluyendo las entidades relacionadas.
-    ''' </summary>
     Public Async Function GetByIdParaEdicionAsync(id As Integer) As Task(Of NotificacionPersonal)
         Return Await _unitOfWork.Repository(Of NotificacionPersonal)().
-        GetAll().
+            GetAll().
             Include(Function(n) n.Funcionario).
             Include(Function(n) n.TipoNotificacion).
             FirstOrDefaultAsync(Function(n) n.Id = id)
     End Function
 
     ''' <summary>
-    ''' Obtiene una lista de notificaciones desde la vista para la grilla principal.
-    ''' (VERSIÓN REFACTORIZADA)
+    ''' Obtiene notificaciones usando Full-Text Search de forma correcta.
     ''' </summary>
     Public Async Function GetAllConDetallesAsync(Optional filtroNombreFuncionario As String = "") As Task(Of List(Of vw_NotificacionesCompletas))
-        ' Apuntamos directamente a la nueva vista
-        Dim query = _unitOfWork.Repository(Of vw_NotificacionesCompletas)().GetAll().AsNoTracking()
+        Dim sqlBuilder As New System.Text.StringBuilder("SELECT * FROM vw_NotificacionesCompletas")
+        Dim parameters As New List(Of Object)
 
+        ' --- INICIO DE LA CORRECCIÓN ---
         If Not String.IsNullOrWhiteSpace(filtroNombreFuncionario) Then
-            query = query.Where(Function(n) n.NombreFuncionario.Contains(filtroNombreFuncionario) Or n.CI.Contains(filtroNombreFuncionario))
-        End If
+            Dim terminos = filtroNombreFuncionario.Split({" "c}, StringSplitOptions.RemoveEmptyEntries).Select(Function(w) $"""{w}*""")
+            Dim expresionFts = String.Join(" AND ", terminos)
 
-        ' Ya no se necesita el .Select() para transformar los datos
-        Return Await query.OrderByDescending(Function(n) n.FechaProgramada).ToListAsync()
+            ' Se busca en la tabla Funcionario y se usa el resultado para filtrar la vista
+            sqlBuilder.Append($" WHERE FuncionarioId IN (SELECT Id FROM dbo.Funcionario WHERE CONTAINS((Nombre, CI), @p0))")
+            parameters.Add(New SqlParameter("@p0", expresionFts))
+        End If
+        ' --- FIN DE LA CORRECCIÓN ---
+
+        sqlBuilder.Append(" ORDER BY FechaProgramada DESC")
+
+        Dim query = _unitOfWork.Context.Database.SqlQuery(Of vw_NotificacionesCompletas)(sqlBuilder.ToString(), parameters.ToArray())
+        Return Await query.ToListAsync()
     End Function
 
-    ''' <summary>
-    ''' Actualiza el estado de una notificación.
-    ''' </summary>
     Public Async Function UpdateEstadoAsync(notificacionId As Integer, nuevoEstadoId As Byte) As Task
         Dim notificacion = Await _unitOfWork.Repository(Of NotificacionPersonal)().GetByIdAsync(notificacionId)
         If notificacion IsNot Nothing Then
@@ -52,7 +55,7 @@ Public Class NotificacionPersonalService
         End If
     End Function
 
-    ' --- MÉTODOS PARA POBLAR COMBOS (se mantienen igual) ---
+    ' --- MÉTODOS PARA COMBOS (sin cambios) ---
     Public Async Function ObtenerFuncionariosParaComboAsync() As Task(Of List(Of KeyValuePair(Of Integer, String)))
         Dim repo = _unitOfWork.Repository(Of Funcionario)()
         Dim lista = Await repo.GetAll().AsNoTracking().Where(Function(f) f.Activo).OrderBy(Function(f) f.Nombre).ToListAsync()
@@ -64,12 +67,11 @@ Public Class NotificacionPersonalService
         Dim lista = Await repo.GetAll().AsNoTracking().OrderBy(Function(t) t.Orden).ToListAsync()
         Return lista.Select(Function(t) New KeyValuePair(Of Byte, String)(t.Id, t.Nombre)).ToList()
     End Function
+
     Public Async Function ObtenerEstadosParaComboAsync() As Task(Of List(Of KeyValuePair(Of Byte, String)))
         Dim repo = _unitOfWork.Repository(Of NotificacionEstado)()
         Dim lista = Await repo.GetAll().AsNoTracking().OrderBy(Function(e) e.Orden).ToListAsync()
         Return lista.Select(Function(e) New KeyValuePair(Of Byte, String)(e.Id, e.Nombre)).ToList()
     End Function
-
-    ' La clase DTO 'NotificacionParaVista' ya no es necesaria y ha sido eliminada.
 
 End Class

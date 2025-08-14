@@ -51,7 +51,7 @@ Public Module ConsultasGenericas
                 Return estados.ToDataTable()
 
             Case TipoOrigenDatos.Notificaciones
-                Dim notificacionService = New NotificacionPersonalService()
+                Dim notificacionService = New NotificacionService()
                 Dim notificaciones = Await notificacionService.GetAllConDetallesAsync()
                 Return notificaciones.Where(Function(n) n.FechaProgramada.Date >= fechaInicio And n.FechaProgramada.Date <= fechaFin).ToList().ToDataTable()
 

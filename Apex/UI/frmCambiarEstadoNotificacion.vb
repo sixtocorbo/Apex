@@ -1,10 +1,10 @@
 ﻿Public Class frmCambiarEstadoNotificacion
 
-    Private _svc As NotificacionPersonalService
+    Private _svc As NotificacionService
     Public SelectedEstadoId As Byte
 
     Private Async Sub frmCambiarEstadoNotificacion_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        _svc = New NotificacionPersonalService()
+        _svc = New NotificacionService()
         Await CargarCombosAsync()
     End Sub
 

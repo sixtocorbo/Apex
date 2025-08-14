@@ -110,7 +110,7 @@ Public Class NotificacionAccionHandler
         ' --- FIN DE LA CORRECCIÓN ---
         If MessageBox.Show($"¿Está seguro de que desea eliminar la notificación para '{nombre}'?", "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
             Try
-                Await New NotificacionPersonalService().DeleteAsync(id)
+                Await New NotificacionService().DeleteAsync(id)
                 Await form.CargarDatosAsync()
             Catch ex As Exception
                 MessageBox.Show("Error al eliminar: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -127,7 +127,7 @@ Public Class NotificacionAccionHandler
             If frm.ShowDialog() = DialogResult.OK Then
                 Dim nuevoEstadoId = frm.SelectedEstadoId
                 Try
-                    Await New NotificacionPersonalService().UpdateEstadoAsync(id, nuevoEstadoId)
+                    Await New NotificacionService().UpdateEstadoAsync(id, nuevoEstadoId)
                     Await form.CargarDatosAsync()
                 Catch ex As Exception
                     MessageBox.Show("Error al actualizar el estado: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)

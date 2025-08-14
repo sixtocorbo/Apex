@@ -3,13 +3,13 @@ Imports System.Data.Entity
 
 Public Class frmNotificaciones
 
-    Private _svc As NotificacionPersonalService
+    Private _svc As NotificacionService
     ' --- CAMBIO: Usamos la entidad de la vista en lugar del DTO ---
     Private _listaNotificaciones As List(Of vw_NotificacionesCompletas)
 
     Private Async Sub frmNotificaciones_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
-        _svc = New NotificacionPersonalService()
+        _svc = New NotificacionService()
         ConfigurarGrilla()
         AddHandler dgvNotificaciones.SelectionChanged, AddressOf DgvNotificaciones_SelectionChanged
         Await CargarNotificacionesAsync()

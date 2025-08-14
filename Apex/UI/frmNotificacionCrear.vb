@@ -2,7 +2,7 @@
 
 Public Class frmNotificacionCrear
 
-    Private _svc As NotificacionPersonalService
+    Private _svc As NotificacionService
     Private _notificacion As NotificacionPersonal
     Private _modo As ModoFormulario
     Private _idNotificacion As Integer
@@ -30,7 +30,7 @@ Public Class frmNotificacionCrear
 
     Private Async Sub frmNotificacionCrear_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
-        _svc = New NotificacionPersonalService()
+        _svc = New NotificacionService()
         Await CargarCombosAsync()
 
         If _modo = ModoFormulario.Editar Then

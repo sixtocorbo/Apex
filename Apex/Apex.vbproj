@@ -329,7 +329,7 @@
     <Compile Include="Services\LicenciaService.vb" />
     <Compile Include="Services\LoadingHelper.vb" />
     <Compile Include="Services\ModuloExtensions.vb" />
-    <Compile Include="Services\NotificacionPersonalService.vb" />
+    <Compile Include="Services\NotificacionService.vb" />
     <Compile Include="Services\NovedadService.vb" />
     <Compile Include="UI\FiltroAvanzadoUI.vb" />
     <Compile Include="UI\frmCambiarEstadoNotificacion.Designer.vb">

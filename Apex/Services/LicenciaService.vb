@@ -1,5 +1,6 @@
 ﻿' Apex/Services/LicenciaService.vb
 Imports System.Data.Entity
+Imports System.Data.SqlClient
 
 Public Class LicenciaService
     Inherits GenericService(Of HistoricoLicencia)
@@ -19,43 +20,45 @@ Public Class LicenciaService
     End Property
 
     ''' <summary>
-    ''' Obtiene TODAS las licencias desde la vista vw_LicenciasCompletas, aplicando filtros.
-    ''' (VERSIÓN CORREGIDA CON FILTRO DE NOMBRE)
+    ''' Obtiene licencias usando Full-Text Search de forma correcta.
     ''' </summary>
     Public Async Function GetAllConDetallesAsync(
         Optional filtroNombre As String = "",
-        Optional filtroTipoId As Integer? = Nothing,
         Optional fechaDesde As Date? = Nothing,
         Optional fechaHasta As Date? = Nothing
     ) As Task(Of List(Of vw_LicenciasCompletas))
 
-        Dim query = _unitOfWork.Repository(Of vw_LicenciasCompletas)().GetAll().AsNoTracking()
-
-        ' --- INICIO DE LA MODIFICACIÓN ---
-        ' Aplicar filtro por nombre de funcionario o CI
-        If Not String.IsNullOrWhiteSpace(filtroNombre) Then
-            query = query.Where(Function(l) l.NombreFuncionario.Contains(filtroNombre) Or l.CI.Contains(filtroNombre))
-        End If
-        ' --- FIN DE LA MODIFICACIÓN ---
-
-        If filtroTipoId.HasValue AndAlso filtroTipoId.Value > 0 Then
-            query = query.Where(Function(l) l.TipoLicenciaId = filtroTipoId.Value)
-        End If
+        Dim sqlBuilder As New System.Text.StringBuilder("SELECT * FROM vw_LicenciasCompletas WHERE 1=1")
+        Dim parameters As New List(Of Object)
 
         If fechaDesde.HasValue Then
-            query = query.Where(Function(l) l.FechaFin >= fechaDesde.Value)
+            sqlBuilder.Append(" AND FechaFin >= @p0")
+            parameters.Add(New SqlParameter("@p0", fechaDesde.Value))
         End If
 
         If fechaHasta.HasValue Then
-            query = query.Where(Function(l) l.FechaInicio <= fechaHasta.Value)
+            sqlBuilder.Append(" AND FechaInicio <= @p" & parameters.Count)
+            parameters.Add(New SqlParameter("@p" & parameters.Count, fechaHasta.Value))
         End If
 
-        Dim licencias = Await query.OrderByDescending(Function(l) l.FechaInicio).ToListAsync()
+        ' --- INICIO DE LA CORRECCIÓN ---
+        If Not String.IsNullOrWhiteSpace(filtroNombre) Then
+            Dim terminos = filtroNombre.Split({" "c}, StringSplitOptions.RemoveEmptyEntries).Select(Function(w) $"""{w}*""")
+            Dim expresionFts = String.Join(" AND ", terminos)
 
-        Return licencias
+            ' Se busca en la tabla Funcionario y se usa el resultado para filtrar la vista
+            sqlBuilder.Append($" AND FuncionarioId IN (SELECT Id FROM dbo.Funcionario WHERE CONTAINS((Nombre, CI), @p{parameters.Count}))")
+            parameters.Add(New SqlParameter($"@p{parameters.Count}", expresionFts))
+        End If
+        ' --- FIN DE LA CORRECCIÓN ---
+
+        sqlBuilder.Append(" ORDER BY FechaInicio DESC")
+
+        Dim query = _unitOfWork.Context.Database.SqlQuery(Of vw_LicenciasCompletas)(sqlBuilder.ToString(), parameters.ToArray())
+        Return Await query.ToListAsync()
     End Function
 
-    ' --- MÉTODOS PARA POBLAR COMBOS (se mantienen igual) ---
+    ' --- MÉTODOS PARA COMBOS (sin cambios) ---
     Public Async Function ObtenerTiposLicenciaParaComboAsync() As Task(Of List(Of KeyValuePair(Of Integer, String)))
         Dim repo = _unitOfWork.Repository(Of TipoLicencia)()
         Dim lista = Await repo.GetAll().AsNoTracking().OrderBy(Function(t) t.Nombre).ToListAsync()

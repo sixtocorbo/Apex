@@ -5,7 +5,7 @@ Public Class frmGestion
 
     ' Servicios para cada pestaña
     Private _licenciaSvc As New LicenciaService()
-    Private _notificacionSvc As New NotificacionPersonalService()
+    Private _notificacionSvc As New NotificacionService()
 
     ' Se ejecuta cuando el formulario se carga
     Private Async Sub frmGestion_Load(sender As Object, e As EventArgs) Handles MyBase.Load
