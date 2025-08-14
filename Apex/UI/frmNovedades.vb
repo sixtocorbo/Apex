@@ -4,18 +4,30 @@ Imports System.IO
 
 Public Class frmNovedades
 
-    Private _svc As New NovedadService()
     Private _novedadGeneradaActual As NovedadGenerada
 
     Private Async Sub frmNovedades_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
         ConfigurarGrilla()
-        Await CargarNovedadesDelDia()
+        ' --- INICIO DE LA CORRECCIÓN ---
+        ' Por defecto, al cargar, no filtramos por fecha para ver todo.
+        Await CargarNovedadesAsync()
+        ' --- FIN DE LA CORRECCIÓN ---
     End Sub
 
+    ' --- INICIO DE LA CORRECCIÓN ---
+    ' Este evento ahora llamará al método de carga general
     Private Async Sub dtpFecha_ValueChanged(sender As Object, e As EventArgs) Handles dtpFecha.ValueChanged
-        Await CargarNovedadesDelDia()
+        ' Para mantener la funcionalidad de seleccionar un día y ver sus detalles de fotos, etc.
+        ' actualizamos la NovedadGenerada del día seleccionado.
+        Using svc As New NovedadService()
+            _novedadGeneradaActual = Await svc.GetOrCreateNovedadGeneradaAsync(dtpFecha.Value.Date)
+            Await CargarFotos()
+        End Using
+
+        ' Si el usuario quiere filtrar por este día, puede presionar "Nueva Novedad" o un futuro botón de "Filtrar"
     End Sub
+    ' --- FIN DE LA CORRECCIÓN ---
 
     Private Async Sub dgvNovedades_SelectionChanged(sender As Object, e As EventArgs) Handles dgvNovedades.SelectionChanged
         Await MostrarDetalleNovedadSeleccionada()
@@ -32,35 +44,35 @@ Public Class frmNovedades
             .MultiSelect = False
             .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Id", .DataPropertyName = "Id", .Visible = False})
             .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "NovedadGeneradaId", .DataPropertyName = "NovedadGeneradaId", .Visible = False})
+            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Fecha", .DataPropertyName = "Fecha", .HeaderText = "Fecha", .Width = 100})
             .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Funcionario", .DataPropertyName = "NombreFuncionario", .HeaderText = "Funcionario", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
             .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Estado", .DataPropertyName = "Estado", .HeaderText = "Estado", .Width = 120})
         End With
     End Sub
 
-    Private Async Function CargarNovedadesDelDia() As Task
+    ' --- INICIO DE LA CORRECCIÓN ---
+    ' Renombrado y modificado para aceptar un rango o cargar todo
+    Private Async Function CargarNovedadesAsync(Optional fechaDesde As Date? = Nothing, Optional fechaHasta As Date? = Nothing) As Task
         LoadingHelper.MostrarCargando(Me)
         Try
-            Dim fechaSeleccionada = dtpFecha.Value.Date
-            _novedadGeneradaActual = Await _svc.GetOrCreateNovedadGeneradaAsync(fechaSeleccionada)
+            Using svc As New NovedadService()
+                ' Si no se pasan fechas, el servicio traerá todo.
+                Dim novedades = Await svc.GetAllConDetallesAsync(fechaDesde, fechaHasta)
+                dgvNovedades.DataSource = novedades
+            End Using
 
-            ' --- INICIO DE LA CORRECCIÓN ---
-            ' Le pasamos la misma fecha dos veces para cumplir con la firma del método
-            Dim novedades = Await _svc.GetAllConDetallesAsync(fechaSeleccionada, fechaSeleccionada)
-            ' --- FIN DE LA CORRECCIÓN ---
-
-            dgvNovedades.DataSource = novedades
-
-            If Not novedades.Any() Then
+            If dgvNovedades.Rows.Count = 0 Then
                 LimpiarDetalles()
             End If
 
-            Await CargarFotos()
         Catch ex As Exception
             MessageBox.Show("Error al cargar las novedades: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         Finally
             LoadingHelper.OcultarCargando(Me)
         End Try
     End Function
+    ' --- FIN DE LA CORRECCIÓN ---
+
 
     Private Sub LimpiarDetalles()
         txtTextoNovedad.Clear()
@@ -78,8 +90,14 @@ Public Class frmNovedades
         txtTextoNovedad.Text = novedadSeleccionada.Texto
 
         lstFuncionarios.DataSource = Nothing
-        Dim funcionarios = Await _svc.GetFuncionariosPorNovedadAsync(novedadSeleccionada.Id)
-        lstFuncionarios.DataSource = funcionarios
+        Using svc As New NovedadService()
+            Dim funcionarios = Await svc.GetFuncionariosPorNovedadAsync(novedadSeleccionada.Id)
+            lstFuncionarios.DataSource = funcionarios
+
+            ' Actualizar la NovedadGenerada y las fotos para la novedad seleccionada
+            _novedadGeneradaActual = Await svc.GetOrCreateNovedadGeneradaAsync(novedadSeleccionada.Fecha)
+            Await CargarFotos()
+        End Using
         lstFuncionarios.DisplayMember = "Nombre"
         lstFuncionarios.ValueMember = "Id"
     End Function
@@ -92,18 +110,20 @@ Public Class frmNovedades
         flpFotos.Controls.Clear()
         If _novedadGeneradaActual Is Nothing Then Return
 
-        Dim fotos = Await _svc.GetFotosPorNovedadGeneradaAsync(_novedadGeneradaActual.Id)
-        For Each foto In fotos
-            Dim pic As New PictureBox With {
-                .Image = Image.FromStream(New MemoryStream(foto.Foto)),
-                .SizeMode = PictureBoxSizeMode.Zoom,
-                .Size = New Size(120, 120),
-                .Margin = New Padding(5),
-                .BorderStyle = BorderStyle.FixedSingle,
-                .Tag = foto.Id
-            }
-            flpFotos.Controls.Add(pic)
-        Next
+        Using svc As New NovedadService()
+            Dim fotos = Await svc.GetFotosPorNovedadGeneradaAsync(_novedadGeneradaActual.Id)
+            For Each foto In fotos
+                Dim pic As New PictureBox With {
+                    .Image = Image.FromStream(New MemoryStream(foto.Foto)),
+                    .SizeMode = PictureBoxSizeMode.Zoom,
+                    .Size = New Size(120, 120),
+                    .Margin = New Padding(5),
+                    .BorderStyle = BorderStyle.FixedSingle,
+                    .Tag = foto.Id
+                }
+                flpFotos.Controls.Add(pic)
+            Next
+        End Using
     End Function
 
     Private Async Sub btnAgregarFoto_Click(sender As Object, e As EventArgs) Handles btnAgregarFoto.Click
@@ -114,9 +134,11 @@ Public Class frmNovedades
             If ofd.ShowDialog() = DialogResult.OK Then
                 LoadingHelper.MostrarCargando(Me)
                 Try
-                    For Each archivo In ofd.FileNames
-                        Await _svc.AddFotoAsync(_novedadGeneradaActual.Id, archivo)
-                    Next
+                    Using svc As New NovedadService()
+                        For Each archivo In ofd.FileNames
+                            Await svc.AddFotoAsync(_novedadGeneradaActual.Id, archivo)
+                        Next
+                    End Using
                     Await CargarFotos()
                 Catch ex As Exception
                     MessageBox.Show("Error al agregar foto(s): " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -133,11 +155,16 @@ Public Class frmNovedades
 
 #End Region
 
-#Region "Gestión de Funcionarios y Novedades (Placeholder)"
+#Region "Gestión de Funcionarios y Novedades"
 
-    Private Sub btnNuevaNovedad_Click(sender As Object, e As EventArgs) Handles btnNuevaNovedad.Click
-        MessageBox.Show("Funcionalidad para crear una nueva novedad pendiente de implementación.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
+    Private Async Sub btnNuevaNovedad_Click(sender As Object, e As EventArgs) Handles btnNuevaNovedad.Click
+        Using frm As New frmNovedadCrear()
+            If frm.ShowDialog(Me) = DialogResult.OK Then
+                Await CargarNovedadesAsync() ' Recarga todas las novedades
+            End If
+        End Using
     End Sub
+
 
     Private Sub btnAgregarFuncionario_Click(sender As Object, e As EventArgs) Handles btnAgregarFuncionario.Click
         MessageBox.Show("Funcionalidad para agregar funcionario pendiente de implementación.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)

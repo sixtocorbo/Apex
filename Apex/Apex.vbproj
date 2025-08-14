@@ -459,6 +459,9 @@
     <EmbeddedResource Include="UI\frmNotificaciones.resx">
       <DependentUpon>frmNotificaciones.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmNovedades.resx">
+      <DependentUpon>frmNovedades.vb</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <EntityDeploy Include="Data\ApexModel.edmx">

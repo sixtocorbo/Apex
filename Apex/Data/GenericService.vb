@@ -1,7 +1,10 @@
 ﻿Imports System.Data.Entity
 
+' --- INICIO DE LA CORRECCIÓN ---
+' 1. Se añade "Implements IDisposable" a la declaración de la clase.
 Public Class GenericService(Of T As Class)
-    Implements IGenericService(Of T)
+    Implements IGenericService(Of T), IDisposable
+    ' --- FIN DE LA CORRECCIÓN ---
 
     Protected ReadOnly _unitOfWork As IUnitOfWork
 
@@ -40,4 +43,23 @@ Public Class GenericService(Of T As Class)
     Public Sub RemoveWithoutCommit(entity As T) Implements IGenericService(Of T).RemoveWithoutCommit
         _unitOfWork.Repository(Of T)().Remove(entity)
     End Sub
+
+    ' --- INICIO DE LA CORRECCIÓN ---
+    ' 2. Se implementa el método Dispose para liberar la UnitOfWork.
+    Private disposedValue As Boolean
+
+    Protected Overridable Sub Dispose(disposing As Boolean)
+        If Not disposedValue Then
+            If disposing Then
+                _unitOfWork.Dispose()
+            End If
+            disposedValue = True
+        End If
+    End Sub
+
+    Public Sub Dispose() Implements IDisposable.Dispose
+        Dispose(disposing:=True)
+        GC.SuppressFinalize(Me)
+    End Sub
+    ' --- FIN DE LA CORRECCIÓN ---
 End Class

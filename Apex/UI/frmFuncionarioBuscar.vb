@@ -12,9 +12,44 @@ Imports System.Windows.Forms
 Public Class frmFuncionarioBuscar
     Inherits Form
 
+    '--- INICIO DE LA CORRECCIÓN ---
+    Public Enum ModoApertura
+        Navegacion ' Para ver y editar desde el Dashboard
+        Seleccion  ' Para seleccionar un funcionario y devolverlo
+    End Enum
+
+    Private ReadOnly _modo As ModoApertura
+    '--- FIN DE LA CORRECCIÓN ---
+
     Private Const LIMITE_FILAS As Integer = 500
 
-    Public Property ResultadosFiltrados As List(Of FuncionarioMin)
+    Public ReadOnly Property FuncionarioSeleccionado As FuncionarioMin
+        Get
+            If dgvResultados.CurrentRow IsNot Nothing Then
+                Return CType(dgvResultados.CurrentRow.DataBoundItem, FuncionarioMin)
+            End If
+            Return Nothing
+        End Get
+    End Property
+
+    '--- INICIO DE LA CORRECCIÓN ---
+    ' Constructor original para el modo Navegación (Dashboard)
+    Public Sub New()
+        InitializeComponent()
+        _modo = ModoApertura.Navegacion
+        ' Ocultar los botones de selección en este modo
+        FlowLayoutPanelAcciones.Visible = False
+    End Sub
+
+    ' Nuevo constructor para el modo Selección
+    Public Sub New(modo As ModoApertura)
+        Me.New() ' Llama al constructor sin parámetros primero
+        _modo = modo
+        ' Asegurar que los botones sean visibles si es modo Selección
+        FlowLayoutPanelAcciones.Visible = (_modo = ModoApertura.Seleccion)
+    End Sub
+    '--- FIN DE LA CORRECCIÓN ---
+
 
     Private Sub frmFuncionarioBuscar_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
@@ -73,19 +108,18 @@ Public Class frmFuncionarioBuscar
 
                 If filtro.Length < 3 Then
                     dgvResultados.DataSource = Nothing
-                    ResultadosFiltrados = New List(Of FuncionarioMin)
                     LimpiarDetalle()
                     Return
                 End If
 
                 Dim terminos = filtro.Split(" "c) _
                                      .Where(Function(w) Not String.IsNullOrWhiteSpace(w)) _
-                                    .Select(Function(w) $"""{w}*""")
+                                     .Select(Function(w) $"""{w}*""")
                 Dim expresionFts = String.Join(" AND ", terminos)
 
                 Dim sb As New StringBuilder()
                 sb.AppendLine("SELECT TOP (@limite)")
-                sb.AppendLine("       Id, CI, Nombre")
+                sb.AppendLine("      Id, CI, Nombre")
                 sb.AppendLine("FROM   dbo.Funcionario WITH (NOLOCK)")
                 sb.AppendLine("WHERE  CONTAINS((CI, Nombre), @patron)")
                 sb.AppendLine("ORDER BY Nombre;")
@@ -100,7 +134,6 @@ Public Class frmFuncionarioBuscar
 
                 dgvResultados.DataSource = Nothing
                 dgvResultados.DataSource = lista
-                ResultadosFiltrados = lista
 
                 If lista.Any() Then
                     dgvResultados.ClearSelection()
@@ -182,10 +215,8 @@ Public Class frmFuncionarioBuscar
         Dim id = CInt(dgvResultados.CurrentRow.Cells("Id").Value)
 
         Using uow As New UnitOfWork()
-            ' --- INICIO DE LA CORRECCIÓN ---
-            ' 1. Cargar el funcionario con todas sus relaciones de estado transitorio
             Dim f = Await uow.Repository(Of Funcionario)() _
-                .GetAll() _
+                 .GetAll() _
                 .Include(Function(x) x.Cargo) _
                 .Include(Function(x) x.TipoFuncionario) _
                 .Include(Function(x) x.EstadoTransitorio.Select(Function(et) et.TipoEstadoTransitorio)) _
@@ -198,11 +229,9 @@ Public Class frmFuncionarioBuscar
                 .AsNoTracking() _
                 .FirstOrDefaultAsync(Function(x) x.Id = id)
 
-            ' Doble chequeo por si la selección cambió
             If dgvResultados.CurrentRow Is Nothing OrElse CInt(dgvResultados.CurrentRow.Cells("Id").Value) <> id Then Return
             If f Is Nothing Then Return
 
-            ' 2. Procesar los estados activos en memoria
             Dim fechaActual = Date.Today
             Dim estadosActivos As New List(Of String)
 
@@ -239,9 +268,7 @@ Public Class frmFuncionarioBuscar
                     estadosActivos.Add(et.TipoEstadoTransitorio.Nombre)
                 End If
             Next
-            ' --- FIN DE LA CORRECCIÓN ---
 
-            ' 3. Rellenar los controles de la UI
             lblCI.Text = f.CI
             lblNombreCompleto.Text = f.Nombre
             lblCargo.Text = If(f.Cargo Is Nothing, "-", f.Cargo.Nombre)
@@ -267,14 +294,24 @@ Public Class frmFuncionarioBuscar
         End Using
     End Sub
 
+    ''' <summary>
+    ''' Maneja el doble clic para seleccionar o para abrir la ficha de edición.
+    ''' </summary>
     Private Async Sub OnDgvDoubleClick(sender As Object, e As DataGridViewCellEventArgs)
         If dgvResultados.CurrentRow Is Nothing Then Return
-        Dim id = CInt(dgvResultados.CurrentRow.Cells("Id").Value)
-        Using frm As New frmFuncionarioCrear(id)
-            If frm.ShowDialog() = DialogResult.OK Then
-                Await BuscarAsync()
-            End If
-        End Using
+
+        '--- INICIO DE LA CORRECCIÓN ---
+        If _modo = ModoApertura.Seleccion Then
+            SeleccionarYcerrar()
+        Else ' Modo Navegacion
+            Dim id = CInt(dgvResultados.CurrentRow.Cells("Id").Value)
+            Using frm As New frmFuncionarioCrear(id)
+                If frm.ShowDialog() = DialogResult.OK Then
+                    Await BuscarAsync()
+                End If
+            End Using
+        End If
+        '--- FIN DE LA CORRECCIÓN ---
     End Sub
 
     Private Async Function ObtenerPresenciaAsync(id As Integer, fecha As Date) As Task(Of String)
@@ -306,6 +343,29 @@ Public Class frmFuncionarioBuscar
 
 
 #End Region
+
+#Region "Lógica de Selección"
+
+    Private Sub SeleccionarYcerrar()
+        If FuncionarioSeleccionado IsNot Nothing Then
+            Me.DialogResult = DialogResult.OK
+            Me.Close()
+        Else
+            MessageBox.Show("Por favor, seleccione un funcionario de la lista.", "Selección requerida", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        End If
+    End Sub
+
+    Private Sub btnSeleccionar_Click(sender As Object, e As EventArgs) Handles btnSeleccionar.Click
+        SeleccionarYcerrar()
+    End Sub
+
+    Private Sub btnCancelar_Click(sender As Object, e As EventArgs) Handles btnCancelar.Click
+        Me.DialogResult = DialogResult.Cancel
+        Me.Close()
+    End Sub
+
+#End Region
+
 
 #Region "DTO ligero"
     Public Class FuncionarioMin
