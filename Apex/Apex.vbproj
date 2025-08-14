@@ -67,10 +67,11 @@
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>6BAD9FDF9585FCA6368E00324B260B14A2AFE704</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>05B6ED7A7E2614382840E7EE233F0CD6692D0976</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>Apex_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>
+    </ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
