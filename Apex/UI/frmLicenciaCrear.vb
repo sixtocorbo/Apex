@@ -61,6 +61,24 @@
             Return
         End If
 
+        ' --- INICIO DE LA CORRECCIÓN ---
+        ' Asegurar que el funcionario de la licencia exista en el ComboBox, incluso si está inactivo.
+        Dim funcionariosSource = CType(cboFuncionario.DataSource, List(Of KeyValuePair(Of Integer, String)))
+
+        ' Verificar si el funcionario de la licencia NO está en la lista del combo.
+        If Not funcionariosSource.Any(Function(kvp) kvp.Key = _licencia.FuncionarioId) Then
+            ' Si no está, lo buscamos directamente en la base de datos.
+            Dim funcionarioDeLicencia = Await _svc.UnitOfWork.Repository(Of Funcionario)().GetByIdAsync(_licencia.FuncionarioId)
+            If funcionarioDeLicencia IsNot Nothing Then
+                ' Lo añadimos a la lista, marcándolo como inactivo para claridad del usuario.
+                funcionariosSource.Add(New KeyValuePair(Of Integer, String)(funcionarioDeLicencia.Id, funcionarioDeLicencia.Nombre & " (Inactivo)"))
+                ' Re-asignamos la fuente de datos y la reordenamos para mantener el orden alfabético.
+                cboFuncionario.DataSource = funcionariosSource.OrderBy(Function(kvp) kvp.Value).ToList()
+            End If
+        End If
+        ' --- FIN DE LA CORRECCIÓN ---
+
+        ' Ahora, las asignaciones de valores funcionarán correctamente para cualquier funcionario.
         cboFuncionario.SelectedValue = _licencia.FuncionarioId
         cboTipoLicencia.SelectedValue = _licencia.TipoLicenciaId
         dtpFechaInicio.Value = _licencia.inicio

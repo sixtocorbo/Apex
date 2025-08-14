@@ -1,4 +1,4 @@
-﻿' Reemplaza el contenido de este archivo.
+﻿' Apex/UI/frmDashboard.vb
 Public Class frmDashboard
 
     Private currentBtn As Button
@@ -7,13 +7,14 @@ Public Class frmDashboard
     ' --- Instancias de los formularios para mantener su estado ---
     Private _funcionarioBuscarInstancia As frmFuncionarioBuscar
     Private _filtroAvanzadoInstancia As frmFiltroAvanzado
-
+    Private _gestionInstancia As frmGestion
 
     Public Sub New()
         InitializeComponent()
         ' Asociar los manejadores de eventos a los botones de navegación
         AddHandler btnFuncionarios.Click, AddressOf ActivateButton
         AddHandler btnFiltros.Click, AddressOf ActivateButton
+        AddHandler btnGestion.Click, AddressOf ActivateButton
         AddHandler btnReportes.Click, AddressOf ActivateButton
         AddHandler btnConfiguracion.Click, AddressOf ActivateButton
     End Sub
@@ -42,6 +43,12 @@ Public Class frmDashboard
                     _filtroAvanzadoInstancia = New frmFiltroAvanzado()
                 End If
                 AbrirFormEnPanel(_filtroAvanzadoInstancia)
+
+            Case "btnGestion"
+                If _gestionInstancia Is Nothing OrElse _gestionInstancia.IsDisposed Then
+                    _gestionInstancia = New frmGestion()
+                End If
+                AbrirFormEnPanel(_gestionInstancia)
 
             Case "btnReportes"
                 MessageBox.Show("Formulario de reportes aún no implementado.", "En desarrollo", MessageBoxButtons.OK, MessageBoxIcon.Information)

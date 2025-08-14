@@ -1,0 +1,252 @@
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
+Partial Class frmGestion
+    Inherits System.Windows.Forms.Form
+
+    <System.Diagnostics.DebuggerNonUserCode()>
+    Protected Overrides Sub Dispose(ByVal disposing As Boolean)
+        Try
+            If disposing AndAlso components IsNot Nothing Then
+                components.Dispose()
+            End If
+        Finally
+            MyBase.Dispose(disposing)
+        End Try
+    End Sub
+
+    Private components As System.ComponentModel.IContainer
+
+    <System.Diagnostics.DebuggerStepThrough()>
+    Private Sub InitializeComponent()
+        Me.TabControlGestion = New System.Windows.Forms.TabControl()
+        Me.TabPageLicencias = New System.Windows.Forms.TabPage()
+        Me.dgvLicencias = New System.Windows.Forms.DataGridView()
+        Me.PanelLicencias = New System.Windows.Forms.Panel()
+        Me.btnEliminarLicencia = New System.Windows.Forms.Button()
+        Me.btnEditarLicencia = New System.Windows.Forms.Button()
+        Me.btnNuevaLicencia = New System.Windows.Forms.Button()
+        Me.TabPageNotificaciones = New System.Windows.Forms.TabPage()
+        Me.dgvNotificaciones = New System.Windows.Forms.DataGridView()
+        Me.PanelNotificaciones = New System.Windows.Forms.Panel()
+        Me.btnCambiarEstado = New System.Windows.Forms.Button()
+        Me.btnEliminarNotificacion = New System.Windows.Forms.Button()
+        Me.btnEditarNotificacion = New System.Windows.Forms.Button()
+        Me.btnNuevaNotificacion = New System.Windows.Forms.Button()
+        Me.TabControlGestion.SuspendLayout()
+        Me.TabPageLicencias.SuspendLayout()
+        CType(Me.dgvLicencias, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.PanelLicencias.SuspendLayout()
+        Me.TabPageNotificaciones.SuspendLayout()
+        CType(Me.dgvNotificaciones, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.PanelNotificaciones.SuspendLayout()
+        Me.SuspendLayout()
+        '
+        'TabControlGestion
+        '
+        Me.TabControlGestion.Controls.Add(Me.TabPageLicencias)
+        Me.TabControlGestion.Controls.Add(Me.TabPageNotificaciones)
+        Me.TabControlGestion.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.TabControlGestion.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.TabControlGestion.Location = New System.Drawing.Point(0, 0)
+        Me.TabControlGestion.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.TabControlGestion.Name = "TabControlGestion"
+        Me.TabControlGestion.SelectedIndex = 0
+        Me.TabControlGestion.Size = New System.Drawing.Size(900, 562)
+        Me.TabControlGestion.TabIndex = 0
+        '
+        'TabPageLicencias
+        '
+        Me.TabPageLicencias.Controls.Add(Me.dgvLicencias)
+        Me.TabPageLicencias.Controls.Add(Me.PanelLicencias)
+        Me.TabPageLicencias.Location = New System.Drawing.Point(4, 37)
+        Me.TabPageLicencias.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.TabPageLicencias.Name = "TabPageLicencias"
+        Me.TabPageLicencias.Padding = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.TabPageLicencias.Size = New System.Drawing.Size(892, 521)
+        Me.TabPageLicencias.TabIndex = 0
+        Me.TabPageLicencias.Text = "Licencias"
+        Me.TabPageLicencias.UseVisualStyleBackColor = True
+        '
+        'dgvLicencias
+        '
+        Me.dgvLicencias.AllowUserToAddRows = False
+        Me.dgvLicencias.AllowUserToDeleteRows = False
+        Me.dgvLicencias.AllowUserToResizeColumns = False
+        Me.dgvLicencias.AllowUserToResizeRows = False
+        Me.dgvLicencias.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.dgvLicencias.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.dgvLicencias.Location = New System.Drawing.Point(3, 4)
+        Me.dgvLicencias.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.dgvLicencias.Name = "dgvLicencias"
+        Me.dgvLicencias.ReadOnly = True
+        Me.dgvLicencias.RowHeadersWidth = 51
+        Me.dgvLicencias.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
+        Me.dgvLicencias.Size = New System.Drawing.Size(886, 451)
+        Me.dgvLicencias.TabIndex = 1
+        '
+        'PanelLicencias
+        '
+        Me.PanelLicencias.Controls.Add(Me.btnEliminarLicencia)
+        Me.PanelLicencias.Controls.Add(Me.btnEditarLicencia)
+        Me.PanelLicencias.Controls.Add(Me.btnNuevaLicencia)
+        Me.PanelLicencias.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.PanelLicencias.Location = New System.Drawing.Point(3, 455)
+        Me.PanelLicencias.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.PanelLicencias.Name = "PanelLicencias"
+        Me.PanelLicencias.Size = New System.Drawing.Size(886, 62)
+        Me.PanelLicencias.TabIndex = 0
+        '
+        'btnEliminarLicencia
+        '
+        Me.btnEliminarLicencia.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnEliminarLicencia.Location = New System.Drawing.Point(572, 12)
+        Me.btnEliminarLicencia.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.btnEliminarLicencia.Name = "btnEliminarLicencia"
+        Me.btnEliminarLicencia.Size = New System.Drawing.Size(96, 38)
+        Me.btnEliminarLicencia.TabIndex = 2
+        Me.btnEliminarLicencia.Text = "Eliminar"
+        Me.btnEliminarLicencia.UseVisualStyleBackColor = True
+        '
+        'btnEditarLicencia
+        '
+        Me.btnEditarLicencia.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnEditarLicencia.Location = New System.Drawing.Point(675, 12)
+        Me.btnEditarLicencia.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.btnEditarLicencia.Name = "btnEditarLicencia"
+        Me.btnEditarLicencia.Size = New System.Drawing.Size(96, 38)
+        Me.btnEditarLicencia.TabIndex = 1
+        Me.btnEditarLicencia.Text = "Editar..."
+        Me.btnEditarLicencia.UseVisualStyleBackColor = True
+        '
+        'btnNuevaLicencia
+        '
+        Me.btnNuevaLicencia.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnNuevaLicencia.Location = New System.Drawing.Point(777, 12)
+        Me.btnNuevaLicencia.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.btnNuevaLicencia.Name = "btnNuevaLicencia"
+        Me.btnNuevaLicencia.Size = New System.Drawing.Size(96, 38)
+        Me.btnNuevaLicencia.TabIndex = 0
+        Me.btnNuevaLicencia.Text = "Nueva..."
+        Me.btnNuevaLicencia.UseVisualStyleBackColor = True
+        '
+        'TabPageNotificaciones
+        '
+        Me.TabPageNotificaciones.Controls.Add(Me.dgvNotificaciones)
+        Me.TabPageNotificaciones.Controls.Add(Me.PanelNotificaciones)
+        Me.TabPageNotificaciones.Location = New System.Drawing.Point(4, 37)
+        Me.TabPageNotificaciones.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.TabPageNotificaciones.Name = "TabPageNotificaciones"
+        Me.TabPageNotificaciones.Padding = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.TabPageNotificaciones.Size = New System.Drawing.Size(892, 521)
+        Me.TabPageNotificaciones.TabIndex = 1
+        Me.TabPageNotificaciones.Text = "Notificaciones"
+        Me.TabPageNotificaciones.UseVisualStyleBackColor = True
+        '
+        'dgvNotificaciones
+        '
+        Me.dgvNotificaciones.AllowUserToAddRows = False
+        Me.dgvNotificaciones.AllowUserToDeleteRows = False
+        Me.dgvNotificaciones.AllowUserToResizeColumns = False
+        Me.dgvNotificaciones.AllowUserToResizeRows = False
+        Me.dgvNotificaciones.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.dgvNotificaciones.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.dgvNotificaciones.Location = New System.Drawing.Point(3, 4)
+        Me.dgvNotificaciones.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.dgvNotificaciones.Name = "dgvNotificaciones"
+        Me.dgvNotificaciones.ReadOnly = True
+        Me.dgvNotificaciones.RowHeadersWidth = 51
+        Me.dgvNotificaciones.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
+        Me.dgvNotificaciones.Size = New System.Drawing.Size(886, 451)
+        Me.dgvNotificaciones.TabIndex = 2
+        '
+        'PanelNotificaciones
+        '
+        Me.PanelNotificaciones.Controls.Add(Me.btnCambiarEstado)
+        Me.PanelNotificaciones.Controls.Add(Me.btnEliminarNotificacion)
+        Me.PanelNotificaciones.Controls.Add(Me.btnEditarNotificacion)
+        Me.PanelNotificaciones.Controls.Add(Me.btnNuevaNotificacion)
+        Me.PanelNotificaciones.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.PanelNotificaciones.Location = New System.Drawing.Point(3, 455)
+        Me.PanelNotificaciones.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.PanelNotificaciones.Name = "PanelNotificaciones"
+        Me.PanelNotificaciones.Size = New System.Drawing.Size(886, 62)
+        Me.PanelNotificaciones.TabIndex = 1
+        '
+        'btnCambiarEstado
+        '
+        Me.btnCambiarEstado.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnCambiarEstado.Location = New System.Drawing.Point(417, 12)
+        Me.btnCambiarEstado.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.btnCambiarEstado.Name = "btnCambiarEstado"
+        Me.btnCambiarEstado.Size = New System.Drawing.Size(135, 38)
+        Me.btnCambiarEstado.TabIndex = 3
+        Me.btnCambiarEstado.Text = "Cambiar Estado..."
+        Me.btnCambiarEstado.UseVisualStyleBackColor = True
+        '
+        'btnEliminarNotificacion
+        '
+        Me.btnEliminarNotificacion.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnEliminarNotificacion.Location = New System.Drawing.Point(559, 12)
+        Me.btnEliminarNotificacion.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.btnEliminarNotificacion.Name = "btnEliminarNotificacion"
+        Me.btnEliminarNotificacion.Size = New System.Drawing.Size(96, 38)
+        Me.btnEliminarNotificacion.TabIndex = 2
+        Me.btnEliminarNotificacion.Text = "Eliminar"
+        Me.btnEliminarNotificacion.UseVisualStyleBackColor = True
+        '
+        'btnEditarNotificacion
+        '
+        Me.btnEditarNotificacion.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnEditarNotificacion.Location = New System.Drawing.Point(661, 12)
+        Me.btnEditarNotificacion.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.btnEditarNotificacion.Name = "btnEditarNotificacion"
+        Me.btnEditarNotificacion.Size = New System.Drawing.Size(96, 38)
+        Me.btnEditarNotificacion.TabIndex = 1
+        Me.btnEditarNotificacion.Text = "Editar..."
+        Me.btnEditarNotificacion.UseVisualStyleBackColor = True
+        '
+        'btnNuevaNotificacion
+        '
+        Me.btnNuevaNotificacion.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnNuevaNotificacion.Location = New System.Drawing.Point(764, 12)
+        Me.btnNuevaNotificacion.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.btnNuevaNotificacion.Name = "btnNuevaNotificacion"
+        Me.btnNuevaNotificacion.Size = New System.Drawing.Size(96, 38)
+        Me.btnNuevaNotificacion.TabIndex = 0
+        Me.btnNuevaNotificacion.Text = "Nueva..."
+        Me.btnNuevaNotificacion.UseVisualStyleBackColor = True
+        '
+        'frmGestion
+        '
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.ClientSize = New System.Drawing.Size(900, 562)
+        Me.Controls.Add(Me.TabControlGestion)
+        Me.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.Name = "frmGestion"
+        Me.Text = "Gestión de Licencias y Notificaciones"
+        Me.TabControlGestion.ResumeLayout(False)
+        Me.TabPageLicencias.ResumeLayout(False)
+        CType(Me.dgvLicencias, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.PanelLicencias.ResumeLayout(False)
+        Me.TabPageNotificaciones.ResumeLayout(False)
+        CType(Me.dgvNotificaciones, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.PanelNotificaciones.ResumeLayout(False)
+        Me.ResumeLayout(False)
+
+    End Sub
+
+    Friend WithEvents TabControlGestion As TabControl
+    Friend WithEvents TabPageLicencias As TabPage
+    Friend WithEvents TabPageNotificaciones As TabPage
+    Friend WithEvents PanelLicencias As Panel
+    Friend WithEvents dgvLicencias As DataGridView
+    Friend WithEvents btnEliminarLicencia As Button
+    Friend WithEvents btnEditarLicencia As Button
+    Friend WithEvents btnNuevaLicencia As Button
+    Friend WithEvents PanelNotificaciones As Panel
+    Friend WithEvents btnCambiarEstado As Button
+    Friend WithEvents btnEliminarNotificacion As Button
+    Friend WithEvents btnEditarNotificacion As Button
+    Friend WithEvents btnNuevaNotificacion As Button
+    Friend WithEvents dgvNotificaciones As DataGridView
+End Class

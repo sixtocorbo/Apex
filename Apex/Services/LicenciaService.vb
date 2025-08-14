@@ -11,7 +11,13 @@ Public Class LicenciaService
     Public Sub New(unitOfWork As IUnitOfWork)
         MyBase.New(unitOfWork)
     End Sub
-
+    ' V---- AÑADE ESTA PROPIEDAD ----V
+    Public ReadOnly Property UnitOfWork As IUnitOfWork
+        Get
+            Return _unitOfWork
+        End Get
+    End Property
+    ' ^---- FIN DEL CÓDIGO AÑADIDO ----^
     ' NOTA: La clase DTO 'LicenciaParaVista' ya no es necesaria,
     ' porque la vista y su entidad generada la reemplazan.
 

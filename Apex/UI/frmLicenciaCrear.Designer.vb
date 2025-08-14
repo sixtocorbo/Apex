@@ -77,9 +77,9 @@ Partial Class frmLicenciaCrear
         '
         Me.lblFuncionario.Anchor = System.Windows.Forms.AnchorStyles.Right
         Me.lblFuncionario.AutoSize = True
-        Me.lblFuncionario.Location = New System.Drawing.Point(34, 5)
+        Me.lblFuncionario.Location = New System.Drawing.Point(36, 2)
         Me.lblFuncionario.Name = "lblFuncionario"
-        Me.lblFuncionario.Size = New System.Drawing.Size(89, 20)
+        Me.lblFuncionario.Size = New System.Drawing.Size(108, 25)
         Me.lblFuncionario.TabIndex = 0
         Me.lblFuncionario.Text = "Funcionario:"
         '
@@ -89,18 +89,18 @@ Partial Class frmLicenciaCrear
         Me.cboFuncionario.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend
         Me.cboFuncionario.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems
         Me.cboFuncionario.FormattingEnabled = True
-        Me.cboFuncionario.Location = New System.Drawing.Point(129, 3)
+        Me.cboFuncionario.Location = New System.Drawing.Point(150, 3)
         Me.cboFuncionario.Name = "cboFuncionario"
-        Me.cboFuncionario.Size = New System.Drawing.Size(332, 28)
+        Me.cboFuncionario.Size = New System.Drawing.Size(311, 33)
         Me.cboFuncionario.TabIndex = 1
         '
         'lblTipoLicencia
         '
         Me.lblTipoLicencia.Anchor = System.Windows.Forms.AnchorStyles.Right
         Me.lblTipoLicencia.AutoSize = True
-        Me.lblTipoLicencia.Location = New System.Drawing.Point(3, 35)
+        Me.lblTipoLicencia.Location = New System.Drawing.Point(3, 32)
         Me.lblTipoLicencia.Name = "lblTipoLicencia"
-        Me.lblTipoLicencia.Size = New System.Drawing.Size(120, 20)
+        Me.lblTipoLicencia.Size = New System.Drawing.Size(141, 25)
         Me.lblTipoLicencia.TabIndex = 2
         Me.lblTipoLicencia.Text = "Tipo de Licencia:"
         '
@@ -109,18 +109,18 @@ Partial Class frmLicenciaCrear
         Me.cboTipoLicencia.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboTipoLicencia.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboTipoLicencia.FormattingEnabled = True
-        Me.cboTipoLicencia.Location = New System.Drawing.Point(129, 33)
+        Me.cboTipoLicencia.Location = New System.Drawing.Point(150, 33)
         Me.cboTipoLicencia.Name = "cboTipoLicencia"
-        Me.cboTipoLicencia.Size = New System.Drawing.Size(332, 28)
+        Me.cboTipoLicencia.Size = New System.Drawing.Size(311, 33)
         Me.cboTipoLicencia.TabIndex = 3
         '
         'lblFechaInicio
         '
         Me.lblFechaInicio.Anchor = System.Windows.Forms.AnchorStyles.Right
         Me.lblFechaInicio.AutoSize = True
-        Me.lblFechaInicio.Location = New System.Drawing.Point(33, 65)
+        Me.lblFechaInicio.Location = New System.Drawing.Point(36, 62)
         Me.lblFechaInicio.Name = "lblFechaInicio"
-        Me.lblFechaInicio.Size = New System.Drawing.Size(90, 20)
+        Me.lblFechaInicio.Size = New System.Drawing.Size(108, 25)
         Me.lblFechaInicio.TabIndex = 4
         Me.lblFechaInicio.Text = "Fecha Inicio:"
         '
@@ -128,18 +128,18 @@ Partial Class frmLicenciaCrear
         '
         Me.dtpFechaInicio.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.dtpFechaInicio.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.dtpFechaInicio.Location = New System.Drawing.Point(129, 63)
+        Me.dtpFechaInicio.Location = New System.Drawing.Point(150, 63)
         Me.dtpFechaInicio.Name = "dtpFechaInicio"
-        Me.dtpFechaInicio.Size = New System.Drawing.Size(120, 27)
+        Me.dtpFechaInicio.Size = New System.Drawing.Size(133, 31)
         Me.dtpFechaInicio.TabIndex = 5
         '
         'lblFechaFin
         '
         Me.lblFechaFin.Anchor = System.Windows.Forms.AnchorStyles.Right
         Me.lblFechaFin.AutoSize = True
-        Me.lblFechaFin.Location = New System.Drawing.Point(50, 95)
+        Me.lblFechaFin.Location = New System.Drawing.Point(55, 92)
         Me.lblFechaFin.Name = "lblFechaFin"
-        Me.lblFechaFin.Size = New System.Drawing.Size(73, 20)
+        Me.lblFechaFin.Size = New System.Drawing.Size(89, 25)
         Me.lblFechaFin.TabIndex = 6
         Me.lblFechaFin.Text = "Fecha Fin:"
         '
@@ -147,18 +147,18 @@ Partial Class frmLicenciaCrear
         '
         Me.dtpFechaFin.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.dtpFechaFin.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.dtpFechaFin.Location = New System.Drawing.Point(129, 93)
+        Me.dtpFechaFin.Location = New System.Drawing.Point(150, 93)
         Me.dtpFechaFin.Name = "dtpFechaFin"
-        Me.dtpFechaFin.Size = New System.Drawing.Size(120, 27)
+        Me.dtpFechaFin.Size = New System.Drawing.Size(133, 31)
         Me.dtpFechaFin.TabIndex = 7
         '
         'lblEstado
         '
         Me.lblEstado.Anchor = System.Windows.Forms.AnchorStyles.Right
         Me.lblEstado.AutoSize = True
-        Me.lblEstado.Location = New System.Drawing.Point(66, 125)
+        Me.lblEstado.Location = New System.Drawing.Point(74, 122)
         Me.lblEstado.Name = "lblEstado"
-        Me.lblEstado.Size = New System.Drawing.Size(57, 20)
+        Me.lblEstado.Size = New System.Drawing.Size(70, 25)
         Me.lblEstado.TabIndex = 10
         Me.lblEstado.Text = "Estado:"
         '
@@ -168,29 +168,29 @@ Partial Class frmLicenciaCrear
         Me.cboEstado.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboEstado.FormattingEnabled = True
         Me.cboEstado.Items.AddRange(New Object() {"Aprobada", "Rechazada", "Anulada", "Pendiente"})
-        Me.cboEstado.Location = New System.Drawing.Point(129, 123)
+        Me.cboEstado.Location = New System.Drawing.Point(150, 123)
         Me.cboEstado.Name = "cboEstado"
-        Me.cboEstado.Size = New System.Drawing.Size(332, 28)
+        Me.cboEstado.Size = New System.Drawing.Size(311, 33)
         Me.cboEstado.TabIndex = 11
         '
         'lblComentario
         '
         Me.lblComentario.Anchor = System.Windows.Forms.AnchorStyles.Right
         Me.lblComentario.AutoSize = True
-        Me.lblComentario.Location = New System.Drawing.Point(33, 196)
+        Me.lblComentario.Location = New System.Drawing.Point(35, 193)
         Me.lblComentario.Name = "lblComentario"
-        Me.lblComentario.Size = New System.Drawing.Size(90, 20)
+        Me.lblComentario.Size = New System.Drawing.Size(109, 25)
         Me.lblComentario.TabIndex = 8
         Me.lblComentario.Text = "Comentario:"
         '
         'txtComentario
         '
         Me.txtComentario.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.txtComentario.Location = New System.Drawing.Point(129, 153)
+        Me.txtComentario.Location = New System.Drawing.Point(150, 153)
         Me.txtComentario.Multiline = True
         Me.txtComentario.Name = "txtComentario"
         Me.txtComentario.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.txtComentario.Size = New System.Drawing.Size(332, 106)
+        Me.txtComentario.Size = New System.Drawing.Size(311, 106)
         Me.txtComentario.TabIndex = 9
         '
         'FlowLayoutPanel1
@@ -226,7 +226,7 @@ Partial Class frmLicenciaCrear
         'frmLicenciaCrear
         '
         Me.AcceptButton = Me.btnGuardar
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 20.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 25.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnCancelar
         Me.ClientSize = New System.Drawing.Size(484, 342)

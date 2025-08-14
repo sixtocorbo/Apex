@@ -391,6 +391,12 @@
     <Compile Include="UI\frmFuncionarioEstadoTransitorio.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="UI\frmGestion.Designer.vb">
+      <DependentUpon>frmGestion.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmGestion.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="UI\frmLicenciaCrear.Designer.vb">
       <DependentUpon>frmLicenciaCrear.vb</DependentUpon>
     </Compile>
@@ -428,6 +434,9 @@
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmGestion.resx">
+      <DependentUpon>frmGestion.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmLicenciaCrear.resx">
       <DependentUpon>frmLicenciaCrear.vb</DependentUpon>
