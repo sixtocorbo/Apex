@@ -44,8 +44,8 @@ Public Class frmNovedades
             _novedadGeneradaActual = Await _svc.GetOrCreateNovedadGeneradaAsync(fechaSeleccionada)
 
             ' --- INICIO DE LA CORRECCIÓN ---
-            ' Se llama a la función con el único argumento que espera: la fecha.
-            Dim novedades = Await _svc.GetAllConDetallesAsync(fechaSeleccionada)
+            ' Le pasamos la misma fecha dos veces para cumplir con la firma del método
+            Dim novedades = Await _svc.GetAllConDetallesAsync(fechaSeleccionada, fechaSeleccionada)
             ' --- FIN DE LA CORRECCIÓN ---
 
             dgvNovedades.DataSource = novedades

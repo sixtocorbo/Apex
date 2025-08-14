@@ -26,7 +26,7 @@ Partial Class frmDashboard
         Me.btnConfiguracion = New System.Windows.Forms.Button()
         Me.btnReportes = New System.Windows.Forms.Button()
         Me.btnGestion = New System.Windows.Forms.Button()
-        Me.btnNovedades = New System.Windows.Forms.Button() ' AÑADIDO
+        Me.btnNovedades = New System.Windows.Forms.Button()
         Me.btnFiltros = New System.Windows.Forms.Button()
         Me.btnFuncionarios = New System.Windows.Forms.Button()
         Me.panelLogo = New System.Windows.Forms.Panel()
@@ -42,7 +42,7 @@ Partial Class frmDashboard
         Me.panelNavegacion.Controls.Add(Me.btnConfiguracion)
         Me.panelNavegacion.Controls.Add(Me.btnReportes)
         Me.panelNavegacion.Controls.Add(Me.btnGestion)
-        Me.panelNavegacion.Controls.Add(Me.btnNovedades) ' AÑADIDO
+        Me.panelNavegacion.Controls.Add(Me.btnNovedades)
         Me.panelNavegacion.Controls.Add(Me.btnFiltros)
         Me.panelNavegacion.Controls.Add(Me.btnFuncionarios)
         Me.panelNavegacion.Controls.Add(Me.panelLogo)
@@ -60,7 +60,7 @@ Partial Class frmDashboard
         Me.btnConfiguracion.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnConfiguracion.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnConfiguracion.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnConfiguracion.Location = New System.Drawing.Point(0, 468) ' Orden ajustado
+        Me.btnConfiguracion.Location = New System.Drawing.Point(0, 468)
         Me.btnConfiguracion.Margin = New System.Windows.Forms.Padding(4)
         Me.btnConfiguracion.Name = "btnConfiguracion"
         Me.btnConfiguracion.Padding = New System.Windows.Forms.Padding(16, 0, 0, 0)
@@ -77,7 +77,7 @@ Partial Class frmDashboard
         Me.btnReportes.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnReportes.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnReportes.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnReportes.Location = New System.Drawing.Point(0, 394) ' Orden ajustado
+        Me.btnReportes.Location = New System.Drawing.Point(0, 394)
         Me.btnReportes.Margin = New System.Windows.Forms.Padding(4)
         Me.btnReportes.Name = "btnReportes"
         Me.btnReportes.Padding = New System.Windows.Forms.Padding(16, 0, 0, 0)
@@ -94,7 +94,7 @@ Partial Class frmDashboard
         Me.btnGestion.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnGestion.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnGestion.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnGestion.Location = New System.Drawing.Point(0, 320) ' Orden ajustado
+        Me.btnGestion.Location = New System.Drawing.Point(0, 320)
         Me.btnGestion.Margin = New System.Windows.Forms.Padding(4)
         Me.btnGestion.Name = "btnGestion"
         Me.btnGestion.Padding = New System.Windows.Forms.Padding(16, 0, 0, 0)
@@ -215,5 +215,5 @@ Partial Class frmDashboard
     Friend WithEvents panelContenido As System.Windows.Forms.Panel
     Friend WithEvents btnFiltros As System.Windows.Forms.Button
     Friend WithEvents btnGestion As System.Windows.Forms.Button
-    Friend WithEvents btnNovedades As System.Windows.Forms.Button ' AÑADIDO
+    Friend WithEvents btnNovedades As System.Windows.Forms.Button
 End Class

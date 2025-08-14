@@ -8,14 +8,14 @@ Public Class frmDashboard
     Private _funcionarioBuscarInstancia As frmFuncionarioBuscar
     Private _filtroAvanzadoInstancia As frmFiltroAvanzado
     Private _gestionInstancia As frmGestion
-    Private _novedadesInstancia As frmNovedades ' <-- AÑADIR ESTA LÍNEA
+    Private _novedadesInstancia As frmNovedades
 
     Public Sub New()
         InitializeComponent()
         ' Asociar los manejadores de eventos a los botones de navegación
         AddHandler btnFuncionarios.Click, AddressOf ActivateButton
         AddHandler btnFiltros.Click, AddressOf ActivateButton
-        AddHandler btnNovedades.Click, AddressOf ActivateButton ' <-- AÑADIR ESTA LÍNEA
+        AddHandler btnNovedades.Click, AddressOf ActivateButton
         AddHandler btnGestion.Click, AddressOf ActivateButton
         AddHandler btnReportes.Click, AddressOf ActivateButton
         AddHandler btnConfiguracion.Click, AddressOf ActivateButton
@@ -46,13 +46,11 @@ Public Class frmDashboard
                 End If
                 AbrirFormEnPanel(_filtroAvanzadoInstancia)
 
-            ' V---- AÑADIR ESTE NUEVO CASO ----V
             Case "btnNovedades"
                 If _novedadesInstancia Is Nothing OrElse _novedadesInstancia.IsDisposed Then
                     _novedadesInstancia = New frmNovedades()
                 End If
                 AbrirFormEnPanel(_novedadesInstancia)
-            ' ^---- FIN DEL NUEVO CASO ----^
 
             Case "btnGestion"
                 If _gestionInstancia Is Nothing OrElse _gestionInstancia.IsDisposed Then
