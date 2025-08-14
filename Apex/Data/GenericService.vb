@@ -1,10 +1,8 @@
 ﻿Imports System.Data.Entity
 
-' --- INICIO DE LA CORRECCIÓN ---
-' 1. Se añade "Implements IDisposable" a la declaración de la clase.
+' Se añade "Implements IDisposable"
 Public Class GenericService(Of T As Class)
     Implements IGenericService(Of T), IDisposable
-    ' --- FIN DE LA CORRECCIÓN ---
 
     Protected ReadOnly _unitOfWork As IUnitOfWork
 
@@ -27,7 +25,6 @@ Public Class GenericService(Of T As Class)
     End Function
 
     Public Async Function UpdateAsync(entity As T) As Task Implements IGenericService(Of T).UpdateAsync
-        ' FIX: Explicitly mark the entity as modified before committing changes.
         _unitOfWork.Repository(Of T)().Update(entity)
         Await _unitOfWork.CommitAsync()
     End Function
@@ -39,13 +36,12 @@ Public Class GenericService(Of T As Class)
             Await _unitOfWork.CommitAsync()
         End If
     End Function
-    ' --- IMPLEMENTACIÓN DEL NUEVO MÉTODO ---
+
     Public Sub RemoveWithoutCommit(entity As T) Implements IGenericService(Of T).RemoveWithoutCommit
         _unitOfWork.Repository(Of T)().Remove(entity)
     End Sub
 
-    ' --- INICIO DE LA CORRECCIÓN ---
-    ' 2. Se implementa el método Dispose para liberar la UnitOfWork.
+    ' --- Implementación de IDisposable ---
     Private disposedValue As Boolean
 
     Protected Overridable Sub Dispose(disposing As Boolean)
@@ -61,5 +57,4 @@ Public Class GenericService(Of T As Class)
         Dispose(disposing:=True)
         GC.SuppressFinalize(Me)
     End Sub
-    ' --- FIN DE LA CORRECCIÓN ---
 End Class

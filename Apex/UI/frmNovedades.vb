@@ -166,14 +166,62 @@ Public Class frmNovedades
     End Sub
 
 
-    Private Sub btnAgregarFuncionario_Click(sender As Object, e As EventArgs) Handles btnAgregarFuncionario.Click
-        MessageBox.Show("Funcionalidad para agregar funcionario pendiente de implementación.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
+    ' --- INICIO DE LA CORRECCIÓN ---
+    Private Async Sub btnAgregarFuncionario_Click(sender As Object, e As EventArgs) Handles btnAgregarFuncionario.Click
+        If dgvNovedades.CurrentRow Is Nothing Then
+            MessageBox.Show("Por favor, seleccione una novedad de la lista.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return
+        End If
+
+        Dim novedadSeleccionada = CType(dgvNovedades.CurrentRow.DataBoundItem, vw_NovedadesCompletas)
+        Dim novedadId = novedadSeleccionada.Id
+
+        Using frm As New frmFuncionarioBuscar(frmFuncionarioBuscar.ModoApertura.Seleccion)
+            If frm.ShowDialog(Me) = DialogResult.OK Then
+                If frm.FuncionarioSeleccionado IsNot Nothing Then
+                    Dim funcionarioId = frm.FuncionarioSeleccionado.Id
+                    Try
+                        Using svc As New NovedadService()
+                            Await svc.AgregarFuncionarioANovedadAsync(novedadId, funcionarioId)
+                        End Using
+                        Await MostrarDetalleNovedadSeleccionada()
+                        ' Es necesario recargar la grilla principal porque ahora habrá una nueva fila
+                        Await CargarNovedadesAsync(If(dtpFecha.Checked, dtpFecha.Value.Date, CType(Nothing, Date?)), If(dtpFecha.Checked, dtpFecha.Value.Date, CType(Nothing, Date?)))
+                    Catch ex As Exception
+                        MessageBox.Show("Error al agregar el funcionario: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                    End Try
+                End If
+            End If
+        End Using
     End Sub
 
-    Private Sub btnQuitarFuncionario_Click(sender As Object, e As EventArgs) Handles btnQuitarFuncionario.Click
-        MessageBox.Show("Funcionalidad para quitar funcionario pendiente de implementación.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
-    End Sub
+    Private Async Sub btnQuitarFuncionario_Click(sender As Object, e As EventArgs) Handles btnQuitarFuncionario.Click
+        If dgvNovedades.CurrentRow Is Nothing OrElse lstFuncionarios.SelectedItem Is Nothing Then
+            MessageBox.Show("Por favor, seleccione una novedad y un funcionario de la lista para quitar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return
+        End If
 
+        Dim novedadSeleccionada = CType(dgvNovedades.CurrentRow.DataBoundItem, vw_NovedadesCompletas)
+        Dim funcionarioSeleccionado = CType(lstFuncionarios.SelectedItem, Funcionario)
+
+        Dim novedadId = novedadSeleccionada.Id
+        Dim funcionarioId = funcionarioSeleccionado.Id
+
+        Dim confirmResult = MessageBox.Show($"¿Está seguro de que desea quitar a '{funcionarioSeleccionado.Nombre}' de esta novedad?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
+
+        If confirmResult = DialogResult.Yes Then
+            Try
+                Using svc As New NovedadService()
+                    Await svc.QuitarFuncionarioDeNovedadAsync(novedadId, funcionarioId)
+                End Using
+                ' Recargamos todo para que la fila desaparezca de la grilla principal
+                Await CargarNovedadesAsync(If(dtpFecha.Checked, dtpFecha.Value.Date, CType(Nothing, Date?)), If(dtpFecha.Checked, dtpFecha.Value.Date, CType(Nothing, Date?)))
+            Catch ex As Exception
+                MessageBox.Show("Error al quitar el funcionario: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            End Try
+        End If
+    End Sub
+    ' --- FIN DE LA CORRECCIÓN ---
 #End Region
 
 End Class
