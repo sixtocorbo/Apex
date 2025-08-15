@@ -57,6 +57,7 @@ Public Class frmNotificacionCrear
         cboTipoNotificacion.SelectedIndex = -1
     End Function
 
+
     Private Async Function CargarDatosAsync() As Task
         _notificacion = Await _svc.GetByIdParaEdicionAsync(_idNotificacion)
 
@@ -66,6 +67,26 @@ Public Class frmNotificacionCrear
             Return
         End If
 
+        ' --- INICIO DE LA CORRECCIÓN CLAVE ---
+        ' Asegurar que el funcionario de la notificación exista en el ComboBox, incluso si está inactivo.
+        Dim funcionariosSource = CType(cboFuncionario.DataSource, List(Of KeyValuePair(Of Integer, String)))
+
+        ' Verificar si el funcionario de la notificación NO está en la lista del combo.
+        If Not funcionariosSource.Any(Function(kvp) kvp.Key = _notificacion.FuncionarioId) Then
+            ' Si no está, lo buscamos directamente en la base de datos (usando el servicio actual).
+            Using tempUow As New UnitOfWork()
+                Dim funcionarioDeNotificacion = Await tempUow.Repository(Of Funcionario)().GetByIdAsync(_notificacion.FuncionarioId)
+                If funcionarioDeNotificacion IsNot Nothing Then
+                    ' Lo añadimos a la lista, marcándolo como inactivo para claridad del usuario.
+                    funcionariosSource.Add(New KeyValuePair(Of Integer, String)(funcionarioDeNotificacion.Id, funcionarioDeNotificacion.Nombre & " (Inactivo)"))
+                    ' Re-asignamos la fuente de datos y la reordenamos para mantener el orden alfabético.
+                    cboFuncionario.DataSource = funcionariosSource.OrderBy(Function(kvp) kvp.Value).ToList()
+                End If
+            End Using
+        End If
+        ' --- FIN DE LA CORRECCIÓN CLAVE ---
+
+        ' Ahora, las asignaciones de valores funcionarán correctamente para cualquier funcionario.
         cboFuncionario.SelectedValue = _notificacion.FuncionarioId
         cboTipoNotificacion.SelectedValue = _notificacion.TipoNotificacionId
         dtpFechaProgramada.Value = _notificacion.FechaProgramada

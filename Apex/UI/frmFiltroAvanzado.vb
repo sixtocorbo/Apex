@@ -224,30 +224,36 @@ Partial Public Class frmFiltroAvanzado
 
             For Each kvp In columnasDeseadas
                 If dt.Columns.Contains(kvp.Key) Then
-                    Dim dgvCol As New DataGridViewTextBoxColumn With {
-                    .DataPropertyName = kvp.Key,
-                    .HeaderText = kvp.Value,
-                    .Name = kvp.Key
-                }
-
-                    dgvCol.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-
-                    dgvDatos.Columns.Add(dgvCol)
+                    ' Omitimos explícitamente las columnas de ID aquí también si existieran
+                    If Not kvp.Key.ToLower().EndsWith("id") Then
+                        Dim dgvCol As New DataGridViewTextBoxColumn With {
+                        .DataPropertyName = kvp.Key,
+                        .HeaderText = kvp.Value,
+                        .Name = kvp.Key
+                    }
+                        dgvCol.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+                        dgvDatos.Columns.Add(dgvCol)
+                    End If
                 End If
             Next
         Else
             ' Comportamiento para otros orígenes de datos
             For Each col As DataColumn In dt.Columns
-                Dim dgvCol As New DataGridViewTextBoxColumn With {
-                .DataPropertyName = col.ColumnName,
-                .HeaderText = col.ColumnName,
-                .Name = col.ColumnName,
-                .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells ' Ajuste para otras vistas
-            }
-                If col.DataType = GetType(Date) OrElse col.DataType = GetType(DateTime) Then
-                    dgvCol.DefaultCellStyle.Format = "dd/MM/yyyy"
+                ' --- INICIO DE LA CORRECCIÓN ---
+                ' Ocultamos las columnas que terminan en "Id"
+                If Not col.ColumnName.ToLower().EndsWith("id") Then
+                    ' --- FIN DE LA CORRECCIÓN ---
+                    Dim dgvCol As New DataGridViewTextBoxColumn With {
+                    .DataPropertyName = col.ColumnName,
+                    .HeaderText = col.ColumnName,
+                    .Name = col.ColumnName,
+                    .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells ' Ajuste para otras vistas
+                }
+                    If col.DataType = GetType(Date) OrElse col.DataType = GetType(DateTime) Then
+                        dgvCol.DefaultCellStyle.Format = "dd/MM/yyyy"
+                    End If
+                    dgvDatos.Columns.Add(dgvCol)
                 End If
-                dgvDatos.Columns.Add(dgvCol)
             Next
         End If
     End Sub
@@ -257,7 +263,12 @@ Partial Public Class frmFiltroAvanzado
         lstValores.Items.Clear()
         If dtOriginal IsNot Nothing Then
             For Each col As DataColumn In dtOriginal.Columns
-                lstColumnas.Items.Add(col.ColumnName)
+                ' --- INICIO DE LA CORRECCIÓN ---
+                ' Ocultamos las columnas de Id también en la lista de filtros
+                If Not col.ColumnName.ToLower().EndsWith("id") Then
+                    ' --- FIN DE LA CORRECCIÓN ---
+                    lstColumnas.Items.Add(col.ColumnName)
+                End If
             Next
             If lstColumnas.Items.Count > 0 Then lstColumnas.SelectedIndex = 0
         End If
@@ -508,7 +519,7 @@ Partial Public Class frmFiltroAvanzado
         End Sub
     End Class
 
-    Private Sub btnCopiarCorreos_Click(sender As Object, e As EventArgs) Handles btnCopiarCorreos.Click
+    Private Sub btnCopiarCorreos_Click(sender As Object, e As EventArgs)
         If dvDatos Is Nothing OrElse dvDatos.Count = 0 Then
             MessageBox.Show("No hay datos para procesar.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Return

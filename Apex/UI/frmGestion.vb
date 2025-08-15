@@ -8,18 +8,19 @@ Public Class frmGestion
     Private _notificacionSvc As New NotificacionService()
 
     ' Se ejecuta cuando el formulario se carga
-    Private Async Sub frmGestion_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Private Sub frmGestion_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
         ConfigurarGrillas()
-        ' Cargar los datos de la primera pestaña visible
-        Await CargarDatosLicenciasAsync()
+        ' Ya no se cargan datos al iniciar, se espera la acción del usuario.
     End Sub
 
     ' Se ejecuta cuando el usuario cambia de pestaña
     Private Async Sub TabControlGestion_SelectedIndexChanged(sender As Object, e As EventArgs) Handles TabControlGestion.SelectedIndexChanged
         If TabControlGestion.SelectedTab Is TabPageLicencias Then
-            Await CargarDatosLicenciasAsync()
+            ' No se cargan datos, solo se pone el foco en el campo de búsqueda.
+            txtBusquedaLicencia.Focus()
         ElseIf TabControlGestion.SelectedTab Is TabPageNotificaciones Then
+            ' Para notificaciones mantenemos la carga inicial ya que son menos registros.
             Await CargarDatosNotificacionesAsync()
         End If
     End Sub
@@ -63,7 +64,7 @@ Public Class frmGestion
             .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "TipoNotificacion", .DataPropertyName = "TipoNotificacion", .HeaderText = "Tipo", .Width = 150})
 
             Dim fechaColumn As New DataGridViewTextBoxColumn With {
-                .Name = "FechaProgramada", .DataPropertyName = "FechaProgramada",
+                 .Name = "FechaProgramada", .DataPropertyName = "FechaProgramada",
                 .HeaderText = "Fecha Programada", .Width = 160
             }
             fechaColumn.DefaultCellStyle.Format = "dd/MM/yyyy HH:mm"
@@ -74,10 +75,18 @@ Public Class frmGestion
     End Sub
 
     Private Async Function CargarDatosLicenciasAsync() As Task
+        Dim filtro = txtBusquedaLicencia.Text.Trim()
+
+        ' Si el campo de búsqueda está vacío, se limpia la grilla y no se hace nada más.
+        If String.IsNullOrWhiteSpace(filtro) Then
+            dgvLicencias.DataSource = Nothing
+            Return
+        End If
+
         LoadingHelper.MostrarCargando(Me)
         Try
             dgvLicencias.DataSource = Nothing
-            Dim filtro = txtBusquedaLicencia.Text.Trim()
+            ' La consulta solo se ejecuta si hay un filtro.
             dgvLicencias.DataSource = Await _licenciaSvc.GetAllConDetallesAsync(filtroNombre:=filtro)
         Catch ex As Exception
             MessageBox.Show("Error al cargar licencias: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -129,18 +138,15 @@ Public Class frmGestion
         End Using
     End Sub
 
-    ' Código Corregido y Mejorado
     Private Async Sub btnEditarLicencia_Click(sender As Object, e As EventArgs) Handles btnEditarLicencia.Click
         If dgvLicencias.CurrentRow Is Nothing Then Return
 
-        ' Obtenemos el objeto completo de la fila seleccionada
         Dim licenciaSeleccionada = CType(dgvLicencias.CurrentRow.DataBoundItem, vw_LicenciasCompletas)
         If licenciaSeleccionada Is Nothing Then Return
 
         Dim idSeleccionado = licenciaSeleccionada.Id
         Dim estadoActual = licenciaSeleccionada.Estado
 
-        ' Pasamos el ID y el estado actual al constructor del formulario de edición
         Using frm As New frmLicenciaCrear(idSeleccionado, estadoActual)
             If frm.ShowDialog(Me) = DialogResult.OK Then
                 Await CargarDatosLicenciasAsync()

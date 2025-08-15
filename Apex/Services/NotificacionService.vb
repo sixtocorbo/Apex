@@ -23,20 +23,33 @@ Public Class NotificacionService
     ''' <summary>
     ''' Obtiene notificaciones usando Full-Text Search de forma correcta.
     ''' </summary>
-    Public Async Function GetAllConDetallesAsync(Optional filtroNombreFuncionario As String = "") As Task(Of List(Of vw_NotificacionesCompletas))
-        Dim sqlBuilder As New System.Text.StringBuilder("SELECT * FROM vw_NotificacionesCompletas")
+    Public Async Function GetAllConDetallesAsync(
+        Optional filtroNombreFuncionario As String = "",
+        Optional fechaDesde As Date? = Nothing,
+        Optional fechaHasta As Date? = Nothing
+    ) As Task(Of List(Of vw_NotificacionesCompletas))
+
+        Dim sqlBuilder As New System.Text.StringBuilder("SELECT * FROM vw_NotificacionesCompletas WHERE 1=1")
         Dim parameters As New List(Of Object)
 
-        ' --- INICIO DE LA CORRECCIÓN ---
+        ' --- INICIO DE LA OPTIMIZACIÓN ---
+        If fechaDesde.HasValue Then
+            sqlBuilder.Append(" AND FechaProgramada >= @p" & parameters.Count)
+            parameters.Add(New SqlParameter("@p" & parameters.Count, fechaDesde.Value))
+        End If
+
+        If fechaHasta.HasValue Then
+            sqlBuilder.Append(" AND FechaProgramada <= @p" & parameters.Count)
+            parameters.Add(New SqlParameter("@p" & parameters.Count, fechaHasta.Value))
+        End If
+        ' --- FIN DE LA OPTIMIZACIÓN ---
+
         If Not String.IsNullOrWhiteSpace(filtroNombreFuncionario) Then
             Dim terminos = filtroNombreFuncionario.Split({" "c}, StringSplitOptions.RemoveEmptyEntries).Select(Function(w) $"""{w}*""")
             Dim expresionFts = String.Join(" AND ", terminos)
-
-            ' Se busca en la tabla Funcionario y se usa el resultado para filtrar la vista
-            sqlBuilder.Append($" WHERE FuncionarioId IN (SELECT Id FROM dbo.Funcionario WHERE CONTAINS((Nombre, CI), @p0))")
-            parameters.Add(New SqlParameter("@p0", expresionFts))
+            sqlBuilder.Append($" AND FuncionarioId IN (SELECT Id FROM dbo.Funcionario WHERE CONTAINS((Nombre, CI), @p{parameters.Count}))")
+            parameters.Add(New SqlParameter($"@p{parameters.Count}", expresionFts))
         End If
-        ' --- FIN DE LA CORRECCIÓN ---
 
         sqlBuilder.Append(" ORDER BY FechaProgramada DESC")
 
