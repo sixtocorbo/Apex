@@ -96,9 +96,6 @@ Public Class frmAsistenteImportacion
     End Sub
 
     Private Sub btnPaso1_Siguiente_Click(sender As Object, e As EventArgs) Handles btnPaso1_Siguiente.Click
-        ' --- INICIO DE LA CORRECCIÓN ---
-        ' Esta es la lógica que faltaba. Se verifica si la opción seleccionada
-        ' es "Históricos". Si es así, debe mostrar el panel intermedio (paso 1.5).
 
         If importacionActual = TipoImportacion.Historicos Then
             ' Acción corregida: Muestra el panel para elegir entre "Presentismo" o "Nocturnidad".
