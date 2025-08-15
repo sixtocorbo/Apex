@@ -27,19 +27,19 @@ Public Class ViaticoService
         Dim fechaInicioMesActual = New Date(periodo.Year, periodo.Month, 1)
         Dim fechaFinMesActual = fechaInicioMesActual.AddMonths(1).AddDays(-1)
 
-        ' --- CORRECCIÓN CLAVE: Se añaden todos los Include necesarios y se optimiza la consulta ---
+        ' --- CORRECCIÓN CLAVE: Se incluyen funcionarios que fueron dados de baja en el período ---
         Dim funcionarios = Await _unitOfWork.Repository(Of Funcionario)().GetAll().
-                            Include(Function(f) f.Cargo).
-                            Include(Function(f) f.Seccion).
-                            Include(Function(f) f.Escalafon).
-                            Include(Function(f) f.PuestoTrabajo.TipoViatico).
-                            Where(Function(f) f.Activo AndAlso
-                                              f.Escalafon IsNot Nothing AndAlso
-                                              f.Escalafon.Nombre = "L" AndAlso
-                                              f.PuestoTrabajo IsNot Nothing AndAlso
-                                              f.PuestoTrabajo.TipoViatico IsNot Nothing AndAlso
-                                              f.PuestoTrabajo.TipoViatico.Dias > 0).
-                            ToListAsync()
+            Include(Function(f) f.Cargo).
+            Include(Function(f) f.Seccion).
+            Include(Function(f) f.Escalafon).
+            Include(Function(f) f.PuestoTrabajo.TipoViatico).
+            Where(Function(f) (f.Activo OrElse (Not f.Activo AndAlso f.UpdatedAt.HasValue AndAlso f.UpdatedAt.Value >= fechaInicioMesActual AndAlso f.UpdatedAt.Value <= fechaFinMesActual)) AndAlso
+                              f.Escalafon IsNot Nothing AndAlso
+                              f.Escalafon.Nombre = "L" AndAlso
+                              f.PuestoTrabajo IsNot Nothing AndAlso
+                              f.PuestoTrabajo.TipoViatico IsNot Nothing AndAlso
+                              f.PuestoTrabajo.TipoViatico.Dias > 0).
+            ToListAsync()
 
         If Not funcionarios.Any() Then
             Return New List(Of ViaticoResultadoDTO)() ' Si no hay funcionarios con viático, se devuelve una lista vacía.
@@ -48,14 +48,14 @@ Public Class ViaticoService
         ' --- Se optimiza la consulta de licencias para que solo busque las de los funcionarios relevantes ---
         Dim funcionariosIds = funcionarios.Select(Function(f) f.Id).ToList()
         Dim licenciasMesActual = Await _unitOfWork.Repository(Of HistoricoLicencia)().GetAll().
-                                    Include(Function(l) l.TipoLicencia).
-                                    Where(Function(l) funcionariosIds.Contains(l.FuncionarioId) AndAlso
-                                                      l.TipoLicencia.SuspendeViatico AndAlso
-                                                      l.inicio <= fechaFinMesActual AndAlso
-                                                      l.finaliza >= fechaInicioMesActual AndAlso
-                                                      l.estado IsNot Nothing AndAlso
-                                                      Not {"Rechazado", "Anulado"}.Contains(l.estado.Trim())).
-                                    ToListAsync()
+            Include(Function(l) l.TipoLicencia).
+            Where(Function(l) funcionariosIds.Contains(l.FuncionarioId) AndAlso
+                              l.TipoLicencia.SuspendeViatico AndAlso
+                              l.inicio <= fechaFinMesActual AndAlso
+                              l.finaliza >= fechaInicioMesActual AndAlso
+                              l.estado IsNot Nothing AndAlso
+                              Not {"Rechazado", "Anulado"}.Contains(l.estado.Trim())).
+            ToListAsync()
 
         Dim resultadoFinal As New List(Of ViaticoResultadoDTO)
 
@@ -65,12 +65,21 @@ Public Class ViaticoService
             Dim motivo = "Liquidación normal"
             Dim observaciones = ""
 
-            If func.FechaIngreso >= fechaInicioMesActual AndAlso func.FechaIngreso <= fechaFinMesActual Then
+            If Not func.Activo Then
+                ' --- LÓGICA PARA BAJAS ---
+                Dim diasTrabajados = (func.UpdatedAt.Value.Date - fechaInicioMesActual).Days + 1
+                Dim totalDiasMes = DateTime.DaysInMonth(periodo.Year, periodo.Month)
+                diasAPagar = CInt(Math.Round((diasTrabajados / totalDiasMes) * diasBaseViatico))
+                motivo = "Baja de la unidad"
+
+            ElseIf func.FechaIngreso >= fechaInicioMesActual AndAlso func.FechaIngreso <= fechaFinMesActual Then
+                ' --- LÓGICA PARA ALTAS ---
                 Dim diasEnElMes = (fechaFinMesActual - func.FechaIngreso).Days + 1
                 Dim totalDiasMes = DateTime.DaysInMonth(periodo.Year, periodo.Month)
                 diasAPagar = CInt(Math.Round((diasEnElMes / totalDiasMes) * diasBaseViatico))
                 motivo = "Alta en el período"
             Else
+                ' --- LÓGICA PARA LICENCIAS ---
                 Dim licenciasDelFuncionario = licenciasMesActual.Where(Function(l) l.FuncionarioId = func.Id)
                 If licenciasDelFuncionario.Any() Then
                     Dim diasDeLicenciaEnMes = licenciasDelFuncionario.Sum(Function(l)
@@ -87,18 +96,16 @@ Public Class ViaticoService
                 End If
             End If
 
-            ' Solo se añaden al reporte los funcionarios a los que se les paga algo.
-            If diasAPagar > 0 Then
-                resultadoFinal.Add(New ViaticoResultadoDTO With {
-                    .Grado = If(func.Cargo IsNot Nothing, func.Cargo.Grado, "N/A"),
-                    .Cedula = func.CI,
-                    .NombreFuncionario = func.Nombre,
-                    .DiasAPagar = diasAPagar,
-                    .Motivo = motivo,
-                    .Observaciones = observaciones,
-                    .Seccion = If(func.Seccion IsNot Nothing, func.Seccion.Nombre, "N/A")
-                })
-            End If
+            ' Se añaden todos los movimientos (altas, bajas y liquidaciones normales)
+            resultadoFinal.Add(New ViaticoResultadoDTO With {
+                .Grado = If(func.Cargo IsNot Nothing AndAlso func.Cargo.Grado.HasValue, func.Cargo.Grado.Value.ToString(), "N/A"),
+                .Cedula = func.CI,
+                .NombreFuncionario = func.Nombre,
+                .DiasAPagar = diasAPagar,
+                .Motivo = motivo,
+                .Observaciones = observaciones,
+                .Seccion = If(func.Seccion IsNot Nothing, func.Seccion.Nombre, "N/A")
+            })
         Next
 
         Return resultadoFinal.OrderBy(Function(r) r.Grado).ThenBy(Function(r) r.NombreFuncionario).ToList()
