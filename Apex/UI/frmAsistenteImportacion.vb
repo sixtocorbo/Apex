@@ -10,10 +10,13 @@ Imports ExcelDataReader ' Asegúrate de tener esta librería desde NuGet
 Public Class frmAsistenteImportacion
 
 #Region "Variables y Enums del Formulario"
+
+    ' Enum para saber qué tipo de importación se está realizando
     Private Enum TipoImportacion
         Ninguna
         Licencias
-        Historicos
+        Presentismo
+        Nocturnidad
         Dotaciones
     End Enum
 
@@ -23,14 +26,18 @@ Public Class frmAsistenteImportacion
     Private reporteErrores As New System.Text.StringBuilder()
     Private stopWatch As New Stopwatch()
     Private WithEvents Temporizador As New System.Windows.Forms.Timer()
+
+    ' Listas para reportar nuevos registros creados
     Private newlyCreatedFuncionarios As New List(Of String)()
     Private newlyCreatedTiposLicencia As New List(Of String)()
+
 #End Region
 
 #Region "Navegación y Lógica de Pasos"
+
     Private Sub frmAsistenteImportacion_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
-        Temporizador.Interval = 100
+        Temporizador.Interval = 100 ' Actualiza la UI cada 100 milisegundos
         NavegarPaso(1)
     End Sub
 
@@ -58,9 +65,11 @@ Public Class frmAsistenteImportacion
         gbxNuevosFuncionarios.Visible = False
         gbxNuevosTipos.Visible = False
     End Sub
+
 #End Region
 
 #Region "Paso 1: Selección"
+
     Private Sub pnlCard_Click(sender As Object, e As EventArgs) Handles pnlCardLicencias.Click, pnlCardHistoricos.Click, pnlCardDotaciones.Click
         DeseleccionarCards()
         Dim pnlSeleccionado As Panel = CType(sender, Panel)
@@ -69,7 +78,8 @@ Public Class frmAsistenteImportacion
         If pnlSeleccionado Is pnlCardLicencias Then
             importacionActual = TipoImportacion.Licencias
         ElseIf pnlSeleccionado Is pnlCardHistoricos Then
-            importacionActual = TipoImportacion.Historicos
+            ' Por ahora, "Históricos" se asume como "Presentismo"
+            importacionActual = TipoImportacion.Presentismo
         ElseIf pnlSeleccionado Is pnlCardDotaciones Then
             importacionActual = TipoImportacion.Dotaciones
         End If
@@ -87,9 +97,12 @@ Public Class frmAsistenteImportacion
             Case TipoImportacion.Licencias
                 lblPaso2_Titulo.Text = "Paso 2: Cargar Archivo de Licencias (SGH)"
                 btnDescargarPlantilla.Text = "⬇️ Descargar Plantilla_Licencias.xlsx"
-            Case TipoImportacion.Historicos
+            Case TipoImportacion.Presentismo
                 lblPaso2_Titulo.Text = "Paso 2: Cargar Archivo de Históricos (Presentismo)"
                 btnDescargarPlantilla.Text = "⬇️ Descargar Plantilla_Presentismo.xlsx"
+            Case TipoImportacion.Nocturnidad
+                lblPaso2_Titulo.Text = "Paso 2: Cargar Archivo de Históricos (Nocturnidad)"
+                btnDescargarPlantilla.Text = "⬇️ Descargar Plantilla_Nocturnidad.xlsx"
             Case TipoImportacion.Dotaciones
                 lblPaso2_Titulo.Text = "Paso 2: Cargar Archivo de Dotaciones"
                 btnDescargarPlantilla.Text = "⬇️ Descargar Plantilla_Dotaciones.xlsx"
@@ -107,8 +120,8 @@ Public Class frmAsistenteImportacion
     Private Sub btnDescargarPlantilla_Click(sender As Object, e As EventArgs) Handles btnDescargarPlantilla.Click
         SaveFileDialog1.FileName = btnDescargarPlantilla.Text.Replace("⬇️ Descargar ", "")
         If SaveFileDialog1.ShowDialog() = DialogResult.OK Then
-            ' Lógica para copiar la plantilla desde los recursos del proyecto
-            ' Ejemplo: File.WriteAllBytes(SaveFileDialog1.FileName, My.Resources.Plantilla_Licencias)
+            ' Aquí iría la lógica para copiar la plantilla desde los recursos del proyecto.
+            ' Ejemplo: File.WriteAllBytes(SaveFileDialog1.FileName, My.Resources.Plantilla_Presentismo)
             MessageBox.Show($"Plantilla guardada en: {SaveFileDialog1.FileName}", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
         End If
     End Sub
@@ -189,14 +202,10 @@ Public Class frmAsistenteImportacion
         Try
             registrosImportados = Await Task.Run(Function()
                                                      Select Case importacionActual
-                                                         Case TipoImportacion.Licencias
-                                                             Return ImportarLicencias(datosValidos)
-                                                         Case TipoImportacion.Historicos
-                                                             Return ImportarHistoricos(datosValidos) ' <-- Llamada a la nueva función
-                                                         Case TipoImportacion.Dotaciones
-                                                             Return ImportarDotaciones(datosValidos)
-                                                         Case Else
-                                                             Return 0
+                                                         Case TipoImportacion.Licencias : Return ImportarLicencias(datosValidos)
+                                                         Case TipoImportacion.Presentismo : Return ImportarHistoricos(datosValidos, "Presentismo")
+                                                         Case TipoImportacion.Nocturnidad : Return ImportarHistoricos(datosValidos, "Nocturnidad")
+                                                         Case Else : Return 0
                                                      End Select
                                                  End Function)
         Catch ex As Exception
@@ -212,12 +221,9 @@ Public Class frmAsistenteImportacion
         If errorOcurrido IsNot Nothing Then
             MessageBox.Show($"Error al importar los datos: {errorOcurrido.Message}", "Error de Base de Datos", MessageBoxButtons.OK, MessageBoxIcon.Error)
         Else
-            lblResumenImportados.Text = $"• Registros Importados con Éxito: {registrosImportados}"
-            lblResumenErroresFinal.Text = $"• Registros con Errores Omitidos: {reporteErrores.ToString().Split({Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries).Length}"
-            Dim tiempoTotal As String = stopWatch.Elapsed.ToString("g")
-            lblResumenTiempo.Text = $"• Tiempo Total de la Operación: {tiempoTotal}"
-
-            ' Mostrar listas de nuevos registros si los hay
+            lblResumenImportados.Text = $"• Registros Afectados con Éxito: {registrosImportados}"
+            lblResumenErroresFinal.Text = $"• Filas con Errores Omitidas: {reporteErrores.ToString().Split({Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries).Length}"
+            lblResumenTiempo.Text = $"• Tiempo Total: {stopWatch.Elapsed:g}"
             If newlyCreatedFuncionarios.Any() Then
                 gbxNuevosFuncionarios.Visible = True
                 lstNuevosFuncionarios.DataSource = newlyCreatedFuncionarios
@@ -226,7 +232,6 @@ Public Class frmAsistenteImportacion
                 gbxNuevosTipos.Visible = True
                 lstNuevosTiposLicencia.DataSource = newlyCreatedTiposLicencia
             End If
-
             NavegarPaso(4)
         End If
     End Sub
@@ -246,21 +251,19 @@ Public Class frmAsistenteImportacion
 #Region "Lógica de Negocio, Excel y Cronómetro"
 
     Private Sub Temporizador_Tick(sender As Object, e As EventArgs) Handles Temporizador.Tick
-        If stopWatch.IsRunning Then
-            Dim tiempoTranscurrido As String = stopWatch.Elapsed.ToString("g")
-            lblPaso3_Feedback.Text = $"Importando... Tiempo transcurrido: {tiempoTranscurrido}"
-        End If
+        If stopWatch.IsRunning Then lblPaso3_Feedback.Text = $"Importando... Tiempo: {stopWatch.Elapsed:g}"
     End Sub
 
     Private Function LeerYValidarCabecerasExcel(ruta As String) As DataTable
         reporteErrores.Clear()
         Dim expectedHeaders As List(Of String) = Nothing
-
         Select Case importacionActual
             Case TipoImportacion.Licencias
                 expectedHeaders = New List(Of String) From {"Unidad Ejecutora", "Unidad Organizativa", "CI", "Nombre", "Tipo de Incidencia", "Estado", "Fecha Desde", "Fecha Hasta", "Cantidad", "Cantidad dentro del período", "Unidad", "Afecta a días", "Motivo", "¿Presentó certificado?", "Usuario aprobó/anuló/rechazó", "Fecha aprobación/anulación/rechazo", "Comentario"}
-            Case TipoImportacion.Historicos
+            Case TipoImportacion.Presentismo
                 expectedHeaders = New List(Of String) From {"CI", "AÑO", "MES", "INCIDENCIA", "MINUTOS", "DIAS", "OBSERVACIONES"}
+            Case TipoImportacion.Nocturnidad
+                expectedHeaders = New List(Of String) From {"CI", "AÑO", "MES", "MINUTOS"}
             Case Else
                 reporteErrores.AppendLine("Tipo de importación no reconocido o no implementado.")
                 Return Nothing
@@ -325,7 +328,6 @@ Public Class frmAsistenteImportacion
     Private Function ImportarLicencias(dtSource As DataTable) As Integer
         Dim dtParaSql As DataTable = CrearDataTableParaLicencias(dtSource)
         If dtParaSql Is Nothing OrElse dtParaSql.Rows.Count = 0 Then Return 0
-
         Dim efConnectionString As String = ConfigurationManager.ConnectionStrings("ApexEntities").ConnectionString
         Dim builder As New EntityConnectionStringBuilder(efConnectionString)
         Dim sqlConnectionString As String = builder.ProviderConnectionString
@@ -336,21 +338,39 @@ Public Class frmAsistenteImportacion
                 Dim param As SqlParameter = cmd.Parameters.AddWithValue("@Licencias", dtParaSql)
                 param.SqlDbType = SqlDbType.Structured
                 param.TypeName = "dbo.TipoTablaLicencia"
-
                 Dim outParam As New SqlParameter("@RegistrosAfectados", SqlDbType.Int) With {.Direction = ParameterDirection.Output}
                 cmd.Parameters.Add(outParam)
-
                 conn.Open()
                 cmd.ExecuteNonQuery()
-
-                If outParam.Value IsNot DBNull.Value Then
-                    Return Convert.ToInt32(outParam.Value)
-                End If
+                If outParam.Value IsNot DBNull.Value Then Return Convert.ToInt32(outParam.Value)
             End Using
         End Using
         Return 0
     End Function
 
+    Private Function ImportarHistoricos(dtSource As DataTable, tipo As String) As Integer
+        Dim dtParaSql As DataTable = CrearDataTableParaHistoricos(dtSource, tipo)
+        If dtParaSql Is Nothing OrElse dtParaSql.Rows.Count = 0 Then Return 0
+        Dim efConnectionString = ConfigurationManager.ConnectionStrings("ApexEntities").ConnectionString
+        Dim builder = New EntityConnectionStringBuilder(efConnectionString)
+        Dim sqlConnectionString = builder.ProviderConnectionString
+
+        Using conn As New SqlConnection(sqlConnectionString)
+            Using cmd As New SqlCommand("dbo.usp_Apex_ImportarAgregadosMensuales", conn)
+                cmd.CommandType = CommandType.StoredProcedure
+                cmd.Parameters.AddWithValue("@TipoHistorico", tipo)
+                Dim param = cmd.Parameters.AddWithValue("@Agregados", dtParaSql)
+                param.SqlDbType = SqlDbType.Structured
+                param.TypeName = "dbo.TipoTablaAgregadosMensuales"
+                Dim outParam = New SqlParameter("@RegistrosAfectados", SqlDbType.Int) With {.Direction = ParameterDirection.Output}
+                cmd.Parameters.Add(outParam)
+                conn.Open()
+                cmd.ExecuteNonQuery()
+                If outParam.Value IsNot DBNull.Value Then Return Convert.ToInt32(outParam.Value)
+            End Using
+        End Using
+        Return 0
+    End Function
     Private Function CrearDataTableParaLicencias(dtSource As DataTable) As DataTable
         Dim dtTarget As New DataTable()
         dtTarget.Columns.Add("FuncionarioId", GetType(Integer))
@@ -432,9 +452,83 @@ Public Class frmAsistenteImportacion
         Return dtTarget
     End Function
 
+    Private Function CrearDataTableParaHistoricos(dtSource As DataTable, tipo As String) As DataTable
+        Dim dtTarget As New DataTable()
+        dtTarget.Columns.Add("FuncionarioId", GetType(Integer))
+        dtTarget.Columns.Add("Anio", GetType(Short))
+        dtTarget.Columns.Add("Mes", GetType(Byte))
+        dtTarget.Columns.Add("Minutos", GetType(Integer))
+        dtTarget.Columns.Add("Dias", GetType(Integer))
+        dtTarget.Columns.Add("Incidencia", GetType(String))
+        dtTarget.Columns.Add("Observaciones", GetType(String))
+
+        Dim funcionariosMap As Dictionary(Of String, Integer) = ObtenerMapaFuncionarios()
+        Dim datosAgrupados As New Dictionary(Of String, DataRow)
+
+        For Each sourceRow As DataRow In dtSource.Rows
+            Try
+                Dim ci = sourceRow("CI").ToString().Trim()
+                Dim anio = TryParseShort(sourceRow("AÑO").ToString())
+                Dim mes = TryParseByte(sourceRow("MES").ToString())
+                Dim clave = $"{ci}-{anio}-{mes}"
+
+                If Not funcionariosMap.ContainsKey(ci) Then
+                    reporteErrores.AppendLine($"Fila omitida: La CI '{ci}' no fue encontrada.")
+                    Continue For
+                End If
+
+                If datosAgrupados.ContainsKey(clave) Then
+                    Dim filaExistente = datosAgrupados(clave)
+                    filaExistente("Minutos") = CInt(filaExistente("Minutos")) + CInt(TryParseInt(sourceRow("MINUTOS").ToString()))
+                    If tipo = "Presentismo" Then
+                        filaExistente("Dias") = CInt(filaExistente("Dias")) + CInt(TryParseInt(sourceRow("DIAS").ToString()))
+                        filaExistente("Incidencia") &= "; " & sourceRow("INCIDENCIA")?.ToString()
+                        filaExistente("Observaciones") &= "; " & sourceRow("OBSERVACIONES")?.ToString()
+                    End If
+                Else
+                    Dim newRow = dtTarget.NewRow()
+                    newRow("FuncionarioId") = funcionariosMap(ci)
+                    newRow("Anio") = anio
+                    newRow("Mes") = mes
+                    newRow("Minutos") = TryParseInt(sourceRow("MINUTOS").ToString())
+                    If tipo = "Presentismo" Then
+                        newRow("Dias") = TryParseInt(sourceRow("DIAS").ToString())
+                        newRow("Incidencia") = sourceRow("INCIDENCIA")?.ToString()
+                        newRow("Observaciones") = sourceRow("OBSERVACIONES")?.ToString()
+                    Else
+                        newRow("Dias") = DBNull.Value
+                        newRow("Incidencia") = DBNull.Value
+                        newRow("Observaciones") = DBNull.Value
+                    End If
+                    datosAgrupados.Add(clave, newRow)
+                End If
+            Catch ex As Exception
+                reporteErrores.AppendLine($"Fila omitida (CI: {sourceRow("CI")}): Error - {ex.Message}")
+            End Try
+        Next
+
+        For Each row In datosAgrupados.Values
+            dtTarget.Rows.Add(row)
+        Next
+
+        Return dtTarget
+    End Function
+
     Private Function TryParseInt(value As String) As Object
         Dim number As Integer
         If Integer.TryParse(value, number) Then Return number
+        Return DBNull.Value
+    End Function
+
+    Private Function TryParseShort(value As String) As Object
+        Dim number As Short
+        If Short.TryParse(value, number) Then Return number
+        Return DBNull.Value
+    End Function
+
+    Private Function TryParseByte(value As String) As Object
+        Dim number As Byte
+        If Byte.TryParse(value, number) Then Return number
         Return DBNull.Value
     End Function
 
@@ -485,84 +579,6 @@ Public Class frmAsistenteImportacion
         End Try
     End Function
 
-    Private Function ImportarHistoricos(dtSource As DataTable) As Integer
-        Dim dtParaSql As DataTable = CrearDataTableParaHistoricos(dtSource)
-        If dtParaSql Is Nothing OrElse dtParaSql.Rows.Count = 0 Then Return 0
-
-        Dim efConnectionString As String = ConfigurationManager.ConnectionStrings("ApexEntities").ConnectionString
-        Dim builder As New EntityConnectionStringBuilder(efConnectionString)
-        Dim sqlConnectionString As String = builder.ProviderConnectionString
-
-        Using conn As New SqlConnection(sqlConnectionString)
-            Using cmd As New SqlCommand("dbo.usp_Apex_ImportarAgregadosMensuales", conn)
-                cmd.CommandType = CommandType.StoredProcedure
-                cmd.Parameters.AddWithValue("@TipoHistorico", "Presentismo")
-                Dim param As SqlParameter = cmd.Parameters.AddWithValue("@Agregados", dtParaSql)
-                param.SqlDbType = SqlDbType.Structured
-                param.TypeName = "dbo.TipoTablaAgregadosMensuales"
-
-                Dim outParam As New SqlParameter("@RegistrosAfectados", SqlDbType.Int) With {.Direction = ParameterDirection.Output}
-                cmd.Parameters.Add(outParam)
-
-                conn.Open()
-                cmd.ExecuteNonQuery()
-
-                If outParam.Value IsNot DBNull.Value Then
-                    Return Convert.ToInt32(outParam.Value)
-                End If
-            End Using
-        End Using
-        Return 0
-    End Function
-    Private Function CrearDataTableParaHistoricos(dtSource As DataTable) As DataTable
-        Dim dtTarget As New DataTable()
-        dtTarget.Columns.Add("FuncionarioId", GetType(Integer))
-        dtTarget.Columns.Add("Anio", GetType(Short))
-        dtTarget.Columns.Add("Mes", GetType(Byte))
-        dtTarget.Columns.Add("Minutos", GetType(Integer))
-        dtTarget.Columns.Add("Dias", GetType(Integer))
-        dtTarget.Columns.Add("Incidencia", GetType(String))
-        dtTarget.Columns.Add("Observaciones", GetType(String))
-
-        Dim funcionariosMap As Dictionary(Of String, Integer) = ObtenerMapaFuncionarios()
-
-        For Each sourceRow As DataRow In dtSource.Rows
-            Try
-                Dim ci As String = sourceRow("CI").ToString().Trim()
-
-                If Not funcionariosMap.ContainsKey(ci) Then
-                    ' Para históricos, asumimos que el funcionario DEBE existir. No lo creamos.
-                    reporteErrores.AppendLine($"Fila omitida: La Cédula '{ci}' no fue encontrada en la base de datos.")
-                    Continue For
-                End If
-
-                Dim newRow = dtTarget.NewRow()
-                newRow("FuncionarioId") = funcionariosMap(ci)
-                newRow("Anio") = TryParseShort(sourceRow("AÑO").ToString())
-                newRow("Mes") = TryParseByte(sourceRow("MES").ToString())
-                newRow("Minutos") = TryParseInt(sourceRow("MINUTOS").ToString())
-                newRow("Dias") = TryParseInt(sourceRow("DIAS").ToString())
-                newRow("Incidencia") = sourceRow("INCIDENCIA")?.ToString()
-                newRow("Observaciones") = sourceRow("OBSERVACIONES")?.ToString()
-                dtTarget.Rows.Add(newRow)
-            Catch ex As Exception
-                reporteErrores.AppendLine($"Fila omitida (CI: {sourceRow("CI")}): Error al procesar - {ex.Message}")
-            End Try
-        Next
-        Return dtTarget
-    End Function
-    ' --- NUEVAS FUNCIONES AUXILIARES PARA CONVERSIÓN SEGURA ---
-    Private Function TryParseShort(value As String) As Object
-        Dim number As Short
-        If Short.TryParse(value, number) Then Return number
-        Return DBNull.Value
-    End Function
-
-    Private Function TryParseByte(value As String) As Object
-        Dim number As Byte
-        If Byte.TryParse(value, number) Then Return number
-        Return DBNull.Value
-    End Function
     Private Function ImportarDotaciones(dt As DataTable) As Integer
         MessageBox.Show("Funcionalidad no implementada.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
         Return 0
