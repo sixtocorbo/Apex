@@ -44,6 +44,10 @@ Partial Class frmAsistenteImportacion
         Me.dgvPrevisualizacion = New System.Windows.Forms.DataGridView()
         Me.lblPaso3_Titulo = New System.Windows.Forms.Label()
         Me.pnlPaso4_Resumen = New System.Windows.Forms.Panel()
+        Me.gbxNuevosTipos = New System.Windows.Forms.GroupBox()
+        Me.lstNuevosTiposLicencia = New System.Windows.Forms.ListBox()
+        Me.gbxNuevosFuncionarios = New System.Windows.Forms.GroupBox()
+        Me.lstNuevosFuncionarios = New System.Windows.Forms.ListBox()
         Me.lblResumenTiempo = New System.Windows.Forms.Label()
         Me.btnPaso4_Finalizar = New System.Windows.Forms.Button()
         Me.btnPaso4_OtraVez = New System.Windows.Forms.Button()
@@ -61,6 +65,8 @@ Partial Class frmAsistenteImportacion
         Me.pnlPaso3_Validar.SuspendLayout()
         CType(Me.dgvPrevisualizacion, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.pnlPaso4_Resumen.SuspendLayout()
+        Me.gbxNuevosTipos.SuspendLayout()
+        Me.gbxNuevosFuncionarios.SuspendLayout()
         Me.SuspendLayout()
         '
         'pnlPaso1_Seleccion
@@ -336,6 +342,8 @@ Partial Class frmAsistenteImportacion
         '
         'pnlPaso4_Resumen
         '
+        Me.pnlPaso4_Resumen.Controls.Add(Me.gbxNuevosTipos)
+        Me.pnlPaso4_Resumen.Controls.Add(Me.gbxNuevosFuncionarios)
         Me.pnlPaso4_Resumen.Controls.Add(Me.lblResumenTiempo)
         Me.pnlPaso4_Resumen.Controls.Add(Me.btnPaso4_Finalizar)
         Me.pnlPaso4_Resumen.Controls.Add(Me.btnPaso4_OtraVez)
@@ -346,6 +354,48 @@ Partial Class frmAsistenteImportacion
         Me.pnlPaso4_Resumen.Name = "pnlPaso4_Resumen"
         Me.pnlPaso4_Resumen.Size = New System.Drawing.Size(760, 437)
         Me.pnlPaso4_Resumen.TabIndex = 3
+        '
+        'gbxNuevosTipos
+        '
+        Me.gbxNuevosTipos.Controls.Add(Me.lstNuevosTiposLicencia)
+        Me.gbxNuevosTipos.Location = New System.Drawing.Point(390, 240)
+        Me.gbxNuevosTipos.Name = "gbxNuevosTipos"
+        Me.gbxNuevosTipos.Size = New System.Drawing.Size(320, 140)
+        Me.gbxNuevosTipos.TabIndex = 7
+        Me.gbxNuevosTipos.TabStop = False
+        Me.gbxNuevosTipos.Text = "Nuevos Tipos de Licencia Creados"
+        Me.gbxNuevosTipos.Visible = False
+        '
+        'lstNuevosTiposLicencia
+        '
+        Me.lstNuevosTiposLicencia.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.lstNuevosTiposLicencia.FormattingEnabled = True
+        Me.lstNuevosTiposLicencia.ItemHeight = 20
+        Me.lstNuevosTiposLicencia.Location = New System.Drawing.Point(3, 23)
+        Me.lstNuevosTiposLicencia.Name = "lstNuevosTiposLicencia"
+        Me.lstNuevosTiposLicencia.Size = New System.Drawing.Size(314, 114)
+        Me.lstNuevosTiposLicencia.TabIndex = 0
+        '
+        'gbxNuevosFuncionarios
+        '
+        Me.gbxNuevosFuncionarios.Controls.Add(Me.lstNuevosFuncionarios)
+        Me.gbxNuevosFuncionarios.Location = New System.Drawing.Point(54, 240)
+        Me.gbxNuevosFuncionarios.Name = "gbxNuevosFuncionarios"
+        Me.gbxNuevosFuncionarios.Size = New System.Drawing.Size(320, 140)
+        Me.gbxNuevosFuncionarios.TabIndex = 6
+        Me.gbxNuevosFuncionarios.TabStop = False
+        Me.gbxNuevosFuncionarios.Text = "Nuevos Funcionarios Creados"
+        Me.gbxNuevosFuncionarios.Visible = False
+        '
+        'lstNuevosFuncionarios
+        '
+        Me.lstNuevosFuncionarios.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.lstNuevosFuncionarios.FormattingEnabled = True
+        Me.lstNuevosFuncionarios.ItemHeight = 20
+        Me.lstNuevosFuncionarios.Location = New System.Drawing.Point(3, 23)
+        Me.lstNuevosFuncionarios.Name = "lstNuevosFuncionarios"
+        Me.lstNuevosFuncionarios.Size = New System.Drawing.Size(314, 114)
+        Me.lstNuevosFuncionarios.TabIndex = 0
         '
         'lblResumenTiempo
         '
@@ -442,6 +492,8 @@ Partial Class frmAsistenteImportacion
         CType(Me.dgvPrevisualizacion, System.ComponentModel.ISupportInitialize).EndInit()
         Me.pnlPaso4_Resumen.ResumeLayout(False)
         Me.pnlPaso4_Resumen.PerformLayout()
+        Me.gbxNuevosTipos.ResumeLayout(False)
+        Me.gbxNuevosFuncionarios.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub
@@ -481,4 +533,8 @@ Partial Class frmAsistenteImportacion
     Friend WithEvents SaveFileDialog1 As SaveFileDialog
     Friend WithEvents lblPaso3_Feedback As Label
     Friend WithEvents lblResumenTiempo As Label
+    Friend WithEvents gbxNuevosTipos As GroupBox
+    Friend WithEvents lstNuevosTiposLicencia As ListBox
+    Friend WithEvents gbxNuevosFuncionarios As GroupBox
+    Friend WithEvents lstNuevosFuncionarios As ListBox
 End Class
