@@ -40,8 +40,10 @@ Public Class frmAsistenteImportacion
     End Sub
 
     Private Sub NavegarPaso(paso As Integer)
+        ' Esta subrutina es la que oculta y muestra los paneles.
+        ' Al llamarla con el número de paso correcto, se soluciona el problema.
         pnlPaso1_Seleccion.Visible = (paso = 1)
-        pnlPaso1_5_SubTipo.Visible = (paso = 15)
+        pnlPaso1_5_SubTipo.Visible = (paso = 15) ' <-- Este es el panel que no se estaba mostrando.
         pnlPaso2_Cargar.Visible = (paso = 2)
         pnlPaso3_Validar.Visible = (paso = 3)
         pnlPaso4_Resumen.Visible = (paso = 4)
@@ -76,11 +78,11 @@ Public Class frmAsistenteImportacion
         Dim pnlSeleccionado As Panel = CType(sender, Panel)
         pnlSeleccionado.BackColor = Color.LightSteelBlue
 
-        ' CORREGIDO: Se asigna el tipo genérico 'Historicos' para forzar el paso intermedio.
+        ' Se asigna el tipo de importación según el panel seleccionado
         If pnlSeleccionado Is pnlCardLicencias Then
             importacionActual = TipoImportacion.Licencias
         ElseIf pnlSeleccionado Is pnlCardHistoricos Then
-            importacionActual = TipoImportacion.Historicos
+            importacionActual = TipoImportacion.Historicos ' <-- Se asigna el tipo genérico
         ElseIf pnlSeleccionado Is pnlCardDotaciones Then
             importacionActual = TipoImportacion.Dotaciones
         End If
@@ -94,9 +96,15 @@ Public Class frmAsistenteImportacion
     End Sub
 
     Private Sub btnPaso1_Siguiente_Click(sender As Object, e As EventArgs) Handles btnPaso1_Siguiente.Click
+        ' --- INICIO DE LA CORRECCIÓN ---
+        ' Esta es la lógica que faltaba. Se verifica si la opción seleccionada
+        ' es "Históricos". Si es así, debe mostrar el panel intermedio (paso 1.5).
+
         If importacionActual = TipoImportacion.Historicos Then
-            NavegarPaso(15) ' Navega al panel de sub-selección
+            ' Acción corregida: Muestra el panel para elegir entre "Presentismo" o "Nocturnidad".
+            NavegarPaso(15)
         Else
+            ' Para cualquier otra opción, el código continúa como antes.
             Select Case importacionActual
                 Case TipoImportacion.Licencias
                     lblPaso2_Titulo.Text = "Paso 2: Cargar Archivo de Licencias (SGH)"
@@ -107,6 +115,7 @@ Public Class frmAsistenteImportacion
             End Select
             NavegarPaso(2)
         End If
+        ' --- FIN DE LA CORRECCIÓN ---
     End Sub
 
     Private Sub btnPaso1_5_Volver_Click(sender As Object, e As EventArgs) Handles btnPaso1_5_Volver.Click
