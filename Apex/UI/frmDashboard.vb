@@ -10,6 +10,7 @@ Public Class frmDashboard
     Private _gestionInstancia As frmGestion
     Private _novedadesInstancia As frmNovedades
     Private _viaticosInstancia As frmGestionViaticos
+    Private _importacionInstancia As frmAsistenteImportacion
 
     Public Sub New()
         InitializeComponent()
@@ -18,6 +19,7 @@ Public Class frmDashboard
         AddHandler btnFiltros.Click, AddressOf ActivateButton
         AddHandler btnNovedades.Click, AddressOf ActivateButton
         AddHandler btnGestion.Click, AddressOf ActivateButton
+        AddHandler btnImportacion.Click, AddressOf ActivateButton
         AddHandler btnViaticos.Click, AddressOf ActivateButton
         AddHandler btnReportes.Click, AddressOf ActivateButton
         AddHandler btnConfiguracion.Click, AddressOf ActivateButton
@@ -59,6 +61,12 @@ Public Class frmDashboard
                     _gestionInstancia = New frmGestion()
                 End If
                 AbrirFormEnPanel(_gestionInstancia)
+
+            Case "btnImportacion"
+                If _importacionInstancia Is Nothing OrElse _importacionInstancia.IsDisposed Then
+                    _importacionInstancia = New frmAsistenteImportacion()
+                End If
+                AbrirFormEnPanel(_importacionInstancia)
 
             Case "btnViaticos"
                 If _viaticosInstancia Is Nothing OrElse _viaticosInstancia.IsDisposed Then

@@ -250,7 +250,7 @@
           <Property Name="fecha_actualizado" Type="date" Nullable="false" />
           <Property Name="usuario" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="datos" Type="varchar(max)" />
-          <Property Name="estado" Type="varchar(max)" />
+          <Property Name="estado" Type="varchar" MaxLength="50" />
           <Property Name="Unidad_Ejecutora" Type="varchar(max)" />
           <Property Name="Unidad_Organizativa" Type="varchar(max)" />
           <Property Name="Cantidad" Type="int" />
@@ -1336,6 +1336,11 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_NovedadesCompletas' no tiene def
         <Function Name="RegimenActual" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="true" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" ReturnType="int">
           <Parameter Name="Fecha" Type="date" Mode="In" />
         </Function>
+        <Function Name="usp_Apex_ImportarAgregadosMensuales" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="TipoHistorico" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="usp_Apex_ImportarDotacionFuncionario" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <Function Name="usp_Apex_ImportarLicenciasMasivas" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="usp_CargarHistoricosPolicia" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="usp_DeleteFuncionario" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="FuncionarioId" Type="int" Mode="In" />
@@ -1352,6 +1357,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_NovedadesCompletas' no tiene def
         <Function Name="usp_MigrarLicencias" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="usp_MigrarNotificaciones" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="usp_MigrarNovedadesDesdePersonal" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <Function Name="usp_MigrarPuestosDeTrabajo" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="usp_MigrarUsuarios" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="usp_PresenciaFecha_Apex" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="Fecha" Type="date" Mode="In" />
@@ -2004,7 +2010,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_NovedadesCompletas' no tiene def
           <Property Name="fecha_actualizado" Type="DateTime" Nullable="false" Precision="0" />
           <Property Name="usuario" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="datos" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="estado" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="estado" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Unidad_Ejecutora" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="Unidad_Organizativa" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="Cantidad" Type="Int32" />
@@ -3388,6 +3394,11 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_NovedadesCompletas' no tiene def
             <End Role="RolUsuario" EntitySet="RolUsuario" />
             <End Role="Usuario" EntitySet="Usuario" />
           </AssociationSet>
+          <FunctionImport Name="usp_Apex_ImportarAgregadosMensuales">
+            <Parameter Name="TipoHistorico" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="usp_Apex_ImportarDotacionFuncionario" />
+          <FunctionImport Name="usp_Apex_ImportarLicenciasMasivas" />
           <FunctionImport Name="usp_CargarHistoricosPolicia" />
           <FunctionImport Name="usp_DeleteFuncionario">
             <Parameter Name="FuncionarioId" Mode="In" Type="Int32" />
@@ -3404,6 +3415,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_NovedadesCompletas' no tiene def
           <FunctionImport Name="usp_MigrarLicencias" />
           <FunctionImport Name="usp_MigrarNotificaciones" ReturnType="Collection(Int32)" />
           <FunctionImport Name="usp_MigrarNovedadesDesdePersonal" />
+          <FunctionImport Name="usp_MigrarPuestosDeTrabajo" ReturnType="Collection(ApexModel.usp_MigrarPuestosDeTrabajo_Result)" />
           <FunctionImport Name="usp_MigrarUsuarios" ReturnType="Collection(Int32)" />
           <FunctionImport Name="usp_PresenciaFecha_Apex">
             <Parameter Name="Fecha" Mode="In" Type="DateTime" />
@@ -3419,6 +3431,11 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_NovedadesCompletas' no tiene def
           <Property Type="Int32" Name="AsignacionesInsertadas" Nullable="true" />
           <Property Type="Int32" Name="TotalArmas" Nullable="true" />
           <Property Type="Int32" Name="TotalAsignaciones" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="usp_MigrarPuestosDeTrabajo_Result">
+          <Property Type="Int32" Name="TotalAreas" Nullable="true" />
+          <Property Type="Int32" Name="TotalTiposViatico" Nullable="true" />
+          <Property Type="Int32" Name="TotalPuestos" Nullable="true" />
         </ComplexType>
       </Schema>
     </edmx:ConceptualModels>
@@ -4128,6 +4145,9 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_NovedadesCompletas' no tiene def
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="usp_Apex_ImportarAgregadosMensuales" FunctionName="ApexModel.Store.usp_Apex_ImportarAgregadosMensuales" />
+          <FunctionImportMapping FunctionImportName="usp_Apex_ImportarDotacionFuncionario" FunctionName="ApexModel.Store.usp_Apex_ImportarDotacionFuncionario" />
+          <FunctionImportMapping FunctionImportName="usp_Apex_ImportarLicenciasMasivas" FunctionName="ApexModel.Store.usp_Apex_ImportarLicenciasMasivas" />
           <FunctionImportMapping FunctionImportName="usp_CargarHistoricosPolicia" FunctionName="ApexModel.Store.usp_CargarHistoricosPolicia" />
           <FunctionImportMapping FunctionImportName="usp_DeleteFuncionario" FunctionName="ApexModel.Store.usp_DeleteFuncionario" />
           <FunctionImportMapping FunctionImportName="usp_LimpiarDatosDeApex" FunctionName="ApexModel.Store.usp_LimpiarDatosDeApex" />
@@ -4156,6 +4176,15 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_NovedadesCompletas' no tiene def
           <FunctionImportMapping FunctionImportName="usp_MigrarLicencias" FunctionName="ApexModel.Store.usp_MigrarLicencias" />
           <FunctionImportMapping FunctionImportName="usp_MigrarNotificaciones" FunctionName="ApexModel.Store.usp_MigrarNotificaciones" />
           <FunctionImportMapping FunctionImportName="usp_MigrarNovedadesDesdePersonal" FunctionName="ApexModel.Store.usp_MigrarNovedadesDesdePersonal" />
+          <FunctionImportMapping FunctionImportName="usp_MigrarPuestosDeTrabajo" FunctionName="ApexModel.Store.usp_MigrarPuestosDeTrabajo">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ApexModel.usp_MigrarPuestosDeTrabajo_Result">
+                <ScalarProperty Name="TotalAreas" ColumnName="TotalAreas" />
+                <ScalarProperty Name="TotalTiposViatico" ColumnName="TotalTiposViatico" />
+                <ScalarProperty Name="TotalPuestos" ColumnName="TotalPuestos" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
           <FunctionImportMapping FunctionImportName="usp_MigrarUsuarios" FunctionName="ApexModel.Store.usp_MigrarUsuarios" />
           <FunctionImportMapping FunctionImportName="usp_PresenciaFecha_Apex" FunctionName="ApexModel.Store.usp_PresenciaFecha_Apex" />
           <FunctionImportMapping FunctionImportName="usp_ProcesarEstadoNotificaciones" FunctionName="ApexModel.Store.usp_ProcesarEstadoNotificaciones" />

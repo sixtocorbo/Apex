@@ -1,4 +1,6 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
+﻿' Apex/UI/frmDashboard.Designer.vb
+
+<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class frmDashboard
     Inherits System.Windows.Forms.Form
 
@@ -26,6 +28,7 @@ Partial Class frmDashboard
         Me.btnConfiguracion = New System.Windows.Forms.Button()
         Me.btnReportes = New System.Windows.Forms.Button()
         Me.btnViaticos = New System.Windows.Forms.Button() ' Botón añadido
+        Me.btnImportacion = New System.Windows.Forms.Button() ' Botón nuevo
         Me.btnGestion = New System.Windows.Forms.Button()
         Me.btnNovedades = New System.Windows.Forms.Button()
         Me.btnFiltros = New System.Windows.Forms.Button()
@@ -43,6 +46,7 @@ Partial Class frmDashboard
         Me.panelNavegacion.Controls.Add(Me.btnConfiguracion)
         Me.panelNavegacion.Controls.Add(Me.btnReportes)
         Me.panelNavegacion.Controls.Add(Me.btnViaticos)
+        Me.panelNavegacion.Controls.Add(Me.btnImportacion)
         Me.panelNavegacion.Controls.Add(Me.btnGestion)
         Me.panelNavegacion.Controls.Add(Me.btnNovedades)
         Me.panelNavegacion.Controls.Add(Me.btnFiltros)
@@ -62,7 +66,7 @@ Partial Class frmDashboard
         Me.btnConfiguracion.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnConfiguracion.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnConfiguracion.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnConfiguracion.Location = New System.Drawing.Point(0, 542) ' Ajuste de posición
+        Me.btnConfiguracion.Location = New System.Drawing.Point(0, 616) ' Ajuste de posición
         Me.btnConfiguracion.Margin = New System.Windows.Forms.Padding(4)
         Me.btnConfiguracion.Name = "btnConfiguracion"
         Me.btnConfiguracion.Padding = New System.Windows.Forms.Padding(16, 0, 0, 0)
@@ -79,7 +83,7 @@ Partial Class frmDashboard
         Me.btnReportes.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnReportes.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnReportes.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnReportes.Location = New System.Drawing.Point(0, 468) ' Ajuste de posición
+        Me.btnReportes.Location = New System.Drawing.Point(0, 542) ' Ajuste de posición
         Me.btnReportes.Margin = New System.Windows.Forms.Padding(4)
         Me.btnReportes.Name = "btnReportes"
         Me.btnReportes.Padding = New System.Windows.Forms.Padding(16, 0, 0, 0)
@@ -96,15 +100,32 @@ Partial Class frmDashboard
         Me.btnViaticos.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnViaticos.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnViaticos.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnViaticos.Location = New System.Drawing.Point(0, 394) ' Ajuste de posición
+        Me.btnViaticos.Location = New System.Drawing.Point(0, 468) ' Ajuste de posición
         Me.btnViaticos.Margin = New System.Windows.Forms.Padding(4)
         Me.btnViaticos.Name = "btnViaticos"
         Me.btnViaticos.Padding = New System.Windows.Forms.Padding(16, 0, 0, 0)
         Me.btnViaticos.Size = New System.Drawing.Size(293, 74)
-        Me.btnViaticos.TabIndex = 8 ' Nuevo índice
+        Me.btnViaticos.TabIndex = 8
         Me.btnViaticos.Text = "   💵 Viáticos"
         Me.btnViaticos.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.btnViaticos.UseVisualStyleBackColor = True
+        '
+        'btnImportacion
+        '
+        Me.btnImportacion.Dock = System.Windows.Forms.DockStyle.Top
+        Me.btnImportacion.FlatAppearance.BorderSize = 0
+        Me.btnImportacion.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnImportacion.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnImportacion.ForeColor = System.Drawing.Color.Gainsboro
+        Me.btnImportacion.Location = New System.Drawing.Point(0, 394)
+        Me.btnImportacion.Margin = New System.Windows.Forms.Padding(4)
+        Me.btnImportacion.Name = "btnImportacion"
+        Me.btnImportacion.Padding = New System.Windows.Forms.Padding(16, 0, 0, 0)
+        Me.btnImportacion.Size = New System.Drawing.Size(293, 74)
+        Me.btnImportacion.TabIndex = 9
+        Me.btnImportacion.Text = "   📥 Importar"
+        Me.btnImportacion.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnImportacion.UseVisualStyleBackColor = True
         '
         'btnGestion
         '
@@ -236,4 +257,5 @@ Partial Class frmDashboard
     Friend WithEvents btnGestion As System.Windows.Forms.Button
     Friend WithEvents btnNovedades As System.Windows.Forms.Button
     Friend WithEvents btnViaticos As System.Windows.Forms.Button
+    Friend WithEvents btnImportacion As System.Windows.Forms.Button
 End Class

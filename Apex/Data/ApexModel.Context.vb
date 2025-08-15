@@ -84,6 +84,20 @@ Partial Public Class ApexEntities
     Public Overridable Property vw_NotificacionesCompletas() As DbSet(Of vw_NotificacionesCompletas)
     Public Overridable Property vw_NovedadesCompletas() As DbSet(Of vw_NovedadesCompletas)
 
+    Public Overridable Function usp_Apex_ImportarAgregadosMensuales(tipoHistorico As String) As Integer
+        Dim tipoHistoricoParameter As ObjectParameter = If(tipoHistorico IsNot Nothing, New ObjectParameter("TipoHistorico", tipoHistorico), New ObjectParameter("TipoHistorico", GetType(String)))
+
+        Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_Apex_ImportarAgregadosMensuales", tipoHistoricoParameter)
+    End Function
+
+    Public Overridable Function usp_Apex_ImportarDotacionFuncionario() As Integer
+        Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_Apex_ImportarDotacionFuncionario")
+    End Function
+
+    Public Overridable Function usp_Apex_ImportarLicenciasMasivas() As Integer
+        Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_Apex_ImportarLicenciasMasivas")
+    End Function
+
     Public Overridable Function usp_CargarHistoricosPolicia() As Integer
         Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_CargarHistoricosPolicia")
     End Function
@@ -134,6 +148,10 @@ Partial Public Class ApexEntities
 
     Public Overridable Function usp_MigrarNovedadesDesdePersonal() As Integer
         Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_MigrarNovedadesDesdePersonal")
+    End Function
+
+    Public Overridable Function usp_MigrarPuestosDeTrabajo() As ObjectResult(Of usp_MigrarPuestosDeTrabajo_Result)
+        Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction(Of usp_MigrarPuestosDeTrabajo_Result)("usp_MigrarPuestosDeTrabajo")
     End Function
 
     Public Overridable Function usp_MigrarUsuarios() As ObjectResult(Of Nullable(Of Integer))
