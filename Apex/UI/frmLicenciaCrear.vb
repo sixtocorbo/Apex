@@ -4,6 +4,7 @@
     Private _licencia As HistoricoLicencia
     Private _modo As ModoFormulario
     Private _idLicencia As Integer
+    Private _estadoInicial As String = "" ' Variable para guardar el estado que viene de la grilla (para editar)
 
     Public Enum ModoFormulario
         Crear
@@ -18,28 +19,32 @@
         Me.Text = "Nueva Licencia"
     End Sub
 
-    ' Constructor para Editar
-    Public Sub New(id As Integer)
+    ' Constructor para Editar (modificado para recibir el estado)
+    Public Sub New(id As Integer, Optional estadoActual As String = "")
         Me.New()
         _modo = ModoFormulario.Editar
         _idLicencia = id
+        _estadoInicial = estadoActual ' Guardamos el estado recibido
         Me.Text = "Editar Licencia"
     End Sub
 
+    ' Evento Load modificado
     Private Async Sub frmLicenciaCrear_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
         _svc = New LicenciaService()
-        Await CargarCombosAsync()
+        Await CargarCombosAsync() ' Este método ahora también se encarga del estado
 
         If _modo = ModoFormulario.Editar Then
+            ' Para editar, cargamos todos los datos de la licencia
             Await CargarDatosAsync()
-        Else
-            ' Por defecto, estado "Aprobada" para nuevas licencias
-            cboEstado.SelectedItem = "Aprobada"
+            ' Y nos aseguramos de que el estado que pasamos desde la grilla sea el visible
+            cboEstado.Text = _estadoInicial
         End If
     End Sub
 
+    ' Método CargarCombosAsync modificado
     Private Async Function CargarCombosAsync() As Task
+        ' Carga de Funcionarios y Tipos de Licencia (sin cambios)
         cboFuncionario.DisplayMember = "Value"
         cboFuncionario.ValueMember = "Key"
         cboFuncionario.DataSource = Await _svc.ObtenerFuncionariosParaComboAsync()
@@ -48,9 +53,31 @@
         cboTipoLicencia.ValueMember = "Key"
         cboTipoLicencia.DataSource = Await _svc.ObtenerTiposLicenciaParaComboAsync()
 
-        cboFuncionario.SelectedIndex = -1
-        cboTipoLicencia.SelectedIndex = -1
+        ' *** INICIO DE LA NUEVA LÓGICA PARA EL COMBO DE ESTADOS ***
+        Dim estadosExistentes = Await _svc.ObtenerEstadosDeLicenciaAsync()
+
+        If estadosExistentes IsNot Nothing AndAlso estadosExistentes.Any() Then
+            ' Si hay estados en la base de datos, los usamos
+            cboEstado.DataSource = estadosExistentes
+        Else
+            ' Si no hay ningún registro, usamos una lista por defecto (fallback)
+            cboEstado.Items.Clear()
+            cboEstado.Items.AddRange(New Object() {"Autorizado", "Rechazada", "Anulada", "Pendiente de..."})
+        End If
+
+        ' Para el modo CREAR, establecemos "Autorizado" como valor predeterminado
+        If _modo = ModoFormulario.Crear Then
+            cboEstado.SelectedItem = "Autorizado"
+        End If
+        ' *** FIN DE LA NUEVA LÓGICA ***
+
+        ' Limpiar selección inicial para los otros combos en modo Crear
+        If _modo = ModoFormulario.Crear Then
+            cboFuncionario.SelectedIndex = -1
+            cboTipoLicencia.SelectedIndex = -1
+        End If
     End Function
+
 
     Private Async Function CargarDatosAsync() As Task
         _licencia = Await _svc.GetByIdAsync(_idLicencia)
@@ -83,7 +110,7 @@
         cboTipoLicencia.SelectedValue = _licencia.TipoLicenciaId
         dtpFechaInicio.Value = _licencia.inicio
         dtpFechaFin.Value = _licencia.finaliza
-        cboEstado.SelectedItem = _licencia.estado
+        cboEstado.Text = If(_licencia.estado IsNot Nothing, _licencia.estado.Trim(), String.Empty)
         txtComentario.Text = _licencia.Comentario
     End Function
 

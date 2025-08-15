@@ -167,7 +167,7 @@ Partial Class frmLicenciaCrear
         Me.cboEstado.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboEstado.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboEstado.FormattingEnabled = True
-        Me.cboEstado.Items.AddRange(New Object() {"Aprobada", "Rechazada", "Anulada", "Pendiente"})
+        Me.cboEstado.Items.AddRange(New Object() {"Autorizado", "Rechazada", "Anulado", "Pendiente de Autorización"})
         Me.cboEstado.Location = New System.Drawing.Point(150, 123)
         Me.cboEstado.Name = "cboEstado"
         Me.cboEstado.Size = New System.Drawing.Size(311, 33)

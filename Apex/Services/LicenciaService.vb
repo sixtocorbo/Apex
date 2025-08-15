@@ -76,5 +76,16 @@ Public Class LicenciaService
         .ToListAsync()
         Return funcionariosData.Select(Function(f) New KeyValuePair(Of Integer, String)(f.Id, f.Nombre)).ToList()
     End Function
-
+    ''' <summary>
+    ''' Obtiene una lista de todos los valores de estado únicos de la tabla de licencias.
+    ''' </summary>
+    Public Async Function ObtenerEstadosDeLicenciaAsync() As Task(Of List(Of String))
+        Dim estados = Await _unitOfWork.Repository(Of HistoricoLicencia)().GetAll().AsNoTracking().
+                        Select(Function(lic) lic.estado).
+                        Distinct().
+                        Where(Function(s) s IsNot Nothing AndAlso s <> "").
+                        OrderBy(Function(s) s).
+                        ToListAsync()
+        Return estados
+    End Function
 End Class

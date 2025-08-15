@@ -129,10 +129,19 @@ Public Class frmGestion
         End Using
     End Sub
 
+    ' Código Corregido y Mejorado
     Private Async Sub btnEditarLicencia_Click(sender As Object, e As EventArgs) Handles btnEditarLicencia.Click
         If dgvLicencias.CurrentRow Is Nothing Then Return
-        Dim idSeleccionado = CInt(dgvLicencias.CurrentRow.Cells("Id").Value)
-        Using frm As New frmLicenciaCrear(idSeleccionado)
+
+        ' Obtenemos el objeto completo de la fila seleccionada
+        Dim licenciaSeleccionada = CType(dgvLicencias.CurrentRow.DataBoundItem, vw_LicenciasCompletas)
+        If licenciaSeleccionada Is Nothing Then Return
+
+        Dim idSeleccionado = licenciaSeleccionada.Id
+        Dim estadoActual = licenciaSeleccionada.Estado
+
+        ' Pasamos el ID y el estado actual al constructor del formulario de edición
+        Using frm As New frmLicenciaCrear(idSeleccionado, estadoActual)
             If frm.ShowDialog(Me) = DialogResult.OK Then
                 Await CargarDatosLicenciasAsync()
             End If
