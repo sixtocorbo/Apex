@@ -5,29 +5,24 @@ Imports System.IO
 Public Class frmNovedades
 
     Private _novedadGeneradaActual As NovedadGenerada
+    ' --- INICIO DE LA CORRECCIÓN ---
+    ' Variable para mantener una referencia a la foto seleccionada
+    Private _pictureBoxSeleccionado As PictureBox = Nothing
+    ' --- FIN DE LA CORRECCIÓN ---
+
 
     Private Async Sub frmNovedades_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
         ConfigurarGrilla()
-        ' --- INICIO DE LA CORRECCIÓN ---
-        ' Por defecto, al cargar, no filtramos por fecha para ver todo.
         Await CargarNovedadesAsync()
-        ' --- FIN DE LA CORRECCIÓN ---
     End Sub
 
-    ' --- INICIO DE LA CORRECCIÓN ---
-    ' Este evento ahora llamará al método de carga general
     Private Async Sub dtpFecha_ValueChanged(sender As Object, e As EventArgs) Handles dtpFecha.ValueChanged
-        ' Para mantener la funcionalidad de seleccionar un día y ver sus detalles de fotos, etc.
-        ' actualizamos la NovedadGenerada del día seleccionado.
         Using svc As New NovedadService()
             _novedadGeneradaActual = Await svc.GetOrCreateNovedadGeneradaAsync(dtpFecha.Value.Date)
             Await CargarFotos()
         End Using
-
-        ' Si el usuario quiere filtrar por este día, puede presionar "Nueva Novedad" o un futuro botón de "Filtrar"
     End Sub
-    ' --- FIN DE LA CORRECCIÓN ---
 
     Private Async Sub dgvNovedades_SelectionChanged(sender As Object, e As EventArgs) Handles dgvNovedades.SelectionChanged
         Await MostrarDetalleNovedadSeleccionada()
@@ -50,13 +45,10 @@ Public Class frmNovedades
         End With
     End Sub
 
-    ' --- INICIO DE LA CORRECCIÓN ---
-    ' Renombrado y modificado para aceptar un rango o cargar todo
     Private Async Function CargarNovedadesAsync(Optional fechaDesde As Date? = Nothing, Optional fechaHasta As Date? = Nothing) As Task
         LoadingHelper.MostrarCargando(Me)
         Try
             Using svc As New NovedadService()
-                ' Si no se pasan fechas, el servicio traerá todo.
                 Dim novedades = Await svc.GetAllConDetallesAsync(fechaDesde, fechaHasta)
                 dgvNovedades.DataSource = novedades
             End Using
@@ -71,7 +63,6 @@ Public Class frmNovedades
             LoadingHelper.OcultarCargando(Me)
         End Try
     End Function
-    ' --- FIN DE LA CORRECCIÓN ---
 
 
     Private Sub LimpiarDetalles()
@@ -94,7 +85,6 @@ Public Class frmNovedades
             Dim funcionarios = Await svc.GetFuncionariosPorNovedadAsync(novedadSeleccionada.Id)
             lstFuncionarios.DataSource = funcionarios
 
-            ' Actualizar la NovedadGenerada y las fotos para la novedad seleccionada
             _novedadGeneradaActual = Await svc.GetOrCreateNovedadGeneradaAsync(novedadSeleccionada.Fecha)
             Await CargarFotos()
         End Using
@@ -107,6 +97,7 @@ Public Class frmNovedades
 #Region "Gestión de Fotos"
 
     Private Async Function CargarFotos() As Task
+        _pictureBoxSeleccionado = Nothing ' Limpiar selección al recargar
         flpFotos.Controls.Clear()
         If _novedadGeneradaActual Is Nothing Then Return
 
@@ -119,12 +110,43 @@ Public Class frmNovedades
                     .Size = New Size(120, 120),
                     .Margin = New Padding(5),
                     .BorderStyle = BorderStyle.FixedSingle,
-                    .Tag = foto.Id
+                    .Tag = foto.Id,
+                    .Cursor = Cursors.Hand
                 }
+                AddHandler pic.DoubleClick, AddressOf PictureBox_DoubleClick
+                ' --- INICIO DE LA CORRECCIÓN ---
+                ' Añadimos el manejador para el clic simple
+                AddHandler pic.Click, AddressOf PictureBox_Click
+                ' --- FIN DE LA CORRECCIÓN ---
                 flpFotos.Controls.Add(pic)
             Next
         End Using
     End Function
+
+    ' --- INICIO DE LA CORRECCIÓN ---
+    Private Sub PictureBox_Click(sender As Object, e As EventArgs)
+        Dim picClickeado = TryCast(sender, PictureBox)
+        If picClickeado Is Nothing Then Return
+
+        ' Quitar el resaltado de la foto previamente seleccionada
+        If _pictureBoxSeleccionado IsNot Nothing Then
+            _pictureBoxSeleccionado.BackColor = Color.Transparent
+        End If
+
+        ' Resaltar la nueva foto seleccionada
+        picClickeado.BackColor = Color.DodgerBlue
+        _pictureBoxSeleccionado = picClickeado
+    End Sub
+    ' --- FIN DE LA CORRECCIÓN ---
+
+    Private Sub PictureBox_DoubleClick(sender As Object, e As EventArgs)
+        Dim pic = TryCast(sender, PictureBox)
+        If pic IsNot Nothing AndAlso pic.Image IsNot Nothing Then
+            Using frm As New frmVisorFoto(pic.Image)
+                frm.ShowDialog(Me)
+            End Using
+        End If
+    End Sub
 
     Private Async Sub btnAgregarFoto_Click(sender As Object, e As EventArgs) Handles btnAgregarFoto.Click
         Using ofd As New OpenFileDialog With {
@@ -149,9 +171,30 @@ Public Class frmNovedades
         End Using
     End Sub
 
-    Private Sub btnEliminarFoto_Click(sender As Object, e As EventArgs) Handles btnEliminarFoto.Click
-        MessageBox.Show("Funcionalidad para seleccionar y eliminar fotos pendiente de implementación.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
+    ' --- INICIO DE LA CORRECCIÓN ---
+    Private Async Sub btnEliminarFoto_Click(sender As Object, e As EventArgs) Handles btnEliminarFoto.Click
+        If _pictureBoxSeleccionado Is Nothing Then
+            MessageBox.Show("Por favor, seleccione una foto para eliminar haciendo clic sobre ella.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return
+        End If
+
+        Dim confirmResult = MessageBox.Show("¿Está seguro de que desea eliminar la foto seleccionada?", "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
+        If confirmResult = DialogResult.Yes Then
+            Dim fotoId = CInt(_pictureBoxSeleccionado.Tag)
+            LoadingHelper.MostrarCargando(Me)
+            Try
+                Using svc As New NovedadService()
+                    Await svc.DeleteFotoAsync(fotoId)
+                End Using
+                Await CargarFotos() ' Recarga las fotos para que la eliminada desaparezca
+            Catch ex As Exception
+                MessageBox.Show("Error al eliminar la foto: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Finally
+                LoadingHelper.OcultarCargando(Me)
+            End Try
+        End If
     End Sub
+    ' --- FIN DE LA CORRECCIÓN ---
 
 #End Region
 
@@ -160,13 +203,11 @@ Public Class frmNovedades
     Private Async Sub btnNuevaNovedad_Click(sender As Object, e As EventArgs) Handles btnNuevaNovedad.Click
         Using frm As New frmNovedadCrear()
             If frm.ShowDialog(Me) = DialogResult.OK Then
-                Await CargarNovedadesAsync() ' Recarga todas las novedades
+                Await CargarNovedadesAsync()
             End If
         End Using
     End Sub
 
-
-    ' --- INICIO DE LA CORRECCIÓN ---
     Private Async Sub btnAgregarFuncionario_Click(sender As Object, e As EventArgs) Handles btnAgregarFuncionario.Click
         If dgvNovedades.CurrentRow Is Nothing Then
             MessageBox.Show("Por favor, seleccione una novedad de la lista.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
@@ -186,7 +227,7 @@ Public Class frmNovedades
                         End Using
                         Await MostrarDetalleNovedadSeleccionada()
                         ' Es necesario recargar la grilla principal porque ahora habrá una nueva fila
-                        Await CargarNovedadesAsync(If(dtpFecha.Checked, dtpFecha.Value.Date, CType(Nothing, Date?)), If(dtpFecha.Checked, dtpFecha.Value.Date, CType(Nothing, Date?)))
+                        Await CargarNovedadesAsync()
                     Catch ex As Exception
                         MessageBox.Show("Error al agregar el funcionario: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
                     End Try
@@ -215,13 +256,13 @@ Public Class frmNovedades
                     Await svc.QuitarFuncionarioDeNovedadAsync(novedadId, funcionarioId)
                 End Using
                 ' Recargamos todo para que la fila desaparezca de la grilla principal
-                Await CargarNovedadesAsync(If(dtpFecha.Checked, dtpFecha.Value.Date, CType(Nothing, Date?)), If(dtpFecha.Checked, dtpFecha.Value.Date, CType(Nothing, Date?)))
+                Await CargarNovedadesAsync()
             Catch ex As Exception
                 MessageBox.Show("Error al quitar el funcionario: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
         End If
     End Sub
-    ' --- FIN DE LA CORRECCIÓN ---
+
 #End Region
 
 End Class

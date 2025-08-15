@@ -3,17 +3,14 @@ Imports System.Data.Entity
 Imports System.IO
 
 Public Class NovedadService
-    Inherits GenericService(Of Novedad) ' Hereda la implementación IDisposable
+    Inherits GenericService(Of Novedad)
 
-    ' El constructor Shadows es correcto para que cada servicio tenga su propio UnitOfWork
     Private Shadows ReadOnly _unitOfWork As IUnitOfWork
 
     Public Sub New()
         MyBase.New(New UnitOfWork())
         _unitOfWork = MyBase._unitOfWork
     End Sub
-
-    ' ... (Los demás métodos como GetAllConDetallesAsync, GetOrCreateNovedadGeneradaAsync, etc., permanecen igual)
 
     Public Async Function GetAllConDetallesAsync(Optional fechaInicio As Date? = Nothing, Optional fechaFin As Date? = Nothing) As Task(Of List(Of vw_NovedadesCompletas))
         Dim query = _unitOfWork.Repository(Of vw_NovedadesCompletas)().GetAll().AsNoTracking()
@@ -65,11 +62,32 @@ Public Class NovedadService
             ToListAsync()
     End Function
 
-    ' --- INICIO DE LA CORRECCIÓN: Métodos añadidos ---
+    Public Async Function AddFotoAsync(novedadGeneradaId As Integer, rutaArchivo As String) As Task
+        Dim fotoBytes = File.ReadAllBytes(rutaArchivo)
+        Dim nuevaFoto = New NovedadFoto With {
+            .NovedadGeneradaId = novedadGeneradaId,
+            .Foto = fotoBytes,
+            .FileName = Path.GetFileName(rutaArchivo),
+            .CreatedAt = DateTime.Now
+        }
+        _unitOfWork.Repository(Of NovedadFoto)().Add(nuevaFoto)
+        Await _unitOfWork.CommitAsync()
+    End Function
 
+    ' --- INICIO DE LA CORRECCIÓN ---
     ''' <summary>
-    ''' Asocia un funcionario a una novedad existente.
+    ''' Elimina una foto específica de la base de datos por su ID.
     ''' </summary>
+    Public Async Function DeleteFotoAsync(fotoId As Integer) As Task
+        Dim repo = _unitOfWork.Repository(Of NovedadFoto)()
+        Dim foto = Await repo.GetByIdAsync(fotoId)
+        If foto IsNot Nothing Then
+            repo.Remove(foto)
+            Await _unitOfWork.CommitAsync()
+        End If
+    End Function
+    ' --- FIN DE LA CORRECCIÓN ---
+
     Public Async Function AgregarFuncionarioANovedadAsync(novedadId As Integer, funcionarioId As Integer) As Task
         Dim repo = _unitOfWork.Repository(Of NovedadFuncionario)()
         Dim existe = Await repo.AnyAsync(Function(nf) nf.NovedadId = novedadId AndAlso nf.FuncionarioId = funcionarioId)
@@ -83,37 +101,11 @@ Public Class NovedadService
         End If
     End Function
 
-    ''' <summary>
-    ''' Desvincula un funcionario de una novedad existente.
-    ''' </summary>
     Public Async Function QuitarFuncionarioDeNovedadAsync(novedadId As Integer, funcionarioId As Integer) As Task
         Dim repo = _unitOfWork.Repository(Of NovedadFuncionario)()
         Dim relacion = Await repo.GetByPredicateAsync(Function(nf) nf.NovedadId = novedadId AndAlso nf.FuncionarioId = funcionarioId)
         If relacion IsNot Nothing Then
             repo.Remove(relacion)
-            Await _unitOfWork.CommitAsync()
-        End If
-    End Function
-
-    ' --- FIN DE LA CORRECCIÓN ---
-
-    Public Async Function AddFotoAsync(novedadGeneradaId As Integer, rutaArchivo As String) As Task
-        Dim fotoBytes = File.ReadAllBytes(rutaArchivo)
-        Dim nuevaFoto = New NovedadFoto With {
-            .NovedadGeneradaId = novedadGeneradaId,
-            .Foto = fotoBytes,
-            .FileName = Path.GetFileName(rutaArchivo),
-            .CreatedAt = DateTime.Now
-        }
-        _unitOfWork.Repository(Of NovedadFoto)().Add(nuevaFoto)
-        Await _unitOfWork.CommitAsync()
-    End Function
-
-    Public Async Function DeleteFotoAsync(fotoId As Integer) As Task
-        Dim repo = _unitOfWork.Repository(Of NovedadFoto)()
-        Dim foto = Await repo.GetByIdAsync(fotoId)
-        If foto IsNot Nothing Then
-            repo.Remove(foto)
             Await _unitOfWork.CommitAsync()
         End If
     End Function

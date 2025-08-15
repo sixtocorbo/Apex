@@ -427,6 +427,12 @@
     <Compile Include="UI\frmNovedades.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="UI\frmVisorFoto.Designer.vb">
+      <DependentUpon>frmVisorFoto.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmVisorFoto.vb">
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="UI\frmDashboard.resx">
