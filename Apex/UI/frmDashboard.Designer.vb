@@ -25,6 +25,7 @@ Partial Class frmDashboard
         Me.panelNavegacion = New System.Windows.Forms.Panel()
         Me.btnConfiguracion = New System.Windows.Forms.Button()
         Me.btnReportes = New System.Windows.Forms.Button()
+        Me.btnViaticos = New System.Windows.Forms.Button() ' Botón añadido
         Me.btnGestion = New System.Windows.Forms.Button()
         Me.btnNovedades = New System.Windows.Forms.Button()
         Me.btnFiltros = New System.Windows.Forms.Button()
@@ -41,6 +42,7 @@ Partial Class frmDashboard
         Me.panelNavegacion.BackColor = System.Drawing.Color.FromArgb(CType(CType(51, Byte), Integer), CType(CType(51, Byte), Integer), CType(CType(76, Byte), Integer))
         Me.panelNavegacion.Controls.Add(Me.btnConfiguracion)
         Me.panelNavegacion.Controls.Add(Me.btnReportes)
+        Me.panelNavegacion.Controls.Add(Me.btnViaticos)
         Me.panelNavegacion.Controls.Add(Me.btnGestion)
         Me.panelNavegacion.Controls.Add(Me.btnNovedades)
         Me.panelNavegacion.Controls.Add(Me.btnFiltros)
@@ -60,7 +62,7 @@ Partial Class frmDashboard
         Me.btnConfiguracion.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnConfiguracion.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnConfiguracion.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnConfiguracion.Location = New System.Drawing.Point(0, 468)
+        Me.btnConfiguracion.Location = New System.Drawing.Point(0, 542) ' Ajuste de posición
         Me.btnConfiguracion.Margin = New System.Windows.Forms.Padding(4)
         Me.btnConfiguracion.Name = "btnConfiguracion"
         Me.btnConfiguracion.Padding = New System.Windows.Forms.Padding(16, 0, 0, 0)
@@ -77,7 +79,7 @@ Partial Class frmDashboard
         Me.btnReportes.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnReportes.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnReportes.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnReportes.Location = New System.Drawing.Point(0, 394)
+        Me.btnReportes.Location = New System.Drawing.Point(0, 468) ' Ajuste de posición
         Me.btnReportes.Margin = New System.Windows.Forms.Padding(4)
         Me.btnReportes.Name = "btnReportes"
         Me.btnReportes.Padding = New System.Windows.Forms.Padding(16, 0, 0, 0)
@@ -86,6 +88,23 @@ Partial Class frmDashboard
         Me.btnReportes.Text = "   📈 Reportes"
         Me.btnReportes.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.btnReportes.UseVisualStyleBackColor = True
+        '
+        'btnViaticos
+        '
+        Me.btnViaticos.Dock = System.Windows.Forms.DockStyle.Top
+        Me.btnViaticos.FlatAppearance.BorderSize = 0
+        Me.btnViaticos.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnViaticos.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnViaticos.ForeColor = System.Drawing.Color.Gainsboro
+        Me.btnViaticos.Location = New System.Drawing.Point(0, 394) ' Ajuste de posición
+        Me.btnViaticos.Margin = New System.Windows.Forms.Padding(4)
+        Me.btnViaticos.Name = "btnViaticos"
+        Me.btnViaticos.Padding = New System.Windows.Forms.Padding(16, 0, 0, 0)
+        Me.btnViaticos.Size = New System.Drawing.Size(293, 74)
+        Me.btnViaticos.TabIndex = 8 ' Nuevo índice
+        Me.btnViaticos.Text = "   💵 Viáticos"
+        Me.btnViaticos.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnViaticos.UseVisualStyleBackColor = True
         '
         'btnGestion
         '
@@ -216,4 +235,5 @@ Partial Class frmDashboard
     Friend WithEvents btnFiltros As System.Windows.Forms.Button
     Friend WithEvents btnGestion As System.Windows.Forms.Button
     Friend WithEvents btnNovedades As System.Windows.Forms.Button
+    Friend WithEvents btnViaticos As System.Windows.Forms.Button
 End Class

@@ -9,6 +9,7 @@ Public Class frmDashboard
     Private _filtroAvanzadoInstancia As frmFiltroAvanzado
     Private _gestionInstancia As frmGestion
     Private _novedadesInstancia As frmNovedades
+    Private _viaticosInstancia As frmGestionViaticos
 
     Public Sub New()
         InitializeComponent()
@@ -17,6 +18,7 @@ Public Class frmDashboard
         AddHandler btnFiltros.Click, AddressOf ActivateButton
         AddHandler btnNovedades.Click, AddressOf ActivateButton
         AddHandler btnGestion.Click, AddressOf ActivateButton
+        AddHandler btnViaticos.Click, AddressOf ActivateButton
         AddHandler btnReportes.Click, AddressOf ActivateButton
         AddHandler btnConfiguracion.Click, AddressOf ActivateButton
     End Sub
@@ -57,6 +59,12 @@ Public Class frmDashboard
                     _gestionInstancia = New frmGestion()
                 End If
                 AbrirFormEnPanel(_gestionInstancia)
+
+            Case "btnViaticos"
+                If _viaticosInstancia Is Nothing OrElse _viaticosInstancia.IsDisposed Then
+                    _viaticosInstancia = New frmGestionViaticos()
+                End If
+                AbrirFormEnPanel(_viaticosInstancia)
 
             Case "btnReportes"
                 MessageBox.Show("Formulario de reportes aún no implementado.", "En desarrollo", MessageBoxButtons.OK, MessageBoxIcon.Information)
