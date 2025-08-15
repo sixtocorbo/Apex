@@ -18,6 +18,9 @@ Partial Class frmGestionViaticos
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.pnlFiltros = New System.Windows.Forms.Panel()
+        Me.lblRegistros = New System.Windows.Forms.Label()
+        Me.txtFiltroDinamico = New System.Windows.Forms.TextBox()
+        Me.Label1 = New System.Windows.Forms.Label()
         Me.btnGenerar = New System.Windows.Forms.Button()
         Me.dtpPeriodo = New System.Windows.Forms.DateTimePicker()
         Me.lblPeriodo = New System.Windows.Forms.Label()
@@ -29,14 +32,46 @@ Partial Class frmGestionViaticos
         'pnlFiltros
         '
         Me.pnlFiltros.BackColor = System.Drawing.Color.WhiteSmoke
+        Me.pnlFiltros.Controls.Add(Me.lblRegistros)
+        Me.pnlFiltros.Controls.Add(Me.txtFiltroDinamico)
+        Me.pnlFiltros.Controls.Add(Me.Label1)
         Me.pnlFiltros.Controls.Add(Me.btnGenerar)
         Me.pnlFiltros.Controls.Add(Me.dtpPeriodo)
         Me.pnlFiltros.Controls.Add(Me.lblPeriodo)
         Me.pnlFiltros.Dock = System.Windows.Forms.DockStyle.Top
         Me.pnlFiltros.Location = New System.Drawing.Point(0, 0)
         Me.pnlFiltros.Name = "pnlFiltros"
-        Me.pnlFiltros.Size = New System.Drawing.Size(784, 60)
+        Me.pnlFiltros.Size = New System.Drawing.Size(784, 100)
         Me.pnlFiltros.TabIndex = 0
+        '
+        'lblRegistros
+        '
+        Me.lblRegistros.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lblRegistros.AutoSize = True
+        Me.lblRegistros.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.lblRegistros.Location = New System.Drawing.Point(650, 65)
+        Me.lblRegistros.Name = "lblRegistros"
+        Me.lblRegistros.Size = New System.Drawing.Size(111, 25)
+        Me.lblRegistros.TabIndex = 5
+        Me.lblRegistros.Text = "Registros: 0"
+        '
+        'txtFiltroDinamico
+        '
+        Me.txtFiltroDinamico.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtFiltroDinamico.Location = New System.Drawing.Point(121, 58)
+        Me.txtFiltroDinamico.Name = "txtFiltroDinamico"
+        Me.txtFiltroDinamico.Size = New System.Drawing.Size(417, 31)
+        Me.txtFiltroDinamico.TabIndex = 4
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(12, 62)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(60, 25)
+        Me.Label1.TabIndex = 3
+        Me.Label1.Text = "Filtrar:"
         '
         'btnGenerar
         '
@@ -69,14 +104,16 @@ Partial Class frmGestionViaticos
         '
         Me.dgvResultados.AllowUserToAddRows = False
         Me.dgvResultados.AllowUserToDeleteRows = False
+        Me.dgvResultados.AllowUserToResizeColumns = False
+        Me.dgvResultados.AllowUserToResizeRows = False
         Me.dgvResultados.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvResultados.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.dgvResultados.Location = New System.Drawing.Point(0, 60)
+        Me.dgvResultados.Location = New System.Drawing.Point(0, 100)
         Me.dgvResultados.Name = "dgvResultados"
         Me.dgvResultados.ReadOnly = True
         Me.dgvResultados.RowHeadersWidth = 51
         Me.dgvResultados.RowTemplate.Height = 25
-        Me.dgvResultados.Size = New System.Drawing.Size(784, 301)
+        Me.dgvResultados.Size = New System.Drawing.Size(784, 261)
         Me.dgvResultados.TabIndex = 1
         '
         'frmGestionViaticos
@@ -101,4 +138,7 @@ Partial Class frmGestionViaticos
     Friend WithEvents dtpPeriodo As DateTimePicker
     Friend WithEvents lblPeriodo As Label
     Friend WithEvents dgvResultados As DataGridView
+    Friend WithEvents txtFiltroDinamico As TextBox
+    Friend WithEvents Label1 As Label
+    Friend WithEvents lblRegistros As Label
 End Class

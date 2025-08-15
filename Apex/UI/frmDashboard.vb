@@ -69,8 +69,16 @@ Public Class frmDashboard
             Case "btnReportes"
                 MessageBox.Show("Formulario de reportes aún no implementado.", "En desarrollo", MessageBoxButtons.OK, MessageBoxIcon.Information)
 
+            ' --- INICIO DE LA MODIFICACIÓN ---
             Case "btnConfiguracion"
-                MessageBox.Show("Formulario de configuración aún no implementado.", "En desarrollo", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                ' Se abre el nuevo formulario en lugar de mostrar un mensaje.
+                Using frm As New frmConfiguracion()
+                    frm.ShowDialog(Me)
+                End Using
+                ' Se desactiva el botón después de cerrar el diálogo para que no quede presionado.
+                DisableButton()
+                currentBtn = Nothing
+                ' --- FIN DE LA MODIFICACIÓN ---
         End Select
     End Sub
 

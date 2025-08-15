@@ -27,7 +27,7 @@ Public Class ViaticoService
         Dim fechaInicioMesActual = New Date(periodo.Year, periodo.Month, 1)
         Dim fechaFinMesActual = fechaInicioMesActual.AddMonths(1).AddDays(-1)
 
-        ' --- CORRECCIÓN CLAVE: Se incluyen funcionarios que fueron dados de baja en el período ---
+        ' Se incluyen funcionarios que fueron dados de baja en el período
         Dim funcionarios = Await _unitOfWork.Repository(Of Funcionario)().GetAll().
             Include(Function(f) f.Cargo).
             Include(Function(f) f.Seccion).
@@ -42,10 +42,9 @@ Public Class ViaticoService
             ToListAsync()
 
         If Not funcionarios.Any() Then
-            Return New List(Of ViaticoResultadoDTO)() ' Si no hay funcionarios con viático, se devuelve una lista vacía.
+            Return New List(Of ViaticoResultadoDTO)()
         End If
 
-        ' --- Se optimiza la consulta de licencias para que solo busque las de los funcionarios relevantes ---
         Dim funcionariosIds = funcionarios.Select(Function(f) f.Id).ToList()
         Dim licenciasMesActual = Await _unitOfWork.Repository(Of HistoricoLicencia)().GetAll().
             Include(Function(l) l.TipoLicencia).
@@ -62,24 +61,24 @@ Public Class ViaticoService
         For Each func In funcionarios
             Dim diasBaseViatico = func.PuestoTrabajo.TipoViatico.Dias
             Dim diasAPagar = diasBaseViatico
-            Dim motivo = "Liquidación normal"
+            Dim motivo = "Normal"
             Dim observaciones = ""
 
             If Not func.Activo Then
-                ' --- LÓGICA PARA BAJAS ---
+                ' LÓGICA PARA BAJAS
                 Dim diasTrabajados = (func.UpdatedAt.Value.Date - fechaInicioMesActual).Days + 1
                 Dim totalDiasMes = DateTime.DaysInMonth(periodo.Year, periodo.Month)
                 diasAPagar = CInt(Math.Round((diasTrabajados / totalDiasMes) * diasBaseViatico))
                 motivo = "Baja de la unidad"
 
             ElseIf func.FechaIngreso >= fechaInicioMesActual AndAlso func.FechaIngreso <= fechaFinMesActual Then
-                ' --- LÓGICA PARA ALTAS ---
+                ' LÓGICA PARA ALTAS
                 Dim diasEnElMes = (fechaFinMesActual - func.FechaIngreso).Days + 1
                 Dim totalDiasMes = DateTime.DaysInMonth(periodo.Year, periodo.Month)
                 diasAPagar = CInt(Math.Round((diasEnElMes / totalDiasMes) * diasBaseViatico))
                 motivo = "Alta en el período"
             Else
-                ' --- LÓGICA PARA LICENCIAS ---
+                ' LÓGICA PARA LICENCIAS
                 Dim licenciasDelFuncionario = licenciasMesActual.Where(Function(l) l.FuncionarioId = func.Id)
                 If licenciasDelFuncionario.Any() Then
                     Dim diasDeLicenciaEnMes = licenciasDelFuncionario.Sum(Function(l)
@@ -88,11 +87,15 @@ Public Class ViaticoService
                                                                               Return (finLic - inicioLic).Days + 1
                                                                           End Function)
 
-                    If diasDeLicenciaEnMes > 2 Then
+                    ' --- INICIO DE LA CORRECCIÓN ---
+                    ' Se elimina la restricción de "> 2". Ahora cualquier día de licencia que
+                    ' suspenda viático (es decir, diasDeLicenciaEnMes > 0) anula el pago.
+                    If diasDeLicenciaEnMes > 0 Then
                         diasAPagar = 0
                         motivo = "Baja por licencia"
                         observaciones = String.Join(", ", licenciasDelFuncionario.Select(Function(l) l.TipoLicencia.Nombre).Distinct())
                     End If
+                    ' --- FIN DE LA CORRECCIÓN ---
                 End If
             End If
 

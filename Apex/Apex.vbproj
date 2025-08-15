@@ -339,6 +339,12 @@
     <Compile Include="UI\frmCambiarEstadoNotificacion.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="UI\frmConfiguracion.Designer.vb">
+      <DependentUpon>frmConfiguracion.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmConfiguracion.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="UI\frmDashboard.Designer.vb">
       <DependentUpon>frmDashboard.vb</DependentUpon>
     </Compile>
