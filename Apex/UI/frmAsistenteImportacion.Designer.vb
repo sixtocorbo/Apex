@@ -56,6 +56,13 @@ Partial Class frmAsistenteImportacion
         Me.lblPaso4_Titulo = New System.Windows.Forms.Label()
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog()
+        Me.pnlPaso1_5_SubTipo = New System.Windows.Forms.Panel()
+        Me.btnPaso1_5_Siguiente = New System.Windows.Forms.Button()
+        Me.btnPaso1_5_Volver = New System.Windows.Forms.Button()
+        Me.gbxSubtipo = New System.Windows.Forms.GroupBox()
+        Me.rbNocturnidad = New System.Windows.Forms.RadioButton()
+        Me.rbPresentismo = New System.Windows.Forms.RadioButton()
+        Me.lblPaso1_5_Titulo = New System.Windows.Forms.Label()
         Me.pnlPaso1_Seleccion.SuspendLayout()
         Me.pnlCardDotaciones.SuspendLayout()
         Me.pnlCardHistoricos.SuspendLayout()
@@ -67,6 +74,8 @@ Partial Class frmAsistenteImportacion
         Me.pnlPaso4_Resumen.SuspendLayout()
         Me.gbxNuevosTipos.SuspendLayout()
         Me.gbxNuevosFuncionarios.SuspendLayout()
+        Me.pnlPaso1_5_SubTipo.SuspendLayout()
+        Me.gbxSubtipo.SuspendLayout()
         Me.SuspendLayout()
         '
         'pnlPaso1_Seleccion
@@ -459,6 +468,78 @@ Partial Class frmAsistenteImportacion
         '
         Me.OpenFileDialog1.FileName = "OpenFileDialog1"
         '
+        'pnlPaso1_5_SubTipo
+        '
+        Me.pnlPaso1_5_SubTipo.Controls.Add(Me.btnPaso1_5_Siguiente)
+        Me.pnlPaso1_5_SubTipo.Controls.Add(Me.btnPaso1_5_Volver)
+        Me.pnlPaso1_5_SubTipo.Controls.Add(Me.gbxSubtipo)
+        Me.pnlPaso1_5_SubTipo.Controls.Add(Me.lblPaso1_5_Titulo)
+        Me.pnlPaso1_5_SubTipo.Location = New System.Drawing.Point(12, 12)
+        Me.pnlPaso1_5_SubTipo.Name = "pnlPaso1_5_SubTipo"
+        Me.pnlPaso1_5_SubTipo.Size = New System.Drawing.Size(760, 437)
+        Me.pnlPaso1_5_SubTipo.TabIndex = 4
+        '
+        'btnPaso1_5_Siguiente
+        '
+        Me.btnPaso1_5_Siguiente.Location = New System.Drawing.Point(623, 388)
+        Me.btnPaso1_5_Siguiente.Name = "btnPaso1_5_Siguiente"
+        Me.btnPaso1_5_Siguiente.Size = New System.Drawing.Size(120, 35)
+        Me.btnPaso1_5_Siguiente.TabIndex = 3
+        Me.btnPaso1_5_Siguiente.Text = "Siguiente >"
+        Me.btnPaso1_5_Siguiente.UseVisualStyleBackColor = True
+        '
+        'btnPaso1_5_Volver
+        '
+        Me.btnPaso1_5_Volver.Location = New System.Drawing.Point(26, 388)
+        Me.btnPaso1_5_Volver.Name = "btnPaso1_5_Volver"
+        Me.btnPaso1_5_Volver.Size = New System.Drawing.Size(120, 35)
+        Me.btnPaso1_5_Volver.TabIndex = 2
+        Me.btnPaso1_5_Volver.Text = "< Volver"
+        Me.btnPaso1_5_Volver.UseVisualStyleBackColor = True
+        '
+        'gbxSubtipo
+        '
+        Me.gbxSubtipo.Controls.Add(Me.rbNocturnidad)
+        Me.gbxSubtipo.Controls.Add(Me.rbPresentismo)
+        Me.gbxSubtipo.Location = New System.Drawing.Point(50, 80)
+        Me.gbxSubtipo.Name = "gbxSubtipo"
+        Me.gbxSubtipo.Size = New System.Drawing.Size(660, 100)
+        Me.gbxSubtipo.TabIndex = 1
+        Me.gbxSubtipo.TabStop = False
+        Me.gbxSubtipo.Text = "Tipo de Histórico"
+        '
+        'rbNocturnidad
+        '
+        Me.rbNocturnidad.AutoSize = True
+        Me.rbNocturnidad.Location = New System.Drawing.Point(180, 45)
+        Me.rbNocturnidad.Name = "rbNocturnidad"
+        Me.rbNocturnidad.Size = New System.Drawing.Size(110, 24)
+        Me.rbNocturnidad.TabIndex = 1
+        Me.rbNocturnidad.TabStop = True
+        Me.rbNocturnidad.Text = "Nocturnidad"
+        Me.rbNocturnidad.UseVisualStyleBackColor = True
+        '
+        'rbPresentismo
+        '
+        Me.rbPresentismo.AutoSize = True
+        Me.rbPresentismo.Location = New System.Drawing.Point(30, 45)
+        Me.rbPresentismo.Name = "rbPresentismo"
+        Me.rbPresentismo.Size = New System.Drawing.Size(111, 24)
+        Me.rbPresentismo.TabIndex = 0
+        Me.rbPresentismo.TabStop = True
+        Me.rbPresentismo.Text = "Presentismo"
+        Me.rbPresentismo.UseVisualStyleBackColor = True
+        '
+        'lblPaso1_5_Titulo
+        '
+        Me.lblPaso1_5_Titulo.AutoSize = True
+        Me.lblPaso1_5_Titulo.Font = New System.Drawing.Font("Segoe UI", 14.0!, System.Drawing.FontStyle.Bold)
+        Me.lblPaso1_5_Titulo.Location = New System.Drawing.Point(20, 20)
+        Me.lblPaso1_5_Titulo.Name = "lblPaso1_5_Titulo"
+        Me.lblPaso1_5_Titulo.Size = New System.Drawing.Size(496, 32)
+        Me.lblPaso1_5_Titulo.TabIndex = 0
+        Me.lblPaso1_5_Titulo.Text = "Paso 1.5: Especifique el tipo de histórico"
+        '
         'frmAsistenteImportacion
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 20.0!)
@@ -494,6 +575,10 @@ Partial Class frmAsistenteImportacion
         Me.pnlPaso4_Resumen.PerformLayout()
         Me.gbxNuevosTipos.ResumeLayout(False)
         Me.gbxNuevosFuncionarios.ResumeLayout(False)
+        Me.pnlPaso1_5_SubTipo.ResumeLayout(False)
+        Me.pnlPaso1_5_SubTipo.PerformLayout()
+        Me.gbxSubtipo.ResumeLayout(False)
+        Me.gbxSubtipo.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -537,4 +622,11 @@ Partial Class frmAsistenteImportacion
     Friend WithEvents lstNuevosTiposLicencia As ListBox
     Friend WithEvents gbxNuevosFuncionarios As GroupBox
     Friend WithEvents lstNuevosFuncionarios As ListBox
+    Friend WithEvents pnlPaso1_5_SubTipo As Panel
+    Friend WithEvents btnPaso1_5_Siguiente As Button
+    Friend WithEvents btnPaso1_5_Volver As Button
+    Friend WithEvents gbxSubtipo As GroupBox
+    Friend WithEvents rbNocturnidad As RadioButton
+    Friend WithEvents rbPresentismo As RadioButton
+    Friend WithEvents lblPaso1_5_Titulo As Label
 End Class

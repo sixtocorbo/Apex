@@ -5,16 +5,16 @@ Imports System.Data.Entity.Core.EntityClient
 Imports System.Data.SqlClient
 Imports System.IO
 Imports System.Threading
-Imports ExcelDataReader ' Asegúrate de tener esta librería desde NuGet
+Imports ExcelDataReader
 
 Public Class frmAsistenteImportacion
 
 #Region "Variables y Enums del Formulario"
 
-    ' Enum para saber qué tipo de importación se está realizando
     Private Enum TipoImportacion
         Ninguna
         Licencias
+        Historicos
         Presentismo
         Nocturnidad
         Dotaciones
@@ -26,8 +26,6 @@ Public Class frmAsistenteImportacion
     Private reporteErrores As New System.Text.StringBuilder()
     Private stopWatch As New Stopwatch()
     Private WithEvents Temporizador As New System.Windows.Forms.Timer()
-
-    ' Listas para reportar nuevos registros creados
     Private newlyCreatedFuncionarios As New List(Of String)()
     Private newlyCreatedTiposLicencia As New List(Of String)()
 
@@ -37,12 +35,13 @@ Public Class frmAsistenteImportacion
 
     Private Sub frmAsistenteImportacion_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
-        Temporizador.Interval = 100 ' Actualiza la UI cada 100 milisegundos
+        Temporizador.Interval = 100
         NavegarPaso(1)
     End Sub
 
     Private Sub NavegarPaso(paso As Integer)
         pnlPaso1_Seleccion.Visible = (paso = 1)
+        pnlPaso1_5_SubTipo.Visible = (paso = 15)
         pnlPaso2_Cargar.Visible = (paso = 2)
         pnlPaso3_Validar.Visible = (paso = 3)
         pnlPaso4_Resumen.Visible = (paso = 4)
@@ -64,22 +63,24 @@ Public Class frmAsistenteImportacion
         lblPaso3_Feedback.Text = ""
         gbxNuevosFuncionarios.Visible = False
         gbxNuevosTipos.Visible = False
+        rbPresentismo.Checked = False
+        rbNocturnidad.Checked = False
     End Sub
 
 #End Region
 
-#Region "Paso 1: Selección"
+#Region "Paso 1 y 1.5: Selección"
 
     Private Sub pnlCard_Click(sender As Object, e As EventArgs) Handles pnlCardLicencias.Click, pnlCardHistoricos.Click, pnlCardDotaciones.Click
         DeseleccionarCards()
         Dim pnlSeleccionado As Panel = CType(sender, Panel)
         pnlSeleccionado.BackColor = Color.LightSteelBlue
 
+        ' CORREGIDO: Se asigna el tipo genérico 'Historicos' para forzar el paso intermedio.
         If pnlSeleccionado Is pnlCardLicencias Then
             importacionActual = TipoImportacion.Licencias
         ElseIf pnlSeleccionado Is pnlCardHistoricos Then
-            ' Por ahora, "Históricos" se asume como "Presentismo"
-            importacionActual = TipoImportacion.Presentismo
+            importacionActual = TipoImportacion.Historicos
         ElseIf pnlSeleccionado Is pnlCardDotaciones Then
             importacionActual = TipoImportacion.Dotaciones
         End If
@@ -93,20 +94,38 @@ Public Class frmAsistenteImportacion
     End Sub
 
     Private Sub btnPaso1_Siguiente_Click(sender As Object, e As EventArgs) Handles btnPaso1_Siguiente.Click
-        Select Case importacionActual
-            Case TipoImportacion.Licencias
-                lblPaso2_Titulo.Text = "Paso 2: Cargar Archivo de Licencias (SGH)"
-                btnDescargarPlantilla.Text = "⬇️ Descargar Plantilla_Licencias.xlsx"
-            Case TipoImportacion.Presentismo
-                lblPaso2_Titulo.Text = "Paso 2: Cargar Archivo de Históricos (Presentismo)"
-                btnDescargarPlantilla.Text = "⬇️ Descargar Plantilla_Presentismo.xlsx"
-            Case TipoImportacion.Nocturnidad
-                lblPaso2_Titulo.Text = "Paso 2: Cargar Archivo de Históricos (Nocturnidad)"
-                btnDescargarPlantilla.Text = "⬇️ Descargar Plantilla_Nocturnidad.xlsx"
-            Case TipoImportacion.Dotaciones
-                lblPaso2_Titulo.Text = "Paso 2: Cargar Archivo de Dotaciones"
-                btnDescargarPlantilla.Text = "⬇️ Descargar Plantilla_Dotaciones.xlsx"
-        End Select
+        If importacionActual = TipoImportacion.Historicos Then
+            NavegarPaso(15) ' Navega al panel de sub-selección
+        Else
+            Select Case importacionActual
+                Case TipoImportacion.Licencias
+                    lblPaso2_Titulo.Text = "Paso 2: Cargar Archivo de Licencias (SGH)"
+                    btnDescargarPlantilla.Text = "⬇️ Descargar Plantilla_Licencias.xlsx"
+                Case TipoImportacion.Dotaciones
+                    lblPaso2_Titulo.Text = "Paso 2: Cargar Archivo de Dotaciones"
+                    btnDescargarPlantilla.Text = "⬇️ Descargar Plantilla_Dotaciones.xlsx"
+            End Select
+            NavegarPaso(2)
+        End If
+    End Sub
+
+    Private Sub btnPaso1_5_Volver_Click(sender As Object, e As EventArgs) Handles btnPaso1_5_Volver.Click
+        NavegarPaso(1)
+    End Sub
+
+    Private Sub btnPaso1_5_Siguiente_Click(sender As Object, e As EventArgs) Handles btnPaso1_5_Siguiente.Click
+        If rbPresentismo.Checked Then
+            importacionActual = TipoImportacion.Presentismo
+            lblPaso2_Titulo.Text = "Paso 2: Cargar Archivo de Históricos (Presentismo)"
+            btnDescargarPlantilla.Text = "⬇️ Descargar Plantilla_Presentismo.xlsx"
+        ElseIf rbNocturnidad.Checked Then
+            importacionActual = TipoImportacion.Nocturnidad
+            lblPaso2_Titulo.Text = "Paso 2: Cargar Archivo de Históricos (Nocturnidad)"
+            btnDescargarPlantilla.Text = "⬇️ Descargar Plantilla_Nocturnidad.xlsx"
+        Else
+            MessageBox.Show("Por favor, seleccione un tipo de histórico.", "Selección Requerida", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return
+        End If
         NavegarPaso(2)
     End Sub
 #End Region
@@ -114,14 +133,16 @@ Public Class frmAsistenteImportacion
 #Region "Paso 2: Carga de Archivo"
 
     Private Sub btnPaso2_Volver_Click(sender As Object, e As EventArgs) Handles btnPaso2_Volver.Click
-        NavegarPaso(1)
+        If importacionActual = TipoImportacion.Presentismo OrElse importacionActual = TipoImportacion.Nocturnidad Then
+            NavegarPaso(15)
+        Else
+            NavegarPaso(1)
+        End If
     End Sub
 
     Private Sub btnDescargarPlantilla_Click(sender As Object, e As EventArgs) Handles btnDescargarPlantilla.Click
         SaveFileDialog1.FileName = btnDescargarPlantilla.Text.Replace("⬇️ Descargar ", "")
         If SaveFileDialog1.ShowDialog() = DialogResult.OK Then
-            ' Aquí iría la lógica para copiar la plantilla desde los recursos del proyecto.
-            ' Ejemplo: File.WriteAllBytes(SaveFileDialog1.FileName, My.Resources.Plantilla_Presentismo)
             MessageBox.Show($"Plantilla guardada en: {SaveFileDialog1.FileName}", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
         End If
     End Sub
@@ -176,29 +197,14 @@ Public Class frmAsistenteImportacion
 #End Region
 
 #Region "Paso 3: Validación"
-
-    Private Sub btnPaso3_Volver_Click(sender As Object, e As EventArgs) Handles btnPaso3_Volver.Click
-        NavegarPaso(2)
-    End Sub
-
-    Private Sub btnDescargarErrores_Click(sender As Object, e As EventArgs) Handles btnDescargarErrores.Click
-        SaveFileDialog1.FileName = "ReporteDeErrores.txt"
-        If SaveFileDialog1.ShowDialog() = DialogResult.OK Then
-            File.WriteAllText(SaveFileDialog1.FileName, reporteErrores.ToString())
-            MessageBox.Show("Reporte de errores guardado.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
-        End If
-    End Sub
-
     Private Async Sub btnPaso3_Importar_Click(sender As Object, e As EventArgs) Handles btnPaso3_Importar.Click
         Me.Cursor = Cursors.WaitCursor
         btnPaso3_Importar.Enabled = False
         btnPaso3_Volver.Enabled = False
         stopWatch.Restart()
         Temporizador.Start()
-
         Dim registrosImportados As Integer = 0
         Dim errorOcurrido As Exception = Nothing
-
         Try
             registrosImportados = Await Task.Run(Function()
                                                      Select Case importacionActual
@@ -238,7 +244,6 @@ Public Class frmAsistenteImportacion
 #End Region
 
 #Region "Paso 4: Resumen"
-
     Private Sub btnPaso4_OtraVez_Click(sender As Object, e As EventArgs) Handles btnPaso4_OtraVez.Click
         NavegarPaso(1)
     End Sub
@@ -281,9 +286,7 @@ Public Class frmAsistenteImportacion
                     If Not expectedHeaders.Except(currentRowHeaders).Any() Then
                         headerRowIndex = i
                         For j = 0 To currentRowHeaders.Count - 1
-                            If Not headerMap.ContainsKey(currentRowHeaders(j)) Then
-                                headerMap.Add(currentRowHeaders(j), j)
-                            End If
+                            If Not headerMap.ContainsKey(currentRowHeaders(j)) Then headerMap.Add(currentRowHeaders(j), j)
                         Next
                         Exit For
                     End If
@@ -331,7 +334,6 @@ Public Class frmAsistenteImportacion
         Dim efConnectionString As String = ConfigurationManager.ConnectionStrings("ApexEntities").ConnectionString
         Dim builder As New EntityConnectionStringBuilder(efConnectionString)
         Dim sqlConnectionString As String = builder.ProviderConnectionString
-
         Using conn As New SqlConnection(sqlConnectionString)
             Using cmd As New SqlCommand("dbo.usp_Apex_ImportarLicenciasMasivas", conn)
                 cmd.CommandType = CommandType.StoredProcedure
@@ -371,6 +373,7 @@ Public Class frmAsistenteImportacion
         End Using
         Return 0
     End Function
+
     Private Function CrearDataTableParaLicencias(dtSource As DataTable) As DataTable
         Dim dtTarget As New DataTable()
         dtTarget.Columns.Add("FuncionarioId", GetType(Integer))
