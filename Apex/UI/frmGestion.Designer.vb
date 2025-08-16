@@ -312,6 +312,8 @@ Partial Class frmGestion
         '
         Me.dgvSanciones.AllowUserToAddRows = False
         Me.dgvSanciones.AllowUserToDeleteRows = False
+        Me.dgvSanciones.AllowUserToResizeColumns = False
+        Me.dgvSanciones.AllowUserToResizeRows = False
         Me.dgvSanciones.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvSanciones.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgvSanciones.Location = New System.Drawing.Point(3, 65)

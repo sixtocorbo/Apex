@@ -15,11 +15,11 @@ Public Class frmGestion
     End Sub
 
     ' Se ejecuta cuando el usuario cambia de pestaña
-    Private Async Sub TabControlGestion_SelectedIndexChanged(sender As Object, e As EventArgs) Handles TabControlGestion.SelectedIndexChanged
+    Private Sub TabControlGestion_SelectedIndexChanged(sender As Object, e As EventArgs) Handles TabControlGestion.SelectedIndexChanged
         If TabControlGestion.SelectedTab Is TabPageLicencias Then
             txtBusquedaLicencia.Focus()
         ElseIf TabControlGestion.SelectedTab Is TabPageNotificaciones Then
-            Await CargarDatosNotificacionesAsync()
+            txtBusquedaNotificacion.Focus()
         ElseIf TabControlGestion.SelectedTab Is TabPageSanciones Then
             txtBusquedaSancion.Focus()
         End If
@@ -28,41 +28,48 @@ Public Class frmGestion
 #Region "Configuración y Carga de Datos"
 
     Private Sub ConfigurarGrillas()
-        ' Configuración para la grilla de Licencias (sin cambios)
+        ' Configuración para la grilla de Licencias
         With dgvLicencias
             .AutoGenerateColumns = False
             .Columns.Clear()
             .RowHeadersVisible = False
             .SelectionMode = DataGridViewSelectionMode.FullRowSelect
             .MultiSelect = False
+
             .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Id", .DataPropertyName = "Id", .Visible = False})
             .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "NombreFuncionario", .DataPropertyName = "NombreFuncionario", .HeaderText = "Funcionario", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
             .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "TipoLicencia", .DataPropertyName = "TipoLicencia", .HeaderText = "Tipo", .Width = 180})
+
             Dim colInicio As New DataGridViewTextBoxColumn With {.Name = "FechaInicio", .DataPropertyName = "FechaInicio", .HeaderText = "Desde", .Width = 100}
             colInicio.DefaultCellStyle.Format = "dd/MM/yyyy"
             .Columns.Add(colInicio)
+
             Dim colFin As New DataGridViewTextBoxColumn With {.Name = "FechaFin", .DataPropertyName = "FechaFin", .HeaderText = "Hasta", .Width = 100}
             colFin.DefaultCellStyle.Format = "dd/MM/yyyy"
             .Columns.Add(colFin)
+
             .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Estado", .DataPropertyName = "Estado", .HeaderText = "Estado", .Width = 120})
         End With
 
-        ' Configuración para la grilla de Notificaciones (sin cambios)
+        ' Configuración para la grilla de Notificaciones
         With dgvNotificaciones
             .AutoGenerateColumns = False
             .Columns.Clear()
             .RowHeadersVisible = False
             .SelectionMode = DataGridViewSelectionMode.FullRowSelect
             .MultiSelect = False
+
             .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Id", .DataPropertyName = "Id", .Visible = False})
             .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "NombreFuncionario", .DataPropertyName = "NombreFuncionario", .HeaderText = "Funcionario", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
             .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "TipoNotificacion", .DataPropertyName = "TipoNotificacion", .HeaderText = "Tipo", .Width = 150})
+
             Dim fechaColumn As New DataGridViewTextBoxColumn With {
                  .Name = "FechaProgramada", .DataPropertyName = "FechaProgramada",
                 .HeaderText = "Fecha Programada", .Width = 160
             }
             fechaColumn.DefaultCellStyle.Format = "dd/MM/yyyy HH:mm"
             .Columns.Add(fechaColumn)
+
             .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Estado", .DataPropertyName = "Estado", .HeaderText = "Estado", .Width = 120})
         End With
 
@@ -106,10 +113,15 @@ Public Class frmGestion
     End Function
 
     Private Async Function CargarDatosNotificacionesAsync() As Task
+        Dim filtro = txtBusquedaNotificacion.Text.Trim()
+        If String.IsNullOrWhiteSpace(filtro) Then
+            dgvNotificaciones.DataSource = Nothing
+            Return
+        End If
+
         LoadingHelper.MostrarCargando(Me)
         Try
             dgvNotificaciones.DataSource = Nothing
-            Dim filtro = txtBusquedaNotificacion.Text.Trim()
             dgvNotificaciones.DataSource = Await _notificacionSvc.GetAllConDetallesAsync(filtro)
         Catch ex As Exception
             MessageBox.Show("Error al cargar notificaciones: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -270,7 +282,7 @@ Public Class frmGestion
 
         Dim idSeleccionado = sancionSeleccionada.Id
         Using frm As New frmSancionCrear()
-            frm.SancionId = idSeleccionado ' Asignamos el ID aquí
+            frm.SancionId = idSeleccionado
             If frm.ShowDialog(Me) = DialogResult.OK Then
                 Await CargarDatosSancionesAsync()
             End If
