@@ -48,6 +48,15 @@ Public Class frmAsistenteImportacion
         pnlPaso3_Validar.Visible = (paso = 3)
         pnlPaso4_Resumen.Visible = (paso = 4)
         If paso = 1 Then ResetearFormulario()
+
+        ' --- INICIO DE LA CORRECCIÓN ---
+        ' Se asegura de que el panel del paso actual esté siempre al frente
+        If paso = 1 Then pnlPaso1_Seleccion.BringToFront()
+        If paso = 15 Then pnlPaso1_5_SubTipo.BringToFront()
+        If paso = 2 Then pnlPaso2_Cargar.BringToFront()
+        If paso = 3 Then pnlPaso3_Validar.BringToFront()
+        If paso = 4 Then pnlPaso4_Resumen.BringToFront()
+        ' --- FIN DE LA CORRECCIÓN ---
     End Sub
 
     Private Sub ResetearFormulario()
@@ -407,7 +416,8 @@ Public Class frmAsistenteImportacion
 
         For Each sourceRow As DataRow In dtSource.Rows
             Try
-                Dim ci As String = sourceRow("CI").ToString().Trim()
+                Dim ci As String = NormalizarCI(sourceRow("CI").ToString())
+
                 Dim tipoLicenciaNombre As String = sourceRow("Tipo de Incidencia").ToString().Trim()
                 Dim nombreFuncionario As String = sourceRow("Nombre").ToString().Trim()
 
@@ -462,6 +472,7 @@ Public Class frmAsistenteImportacion
     End Function
 
     Private Function CrearDataTableParaHistoricos(dtSource As DataTable, tipo As String) As DataTable
+        ' Crea la tabla destino con el esquema que espera el TVP dbo.TipoTablaAgregadosMensuales
         Dim dtTarget As New DataTable()
         dtTarget.Columns.Add("FuncionarioId", GetType(Integer))
         dtTarget.Columns.Add("Anio", GetType(Short))
@@ -471,57 +482,117 @@ Public Class frmAsistenteImportacion
         dtTarget.Columns.Add("Incidencia", GetType(String))
         dtTarget.Columns.Add("Observaciones", GetType(String))
 
+        ' Mapa de funcionarios (normalizamos las claves para evitar fallos por formato de CI)
         Dim funcionariosMap As Dictionary(Of String, Integer) = ObtenerMapaFuncionarios()
-        Dim datosAgrupados As New Dictionary(Of String, DataRow)
+        Dim mapNormalizado As New Dictionary(Of String, Integer)(StringComparer.Ordinal)
+        For Each kv In funcionariosMap
+            Dim k = NormalizarCI(kv.Key)
+            If Not mapNormalizado.ContainsKey(k) Then mapNormalizado.Add(k, kv.Value)
+        Next
+        funcionariosMap = mapNormalizado
+
+        ' Acumulador por CI-Año-Mes
+        Dim datosAgrupados As New Dictionary(Of String, DataRow)(StringComparer.Ordinal)
 
         For Each sourceRow As DataRow In dtSource.Rows
             Try
-                Dim ci = sourceRow("CI").ToString().Trim()
-                Dim anio = TryParseShort(sourceRow("AÑO").ToString())
-                Dim mes = TryParseByte(sourceRow("MES").ToString())
-                Dim clave = $"{ci}-{anio}-{mes}"
-
-                If Not funcionariosMap.ContainsKey(ci) Then
-                    reporteErrores.AppendLine($"Fila omitida: La CI '{ci}' no fue encontrada.")
+                ' --- Lectura y validaciones base ---
+                Dim ciNorm As String = NormalizarCI(Convert.ToString(sourceRow("CI")))
+                If String.IsNullOrWhiteSpace(ciNorm) Then
+                    reporteErrores.AppendLine("Fila omitida: CI vacía o inválida.")
                     Continue For
                 End If
 
-                If datosAgrupados.ContainsKey(clave) Then
-                    Dim filaExistente = datosAgrupados(clave)
-                    filaExistente("Minutos") = CInt(filaExistente("Minutos")) + CInt(TryParseInt(sourceRow("MINUTOS").ToString()))
-                    If tipo = "Presentismo" Then
-                        filaExistente("Dias") = CInt(filaExistente("Dias")) + CInt(TryParseInt(sourceRow("DIAS").ToString()))
-                        filaExistente("Incidencia") &= "; " & sourceRow("INCIDENCIA")?.ToString()
-                        filaExistente("Observaciones") &= "; " & sourceRow("OBSERVACIONES")?.ToString()
+                Dim anioObj As Object = TryParseShort(Convert.ToString(sourceRow("AÑO")))
+                Dim mesObj As Object = TryParseByte(Convert.ToString(sourceRow("MES")))
+                If anioObj Is DBNull.Value OrElse mesObj Is DBNull.Value Then
+                    reporteErrores.AppendLine($"Fila omitida (CI: {sourceRow("CI")}): AÑO o MES inválidos.")
+                    Continue For
+                End If
+                Dim anio As Short = CType(anioObj, Short)
+                Dim mes As Byte = CType(mesObj, Byte)
+
+                ' Minutos (si viene vacío, tomamos 0)
+                Dim minutosObj As Object = TryParseInt(Convert.ToString(sourceRow("MINUTOS")))
+                Dim minutos As Integer = If(minutosObj Is DBNull.Value, 0, CType(minutosObj, Integer))
+
+                ' --- Asegurar FuncionarioId: crear si no existe ---
+                Dim fid As Integer
+                If Not funcionariosMap.TryGetValue(ciNorm, fid) Then
+                    ' Alta mínima (sin nombre) para poder registrar el histórico
+                    Dim nuevo = CrearFuncionario(ciNorm, "(auto)")
+                    If nuevo Is Nothing Then
+                        reporteErrores.AppendLine($"Fila omitida: La CI '{ciNorm}' no existe y no pudo crearse.")
+                        Continue For
                     End If
+                    fid = nuevo.Id
+                    funcionariosMap(ciNorm) = fid
+                    newlyCreatedFuncionarios.Add($"{ciNorm} - (creado por importación de {tipo})")
+                End If
+
+                ' --- Clave de agrupación por CI-Año-Mes ---
+                Dim clave As String = $"{ciNorm}-{anio}-{mes}"
+
+                If datosAgrupados.ContainsKey(clave) Then
+                    ' Acumular sobre la fila existente
+                    Dim filaExistente As DataRow = datosAgrupados(clave)
+                    filaExistente("Minutos") = CInt(filaExistente("Minutos")) + minutos
+
+                    If tipo = "Presentismo" Then
+                        Dim diasObj As Object = TryParseInt(Convert.ToString(sourceRow("DIAS")))
+                        Dim dias As Integer = If(diasObj Is DBNull.Value, 0, CType(diasObj, Integer))
+                        filaExistente("Dias") = CInt(filaExistente("Dias")) + dias
+
+                        Dim incNueva As String = If(dtSource.Columns.Contains("INCIDENCIA"), Convert.ToString(sourceRow("INCIDENCIA")), Nothing)
+                        Dim obsNueva As String = If(dtSource.Columns.Contains("OBSERVACIONES"), Convert.ToString(sourceRow("OBSERVACIONES")), Nothing)
+
+                        Dim incActual As String = If(filaExistente.IsNull("Incidencia"), "", CStr(filaExistente("Incidencia")))
+                        Dim obsActual As String = If(filaExistente.IsNull("Observaciones"), "", CStr(filaExistente("Observaciones")))
+
+                        If Not String.IsNullOrWhiteSpace(incNueva) Then
+                            filaExistente("Incidencia") = If(String.IsNullOrEmpty(incActual), incNueva, incActual & "; " & incNueva)
+                        End If
+                        If Not String.IsNullOrWhiteSpace(obsNueva) Then
+                            filaExistente("Observaciones") = If(String.IsNullOrEmpty(obsActual), obsNueva, obsActual & "; " & obsNueva)
+                        End If
+                    End If
+
                 Else
-                    Dim newRow = dtTarget.NewRow()
-                    newRow("FuncionarioId") = funcionariosMap(ci)
+                    ' Crear fila nueva en el acumulador
+                    Dim newRow As DataRow = dtTarget.NewRow()
+                    newRow("FuncionarioId") = fid
                     newRow("Anio") = anio
                     newRow("Mes") = mes
-                    newRow("Minutos") = TryParseInt(sourceRow("MINUTOS").ToString())
+                    newRow("Minutos") = minutos
+
                     If tipo = "Presentismo" Then
-                        newRow("Dias") = TryParseInt(sourceRow("DIAS").ToString())
-                        newRow("Incidencia") = sourceRow("INCIDENCIA")?.ToString()
-                        newRow("Observaciones") = sourceRow("OBSERVACIONES")?.ToString()
+                        Dim diasObj As Object = TryParseInt(Convert.ToString(sourceRow("DIAS")))
+                        newRow("Dias") = If(diasObj Is DBNull.Value, 0, CType(diasObj, Integer))
+                        newRow("Incidencia") = If(dtSource.Columns.Contains("INCIDENCIA"), Convert.ToString(sourceRow("INCIDENCIA")), Nothing)
+                        newRow("Observaciones") = If(dtSource.Columns.Contains("OBSERVACIONES"), Convert.ToString(sourceRow("OBSERVACIONES")), Nothing)
                     Else
+                        ' Nocturnidad: estas columnas pueden ir NULL
                         newRow("Dias") = DBNull.Value
                         newRow("Incidencia") = DBNull.Value
                         newRow("Observaciones") = DBNull.Value
                     End If
+
                     datosAgrupados.Add(clave, newRow)
                 End If
+
             Catch ex As Exception
                 reporteErrores.AppendLine($"Fila omitida (CI: {sourceRow("CI")}): Error - {ex.Message}")
             End Try
         Next
 
-        For Each row In datosAgrupados.Values
+        ' Volcar acumulados a la tabla destino
+        For Each row As DataRow In datosAgrupados.Values
             dtTarget.Rows.Add(row)
         Next
 
         Return dtTarget
     End Function
+
 
     Private Function TryParseInt(value As String) As Object
         Dim number As Integer
@@ -543,7 +614,7 @@ Public Class frmAsistenteImportacion
 
     Private Function ObtenerMapaFuncionarios() As Dictionary(Of String, Integer)
         Using ctx As New ApexEntities()
-            Return ctx.Funcionario.ToDictionary(Function(f) f.CI.Trim(), Function(f) f.Id)
+            Return ctx.Funcionario.ToDictionary(Function(f) NormalizarCI(f.CI), Function(f) f.Id)
         End Using
     End Function
 
@@ -586,6 +657,15 @@ Public Class frmAsistenteImportacion
         Catch ex As Exception
             Return Nothing
         End Try
+    End Function
+
+    Private Function NormalizarCI(raw As String) As String
+        If String.IsNullOrWhiteSpace(raw) Then Return ""
+        ' Deja solo dígitos (sirve si viene "5.014.672-9", "50146729", "050146729", etc.)
+        Dim digits = New String(raw.Where(AddressOf Char.IsDigit).ToArray())
+        ' Si en tu BD guardás CI con 8 dígitos fijos, descomentá esta línea:
+        ' If digits.Length > 0 AndAlso digits.Length < 8 Then digits = digits.PadLeft(8, "0"c)
+        Return digits
     End Function
 
     Private Function ImportarDotaciones(dt As DataTable) As Integer

@@ -549,6 +549,7 @@ Partial Class frmAsistenteImportacion
         Me.Controls.Add(Me.pnlPaso2_Cargar)
         Me.Controls.Add(Me.pnlPaso3_Validar)
         Me.Controls.Add(Me.pnlPaso4_Resumen)
+        Me.Controls.Add(Me.pnlPaso1_5_SubTipo)
         Me.Font = New System.Drawing.Font("Segoe UI", 9.0!)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
         Me.MaximizeBox = False
