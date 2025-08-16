@@ -14,7 +14,6 @@ Public Class frmAsistenteImportacion
     Private Enum TipoImportacion
         Ninguna
         Licencias
-        Historicos
         Presentismo
         Nocturnidad
         Dotaciones
@@ -36,27 +35,28 @@ Public Class frmAsistenteImportacion
     Private Sub frmAsistenteImportacion_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
         Temporizador.Interval = 100
-        NavegarPaso(1)
+        NavegarPaso(1) ' Inicia directamente en el paso 1 unificado
     End Sub
 
     Private Sub NavegarPaso(paso As Integer)
-        ' Esta subrutina es la que oculta y muestra los paneles.
-        ' Al llamarla con el número de paso correcto, se soluciona el problema.
+        ' Oculta todos los paneles principales
         pnlPaso1_Seleccion.Visible = (paso = 1)
-        pnlPaso1_5_SubTipo.Visible = (paso = 15) ' <-- Este es el panel que no se estaba mostrando.
         pnlPaso2_Cargar.Visible = (paso = 2)
         pnlPaso3_Validar.Visible = (paso = 3)
         pnlPaso4_Resumen.Visible = (paso = 4)
-        If paso = 1 Then ResetearFormulario()
 
-        ' --- INICIO DE LA CORRECCIÓN ---
-        ' Se asegura de que el panel del paso actual esté siempre al frente
-        If paso = 1 Then pnlPaso1_Seleccion.BringToFront()
-        If paso = 15 Then pnlPaso1_5_SubTipo.BringToFront()
-        If paso = 2 Then pnlPaso2_Cargar.BringToFront()
-        If paso = 3 Then pnlPaso3_Validar.BringToFront()
-        If paso = 4 Then pnlPaso4_Resumen.BringToFront()
-        ' --- FIN DE LA CORRECCIÓN ---
+        ' Trae el panel del paso actual al frente
+        Select Case paso
+            Case 1
+                pnlPaso1_Seleccion.BringToFront()
+                ResetearFormulario()
+            Case 2
+                pnlPaso2_Cargar.BringToFront()
+            Case 3
+                pnlPaso3_Validar.BringToFront()
+            Case 4
+                pnlPaso4_Resumen.BringToFront()
+        End Select
     End Sub
 
     Private Sub ResetearFormulario()
@@ -66,99 +66,77 @@ Public Class frmAsistenteImportacion
         reporteErrores.Clear()
         newlyCreatedFuncionarios.Clear()
         newlyCreatedTiposLicencia.Clear()
-        DeseleccionarCards()
         lblArchivoSeleccionado.Text = "Ningún archivo seleccionado."
-        btnPaso1_Siguiente.Enabled = False
+        btnPaso1_Siguiente.Enabled = True
         btnPaso2_Procesar.Enabled = False
         dgvPrevisualizacion.DataSource = Nothing
         lblPaso3_Feedback.Text = ""
         gbxNuevosFuncionarios.Visible = False
         gbxNuevosTipos.Visible = False
+        rbLicencias.Checked = False
         rbPresentismo.Checked = False
         rbNocturnidad.Checked = False
+        rbDotaciones.Checked = False
     End Sub
 
 #End Region
 
-#Region "Paso 1 y 1.5: Selección"
-
-    Private Sub pnlCard_Click(sender As Object, e As EventArgs) Handles pnlCardLicencias.Click, pnlCardHistoricos.Click, pnlCardDotaciones.Click
-        DeseleccionarCards()
-        Dim pnlSeleccionado As Panel = CType(sender, Panel)
-        pnlSeleccionado.BackColor = Color.LightSteelBlue
-
-        ' Se asigna el tipo de importación según el panel seleccionado
-        If pnlSeleccionado Is pnlCardLicencias Then
-            importacionActual = TipoImportacion.Licencias
-        ElseIf pnlSeleccionado Is pnlCardHistoricos Then
-            importacionActual = TipoImportacion.Historicos ' <-- Se asigna el tipo genérico
-        ElseIf pnlSeleccionado Is pnlCardDotaciones Then
-            importacionActual = TipoImportacion.Dotaciones
-        End If
-        btnPaso1_Siguiente.Enabled = True
-    End Sub
-
-    Private Sub DeseleccionarCards()
-        pnlCardLicencias.BackColor = Color.White
-        pnlCardHistoricos.BackColor = Color.White
-        pnlCardDotaciones.BackColor = Color.White
-    End Sub
+#Region "Paso 1: Selección"
 
     Private Sub btnPaso1_Siguiente_Click(sender As Object, e As EventArgs) Handles btnPaso1_Siguiente.Click
-
-        If importacionActual = TipoImportacion.Historicos Then
-            ' Acción corregida: Muestra el panel para elegir entre "Presentismo" o "Nocturnidad".
-            NavegarPaso(15)
-        Else
-            ' Para cualquier otra opción, el código continúa como antes.
-            Select Case importacionActual
-                Case TipoImportacion.Licencias
-                    lblPaso2_Titulo.Text = "Paso 2: Cargar Archivo de Licencias (SGH)"
-                    btnDescargarPlantilla.Text = "⬇️ Descargar Plantilla_Licencias.xlsx"
-                Case TipoImportacion.Dotaciones
-                    lblPaso2_Titulo.Text = "Paso 2: Cargar Archivo de Dotaciones"
-                    btnDescargarPlantilla.Text = "⬇️ Descargar Plantilla_Dotaciones.xlsx"
-            End Select
-            NavegarPaso(2)
-        End If
-        ' --- FIN DE LA CORRECCIÓN ---
-    End Sub
-
-    Private Sub btnPaso1_5_Volver_Click(sender As Object, e As EventArgs) Handles btnPaso1_5_Volver.Click
-        NavegarPaso(1)
-    End Sub
-
-    Private Sub btnPaso1_5_Siguiente_Click(sender As Object, e As EventArgs) Handles btnPaso1_5_Siguiente.Click
-        If rbPresentismo.Checked Then
+        If rbLicencias.Checked Then
+            importacionActual = TipoImportacion.Licencias
+            lblPaso2_Titulo.Text = "Paso 2: Cargar Archivo de Licencias (SGH)"
+        ElseIf rbPresentismo.Checked Then
             importacionActual = TipoImportacion.Presentismo
             lblPaso2_Titulo.Text = "Paso 2: Cargar Archivo de Históricos (Presentismo)"
-            btnDescargarPlantilla.Text = "⬇️ Descargar Plantilla_Presentismo.xlsx"
         ElseIf rbNocturnidad.Checked Then
             importacionActual = TipoImportacion.Nocturnidad
             lblPaso2_Titulo.Text = "Paso 2: Cargar Archivo de Históricos (Nocturnidad)"
-            btnDescargarPlantilla.Text = "⬇️ Descargar Plantilla_Nocturnidad.xlsx"
+        ElseIf rbDotaciones.Checked Then
+            importacionActual = TipoImportacion.Dotaciones
+            lblPaso2_Titulo.Text = "Paso 2: Cargar Archivo de Dotaciones"
         Else
-            MessageBox.Show("Por favor, seleccione un tipo de histórico.", "Selección Requerida", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            MessageBox.Show("Por favor, seleccione un tipo de archivo para importar.", "Selección Requerida", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             Return
         End If
+
+        MostrarEncabezadosRequeridos()
         NavegarPaso(2)
     End Sub
+
 #End Region
 
 #Region "Paso 2: Carga de Archivo"
 
     Private Sub btnPaso2_Volver_Click(sender As Object, e As EventArgs) Handles btnPaso2_Volver.Click
-        If importacionActual = TipoImportacion.Presentismo OrElse importacionActual = TipoImportacion.Nocturnidad Then
-            NavegarPaso(15)
-        Else
-            NavegarPaso(1)
-        End If
+        NavegarPaso(1)
     End Sub
-
-    Private Sub btnDescargarPlantilla_Click(sender As Object, e As EventArgs) Handles btnDescargarPlantilla.Click
-        SaveFileDialog1.FileName = btnDescargarPlantilla.Text.Replace("⬇️ Descargar ", "")
-        If SaveFileDialog1.ShowDialog() = DialogResult.OK Then
-            MessageBox.Show($"Plantilla guardada en: {SaveFileDialog1.FileName}", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
+    ''' <summary>
+    ''' Devuelve la lista de encabezados esperados para un tipo de importación.
+    ''' </summary>
+    Private Function GetExpectedHeaders(tipo As TipoImportacion) As List(Of String)
+        Select Case tipo
+            Case TipoImportacion.Licencias
+                Return New List(Of String) From {"Unidad Ejecutora", "Unidad Organizativa", "CI", "Nombre", "Tipo de Incidencia", "Estado", "Fecha Desde", "Fecha Hasta", "Cantidad", "Cantidad dentro del período", "Unidad", "Afecta a días", "Motivo", "¿Presentó certificado?", "Usuario aprobó/anuló/rechazó", "Fecha aprobación/anulación/rechazo", "Comentario"}
+            Case TipoImportacion.Presentismo
+                Return New List(Of String) From {"CI", "AÑO", "MES", "INCIDENCIA", "MINUTOS", "DIAS", "OBSERVACIONES"}
+            Case TipoImportacion.Nocturnidad
+                Return New List(Of String) From {"CI", "AÑO", "MES", "MINUTOS"}
+            Case TipoImportacion.Dotaciones
+                Return New List(Of String) From {"CI", "Tipo Prenda", "Talle", "Fecha Entrega", "Observaciones"}
+            Case Else
+                Return New List(Of String)()
+        End Select
+    End Function
+    Private Sub MostrarEncabezadosRequeridos()
+        Dim headers As List(Of String) = GetExpectedHeaders(importacionActual)
+        If headers.Any() Then
+            lblEncabezados.Text = "El archivo Excel debe contener las siguientes columnas (en cualquier orden):" & Environment.NewLine & Environment.NewLine
+            lblEncabezados.Text &= String.Join(", ", headers)
+            gbxInstrucciones.Visible = True
+        Else
+            gbxInstrucciones.Visible = False
         End If
     End Sub
 
@@ -276,18 +254,12 @@ Public Class frmAsistenteImportacion
 
     Private Function LeerYValidarCabecerasExcel(ruta As String) As DataTable
         reporteErrores.Clear()
-        Dim expectedHeaders As List(Of String) = Nothing
-        Select Case importacionActual
-            Case TipoImportacion.Licencias
-                expectedHeaders = New List(Of String) From {"Unidad Ejecutora", "Unidad Organizativa", "CI", "Nombre", "Tipo de Incidencia", "Estado", "Fecha Desde", "Fecha Hasta", "Cantidad", "Cantidad dentro del período", "Unidad", "Afecta a días", "Motivo", "¿Presentó certificado?", "Usuario aprobó/anuló/rechazó", "Fecha aprobación/anulación/rechazo", "Comentario"}
-            Case TipoImportacion.Presentismo
-                expectedHeaders = New List(Of String) From {"CI", "AÑO", "MES", "INCIDENCIA", "MINUTOS", "DIAS", "OBSERVACIONES"}
-            Case TipoImportacion.Nocturnidad
-                expectedHeaders = New List(Of String) From {"CI", "AÑO", "MES", "MINUTOS"}
-            Case Else
-                reporteErrores.AppendLine("Tipo de importación no reconocido o no implementado.")
-                Return Nothing
-        End Select
+        Dim expectedHeaders As List(Of String) = GetExpectedHeaders(importacionActual)
+
+        If Not expectedHeaders.Any() Then
+            reporteErrores.AppendLine("Tipo de importación no reconocido o no implementado.")
+            Return Nothing
+        End If
 
         Using stream = File.Open(ruta, FileMode.Open, FileAccess.Read)
             Using reader As IExcelDataReader = ExcelReaderFactory.CreateReader(stream)
@@ -472,7 +444,6 @@ Public Class frmAsistenteImportacion
     End Function
 
     Private Function CrearDataTableParaHistoricos(dtSource As DataTable, tipo As String) As DataTable
-        ' Crea la tabla destino con el esquema que espera el TVP dbo.TipoTablaAgregadosMensuales
         Dim dtTarget As New DataTable()
         dtTarget.Columns.Add("FuncionarioId", GetType(Integer))
         dtTarget.Columns.Add("Anio", GetType(Short))
@@ -482,7 +453,6 @@ Public Class frmAsistenteImportacion
         dtTarget.Columns.Add("Incidencia", GetType(String))
         dtTarget.Columns.Add("Observaciones", GetType(String))
 
-        ' Mapa de funcionarios (normalizamos las claves para evitar fallos por formato de CI)
         Dim funcionariosMap As Dictionary(Of String, Integer) = ObtenerMapaFuncionarios()
         Dim mapNormalizado As New Dictionary(Of String, Integer)(StringComparer.Ordinal)
         For Each kv In funcionariosMap
@@ -491,12 +461,10 @@ Public Class frmAsistenteImportacion
         Next
         funcionariosMap = mapNormalizado
 
-        ' Acumulador por CI-Año-Mes
         Dim datosAgrupados As New Dictionary(Of String, DataRow)(StringComparer.Ordinal)
 
         For Each sourceRow As DataRow In dtSource.Rows
             Try
-                ' --- Lectura y validaciones base ---
                 Dim ciNorm As String = NormalizarCI(Convert.ToString(sourceRow("CI")))
                 If String.IsNullOrWhiteSpace(ciNorm) Then
                     reporteErrores.AppendLine("Fila omitida: CI vacía o inválida.")
@@ -512,14 +480,11 @@ Public Class frmAsistenteImportacion
                 Dim anio As Short = CType(anioObj, Short)
                 Dim mes As Byte = CType(mesObj, Byte)
 
-                ' Minutos (si viene vacío, tomamos 0)
                 Dim minutosObj As Object = TryParseInt(Convert.ToString(sourceRow("MINUTOS")))
                 Dim minutos As Integer = If(minutosObj Is DBNull.Value, 0, CType(minutosObj, Integer))
 
-                ' --- Asegurar FuncionarioId: crear si no existe ---
                 Dim fid As Integer
                 If Not funcionariosMap.TryGetValue(ciNorm, fid) Then
-                    ' Alta mínima (sin nombre) para poder registrar el histórico
                     Dim nuevo = CrearFuncionario(ciNorm, "(auto)")
                     If nuevo Is Nothing Then
                         reporteErrores.AppendLine($"Fila omitida: La CI '{ciNorm}' no existe y no pudo crearse.")
@@ -530,11 +495,9 @@ Public Class frmAsistenteImportacion
                     newlyCreatedFuncionarios.Add($"{ciNorm} - (creado por importación de {tipo})")
                 End If
 
-                ' --- Clave de agrupación por CI-Año-Mes ---
                 Dim clave As String = $"{ciNorm}-{anio}-{mes}"
 
                 If datosAgrupados.ContainsKey(clave) Then
-                    ' Acumular sobre la fila existente
                     Dim filaExistente As DataRow = datosAgrupados(clave)
                     filaExistente("Minutos") = CInt(filaExistente("Minutos")) + minutos
 
@@ -558,7 +521,6 @@ Public Class frmAsistenteImportacion
                     End If
 
                 Else
-                    ' Crear fila nueva en el acumulador
                     Dim newRow As DataRow = dtTarget.NewRow()
                     newRow("FuncionarioId") = fid
                     newRow("Anio") = anio
@@ -571,7 +533,6 @@ Public Class frmAsistenteImportacion
                         newRow("Incidencia") = If(dtSource.Columns.Contains("INCIDENCIA"), Convert.ToString(sourceRow("INCIDENCIA")), Nothing)
                         newRow("Observaciones") = If(dtSource.Columns.Contains("OBSERVACIONES"), Convert.ToString(sourceRow("OBSERVACIONES")), Nothing)
                     Else
-                        ' Nocturnidad: estas columnas pueden ir NULL
                         newRow("Dias") = DBNull.Value
                         newRow("Incidencia") = DBNull.Value
                         newRow("Observaciones") = DBNull.Value
@@ -585,14 +546,12 @@ Public Class frmAsistenteImportacion
             End Try
         Next
 
-        ' Volcar acumulados a la tabla destino
         For Each row As DataRow In datosAgrupados.Values
             dtTarget.Rows.Add(row)
         Next
 
         Return dtTarget
     End Function
-
 
     Private Function TryParseInt(value As String) As Object
         Dim number As Integer
@@ -661,10 +620,7 @@ Public Class frmAsistenteImportacion
 
     Private Function NormalizarCI(raw As String) As String
         If String.IsNullOrWhiteSpace(raw) Then Return ""
-        ' Deja solo dígitos (sirve si viene "5.014.672-9", "50146729", "050146729", etc.)
         Dim digits = New String(raw.Where(AddressOf Char.IsDigit).ToArray())
-        ' Si en tu BD guardás CI con 8 dígitos fijos, descomentá esta línea:
-        ' If digits.Length > 0 AndAlso digits.Length < 8 Then digits = digits.PadLeft(8, "0"c)
         Return digits
     End Function
 

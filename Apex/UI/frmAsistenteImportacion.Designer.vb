@@ -17,22 +17,14 @@ Partial Class frmAsistenteImportacion
 
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Me.pnlPaso1_Seleccion = New System.Windows.Forms.Panel()
-        Me.btnPaso1_Siguiente = New System.Windows.Forms.Button()
-        Me.pnlCardDotaciones = New System.Windows.Forms.Panel()
-        Me.Label3 = New System.Windows.Forms.Label()
-        Me.pnlCardHistoricos = New System.Windows.Forms.Panel()
-        Me.Label2 = New System.Windows.Forms.Label()
-        Me.pnlCardLicencias = New System.Windows.Forms.Panel()
-        Me.Label1 = New System.Windows.Forms.Label()
-        Me.lblPaso1_Titulo = New System.Windows.Forms.Label()
         Me.pnlPaso2_Cargar = New System.Windows.Forms.Panel()
+        Me.gbxInstrucciones = New System.Windows.Forms.GroupBox()
+        Me.lblEncabezados = New System.Windows.Forms.Label()
         Me.btnPaso2_Procesar = New System.Windows.Forms.Button()
         Me.btnPaso2_Volver = New System.Windows.Forms.Button()
         Me.pnlDropZone = New System.Windows.Forms.Panel()
         Me.lblDropZone = New System.Windows.Forms.Label()
         Me.lblArchivoSeleccionado = New System.Windows.Forms.Label()
-        Me.btnDescargarPlantilla = New System.Windows.Forms.Button()
         Me.lblPaso2_Titulo = New System.Windows.Forms.Label()
         Me.pnlPaso3_Validar = New System.Windows.Forms.Panel()
         Me.lblPaso3_Feedback = New System.Windows.Forms.Label()
@@ -56,134 +48,59 @@ Partial Class frmAsistenteImportacion
         Me.lblPaso4_Titulo = New System.Windows.Forms.Label()
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog()
-        Me.pnlPaso1_5_SubTipo = New System.Windows.Forms.Panel()
-        Me.btnPaso1_5_Siguiente = New System.Windows.Forms.Button()
-        Me.btnPaso1_5_Volver = New System.Windows.Forms.Button()
+        Me.pnlPaso1_Seleccion = New System.Windows.Forms.Panel()
+        Me.btnPaso1_Siguiente = New System.Windows.Forms.Button()
+        Me.btnPaso1_Volver = New System.Windows.Forms.Button()
         Me.gbxSubtipo = New System.Windows.Forms.GroupBox()
+        Me.rbDotaciones = New System.Windows.Forms.RadioButton()
+        Me.rbLicencias = New System.Windows.Forms.RadioButton()
         Me.rbNocturnidad = New System.Windows.Forms.RadioButton()
         Me.rbPresentismo = New System.Windows.Forms.RadioButton()
-        Me.lblPaso1_5_Titulo = New System.Windows.Forms.Label()
-        Me.pnlPaso1_Seleccion.SuspendLayout()
-        Me.pnlCardDotaciones.SuspendLayout()
-        Me.pnlCardHistoricos.SuspendLayout()
-        Me.pnlCardLicencias.SuspendLayout()
+        Me.lblPaso1_Titulo = New System.Windows.Forms.Label()
         Me.pnlPaso2_Cargar.SuspendLayout()
+        Me.gbxInstrucciones.SuspendLayout()
         Me.pnlDropZone.SuspendLayout()
         Me.pnlPaso3_Validar.SuspendLayout()
         CType(Me.dgvPrevisualizacion, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.pnlPaso4_Resumen.SuspendLayout()
         Me.gbxNuevosTipos.SuspendLayout()
         Me.gbxNuevosFuncionarios.SuspendLayout()
-        Me.pnlPaso1_5_SubTipo.SuspendLayout()
+        Me.pnlPaso1_Seleccion.SuspendLayout()
         Me.gbxSubtipo.SuspendLayout()
         Me.SuspendLayout()
         '
-        'pnlPaso1_Seleccion
-        '
-        Me.pnlPaso1_Seleccion.Controls.Add(Me.btnPaso1_Siguiente)
-        Me.pnlPaso1_Seleccion.Controls.Add(Me.pnlCardDotaciones)
-        Me.pnlPaso1_Seleccion.Controls.Add(Me.pnlCardHistoricos)
-        Me.pnlPaso1_Seleccion.Controls.Add(Me.pnlCardLicencias)
-        Me.pnlPaso1_Seleccion.Controls.Add(Me.lblPaso1_Titulo)
-        Me.pnlPaso1_Seleccion.Location = New System.Drawing.Point(12, 12)
-        Me.pnlPaso1_Seleccion.Name = "pnlPaso1_Seleccion"
-        Me.pnlPaso1_Seleccion.Size = New System.Drawing.Size(760, 437)
-        Me.pnlPaso1_Seleccion.TabIndex = 0
-        '
-        'btnPaso1_Siguiente
-        '
-        Me.btnPaso1_Siguiente.Location = New System.Drawing.Point(623, 388)
-        Me.btnPaso1_Siguiente.Name = "btnPaso1_Siguiente"
-        Me.btnPaso1_Siguiente.Size = New System.Drawing.Size(120, 35)
-        Me.btnPaso1_Siguiente.TabIndex = 4
-        Me.btnPaso1_Siguiente.Text = "Siguiente >"
-        Me.btnPaso1_Siguiente.UseVisualStyleBackColor = True
-        '
-        'pnlCardDotaciones
-        '
-        Me.pnlCardDotaciones.BackColor = System.Drawing.Color.White
-        Me.pnlCardDotaciones.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.pnlCardDotaciones.Controls.Add(Me.Label3)
-        Me.pnlCardDotaciones.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.pnlCardDotaciones.Location = New System.Drawing.Point(510, 80)
-        Me.pnlCardDotaciones.Name = "pnlCardDotaciones"
-        Me.pnlCardDotaciones.Size = New System.Drawing.Size(200, 150)
-        Me.pnlCardDotaciones.TabIndex = 3
-        '
-        'Label3
-        '
-        Me.Label3.AutoSize = True
-        Me.Label3.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Bold)
-        Me.Label3.Location = New System.Drawing.Point(45, 61)
-        Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(110, 28)
-        Me.Label3.TabIndex = 0
-        Me.Label3.Text = "Dotaciones"
-        '
-        'pnlCardHistoricos
-        '
-        Me.pnlCardHistoricos.BackColor = System.Drawing.Color.White
-        Me.pnlCardHistoricos.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.pnlCardHistoricos.Controls.Add(Me.Label2)
-        Me.pnlCardHistoricos.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.pnlCardHistoricos.Location = New System.Drawing.Point(280, 80)
-        Me.pnlCardHistoricos.Name = "pnlCardHistoricos"
-        Me.pnlCardHistoricos.Size = New System.Drawing.Size(200, 150)
-        Me.pnlCardHistoricos.TabIndex = 2
-        '
-        'Label2
-        '
-        Me.Label2.AutoSize = True
-        Me.Label2.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Bold)
-        Me.Label2.Location = New System.Drawing.Point(50, 61)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(100, 28)
-        Me.Label2.TabIndex = 0
-        Me.Label2.Text = "Históricos"
-        '
-        'pnlCardLicencias
-        '
-        Me.pnlCardLicencias.BackColor = System.Drawing.Color.White
-        Me.pnlCardLicencias.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.pnlCardLicencias.Controls.Add(Me.Label1)
-        Me.pnlCardLicencias.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.pnlCardLicencias.Location = New System.Drawing.Point(50, 80)
-        Me.pnlCardLicencias.Name = "pnlCardLicencias"
-        Me.pnlCardLicencias.Size = New System.Drawing.Size(200, 150)
-        Me.pnlCardLicencias.TabIndex = 1
-        '
-        'Label1
-        '
-        Me.Label1.AutoSize = True
-        Me.Label1.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Bold)
-        Me.Label1.Location = New System.Drawing.Point(55, 61)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(90, 28)
-        Me.Label1.TabIndex = 0
-        Me.Label1.Text = "Licencias"
-        '
-        'lblPaso1_Titulo
-        '
-        Me.lblPaso1_Titulo.AutoSize = True
-        Me.lblPaso1_Titulo.Font = New System.Drawing.Font("Segoe UI", 14.0!, System.Drawing.FontStyle.Bold)
-        Me.lblPaso1_Titulo.Location = New System.Drawing.Point(20, 20)
-        Me.lblPaso1_Titulo.Name = "lblPaso1_Titulo"
-        Me.lblPaso1_Titulo.Size = New System.Drawing.Size(437, 32)
-        Me.lblPaso1_Titulo.TabIndex = 0
-        Me.lblPaso1_Titulo.Text = "Paso 1: Seleccione el tipo de archivo"
-        '
         'pnlPaso2_Cargar
         '
+        Me.pnlPaso2_Cargar.Controls.Add(Me.gbxInstrucciones)
         Me.pnlPaso2_Cargar.Controls.Add(Me.btnPaso2_Procesar)
         Me.pnlPaso2_Cargar.Controls.Add(Me.btnPaso2_Volver)
         Me.pnlPaso2_Cargar.Controls.Add(Me.pnlDropZone)
         Me.pnlPaso2_Cargar.Controls.Add(Me.lblArchivoSeleccionado)
-        Me.pnlPaso2_Cargar.Controls.Add(Me.btnDescargarPlantilla)
         Me.pnlPaso2_Cargar.Controls.Add(Me.lblPaso2_Titulo)
         Me.pnlPaso2_Cargar.Location = New System.Drawing.Point(12, 12)
         Me.pnlPaso2_Cargar.Name = "pnlPaso2_Cargar"
         Me.pnlPaso2_Cargar.Size = New System.Drawing.Size(760, 437)
         Me.pnlPaso2_Cargar.TabIndex = 1
+        '
+        'gbxInstrucciones
+        '
+        Me.gbxInstrucciones.Controls.Add(Me.lblEncabezados)
+        Me.gbxInstrucciones.Location = New System.Drawing.Point(26, 68)
+        Me.gbxInstrucciones.Name = "gbxInstrucciones"
+        Me.gbxInstrucciones.Size = New System.Drawing.Size(717, 100)
+        Me.gbxInstrucciones.TabIndex = 6
+        Me.gbxInstrucciones.TabStop = False
+        Me.gbxInstrucciones.Text = "Encabezados Requeridos"
+        '
+        'lblEncabezados
+        '
+        Me.lblEncabezados.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.lblEncabezados.Location = New System.Drawing.Point(3, 23)
+        Me.lblEncabezados.Name = "lblEncabezados"
+        Me.lblEncabezados.Padding = New System.Windows.Forms.Padding(5)
+        Me.lblEncabezados.Size = New System.Drawing.Size(711, 74)
+        Me.lblEncabezados.TabIndex = 0
+        Me.lblEncabezados.Text = "Seleccione un tipo de importación para ver los encabezados requeridos."
         '
         'btnPaso2_Procesar
         '
@@ -210,7 +127,7 @@ Partial Class frmAsistenteImportacion
         Me.pnlDropZone.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.pnlDropZone.Controls.Add(Me.lblDropZone)
         Me.pnlDropZone.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.pnlDropZone.Location = New System.Drawing.Point(26, 120)
+        Me.pnlDropZone.Location = New System.Drawing.Point(26, 180)
         Me.pnlDropZone.Name = "pnlDropZone"
         Me.pnlDropZone.Size = New System.Drawing.Size(717, 150)
         Me.pnlDropZone.TabIndex = 3
@@ -227,19 +144,10 @@ Partial Class frmAsistenteImportacion
         'lblArchivoSeleccionado
         '
         Me.lblArchivoSeleccionado.AutoSize = True
-        Me.lblArchivoSeleccionado.Location = New System.Drawing.Point(22, 280)
+        Me.lblArchivoSeleccionado.Location = New System.Drawing.Point(22, 340)
         Me.lblArchivoSeleccionado.Name = "lblArchivoSeleccionado"
         Me.lblArchivoSeleccionado.Size = New System.Drawing.Size(0, 20)
         Me.lblArchivoSeleccionado.TabIndex = 2
-        '
-        'btnDescargarPlantilla
-        '
-        Me.btnDescargarPlantilla.Location = New System.Drawing.Point(26, 70)
-        Me.btnDescargarPlantilla.Name = "btnDescargarPlantilla"
-        Me.btnDescargarPlantilla.Size = New System.Drawing.Size(250, 35)
-        Me.btnDescargarPlantilla.TabIndex = 1
-        Me.btnDescargarPlantilla.Text = "⬇️ Descargar Plantilla"
-        Me.btnDescargarPlantilla.UseVisualStyleBackColor = True
         '
         'lblPaso2_Titulo
         '
@@ -468,50 +376,74 @@ Partial Class frmAsistenteImportacion
         '
         Me.OpenFileDialog1.FileName = "OpenFileDialog1"
         '
-        'pnlPaso1_5_SubTipo
+        'pnlPaso1_Seleccion
         '
-        Me.pnlPaso1_5_SubTipo.Controls.Add(Me.btnPaso1_5_Siguiente)
-        Me.pnlPaso1_5_SubTipo.Controls.Add(Me.btnPaso1_5_Volver)
-        Me.pnlPaso1_5_SubTipo.Controls.Add(Me.gbxSubtipo)
-        Me.pnlPaso1_5_SubTipo.Controls.Add(Me.lblPaso1_5_Titulo)
-        Me.pnlPaso1_5_SubTipo.Location = New System.Drawing.Point(12, 12)
-        Me.pnlPaso1_5_SubTipo.Name = "pnlPaso1_5_SubTipo"
-        Me.pnlPaso1_5_SubTipo.Size = New System.Drawing.Size(760, 437)
-        Me.pnlPaso1_5_SubTipo.TabIndex = 4
+        Me.pnlPaso1_Seleccion.Controls.Add(Me.btnPaso1_Siguiente)
+        Me.pnlPaso1_Seleccion.Controls.Add(Me.btnPaso1_Volver)
+        Me.pnlPaso1_Seleccion.Controls.Add(Me.gbxSubtipo)
+        Me.pnlPaso1_Seleccion.Controls.Add(Me.lblPaso1_Titulo)
+        Me.pnlPaso1_Seleccion.Location = New System.Drawing.Point(12, 12)
+        Me.pnlPaso1_Seleccion.Name = "pnlPaso1_Seleccion"
+        Me.pnlPaso1_Seleccion.Size = New System.Drawing.Size(760, 437)
+        Me.pnlPaso1_Seleccion.TabIndex = 4
         '
-        'btnPaso1_5_Siguiente
+        'btnPaso1_Siguiente
         '
-        Me.btnPaso1_5_Siguiente.Location = New System.Drawing.Point(623, 388)
-        Me.btnPaso1_5_Siguiente.Name = "btnPaso1_5_Siguiente"
-        Me.btnPaso1_5_Siguiente.Size = New System.Drawing.Size(120, 35)
-        Me.btnPaso1_5_Siguiente.TabIndex = 3
-        Me.btnPaso1_5_Siguiente.Text = "Siguiente >"
-        Me.btnPaso1_5_Siguiente.UseVisualStyleBackColor = True
+        Me.btnPaso1_Siguiente.Location = New System.Drawing.Point(623, 388)
+        Me.btnPaso1_Siguiente.Name = "btnPaso1_Siguiente"
+        Me.btnPaso1_Siguiente.Size = New System.Drawing.Size(120, 35)
+        Me.btnPaso1_Siguiente.TabIndex = 3
+        Me.btnPaso1_Siguiente.Text = "Siguiente >"
+        Me.btnPaso1_Siguiente.UseVisualStyleBackColor = True
         '
-        'btnPaso1_5_Volver
+        'btnPaso1_Volver
         '
-        Me.btnPaso1_5_Volver.Location = New System.Drawing.Point(26, 388)
-        Me.btnPaso1_5_Volver.Name = "btnPaso1_5_Volver"
-        Me.btnPaso1_5_Volver.Size = New System.Drawing.Size(120, 35)
-        Me.btnPaso1_5_Volver.TabIndex = 2
-        Me.btnPaso1_5_Volver.Text = "< Volver"
-        Me.btnPaso1_5_Volver.UseVisualStyleBackColor = True
+        Me.btnPaso1_Volver.Location = New System.Drawing.Point(26, 388)
+        Me.btnPaso1_Volver.Name = "btnPaso1_Volver"
+        Me.btnPaso1_Volver.Size = New System.Drawing.Size(120, 35)
+        Me.btnPaso1_Volver.TabIndex = 2
+        Me.btnPaso1_Volver.Text = "< Volver"
+        Me.btnPaso1_Volver.UseVisualStyleBackColor = True
         '
         'gbxSubtipo
         '
+        Me.gbxSubtipo.Controls.Add(Me.rbDotaciones)
+        Me.gbxSubtipo.Controls.Add(Me.rbLicencias)
         Me.gbxSubtipo.Controls.Add(Me.rbNocturnidad)
         Me.gbxSubtipo.Controls.Add(Me.rbPresentismo)
         Me.gbxSubtipo.Location = New System.Drawing.Point(50, 80)
         Me.gbxSubtipo.Name = "gbxSubtipo"
-        Me.gbxSubtipo.Size = New System.Drawing.Size(660, 100)
+        Me.gbxSubtipo.Size = New System.Drawing.Size(660, 150)
         Me.gbxSubtipo.TabIndex = 1
         Me.gbxSubtipo.TabStop = False
-        Me.gbxSubtipo.Text = "Tipo de Histórico"
+        Me.gbxSubtipo.Text = "Tipo de Importación"
+        '
+        'rbDotaciones
+        '
+        Me.rbDotaciones.AutoSize = True
+        Me.rbDotaciones.Location = New System.Drawing.Point(30, 115)
+        Me.rbDotaciones.Name = "rbDotaciones"
+        Me.rbDotaciones.Size = New System.Drawing.Size(104, 24)
+        Me.rbDotaciones.TabIndex = 3
+        Me.rbDotaciones.TabStop = True
+        Me.rbDotaciones.Text = "Dotaciones"
+        Me.rbDotaciones.UseVisualStyleBackColor = True
+        '
+        'rbLicencias
+        '
+        Me.rbLicencias.AutoSize = True
+        Me.rbLicencias.Location = New System.Drawing.Point(30, 25)
+        Me.rbLicencias.Name = "rbLicencias"
+        Me.rbLicencias.Size = New System.Drawing.Size(89, 24)
+        Me.rbLicencias.TabIndex = 2
+        Me.rbLicencias.TabStop = True
+        Me.rbLicencias.Text = "Licencias"
+        Me.rbLicencias.UseVisualStyleBackColor = True
         '
         'rbNocturnidad
         '
         Me.rbNocturnidad.AutoSize = True
-        Me.rbNocturnidad.Location = New System.Drawing.Point(180, 45)
+        Me.rbNocturnidad.Location = New System.Drawing.Point(30, 85)
         Me.rbNocturnidad.Name = "rbNocturnidad"
         Me.rbNocturnidad.Size = New System.Drawing.Size(110, 24)
         Me.rbNocturnidad.TabIndex = 1
@@ -522,7 +454,7 @@ Partial Class frmAsistenteImportacion
         'rbPresentismo
         '
         Me.rbPresentismo.AutoSize = True
-        Me.rbPresentismo.Location = New System.Drawing.Point(30, 45)
+        Me.rbPresentismo.Location = New System.Drawing.Point(30, 55)
         Me.rbPresentismo.Name = "rbPresentismo"
         Me.rbPresentismo.Size = New System.Drawing.Size(111, 24)
         Me.rbPresentismo.TabIndex = 0
@@ -530,15 +462,15 @@ Partial Class frmAsistenteImportacion
         Me.rbPresentismo.Text = "Presentismo"
         Me.rbPresentismo.UseVisualStyleBackColor = True
         '
-        'lblPaso1_5_Titulo
+        'lblPaso1_Titulo
         '
-        Me.lblPaso1_5_Titulo.AutoSize = True
-        Me.lblPaso1_5_Titulo.Font = New System.Drawing.Font("Segoe UI", 14.0!, System.Drawing.FontStyle.Bold)
-        Me.lblPaso1_5_Titulo.Location = New System.Drawing.Point(20, 20)
-        Me.lblPaso1_5_Titulo.Name = "lblPaso1_5_Titulo"
-        Me.lblPaso1_5_Titulo.Size = New System.Drawing.Size(496, 32)
-        Me.lblPaso1_5_Titulo.TabIndex = 0
-        Me.lblPaso1_5_Titulo.Text = "Paso 1.5: Especifique el tipo de histórico"
+        Me.lblPaso1_Titulo.AutoSize = True
+        Me.lblPaso1_Titulo.Font = New System.Drawing.Font("Segoe UI", 14.0!, System.Drawing.FontStyle.Bold)
+        Me.lblPaso1_Titulo.Location = New System.Drawing.Point(20, 20)
+        Me.lblPaso1_Titulo.Name = "lblPaso1_Titulo"
+        Me.lblPaso1_Titulo.Size = New System.Drawing.Size(437, 32)
+        Me.lblPaso1_Titulo.TabIndex = 0
+        Me.lblPaso1_Titulo.Text = "Paso 1: Seleccione el tipo de archivo"
         '
         'frmAsistenteImportacion
         '
@@ -549,7 +481,6 @@ Partial Class frmAsistenteImportacion
         Me.Controls.Add(Me.pnlPaso2_Cargar)
         Me.Controls.Add(Me.pnlPaso3_Validar)
         Me.Controls.Add(Me.pnlPaso4_Resumen)
-        Me.Controls.Add(Me.pnlPaso1_5_SubTipo)
         Me.Font = New System.Drawing.Font("Segoe UI", 9.0!)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
         Me.MaximizeBox = False
@@ -557,16 +488,9 @@ Partial Class frmAsistenteImportacion
         Me.Name = "frmAsistenteImportacion"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = "Asistente de Importación de Datos"
-        Me.pnlPaso1_Seleccion.ResumeLayout(False)
-        Me.pnlPaso1_Seleccion.PerformLayout()
-        Me.pnlCardDotaciones.ResumeLayout(False)
-        Me.pnlCardDotaciones.PerformLayout()
-        Me.pnlCardHistoricos.ResumeLayout(False)
-        Me.pnlCardHistoricos.PerformLayout()
-        Me.pnlCardLicencias.ResumeLayout(False)
-        Me.pnlCardLicencias.PerformLayout()
         Me.pnlPaso2_Cargar.ResumeLayout(False)
         Me.pnlPaso2_Cargar.PerformLayout()
+        Me.gbxInstrucciones.ResumeLayout(False)
         Me.pnlDropZone.ResumeLayout(False)
         Me.pnlDropZone.PerformLayout()
         Me.pnlPaso3_Validar.ResumeLayout(False)
@@ -576,32 +500,32 @@ Partial Class frmAsistenteImportacion
         Me.pnlPaso4_Resumen.PerformLayout()
         Me.gbxNuevosTipos.ResumeLayout(False)
         Me.gbxNuevosFuncionarios.ResumeLayout(False)
-        Me.pnlPaso1_5_SubTipo.ResumeLayout(False)
-        Me.pnlPaso1_5_SubTipo.PerformLayout()
+        Me.pnlPaso1_Seleccion.ResumeLayout(False)
+        Me.pnlPaso1_Seleccion.PerformLayout()
         Me.gbxSubtipo.ResumeLayout(False)
         Me.gbxSubtipo.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
 
+    ' (Declaraciones de controles, incluyendo los nuevos)
     Friend WithEvents pnlPaso1_Seleccion As Panel
     Friend WithEvents btnPaso1_Siguiente As Button
-    Friend WithEvents pnlCardDotaciones As Panel
-    Friend WithEvents Label3 As Label
-    Friend WithEvents pnlCardHistoricos As Panel
-    Friend WithEvents Label2 As Label
-    Friend WithEvents pnlCardLicencias As Panel
-    Friend WithEvents Label1 As Label
+    Friend WithEvents gbxSubtipo As GroupBox
+    Friend WithEvents rbNocturnidad As RadioButton
+    Friend WithEvents rbPresentismo As RadioButton
     Friend WithEvents lblPaso1_Titulo As Label
+    Friend WithEvents rbLicencias As RadioButton
+    Friend WithEvents rbDotaciones As RadioButton
     Friend WithEvents pnlPaso2_Cargar As Panel
     Friend WithEvents btnPaso2_Procesar As Button
     Friend WithEvents btnPaso2_Volver As Button
     Friend WithEvents pnlDropZone As Panel
     Friend WithEvents lblDropZone As Label
     Friend WithEvents lblArchivoSeleccionado As Label
-    Friend WithEvents btnDescargarPlantilla As Button
     Friend WithEvents lblPaso2_Titulo As Label
     Friend WithEvents pnlPaso3_Validar As Panel
+    Friend WithEvents lblPaso3_Feedback As Label
     Friend WithEvents btnPaso3_Importar As Button
     Friend WithEvents btnDescargarErrores As Button
     Friend WithEvents btnPaso3_Volver As Button
@@ -610,6 +534,11 @@ Partial Class frmAsistenteImportacion
     Friend WithEvents dgvPrevisualizacion As DataGridView
     Friend WithEvents lblPaso3_Titulo As Label
     Friend WithEvents pnlPaso4_Resumen As Panel
+    Friend WithEvents gbxNuevosTipos As GroupBox
+    Friend WithEvents lstNuevosTiposLicencia As ListBox
+    Friend WithEvents gbxNuevosFuncionarios As GroupBox
+    Friend WithEvents lstNuevosFuncionarios As ListBox
+    Friend WithEvents lblResumenTiempo As Label
     Friend WithEvents btnPaso4_Finalizar As Button
     Friend WithEvents btnPaso4_OtraVez As Button
     Friend WithEvents lblResumenErroresFinal As Label
@@ -617,17 +546,8 @@ Partial Class frmAsistenteImportacion
     Friend WithEvents lblPaso4_Titulo As Label
     Friend WithEvents OpenFileDialog1 As OpenFileDialog
     Friend WithEvents SaveFileDialog1 As SaveFileDialog
-    Friend WithEvents lblPaso3_Feedback As Label
-    Friend WithEvents lblResumenTiempo As Label
-    Friend WithEvents gbxNuevosTipos As GroupBox
-    Friend WithEvents lstNuevosTiposLicencia As ListBox
-    Friend WithEvents gbxNuevosFuncionarios As GroupBox
-    Friend WithEvents lstNuevosFuncionarios As ListBox
-    Friend WithEvents pnlPaso1_5_SubTipo As Panel
-    Friend WithEvents btnPaso1_5_Siguiente As Button
-    Friend WithEvents btnPaso1_5_Volver As Button
-    Friend WithEvents gbxSubtipo As GroupBox
-    Friend WithEvents rbNocturnidad As RadioButton
-    Friend WithEvents rbPresentismo As RadioButton
-    Friend WithEvents lblPaso1_5_Titulo As Label
+    Friend WithEvents gbxInstrucciones As GroupBox
+    Friend WithEvents lblEncabezados As Label
+    Friend WithEvents btnPaso1_Volver As Button
+
 End Class
