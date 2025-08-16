@@ -37,6 +37,15 @@ Partial Class frmGestion
         Me.PanelBusquedaNotificaciones = New System.Windows.Forms.Panel()
         Me.txtBusquedaNotificacion = New System.Windows.Forms.TextBox()
         Me.Label2 = New System.Windows.Forms.Label()
+        Me.TabPageSanciones = New System.Windows.Forms.TabPage()
+        Me.dgvSanciones = New System.Windows.Forms.DataGridView()
+        Me.PanelSanciones = New System.Windows.Forms.Panel()
+        Me.btnEliminarSancion = New System.Windows.Forms.Button()
+        Me.btnEditarSancion = New System.Windows.Forms.Button()
+        Me.btnNuevaSancion = New System.Windows.Forms.Button()
+        Me.PanelBusquedaSanciones = New System.Windows.Forms.Panel()
+        Me.txtBusquedaSancion = New System.Windows.Forms.TextBox()
+        Me.Label3 = New System.Windows.Forms.Label()
         Me.TabControlGestion.SuspendLayout()
         Me.TabPageLicencias.SuspendLayout()
         CType(Me.dgvLicencias, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -46,12 +55,17 @@ Partial Class frmGestion
         CType(Me.dgvNotificaciones, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.PanelNotificaciones.SuspendLayout()
         Me.PanelBusquedaNotificaciones.SuspendLayout()
+        Me.TabPageSanciones.SuspendLayout()
+        CType(Me.dgvSanciones, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.PanelSanciones.SuspendLayout()
+        Me.PanelBusquedaSanciones.SuspendLayout()
         Me.SuspendLayout()
         '
         'TabControlGestion
         '
         Me.TabControlGestion.Controls.Add(Me.TabPageLicencias)
         Me.TabControlGestion.Controls.Add(Me.TabPageNotificaciones)
+        Me.TabControlGestion.Controls.Add(Me.TabPageSanciones)
         Me.TabControlGestion.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TabControlGestion.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TabControlGestion.Location = New System.Drawing.Point(0, 0)
@@ -281,6 +295,104 @@ Partial Class frmGestion
         Me.Label2.TabIndex = 0
         Me.Label2.Text = "Funcionario:"
         '
+        'TabPageSanciones
+        '
+        Me.TabPageSanciones.Controls.Add(Me.dgvSanciones)
+        Me.TabPageSanciones.Controls.Add(Me.PanelSanciones)
+        Me.TabPageSanciones.Controls.Add(Me.PanelBusquedaSanciones)
+        Me.TabPageSanciones.Location = New System.Drawing.Point(4, 37)
+        Me.TabPageSanciones.Name = "TabPageSanciones"
+        Me.TabPageSanciones.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPageSanciones.Size = New System.Drawing.Size(892, 521)
+        Me.TabPageSanciones.TabIndex = 2
+        Me.TabPageSanciones.Text = "Sanciones"
+        Me.TabPageSanciones.UseVisualStyleBackColor = True
+        '
+        'dgvSanciones
+        '
+        Me.dgvSanciones.AllowUserToAddRows = False
+        Me.dgvSanciones.AllowUserToDeleteRows = False
+        Me.dgvSanciones.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.dgvSanciones.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.dgvSanciones.Location = New System.Drawing.Point(3, 65)
+        Me.dgvSanciones.Name = "dgvSanciones"
+        Me.dgvSanciones.ReadOnly = True
+        Me.dgvSanciones.RowHeadersWidth = 51
+        Me.dgvSanciones.RowTemplate.Height = 24
+        Me.dgvSanciones.Size = New System.Drawing.Size(886, 391)
+        Me.dgvSanciones.TabIndex = 2
+        '
+        'PanelSanciones
+        '
+        Me.PanelSanciones.Controls.Add(Me.btnEliminarSancion)
+        Me.PanelSanciones.Controls.Add(Me.btnEditarSancion)
+        Me.PanelSanciones.Controls.Add(Me.btnNuevaSancion)
+        Me.PanelSanciones.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.PanelSanciones.Location = New System.Drawing.Point(3, 456)
+        Me.PanelSanciones.Name = "PanelSanciones"
+        Me.PanelSanciones.Size = New System.Drawing.Size(886, 62)
+        Me.PanelSanciones.TabIndex = 1
+        '
+        'btnEliminarSancion
+        '
+        Me.btnEliminarSancion.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnEliminarSancion.Location = New System.Drawing.Point(572, 12)
+        Me.btnEliminarSancion.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.btnEliminarSancion.Name = "btnEliminarSancion"
+        Me.btnEliminarSancion.Size = New System.Drawing.Size(96, 38)
+        Me.btnEliminarSancion.TabIndex = 2
+        Me.btnEliminarSancion.Text = "Eliminar"
+        Me.btnEliminarSancion.UseVisualStyleBackColor = True
+        '
+        'btnEditarSancion
+        '
+        Me.btnEditarSancion.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnEditarSancion.Location = New System.Drawing.Point(675, 12)
+        Me.btnEditarSancion.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.btnEditarSancion.Name = "btnEditarSancion"
+        Me.btnEditarSancion.Size = New System.Drawing.Size(96, 38)
+        Me.btnEditarSancion.TabIndex = 1
+        Me.btnEditarSancion.Text = "Editar..."
+        Me.btnEditarSancion.UseVisualStyleBackColor = True
+        '
+        'btnNuevaSancion
+        '
+        Me.btnNuevaSancion.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnNuevaSancion.Location = New System.Drawing.Point(777, 12)
+        Me.btnNuevaSancion.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.btnNuevaSancion.Name = "btnNuevaSancion"
+        Me.btnNuevaSancion.Size = New System.Drawing.Size(96, 38)
+        Me.btnNuevaSancion.TabIndex = 0
+        Me.btnNuevaSancion.Text = "Nueva..."
+        Me.btnNuevaSancion.UseVisualStyleBackColor = True
+        '
+        'PanelBusquedaSanciones
+        '
+        Me.PanelBusquedaSanciones.Controls.Add(Me.txtBusquedaSancion)
+        Me.PanelBusquedaSanciones.Controls.Add(Me.Label3)
+        Me.PanelBusquedaSanciones.Dock = System.Windows.Forms.DockStyle.Top
+        Me.PanelBusquedaSanciones.Location = New System.Drawing.Point(3, 3)
+        Me.PanelBusquedaSanciones.Name = "PanelBusquedaSanciones"
+        Me.PanelBusquedaSanciones.Size = New System.Drawing.Size(886, 62)
+        Me.PanelBusquedaSanciones.TabIndex = 0
+        '
+        'txtBusquedaSancion
+        '
+        Me.txtBusquedaSancion.Location = New System.Drawing.Point(131, 14)
+        Me.txtBusquedaSancion.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.txtBusquedaSancion.Name = "txtBusquedaSancion"
+        Me.txtBusquedaSancion.Size = New System.Drawing.Size(380, 33)
+        Me.txtBusquedaSancion.TabIndex = 1
+        '
+        'Label3
+        '
+        Me.Label3.AutoSize = True
+        Me.Label3.Location = New System.Drawing.Point(6, 19)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(119, 28)
+        Me.Label3.TabIndex = 0
+        Me.Label3.Text = "Funcionario:"
+        '
         'frmGestion
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -301,6 +413,11 @@ Partial Class frmGestion
         Me.PanelNotificaciones.ResumeLayout(False)
         Me.PanelBusquedaNotificaciones.ResumeLayout(False)
         Me.PanelBusquedaNotificaciones.PerformLayout()
+        Me.TabPageSanciones.ResumeLayout(False)
+        CType(Me.dgvSanciones, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.PanelSanciones.ResumeLayout(False)
+        Me.PanelBusquedaSanciones.ResumeLayout(False)
+        Me.PanelBusquedaSanciones.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -325,4 +442,13 @@ Partial Class frmGestion
     Friend WithEvents PanelBusquedaNotificaciones As Panel
     Friend WithEvents txtBusquedaNotificacion As TextBox
     Friend WithEvents Label2 As Label
+    Friend WithEvents TabPageSanciones As TabPage
+    Friend WithEvents dgvSanciones As DataGridView
+    Friend WithEvents PanelSanciones As Panel
+    Friend WithEvents PanelBusquedaSanciones As Panel
+    Friend WithEvents txtBusquedaSancion As TextBox
+    Friend WithEvents Label3 As Label
+    Friend WithEvents btnEliminarSancion As Button
+    Friend WithEvents btnEditarSancion As Button
+    Friend WithEvents btnNuevaSancion As Button
 End Class

@@ -83,19 +83,20 @@ Partial Public Class ApexEntities
     Public Overridable Property vw_LicenciasCompletas() As DbSet(Of vw_LicenciasCompletas)
     Public Overridable Property vw_NotificacionesCompletas() As DbSet(Of vw_NotificacionesCompletas)
     Public Overridable Property vw_NovedadesCompletas() As DbSet(Of vw_NovedadesCompletas)
+    Public Overridable Property vw_SancionesCompletas() As DbSet(Of vw_SancionesCompletas)
 
-    Public Overridable Function usp_Apex_ImportarAgregadosMensuales(tipoHistorico As String) As Integer
+    Public Overridable Function usp_Apex_ImportarAgregadosMensuales(tipoHistorico As String, registrosAfectados As ObjectParameter) As Integer
         Dim tipoHistoricoParameter As ObjectParameter = If(tipoHistorico IsNot Nothing, New ObjectParameter("TipoHistorico", tipoHistorico), New ObjectParameter("TipoHistorico", GetType(String)))
 
-        Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_Apex_ImportarAgregadosMensuales", tipoHistoricoParameter)
+        Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_Apex_ImportarAgregadosMensuales", tipoHistoricoParameter, registrosAfectados)
     End Function
 
     Public Overridable Function usp_Apex_ImportarDotacionFuncionario() As Integer
         Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_Apex_ImportarDotacionFuncionario")
     End Function
 
-    Public Overridable Function usp_Apex_ImportarLicenciasMasivas() As Integer
-        Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_Apex_ImportarLicenciasMasivas")
+    Public Overridable Function usp_Apex_ImportarLicenciasMasivas(registrosAfectados As ObjectParameter) As Integer
+        Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_Apex_ImportarLicenciasMasivas", registrosAfectados)
     End Function
 
     Public Overridable Function usp_CargarHistoricosPolicia() As Integer

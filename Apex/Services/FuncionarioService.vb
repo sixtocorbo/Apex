@@ -52,13 +52,13 @@ Public Class FuncionarioService
             f.Activo,
             .CorreoElectronico = f.Email,
             .FechaNacimiento = f.FechaNacimiento,
-            .Domicilio = f.Domicilio,
+             .Domicilio = f.Domicilio,
             .Cargo = If(f.Cargo IsNot Nothing, f.Cargo.Nombre, "N/A"),
             .TipoDeFuncionario = If(f.TipoFuncionario IsNot Nothing, f.TipoFuncionario.Nombre, "N/A"),
             .Escalafon = If(f.Escalafon IsNot Nothing, f.Escalafon.Nombre, "N/A"),
             .Funcion = If(f.Funcion IsNot Nothing, f.Funcion.Nombre, "N/A"),
             .EstadoActual = If(f.Estado IsNot Nothing, f.Estado.Nombre, "N/A"),
-            .Seccion = If(f.Seccion IsNot Nothing, f.Seccion.Nombre, "N/A"),
+             .Seccion = If(f.Seccion IsNot Nothing, f.Seccion.Nombre, "N/A"),
             .PuestoDeTrabajo = If(f.PuestoTrabajo IsNot Nothing, f.PuestoTrabajo.Nombre, "N/A"),
             .Turno = If(f.Turno IsNot Nothing, f.Turno.Nombre, "N/A"),
             .Semana = If(f.Semana IsNot Nothing, f.Semana.Nombre, "N/A"),
@@ -143,7 +143,7 @@ Public Class FuncionarioService
 
     Public Async Function ObtenerItemsDotacionCompletosAsync() As Task(Of List(Of DotacionItem))
         Return Await _unitOfWork.Repository(Of DotacionItem)().
-            GetAll().
+        GetAll().
             AsNoTracking().
             OrderBy(Function(di) di.Nombre).
             ToListAsync()
@@ -151,7 +151,7 @@ Public Class FuncionarioService
 
     Public Async Function ObtenerTiposEstadoTransitorioCompletosAsync() As Task(Of List(Of TipoEstadoTransitorio))
         Return Await _unitOfWork.Repository(Of TipoEstadoTransitorio)().
-            GetAll().OrderBy(Function(t) t.Nombre).
+        GetAll().OrderBy(Function(t) t.Nombre).
             ToListAsync()
     End Function
     Public Async Function BuscarConFiltrosDinamicosAsync(
@@ -195,6 +195,18 @@ Public Class FuncionarioService
         Return lista.Select(Function(t) New KeyValuePair(Of Integer, String)(t.Id, t.Nombre)).ToList()
     End Function
 
+    ' --- MÉTODO AÑADIDO ---
+    Public Async Function ObtenerFuncionariosParaComboAsync() As Task(Of List(Of KeyValuePair(Of Integer, String)))
+        Dim funcionariosData = Await _unitOfWork.Repository(Of Funcionario)().GetAll().AsNoTracking() _
+        .Where(Function(f) f.Activo) _
+        .OrderBy(Function(f) f.Nombre) _
+        .Select(Function(f) New With {
+            Key .Id = f.Id,
+            Key .Nombre = f.Nombre
+        }) _
+        .ToListAsync()
+        Return funcionariosData.Select(Function(f) New KeyValuePair(Of Integer, String)(f.Id, f.Nombre)).ToList()
+    End Function
 End Class
 Public Class FuncionarioVistaDTO
     Public Property Id As Integer

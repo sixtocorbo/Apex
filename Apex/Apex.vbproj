@@ -28,7 +28,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>207</ApplicationRevision>
+    <ApplicationRevision>208</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -369,6 +369,9 @@
     <Compile Include="Data\vw_NovedadesCompletas.vb">
       <DependentUpon>ApexModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Data\vw_SancionesCompletas.vb">
+      <DependentUpon>ApexModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Services\AppTheme.vb" />
     <Compile Include="Services\ChipControl.vb">
       <SubType>UserControl</SubType>
@@ -380,6 +383,7 @@
     <Compile Include="Services\ModuloExtensions.vb" />
     <Compile Include="Services\NotificacionService.vb" />
     <Compile Include="Services\NovedadService.vb" />
+    <Compile Include="Services\SancionService.vb" />
     <Compile Include="Services\ViaticoService.vb" />
     <Compile Include="UI\FiltroAvanzadoUI.vb" />
     <Compile Include="UI\frmAsistenteImportacion.Designer.vb">
@@ -495,6 +499,12 @@
     <Compile Include="UI\frmNovedades.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="UI\frmSancionCrear.Designer.vb">
+      <DependentUpon>frmSancionCrear.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmSancionCrear.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="UI\frmVisorFoto.Designer.vb">
       <DependentUpon>frmVisorFoto.vb</DependentUpon>
     </Compile>
@@ -538,6 +548,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmNovedades.resx">
       <DependentUpon>frmNovedades.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmSancionCrear.resx">
+      <DependentUpon>frmSancionCrear.vb</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
