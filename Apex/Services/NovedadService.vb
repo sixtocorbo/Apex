@@ -12,8 +12,16 @@ Public Class NovedadService
         _unitOfWork = MyBase._unitOfWork
     End Sub
 
-    Public Async Function GetAllConDetallesAsync(Optional fechaInicio As Date? = Nothing, Optional fechaFin As Date? = Nothing) As Task(Of List(Of vw_NovedadesCompletas))
-        Dim query = _unitOfWork.Repository(Of vw_NovedadesCompletas)().GetAll().AsNoTracking()
+    Public Sub New(unitOfWork As IUnitOfWork)
+        MyBase.New(unitOfWork)
+        _unitOfWork = unitOfWork
+    End Sub
+
+    ''' <summary>
+    ''' Obtiene las novedades AGRUPADAS para la grilla principal usando la nueva vista.
+    ''' </summary>
+    Public Async Function GetAllAgrupadasAsync(Optional fechaInicio As Date? = Nothing, Optional fechaFin As Date? = Nothing) As Task(Of List(Of vw_NovedadesAgrupadas))
+        Dim query = _unitOfWork.Repository(Of vw_NovedadesAgrupadas)().GetAll().AsNoTracking()
         If fechaInicio.HasValue Then
             query = query.Where(Function(n) n.Fecha >= fechaInicio.Value)
         End If
@@ -23,32 +31,29 @@ Public Class NovedadService
         Return Await query.OrderByDescending(Function(n) n.Fecha).ThenBy(Function(n) n.Id).ToListAsync()
     End Function
 
-    Public Async Function GetOrCreateNovedadGeneradaAsync(fecha As Date) As Task(Of NovedadGenerada)
-        Dim repo = _unitOfWork.Repository(Of NovedadGenerada)()
-        Dim novedadGenerada = Await repo.GetByPredicateAsync(Function(ng) ng.Fecha = fecha)
-        If novedadGenerada Is Nothing Then
-            novedadGenerada = New NovedadGenerada With {.Fecha = fecha, .CreatedAt = DateTime.Now}
-            repo.Add(novedadGenerada)
-            Await _unitOfWork.CommitAsync()
-        End If
-        Return novedadGenerada
-    End Function
-
-    Public Async Function CrearNovedadCompletaAsync(novedadGeneradaId As Integer, fecha As Date, texto As String, funcionarioIds As List(Of Integer)) As Task
+    ''' <summary>
+    ''' Crea una nueva novedad junto con sus funcionarios asociados en una única transacción.
+    ''' </summary>
+    Public Async Function CrearNovedadCompletaAsync(fecha As Date, texto As String, funcionarioIds As List(Of Integer)) As Task(Of Novedad)
         Dim nuevaNovedad = New Novedad With {
-            .NovedadGeneradaId = novedadGeneradaId,
             .Fecha = fecha,
             .Texto = texto,
-            .EstadoId = 1, ' Pendiente
+            .EstadoId = 1, ' Por defecto: "Pendiente"
             .CreatedAt = DateTime.Now
         }
+
         For Each funcId In funcionarioIds
             nuevaNovedad.NovedadFuncionario.Add(New NovedadFuncionario With {.FuncionarioId = funcId})
         Next
+
         _unitOfWork.Repository(Of Novedad)().Add(nuevaNovedad)
         Await _unitOfWork.CommitAsync()
+        Return nuevaNovedad
     End Function
 
+    ''' <summary>
+    ''' Obtiene la lista de funcionarios asociados a una novedad específica.
+    ''' </summary>
     Public Async Function GetFuncionariosPorNovedadAsync(novedadId As Integer) As Task(Of List(Of Funcionario))
         Return Await _unitOfWork.Repository(Of Funcionario)().GetAll().AsNoTracking().
             Where(Function(f) f.NovedadFuncionario.Any(Function(nf) nf.NovedadId = novedadId)).
@@ -56,16 +61,22 @@ Public Class NovedadService
             ToListAsync()
     End Function
 
-    Public Async Function GetFotosPorNovedadGeneradaAsync(novedadGeneradaId As Integer) As Task(Of List(Of NovedadFoto))
+    ''' <summary>
+    ''' Obtiene las fotos asociadas a una novedad específica.
+    ''' </summary>
+    Public Async Function GetFotosPorNovedadAsync(novedadId As Integer) As Task(Of List(Of NovedadFoto))
         Return Await _unitOfWork.Repository(Of NovedadFoto)().GetAll().AsNoTracking().
-            Where(Function(nf) nf.NovedadGeneradaId = novedadGeneradaId).
+            Where(Function(nf) nf.NovedadId = novedadId).
             ToListAsync()
     End Function
 
-    Public Async Function AddFotoAsync(novedadGeneradaId As Integer, rutaArchivo As String) As Task
+    ''' <summary>
+    ''' Agrega una foto a una novedad existente.
+    ''' </summary>
+    Public Async Function AddFotoAsync(novedadId As Integer, rutaArchivo As String) As Task
         Dim fotoBytes = File.ReadAllBytes(rutaArchivo)
         Dim nuevaFoto = New NovedadFoto With {
-            .NovedadGeneradaId = novedadGeneradaId,
+            .NovedadId = novedadId,
             .Foto = fotoBytes,
             .FileName = Path.GetFileName(rutaArchivo),
             .CreatedAt = DateTime.Now
@@ -74,9 +85,8 @@ Public Class NovedadService
         Await _unitOfWork.CommitAsync()
     End Function
 
-    ' --- INICIO DE LA CORRECCIÓN ---
     ''' <summary>
-    ''' Elimina una foto específica de la base de datos por su ID.
+    ''' Elimina una foto específica por su ID.
     ''' </summary>
     Public Async Function DeleteFotoAsync(fotoId As Integer) As Task
         Dim repo = _unitOfWork.Repository(Of NovedadFoto)()
@@ -86,8 +96,10 @@ Public Class NovedadService
             Await _unitOfWork.CommitAsync()
         End If
     End Function
-    ' --- FIN DE LA CORRECCIÓN ---
 
+    ''' <summary>
+    ''' Agrega un funcionario a una novedad que ya existe.
+    ''' </summary>
     Public Async Function AgregarFuncionarioANovedadAsync(novedadId As Integer, funcionarioId As Integer) As Task
         Dim repo = _unitOfWork.Repository(Of NovedadFuncionario)()
         Dim existe = Await repo.AnyAsync(Function(nf) nf.NovedadId = novedadId AndAlso nf.FuncionarioId = funcionarioId)
@@ -101,6 +113,9 @@ Public Class NovedadService
         End If
     End Function
 
+    ''' <summary>
+    ''' Quita a un funcionario de una novedad existente.
+    ''' </summary>
     Public Async Function QuitarFuncionarioDeNovedadAsync(novedadId As Integer, funcionarioId As Integer) As Task
         Dim repo = _unitOfWork.Repository(Of NovedadFuncionario)()
         Dim relacion = Await repo.GetByPredicateAsync(Function(nf) nf.NovedadId = novedadId AndAlso nf.FuncionarioId = funcionarioId)
@@ -109,4 +124,5 @@ Public Class NovedadService
             Await _unitOfWork.CommitAsync()
         End If
     End Function
+
 End Class

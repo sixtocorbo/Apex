@@ -16,6 +16,5 @@ Partial Public Class NotificacionEstado
     Public Property Orden As Byte
 
     Public Overridable Property NotificacionPersonal As ICollection(Of NotificacionPersonal) = New HashSet(Of NotificacionPersonal)
-    Public Overridable Property Novedad As ICollection(Of Novedad) = New HashSet(Of Novedad)
 
 End Class

@@ -12,11 +12,11 @@ Imports System.Collections.Generic
 
 Partial Public Class NovedadFoto
     Public Property Id As Integer
-    Public Property NovedadGeneradaId As Integer
+    Public Property NovedadId As Integer
     Public Property Foto As Byte()
     Public Property FileName As String
     Public Property CreatedAt As Date
 
-    Public Overridable Property NovedadGenerada As NovedadGenerada
+    Public Overridable Property Novedad As Novedad
 
 End Class

@@ -10,12 +10,11 @@
 Imports System
 Imports System.Collections.Generic
 
-Partial Public Class NovedadGenerada
+Partial Public Class vw_NovedadesAgrupadas
     Public Property Id As Integer
     Public Property Fecha As Date
-    Public Property CreatedAt As Date
-
-    Public Overridable Property Novedad As ICollection(Of Novedad) = New HashSet(Of Novedad)
-    Public Overridable Property NovedadFoto As ICollection(Of NovedadFoto) = New HashSet(Of NovedadFoto)
+    Public Property Resumen As String
+    Public Property Funcionarios As String
+    Public Property Estado As String
 
 End Class

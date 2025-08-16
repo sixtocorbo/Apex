@@ -62,7 +62,7 @@ Public Module ConsultasGenericas
 
             Case TipoOrigenDatos.Novedades
                 Dim novedadService = New NovedadService()
-                Dim novedades = Await novedadService.GetAllConDetallesAsync(fechaInicio, fechaFin)
+                Dim novedades = Await novedadService.GetAllAgrupadasAsync(fechaInicio, fechaFin)
                 Return novedades.ToDataTable()
 
             Case TipoOrigenDatos.Funcionarios

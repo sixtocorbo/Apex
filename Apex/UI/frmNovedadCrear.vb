@@ -1,10 +1,9 @@
-﻿Imports System.ComponentModel
+﻿' Apex/UI/frmNovedadCrear.vb
+Imports System.ComponentModel
 
 Public Class frmNovedadCrear
 
     Private _svc As New NovedadService()
-    Private _novedadGenerada As NovedadGenerada
-
     ' Usamos un BindingList para que el ListBox se actualice automáticamente
     Private _funcionariosSeleccionados As New BindingList(Of Funcionario)
 
@@ -12,24 +11,13 @@ Public Class frmNovedadCrear
         InitializeComponent()
     End Sub
 
-    Private Async Sub frmNovedadCrear_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Private Sub frmNovedadCrear_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
         ' Enlazar la lista de funcionarios al ListBox
         lstFuncionariosSeleccionados.DataSource = _funcionariosSeleccionados
         lstFuncionariosSeleccionados.DisplayMember = "Nombre"
         lstFuncionariosSeleccionados.ValueMember = "Id"
-
-        ' Cargar la NovedadGenerada para el día actual
-        Await CargarNovedadGeneradaDelDia()
     End Sub
-
-    Private Async Function CargarNovedadGeneradaDelDia() As Task
-        Try
-            _novedadGenerada = Await _svc.GetOrCreateNovedadGeneradaAsync(dtpFecha.Value.Date)
-        Catch ex As Exception
-            MessageBox.Show("Error al obtener o crear el registro de novedades para el día: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-        End Try
-    End Function
 
     Private Async Sub btnAgregarFuncionario_Click(sender As Object, e As EventArgs) Handles btnAgregarFuncionario.Click
         ' Abrimos el formulario en modo de selección
@@ -65,7 +53,6 @@ Public Class frmNovedadCrear
         End If
     End Sub
 
-    ' --- INICIO DE LA CORRECCIÓN ---
     Private Async Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
         ' --- Validaciones ---
         If String.IsNullOrWhiteSpace(txtTexto.Text) Then
@@ -78,19 +65,14 @@ Public Class frmNovedadCrear
             Return
         End If
 
-        If _novedadGenerada Is Nothing Then
-            MessageBox.Show("No se pudo obtener el contenedor de novedades para la fecha. Intente de nuevo.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            Return
-        End If
-
         ' --- Proceso de Guardado ---
         LoadingHelper.MostrarCargando(Me)
         Try
             ' 1. Obtener la lista de IDs de los funcionarios seleccionados
             Dim funcionarioIds = _funcionariosSeleccionados.Select(Function(f) f.Id).ToList()
 
-            ' 2. Llamar al nuevo método del servicio que maneja toda la transacción
-            Await _svc.CrearNovedadCompletaAsync(_novedadGenerada.Id, dtpFecha.Value.Date, txtTexto.Text.Trim(), funcionarioIds)
+            ' 2. Llamar al método del servicio que maneja toda la transacción
+            Await _svc.CrearNovedadCompletaAsync(dtpFecha.Value.Date, txtTexto.Text.Trim(), funcionarioIds)
 
             MessageBox.Show("Novedad creada con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
             DialogResult = DialogResult.OK
@@ -102,15 +84,10 @@ Public Class frmNovedadCrear
             LoadingHelper.OcultarCargando(Me)
         End Try
     End Sub
-    ' --- FIN DE LA CORRECCIÓN ---
 
     Private Sub btnCancelar_Click(sender As Object, e As EventArgs) Handles btnCancelar.Click
         DialogResult = DialogResult.Cancel
         Close()
     End Sub
 
-    Private Async Sub dtpFecha_ValueChanged(sender As Object, e As EventArgs) Handles dtpFecha.ValueChanged
-        ' Si el usuario cambia la fecha, debemos obtener la NovedadGenerada para esa nueva fecha
-        Await CargarNovedadGeneradaDelDia()
-    End Sub
 End Class

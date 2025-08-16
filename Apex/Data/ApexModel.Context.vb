@@ -59,7 +59,6 @@ Partial Public Class ApexEntities
     Public Overridable Property Novedad() As DbSet(Of Novedad)
     Public Overridable Property NovedadFoto() As DbSet(Of NovedadFoto)
     Public Overridable Property NovedadFuncionario() As DbSet(Of NovedadFuncionario)
-    Public Overridable Property NovedadGenerada() As DbSet(Of NovedadGenerada)
     Public Overridable Property OrdenCincoDetalle() As DbSet(Of OrdenCincoDetalle)
     Public Overridable Property PuestoTrabajo() As DbSet(Of PuestoTrabajo)
     Public Overridable Property RegimenAlternancia() As DbSet(Of RegimenAlternancia)
@@ -82,6 +81,7 @@ Partial Public Class ApexEntities
     Public Overridable Property vw_FuncionarioEstadosConsolidados() As DbSet(Of vw_FuncionarioEstadosConsolidados)
     Public Overridable Property vw_LicenciasCompletas() As DbSet(Of vw_LicenciasCompletas)
     Public Overridable Property vw_NotificacionesCompletas() As DbSet(Of vw_NotificacionesCompletas)
+    Public Overridable Property vw_NovedadesAgrupadas() As DbSet(Of vw_NovedadesAgrupadas)
     Public Overridable Property vw_NovedadesCompletas() As DbSet(Of vw_NovedadesCompletas)
     Public Overridable Property vw_SancionesCompletas() As DbSet(Of vw_SancionesCompletas)
 
