@@ -21,6 +21,7 @@ Partial Class frmNovedades
         Me.SplitContenedor = New System.Windows.Forms.SplitContainer()
         Me.dgvNovedades = New System.Windows.Forms.DataGridView()
         Me.PanelEncabezadoLista = New System.Windows.Forms.Panel()
+        Me.btnEditarNovedad = New System.Windows.Forms.Button() ' << MOVIDO AQUÍ
         Me.btnNuevaNovedad = New System.Windows.Forms.Button()
         Me.dtpFecha = New System.Windows.Forms.DateTimePicker()
         Me.Label1 = New System.Windows.Forms.Label()
@@ -101,6 +102,7 @@ Partial Class frmNovedades
         '
         'PanelEncabezadoLista
         '
+        Me.PanelEncabezadoLista.Controls.Add(Me.btnEditarNovedad)
         Me.PanelEncabezadoLista.Controls.Add(Me.btnNuevaNovedad)
         Me.PanelEncabezadoLista.Controls.Add(Me.dtpFecha)
         Me.PanelEncabezadoLista.Controls.Add(Me.Label1)
@@ -111,13 +113,26 @@ Partial Class frmNovedades
         Me.PanelEncabezadoLista.Size = New System.Drawing.Size(506, 62)
         Me.PanelEncabezadoLista.TabIndex = 0
         '
+        'btnEditarNovedad
+        '
+        Me.btnEditarNovedad.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnEditarNovedad.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.btnEditarNovedad.Location = New System.Drawing.Point(220, 12)
+        Me.btnEditarNovedad.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.btnEditarNovedad.Name = "btnEditarNovedad"
+        Me.btnEditarNovedad.Size = New System.Drawing.Size(120, 38)
+        Me.btnEditarNovedad.TabIndex = 3
+        Me.btnEditarNovedad.Text = "Editar..."
+        Me.btnEditarNovedad.UseVisualStyleBackColor = True
+        '
         'btnNuevaNovedad
         '
+        Me.btnNuevaNovedad.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnNuevaNovedad.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.btnNuevaNovedad.Location = New System.Drawing.Point(322, 12)
+        Me.btnNuevaNovedad.Location = New System.Drawing.Point(346, 12)
         Me.btnNuevaNovedad.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.btnNuevaNovedad.Name = "btnNuevaNovedad"
-        Me.btnNuevaNovedad.Size = New System.Drawing.Size(135, 38)
+        Me.btnNuevaNovedad.Size = New System.Drawing.Size(150, 38)
         Me.btnNuevaNovedad.TabIndex = 2
         Me.btnNuevaNovedad.Text = "Nueva Novedad"
         Me.btnNuevaNovedad.UseVisualStyleBackColor = True
@@ -125,7 +140,7 @@ Partial Class frmNovedades
         'dtpFecha
         '
         Me.dtpFecha.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.dtpFecha.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
+        Me.dtpFecha.Format = System.Windows.Forms.DateTimePickerFormat.Short
         Me.dtpFecha.Location = New System.Drawing.Point(73, 15)
         Me.dtpFecha.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.dtpFecha.Name = "dtpFecha"
@@ -186,7 +201,7 @@ Partial Class frmNovedades
         Me.TabPageFuncionarios.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.TabPageFuncionarios.Name = "TabPageFuncionarios"
         Me.TabPageFuncionarios.Padding = New System.Windows.Forms.Padding(3, 4, 3, 4)
-        Me.TabPageFuncionarios.Size = New System.Drawing.Size(566, 643)
+        Me.TabPageFuncionarios.Size = New System.Drawing.Size(567, 644)
         Me.TabPageFuncionarios.TabIndex = 1
         Me.TabPageFuncionarios.Text = "Funcionarios"
         Me.TabPageFuncionarios.UseVisualStyleBackColor = True
@@ -199,7 +214,7 @@ Partial Class frmNovedades
         Me.lstFuncionarios.Location = New System.Drawing.Point(3, 4)
         Me.lstFuncionarios.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.lstFuncionarios.Name = "lstFuncionarios"
-        Me.lstFuncionarios.Size = New System.Drawing.Size(560, 577)
+        Me.lstFuncionarios.Size = New System.Drawing.Size(561, 578)
         Me.lstFuncionarios.TabIndex = 1
         '
         'FlowLayoutPanel1
@@ -209,15 +224,15 @@ Partial Class frmNovedades
         Me.FlowLayoutPanel1.Controls.Add(Me.btnAgregarFuncionario)
         Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Bottom
         Me.FlowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
-        Me.FlowLayoutPanel1.Location = New System.Drawing.Point(3, 581)
+        Me.FlowLayoutPanel1.Location = New System.Drawing.Point(3, 582)
         Me.FlowLayoutPanel1.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
-        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(560, 58)
+        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(561, 58)
         Me.FlowLayoutPanel1.TabIndex = 0
         '
         'btnQuitarFuncionario
         '
-        Me.btnQuitarFuncionario.Location = New System.Drawing.Point(445, 4)
+        Me.btnQuitarFuncionario.Location = New System.Drawing.Point(446, 4)
         Me.btnQuitarFuncionario.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.btnQuitarFuncionario.Name = "btnQuitarFuncionario"
         Me.btnQuitarFuncionario.Size = New System.Drawing.Size(112, 50)
@@ -227,7 +242,7 @@ Partial Class frmNovedades
         '
         'btnAgregarFuncionario
         '
-        Me.btnAgregarFuncionario.Location = New System.Drawing.Point(327, 4)
+        Me.btnAgregarFuncionario.Location = New System.Drawing.Point(328, 4)
         Me.btnAgregarFuncionario.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.btnAgregarFuncionario.Name = "btnAgregarFuncionario"
         Me.btnAgregarFuncionario.Size = New System.Drawing.Size(112, 50)
@@ -242,7 +257,7 @@ Partial Class frmNovedades
         Me.TabPageFotos.Location = New System.Drawing.Point(4, 29)
         Me.TabPageFotos.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.TabPageFotos.Name = "TabPageFotos"
-        Me.TabPageFotos.Size = New System.Drawing.Size(566, 643)
+        Me.TabPageFotos.Size = New System.Drawing.Size(567, 644)
         Me.TabPageFotos.TabIndex = 2
         Me.TabPageFotos.Text = "Fotos"
         Me.TabPageFotos.UseVisualStyleBackColor = True
@@ -254,7 +269,7 @@ Partial Class frmNovedades
         Me.flpFotos.Location = New System.Drawing.Point(0, 0)
         Me.flpFotos.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.flpFotos.Name = "flpFotos"
-        Me.flpFotos.Size = New System.Drawing.Size(566, 585)
+        Me.flpFotos.Size = New System.Drawing.Size(567, 586)
         Me.flpFotos.TabIndex = 2
         '
         'FlowLayoutPanel2
@@ -264,15 +279,15 @@ Partial Class frmNovedades
         Me.FlowLayoutPanel2.Controls.Add(Me.btnAgregarFoto)
         Me.FlowLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Bottom
         Me.FlowLayoutPanel2.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
-        Me.FlowLayoutPanel2.Location = New System.Drawing.Point(0, 585)
+        Me.FlowLayoutPanel2.Location = New System.Drawing.Point(0, 586)
         Me.FlowLayoutPanel2.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.FlowLayoutPanel2.Name = "FlowLayoutPanel2"
-        Me.FlowLayoutPanel2.Size = New System.Drawing.Size(566, 58)
+        Me.FlowLayoutPanel2.Size = New System.Drawing.Size(567, 58)
         Me.FlowLayoutPanel2.TabIndex = 1
         '
         'btnEliminarFoto
         '
-        Me.btnEliminarFoto.Location = New System.Drawing.Point(451, 4)
+        Me.btnEliminarFoto.Location = New System.Drawing.Point(452, 4)
         Me.btnEliminarFoto.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.btnEliminarFoto.Name = "btnEliminarFoto"
         Me.btnEliminarFoto.Size = New System.Drawing.Size(112, 50)
@@ -282,7 +297,7 @@ Partial Class frmNovedades
         '
         'btnAgregarFoto
         '
-        Me.btnAgregarFoto.Location = New System.Drawing.Point(333, 4)
+        Me.btnAgregarFoto.Location = New System.Drawing.Point(334, 4)
         Me.btnAgregarFoto.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.btnAgregarFoto.Name = "btnAgregarFoto"
         Me.btnAgregarFoto.Size = New System.Drawing.Size(112, 50)
@@ -340,4 +355,6 @@ Partial Class frmNovedades
     Friend WithEvents FlowLayoutPanel2 As FlowLayoutPanel
     Friend WithEvents btnEliminarFoto As Button
     Friend WithEvents btnAgregarFoto As Button
+    ' << --- AÑADIDO --- >>
+    Friend WithEvents btnEditarNovedad As Button
 End Class

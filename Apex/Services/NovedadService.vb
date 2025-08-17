@@ -51,6 +51,47 @@ Public Class NovedadService
         Return nuevaNovedad
     End Function
 
+    Public Async Function ActualizarNovedadCompletaAsync(novedadActualizada As Novedad,
+                                                     nuevosFuncionarioIds As List(Of Integer)) As Task
+        If nuevosFuncionarioIds Is Nothing Then nuevosFuncionarioIds = New List(Of Integer)()
+
+        ' 1) Traer tracked (NO uses GetAll)
+        Dim ctx = _unitOfWork.Context
+        Dim novedadEnDb = Await ctx.Set(Of Novedad)().
+        Include(Function(n) n.NovedadFuncionario).
+        SingleOrDefaultAsync(Function(n) n.Id = novedadActualizada.Id)
+
+        If novedadEnDb Is Nothing Then Throw New Exception("La novedad que intenta actualizar ya no existe.")
+
+        ' 2) Actualizar escalares (si quieres, asigna a mano)
+        ctx.Entry(novedadEnDb).CurrentValues.SetValues(New With {
+        .Fecha = novedadActualizada.Fecha,
+        .Texto = novedadActualizada.Texto,
+        .EstadoId = novedadActualizada.EstadoId
+    })
+
+        ' 3) Sincronizar funcionarios
+        Dim actuales = novedadEnDb.NovedadFuncionario.Select(Function(nf) nf.FuncionarioId).ToList()
+        Dim quitar = actuales.Except(nuevosFuncionarioIds).ToList()
+        Dim agregar = nuevosFuncionarioIds.Except(actuales).ToList()
+
+        If quitar.Any() Then
+            Dim aQuitar = novedadEnDb.NovedadFuncionario.Where(Function(nf) quitar.Contains(nf.FuncionarioId)).ToList()
+            For Each nf In aQuitar
+                ctx.Set(Of NovedadFuncionario)().Remove(nf)
+            Next
+        End If
+
+        For Each id In agregar
+            ctx.Set(Of NovedadFuncionario)().Add(New NovedadFuncionario With {.NovedadId = novedadEnDb.Id, .FuncionarioId = id})
+        Next
+
+        Await _unitOfWork.CommitAsync()
+    End Function
+
+
+
+
     ''' <summary>
     ''' Obtiene la lista de funcionarios asociados a una novedad específica.
     ''' </summary>
