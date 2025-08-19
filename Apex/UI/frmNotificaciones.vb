@@ -134,9 +134,6 @@ Public Class frmNotificaciones
                     Return
                 End If
 
-                ' Aquí puedes añadir más reglas de validación si lo necesitas...
-
-
                 ' Si todas las validaciones pasan, actualizamos el estado.
                 Try
                     Await _svc.UpdateEstadoAsync(idSeleccionado, nuevoEstadoId)
