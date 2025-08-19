@@ -51,41 +51,52 @@ Public Class NovedadService
         Return nuevaNovedad
     End Function
 
-    Public Async Function ActualizarNovedadCompletaAsync(novedadActualizada As Novedad,
-                                                     nuevosFuncionarioIds As List(Of Integer)) As Task
-        If nuevosFuncionarioIds Is Nothing Then nuevosFuncionarioIds = New List(Of Integer)()
+    ' En el archivo: Apex/Services/NovedadService.vb
 
-        ' 1) Traer tracked (NO uses GetAll)
-        Dim ctx = _unitOfWork.Context
-        Dim novedadEnDb = Await ctx.Set(Of Novedad)().
+    ''' <summary>
+    ''' Actualiza una novedad existente, sincronizando solo los campos modificables y la lista de funcionarios.
+    ''' Las fotos y otras relaciones no se ven afectadas.
+    ''' </summary>
+    Public Async Function ActualizarNovedadCompletaAsync(novedadActualizada As Novedad, nuevosFuncionarioIds As List(Of Integer)) As Task
+        ' 1. Obtener la Novedad original desde la base de datos, incluyendo la lista de funcionarios actual.
+        '    Es crucial traer la entidad "trackeada" por el contexto para que EF maneje los cambios.
+        Dim novedadEnDb = Await _unitOfWork.Repository(Of Novedad)().
+        GetAll().
         Include(Function(n) n.NovedadFuncionario).
         SingleOrDefaultAsync(Function(n) n.Id = novedadActualizada.Id)
 
-        If novedadEnDb Is Nothing Then Throw New Exception("La novedad que intenta actualizar ya no existe.")
+        If novedadEnDb Is Nothing Then
+            Throw New KeyNotFoundException("La novedad que intenta actualizar ya no existe en la base de datos.")
+        End If
 
-        ' 2) Actualizar escalares (si quieres, asigna a mano)
-        ctx.Entry(novedadEnDb).CurrentValues.SetValues(New With {
-        .Fecha = novedadActualizada.Fecha,
-        .Texto = novedadActualizada.Texto,
-        .EstadoId = novedadActualizada.EstadoId
-    })
+        ' 2. Actualizar solo las propiedades escalares (los campos simples) que se modifican en el formulario de edición.
+        '    Esto evita que Entity Framework toque otras propiedades o relaciones no relacionadas como las fotos.
+        novedadEnDb.Fecha = novedadActualizada.Fecha
+        novedadEnDb.Texto = novedadActualizada.Texto
+        novedadEnDb.EstadoId = novedadActualizada.EstadoId ' Asumiendo que el estado también puede cambiar
 
-        ' 3) Sincronizar funcionarios
-        Dim actuales = novedadEnDb.NovedadFuncionario.Select(Function(nf) nf.FuncionarioId).ToList()
-        Dim quitar = actuales.Except(nuevosFuncionarioIds).ToList()
-        Dim agregar = nuevosFuncionarioIds.Except(actuales).ToList()
+        ' 3. Sincronizar la lista de funcionarios (esta lógica es para añadir/quitar solo los necesarios).
+        Dim idsActuales = novedadEnDb.NovedadFuncionario.Select(Function(nf) nf.FuncionarioId).ToList()
+        Dim idsParaQuitar = idsActuales.Except(nuevosFuncionarioIds).ToList()
+        Dim idsParaAgregar = nuevosFuncionarioIds.Except(idsActuales).ToList()
 
-        If quitar.Any() Then
-            Dim aQuitar = novedadEnDb.NovedadFuncionario.Where(Function(nf) quitar.Contains(nf.FuncionarioId)).ToList()
-            For Each nf In aQuitar
-                ctx.Set(Of NovedadFuncionario)().Remove(nf)
+        ' Quitar los que ya no están
+        If idsParaQuitar.Any() Then
+            Dim relacionesAQuitar = novedadEnDb.NovedadFuncionario.Where(Function(nf) idsParaQuitar.Contains(nf.FuncionarioId)).ToList()
+            For Each rel In relacionesAQuitar
+                _unitOfWork.Repository(Of NovedadFuncionario)().Remove(rel)
             Next
         End If
 
-        For Each id In agregar
-            ctx.Set(Of NovedadFuncionario)().Add(New NovedadFuncionario With {.NovedadId = novedadEnDb.Id, .FuncionarioId = id})
+        ' Agregar los nuevos
+        For Each funcId In idsParaAgregar
+            _unitOfWork.Repository(Of NovedadFuncionario)().Add(New NovedadFuncionario With {
+            .NovedadId = novedadEnDb.Id,
+            .FuncionarioId = funcId
+        })
         Next
 
+        ' 4. Guardar todos los cambios en una única transacción.
         Await _unitOfWork.CommitAsync()
     End Function
 

@@ -9,11 +9,31 @@ Public Class frmNovedades
     ' Variable de clase para guardar la novedad seleccionada, evitando errores de referencia
     Private _novedadSeleccionada As vw_NovedadesAgrupadas = Nothing
 
+    ' En el archivo: Apex/UI/frmNovedades.vb
+
     Private Async Sub frmNovedades_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
         ConfigurarGrilla()
-        ' Carga inicial de todas las novedades
-        Await CargarNovedadesAsync()
+
+        ' --- INICIO DE LA CORRECCIÓN ---
+        ' Desactivamos temporalmente el evento de selección para evitar que se dispare
+        ' mientras se cargan los datos iniciales.
+        RemoveHandler dgvNovedades.SelectionChanged, AddressOf dgvNovedades_SelectionChanged
+
+        ' Cargamos los datos de la grilla
+        Await CargarNovedadesAsync(mantenerSeleccion:=False) ' Le decimos que no intente mantener selección
+
+        ' Si hay filas, seleccionamos la primera manualmente
+        If dgvNovedades.Rows.Count > 0 Then
+            dgvNovedades.Rows(0).Selected = True
+        End If
+
+        ' Volvemos a activar el evento para que funcione normalmente cuando el usuario haga clic.
+        AddHandler dgvNovedades.SelectionChanged, AddressOf dgvNovedades_SelectionChanged
+
+        ' Forzamos la actualización del panel de detalle una sola vez con la selección correcta.
+        Await MostrarDetalleNovedadSeleccionada()
+        ' --- FIN DE LA CORRECCIÓN ---
     End Sub
 
     Private Async Sub dgvNovedades_SelectionChanged(sender As Object, e As EventArgs) Handles dgvNovedades.SelectionChanged
