@@ -712,6 +712,25 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_NovedadesCompletas' no tiene def
           <Property Name="CI" Type="char" MaxLength="8" Nullable="false" />
           <Property Name="Estado" Type="nvarchar" MaxLength="40" Nullable="false" />
         </EntityType>
+        <!--Errores durante la generación:
+advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
+        <EntityType Name="vw_SancionesCompletas">
+          <Key>
+            <PropertyRef Name="Id" />
+            <PropertyRef Name="FuncionarioId" />
+            <PropertyRef Name="CI" />
+            <PropertyRef Name="NombreFuncionario" />
+            <PropertyRef Name="FechaDesde" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" />
+          <Property Name="FuncionarioId" Type="int" Nullable="false" />
+          <Property Name="CI" Type="char" MaxLength="8" Nullable="false" />
+          <Property Name="NombreFuncionario" Type="nvarchar" MaxLength="60" Nullable="false" />
+          <Property Name="FechaDesde" Type="date" Nullable="false" />
+          <Property Name="FechaHasta" Type="date" />
+          <Property Name="Resolucion" Type="nvarchar" MaxLength="100" />
+          <Property Name="Observaciones" Type="nvarchar(max)" />
+        </EntityType>
         <Association Name="FK__Funcionar__Estad__282DF8C2">
           <End Role="EstadoCivil" Type="Self.EstadoCivil" Multiplicity="0..1" />
           <End Role="Funcionario" Type="Self.Funcionario" Multiplicity="*" />
@@ -1530,6 +1549,18 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_NovedadesCompletas' no tiene def
     [vw_NovedadesCompletas].[CI] AS [CI], 
     [vw_NovedadesCompletas].[Estado] AS [Estado]
     FROM [dbo].[vw_NovedadesCompletas] AS [vw_NovedadesCompletas]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="vw_SancionesCompletas" EntityType="Self.vw_SancionesCompletas" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [vw_SancionesCompletas].[Id] AS [Id], 
+    [vw_SancionesCompletas].[FuncionarioId] AS [FuncionarioId], 
+    [vw_SancionesCompletas].[CI] AS [CI], 
+    [vw_SancionesCompletas].[NombreFuncionario] AS [NombreFuncionario], 
+    [vw_SancionesCompletas].[FechaDesde] AS [FechaDesde], 
+    [vw_SancionesCompletas].[FechaHasta] AS [FechaHasta], 
+    [vw_SancionesCompletas].[Resolucion] AS [Resolucion], 
+    [vw_SancionesCompletas].[Observaciones] AS [Observaciones]
+    FROM [dbo].[vw_SancionesCompletas] AS [vw_SancionesCompletas]</DefiningQuery>
           </EntitySet>
           <AssociationSet Name="FK__Funcionar__Estad__282DF8C2" Association="Self.FK__Funcionar__Estad__282DF8C2">
             <End Role="EstadoCivil" EntitySet="EstadoCivil" />
@@ -2550,6 +2581,23 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_NovedadesCompletas' no tiene def
           <Property Name="CI" Type="String" MaxLength="8" FixedLength="true" Unicode="false" Nullable="false" />
           <Property Name="Estado" Type="String" MaxLength="40" FixedLength="false" Unicode="true" Nullable="false" />
         </EntityType>
+        <EntityType Name="vw_SancionesCompletas">
+          <Key>
+            <PropertyRef Name="Id" />
+            <PropertyRef Name="FuncionarioId" />
+            <PropertyRef Name="CI" />
+            <PropertyRef Name="NombreFuncionario" />
+            <PropertyRef Name="FechaDesde" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" />
+          <Property Name="FuncionarioId" Type="Int32" Nullable="false" />
+          <Property Name="CI" Type="String" MaxLength="8" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="NombreFuncionario" Type="String" MaxLength="60" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="FechaDesde" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="FechaHasta" Type="DateTime" Precision="0" />
+          <Property Name="Resolucion" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
         <Association Name="FK_PuestoTrabajo_AreaTrabajo">
           <End Role="AreaTrabajo" Type="Self.AreaTrabajo" Multiplicity="0..1" />
           <End Role="PuestoTrabajo" Type="Self.PuestoTrabajo" Multiplicity="*" />
@@ -3261,6 +3309,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_NovedadesCompletas' no tiene def
           <EntitySet Name="vw_NotificacionesCompletas" EntityType="Self.vw_NotificacionesCompletas" />
           <EntitySet Name="vw_NovedadesAgrupadas" EntityType="Self.vw_NovedadesAgrupadas" />
           <EntitySet Name="vw_NovedadesCompletas" EntityType="Self.vw_NovedadesCompletas" />
+          <EntitySet Name="vw_SancionesCompletas" EntityType="Self.vw_SancionesCompletas" />
           <AssociationSet Name="FK_PuestoTrabajo_AreaTrabajo" Association="Self.FK_PuestoTrabajo_AreaTrabajo">
             <End Role="AreaTrabajo" EntitySet="AreaTrabajo" />
             <End Role="PuestoTrabajo" EntitySet="PuestoTrabajo" />
@@ -4236,6 +4285,20 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_NovedadesCompletas' no tiene def
                 <ScalarProperty Name="NombreFuncionario" ColumnName="NombreFuncionario" />
                 <ScalarProperty Name="CI" ColumnName="CI" />
                 <ScalarProperty Name="Estado" ColumnName="Estado" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vw_SancionesCompletas">
+            <EntityTypeMapping TypeName="ApexModel.vw_SancionesCompletas">
+              <MappingFragment StoreEntitySet="vw_SancionesCompletas">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="FuncionarioId" ColumnName="FuncionarioId" />
+                <ScalarProperty Name="CI" ColumnName="CI" />
+                <ScalarProperty Name="NombreFuncionario" ColumnName="NombreFuncionario" />
+                <ScalarProperty Name="FechaDesde" ColumnName="FechaDesde" />
+                <ScalarProperty Name="FechaHasta" ColumnName="FechaHasta" />
+                <ScalarProperty Name="Resolucion" ColumnName="Resolucion" />
+                <ScalarProperty Name="Observaciones" ColumnName="Observaciones" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

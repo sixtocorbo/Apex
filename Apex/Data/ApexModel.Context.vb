@@ -84,6 +84,7 @@ Partial Public Class ApexEntities
     Public Overridable Property vw_NotificacionesCompletas() As DbSet(Of vw_NotificacionesCompletas)
     Public Overridable Property vw_NovedadesAgrupadas() As DbSet(Of vw_NovedadesAgrupadas)
     Public Overridable Property vw_NovedadesCompletas() As DbSet(Of vw_NovedadesCompletas)
+    Public Overridable Property vw_SancionesCompletas() As DbSet(Of vw_SancionesCompletas)
 
     Public Overridable Function usp_Apex_ImportarAgregadosMensuales(tipoHistorico As String, registrosAfectados As ObjectParameter) As Integer
         Dim tipoHistoricoParameter As ObjectParameter = If(tipoHistorico IsNot Nothing, New ObjectParameter("TipoHistorico", tipoHistorico), New ObjectParameter("TipoHistorico", GetType(String)))

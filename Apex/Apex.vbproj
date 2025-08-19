@@ -372,6 +372,9 @@
     <Compile Include="Data\vw_NovedadesCompletas.vb">
       <DependentUpon>ApexModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Data\vw_SancionesCompletas.vb">
+      <DependentUpon>ApexModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Services\AppTheme.vb" />
     <Compile Include="Services\ChipControl.vb">
       <SubType>UserControl</SubType>
