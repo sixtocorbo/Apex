@@ -1,5 +1,4 @@
-﻿' Apex/Services/SancionService.vb
-Imports System.Data.Entity
+﻿Imports System.Data.Entity
 Imports System.Data.SqlClient
 
 Public Class SancionService
