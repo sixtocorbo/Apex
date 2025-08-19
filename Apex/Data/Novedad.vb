@@ -12,11 +12,14 @@ Imports System.Collections.Generic
 
 Partial Public Class Novedad
     Public Property Id As Integer
+    Public Property NovedadGeneradaId As Integer
     Public Property Fecha As Date
     Public Property Texto As String
     Public Property EstadoId As Nullable(Of Byte)
     Public Property CreatedAt As Date
 
+    Public Overridable Property NotificacionEstado As NotificacionEstado
+    Public Overridable Property NovedadGenerada As NovedadGenerada
     Public Overridable Property NovedadFoto As ICollection(Of NovedadFoto) = New HashSet(Of NovedadFoto)
     Public Overridable Property NovedadFuncionario As ICollection(Of NovedadFuncionario) = New HashSet(Of NovedadFuncionario)
 

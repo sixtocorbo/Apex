@@ -10,14 +10,12 @@
 Imports System
 Imports System.Collections.Generic
 
-Partial Public Class vw_SancionesCompletas
+Partial Public Class NovedadGenerada
     Public Property Id As Integer
-    Public Property FuncionarioId As Integer
-    Public Property Cedula As String
-    Public Property NombreFuncionario As String
-    Public Property FechaDesde As Date
-    Public Property FechaHasta As Nullable(Of Date)
-    Public Property Resolucion As String
-    Public Property Observaciones As String
+    Public Property Fecha As Date
+    Public Property CreatedAt As Date
+
+    Public Overridable Property Novedad As ICollection(Of Novedad) = New HashSet(Of Novedad)
+    Public Overridable Property NovedadFoto As ICollection(Of NovedadFoto) = New HashSet(Of NovedadFoto)
 
 End Class

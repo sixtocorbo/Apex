@@ -363,6 +363,7 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="NovedadGeneradaId" Type="int" Nullable="false" />
           <Property Name="Fecha" Type="date" Nullable="false" />
           <Property Name="Texto" Type="nvarchar(max)" Nullable="false" />
           <Property Name="EstadoId" Type="tinyint" />
@@ -373,10 +374,11 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="NovedadId" Type="int" Nullable="false" />
+          <Property Name="NovedadGeneradaId" Type="int" Nullable="false" />
           <Property Name="Foto" Type="varbinary(max)" Nullable="false" />
           <Property Name="FileName" Type="nvarchar" MaxLength="255" />
           <Property Name="CreatedAt" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="NovedadId" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="NovedadFuncionario">
           <Key>
@@ -385,6 +387,14 @@
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="NovedadId" Type="int" Nullable="false" />
           <Property Name="FuncionarioId" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="NovedadGenerada">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Fecha" Type="date" Nullable="false" />
+          <Property Name="CreatedAt" Type="datetime2" Precision="7" Nullable="false" />
         </EntityType>
         <EntityType Name="OrdenCincoDetalle">
           <Key>
@@ -672,19 +682,20 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_NovedadesAgrupadas' no tiene def
           <Key>
             <PropertyRef Name="Id" />
             <PropertyRef Name="Fecha" />
-            <PropertyRef Name="Estado" />
+            <PropertyRef Name="Funcionarios" />
           </Key>
           <Property Name="Id" Type="int" Nullable="false" />
           <Property Name="Fecha" Type="date" Nullable="false" />
           <Property Name="Resumen" Type="nvarchar(max)" />
-          <Property Name="Funcionarios" Type="nvarchar(max)" />
-          <Property Name="Estado" Type="nvarchar" MaxLength="40" Nullable="false" />
+          <Property Name="Funcionarios" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Estado" Type="nvarchar" MaxLength="40" />
         </EntityType>
         <!--Errores durante la generación:
 advertencia 6002: La tabla o vista 'Apex.dbo.vw_NovedadesCompletas' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
         <EntityType Name="vw_NovedadesCompletas">
           <Key>
             <PropertyRef Name="Id" />
+            <PropertyRef Name="NovedadGeneradaId" />
             <PropertyRef Name="Fecha" />
             <PropertyRef Name="Texto" />
             <PropertyRef Name="NombreFuncionario" />
@@ -692,6 +703,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_NovedadesCompletas' no tiene def
             <PropertyRef Name="Estado" />
           </Key>
           <Property Name="Id" Type="int" Nullable="false" />
+          <Property Name="NovedadGeneradaId" Type="int" Nullable="false" />
           <Property Name="Fecha" Type="date" Nullable="false" />
           <Property Name="Texto" Type="nvarchar(max)" Nullable="false" />
           <Property Name="EstadoId" Type="tinyint" />
@@ -699,25 +711,6 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_NovedadesCompletas' no tiene def
           <Property Name="NombreFuncionario" Type="nvarchar" MaxLength="60" Nullable="false" />
           <Property Name="CI" Type="char" MaxLength="8" Nullable="false" />
           <Property Name="Estado" Type="nvarchar" MaxLength="40" Nullable="false" />
-        </EntityType>
-        <!--Errores durante la generación:
-advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
-        <EntityType Name="vw_SancionesCompletas">
-          <Key>
-            <PropertyRef Name="Id" />
-            <PropertyRef Name="FuncionarioId" />
-            <PropertyRef Name="Cedula" />
-            <PropertyRef Name="NombreFuncionario" />
-            <PropertyRef Name="FechaDesde" />
-          </Key>
-          <Property Name="Id" Type="int" Nullable="false" />
-          <Property Name="FuncionarioId" Type="int" Nullable="false" />
-          <Property Name="Cedula" Type="char" MaxLength="8" Nullable="false" />
-          <Property Name="NombreFuncionario" Type="nvarchar" MaxLength="60" Nullable="false" />
-          <Property Name="FechaDesde" Type="date" Nullable="false" />
-          <Property Name="FechaHasta" Type="date" />
-          <Property Name="Resolucion" Type="nvarchar" MaxLength="100" />
-          <Property Name="Observaciones" Type="nvarchar(max)" />
         </EntityType>
         <Association Name="FK__Funcionar__Estad__282DF8C2">
           <End Role="EstadoCivil" Type="Self.EstadoCivil" Multiplicity="0..1" />
@@ -1167,6 +1160,30 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Novedad_Estado">
+          <End Role="NotificacionEstado" Type="Self.NotificacionEstado" Multiplicity="0..1" />
+          <End Role="Novedad" Type="Self.Novedad" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="NotificacionEstado">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Novedad">
+              <PropertyRef Name="EstadoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Novedad_NG">
+          <End Role="NovedadGenerada" Type="Self.NovedadGenerada" Multiplicity="1" />
+          <End Role="Novedad" Type="Self.Novedad" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="NovedadGenerada">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Novedad">
+              <PropertyRef Name="NovedadGeneradaId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_NovedadFoto_Novedad">
           <End Role="Novedad" Type="Self.Novedad" Multiplicity="1">
             <OnDelete Action="Cascade" />
@@ -1181,10 +1198,20 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_NovFoto_NG">
+          <End Role="NovedadGenerada" Type="Self.NovedadGenerada" Multiplicity="1" />
+          <End Role="NovedadFoto" Type="Self.NovedadFoto" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="NovedadGenerada">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="NovedadFoto">
+              <PropertyRef Name="NovedadGeneradaId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_NovFunc_Func">
-          <End Role="Funcionario" Type="Self.Funcionario" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
+          <End Role="Funcionario" Type="Self.Funcionario" Multiplicity="1" />
           <End Role="NovedadFuncionario" Type="Self.NovedadFuncionario" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Funcionario">
@@ -1196,9 +1223,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_NovFunc_Novedad">
-          <End Role="Novedad" Type="Self.Novedad" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
+          <End Role="Novedad" Type="Self.Novedad" Multiplicity="1" />
           <End Role="NovedadFuncionario" Type="Self.NovedadFuncionario" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Novedad">
@@ -1406,6 +1431,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <EntitySet Name="Novedad" EntityType="Self.Novedad" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="NovedadFoto" EntityType="Self.NovedadFoto" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="NovedadFuncionario" EntityType="Self.NovedadFuncionario" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="NovedadGenerada" EntityType="Self.NovedadGenerada" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="OrdenCincoDetalle" EntityType="Self.OrdenCincoDetalle" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="PuestoTrabajo" EntityType="Self.PuestoTrabajo" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="RegimenAlternancia" EntityType="Self.RegimenAlternancia" Schema="dbo" store:Type="Tables" />
@@ -1495,6 +1521,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <EntitySet Name="vw_NovedadesCompletas" EntityType="Self.vw_NovedadesCompletas" store:Type="Views" store:Schema="dbo">
             <DefiningQuery>SELECT 
     [vw_NovedadesCompletas].[Id] AS [Id], 
+    [vw_NovedadesCompletas].[NovedadGeneradaId] AS [NovedadGeneradaId], 
     [vw_NovedadesCompletas].[Fecha] AS [Fecha], 
     [vw_NovedadesCompletas].[Texto] AS [Texto], 
     [vw_NovedadesCompletas].[EstadoId] AS [EstadoId], 
@@ -1503,18 +1530,6 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
     [vw_NovedadesCompletas].[CI] AS [CI], 
     [vw_NovedadesCompletas].[Estado] AS [Estado]
     FROM [dbo].[vw_NovedadesCompletas] AS [vw_NovedadesCompletas]</DefiningQuery>
-          </EntitySet>
-          <EntitySet Name="vw_SancionesCompletas" EntityType="Self.vw_SancionesCompletas" store:Type="Views" store:Schema="dbo">
-            <DefiningQuery>SELECT 
-    [vw_SancionesCompletas].[Id] AS [Id], 
-    [vw_SancionesCompletas].[FuncionarioId] AS [FuncionarioId], 
-    [vw_SancionesCompletas].[Cedula] AS [Cedula], 
-    [vw_SancionesCompletas].[NombreFuncionario] AS [NombreFuncionario], 
-    [vw_SancionesCompletas].[FechaDesde] AS [FechaDesde], 
-    [vw_SancionesCompletas].[FechaHasta] AS [FechaHasta], 
-    [vw_SancionesCompletas].[Resolucion] AS [Resolucion], 
-    [vw_SancionesCompletas].[Observaciones] AS [Observaciones]
-    FROM [dbo].[vw_SancionesCompletas] AS [vw_SancionesCompletas]</DefiningQuery>
           </EntitySet>
           <AssociationSet Name="FK__Funcionar__Estad__282DF8C2" Association="Self.FK__Funcionar__Estad__282DF8C2">
             <End Role="EstadoCivil" EntitySet="EstadoCivil" />
@@ -1664,8 +1679,20 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             <End Role="TipoNotificacion" EntitySet="TipoNotificacion" />
             <End Role="NotificacionPersonal" EntitySet="NotificacionPersonal" />
           </AssociationSet>
+          <AssociationSet Name="FK_Novedad_Estado" Association="Self.FK_Novedad_Estado">
+            <End Role="NotificacionEstado" EntitySet="NotificacionEstado" />
+            <End Role="Novedad" EntitySet="Novedad" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Novedad_NG" Association="Self.FK_Novedad_NG">
+            <End Role="NovedadGenerada" EntitySet="NovedadGenerada" />
+            <End Role="Novedad" EntitySet="Novedad" />
+          </AssociationSet>
           <AssociationSet Name="FK_NovedadFoto_Novedad" Association="Self.FK_NovedadFoto_Novedad">
             <End Role="Novedad" EntitySet="Novedad" />
+            <End Role="NovedadFoto" EntitySet="NovedadFoto" />
+          </AssociationSet>
+          <AssociationSet Name="FK_NovFoto_NG" Association="Self.FK_NovFoto_NG">
+            <End Role="NovedadGenerada" EntitySet="NovedadGenerada" />
             <End Role="NovedadFoto" EntitySet="NovedadFoto" />
           </AssociationSet>
           <AssociationSet Name="FK_NovFunc_Func" Association="Self.FK_NovFunc_Func">
@@ -2127,6 +2154,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <Property Name="Nombre" Type="String" MaxLength="40" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Orden" Type="Byte" Nullable="false" />
           <NavigationProperty Name="NotificacionPersonal" Relationship="Self.FK_NotifPers_Estado" FromRole="NotificacionEstado" ToRole="NotificacionPersonal" />
+          <NavigationProperty Name="Novedad" Relationship="Self.FK_Novedad_Estado" FromRole="NotificacionEstado" ToRole="Novedad" />
         </EntityType>
         <EntityType Name="NotificacionPersonal">
           <Key>
@@ -2154,10 +2182,13 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="NovedadGeneradaId" Type="Int32" Nullable="false" />
           <Property Name="Fecha" Type="DateTime" Nullable="false" Precision="0" />
           <Property Name="Texto" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="EstadoId" Type="Byte" />
           <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="NotificacionEstado" Relationship="Self.FK_Novedad_Estado" FromRole="Novedad" ToRole="NotificacionEstado" />
+          <NavigationProperty Name="NovedadGenerada" Relationship="Self.FK_Novedad_NG" FromRole="Novedad" ToRole="NovedadGenerada" />
           <NavigationProperty Name="NovedadFoto" Relationship="Self.FK_NovedadFoto_Novedad" FromRole="Novedad" ToRole="NovedadFoto" />
           <NavigationProperty Name="NovedadFuncionario" Relationship="Self.FK_NovFunc_Novedad" FromRole="Novedad" ToRole="NovedadFuncionario" />
         </EntityType>
@@ -2166,11 +2197,13 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="NovedadId" Type="Int32" Nullable="false" />
+          <Property Name="NovedadGeneradaId" Type="Int32" Nullable="false" />
           <Property Name="Foto" Type="Binary" MaxLength="Max" FixedLength="false" Nullable="false" />
           <Property Name="FileName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
           <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="NovedadId" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Novedad" Relationship="Self.FK_NovedadFoto_Novedad" FromRole="NovedadFoto" ToRole="Novedad" />
+          <NavigationProperty Name="NovedadGenerada" Relationship="Self.FK_NovFoto_NG" FromRole="NovedadFoto" ToRole="NovedadGenerada" />
         </EntityType>
         <EntityType Name="NovedadFuncionario">
           <Key>
@@ -2181,6 +2214,16 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <Property Name="FuncionarioId" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Funcionario" Relationship="Self.FK_NovFunc_Func" FromRole="NovedadFuncionario" ToRole="Funcionario" />
           <NavigationProperty Name="Novedad" Relationship="Self.FK_NovFunc_Novedad" FromRole="NovedadFuncionario" ToRole="Novedad" />
+        </EntityType>
+        <EntityType Name="NovedadGenerada">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Fecha" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="Novedad" Relationship="Self.FK_Novedad_NG" FromRole="NovedadGenerada" ToRole="Novedad" />
+          <NavigationProperty Name="NovedadFoto" Relationship="Self.FK_NovFoto_NG" FromRole="NovedadGenerada" ToRole="NovedadFoto" />
         </EntityType>
         <EntityType Name="OrdenCincoDetalle">
           <Key>
@@ -2479,17 +2522,18 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <Key>
             <PropertyRef Name="Id" />
             <PropertyRef Name="Fecha" />
-            <PropertyRef Name="Estado" />
+            <PropertyRef Name="Funcionarios" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" />
           <Property Name="Fecha" Type="DateTime" Nullable="false" Precision="0" />
           <Property Name="Resumen" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Funcionarios" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Estado" Type="String" MaxLength="40" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Funcionarios" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Estado" Type="String" MaxLength="40" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="vw_NovedadesCompletas">
           <Key>
             <PropertyRef Name="Id" />
+            <PropertyRef Name="NovedadGeneradaId" />
             <PropertyRef Name="Fecha" />
             <PropertyRef Name="Texto" />
             <PropertyRef Name="NombreFuncionario" />
@@ -2497,6 +2541,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             <PropertyRef Name="Estado" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" />
+          <Property Name="NovedadGeneradaId" Type="Int32" Nullable="false" />
           <Property Name="Fecha" Type="DateTime" Nullable="false" Precision="0" />
           <Property Name="Texto" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="EstadoId" Type="Byte" />
@@ -2504,23 +2549,6 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <Property Name="NombreFuncionario" Type="String" MaxLength="60" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="CI" Type="String" MaxLength="8" FixedLength="true" Unicode="false" Nullable="false" />
           <Property Name="Estado" Type="String" MaxLength="40" FixedLength="false" Unicode="true" Nullable="false" />
-        </EntityType>
-        <EntityType Name="vw_SancionesCompletas">
-          <Key>
-            <PropertyRef Name="Id" />
-            <PropertyRef Name="FuncionarioId" />
-            <PropertyRef Name="Cedula" />
-            <PropertyRef Name="NombreFuncionario" />
-            <PropertyRef Name="FechaDesde" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" />
-          <Property Name="FuncionarioId" Type="Int32" Nullable="false" />
-          <Property Name="Cedula" Type="String" MaxLength="8" FixedLength="true" Unicode="false" Nullable="false" />
-          <Property Name="NombreFuncionario" Type="String" MaxLength="60" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="FechaDesde" Type="DateTime" Nullable="false" Precision="0" />
-          <Property Name="FechaHasta" Type="DateTime" Precision="0" />
-          <Property Name="Resolucion" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
-          <Property Name="Observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
         </EntityType>
         <Association Name="FK_PuestoTrabajo_AreaTrabajo">
           <End Role="AreaTrabajo" Type="Self.AreaTrabajo" Multiplicity="0..1" />
@@ -3015,9 +3043,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_NovFunc_Func">
-          <End Role="Funcionario" Type="Self.Funcionario" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
+          <End Role="Funcionario" Type="Self.Funcionario" Multiplicity="1" />
           <End Role="NovedadFuncionario" Type="Self.NovedadFuncionario" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Funcionario">
@@ -3064,6 +3090,18 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Novedad_Estado">
+          <End Role="NotificacionEstado" Type="Self.NotificacionEstado" Multiplicity="0..1" />
+          <End Role="Novedad" Type="Self.Novedad" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="NotificacionEstado">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Novedad">
+              <PropertyRef Name="EstadoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_NotifPers_Tipo">
           <End Role="TipoNotificacion" Type="Self.TipoNotificacion" Multiplicity="1" />
           <End Role="NotificacionPersonal" Type="Self.NotificacionPersonal" Multiplicity="*" />
@@ -3073,6 +3111,18 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             </Principal>
             <Dependent Role="NotificacionPersonal">
               <PropertyRef Name="TipoNotificacionId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Novedad_NG">
+          <End Role="NovedadGenerada" Type="Self.NovedadGenerada" Multiplicity="1" />
+          <End Role="Novedad" Type="Self.Novedad" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="NovedadGenerada">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Novedad">
+              <PropertyRef Name="NovedadGeneradaId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -3091,9 +3141,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_NovFunc_Novedad">
-          <End Role="Novedad" Type="Self.Novedad" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
+          <End Role="Novedad" Type="Self.Novedad" Multiplicity="1" />
           <End Role="NovedadFuncionario" Type="Self.NovedadFuncionario" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Novedad">
@@ -3101,6 +3149,18 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             </Principal>
             <Dependent Role="NovedadFuncionario">
               <PropertyRef Name="NovedadId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_NovFoto_NG">
+          <End Role="NovedadGenerada" Type="Self.NovedadGenerada" Multiplicity="1" />
+          <End Role="NovedadFoto" Type="Self.NovedadFoto" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="NovedadGenerada">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="NovedadFoto">
+              <PropertyRef Name="NovedadGeneradaId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -3176,6 +3236,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <EntitySet Name="Novedad" EntityType="Self.Novedad" />
           <EntitySet Name="NovedadFoto" EntityType="Self.NovedadFoto" />
           <EntitySet Name="NovedadFuncionario" EntityType="Self.NovedadFuncionario" />
+          <EntitySet Name="NovedadGenerada" EntityType="Self.NovedadGenerada" />
           <EntitySet Name="OrdenCincoDetalle" EntityType="Self.OrdenCincoDetalle" />
           <EntitySet Name="PuestoTrabajo" EntityType="Self.PuestoTrabajo" />
           <EntitySet Name="RegimenAlternancia" EntityType="Self.RegimenAlternancia" />
@@ -3200,7 +3261,6 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <EntitySet Name="vw_NotificacionesCompletas" EntityType="Self.vw_NotificacionesCompletas" />
           <EntitySet Name="vw_NovedadesAgrupadas" EntityType="Self.vw_NovedadesAgrupadas" />
           <EntitySet Name="vw_NovedadesCompletas" EntityType="Self.vw_NovedadesCompletas" />
-          <EntitySet Name="vw_SancionesCompletas" EntityType="Self.vw_SancionesCompletas" />
           <AssociationSet Name="FK_PuestoTrabajo_AreaTrabajo" Association="Self.FK_PuestoTrabajo_AreaTrabajo">
             <End Role="AreaTrabajo" EntitySet="AreaTrabajo" />
             <End Role="PuestoTrabajo" EntitySet="PuestoTrabajo" />
@@ -3377,9 +3437,17 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             <End Role="NotificacionEstado" EntitySet="NotificacionEstado" />
             <End Role="NotificacionPersonal" EntitySet="NotificacionPersonal" />
           </AssociationSet>
+          <AssociationSet Name="FK_Novedad_Estado" Association="Self.FK_Novedad_Estado">
+            <End Role="NotificacionEstado" EntitySet="NotificacionEstado" />
+            <End Role="Novedad" EntitySet="Novedad" />
+          </AssociationSet>
           <AssociationSet Name="FK_NotifPers_Tipo" Association="Self.FK_NotifPers_Tipo">
             <End Role="TipoNotificacion" EntitySet="TipoNotificacion" />
             <End Role="NotificacionPersonal" EntitySet="NotificacionPersonal" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Novedad_NG" Association="Self.FK_Novedad_NG">
+            <End Role="NovedadGenerada" EntitySet="NovedadGenerada" />
+            <End Role="Novedad" EntitySet="Novedad" />
           </AssociationSet>
           <AssociationSet Name="FK_NovedadFoto_Novedad" Association="Self.FK_NovedadFoto_Novedad">
             <End Role="Novedad" EntitySet="Novedad" />
@@ -3388,6 +3456,10 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <AssociationSet Name="FK_NovFunc_Novedad" Association="Self.FK_NovFunc_Novedad">
             <End Role="Novedad" EntitySet="Novedad" />
             <End Role="NovedadFuncionario" EntitySet="NovedadFuncionario" />
+          </AssociationSet>
+          <AssociationSet Name="FK_NovFoto_NG" Association="Self.FK_NovFoto_NG">
+            <End Role="NovedadGenerada" EntitySet="NovedadGenerada" />
+            <End Role="NovedadFoto" EntitySet="NovedadFoto" />
           </AssociationSet>
           <AssociationSet Name="FK_PuestoTrabajo_TipoViatico" Association="Self.FK_PuestoTrabajo_TipoViatico">
             <End Role="TipoViatico" EntitySet="TipoViatico" />
@@ -3835,6 +3907,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             <EntityTypeMapping TypeName="ApexModel.Novedad">
               <MappingFragment StoreEntitySet="Novedad">
                 <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="NovedadGeneradaId" ColumnName="NovedadGeneradaId" />
                 <ScalarProperty Name="Fecha" ColumnName="Fecha" />
                 <ScalarProperty Name="Texto" ColumnName="Texto" />
                 <ScalarProperty Name="EstadoId" ColumnName="EstadoId" />
@@ -3846,10 +3919,11 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             <EntityTypeMapping TypeName="ApexModel.NovedadFoto">
               <MappingFragment StoreEntitySet="NovedadFoto">
                 <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="NovedadId" ColumnName="NovedadId" />
+                <ScalarProperty Name="NovedadGeneradaId" ColumnName="NovedadGeneradaId" />
                 <ScalarProperty Name="Foto" ColumnName="Foto" />
                 <ScalarProperty Name="FileName" ColumnName="FileName" />
                 <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="NovedadId" ColumnName="NovedadId" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -3859,6 +3933,15 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="NovedadId" ColumnName="NovedadId" />
                 <ScalarProperty Name="FuncionarioId" ColumnName="FuncionarioId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="NovedadGenerada">
+            <EntityTypeMapping TypeName="ApexModel.NovedadGenerada">
+              <MappingFragment StoreEntitySet="NovedadGenerada">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Fecha" ColumnName="Fecha" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -4145,6 +4228,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             <EntityTypeMapping TypeName="ApexModel.vw_NovedadesCompletas">
               <MappingFragment StoreEntitySet="vw_NovedadesCompletas">
                 <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="NovedadGeneradaId" ColumnName="NovedadGeneradaId" />
                 <ScalarProperty Name="Fecha" ColumnName="Fecha" />
                 <ScalarProperty Name="Texto" ColumnName="Texto" />
                 <ScalarProperty Name="EstadoId" ColumnName="EstadoId" />
@@ -4152,20 +4236,6 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
                 <ScalarProperty Name="NombreFuncionario" ColumnName="NombreFuncionario" />
                 <ScalarProperty Name="CI" ColumnName="CI" />
                 <ScalarProperty Name="Estado" ColumnName="Estado" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="vw_SancionesCompletas">
-            <EntityTypeMapping TypeName="ApexModel.vw_SancionesCompletas">
-              <MappingFragment StoreEntitySet="vw_SancionesCompletas">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="FuncionarioId" ColumnName="FuncionarioId" />
-                <ScalarProperty Name="Cedula" ColumnName="Cedula" />
-                <ScalarProperty Name="NombreFuncionario" ColumnName="NombreFuncionario" />
-                <ScalarProperty Name="FechaDesde" ColumnName="FechaDesde" />
-                <ScalarProperty Name="FechaHasta" ColumnName="FechaHasta" />
-                <ScalarProperty Name="Resolucion" ColumnName="Resolucion" />
-                <ScalarProperty Name="Observaciones" ColumnName="Observaciones" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

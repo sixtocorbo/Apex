@@ -15,6 +15,7 @@ Public Class frmNovedades
         AppTheme.Aplicar(Me)
         ConfigurarGrilla()
 
+
         ' --- INICIO DE LA CORRECCIÓN ---
         ' Desactivamos temporalmente el evento de selección para evitar que se dispare
         ' mientras se cargan los datos iniciales.
@@ -67,9 +68,7 @@ Public Class frmNovedades
     Private Async Function CargarNovedadesAsync(Optional mantenerSeleccion As Boolean = True) As Task
         LoadingHelper.MostrarCargando(Me)
         Try
-            Dim idSel As Integer? = If(mantenerSeleccion AndAlso _novedadSeleccionada IsNot Nothing,
-                                   CType(_novedadSeleccionada.Id, Integer?),
-                                   Nothing)
+            Dim idSel As Integer? = If(mantenerSeleccion AndAlso _novedadSeleccionada IsNot Nothing, CType(_novedadSeleccionada.Id, Integer?), Nothing)
 
             Using svc As New NovedadService()
                 dgvNovedades.DataSource = Await svc.GetAllAgrupadasAsync()

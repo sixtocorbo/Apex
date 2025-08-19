@@ -12,6 +12,7 @@ Imports System.Collections.Generic
 
 Partial Public Class vw_NovedadesCompletas
     Public Property Id As Integer
+    Public Property NovedadGeneradaId As Integer
     Public Property Fecha As Date
     Public Property Texto As String
     Public Property EstadoId As Nullable(Of Byte)

@@ -286,6 +286,9 @@
     <Compile Include="Data\NovedadFuncionario.vb">
       <DependentUpon>ApexModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Data\NovedadGenerada.vb">
+      <DependentUpon>ApexModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Data\OrdenCincoDetalle.vb">
       <DependentUpon>ApexModel.tt</DependentUpon>
     </Compile>
@@ -367,9 +370,6 @@
       <DependentUpon>ApexModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\vw_NovedadesCompletas.vb">
-      <DependentUpon>ApexModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Data\vw_SancionesCompletas.vb">
       <DependentUpon>ApexModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Services\AppTheme.vb" />
