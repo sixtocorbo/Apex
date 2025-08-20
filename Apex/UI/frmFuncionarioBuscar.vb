@@ -147,7 +147,7 @@ Public Class frmFuncionarioBuscar
                     MessageBox.Show($"Mostrando los primeros {LIMITE_FILAS} resultados." &
                                 "Refiná la búsqueda para ver más.",
                                 "Aviso",
-                            MessageBoxButtons.OK, MessageBoxIcon.Information)
+                                MessageBoxButtons.OK, MessageBoxIcon.Information)
                 End If
             End Using
 
@@ -226,6 +226,9 @@ Public Class frmFuncionarioBuscar
                 .Include(Function(x) x.EstadoTransitorio.Select(Function(et) et.OrdenCincoDetalle)) _
                 .Include(Function(x) x.EstadoTransitorio.Select(Function(et) et.EnfermedadDetalle)) _
                 .Include(Function(x) x.EstadoTransitorio.Select(Function(et) et.RetenDetalle)) _
+                .Include(Function(x) x.Semana) _
+                .Include(Function(x) x.Turno) _
+                .Include(Function(x) x.Horario) _
                 .AsNoTracking() _
                 .FirstOrDefaultAsync(Function(x) x.Id = id)
 
@@ -275,12 +278,22 @@ Public Class frmFuncionarioBuscar
             lblTipo.Text = f.TipoFuncionario.Nombre
             lblFechaIngreso.Text = f.FechaIngreso.ToShortDateString()
             chkActivoDetalle.Checked = f.Activo
+            lblHorarioCompleto.Text = $"{If(f.Semana IsNot Nothing, f.Semana.Nombre, "-")} / {If(f.Turno IsNot Nothing, f.Turno.Nombre, "-")} / {If(f.Horario IsNot Nothing, f.Horario.Nombre, "-")}"
 
-            If estadosActivos.Any() Then
+            '--- INICIO DE LA CORRECCIÓN ---
+            'La prioridad la tiene el estado de Actividad del funcionario.
+            If Not f.Activo Then
+                lblEstadoTransitorio.Text = "Inactivo"
+                lblEstadoTransitorio.ForeColor = Color.Red
+            ElseIf estadosActivos.Any() Then
                 lblEstadoTransitorio.Text = String.Join(", ", estadosActivos)
+                lblEstadoTransitorio.ForeColor = Color.Red
             Else
                 lblEstadoTransitorio.Text = "Normal"
+                lblEstadoTransitorio.ForeColor = Color.Green
             End If
+            '--- FIN DE LA CORRECCIÓN ---
+
 
             If f.Foto Is Nothing OrElse f.Foto.Length = 0 Then
                 pbFotoDetalle.Image = My.Resources.Police
@@ -338,6 +351,7 @@ Public Class frmFuncionarioBuscar
         lblPresencia.Text = ""
         lblEstadoTransitorio.Text = ""
         pbFotoDetalle.Image = Nothing
+        lblHorarioCompleto.Text = ""
     End Sub
 
 

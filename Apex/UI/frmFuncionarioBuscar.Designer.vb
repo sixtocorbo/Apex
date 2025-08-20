@@ -4,7 +4,7 @@ Partial Class frmFuncionarioBuscar
 
 #Region "Dispose"
     <System.Diagnostics.DebuggerNonUserCode()>
-    Protected Overrides Sub Dispose(disposing As Boolean)
+    Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso (components IsNot Nothing) Then
                 components.Dispose()
@@ -30,6 +30,8 @@ Partial Class frmFuncionarioBuscar
         Me.splitContenedor = New System.Windows.Forms.SplitContainer()
         Me.dgvResultados = New System.Windows.Forms.DataGridView()
         Me.panelDetalle = New System.Windows.Forms.Panel()
+        Me.lblHorarioCompleto = New System.Windows.Forms.Label()
+        Me.lblHorarioCompletoHeader = New System.Windows.Forms.Label()
         Me.lblEstadoTransitorio = New System.Windows.Forms.Label()
         Me.lblEstadoTransitorioHeader = New System.Windows.Forms.Label()
         Me.chkActivoDetalle = New System.Windows.Forms.CheckBox()
@@ -140,6 +142,8 @@ Partial Class frmFuncionarioBuscar
         'panelDetalle
         '
         Me.panelDetalle.BackColor = System.Drawing.Color.White
+        Me.panelDetalle.Controls.Add(Me.lblHorarioCompleto)
+        Me.panelDetalle.Controls.Add(Me.lblHorarioCompletoHeader)
         Me.panelDetalle.Controls.Add(Me.lblEstadoTransitorio)
         Me.panelDetalle.Controls.Add(Me.lblEstadoTransitorioHeader)
         Me.panelDetalle.Controls.Add(Me.chkActivoDetalle)
@@ -161,6 +165,31 @@ Partial Class frmFuncionarioBuscar
         Me.panelDetalle.Padding = New System.Windows.Forms.Padding(13, 12, 13, 12)
         Me.panelDetalle.Size = New System.Drawing.Size(969, 767)
         Me.panelDetalle.TabIndex = 0
+        '
+        'lblHorarioCompleto
+        '
+        Me.lblHorarioCompleto.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.lblHorarioCompleto.AutoSize = True
+        Me.lblHorarioCompleto.Font = New System.Drawing.Font("Segoe UI", 9.75!)
+        Me.lblHorarioCompleto.ForeColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
+        Me.lblHorarioCompleto.Location = New System.Drawing.Point(160, 627)
+        Me.lblHorarioCompleto.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.lblHorarioCompleto.Name = "lblHorarioCompleto"
+        Me.lblHorarioCompleto.Size = New System.Drawing.Size(17, 23)
+        Me.lblHorarioCompleto.TabIndex = 13
+        Me.lblHorarioCompleto.Text = "-"
+        '
+        'lblHorarioCompletoHeader
+        '
+        Me.lblHorarioCompletoHeader.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.lblHorarioCompletoHeader.AutoSize = True
+        Me.lblHorarioCompletoHeader.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.lblHorarioCompletoHeader.Location = New System.Drawing.Point(27, 627)
+        Me.lblHorarioCompletoHeader.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.lblHorarioCompletoHeader.Name = "lblHorarioCompletoHeader"
+        Me.lblHorarioCompletoHeader.Size = New System.Drawing.Size(73, 23)
+        Me.lblHorarioCompletoHeader.TabIndex = 12
+        Me.lblHorarioCompletoHeader.Text = "Horario:"
         '
         'lblEstadoTransitorio
         '
@@ -230,7 +259,7 @@ Partial Class frmFuncionarioBuscar
         Me.lblFechaIngreso.AutoSize = True
         Me.lblFechaIngreso.Font = New System.Drawing.Font("Segoe UI", 9.75!)
         Me.lblFechaIngreso.ForeColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
-        Me.lblFechaIngreso.Location = New System.Drawing.Point(160, 627)
+        Me.lblFechaIngreso.Location = New System.Drawing.Point(160, 596)
         Me.lblFechaIngreso.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblFechaIngreso.Name = "lblFechaIngreso"
         Me.lblFechaIngreso.Size = New System.Drawing.Size(17, 23)
@@ -242,7 +271,7 @@ Partial Class frmFuncionarioBuscar
         Me.lblFechaIngresoHeader.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblFechaIngresoHeader.AutoSize = True
         Me.lblFechaIngresoHeader.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.lblFechaIngresoHeader.Location = New System.Drawing.Point(27, 627)
+        Me.lblFechaIngresoHeader.Location = New System.Drawing.Point(27, 596)
         Me.lblFechaIngresoHeader.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblFechaIngresoHeader.Name = "lblFechaIngresoHeader"
         Me.lblFechaIngresoHeader.Size = New System.Drawing.Size(121, 23)
@@ -255,7 +284,7 @@ Partial Class frmFuncionarioBuscar
         Me.lblTipo.AutoSize = True
         Me.lblTipo.Font = New System.Drawing.Font("Segoe UI", 9.75!)
         Me.lblTipo.ForeColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
-        Me.lblTipo.Location = New System.Drawing.Point(160, 596)
+        Me.lblTipo.Location = New System.Drawing.Point(160, 565)
         Me.lblTipo.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblTipo.Name = "lblTipo"
         Me.lblTipo.Size = New System.Drawing.Size(17, 23)
@@ -267,7 +296,7 @@ Partial Class frmFuncionarioBuscar
         Me.lblTipoHeader.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblTipoHeader.AutoSize = True
         Me.lblTipoHeader.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.lblTipoHeader.Location = New System.Drawing.Point(27, 596)
+        Me.lblTipoHeader.Location = New System.Drawing.Point(27, 565)
         Me.lblTipoHeader.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblTipoHeader.Name = "lblTipoHeader"
         Me.lblTipoHeader.Size = New System.Drawing.Size(47, 23)
@@ -280,7 +309,7 @@ Partial Class frmFuncionarioBuscar
         Me.lblCargo.AutoSize = True
         Me.lblCargo.Font = New System.Drawing.Font("Segoe UI", 9.75!)
         Me.lblCargo.ForeColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
-        Me.lblCargo.Location = New System.Drawing.Point(160, 565)
+        Me.lblCargo.Location = New System.Drawing.Point(160, 534)
         Me.lblCargo.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblCargo.Name = "lblCargo"
         Me.lblCargo.Size = New System.Drawing.Size(17, 23)
@@ -292,7 +321,7 @@ Partial Class frmFuncionarioBuscar
         Me.lblCargoHeader.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblCargoHeader.AutoSize = True
         Me.lblCargoHeader.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.lblCargoHeader.Location = New System.Drawing.Point(27, 565)
+        Me.lblCargoHeader.Location = New System.Drawing.Point(27, 534)
         Me.lblCargoHeader.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblCargoHeader.Name = "lblCargoHeader"
         Me.lblCargoHeader.Size = New System.Drawing.Size(60, 23)
@@ -304,7 +333,7 @@ Partial Class frmFuncionarioBuscar
         Me.lblNombreCompleto.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblNombreCompleto.Font = New System.Drawing.Font("Segoe UI", 14.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblNombreCompleto.Location = New System.Drawing.Point(17, 522)
+        Me.lblNombreCompleto.Location = New System.Drawing.Point(17, 491)
         Me.lblNombreCompleto.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblNombreCompleto.Name = "lblNombreCompleto"
         Me.lblNombreCompleto.Size = New System.Drawing.Size(934, 31)
@@ -318,7 +347,7 @@ Partial Class frmFuncionarioBuscar
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblCI.Font = New System.Drawing.Font("Segoe UI", 11.25!)
         Me.lblCI.ForeColor = System.Drawing.SystemColors.ControlDarkDark
-        Me.lblCI.Location = New System.Drawing.Point(17, 497)
+        Me.lblCI.Location = New System.Drawing.Point(17, 466)
         Me.lblCI.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblCI.Name = "lblCI"
         Me.lblCI.Size = New System.Drawing.Size(934, 25)
@@ -334,7 +363,7 @@ Partial Class frmFuncionarioBuscar
         Me.pbFotoDetalle.Location = New System.Drawing.Point(17, 16)
         Me.pbFotoDetalle.Margin = New System.Windows.Forms.Padding(4)
         Me.pbFotoDetalle.Name = "pbFotoDetalle"
-        Me.pbFotoDetalle.Size = New System.Drawing.Size(934, 464)
+        Me.pbFotoDetalle.Size = New System.Drawing.Size(934, 433)
         Me.pbFotoDetalle.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
         Me.pbFotoDetalle.TabIndex = 0
         Me.pbFotoDetalle.TabStop = False
@@ -422,4 +451,6 @@ Partial Class frmFuncionarioBuscar
     Friend WithEvents FlowLayoutPanelAcciones As FlowLayoutPanel
     Friend WithEvents btnSeleccionar As Button
     Friend WithEvents btnCancelar As Button
+    Friend WithEvents lblHorarioCompleto As Label
+    Friend WithEvents lblHorarioCompletoHeader As Label
 End Class
