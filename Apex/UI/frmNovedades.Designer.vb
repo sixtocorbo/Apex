@@ -2,6 +2,7 @@
 Partial Class frmNovedades
     Inherits System.Windows.Forms.Form
 
+    'Form overrides dispose to clean up the component list.
     <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
@@ -13,14 +14,19 @@ Partial Class frmNovedades
         End Try
     End Sub
 
+    'Required by the Windows Form Designer
     Private components As System.ComponentModel.IContainer
 
+    'NOTE: The following procedure is required by the Windows Form Designer
+    'It can be modified using the Windows Form Designer.  
+    'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.PanelPrincipal = New System.Windows.Forms.Panel()
         Me.SplitContenedor = New System.Windows.Forms.SplitContainer()
         Me.dgvNovedades = New System.Windows.Forms.DataGridView()
         Me.PanelEncabezadoLista = New System.Windows.Forms.Panel()
+        Me.btnEliminarNovedad = New System.Windows.Forms.Button()
         Me.btnEditarNovedad = New System.Windows.Forms.Button()
         Me.btnNuevaNovedad = New System.Windows.Forms.Button()
         Me.dtpFecha = New System.Windows.Forms.DateTimePicker()
@@ -94,6 +100,7 @@ Partial Class frmNovedades
         '
         'PanelEncabezadoLista
         '
+        Me.PanelEncabezadoLista.Controls.Add(Me.btnEliminarNovedad)
         Me.PanelEncabezadoLista.Controls.Add(Me.btnEditarNovedad)
         Me.PanelEncabezadoLista.Controls.Add(Me.btnNuevaNovedad)
         Me.PanelEncabezadoLista.Controls.Add(Me.dtpFecha)
@@ -104,6 +111,18 @@ Partial Class frmNovedades
         Me.PanelEncabezadoLista.Name = "PanelEncabezadoLista"
         Me.PanelEncabezadoLista.Size = New System.Drawing.Size(506, 62)
         Me.PanelEncabezadoLista.TabIndex = 0
+        '
+        'btnEliminarNovedad
+        '
+        Me.btnEliminarNovedad.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnEliminarNovedad.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.btnEliminarNovedad.Location = New System.Drawing.Point(94, 12)
+        Me.btnEliminarNovedad.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.btnEliminarNovedad.Name = "btnEliminarNovedad"
+        Me.btnEliminarNovedad.Size = New System.Drawing.Size(120, 38)
+        Me.btnEliminarNovedad.TabIndex = 4
+        Me.btnEliminarNovedad.Text = "Eliminar"
+        Me.btnEliminarNovedad.UseVisualStyleBackColor = True
         '
         'btnEditarNovedad
         '
@@ -269,4 +288,5 @@ Partial Class frmNovedades
     Friend WithEvents btnEditarNovedad As Button
     Friend WithEvents TabPageFotos As TabPage
     Friend WithEvents flpFotos As FlowLayoutPanel
+    Friend WithEvents btnEliminarNovedad As Button
 End Class

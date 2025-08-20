@@ -22,7 +22,6 @@ Public Class frmNovedades
 #Region "Carga de Datos y Configuración"
 
     Private Sub ConfigurarGrilla()
-        ' (Sin cambios)
         With dgvNovedades
             .AutoGenerateColumns = False
             .Columns.Clear()
@@ -40,22 +39,18 @@ Public Class frmNovedades
     Private Async Function CargarNovedadesAsync(Optional mantenerSeleccion As Boolean = True) As Task
         LoadingHelper.MostrarCargando(Me)
 
-        ' 1. Guardar el ID de la selección actual si es necesario
         If mantenerSeleccion AndAlso dgvNovedades.CurrentRow IsNot Nothing Then
             _idNovedadSeleccionada = CInt(dgvNovedades.CurrentRow.Cells("Id").Value)
         End If
 
-        ' 2. Desactivar el evento para evitar ejecuciones múltiples
         RemoveHandler dgvNovedades.SelectionChanged, AddressOf dgvNovedades_SelectionChanged
 
         Try
-            ' 3. Limpiar y recargar la fuente de datos
             _bsNovedades.DataSource = Nothing
             Using svc As New NovedadService()
                 _bsNovedades.DataSource = Await svc.GetAllAgrupadasAsync()
             End Using
 
-            ' 4. Restaurar la selección si es posible
             If _idNovedadSeleccionada.HasValue Then
                 Dim itemToSelect = _bsNovedades.List.Cast(Of vw_NovedadesAgrupadas)().FirstOrDefault(Function(n) n.Id = _idNovedadSeleccionada.Value)
                 If itemToSelect IsNot Nothing Then
@@ -66,12 +61,9 @@ Public Class frmNovedades
             MessageBox.Show("Error al cargar las novedades: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
 
-        ' --- CORRECCIÓN CLAVE ---
-        ' 5. Mover la lógica de actualización de la UI FUERA del bloque Try/Catch/Finally
         AddHandler dgvNovedades.SelectionChanged, AddressOf dgvNovedades_SelectionChanged
         Await ActualizarDetalleDesdeSeleccion()
         LoadingHelper.OcultarCargando(Me)
-
     End Function
 
     Private Sub LimpiarDetalles()
@@ -107,7 +99,7 @@ Public Class frmNovedades
 #Region "Gestión de Fotos (Visualización)"
     Private Async Function CargarFotos(novedadId As Integer) As Task
         _pictureBoxSeleccionado = Nothing
-        flpFotos.Controls.Clear() ' Punto clave: siempre limpiar primero
+        flpFotos.Controls.Clear()
 
         Using svc As New NovedadService()
             Dim fotos = Await svc.GetFotosPorNovedadAsync(novedadId)
@@ -168,6 +160,31 @@ Public Class frmNovedades
                 Await CargarNovedadesAsync(mantenerSeleccion:=True)
             End If
         End Using
+    End Sub
+
+    Private Async Sub btnEliminarNovedad_Click(sender As Object, e As EventArgs) Handles btnEliminarNovedad.Click
+        If dgvNovedades.CurrentRow Is Nothing Then
+            MessageBox.Show("Por favor, seleccione una novedad de la lista para eliminar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return
+        End If
+
+        Dim novedadSeleccionada = CType(dgvNovedades.CurrentRow.DataBoundItem, vw_NovedadesAgrupadas)
+        Dim confirmResult = MessageBox.Show($"¿Está seguro de que desea eliminar la novedad del {novedadSeleccionada.Fecha.ToShortDateString()}?", "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Warning)
+
+        If confirmResult = DialogResult.Yes Then
+            LoadingHelper.MostrarCargando(Me)
+            Try
+                Using svc As New NovedadService()
+                    Await svc.DeleteNovedadCompletaAsync(novedadSeleccionada.Id)
+                End Using
+                _idNovedadSeleccionada = Nothing
+                Await CargarNovedadesAsync(mantenerSeleccion:=False)
+            Catch ex As Exception
+                MessageBox.Show("Ocurrió un error al eliminar la novedad: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Finally
+                LoadingHelper.OcultarCargando(Me)
+            End Try
+        End If
     End Sub
 #End Region
 

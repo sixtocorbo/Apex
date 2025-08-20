@@ -31,15 +31,35 @@ Public Class NovedadService
         Return Await query.OrderByDescending(Function(n) n.Fecha).ThenBy(Function(n) n.Id).ToListAsync()
     End Function
 
+
     ''' <summary>
     ''' Crea una nueva novedad junto con sus funcionarios asociados en una única transacción.
+    ''' Primero asegura la existencia de una NovedadGenerada para la fecha dada.
     ''' </summary>
     Public Async Function CrearNovedadCompletaAsync(fecha As Date, texto As String, funcionarioIds As List(Of Integer)) As Task(Of Novedad)
+        ' --- INICIO DE LA CORRECCIÓN CLAVE ---
+        ' 1. Buscar o crear el contenedor NovedadGenerada para la fecha.
+        Dim repoGenerada = _unitOfWork.Repository(Of NovedadGenerada)()
+        Dim novedadDelDia = Await repoGenerada.GetByPredicateAsync(Function(ng) ng.Fecha = fecha.Date)
+
+        If novedadDelDia Is Nothing Then
+            ' Si no existe para esta fecha, la creamos.
+            novedadDelDia = New NovedadGenerada With {
+                .Fecha = fecha.Date,
+                .CreatedAt = DateTime.Now
+            }
+            repoGenerada.Add(novedadDelDia)
+            Await _unitOfWork.CommitAsync() ' Guardamos para obtener su ID.
+        End If
+        ' --- FIN DE LA CORRECCIÓN CLAVE ---
+
+        ' 2. Crear la Novedad específica, ahora con el ID del contenedor correcto.
         Dim nuevaNovedad = New Novedad With {
             .Fecha = fecha,
             .Texto = texto,
             .EstadoId = 1, ' Por defecto: "Pendiente"
-            .CreatedAt = DateTime.Now
+            .CreatedAt = DateTime.Now,
+            .NovedadGeneradaId = novedadDelDia.Id ' <-- Asignación del ID correcto
         }
 
         For Each funcId In funcionarioIds
@@ -52,6 +72,35 @@ Public Class NovedadService
     End Function
 
 
+    ''' <summary>
+    ''' Elimina una novedad y todas sus relaciones (funcionarios, fotos) de forma explícita y transaccional.
+    ''' </summary>
+    Public Async Function DeleteNovedadCompletaAsync(novedadId As Integer) As Task
+        ' Obtenemos la novedad incluyendo sus relaciones para poder eliminarlas.
+        Dim novedadAEliminar = Await _unitOfWork.Context.Set(Of Novedad)().
+            Include(Function(n) n.NovedadFuncionario).
+            Include(Function(n) n.NovedadFoto).
+            SingleOrDefaultAsync(Function(n) n.Id = novedadId)
+
+        If novedadAEliminar IsNot Nothing Then
+            ' --- INICIO DE LA CORRECCIÓN CLAVE ---
+            ' 1. Obtener los repositorios para las tablas hijas.
+            Dim repoFuncionarios = _unitOfWork.Repository(Of NovedadFuncionario)()
+            Dim repoFotos = _unitOfWork.Repository(Of NovedadFoto)()
+
+            ' 2. Eliminar explícitamente todos los registros de las tablas hijas.
+            '    ToList() es importante para evitar errores de "colección modificada".
+            repoFuncionarios.RemoveRange(novedadAEliminar.NovedadFuncionario.ToList())
+            repoFotos.RemoveRange(novedadAEliminar.NovedadFoto.ToList())
+
+            ' 3. Ahora que no tiene dependencias, eliminamos la novedad principal.
+            _unitOfWork.Repository(Of Novedad)().Remove(novedadAEliminar)
+
+            ' 4. Guardamos todos los cambios (las 3 eliminaciones) en una sola operación.
+            Await _unitOfWork.CommitAsync()
+            ' --- FIN DE LA CORRECCIÓN ---
+        End If
+    End Function
 
     ''' <summary>
     ''' Actualiza una novedad existente, sincronizando la lista de funcionarios. (Versión Definitiva)

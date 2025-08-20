@@ -11,8 +11,9 @@ Public Class frmNovedadCrear
     Private _novedadId As Integer
     Private _funcionariosSeleccionados As New BindingList(Of Funcionario)
 
-    '--- NUEVO: Lista para gestionar las fotos en la UI ---
-    Private _fotos As New BindingList(Of NovedadFoto)
+    Private _fotosExistentes As New BindingList(Of NovedadFoto)
+    '--- CORRECCIÓN CLAVE: Lista para fotos nuevas antes de guardar ---
+    Private _rutasFotosNuevas As New List(Of String)
     Private _pictureBoxSeleccionado As PictureBox = Nothing
 
     Public Enum ModoFormulario
@@ -26,8 +27,6 @@ Public Class frmNovedadCrear
         _novedad = New Novedad()
         Me.Text = "Crear Nueva Novedad"
         btnGuardar.Text = "Guardar"
-        ' Ocultar pestaña de fotos al crear, ya que se necesita un ID de novedad.
-        TabControlMain.TabPages.Remove(TabPageFotos)
     End Sub
 
     Public Sub New(novedadId As Integer)
@@ -36,10 +35,6 @@ Public Class frmNovedadCrear
         _novedadId = novedadId
         Me.Text = "Editar Novedad"
         btnGuardar.Text = "Actualizar"
-        ' Mostrar la pestaña de fotos al editar
-        If Not TabControlMain.TabPages.Contains(TabPageFotos) Then
-            TabControlMain.TabPages.Add(TabPageFotos)
-        End If
     End Sub
 
     Private Async Sub frmNovedadCrear_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -65,18 +60,16 @@ Public Class frmNovedadCrear
         dtpFecha.Value = _novedad.Fecha
         txtTexto.Text = _novedad.Texto
 
-        ' Cargar funcionarios asociados
         _funcionariosSeleccionados.Clear()
         Dim funcionariosAsociados = Await _svc.GetFuncionariosPorNovedadAsync(_novedad.Id)
         For Each func In funcionariosAsociados
             _funcionariosSeleccionados.Add(func)
         Next
 
-        ' Cargar fotos asociadas
         Await CargarFotosAsync()
     End Function
 
-    ' --- LÓGICA DE FUNCIONARIOS (Sin cambios) ---
+#Region "Lógica de Funcionarios"
     Private Async Sub btnAgregarFuncionario_Click(sender As Object, e As EventArgs) Handles btnAgregarFuncionario.Click
         Using frm As New frmFuncionarioBuscar(frmFuncionarioBuscar.ModoApertura.Seleccion)
             If frm.ShowDialog(Me) = DialogResult.OK AndAlso frm.FuncionarioSeleccionado IsNot Nothing Then
@@ -103,30 +96,37 @@ Public Class frmNovedadCrear
             Next
         End If
     End Sub
+#End Region
 
-    ' --- NUEVA LÓGICA PARA FOTOS (Movida desde frmNovedades) ---
+#Region "Lógica de Fotos"
     Private Async Function CargarFotosAsync() As Task
-        _pictureBoxSeleccionado = Nothing
         flpFotos.Controls.Clear()
-        _fotos.Clear()
+        _fotosExistentes.Clear()
+        _pictureBoxSeleccionado = Nothing
 
-        Dim fotosDb = Await _svc.GetFotosPorNovedadAsync(_novedadId)
-        For Each foto In fotosDb
-            _fotos.Add(foto)
-            Dim pic As New PictureBox With {
-                .Image = Image.FromStream(New MemoryStream(foto.Foto)),
-                .SizeMode = PictureBoxSizeMode.Zoom,
-                .Size = New Size(120, 120),
-                .Margin = New Padding(5),
-                .BorderStyle = BorderStyle.FixedSingle,
-                .Tag = foto, ' Guardar el objeto completo
-                .Cursor = Cursors.Hand
-            }
-            AddHandler pic.DoubleClick, AddressOf PictureBox_DoubleClick
-            AddHandler pic.Click, AddressOf PictureBox_Click
-            flpFotos.Controls.Add(pic)
-        Next
+        If _modo = ModoFormulario.Editar Then
+            Dim fotosDb = Await _svc.GetFotosPorNovedadAsync(_novedadId)
+            For Each foto In fotosDb
+                _fotosExistentes.Add(foto)
+                AgregarPictureBox(foto.Foto, foto)
+            Next
+        End If
     End Function
+
+    Private Sub AgregarPictureBox(imageData As Byte(), tag As Object)
+        Dim pic As New PictureBox With {
+            .Image = Image.FromStream(New MemoryStream(imageData)),
+            .SizeMode = PictureBoxSizeMode.Zoom,
+            .Size = New Size(120, 120),
+            .Margin = New Padding(5),
+            .BorderStyle = BorderStyle.FixedSingle,
+            .Tag = tag,
+            .Cursor = Cursors.Hand
+        }
+        AddHandler pic.DoubleClick, AddressOf PictureBox_DoubleClick
+        AddHandler pic.Click, AddressOf PictureBox_Click
+        flpFotos.Controls.Add(pic)
+    End Sub
 
     Private Sub PictureBox_Click(sender As Object, e As EventArgs)
         Dim picClickeado = TryCast(sender, PictureBox)
@@ -155,17 +155,24 @@ Public Class frmNovedadCrear
             .Multiselect = True
         }
             If ofd.ShowDialog() = DialogResult.OK Then
-                LoadingHelper.MostrarCargando(Me)
-                Try
+                If _modo = ModoFormulario.Crear Then
                     For Each archivo In ofd.FileNames
-                        Await _svc.AddFotoAsync(_novedadId, archivo)
+                        _rutasFotosNuevas.Add(archivo)
+                        AgregarPictureBox(File.ReadAllBytes(archivo), archivo)
                     Next
-                    Await CargarFotosAsync()
-                Catch ex As Exception
-                    MessageBox.Show("Error al agregar foto(s): " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                Finally
-                    LoadingHelper.OcultarCargando(Me)
-                End Try
+                Else ' Modo Editar
+                    LoadingHelper.MostrarCargando(Me)
+                    Try
+                        For Each archivo In ofd.FileNames
+                            Await _svc.AddFotoAsync(_novedadId, archivo)
+                        Next
+                        Await CargarFotosAsync()
+                    Catch ex As Exception
+                        MessageBox.Show("Error al agregar foto(s): " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                    Finally
+                        LoadingHelper.OcultarCargando(Me)
+                    End Try
+                End If
             End If
         End Using
     End Sub
@@ -177,20 +184,29 @@ Public Class frmNovedadCrear
         End If
 
         If MessageBox.Show("¿Está seguro de que desea eliminar la foto seleccionada?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
-            Dim fotoAEliminar = CType(_pictureBoxSeleccionado.Tag, NovedadFoto)
-            LoadingHelper.MostrarCargando(Me)
-            Try
-                Await _svc.DeleteFotoAsync(fotoAEliminar.Id)
-                Await CargarFotosAsync()
-            Catch ex As Exception
-                MessageBox.Show("Error al eliminar la foto: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            Finally
-                LoadingHelper.OcultarCargando(Me)
-            End Try
+            If TypeOf _pictureBoxSeleccionado.Tag Is NovedadFoto Then ' Es una foto existente
+                Dim fotoAEliminar = CType(_pictureBoxSeleccionado.Tag, NovedadFoto)
+                LoadingHelper.MostrarCargando(Me)
+                Try
+                    Await _svc.DeleteFotoAsync(fotoAEliminar.Id)
+                    Await CargarFotosAsync()
+                Catch ex As Exception
+                    MessageBox.Show("Error al eliminar la foto: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                Finally
+                    LoadingHelper.OcultarCargando(Me)
+                End Try
+            ElseIf TypeOf _pictureBoxSeleccionado.Tag Is String Then ' Es una foto nueva (ruta)
+                Dim rutaAEliminar = CType(_pictureBoxSeleccionado.Tag, String)
+                _rutasFotosNuevas.Remove(rutaAEliminar)
+                flpFotos.Controls.Remove(_pictureBoxSeleccionado)
+                _pictureBoxSeleccionado.Dispose()
+                _pictureBoxSeleccionado = Nothing
+            End If
         End If
     End Sub
+#End Region
 
-    ' --- LÓGICA DE GUARDADO (Sin cambios) ---
+#Region "Guardado y Cancelación"
     Private Async Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
         If String.IsNullOrWhiteSpace(txtTexto.Text) Then
             MessageBox.Show("El texto de la novedad no puede estar vacío.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
@@ -206,9 +222,17 @@ Public Class frmNovedadCrear
             Dim funcionarioIds = _funcionariosSeleccionados.Select(Function(f) f.Id).ToList()
 
             If _modo = ModoFormulario.Crear Then
-                Await _svc.CrearNovedadCompletaAsync(dtpFecha.Value.Date, txtTexto.Text.Trim(), funcionarioIds)
+                ' 1. Crear la novedad principal
+                Dim nuevaNovedad = Await _svc.CrearNovedadCompletaAsync(dtpFecha.Value.Date, txtTexto.Text.Trim(), funcionarioIds)
+
+                ' 2. Si se creó con éxito, agregar las fotos de la lista temporal
+                If nuevaNovedad IsNot Nothing AndAlso _rutasFotosNuevas.Any() Then
+                    For Each ruta In _rutasFotosNuevas
+                        Await _svc.AddFotoAsync(nuevaNovedad.Id, ruta)
+                    Next
+                End If
                 MessageBox.Show("Novedad creada con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
-            Else
+            Else ' Modo Editar
                 _novedad.Fecha = dtpFecha.Value.Date
                 _novedad.Texto = txtTexto.Text.Trim()
                 Await _svc.ActualizarNovedadCompletaAsync(_novedad, funcionarioIds)
@@ -228,4 +252,6 @@ Public Class frmNovedadCrear
         DialogResult = DialogResult.Cancel
         Close()
     End Sub
+#End Region
+
 End Class
