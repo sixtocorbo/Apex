@@ -16,6 +16,5 @@ Partial Public Class NovedadGenerada
     Public Property CreatedAt As Date
 
     Public Overridable Property Novedad As ICollection(Of Novedad) = New HashSet(Of Novedad)
-    Public Overridable Property NovedadFoto As ICollection(Of NovedadFoto) = New HashSet(Of NovedadFoto)
 
 End Class

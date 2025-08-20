@@ -4,54 +4,25 @@ Imports System.IO
 
 Public Class frmNovedades
 
-    ' Variable para mantener una referencia a la foto seleccionada para eliminar
+    Private _bsNovedades As New BindingSource()
     Private _pictureBoxSeleccionado As PictureBox = Nothing
-    ' Variable de clase para guardar la novedad seleccionada, evitando errores de referencia
-    Private _novedadSeleccionada As vw_NovedadesAgrupadas = Nothing
-
-    ' En el archivo: Apex/UI/frmNovedades.vb
+    Private _idNovedadSeleccionada As Integer?
 
     Private Async Sub frmNovedades_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
         ConfigurarGrilla()
-
-
-        ' --- INICIO DE LA CORRECCIÓN ---
-        ' Desactivamos temporalmente el evento de selección para evitar que se dispare
-        ' mientras se cargan los datos iniciales.
-        RemoveHandler dgvNovedades.SelectionChanged, AddressOf dgvNovedades_SelectionChanged
-
-        ' Cargamos los datos de la grilla
-        Await CargarNovedadesAsync(mantenerSeleccion:=False) ' Le decimos que no intente mantener selección
-
-        ' Si hay filas, seleccionamos la primera manualmente
-        If dgvNovedades.Rows.Count > 0 Then
-            dgvNovedades.Rows(0).Selected = True
-        End If
-
-        ' Volvemos a activar el evento para que funcione normalmente cuando el usuario haga clic.
-        AddHandler dgvNovedades.SelectionChanged, AddressOf dgvNovedades_SelectionChanged
-
-        ' Forzamos la actualización del panel de detalle una sola vez con la selección correcta.
-        Await MostrarDetalleNovedadSeleccionada()
-        ' --- FIN DE LA CORRECCIÓN ---
+        dgvNovedades.DataSource = _bsNovedades
+        Await CargarNovedadesAsync()
     End Sub
 
     Private Async Sub dgvNovedades_SelectionChanged(sender As Object, e As EventArgs) Handles dgvNovedades.SelectionChanged
-        ' Cuando cambia la selección en la grilla, actualizamos nuestra variable de clase
-        If dgvNovedades.CurrentRow IsNot Nothing AndAlso dgvNovedades.CurrentRow.DataBoundItem IsNot Nothing Then
-            _novedadSeleccionada = CType(dgvNovedades.CurrentRow.DataBoundItem, vw_NovedadesAgrupadas)
-        Else
-            _novedadSeleccionada = Nothing
-        End If
-
-        ' Actualizamos los paneles de detalle
-        Await MostrarDetalleNovedadSeleccionada()
+        Await ActualizarDetalleDesdeSeleccion()
     End Sub
 
 #Region "Carga de Datos y Configuración"
 
     Private Sub ConfigurarGrilla()
+        ' (Sin cambios)
         With dgvNovedades
             .AutoGenerateColumns = False
             .Columns.Clear()
@@ -65,93 +36,78 @@ Public Class frmNovedades
             .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Estado", .DataPropertyName = "Estado", .HeaderText = "Estado", .Width = 120})
         End With
     End Sub
+
     Private Async Function CargarNovedadesAsync(Optional mantenerSeleccion As Boolean = True) As Task
         LoadingHelper.MostrarCargando(Me)
-        Try
-            Dim idSel As Integer? = If(mantenerSeleccion AndAlso _novedadSeleccionada IsNot Nothing, CType(_novedadSeleccionada.Id, Integer?), Nothing)
 
+        ' 1. Guardar el ID de la selección actual si es necesario
+        If mantenerSeleccion AndAlso dgvNovedades.CurrentRow IsNot Nothing Then
+            _idNovedadSeleccionada = CInt(dgvNovedades.CurrentRow.Cells("Id").Value)
+        End If
+
+        ' 2. Desactivar el evento para evitar ejecuciones múltiples
+        RemoveHandler dgvNovedades.SelectionChanged, AddressOf dgvNovedades_SelectionChanged
+
+        Try
+            ' 3. Limpiar y recargar la fuente de datos
+            _bsNovedades.DataSource = Nothing
             Using svc As New NovedadService()
-                dgvNovedades.DataSource = Await svc.GetAllAgrupadasAsync()
+                _bsNovedades.DataSource = Await svc.GetAllAgrupadasAsync()
             End Using
 
-            If idSel.HasValue Then
-                For Each row As DataGridViewRow In dgvNovedades.Rows
-                    If CInt(row.Cells("Id").Value) = idSel.Value Then
-                        dgvNovedades.CurrentCell = row.Cells("Fecha")
-                        row.Selected = True
-                        Exit For
-                    End If
-                Next
+            ' 4. Restaurar la selección si es posible
+            If _idNovedadSeleccionada.HasValue Then
+                Dim itemToSelect = _bsNovedades.List.Cast(Of vw_NovedadesAgrupadas)().FirstOrDefault(Function(n) n.Id = _idNovedadSeleccionada.Value)
+                If itemToSelect IsNot Nothing Then
+                    _bsNovedades.Position = _bsNovedades.IndexOf(itemToSelect)
+                End If
             End If
-
-            Await MostrarDetalleNovedadSeleccionada()
         Catch ex As Exception
             MessageBox.Show("Error al cargar las novedades: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-        Finally
-            LoadingHelper.OcultarCargando(Me)
         End Try
+
+        ' --- CORRECCIÓN CLAVE ---
+        ' 5. Mover la lógica de actualización de la UI FUERA del bloque Try/Catch/Finally
+        AddHandler dgvNovedades.SelectionChanged, AddressOf dgvNovedades_SelectionChanged
+        Await ActualizarDetalleDesdeSeleccion()
+        LoadingHelper.OcultarCargando(Me)
+
     End Function
-
-    'Private Async Function CargarNovedadesAsync() As Task
-    '    LoadingHelper.MostrarCargando(Me)
-    '    Try
-    '        Using svc As New NovedadService()
-    '            ' Usamos el nuevo método que trae los datos agrupados
-    '            dgvNovedades.DataSource = Await svc.GetAllAgrupadasAsync()
-    '        End Using
-
-    '        If dgvNovedades.Rows.Count = 0 Then
-    '            LimpiarDetalles()
-    '        End If
-
-    '    Catch ex As Exception
-    '        MessageBox.Show("Error al cargar las novedades: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-    '    Finally
-    '        LoadingHelper.OcultarCargando(Me)
-    '    End Try
-    'End Function
 
     Private Sub LimpiarDetalles()
         txtTextoNovedad.Clear()
         lstFuncionarios.DataSource = Nothing
         flpFotos.Controls.Clear()
         _pictureBoxSeleccionado = Nothing
-        _novedadSeleccionada = Nothing
     End Sub
 
-    Private Async Function MostrarDetalleNovedadSeleccionada() As Task
-        ' Usamos la variable de clase para asegurarnos de tener siempre una referencia válida
-        If _novedadSeleccionada Is Nothing Then
+    Private Async Function ActualizarDetalleDesdeSeleccion() As Task
+        If dgvNovedades.CurrentRow Is Nothing OrElse dgvNovedades.CurrentRow.DataBoundItem Is Nothing Then
             LimpiarDetalles()
             Return
         End If
 
-        Using svc As New NovedadService()
-            ' Para el texto completo, necesitamos buscar la novedad original por su Id
-            Dim novedadCompleta = Await svc.GetByIdAsync(_novedadSeleccionada.Id)
-            If novedadCompleta IsNot Nothing Then
-                txtTextoNovedad.Text = novedadCompleta.Texto
-            Else
-                txtTextoNovedad.Text = ""
-            End If
+        Dim novedadSeleccionada = CType(dgvNovedades.CurrentRow.DataBoundItem, vw_NovedadesAgrupadas)
+        _idNovedadSeleccionada = novedadSeleccionada.Id
 
-            ' Los funcionarios y fotos se cargan usando el Id
-            Dim funcionarios = Await svc.GetFuncionariosPorNovedadAsync(_novedadSeleccionada.Id)
+        Using svc As New NovedadService()
+            Dim novedadCompleta = Await svc.GetByIdAsync(novedadSeleccionada.Id)
+            txtTextoNovedad.Text = If(novedadCompleta IsNot Nothing, novedadCompleta.Texto, "")
+
+            Dim funcionarios = Await svc.GetFuncionariosPorNovedadAsync(novedadSeleccionada.Id)
             lstFuncionarios.DataSource = funcionarios
             lstFuncionarios.DisplayMember = "Nombre"
             lstFuncionarios.ValueMember = "Id"
 
-            Await CargarFotos(_novedadSeleccionada.Id)
+            Await CargarFotos(novedadSeleccionada.Id)
         End Using
     End Function
-
 #End Region
 
-#Region "Gestión de Fotos"
-
+#Region "Gestión de Fotos (Visualización)"
     Private Async Function CargarFotos(novedadId As Integer) As Task
-        _pictureBoxSeleccionado = Nothing ' Limpiar selección al recargar
-        flpFotos.Controls.Clear()
+        _pictureBoxSeleccionado = Nothing
+        flpFotos.Controls.Clear() ' Punto clave: siempre limpiar primero
 
         Using svc As New NovedadService()
             Dim fotos = Await svc.GetFotosPorNovedadAsync(novedadId)
@@ -175,11 +131,9 @@ Public Class frmNovedades
     Private Sub PictureBox_Click(sender As Object, e As EventArgs)
         Dim picClickeado = TryCast(sender, PictureBox)
         If picClickeado Is Nothing Then Return
-
         If _pictureBoxSeleccionado IsNot Nothing Then
             _pictureBoxSeleccionado.BackColor = Color.Transparent
         End If
-
         picClickeado.BackColor = Color.DodgerBlue
         _pictureBoxSeleccionado = picClickeado
     End Sub
@@ -192,133 +146,29 @@ Public Class frmNovedades
             End Using
         End If
     End Sub
-
-    Private Async Sub btnAgregarFoto_Click(sender As Object, e As EventArgs) Handles btnAgregarFoto.Click
-        If _novedadSeleccionada Is Nothing Then
-            MessageBox.Show("Por favor, seleccione una novedad de la lista antes de agregar fotos.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
-            Return
-        End If
-
-        Dim novedadId = _novedadSeleccionada.Id
-
-        Using ofd As New OpenFileDialog With {
-            .Filter = "Imágenes|*.jpg;*.jpeg;*.png;*.bmp",
-            .Multiselect = True
-        }
-            If ofd.ShowDialog() = DialogResult.OK Then
-                LoadingHelper.MostrarCargando(Me)
-                Try
-                    Using svc As New NovedadService()
-                        For Each archivo In ofd.FileNames
-                            Await svc.AddFotoAsync(novedadId, archivo)
-                        Next
-                    End Using
-                    Await CargarFotos(novedadId)
-                Catch ex As Exception
-                    MessageBox.Show("Error al agregar foto(s): " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                Finally
-                    LoadingHelper.OcultarCargando(Me)
-                End Try
-            End If
-        End Using
-    End Sub
-
-    Private Async Sub btnEliminarFoto_Click(sender As Object, e As EventArgs) Handles btnEliminarFoto.Click
-        If _pictureBoxSeleccionado Is Nothing Then
-            MessageBox.Show("Por favor, seleccione una foto para eliminar haciendo clic sobre ella.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
-            Return
-        End If
-
-        Dim confirmResult = MessageBox.Show("¿Está seguro de que desea eliminar la foto seleccionada?", "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
-        If confirmResult = DialogResult.Yes Then
-            Dim fotoId = CInt(_pictureBoxSeleccionado.Tag)
-            LoadingHelper.MostrarCargando(Me)
-            Try
-                Using svc As New NovedadService()
-                    Await svc.DeleteFotoAsync(fotoId)
-                End Using
-                Await CargarFotos(_novedadSeleccionada.Id)
-            Catch ex As Exception
-                MessageBox.Show("Error al eliminar la foto: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            Finally
-                LoadingHelper.OcultarCargando(Me)
-            End Try
-        End If
-    End Sub
-
 #End Region
 
-#Region "Gestión de Funcionarios y Novedades"
-
+#Region "Gestión de Novedades (CRUD)"
     Private Async Sub btnNuevaNovedad_Click(sender As Object, e As EventArgs) Handles btnNuevaNovedad.Click
         Using frm As New frmNovedadCrear()
             If frm.ShowDialog(Me) = DialogResult.OK Then
-                Await CargarNovedadesAsync()
+                Await CargarNovedadesAsync(mantenerSeleccion:=False)
             End If
         End Using
     End Sub
 
     Private Async Sub btnEditarNovedad_Click(sender As Object, e As EventArgs) Handles btnEditarNovedad.Click
-        If _novedadSeleccionada Is Nothing Then
+        If dgvNovedades.CurrentRow Is Nothing Then
             MessageBox.Show("Por favor, seleccione una novedad de la lista para editar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Return
         End If
-
-        Dim novedadId = _novedadSeleccionada.Id
-
+        Dim novedadId = CInt(dgvNovedades.CurrentRow.Cells("Id").Value)
         Using frm As New frmNovedadCrear(novedadId)
             If frm.ShowDialog(Me) = DialogResult.OK Then
-                Await CargarNovedadesAsync()
+                Await CargarNovedadesAsync(mantenerSeleccion:=True)
             End If
         End Using
     End Sub
-
-    Private Async Sub btnAgregarFuncionario_Click(sender As Object, e As EventArgs) Handles btnAgregarFuncionario.Click
-        If _novedadSeleccionada Is Nothing Then
-            MessageBox.Show("Por favor, seleccione una novedad de la lista.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
-            Return
-        End If
-
-        Dim novedadId = _novedadSeleccionada.Id
-
-        Using frm As New frmFuncionarioBuscar(frmFuncionarioBuscar.ModoApertura.Seleccion)
-            If frm.ShowDialog(Me) = DialogResult.OK AndAlso frm.FuncionarioSeleccionado IsNot Nothing Then
-                Try
-                    Using svc As New NovedadService()
-                        Await svc.AgregarFuncionarioANovedadAsync(novedadId, frm.FuncionarioSeleccionado.Id)
-                    End Using
-                    Await CargarNovedadesAsync()
-                Catch ex As Exception
-                    MessageBox.Show("Error al agregar el funcionario: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                End Try
-            End If
-        End Using
-    End Sub
-
-    Private Async Sub btnQuitarFuncionario_Click(sender As Object, e As EventArgs) Handles btnQuitarFuncionario.Click
-        If _novedadSeleccionada Is Nothing OrElse lstFuncionarios.SelectedItem Is Nothing Then
-            MessageBox.Show("Por favor, seleccione una novedad y un funcionario de la lista para quitar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
-            Return
-        End If
-
-        Dim funcionarioSeleccionado = CType(lstFuncionarios.SelectedItem, Funcionario)
-        Dim novedadId = _novedadSeleccionada.Id
-        Dim funcionarioId = funcionarioSeleccionado.Id
-
-        Dim confirmResult = MessageBox.Show($"¿Está seguro de que desea quitar a '{funcionarioSeleccionado.Nombre}' de esta novedad?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
-
-        If confirmResult = DialogResult.Yes Then
-            Try
-                Using svc As New NovedadService()
-                    Await svc.QuitarFuncionarioDeNovedadAsync(novedadId, funcionarioId)
-                End Using
-                Await CargarNovedadesAsync()
-            Catch ex As Exception
-                MessageBox.Show("Error al quitar el funcionario: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            End Try
-        End If
-    End Sub
-
 #End Region
 
 End Class

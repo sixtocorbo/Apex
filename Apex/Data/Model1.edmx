@@ -374,7 +374,6 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="NovedadGeneradaId" Type="int" Nullable="false" />
           <Property Name="Foto" Type="varbinary(max)" Nullable="false" />
           <Property Name="FileName" Type="nvarchar" MaxLength="255" />
           <Property Name="CreatedAt" Type="datetime2" Precision="7" Nullable="false" />
@@ -1217,18 +1216,6 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_NovFoto_NG">
-          <End Role="NovedadGenerada" Type="Self.NovedadGenerada" Multiplicity="1" />
-          <End Role="NovedadFoto" Type="Self.NovedadFoto" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="NovedadGenerada">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="NovedadFoto">
-              <PropertyRef Name="NovedadGeneradaId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_NovFunc_Func">
           <End Role="Funcionario" Type="Self.Funcionario" Multiplicity="1" />
           <End Role="NovedadFuncionario" Type="Self.NovedadFuncionario" Multiplicity="*" />
@@ -1720,10 +1707,6 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           </AssociationSet>
           <AssociationSet Name="FK_NovedadFoto_Novedad" Association="Self.FK_NovedadFoto_Novedad">
             <End Role="Novedad" EntitySet="Novedad" />
-            <End Role="NovedadFoto" EntitySet="NovedadFoto" />
-          </AssociationSet>
-          <AssociationSet Name="FK_NovFoto_NG" Association="Self.FK_NovFoto_NG">
-            <End Role="NovedadGenerada" EntitySet="NovedadGenerada" />
             <End Role="NovedadFoto" EntitySet="NovedadFoto" />
           </AssociationSet>
           <AssociationSet Name="FK_NovFunc_Func" Association="Self.FK_NovFunc_Func">
@@ -2228,13 +2211,11 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="NovedadGeneradaId" Type="Int32" Nullable="false" />
           <Property Name="Foto" Type="Binary" MaxLength="Max" FixedLength="false" Nullable="false" />
           <Property Name="FileName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
           <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
           <Property Name="NovedadId" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Novedad" Relationship="Self.FK_NovedadFoto_Novedad" FromRole="NovedadFoto" ToRole="Novedad" />
-          <NavigationProperty Name="NovedadGenerada" Relationship="Self.FK_NovFoto_NG" FromRole="NovedadFoto" ToRole="NovedadGenerada" />
         </EntityType>
         <EntityType Name="NovedadFuncionario">
           <Key>
@@ -2254,7 +2235,6 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <Property Name="Fecha" Type="DateTime" Nullable="false" Precision="0" />
           <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
           <NavigationProperty Name="Novedad" Relationship="Self.FK_Novedad_NG" FromRole="NovedadGenerada" ToRole="Novedad" />
-          <NavigationProperty Name="NovedadFoto" Relationship="Self.FK_NovFoto_NG" FromRole="NovedadGenerada" ToRole="NovedadFoto" />
         </EntityType>
         <EntityType Name="OrdenCincoDetalle">
           <Key>
@@ -3200,18 +3180,6 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_NovFoto_NG">
-          <End Role="NovedadGenerada" Type="Self.NovedadGenerada" Multiplicity="1" />
-          <End Role="NovedadFoto" Type="Self.NovedadFoto" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="NovedadGenerada">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="NovedadFoto">
-              <PropertyRef Name="NovedadGeneradaId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_PuestoTrabajo_TipoViatico">
           <End Role="TipoViatico" Type="Self.TipoViatico" Multiplicity="0..1" />
           <End Role="PuestoTrabajo" Type="Self.PuestoTrabajo" Multiplicity="*" />
@@ -3505,10 +3473,6 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <AssociationSet Name="FK_NovFunc_Novedad" Association="Self.FK_NovFunc_Novedad">
             <End Role="Novedad" EntitySet="Novedad" />
             <End Role="NovedadFuncionario" EntitySet="NovedadFuncionario" />
-          </AssociationSet>
-          <AssociationSet Name="FK_NovFoto_NG" Association="Self.FK_NovFoto_NG">
-            <End Role="NovedadGenerada" EntitySet="NovedadGenerada" />
-            <End Role="NovedadFoto" EntitySet="NovedadFoto" />
           </AssociationSet>
           <AssociationSet Name="FK_PuestoTrabajo_TipoViatico" Association="Self.FK_PuestoTrabajo_TipoViatico">
             <End Role="TipoViatico" EntitySet="TipoViatico" />
@@ -3968,7 +3932,6 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             <EntityTypeMapping TypeName="ApexModel.NovedadFoto">
               <MappingFragment StoreEntitySet="NovedadFoto">
                 <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="NovedadGeneradaId" ColumnName="NovedadGeneradaId" />
                 <ScalarProperty Name="Foto" ColumnName="Foto" />
                 <ScalarProperty Name="FileName" ColumnName="FileName" />
                 <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />

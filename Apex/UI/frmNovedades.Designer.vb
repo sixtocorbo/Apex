@@ -21,7 +21,7 @@ Partial Class frmNovedades
         Me.SplitContenedor = New System.Windows.Forms.SplitContainer()
         Me.dgvNovedades = New System.Windows.Forms.DataGridView()
         Me.PanelEncabezadoLista = New System.Windows.Forms.Panel()
-        Me.btnEditarNovedad = New System.Windows.Forms.Button() ' << MOVIDO AQUÍ
+        Me.btnEditarNovedad = New System.Windows.Forms.Button()
         Me.btnNuevaNovedad = New System.Windows.Forms.Button()
         Me.dtpFecha = New System.Windows.Forms.DateTimePicker()
         Me.Label1 = New System.Windows.Forms.Label()
@@ -30,14 +30,8 @@ Partial Class frmNovedades
         Me.txtTextoNovedad = New System.Windows.Forms.TextBox()
         Me.TabPageFuncionarios = New System.Windows.Forms.TabPage()
         Me.lstFuncionarios = New System.Windows.Forms.ListBox()
-        Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
-        Me.btnQuitarFuncionario = New System.Windows.Forms.Button()
-        Me.btnAgregarFuncionario = New System.Windows.Forms.Button()
         Me.TabPageFotos = New System.Windows.Forms.TabPage()
         Me.flpFotos = New System.Windows.Forms.FlowLayoutPanel()
-        Me.FlowLayoutPanel2 = New System.Windows.Forms.FlowLayoutPanel()
-        Me.btnEliminarFoto = New System.Windows.Forms.Button()
-        Me.btnAgregarFoto = New System.Windows.Forms.Button()
         Me.PanelPrincipal.SuspendLayout()
         CType(Me.SplitContenedor, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContenedor.Panel1.SuspendLayout()
@@ -48,9 +42,7 @@ Partial Class frmNovedades
         Me.TabControlDetalle.SuspendLayout()
         Me.TabPageTexto.SuspendLayout()
         Me.TabPageFuncionarios.SuspendLayout()
-        Me.FlowLayoutPanel1.SuspendLayout()
         Me.TabPageFotos.SuspendLayout()
-        Me.FlowLayoutPanel2.SuspendLayout()
         Me.SuspendLayout()
         '
         'PanelPrincipal
@@ -196,7 +188,6 @@ Partial Class frmNovedades
         'TabPageFuncionarios
         '
         Me.TabPageFuncionarios.Controls.Add(Me.lstFuncionarios)
-        Me.TabPageFuncionarios.Controls.Add(Me.FlowLayoutPanel1)
         Me.TabPageFuncionarios.Location = New System.Drawing.Point(4, 29)
         Me.TabPageFuncionarios.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.TabPageFuncionarios.Name = "TabPageFuncionarios"
@@ -214,49 +205,15 @@ Partial Class frmNovedades
         Me.lstFuncionarios.Location = New System.Drawing.Point(3, 4)
         Me.lstFuncionarios.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.lstFuncionarios.Name = "lstFuncionarios"
-        Me.lstFuncionarios.Size = New System.Drawing.Size(561, 578)
+        Me.lstFuncionarios.Size = New System.Drawing.Size(561, 636)
         Me.lstFuncionarios.TabIndex = 1
-        '
-        'FlowLayoutPanel1
-        '
-        Me.FlowLayoutPanel1.AutoSize = True
-        Me.FlowLayoutPanel1.Controls.Add(Me.btnQuitarFuncionario)
-        Me.FlowLayoutPanel1.Controls.Add(Me.btnAgregarFuncionario)
-        Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.FlowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
-        Me.FlowLayoutPanel1.Location = New System.Drawing.Point(3, 582)
-        Me.FlowLayoutPanel1.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
-        Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
-        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(561, 58)
-        Me.FlowLayoutPanel1.TabIndex = 0
-        '
-        'btnQuitarFuncionario
-        '
-        Me.btnQuitarFuncionario.Location = New System.Drawing.Point(446, 4)
-        Me.btnQuitarFuncionario.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
-        Me.btnQuitarFuncionario.Name = "btnQuitarFuncionario"
-        Me.btnQuitarFuncionario.Size = New System.Drawing.Size(112, 50)
-        Me.btnQuitarFuncionario.TabIndex = 1
-        Me.btnQuitarFuncionario.Text = "Quitar"
-        Me.btnQuitarFuncionario.UseVisualStyleBackColor = True
-        '
-        'btnAgregarFuncionario
-        '
-        Me.btnAgregarFuncionario.Location = New System.Drawing.Point(328, 4)
-        Me.btnAgregarFuncionario.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
-        Me.btnAgregarFuncionario.Name = "btnAgregarFuncionario"
-        Me.btnAgregarFuncionario.Size = New System.Drawing.Size(112, 50)
-        Me.btnAgregarFuncionario.TabIndex = 0
-        Me.btnAgregarFuncionario.Text = "Agregar..."
-        Me.btnAgregarFuncionario.UseVisualStyleBackColor = True
         '
         'TabPageFotos
         '
         Me.TabPageFotos.Controls.Add(Me.flpFotos)
-        Me.TabPageFotos.Controls.Add(Me.FlowLayoutPanel2)
         Me.TabPageFotos.Location = New System.Drawing.Point(4, 29)
-        Me.TabPageFotos.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.TabPageFotos.Name = "TabPageFotos"
+        Me.TabPageFotos.Padding = New System.Windows.Forms.Padding(3)
         Me.TabPageFotos.Size = New System.Drawing.Size(567, 644)
         Me.TabPageFotos.TabIndex = 2
         Me.TabPageFotos.Text = "Fotos"
@@ -266,44 +223,10 @@ Partial Class frmNovedades
         '
         Me.flpFotos.AutoScroll = True
         Me.flpFotos.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.flpFotos.Location = New System.Drawing.Point(0, 0)
-        Me.flpFotos.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.flpFotos.Location = New System.Drawing.Point(3, 3)
         Me.flpFotos.Name = "flpFotos"
-        Me.flpFotos.Size = New System.Drawing.Size(567, 586)
-        Me.flpFotos.TabIndex = 2
-        '
-        'FlowLayoutPanel2
-        '
-        Me.FlowLayoutPanel2.AutoSize = True
-        Me.FlowLayoutPanel2.Controls.Add(Me.btnEliminarFoto)
-        Me.FlowLayoutPanel2.Controls.Add(Me.btnAgregarFoto)
-        Me.FlowLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.FlowLayoutPanel2.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
-        Me.FlowLayoutPanel2.Location = New System.Drawing.Point(0, 586)
-        Me.FlowLayoutPanel2.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
-        Me.FlowLayoutPanel2.Name = "FlowLayoutPanel2"
-        Me.FlowLayoutPanel2.Size = New System.Drawing.Size(567, 58)
-        Me.FlowLayoutPanel2.TabIndex = 1
-        '
-        'btnEliminarFoto
-        '
-        Me.btnEliminarFoto.Location = New System.Drawing.Point(452, 4)
-        Me.btnEliminarFoto.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
-        Me.btnEliminarFoto.Name = "btnEliminarFoto"
-        Me.btnEliminarFoto.Size = New System.Drawing.Size(112, 50)
-        Me.btnEliminarFoto.TabIndex = 1
-        Me.btnEliminarFoto.Text = "Eliminar"
-        Me.btnEliminarFoto.UseVisualStyleBackColor = True
-        '
-        'btnAgregarFoto
-        '
-        Me.btnAgregarFoto.Location = New System.Drawing.Point(334, 4)
-        Me.btnAgregarFoto.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
-        Me.btnAgregarFoto.Name = "btnAgregarFoto"
-        Me.btnAgregarFoto.Size = New System.Drawing.Size(112, 50)
-        Me.btnAgregarFoto.TabIndex = 0
-        Me.btnAgregarFoto.Text = "Agregar..."
-        Me.btnAgregarFoto.UseVisualStyleBackColor = True
+        Me.flpFotos.Size = New System.Drawing.Size(561, 638)
+        Me.flpFotos.TabIndex = 0
         '
         'frmNovedades
         '
@@ -326,11 +249,7 @@ Partial Class frmNovedades
         Me.TabPageTexto.ResumeLayout(False)
         Me.TabPageTexto.PerformLayout()
         Me.TabPageFuncionarios.ResumeLayout(False)
-        Me.TabPageFuncionarios.PerformLayout()
-        Me.FlowLayoutPanel1.ResumeLayout(False)
         Me.TabPageFotos.ResumeLayout(False)
-        Me.TabPageFotos.PerformLayout()
-        Me.FlowLayoutPanel2.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub
@@ -345,16 +264,9 @@ Partial Class frmNovedades
     Friend WithEvents TabControlDetalle As TabControl
     Friend WithEvents TabPageTexto As TabPage
     Friend WithEvents TabPageFuncionarios As TabPage
-    Friend WithEvents TabPageFotos As TabPage
     Friend WithEvents txtTextoNovedad As TextBox
     Friend WithEvents lstFuncionarios As ListBox
-    Friend WithEvents FlowLayoutPanel1 As FlowLayoutPanel
-    Friend WithEvents btnQuitarFuncionario As Button
-    Friend WithEvents btnAgregarFuncionario As Button
-    Friend WithEvents flpFotos As FlowLayoutPanel
-    Friend WithEvents FlowLayoutPanel2 As FlowLayoutPanel
-    Friend WithEvents btnEliminarFoto As Button
-    Friend WithEvents btnAgregarFoto As Button
-    ' << --- AÑADIDO --- >>
     Friend WithEvents btnEditarNovedad As Button
+    Friend WithEvents TabPageFotos As TabPage
+    Friend WithEvents flpFotos As FlowLayoutPanel
 End Class

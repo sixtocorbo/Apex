@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="06dba9bcead04865914b35f6507c3cba" Name="Diagram1">
+      <Diagram DiagramId="14bb0222ef4f403580a5007bd7a2bec1" Name="Diagram1">
         <EntityTypeShape EntityType="ApexModel.AreaTrabajo" Width="1.5" PointX="1.5" PointY="50.75" IsExpanded="true" />
         <EntityTypeShape EntityType="ApexModel.Arma" Width="1.5" PointX="6" PointY="17.5" IsExpanded="true" />
         <EntityTypeShape EntityType="ApexModel.Cargo" Width="1.5" PointX="0.75" PointY="24.5" IsExpanded="true" />
@@ -35,12 +35,12 @@
         <EntityTypeShape EntityType="ApexModel.MapPoliciaFunc" Width="1.5" PointX="5.75" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="ApexModel.Movimiento" Width="1.5" PointX="5.25" PointY="43.25" IsExpanded="true" />
         <EntityTypeShape EntityType="ApexModel.NivelEstudio" Width="1.5" PointX="0.75" PointY="43.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.NotificacionEstado" Width="1.5" PointX="6.75" PointY="11.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.NotificacionEstado" Width="1.5" PointX="6.75" PointY="12.25" IsExpanded="true" />
         <EntityTypeShape EntityType="ApexModel.NotificacionPersonal" Width="1.5" PointX="8.25" PointY="43.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.Novedad" Width="1.5" PointX="9" PointY="12.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.NovedadFoto" Width="1.5" PointX="11.25" PointY="12.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.Novedad" Width="1.5" PointX="9" PointY="13.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.NovedadFoto" Width="1.5" PointX="11.25" PointY="13.5" IsExpanded="true" />
         <EntityTypeShape EntityType="ApexModel.NovedadFuncionario" Width="1.5" PointX="11.25" PointY="39.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.NovedadGenerada" Width="1.5" PointX="6.75" PointY="13.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.NovedadGenerada" Width="1.5" PointX="6.75" PointY="15" IsExpanded="true" />
         <EntityTypeShape EntityType="ApexModel.OrdenCincoDetalle" Width="1.5" PointX="7.5" PointY="49.125" IsExpanded="true" />
         <EntityTypeShape EntityType="ApexModel.PuestoTrabajo" Width="1.5" PointX="0.75" PointY="46.625" IsExpanded="true" />
         <EntityTypeShape EntityType="ApexModel.RegimenAlternancia" Width="1.5" PointX="0.75" PointY="5.75" IsExpanded="true" />
@@ -115,7 +115,6 @@
         <AssociationConnector Association="ApexModel.FK_Novedad_NG" ManuallyRouted="false" />
         <AssociationConnector Association="ApexModel.FK_NovedadFoto_Novedad" ManuallyRouted="false" />
         <AssociationConnector Association="ApexModel.FK_NovFunc_Novedad" ManuallyRouted="false" />
-        <AssociationConnector Association="ApexModel.FK_NovFoto_NG" ManuallyRouted="false" />
         <AssociationConnector Association="ApexModel.FK_PuestoTrabajo_TipoViatico" ManuallyRouted="false" />
         <AssociationConnector Association="ApexModel.FK_RegimenDetalle_RegimenTrabajo" ManuallyRouted="false" />
         <AssociationConnector Association="ApexModel.FK_Usuario_Rol" ManuallyRouted="false" />

@@ -51,52 +51,52 @@ Public Class NovedadService
         Return nuevaNovedad
     End Function
 
-    ' En el archivo: Apex/Services/NovedadService.vb
+
 
     ''' <summary>
-    ''' Actualiza una novedad existente, sincronizando solo los campos modificables y la lista de funcionarios.
-    ''' Las fotos y otras relaciones no se ven afectadas.
+    ''' Actualiza una novedad existente, sincronizando la lista de funcionarios. (Versión Definitiva)
     ''' </summary>
     Public Async Function ActualizarNovedadCompletaAsync(novedadActualizada As Novedad, nuevosFuncionarioIds As List(Of Integer)) As Task
-        ' 1. Obtener la Novedad original desde la base de datos, incluyendo la lista de funcionarios actual.
-        '    Es crucial traer la entidad "trackeada" por el contexto para que EF maneje los cambios.
-        Dim novedadEnDb = Await _unitOfWork.Repository(Of Novedad)().
-        GetAll().
-        Include(Function(n) n.NovedadFuncionario).
-        SingleOrDefaultAsync(Function(n) n.Id = novedadActualizada.Id)
+        ' 1. Obtener la Novedad original desde la base de datos CON SEGUIMIENTO.
+        '    Esto es crucial para que Entity Framework sepa qué entidades vigilar.
+        Dim novedadEnDb = Await _unitOfWork.Context.Set(Of Novedad)().
+            Include(Function(n) n.NovedadFuncionario).
+            SingleOrDefaultAsync(Function(n) n.Id = novedadActualizada.Id)
 
         If novedadEnDb Is Nothing Then
             Throw New KeyNotFoundException("La novedad que intenta actualizar ya no existe en la base de datos.")
         End If
 
-        ' 2. Actualizar solo las propiedades escalares (los campos simples) que se modifican en el formulario de edición.
-        '    Esto evita que Entity Framework toque otras propiedades o relaciones no relacionadas como las fotos.
+        ' 2. Actualizar las propiedades escalares (campos simples) de forma manual.
         novedadEnDb.Fecha = novedadActualizada.Fecha
         novedadEnDb.Texto = novedadActualizada.Texto
-        novedadEnDb.EstadoId = novedadActualizada.EstadoId ' Asumiendo que el estado también puede cambiar
+        ' Si tienes otros campos para editar, como el EstadoId, añádelos aquí.
+        ' novedadEnDb.EstadoId = novedadActualizada.EstadoId 
 
-        ' 3. Sincronizar la lista de funcionarios (esta lógica es para añadir/quitar solo los necesarios).
+        ' 3. Sincronizar la lista de funcionarios.
         Dim idsActuales = novedadEnDb.NovedadFuncionario.Select(Function(nf) nf.FuncionarioId).ToList()
         Dim idsParaQuitar = idsActuales.Except(nuevosFuncionarioIds).ToList()
         Dim idsParaAgregar = nuevosFuncionarioIds.Except(idsActuales).ToList()
 
-        ' Quitar los que ya no están
+        ' --- INICIO DE LA CORRECCIÓN CLAVE ---
+        ' Quitar explícitamente los registros de la tabla de unión.
         If idsParaQuitar.Any() Then
             Dim relacionesAQuitar = novedadEnDb.NovedadFuncionario.Where(Function(nf) idsParaQuitar.Contains(nf.FuncionarioId)).ToList()
-            For Each rel In relacionesAQuitar
-                _unitOfWork.Repository(Of NovedadFuncionario)().Remove(rel)
-            Next
-        End If
 
-        ' Agregar los nuevos
+            ' Le decimos al repositorio que elimine este conjunto de registros.
+            ' Esto se traduce en un comando DELETE en SQL, que es lo que queremos.
+            _unitOfWork.Repository(Of NovedadFuncionario)().RemoveRange(relacionesAQuitar)
+        End If
+        ' --- FIN DE LA CORRECCIÓN CLAVE ---
+
+        ' Agregar los nuevos.
         For Each funcId In idsParaAgregar
-            _unitOfWork.Repository(Of NovedadFuncionario)().Add(New NovedadFuncionario With {
-            .NovedadId = novedadEnDb.Id,
-            .FuncionarioId = funcId
-        })
+            novedadEnDb.NovedadFuncionario.Add(New NovedadFuncionario With {
+                .FuncionarioId = funcId
+            })
         Next
 
-        ' 4. Guardar todos los cambios en una única transacción.
+        ' 4. Guardar todos los cambios (actualizaciones, eliminaciones e inserciones) en una única transacción.
         Await _unitOfWork.CommitAsync()
     End Function
 
@@ -123,16 +123,19 @@ Public Class NovedadService
     End Function
 
     ''' <summary>
-    ''' Agrega una foto a una novedad existente.
+    ''' Agrega una foto a una novedad existente. (Versión Simplificada)
     ''' </summary>
     Public Async Function AddFotoAsync(novedadId As Integer, rutaArchivo As String) As Task
         Dim fotoBytes = File.ReadAllBytes(rutaArchivo)
+
+        ' Ahora solo necesitas el NovedadId, que es la relación correcta.
         Dim nuevaFoto = New NovedadFoto With {
             .NovedadId = novedadId,
             .Foto = fotoBytes,
             .FileName = Path.GetFileName(rutaArchivo),
             .CreatedAt = DateTime.Now
         }
+
         _unitOfWork.Repository(Of NovedadFoto)().Add(nuevaFoto)
         Await _unitOfWork.CommitAsync()
     End Function
