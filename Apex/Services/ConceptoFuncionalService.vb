@@ -1,4 +1,5 @@
-﻿Imports System.Data.Entity
+﻿' Apex/Services/ConceptoFuncionalService.vb
+Imports System.Data.Entity
 
 ''' <summary>
 ''' Servicio para obtener los datos del informe de Concepto Funcional.
@@ -22,14 +23,13 @@ Public Class ConceptoFuncionalService
     ) As IEnumerable(Of IncidenciaUI)
 
         ' 1. Se traen los datos filtrados desde la base de datos a memoria.
-        Dim licenciasDb = _unitOfWork.Repository(Of HistoricoLicencia).Find(
-            Function(lic)
-                Return lic.FuncionarioId = funcionarioId AndAlso
+        Dim licenciasDb = _unitOfWork.Repository(Of HistoricoLicencia).GetAll().
+            Where(
+                Function(lic) lic.FuncionarioId = funcionarioId AndAlso
                        lic.TipoLicencia.CategoriaAusencia.Nombre.Equals(categoria, StringComparison.OrdinalIgnoreCase) AndAlso
                        DbFunctions.TruncateTime(lic.inicio) >= fechaInicio.Date AndAlso
                        DbFunctions.TruncateTime(lic.inicio) <= fechaFin.Date
-            End Function
-        ).ToList()
+            ).ToList()
 
         ' 2. Se transforman los datos al formato de la UI, ya en memoria.
         Return licenciasDb.Select(
@@ -52,28 +52,23 @@ Public Class ConceptoFuncionalService
 
         ' --- 1. Obtener sanciones PUNTUALES ---
         ' Se filtra en la DB y se trae la colección a memoria con ToList().
-        Dim estadosTransitoriosDb = _unitOfWork.Repository(Of EstadoTransitorio).Find(
-            Function(et)
-                Return et.FuncionarioId = funcionarioId AndAlso
+        Dim estadosTransitoriosDb = _unitOfWork.Repository(Of EstadoTransitorio).GetAll().
+            Where(
+                Function(et) et.FuncionarioId = funcionarioId AndAlso
                        et.TipoEstadoTransitorio.Nombre.Equals(ModConstantesApex.CATEGORIA_ESTADO_SANCION, StringComparison.OrdinalIgnoreCase) AndAlso
                        et.SancionDetalle IsNot Nothing AndAlso
                        DbFunctions.TruncateTime(et.SancionDetalle.FechaDesde) >= fechaInicio.Date AndAlso
                        DbFunctions.TruncateTime(et.SancionDetalle.FechaDesde) <= fechaFin.Date
-            End Function
-        ).ToList()
+            ).ToList()
 
         ' Se mapea la colección en memoria para evitar errores de conversión a SQL.
         Dim puntuales = estadosTransitoriosDb.Select(
-            Function(et)
-                ' CORRECCIÓN DEFINITIVA: Se usa la propiedad booleana 'Activo' que es más simple y directa.
-                Dim estadoSancion As String = If(et.Activo, "Abierta", "Cerrada")
-
-                Return New ObservacionUI With {
-                    .Fecha = et.SancionDetalle.FechaDesde,
-                    .Causa = et.SancionDetalle.Observaciones,
-                    .Sancion = estadoSancion
-                }
-            End Function).ToList()
+            Function(et) New ObservacionUI With {
+                .Fecha = et.SancionDetalle.FechaDesde,
+                .Causa = et.SancionDetalle.Observaciones,
+                .Sancion = If(Not et.SancionDetalle.FechaHasta.HasValue OrElse et.SancionDetalle.FechaHasta.Value >= Date.Today, "Abierta", "Cerrada")
+            }
+        ).ToList()
 
         ' --- 2. Obtener sanciones LEVES ---
         Dim leves = ObtenerIncidencias(funcionarioId, fechaInicio, fechaFin, ModConstantesApex.CATEGORIA_SANCION_LEVE) _

@@ -21,6 +21,7 @@ Partial Class frmGestion
         Me.TabPageLicencias = New System.Windows.Forms.TabPage()
         Me.dgvLicencias = New System.Windows.Forms.DataGridView()
         Me.PanelLicencias = New System.Windows.Forms.Panel()
+        Me.btnConceptoFuncional = New System.Windows.Forms.Button() ' Botón añadido
         Me.btnEliminarLicencia = New System.Windows.Forms.Button()
         Me.btnEditarLicencia = New System.Windows.Forms.Button()
         Me.btnNuevaLicencia = New System.Windows.Forms.Button()
@@ -108,6 +109,7 @@ Partial Class frmGestion
         '
         'PanelLicencias
         '
+        Me.PanelLicencias.Controls.Add(Me.btnConceptoFuncional)
         Me.PanelLicencias.Controls.Add(Me.btnEliminarLicencia)
         Me.PanelLicencias.Controls.Add(Me.btnEditarLicencia)
         Me.PanelLicencias.Controls.Add(Me.btnNuevaLicencia)
@@ -117,6 +119,17 @@ Partial Class frmGestion
         Me.PanelLicencias.Name = "PanelLicencias"
         Me.PanelLicencias.Size = New System.Drawing.Size(886, 62)
         Me.PanelLicencias.TabIndex = 0
+        '
+        'btnConceptoFuncional
+        '
+        Me.btnConceptoFuncional.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnConceptoFuncional.Location = New System.Drawing.Point(15, 12)
+        Me.btnConceptoFuncional.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.btnConceptoFuncional.Name = "btnConceptoFuncional"
+        Me.btnConceptoFuncional.Size = New System.Drawing.Size(180, 38)
+        Me.btnConceptoFuncional.TabIndex = 3
+        Me.btnConceptoFuncional.Text = "Ver Concepto Funcional"
+        Me.btnConceptoFuncional.UseVisualStyleBackColor = True
         '
         'btnEliminarLicencia
         '
@@ -453,4 +466,5 @@ Partial Class frmGestion
     Friend WithEvents btnEliminarSancion As Button
     Friend WithEvents btnEditarSancion As Button
     Friend WithEvents btnNuevaSancion As Button
+    Friend WithEvents btnConceptoFuncional As Button ' Botón añadido
 End Class

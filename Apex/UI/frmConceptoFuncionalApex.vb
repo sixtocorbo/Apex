@@ -1,5 +1,4 @@
-﻿Imports Apex.Data
-Imports Apex.Services
+﻿' Imports eliminados porque las clases están en el mismo espacio de nombres raíz 'Apex'
 
 Public Class frmConceptoFuncionalApex
 
@@ -23,12 +22,19 @@ Public Class frmConceptoFuncionalApex
         ActualizarTemporalLabel()
     End Sub
 
-    Private Sub btnBuscarFuncionario_Click(sender As Object, e As EventArgs) Handles btnBuscarFuncionario.Click
-        Using frm As New frmFuncionarioBuscar(_funcionarioService)
+    Private Async Sub btnBuscarFuncionario_Click(sender As Object, e As EventArgs) Handles btnBuscarFuncionario.Click
+        ' CORRECCIÓN: Se llama al constructor con el modo de apertura correcto.
+        Using frm As New frmFuncionarioBuscar(frmFuncionarioBuscar.ModoApertura.Seleccion)
             If frm.ShowDialog() = DialogResult.OK AndAlso frm.FuncionarioSeleccionado IsNot Nothing Then
-                _funcionarioSeleccionado = frm.FuncionarioSeleccionado
-                txtFuncionarioSeleccionado.Text = $"{_funcionarioSeleccionado.Apellido}, {_funcionarioSeleccionado.Nombre}"
-                ActualizarDatos()
+                ' CORRECCIÓN: Se obtiene el ID del objeto FuncionarioMin y se busca el objeto completo.
+                Dim funcionarioMin = frm.FuncionarioSeleccionado
+                _funcionarioSeleccionado = Await _funcionarioService.GetByIdAsync(funcionarioMin.Id)
+
+                If _funcionarioSeleccionado IsNot Nothing Then
+                    ' CORRECCIÓN: Se usa la propiedad 'Nombre' en lugar de 'Apellido'.
+                    txtFuncionarioSeleccionado.Text = _funcionarioSeleccionado.Nombre
+                    ActualizarDatos()
+                End If
             End If
         End Using
     End Sub
@@ -68,9 +74,18 @@ Public Class frmConceptoFuncionalApex
             Return
         End If
 
-        ' Aquí iría la lógica para llamar al formulario de ReportViewer,
-        ' pasándole los parámetros necesarios para generar el RDLC.
-        MessageBox.Show("Lógica para generar el informe no implementada.", "Información")
+        ' --- INICIO DE LA CORRECCIÓN ---
+        ' Recolectar los datos de las grillas y convertirlos a una Lista.
+        Dim licencias As List(Of IncidenciaUI) = CType(dgvLicenciasMedicas.DataSource, IEnumerable(Of IncidenciaUI)).ToList()
+        Dim sanciones As List(Of IncidenciaUI) = CType(dgvSanciones.DataSource, IEnumerable(Of IncidenciaUI)).ToList()
+        Dim observaciones As List(Of ObservacionUI) = CType(dgvObservaciones.DataSource, IEnumerable(Of ObservacionUI)).ToList()
+        ' --- FIN DE LA CORRECCIÓN ---
+
+        ' Crear y mostrar el formulario del reporte, pasándole todos los datos necesarios
+        Using frm As New frmConceptoFuncionalRPT(_funcionarioSeleccionado, dtpFechaInicio.Value, dtpFechaFin.Value,
+                                           licencias, sanciones, observaciones)
+            frm.ShowDialog(Me)
+        End Using
     End Sub
 
     ' --- CONFIGURACIÓN DE GRIDS Y CLASES DTO ---

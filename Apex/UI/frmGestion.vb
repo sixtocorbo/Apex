@@ -64,7 +64,7 @@ Public Class frmGestion
             .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "TipoNotificacion", .DataPropertyName = "TipoNotificacion", .HeaderText = "Tipo", .Width = 150})
 
             Dim fechaColumn As New DataGridViewTextBoxColumn With {
-                 .Name = "FechaProgramada", .DataPropertyName = "FechaProgramada",
+                .Name = "FechaProgramada", .DataPropertyName = "FechaProgramada",
                 .HeaderText = "Fecha Programada", .Width = 160
             }
             fechaColumn.DefaultCellStyle.Format = "dd/MM/yyyy HH:mm"
@@ -175,6 +175,12 @@ Public Class frmGestion
 #End Region
 
 #Region "Acciones para Licencias"
+
+    Private Sub btnConceptoFuncional_Click(sender As Object, e As EventArgs) Handles btnConceptoFuncional.Click
+        Using frm As New frmConceptoFuncionalApex()
+            frm.ShowDialog(Me)
+        End Using
+    End Sub
 
     Private Async Sub btnNuevaLicencia_Click(sender As Object, e As EventArgs) Handles btnNuevaLicencia.Click
         Using frm As New frmLicenciaCrear()
