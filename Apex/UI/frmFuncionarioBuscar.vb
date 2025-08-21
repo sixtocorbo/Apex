@@ -1,4 +1,5 @@
-﻿Option Strict On
+﻿' Apex/UI/frmFuncionarioBuscar.vb
+Option Strict On
 Option Explicit On
 
 Imports System.Data.Entity
@@ -12,16 +13,14 @@ Imports System.Windows.Forms
 Public Class frmFuncionarioBuscar
     Inherits Form
 
-    '--- INICIO DE LA CORRECCIÓN ---
     Public Enum ModoApertura
         Navegacion ' Para ver y editar desde el Dashboard
         Seleccion  ' Para seleccionar un funcionario y devolverlo
     End Enum
 
     Private ReadOnly _modo As ModoApertura
-    '--- FIN DE LA CORRECCIÓN ---
-
     Private Const LIMITE_FILAS As Integer = 500
+    Private _detallesEstadoActual As New List(Of String)
 
     Public ReadOnly Property FuncionarioSeleccionado As FuncionarioMin
         Get
@@ -32,28 +31,23 @@ Public Class frmFuncionarioBuscar
         End Get
     End Property
 
-    '--- INICIO DE LA CORRECCIÓN ---
-    ' Constructor original para el modo Navegación (Dashboard)
     Public Sub New()
         InitializeComponent()
         _modo = ModoApertura.Navegacion
-        ' Ocultar los botones de selección en este modo
         FlowLayoutPanelAcciones.Visible = False
     End Sub
 
-    ' Nuevo constructor para el modo Selección
     Public Sub New(modo As ModoApertura)
-        Me.New() ' Llama al constructor sin parámetros primero
+        Me.New()
         _modo = modo
-        ' Asegurar que los botones sean visibles si es modo Selección
         FlowLayoutPanelAcciones.Visible = (_modo = ModoApertura.Seleccion)
     End Sub
-    '--- FIN DE LA CORRECCIÓN ---
 
 
     Private Sub frmFuncionarioBuscar_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
         ConfigurarGrilla()
+        AddHandler lblEstadoTransitorio.DoubleClick, AddressOf lblEstadoTransitorio_DoubleClick
     End Sub
 
     Private Sub frmFuncionarioBuscar_Shown(sender As Object, e As EventArgs) Handles Me.Shown
@@ -214,6 +208,8 @@ Public Class frmFuncionarioBuscar
         If dgvResultados.CurrentRow Is Nothing OrElse dgvResultados.CurrentRow.DataBoundItem Is Nothing Then Return
         Dim id = CInt(dgvResultados.CurrentRow.Cells("Id").Value)
 
+        _detallesEstadoActual.Clear()
+
         Using uow As New UnitOfWork()
             Dim f = Await uow.Repository(Of Funcionario)() _
                  .GetAll() _
@@ -236,64 +232,123 @@ Public Class frmFuncionarioBuscar
             If f Is Nothing Then Return
 
             Dim fechaActual = Date.Today
-            Dim estadosActivos As New List(Of String)
+            Dim todosLosEstadosActivos As New List(Of String)
 
-            For Each et In f.EstadoTransitorio
-                Dim esActivo As Boolean = False
-                Select Case et.TipoEstadoTransitorioId
-                    Case 1 ' Designación
-                        If et.DesignacionDetalle IsNot Nothing Then
-                            esActivo = fechaActual >= et.DesignacionDetalle.FechaDesde AndAlso (Not et.DesignacionDetalle.FechaHasta.HasValue OrElse fechaActual <= et.DesignacionDetalle.FechaHasta.Value)
-                        End If
-                    Case 2 ' Enfermedad
-                        If et.EnfermedadDetalle IsNot Nothing Then
-                            esActivo = fechaActual >= et.EnfermedadDetalle.FechaDesde AndAlso (Not et.EnfermedadDetalle.FechaHasta.HasValue OrElse fechaActual <= et.EnfermedadDetalle.FechaHasta.Value)
-                        End If
-                    Case 3 ' Sanción
-                        If et.SancionDetalle IsNot Nothing Then
-                            esActivo = fechaActual >= et.SancionDetalle.FechaDesde AndAlso (Not et.SancionDetalle.FechaHasta.HasValue OrElse fechaActual <= et.SancionDetalle.FechaHasta.Value)
-                        End If
-                    Case 4 ' Orden Cinco
-                        If et.OrdenCincoDetalle IsNot Nothing Then
-                            esActivo = fechaActual >= et.OrdenCincoDetalle.FechaDesde AndAlso (Not et.OrdenCincoDetalle.FechaHasta.HasValue OrElse fechaActual <= et.OrdenCincoDetalle.FechaHasta.Value)
-                        End If
-                    Case 5 ' Retén
-                        If et.RetenDetalle IsNot Nothing Then
-                            esActivo = fechaActual = et.RetenDetalle.FechaReten
-                        End If
-                    Case 6 ' Sumario
-                        If et.SumarioDetalle IsNot Nothing Then
-                            esActivo = fechaActual >= et.SumarioDetalle.FechaDesde AndAlso (Not et.SumarioDetalle.FechaHasta.HasValue OrElse fechaActual <= et.SumarioDetalle.FechaHasta.Value)
-                        End If
-                End Select
+            ' --- INICIO DE LA CORRECCIÓN: Lógica de Prioridades para "Estado Actual" ---
 
-                If esActivo Then
-                    estadosActivos.Add(et.TipoEstadoTransitorio.Nombre)
-                End If
+            ' Prioridad 1: Licencias
+            Dim licenciasActivas = Await uow.Repository(Of HistoricoLicencia)().GetAll().
+                Include(Function(l) l.TipoLicencia).
+                Where(Function(l) l.FuncionarioId = id AndAlso
+                                  l.inicio <= fechaActual AndAlso
+                                  l.finaliza >= fechaActual AndAlso
+                                  l.estado IsNot Nothing AndAlso
+                                  Not {"Rechazado", "Anulado"}.Contains(l.estado.Trim())).
+                ToListAsync()
+
+            For Each lic In licenciasActivas
+                todosLosEstadosActivos.Add(lic.TipoLicencia.Nombre)
+                _detallesEstadoActual.Add($"• {lic.TipoLicencia.Nombre} (desde {lic.inicio.ToShortDateString()} hasta {lic.finaliza.ToShortDateString()})")
             Next
+
+            ' Si está Inactivo, esta es la segunda prioridad
+            If Not f.Activo Then
+                todosLosEstadosActivos.Add("Inactivo")
+                _detallesEstadoActual.Add("• El funcionario se encuentra Inactivo en el sistema.")
+            Else
+                ' Si está activo, se revisan las demás condiciones solo si no hay licencias
+                If Not licenciasActivas.Any() Then
+                    ' Prioridad 3: Estados permanentes (Procesado, etc.)
+                    If f.Procesado Then
+                        todosLosEstadosActivos.Add("Procesado")
+                        _detallesEstadoActual.Add("• Se encuentra Procesado.")
+                    End If
+                    If f.SeparadoDeCargo Then
+                        todosLosEstadosActivos.Add("Separado de Cargo")
+                        _detallesEstadoActual.Add("• Se encuentra Separado del Cargo.")
+                    End If
+                    If f.Desarmado Then
+                        todosLosEstadosActivos.Add("Desarmado")
+                        _detallesEstadoActual.Add("• Se encuentra Desarmado.")
+                    End If
+
+                    ' Prioridad 4: Estados Transitorios
+                    For Each et In f.EstadoTransitorio
+                        Dim esActivo As Boolean = False
+                        Dim detalleCompleto As String = ""
+
+                        Select Case et.TipoEstadoTransitorioId
+                            Case 1 ' Designación
+                                If et.DesignacionDetalle IsNot Nothing Then
+                                    esActivo = fechaActual >= et.DesignacionDetalle.FechaDesde AndAlso (Not et.DesignacionDetalle.FechaHasta.HasValue OrElse fechaActual <= et.DesignacionDetalle.FechaHasta.Value)
+                                    If esActivo Then detalleCompleto = $"Designación: {et.DesignacionDetalle.Observaciones} (Resolución: {et.DesignacionDetalle.DocResolucion})"
+                                End If
+                            Case 2 ' Enfermedad
+                                If et.EnfermedadDetalle IsNot Nothing Then
+                                    esActivo = fechaActual >= et.EnfermedadDetalle.FechaDesde AndAlso (Not et.EnfermedadDetalle.FechaHasta.HasValue OrElse fechaActual <= et.EnfermedadDetalle.FechaHasta.Value)
+                                    If esActivo Then detalleCompleto = $"Enfermedad: {et.EnfermedadDetalle.Observaciones} (Diagnóstico: {et.EnfermedadDetalle.Diagnostico})"
+                                End If
+                            Case 3 ' Sanción
+                                If et.SancionDetalle IsNot Nothing Then
+                                    esActivo = fechaActual >= et.SancionDetalle.FechaDesde AndAlso (Not et.SancionDetalle.FechaHasta.HasValue OrElse fechaActual <= et.SancionDetalle.FechaHasta.Value)
+                                    If esActivo Then detalleCompleto = $"Sanción: {et.SancionDetalle.Observaciones} (Resolución: {et.SancionDetalle.Resolucion})"
+                                End If
+                            Case 4 ' Orden Cinco
+                                If et.OrdenCincoDetalle IsNot Nothing Then
+                                    esActivo = fechaActual >= et.OrdenCincoDetalle.FechaDesde AndAlso (Not et.OrdenCincoDetalle.FechaHasta.HasValue OrElse fechaActual <= et.OrdenCincoDetalle.FechaHasta.Value)
+                                    If esActivo Then detalleCompleto = $"Orden Cinco: {et.OrdenCincoDetalle.Observaciones}"
+                                End If
+                            Case 5 ' Retén
+                                If et.RetenDetalle IsNot Nothing Then
+                                    esActivo = fechaActual = et.RetenDetalle.FechaReten
+                                    If esActivo Then detalleCompleto = $"Retén: {et.RetenDetalle.Observaciones} (Turno: {et.RetenDetalle.Turno})"
+                                End If
+                            Case 6 ' Sumario
+                                If et.SumarioDetalle IsNot Nothing Then
+                                    esActivo = fechaActual >= et.SumarioDetalle.FechaDesde AndAlso (Not et.SumarioDetalle.FechaHasta.HasValue OrElse fechaActual <= et.SumarioDetalle.FechaHasta.Value)
+                                    If esActivo Then detalleCompleto = $"Sumario: {et.SumarioDetalle.Observaciones} (Expediente: {et.SumarioDetalle.Expediente})"
+                                End If
+                        End Select
+
+                        If esActivo Then
+                            todosLosEstadosActivos.Add(et.TipoEstadoTransitorio.Nombre)
+                            _detallesEstadoActual.Add($"• {detalleCompleto}")
+                        End If
+                    Next
+                End If
+            End If
 
             lblCI.Text = f.CI
             lblNombreCompleto.Text = f.Nombre
             lblCargo.Text = If(f.Cargo Is Nothing, "-", f.Cargo.Nombre)
             lblTipo.Text = f.TipoFuncionario.Nombre
             lblFechaIngreso.Text = f.FechaIngreso.ToShortDateString()
-            chkActivoDetalle.Checked = f.Activo
             lblHorarioCompleto.Text = $"{If(f.Semana IsNot Nothing, f.Semana.Nombre, "-")} / {If(f.Turno IsNot Nothing, f.Turno.Nombre, "-")} / {If(f.Horario IsNot Nothing, f.Horario.Nombre, "-")}"
 
-            '--- INICIO DE LA CORRECCIÓN ---
-            'La prioridad la tiene el estado de Actividad del funcionario.
-            If Not f.Activo Then
-                lblEstadoTransitorio.Text = "Inactivo"
-                lblEstadoTransitorio.ForeColor = Color.Red
-            ElseIf estadosActivos.Any() Then
-                lblEstadoTransitorio.Text = String.Join(", ", estadosActivos)
-                lblEstadoTransitorio.ForeColor = Color.Red
+            ' Lógica para el label de estado de actividad
+            If f.Activo Then
+                lblEstadoActividad.Text = "Estado: Activo"
+                lblEstadoActividad.ForeColor = Color.DarkGreen
+            Else
+                lblEstadoActividad.Text = "Estado: Inactivo"
+                lblEstadoActividad.ForeColor = Color.Maroon
+            End If
+
+            ' Asignar el texto final a "Estado Actual"
+            If todosLosEstadosActivos.Any() Then
+                lblEstadoTransitorio.Text = String.Join(", ", todosLosEstadosActivos.Distinct())
+                lblEstadoTransitorio.ForeColor = Color.Maroon
             Else
                 lblEstadoTransitorio.Text = "Normal"
-                lblEstadoTransitorio.ForeColor = Color.Green
+                lblEstadoTransitorio.ForeColor = Color.DarkGreen
             End If
-            '--- FIN DE LA CORRECCIÓN ---
+            ' --- FIN DE LA CORRECCIÓN ---
 
+            ' Determinar "Presencia"
+            lblPresencia.Text = Await ObtenerPresenciaAsync(id, fechaActual)
+            If Not f.Activo AndAlso Not licenciasActivas.Any() Then
+                lblPresencia.Text = "Inactivo"
+            End If
 
             If f.Foto Is Nothing OrElse f.Foto.Length = 0 Then
                 pbFotoDetalle.Image = My.Resources.Police
@@ -302,8 +357,6 @@ Public Class frmFuncionarioBuscar
                     pbFotoDetalle.Image = Image.FromStream(ms)
                 End Using
             End If
-
-            lblPresencia.Text = Await ObtenerPresenciaAsync(id, fechaActual)
         End Using
     End Sub
 
@@ -313,7 +366,6 @@ Public Class frmFuncionarioBuscar
     Private Async Sub OnDgvDoubleClick(sender As Object, e As DataGridViewCellEventArgs)
         If dgvResultados.CurrentRow Is Nothing Then Return
 
-        '--- INICIO DE LA CORRECCIÓN ---
         If _modo = ModoApertura.Seleccion Then
             SeleccionarYcerrar()
         Else ' Modo Navegacion
@@ -324,7 +376,6 @@ Public Class frmFuncionarioBuscar
                 End If
             End Using
         End If
-        '--- FIN DE LA CORRECCIÓN ---
     End Sub
 
     Private Async Function ObtenerPresenciaAsync(id As Integer, fecha As Date) As Task(Of String)
@@ -335,8 +386,8 @@ Public Class frmFuncionarioBuscar
                 "EXEC dbo.usp_PresenciaFecha_Apex @Fecha", pFecha
             ).ToListAsync()
             Dim presencia = lista.Where(Function(r) r.FuncionarioId = id).
-                             Select(Function(r) r.Resultado).
-                             FirstOrDefault()
+                         Select(Function(r) r.Resultado).
+                         FirstOrDefault()
             Return If(presencia, "-")
         End Using
     End Function
@@ -347,14 +398,20 @@ Public Class frmFuncionarioBuscar
         lblCargo.Text = ""
         lblTipo.Text = ""
         lblFechaIngreso.Text = ""
-        chkActivoDetalle.Checked = False
+        lblEstadoActividad.Text = ""
         lblPresencia.Text = ""
         lblEstadoTransitorio.Text = ""
         pbFotoDetalle.Image = Nothing
         lblHorarioCompleto.Text = ""
+        _detallesEstadoActual.Clear()
     End Sub
 
-
+    Private Sub lblEstadoTransitorio_DoubleClick(sender As Object, e As EventArgs)
+        If _detallesEstadoActual IsNot Nothing AndAlso _detallesEstadoActual.Any() Then
+            Dim detalleTexto = String.Join(Environment.NewLine, _detallesEstadoActual)
+            MessageBox.Show(detalleTexto, "Detalle del Estado Actual", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        End If
+    End Sub
 
 #End Region
 

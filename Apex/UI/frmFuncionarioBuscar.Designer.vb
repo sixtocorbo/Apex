@@ -30,11 +30,11 @@ Partial Class frmFuncionarioBuscar
         Me.splitContenedor = New System.Windows.Forms.SplitContainer()
         Me.dgvResultados = New System.Windows.Forms.DataGridView()
         Me.panelDetalle = New System.Windows.Forms.Panel()
+        Me.lblEstadoActividad = New System.Windows.Forms.Label()
         Me.lblHorarioCompleto = New System.Windows.Forms.Label()
         Me.lblHorarioCompletoHeader = New System.Windows.Forms.Label()
         Me.lblEstadoTransitorio = New System.Windows.Forms.Label()
         Me.lblEstadoTransitorioHeader = New System.Windows.Forms.Label()
-        Me.chkActivoDetalle = New System.Windows.Forms.CheckBox()
         Me.lblPresencia = New System.Windows.Forms.Label()
         Me.lblPresenciaHeader = New System.Windows.Forms.Label()
         Me.lblFechaIngreso = New System.Windows.Forms.Label()
@@ -142,11 +142,11 @@ Partial Class frmFuncionarioBuscar
         'panelDetalle
         '
         Me.panelDetalle.BackColor = System.Drawing.Color.White
+        Me.panelDetalle.Controls.Add(Me.lblEstadoActividad)
         Me.panelDetalle.Controls.Add(Me.lblHorarioCompleto)
         Me.panelDetalle.Controls.Add(Me.lblHorarioCompletoHeader)
         Me.panelDetalle.Controls.Add(Me.lblEstadoTransitorio)
         Me.panelDetalle.Controls.Add(Me.lblEstadoTransitorioHeader)
-        Me.panelDetalle.Controls.Add(Me.chkActivoDetalle)
         Me.panelDetalle.Controls.Add(Me.lblPresencia)
         Me.panelDetalle.Controls.Add(Me.lblPresenciaHeader)
         Me.panelDetalle.Controls.Add(Me.lblFechaIngreso)
@@ -165,6 +165,18 @@ Partial Class frmFuncionarioBuscar
         Me.panelDetalle.Padding = New System.Windows.Forms.Padding(13, 12, 13, 12)
         Me.panelDetalle.Size = New System.Drawing.Size(969, 767)
         Me.panelDetalle.TabIndex = 0
+        '
+        'lblEstadoActividad
+        '
+        Me.lblEstadoActividad.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.lblEstadoActividad.AutoSize = True
+        Me.lblEstadoActividad.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.lblEstadoActividad.Location = New System.Drawing.Point(27, 724)
+        Me.lblEstadoActividad.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.lblEstadoActividad.Name = "lblEstadoActividad"
+        Me.lblEstadoActividad.Size = New System.Drawing.Size(75, 23)
+        Me.lblEstadoActividad.TabIndex = 14
+        Me.lblEstadoActividad.Text = "Estado: -"
         '
         'lblHorarioCompleto
         '
@@ -195,6 +207,7 @@ Partial Class frmFuncionarioBuscar
         '
         Me.lblEstadoTransitorio.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblEstadoTransitorio.AutoSize = True
+        Me.lblEstadoTransitorio.Cursor = System.Windows.Forms.Cursors.Hand
         Me.lblEstadoTransitorio.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Bold)
         Me.lblEstadoTransitorio.ForeColor = System.Drawing.Color.Maroon
         Me.lblEstadoTransitorio.Location = New System.Drawing.Point(160, 688)
@@ -213,20 +226,6 @@ Partial Class frmFuncionarioBuscar
         Me.lblEstadoTransitorioHeader.Size = New System.Drawing.Size(118, 23)
         Me.lblEstadoTransitorioHeader.TabIndex = 1
         Me.lblEstadoTransitorioHeader.Text = "Estado Actual:"
-        '
-        'chkActivoDetalle
-        '
-        Me.chkActivoDetalle.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.chkActivoDetalle.AutoSize = True
-        Me.chkActivoDetalle.Enabled = False
-        Me.chkActivoDetalle.Font = New System.Drawing.Font("Segoe UI", 9.75!)
-        Me.chkActivoDetalle.Location = New System.Drawing.Point(31, 724)
-        Me.chkActivoDetalle.Margin = New System.Windows.Forms.Padding(4)
-        Me.chkActivoDetalle.Name = "chkActivoDetalle"
-        Me.chkActivoDetalle.Size = New System.Drawing.Size(79, 27)
-        Me.chkActivoDetalle.TabIndex = 11
-        Me.chkActivoDetalle.Text = "Activo"
-        Me.chkActivoDetalle.UseVisualStyleBackColor = True
         '
         'lblPresencia
         '
@@ -445,7 +444,6 @@ Partial Class frmFuncionarioBuscar
     Friend WithEvents lblFechaIngreso As System.Windows.Forms.Label
     Friend WithEvents lblPresencia As System.Windows.Forms.Label
     Friend WithEvents lblPresenciaHeader As System.Windows.Forms.Label
-    Friend WithEvents chkActivoDetalle As System.Windows.Forms.CheckBox
     Friend WithEvents lblEstadoTransitorio As System.Windows.Forms.Label
     Friend WithEvents lblEstadoTransitorioHeader As System.Windows.Forms.Label
     Friend WithEvents FlowLayoutPanelAcciones As FlowLayoutPanel
@@ -453,4 +451,5 @@ Partial Class frmFuncionarioBuscar
     Friend WithEvents btnCancelar As Button
     Friend WithEvents lblHorarioCompleto As Label
     Friend WithEvents lblHorarioCompletoHeader As Label
+    Friend WithEvents lblEstadoActividad As Label
 End Class

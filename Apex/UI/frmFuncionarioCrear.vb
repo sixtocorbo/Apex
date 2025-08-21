@@ -5,6 +5,7 @@ Option Explicit On
 Imports System.IO
 Imports System.Data.Entity
 Imports System.ComponentModel
+Imports System.Text
 
 Public Class frmFuncionarioCrear
     Inherits Form
@@ -116,6 +117,11 @@ Public Class frmFuncionarioCrear
         AddHandler chkVerHistorial.CheckedChanged, AddressOf chkVerHistorial_CheckedChanged
         AddHandler dgvEstadosTransitorios.SelectionChanged, AddressOf DgvEstadosTransitorios_SelectionChanged
 
+        ' --- INICIO DE LA MODIFICACIÓN ---
+        ' Se añade el manejador para el doble clic en la grilla de estados
+        AddHandler dgvEstadosTransitorios.CellDoubleClick, AddressOf DgvEstadosTransitorios_CellDoubleClick
+        ' --- FIN DE LA MODIFICACIÓN ---
+
         If _modo = ModoFormulario.Editar Then
             Me.Text = "Editar Funcionario"
             btnGuardar.Text = "Actualizar"
@@ -126,6 +132,33 @@ Public Class frmFuncionarioCrear
             pbFoto.Image = My.Resources.Police
         End If
     End Sub
+
+    ' --- INICIO DE LA MODIFICACIÓN ---
+    ''' <summary>
+    ''' Muestra un cuadro de diálogo con los detalles del estado transitorio al hacer doble clic.
+    ''' </summary>
+    Private Sub DgvEstadosTransitorios_CellDoubleClick(sender As Object, e As DataGridViewCellEventArgs)
+        If e.RowIndex < 0 Then Return ' Ignorar clics en la cabecera
+
+        Dim row = TryCast(dgvEstadosTransitorios.Rows(e.RowIndex).DataBoundItem, EstadoRow)
+        If row Is Nothing Then Return
+
+        Dim sb As New StringBuilder()
+        sb.AppendLine($"Tipo de Estado: {row.TipoEstado}")
+        sb.AppendLine()
+        If row.FechaDesde.HasValue Then
+            sb.AppendLine($"Fecha Desde: {row.FechaDesde.Value.ToShortDateString()}")
+        End If
+        If row.FechaHasta.HasValue Then
+            sb.AppendLine($"Fecha Hasta: {row.FechaHasta.Value.ToShortDateString()}")
+        End If
+        sb.AppendLine()
+        sb.AppendLine("Observaciones y Detalles:")
+        sb.AppendLine(If(String.IsNullOrWhiteSpace(row.Observaciones), "(Sin observaciones)", row.Observaciones))
+
+        MessageBox.Show(sb.ToString(), "Detalle del Estado Transitorio", MessageBoxButtons.OK, MessageBoxIcon.Information)
+    End Sub
+    ' --- FIN DE LA MODIFICACIÓN ---
 
     ' -------------------- Helpers de mapeo ---------------------
     Private Function MapEstadosActivos(source As IEnumerable(Of EstadoTransitorio)) As BindingList(Of EstadoRow)
@@ -289,8 +322,8 @@ Public Class frmFuncionarioCrear
     Private Async Function CargarHistorialCompleto() As Task
         LoadingHelper.MostrarCargando(Me)
         Try
-            Dim repo = _uow.Repository(Of EstadoTransitorio)()
-            Dim historial = Await repo.GetAll().
+            Dim query = _uow.Context.Set(Of EstadoTransitorio)()
+            Dim historial = Await query.
                 Include(Function(et) et.TipoEstadoTransitorio).
                 Include(Function(et) et.DesignacionDetalle).
                 Include(Function(et) et.SancionDetalle).
@@ -311,11 +344,12 @@ Public Class frmFuncionarioCrear
 
     Private Sub DgvEstadosTransitorios_SelectionChanged(sender As Object, e As EventArgs)
         Dim row = TryCast(dgvEstadosTransitorios.CurrentRow?.DataBoundItem, EstadoRow)
-        Dim editable = (row IsNot Nothing AndAlso row.Origen.Equals("Estado", StringComparison.OrdinalIgnoreCase))
+        Dim editable = (row IsNot Nothing) ' Enable editing/deleting for any selected row
         btnEditarEstado.Enabled = editable
         btnQuitarEstado.Enabled = editable
         btnAñadirEstado.Enabled = True
     End Sub
+
 
     '------------------- Guardado / cierre --------------------------
     Private Async Function GuardarAsync() As Task(Of Boolean)
@@ -346,6 +380,10 @@ Public Class frmFuncionarioCrear
             _funcionario.TurnoId = If(cboTurno.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboTurno.SelectedValue))
             _funcionario.SemanaId = If(cboSemana.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboSemana.SelectedValue))
             _funcionario.HorarioId = If(cboHorario.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboHorario.SelectedValue))
+
+            _funcionario.Procesado = chkProcesado.Checked
+            _funcionario.SeparadoDeCargo = chkSeparado.Checked
+            _funcionario.Desarmado = chkDesarmado.Checked
 
             If Not String.IsNullOrWhiteSpace(_rutaFotoSeleccionada) Then
                 _funcionario.Foto = File.ReadAllBytes(_rutaFotoSeleccionada)

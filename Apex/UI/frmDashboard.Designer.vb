@@ -20,7 +20,7 @@ Partial Class frmDashboard
     Private components As System.ComponentModel.IContainer
 
     'NOTE: The following procedure is required by the Windows Form Designer
-    'It can be modified using the Windows Form Designer.  
+    'It can be modified using the Windows Form Designer.
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
@@ -36,6 +36,7 @@ Partial Class frmDashboard
         Me.panelLogo = New System.Windows.Forms.Panel()
         Me.lblAppName = New System.Windows.Forms.Label()
         Me.panelContenido = New System.Windows.Forms.Panel()
+        Me.lblSemanaActual = New System.Windows.Forms.Label()
         Me.panelNavegacion.SuspendLayout()
         Me.panelLogo.SuspendLayout()
         Me.SuspendLayout()
@@ -198,6 +199,7 @@ Partial Class frmDashboard
         'panelLogo
         '
         Me.panelLogo.BackColor = System.Drawing.Color.FromArgb(CType(CType(39, Byte), Integer), CType(CType(39, Byte), Integer), CType(CType(58, Byte), Integer))
+        Me.panelLogo.Controls.Add(Me.lblSemanaActual)
         Me.panelLogo.Controls.Add(Me.lblAppName)
         Me.panelLogo.Dock = System.Windows.Forms.DockStyle.Top
         Me.panelLogo.Location = New System.Drawing.Point(0, 0)
@@ -208,13 +210,13 @@ Partial Class frmDashboard
         '
         'lblAppName
         '
-        Me.lblAppName.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.lblAppName.Dock = System.Windows.Forms.DockStyle.Top
         Me.lblAppName.Font = New System.Drawing.Font("Segoe UI Semibold", 15.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblAppName.ForeColor = System.Drawing.Color.White
         Me.lblAppName.Location = New System.Drawing.Point(0, 0)
         Me.lblAppName.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblAppName.Name = "lblAppName"
-        Me.lblAppName.Size = New System.Drawing.Size(330, 122)
+        Me.lblAppName.Size = New System.Drawing.Size(330, 80)
         Me.lblAppName.TabIndex = 0
         Me.lblAppName.Text = "APEX"
         Me.lblAppName.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
@@ -227,6 +229,18 @@ Partial Class frmDashboard
         Me.panelContenido.Name = "panelContenido"
         Me.panelContenido.Size = New System.Drawing.Size(1566, 1048)
         Me.panelContenido.TabIndex = 1
+        '
+        'lblSemanaActual
+        '
+        Me.lblSemanaActual.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.lblSemanaActual.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblSemanaActual.ForeColor = System.Drawing.Color.Gold
+        Me.lblSemanaActual.Location = New System.Drawing.Point(0, 80)
+        Me.lblSemanaActual.Name = "lblSemanaActual"
+        Me.lblSemanaActual.Size = New System.Drawing.Size(330, 42)
+        Me.lblSemanaActual.TabIndex = 1
+        Me.lblSemanaActual.Text = "Semana: -"
+        Me.lblSemanaActual.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
         'frmDashboard
         '
@@ -258,4 +272,5 @@ Partial Class frmDashboard
     Friend WithEvents btnNovedades As System.Windows.Forms.Button
     Friend WithEvents btnViaticos As System.Windows.Forms.Button
     Friend WithEvents btnImportacion As System.Windows.Forms.Button
+    Friend WithEvents lblSemanaActual As Label
 End Class

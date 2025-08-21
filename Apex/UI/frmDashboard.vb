@@ -1,4 +1,6 @@
 ﻿' Apex/UI/frmDashboard.vb
+Imports System.Data.Entity
+
 Public Class frmDashboard
 
     Private currentBtn As Button
@@ -23,7 +25,36 @@ Public Class frmDashboard
         AddHandler btnViaticos.Click, AddressOf ActivateButton
         AddHandler btnReportes.Click, AddressOf ActivateButton
         AddHandler btnConfiguracion.Click, AddressOf ActivateButton
+
+        ' --- INICIO DE LA MODIFICACIÓN ---
+        ' Se añade el manejador para el evento Shown
+        AddHandler Me.Shown, AddressOf frmDashboard_Shown
+        ' --- FIN DE LA MODIFICACIÓN ---
     End Sub
+
+    ' --- INICIO DE LA MODIFICACIÓN ---
+    ' Se utiliza el evento Shown para asegurar que el formulario ya es visible
+    Private Async Sub frmDashboard_Shown(sender As Object, e As EventArgs)
+        Await CargarSemanaActualAsync()
+    End Sub
+
+    Private Async Function CargarSemanaActualAsync() As Task
+        Try
+            Using uow As New UnitOfWork()
+                ' Ejecuta la función de la base de datos directamente
+                Dim semana = Await uow.Context.Database.SqlQuery(Of Integer)("SELECT dbo.RegimenActual(GETDATE())").FirstOrDefaultAsync()
+                If semana > 0 Then
+                    lblSemanaActual.Text = $"SEMANA {semana}"
+                Else
+                    lblSemanaActual.Text = "Régimen no definido"
+                End If
+            End Using
+        Catch ex As Exception
+            ' En caso de error, se muestra un mensaje genérico
+            lblSemanaActual.Text = "Error al cargar"
+        End Try
+    End Function
+    ' --- FIN DE LA MODIFICACIÓN ---
 
     Private Sub ActivateButton(sender As Object, e As EventArgs)
         If sender Is Nothing Then Return

@@ -140,6 +140,9 @@
           <Property Name="FuncionId" Type="int" />
           <Property Name="LastPictureId" Type="int" />
           <Property Name="Telefono" Type="nvarchar" MaxLength="50" />
+          <Property Name="Procesado" Type="bit" Nullable="false" />
+          <Property Name="SeparadoDeCargo" Type="bit" Nullable="false" />
+          <Property Name="Desarmado" Type="bit" Nullable="false" />
         </EntityType>
         <EntityType Name="FuncionarioArma">
           <Key>
@@ -1918,6 +1921,9 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <Property Name="FuncionId" Type="Int32" />
           <Property Name="LastPictureId" Type="Int32" />
           <Property Name="Telefono" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Procesado" Type="Boolean" Nullable="false" />
+          <Property Name="SeparadoDeCargo" Type="Boolean" Nullable="false" />
+          <Property Name="Desarmado" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="Cargo" Relationship="Self.FK_Funcionario_Cargo" FromRole="Funcionario" ToRole="Cargo" />
           <NavigationProperty Name="Escalafon" Relationship="Self.FK_Funcionario_Escalafon" FromRole="Funcionario" ToRole="Escalafon" />
           <NavigationProperty Name="Estado" Relationship="Self.FK__Funcionar__Estad__29221CFB" FromRole="Funcionario" ToRole="Estado" />
@@ -3684,6 +3690,9 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
                 <ScalarProperty Name="FuncionId" ColumnName="FuncionId" />
                 <ScalarProperty Name="LastPictureId" ColumnName="LastPictureId" />
                 <ScalarProperty Name="Telefono" ColumnName="Telefono" />
+                <ScalarProperty Name="Procesado" ColumnName="Procesado" />
+                <ScalarProperty Name="SeparadoDeCargo" ColumnName="SeparadoDeCargo" />
+                <ScalarProperty Name="Desarmado" ColumnName="Desarmado" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
