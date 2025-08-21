@@ -192,11 +192,7 @@ Public Class frmFuncionarioBuscar
         dgvResultados.ClearSelection()
         dgvResultados.Rows(nuevoIndex).Selected = True
         dgvResultados.CurrentCell = dgvResultados.Rows(nuevoIndex).Cells("CI")
-
-        MostrarDetalle(Nothing, EventArgs.Empty)
     End Sub
-
-
 #End Region
 
     Private Async Sub btnBuscar_Click(sender As Object, e As EventArgs) Handles btnBuscar.Click
@@ -208,7 +204,7 @@ Public Class frmFuncionarioBuscar
         If dgvResultados.CurrentRow Is Nothing OrElse dgvResultados.CurrentRow.DataBoundItem Is Nothing Then Return
         Dim id = CInt(dgvResultados.CurrentRow.Cells("Id").Value)
 
-        _detallesEstadoActual.Clear()
+        Dim detalles As New List(Of String)
 
         Using uow As New UnitOfWork()
             Dim f = Await uow.Repository(Of Funcionario)() _
@@ -234,8 +230,6 @@ Public Class frmFuncionarioBuscar
             Dim fechaActual = Date.Today
             Dim todosLosEstadosActivos As New List(Of String)
 
-            ' --- INICIO DE LA CORRECCIÓN: Lógica de Prioridades para "Estado Actual" ---
-
             ' Prioridad 1: Licencias
             Dim licenciasActivas = Await uow.Repository(Of HistoricoLicencia)().GetAll().
                 Include(Function(l) l.TipoLicencia).
@@ -248,71 +242,94 @@ Public Class frmFuncionarioBuscar
 
             For Each lic In licenciasActivas
                 todosLosEstadosActivos.Add(lic.TipoLicencia.Nombre)
-                _detallesEstadoActual.Add($"• {lic.TipoLicencia.Nombre} (desde {lic.inicio.ToShortDateString()} hasta {lic.finaliza.ToShortDateString()})")
+                detalles.Add($"• {lic.TipoLicencia.Nombre} (desde {lic.inicio.ToShortDateString()} hasta {lic.finaliza.ToShortDateString()})")
             Next
 
             ' Si está Inactivo, esta es la segunda prioridad
             If Not f.Activo Then
                 todosLosEstadosActivos.Add("Inactivo")
-                _detallesEstadoActual.Add("• El funcionario se encuentra Inactivo en el sistema.")
+                detalles.Add("• El funcionario se encuentra Inactivo en el sistema.")
             Else
                 ' Si está activo, se revisan las demás condiciones solo si no hay licencias
                 If Not licenciasActivas.Any() Then
                     ' Prioridad 3: Estados permanentes (Procesado, etc.)
                     If f.Procesado Then
                         todosLosEstadosActivos.Add("Procesado")
-                        _detallesEstadoActual.Add("• Se encuentra Procesado.")
+                        detalles.Add("• Se encuentra Procesado.")
                     End If
                     If f.SeparadoDeCargo Then
                         todosLosEstadosActivos.Add("Separado de Cargo")
-                        _detallesEstadoActual.Add("• Se encuentra Separado del Cargo.")
+                        detalles.Add("• Se encuentra Separado del Cargo.")
                     End If
                     If f.Desarmado Then
                         todosLosEstadosActivos.Add("Desarmado")
-                        _detallesEstadoActual.Add("• Se encuentra Desarmado.")
+                        detalles.Add("• Se encuentra Desarmado.")
                     End If
 
                     ' Prioridad 4: Estados Transitorios
                     For Each et In f.EstadoTransitorio
                         Dim esActivo As Boolean = False
                         Dim detalleCompleto As String = ""
+                        Dim detailParts As New List(Of String)()
 
                         Select Case et.TipoEstadoTransitorioId
                             Case 1 ' Designación
                                 If et.DesignacionDetalle IsNot Nothing Then
                                     esActivo = fechaActual >= et.DesignacionDetalle.FechaDesde AndAlso (Not et.DesignacionDetalle.FechaHasta.HasValue OrElse fechaActual <= et.DesignacionDetalle.FechaHasta.Value)
-                                    If esActivo Then detalleCompleto = $"Designación: {et.DesignacionDetalle.Observaciones} (Resolución: {et.DesignacionDetalle.DocResolucion})"
+                                    If esActivo Then
+                                        If Not String.IsNullOrWhiteSpace(et.DesignacionDetalle.Observaciones) Then detailParts.Add(et.DesignacionDetalle.Observaciones)
+                                        If Not String.IsNullOrWhiteSpace(et.DesignacionDetalle.DocResolucion) Then detailParts.Add($"Resolución: {et.DesignacionDetalle.DocResolucion}")
+                                        If detailParts.Any() Then detalleCompleto = "Designación: " & String.Join(" | ", detailParts)
+                                    End If
                                 End If
                             Case 2 ' Enfermedad
                                 If et.EnfermedadDetalle IsNot Nothing Then
                                     esActivo = fechaActual >= et.EnfermedadDetalle.FechaDesde AndAlso (Not et.EnfermedadDetalle.FechaHasta.HasValue OrElse fechaActual <= et.EnfermedadDetalle.FechaHasta.Value)
-                                    If esActivo Then detalleCompleto = $"Enfermedad: {et.EnfermedadDetalle.Observaciones} (Diagnóstico: {et.EnfermedadDetalle.Diagnostico})"
+                                    If esActivo Then
+                                        If Not String.IsNullOrWhiteSpace(et.EnfermedadDetalle.Observaciones) Then detailParts.Add(et.EnfermedadDetalle.Observaciones)
+                                        If Not String.IsNullOrWhiteSpace(et.EnfermedadDetalle.Diagnostico) Then detailParts.Add($"Diagnóstico: {et.EnfermedadDetalle.Diagnostico}")
+                                        If detailParts.Any() Then detalleCompleto = "Enfermedad: " & String.Join(" | ", detailParts)
+                                    End If
                                 End If
                             Case 3 ' Sanción
                                 If et.SancionDetalle IsNot Nothing Then
                                     esActivo = fechaActual >= et.SancionDetalle.FechaDesde AndAlso (Not et.SancionDetalle.FechaHasta.HasValue OrElse fechaActual <= et.SancionDetalle.FechaHasta.Value)
-                                    If esActivo Then detalleCompleto = $"Sanción: {et.SancionDetalle.Observaciones} (Resolución: {et.SancionDetalle.Resolucion})"
+                                    If esActivo Then
+                                        If Not String.IsNullOrWhiteSpace(et.SancionDetalle.Observaciones) Then detailParts.Add(et.SancionDetalle.Observaciones)
+                                        If Not String.IsNullOrWhiteSpace(et.SancionDetalle.Resolucion) Then detailParts.Add($"Resolución: {et.SancionDetalle.Resolucion}")
+                                        If detailParts.Any() Then detalleCompleto = "Sanción: " & String.Join(" | ", detailParts)
+                                    End If
                                 End If
                             Case 4 ' Orden Cinco
                                 If et.OrdenCincoDetalle IsNot Nothing Then
                                     esActivo = fechaActual >= et.OrdenCincoDetalle.FechaDesde AndAlso (Not et.OrdenCincoDetalle.FechaHasta.HasValue OrElse fechaActual <= et.OrdenCincoDetalle.FechaHasta.Value)
-                                    If esActivo Then detalleCompleto = $"Orden Cinco: {et.OrdenCincoDetalle.Observaciones}"
+                                    If esActivo AndAlso Not String.IsNullOrWhiteSpace(et.OrdenCincoDetalle.Observaciones) Then
+                                        detalleCompleto = $"Orden Cinco: {et.OrdenCincoDetalle.Observaciones}"
+                                    End If
                                 End If
                             Case 5 ' Retén
                                 If et.RetenDetalle IsNot Nothing Then
                                     esActivo = fechaActual = et.RetenDetalle.FechaReten
-                                    If esActivo Then detalleCompleto = $"Retén: {et.RetenDetalle.Observaciones} (Turno: {et.RetenDetalle.Turno})"
+                                    If esActivo Then
+                                        If Not String.IsNullOrWhiteSpace(et.RetenDetalle.Observaciones) Then detailParts.Add(et.RetenDetalle.Observaciones)
+                                        If Not String.IsNullOrWhiteSpace(et.RetenDetalle.Turno) Then detailParts.Add($"Turno: {et.RetenDetalle.Turno}")
+                                        If detailParts.Any() Then detalleCompleto = "Retén: " & String.Join(" | ", detailParts)
+                                    End If
                                 End If
                             Case 6 ' Sumario
                                 If et.SumarioDetalle IsNot Nothing Then
                                     esActivo = fechaActual >= et.SumarioDetalle.FechaDesde AndAlso (Not et.SumarioDetalle.FechaHasta.HasValue OrElse fechaActual <= et.SumarioDetalle.FechaHasta.Value)
-                                    If esActivo Then detalleCompleto = $"Sumario: {et.SumarioDetalle.Observaciones} (Expediente: {et.SumarioDetalle.Expediente})"
+                                    If esActivo Then
+                                        If Not String.IsNullOrWhiteSpace(et.SumarioDetalle.Observaciones) Then detailParts.Add(et.SumarioDetalle.Observaciones)
+                                        If Not String.IsNullOrWhiteSpace(et.SumarioDetalle.Expediente) Then detailParts.Add($"Expediente: {et.SumarioDetalle.Expediente}")
+                                        If detailParts.Any() Then detalleCompleto = "Sumario: " & String.Join(" | ", detailParts)
+                                    End If
                                 End If
                         End Select
 
-                        If esActivo Then
+                        If esActivo AndAlso Not String.IsNullOrWhiteSpace(detalleCompleto) Then
                             todosLosEstadosActivos.Add(et.TipoEstadoTransitorio.Nombre)
-                            _detallesEstadoActual.Add($"• {detalleCompleto}")
+                            detalles.Add($"• {detalleCompleto}")
                         End If
                     Next
                 End If
@@ -342,7 +359,6 @@ Public Class frmFuncionarioBuscar
                 lblEstadoTransitorio.Text = "Normal"
                 lblEstadoTransitorio.ForeColor = Color.DarkGreen
             End If
-            ' --- FIN DE LA CORRECCIÓN ---
 
             ' Determinar "Presencia"
             lblPresencia.Text = Await ObtenerPresenciaAsync(id, fechaActual)
@@ -356,6 +372,10 @@ Public Class frmFuncionarioBuscar
                 Using ms As New MemoryStream(f.Foto)
                     pbFotoDetalle.Image = Image.FromStream(ms)
                 End Using
+            End If
+
+            If dgvResultados.CurrentRow IsNot Nothing AndAlso CInt(dgvResultados.CurrentRow.Cells("Id").Value) = id Then
+                _detallesEstadoActual = detalles
             End If
         End Using
     End Sub
@@ -408,7 +428,7 @@ Public Class frmFuncionarioBuscar
 
     Private Sub lblEstadoTransitorio_DoubleClick(sender As Object, e As EventArgs)
         If _detallesEstadoActual IsNot Nothing AndAlso _detallesEstadoActual.Any() Then
-            Dim detalleTexto = String.Join(Environment.NewLine, _detallesEstadoActual)
+            Dim detalleTexto = String.Join(Environment.NewLine, _detallesEstadoActual.Distinct())
             MessageBox.Show(detalleTexto, "Detalle del Estado Actual", MessageBoxButtons.OK, MessageBoxIcon.Information)
         End If
     End Sub
