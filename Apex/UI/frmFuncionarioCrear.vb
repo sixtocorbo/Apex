@@ -116,11 +116,7 @@ Public Class frmFuncionarioCrear
         AddHandler dgvDotacion.CellFormatting, AddressOf dgvDotacion_CellFormatting ' para FechaAsign tolerante
         AddHandler chkVerHistorial.CheckedChanged, AddressOf chkVerHistorial_CheckedChanged
         AddHandler dgvEstadosTransitorios.SelectionChanged, AddressOf DgvEstadosTransitorios_SelectionChanged
-
-        ' --- INICIO DE LA MODIFICACIÓN ---
-        ' Se añade el manejador para el doble clic en la grilla de estados
         AddHandler dgvEstadosTransitorios.CellDoubleClick, AddressOf DgvEstadosTransitorios_CellDoubleClick
-        ' --- FIN DE LA MODIFICACIÓN ---
 
         If _modo = ModoFormulario.Editar Then
             Me.Text = "Editar Funcionario"
@@ -133,10 +129,6 @@ Public Class frmFuncionarioCrear
         End If
     End Sub
 
-    ' --- INICIO DE LA MODIFICACIÓN ---
-    ''' <summary>
-    ''' Muestra un cuadro de diálogo con los detalles del estado transitorio al hacer doble clic.
-    ''' </summary>
     Private Sub DgvEstadosTransitorios_CellDoubleClick(sender As Object, e As DataGridViewCellEventArgs)
         If e.RowIndex < 0 Then Return ' Ignorar clics en la cabecera
 
@@ -158,7 +150,6 @@ Public Class frmFuncionarioCrear
 
         MessageBox.Show(sb.ToString(), "Detalle del Estado Transitorio", MessageBoxButtons.OK, MessageBoxIcon.Information)
     End Sub
-    ' --- FIN DE LA MODIFICACIÓN ---
 
     ' -------------------- Helpers de mapeo ---------------------
     Private Function MapEstadosActivos(source As IEnumerable(Of EstadoTransitorio)) As BindingList(Of EstadoRow)
@@ -298,11 +289,17 @@ Public Class frmFuncionarioCrear
         cboGenero.SelectedValue = If(_funcionario.GeneroId.HasValue, CInt(_funcionario.GeneroId), -1)
         cboNivelEstudio.SelectedValue = If(_funcionario.NivelEstudioId.HasValue, CInt(_funcionario.NivelEstudioId), -1)
 
-        ' --- INICIO DE LA CORRECCIÓN ---
         chkProcesado.Checked = _funcionario.Procesado
         chkSeparado.Checked = _funcionario.SeparadoDeCargo
         chkDesarmado.Checked = _funcionario.Desarmado
-        ' --- FIN DE LA CORRECCIÓN ---
+
+        ' --- INICIO DE LA MODIFICACIÓN ---
+        ' Cargar datos de los nuevos campos
+        txtCiudad.Text = _funcionario.Ciudad
+        txtSeccional.Text = _funcionario.Seccional
+        txtCredencial.Text = _funcionario.Credencial
+        chkEstudia.Checked = _funcionario.Estudia
+        ' --- FIN DE LA MODIFICACIÓN ---
     End Sub
 
     '------------------- Cambiar vista Activos / Historial --------------------------
@@ -390,6 +387,15 @@ Public Class frmFuncionarioCrear
             _funcionario.Procesado = chkProcesado.Checked
             _funcionario.SeparadoDeCargo = chkSeparado.Checked
             _funcionario.Desarmado = chkDesarmado.Checked
+
+            ' --- INICIO DE LA MODIFICACIÓN ---
+            ' Guardar los nuevos campos
+            _funcionario.Ciudad = txtCiudad.Text.Trim()
+            _funcionario.Seccional = txtSeccional.Text.Trim()
+            _funcionario.Credencial = txtCredencial.Text.Trim()
+            _funcionario.Estudia = chkEstudia.Checked
+            ' --- FIN DE LA MODIFICACIÓN ---
+
 
             If Not String.IsNullOrWhiteSpace(_rutaFotoSeleccionada) Then
                 _funcionario.Foto = File.ReadAllBytes(_rutaFotoSeleccionada)

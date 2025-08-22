@@ -28,16 +28,8 @@ Public Class ReportesService
 
         If funcionario Is Nothing Then Return Nothing
 
-        ' --- INICIO DE LA MODIFICACIÓN ---
-        ' Se eliminaron las consultas para licencias y sanciones que ya no se usan en el reporte.
-        ' --- FIN DE LA MODIFICACIÓN ---
-
-        ' Construir campos nuevos
-        Dim sexo As String = funcionario.Genero?.Nombre
-        Dim ciudad As String = funcionario.Ciudad?.Nombre
-        Dim seccional As String = funcionario.Seccional?.Nombre
-        Dim estudia As String = Nothing
-        Dim credencial As String = funcionario.Credencial?.Numero
+        ' Se obtiene el valor del nuevo campo y se convierte a "Sí" o "No".
+        Dim estudia As String = If(funcionario.Estudia, "Sí", "No")
 
         ' Armar resumen de datos laborales y situación general
         Dim datosLaborales = $"{funcionario.Cargo?.Nombre} {funcionario.Escalafon?.Nombre} {funcionario.Seccion?.Nombre} {funcionario.PuestoTrabajo?.Nombre}".Trim()
@@ -65,11 +57,11 @@ Public Class ReportesService
             .Escalafon = funcionario.Escalafon?.Nombre,
             .Funcion = funcionario.Funcion?.Nombre,
             .Foto = funcionario.Foto,
-            .Sexo = sexo,
-            .Ciudad = ciudad,
-            .Seccional = seccional,
+            .Sexo = funcionario.Genero?.Nombre,
+            .Ciudad = funcionario.Ciudad,
+            .Seccional = funcionario.Seccional,
             .Estudia = estudia,
-            .Credencial = credencial,
+            .Credencial = funcionario.Credencial,
             .DatosLaborales = datosLaborales,
             .SituacionGeneral = situacionGeneral
         }
@@ -109,5 +101,3 @@ Public Class FichaFuncionalDTO
     Public Property DatosLaborales As String
     Public Property SituacionGeneral As String
 End Class
-
-' Las clases LicenciaFichaDTO y SancionFichaDTO se han eliminado al no ser necesarias.

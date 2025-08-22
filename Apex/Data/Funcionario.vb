@@ -41,6 +41,9 @@ Partial Public Class Funcionario
     Public Property SeparadoDeCargo As Boolean
     Public Property Desarmado As Boolean
     Public Property Ciudad As String
+    Public Property Credencial As String
+    Public Property Seccional As String
+    Public Property Estudia As Boolean
 
     Public Overridable Property Cargo As Cargo
     Public Overridable Property Escalafon As Escalafon

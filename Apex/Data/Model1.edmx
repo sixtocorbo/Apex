@@ -144,6 +144,9 @@
           <Property Name="SeparadoDeCargo" Type="bit" Nullable="false" />
           <Property Name="Desarmado" Type="bit" Nullable="false" />
           <Property Name="Ciudad" Type="nvarchar" MaxLength="100" />
+          <Property Name="Credencial" Type="nvarchar" MaxLength="100" />
+          <Property Name="Seccional" Type="nvarchar" MaxLength="100" />
+          <Property Name="Estudia" Type="bit" Nullable="false" />
         </EntityType>
         <EntityType Name="FuncionarioArma">
           <Key>
@@ -1950,6 +1953,9 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <Property Name="SeparadoDeCargo" Type="Boolean" Nullable="false" />
           <Property Name="Desarmado" Type="Boolean" Nullable="false" />
           <Property Name="Ciudad" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Credencial" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Seccional" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Estudia" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="Cargo" Relationship="Self.FK_Funcionario_Cargo" FromRole="Funcionario" ToRole="Cargo" />
           <NavigationProperty Name="Escalafon" Relationship="Self.FK_Funcionario_Escalafon" FromRole="Funcionario" ToRole="Escalafon" />
           <NavigationProperty Name="Estado" Relationship="Self.FK__Funcionar__Estad__29221CFB" FromRole="Funcionario" ToRole="Estado" />
@@ -3734,6 +3740,9 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
                 <ScalarProperty Name="SeparadoDeCargo" ColumnName="SeparadoDeCargo" />
                 <ScalarProperty Name="Desarmado" ColumnName="Desarmado" />
                 <ScalarProperty Name="Ciudad" ColumnName="Ciudad" />
+                <ScalarProperty Name="Credencial" ColumnName="Credencial" />
+                <ScalarProperty Name="Seccional" ColumnName="Seccional" />
+                <ScalarProperty Name="Estudia" ColumnName="Estudia" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
