@@ -29,7 +29,9 @@ Partial Class frmGestion
         Me.txtBusquedaLicencia = New System.Windows.Forms.TextBox()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.TabPageNotificaciones = New System.Windows.Forms.TabPage()
+        Me.splitContenedorNotificaciones = New System.Windows.Forms.SplitContainer()
         Me.dgvNotificaciones = New System.Windows.Forms.DataGridView()
+        Me.txtTextoNotificacion = New System.Windows.Forms.TextBox()
         Me.PanelNotificaciones = New System.Windows.Forms.Panel()
         Me.btnCambiarEstado = New System.Windows.Forms.Button()
         Me.btnEliminarNotificacion = New System.Windows.Forms.Button()
@@ -53,6 +55,10 @@ Partial Class frmGestion
         Me.PanelLicencias.SuspendLayout()
         Me.PanelBusquedaLicencias.SuspendLayout()
         Me.TabPageNotificaciones.SuspendLayout()
+        CType(Me.splitContenedorNotificaciones, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.splitContenedorNotificaciones.Panel1.SuspendLayout()
+        Me.splitContenedorNotificaciones.Panel2.SuspendLayout()
+        Me.splitContenedorNotificaciones.SuspendLayout()
         CType(Me.dgvNotificaciones, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.PanelNotificaciones.SuspendLayout()
         Me.PanelBusquedaNotificaciones.SuspendLayout()
@@ -193,7 +199,7 @@ Partial Class frmGestion
         '
         'TabPageNotificaciones
         '
-        Me.TabPageNotificaciones.Controls.Add(Me.dgvNotificaciones)
+        Me.TabPageNotificaciones.Controls.Add(Me.splitContenedorNotificaciones)
         Me.TabPageNotificaciones.Controls.Add(Me.PanelNotificaciones)
         Me.TabPageNotificaciones.Controls.Add(Me.PanelBusquedaNotificaciones)
         Me.TabPageNotificaciones.Location = New System.Drawing.Point(4, 37)
@@ -205,6 +211,25 @@ Partial Class frmGestion
         Me.TabPageNotificaciones.Text = "Notificaciones"
         Me.TabPageNotificaciones.UseVisualStyleBackColor = True
         '
+        'splitContenedorNotificaciones
+        '
+        Me.splitContenedorNotificaciones.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.splitContenedorNotificaciones.Location = New System.Drawing.Point(3, 66)
+        Me.splitContenedorNotificaciones.Name = "splitContenedorNotificaciones"
+        Me.splitContenedorNotificaciones.Orientation = System.Windows.Forms.Orientation.Horizontal
+        '
+        'splitContenedorNotificaciones.Panel1
+        '
+        Me.splitContenedorNotificaciones.Panel1.Controls.Add(Me.dgvNotificaciones)
+        '
+        'splitContenedorNotificaciones.Panel2
+        '
+        Me.splitContenedorNotificaciones.Panel2.Controls.Add(Me.txtTextoNotificacion)
+        Me.splitContenedorNotificaciones.Panel2.Padding = New System.Windows.Forms.Padding(5)
+        Me.splitContenedorNotificaciones.Size = New System.Drawing.Size(886, 389)
+        Me.splitContenedorNotificaciones.SplitterDistance = 183
+        Me.splitContenedorNotificaciones.TabIndex = 4
+        '
         'dgvNotificaciones
         '
         Me.dgvNotificaciones.AllowUserToAddRows = False
@@ -213,14 +238,27 @@ Partial Class frmGestion
         Me.dgvNotificaciones.AllowUserToResizeRows = False
         Me.dgvNotificaciones.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvNotificaciones.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.dgvNotificaciones.Location = New System.Drawing.Point(3, 66)
+        Me.dgvNotificaciones.Location = New System.Drawing.Point(0, 0)
         Me.dgvNotificaciones.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.dgvNotificaciones.Name = "dgvNotificaciones"
         Me.dgvNotificaciones.ReadOnly = True
         Me.dgvNotificaciones.RowHeadersWidth = 51
         Me.dgvNotificaciones.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgvNotificaciones.Size = New System.Drawing.Size(886, 389)
+        Me.dgvNotificaciones.Size = New System.Drawing.Size(886, 183)
         Me.dgvNotificaciones.TabIndex = 2
+        '
+        'txtTextoNotificacion
+        '
+        Me.txtTextoNotificacion.BackColor = System.Drawing.SystemColors.Info
+        Me.txtTextoNotificacion.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.txtTextoNotificacion.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.txtTextoNotificacion.Location = New System.Drawing.Point(5, 5)
+        Me.txtTextoNotificacion.Multiline = True
+        Me.txtTextoNotificacion.Name = "txtTextoNotificacion"
+        Me.txtTextoNotificacion.ReadOnly = True
+        Me.txtTextoNotificacion.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
+        Me.txtTextoNotificacion.Size = New System.Drawing.Size(876, 192)
+        Me.txtTextoNotificacion.TabIndex = 0
         '
         'PanelNotificaciones
         '
@@ -424,6 +462,11 @@ Partial Class frmGestion
         Me.PanelBusquedaLicencias.ResumeLayout(False)
         Me.PanelBusquedaLicencias.PerformLayout()
         Me.TabPageNotificaciones.ResumeLayout(False)
+        Me.splitContenedorNotificaciones.Panel1.ResumeLayout(False)
+        Me.splitContenedorNotificaciones.Panel2.ResumeLayout(False)
+        Me.splitContenedorNotificaciones.Panel2.PerformLayout()
+        CType(Me.splitContenedorNotificaciones, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.splitContenedorNotificaciones.ResumeLayout(False)
         CType(Me.dgvNotificaciones, System.ComponentModel.ISupportInitialize).EndInit()
         Me.PanelNotificaciones.ResumeLayout(False)
         Me.PanelBusquedaNotificaciones.ResumeLayout(False)
@@ -466,5 +509,9 @@ Partial Class frmGestion
     Friend WithEvents btnEliminarSancion As Button
     Friend WithEvents btnEditarSancion As Button
     Friend WithEvents btnNuevaSancion As Button
-    Friend WithEvents btnConceptoFuncional As Button ' Botón añadido
+    Friend WithEvents btnConceptoFuncional As Button
+    ' --- INICIO DE LA MODIFICACIÓN ---
+    Friend WithEvents splitContenedorNotificaciones As SplitContainer
+    Friend WithEvents txtTextoNotificacion As TextBox
+    ' --- FIN DE LA MODIFICACIÓN ---
 End Class

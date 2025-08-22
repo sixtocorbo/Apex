@@ -1,11 +1,30 @@
-﻿Public Class frmCambiarEstadoNotificacion
+﻿' Apex/UI/frmCambiarEstadoNotificacion.vb
+
+Public Class frmCambiarEstadoNotificacion
 
     Private _svc As NotificacionService
     Public SelectedEstadoId As Byte
 
+    ' --- INICIO DE LA CORRECCIÓN ---
+    Private _idEstadoActual As Byte
+
+    ' Constructor modificado para recibir el estado actual
+    Public Sub New(Optional idEstadoActual As Byte = 0)
+        InitializeComponent()
+        _idEstadoActual = idEstadoActual
+    End Sub
+    ' --- FIN DE LA CORRECCIÓN ---
+
     Private Async Sub frmCambiarEstadoNotificacion_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         _svc = New NotificacionService()
         Await CargarCombosAsync()
+
+        ' --- INICIO DE LA CORRECCIÓN ---
+        ' Si se recibió un estado actual, lo seleccionamos en el ComboBox
+        If _idEstadoActual > 0 Then
+            cboEstados.SelectedValue = _idEstadoActual
+        End If
+        ' --- FIN DE LA CORRECCIÓN ---
     End Sub
 
     Private Async Function CargarCombosAsync() As Task
