@@ -28,29 +28,40 @@ Public Class ReportesService
             Return Nothing
         End If
 
-        ' Obtener historial de licencias
-        Dim licencias = Await _unitOfWork.Repository(Of HistoricoLicencia)().GetAll().
+        ' --- INICIO DE LA CORRECCIÓN ---
+
+        ' 1. Obtener historial de licencias (datos crudos)
+        Dim licenciasDb = Await _unitOfWork.Repository(Of HistoricoLicencia)().GetAll().
             Include(Function(l) l.TipoLicencia).
             Where(Function(l) l.FuncionarioId = funcionarioId).
             OrderByDescending(Function(l) l.inicio).
-            Select(Function(l) New LicenciaFichaDTO With {
-                .Inicio = l.inicio.ToShortDateString(),
-                .Finaliza = l.finaliza.ToShortDateString(),
-                .Dias = DbFunctions.DiffDays(l.inicio, l.finaliza) + 1,
-                .TipoLicencia = l.TipoLicencia.Nombre,
-                .Anio = l.inicio.Year
-            }).ToListAsync()
+            ToListAsync()
 
-        ' Obtener historial de sanciones
-        Dim sanciones = Await _unitOfWork.Repository(Of vw_SancionesCompletas)().GetAll().
+        ' 2. Proyectar a DTO en memoria
+        Dim licencias = licenciasDb.Select(Function(l) New LicenciaFichaDTO With {
+            .Inicio = l.inicio.ToShortDateString(),
+            .Finaliza = l.finaliza.ToShortDateString(),
+            .Dias = (l.finaliza - l.inicio).Days + 1,
+            .TipoLicencia = l.TipoLicencia.Nombre,
+            .Anio = l.inicio.Year
+        }).ToList()
+
+
+        ' 1. Obtener historial de sanciones (datos crudos)
+        Dim sancionesDb = Await _unitOfWork.Repository(Of vw_SancionesCompletas)().GetAll().
             Where(Function(s) s.FuncionarioId = funcionarioId).
             OrderByDescending(Function(s) s.FechaDesde).
-            Select(Function(s) New SancionFichaDTO With {
-                .FechaDesde = s.FechaDesde.ToShortDateString(),
-                .FechaHasta = If(s.FechaHasta.HasValue, s.FechaHasta.Value.ToShortDateString(), "Indefinido"),
-                .Observaciones = s.Observaciones,
-                .Resolucion = s.Resolucion
-            }).ToListAsync()
+            ToListAsync()
+
+        ' 2. Proyectar a DTO en memoria
+        Dim sanciones = sancionesDb.Select(Function(s) New SancionFichaDTO With {
+            .FechaDesde = s.FechaDesde.ToShortDateString(),
+            .FechaHasta = If(s.FechaHasta.HasValue, s.FechaHasta.Value.ToShortDateString(), "Indefinido"),
+            .Observaciones = s.Observaciones,
+            .Resolucion = s.Resolucion
+        }).ToList()
+
+        ' --- FIN DE LA CORRECCIÓN ---
 
         ' Mapear todos los datos al DTO principal
         Dim dto = New FichaFuncionalDTO With {

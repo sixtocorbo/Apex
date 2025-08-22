@@ -492,12 +492,13 @@
 															<Style>Solid</Style>
 															<Width>1pt</Width>
 														</RightBorder>
-														<BackgroundColor>LightGrey</BackgroundColor>
+														<BackgroundColor>LightGray</BackgroundColor>
 														<PaddingLeft>2pt</PaddingLeft>
 														<PaddingRight>2pt</PaddingRight>
 														<PaddingTop>2pt</PaddingTop>
 														<PaddingBottom>2pt</PaddingBottom>
 													</Style>
+												</Textbox>
 											</CellContents>
 										</TablixCell>
 										<TablixCell>
@@ -543,12 +544,13 @@
 															<Style>Solid</Style>
 															<Width>1pt</Width>
 														</RightBorder>
-														<BackgroundColor>LightGrey</BackgroundColor>
+														<BackgroundColor>LightGray</BackgroundColor>
 														<PaddingLeft>2pt</PaddingLeft>
 														<PaddingRight>2pt</PaddingRight>
 														<PaddingTop>2pt</PaddingTop>
 														<PaddingBottom>2pt</PaddingBottom>
 													</Style>
+												</Textbox>
 											</CellContents>
 										</TablixCell>
 										<TablixCell>
@@ -596,12 +598,13 @@
 															<Style>Solid</Style>
 															<Width>1pt</Width>
 														</RightBorder>
-														<BackgroundColor>LightGrey</BackgroundColor>
+														<BackgroundColor>LightGray</BackgroundColor>
 														<PaddingLeft>2pt</PaddingLeft>
 														<PaddingRight>2pt</PaddingRight>
 														<PaddingTop>2pt</PaddingTop>
 														<PaddingBottom>2pt</PaddingBottom>
 													</Style>
+												</Textbox>
 											</CellContents>
 										</TablixCell>
 										<TablixCell>
@@ -647,12 +650,13 @@
 															<Style>Solid</Style>
 															<Width>1pt</Width>
 														</RightBorder>
-														<BackgroundColor>LightGrey</BackgroundColor>
+														<BackgroundColor>LightGray</BackgroundColor>
 														<PaddingLeft>2pt</PaddingLeft>
 														<PaddingRight>2pt</PaddingRight>
 														<PaddingTop>2pt</PaddingTop>
 														<PaddingBottom>2pt</PaddingBottom>
 													</Style>
+												</Textbox>
 											</CellContents>
 										</TablixCell>
 										<TablixCell>
@@ -700,12 +704,13 @@
 															<Style>Solid</Style>
 															<Width>1pt</Width>
 														</RightBorder>
-														<BackgroundColor>LightGrey</BackgroundColor>
+														<BackgroundColor>LightGray</BackgroundColor>
 														<PaddingLeft>2pt</PaddingLeft>
 														<PaddingRight>2pt</PaddingRight>
 														<PaddingTop>2pt</PaddingTop>
 														<PaddingBottom>2pt</PaddingBottom>
 													</Style>
+												</Textbox>
 											</CellContents>
 										</TablixCell>
 									</TablixCells>
@@ -739,6 +744,7 @@
 														<PaddingTop>2pt</PaddingTop>
 														<PaddingBottom>2pt</PaddingBottom>
 													</Style>
+												</Textbox>
 											</CellContents>
 										</TablixCell>
 										<TablixCell>
@@ -767,6 +773,7 @@
 														<PaddingTop>2pt</PaddingTop>
 														<PaddingBottom>2pt</PaddingBottom>
 													</Style>
+												</Textbox>
 											</CellContents>
 										</TablixCell>
 										<TablixCell>
@@ -797,6 +804,7 @@
 														<PaddingTop>2pt</PaddingTop>
 														<PaddingBottom>2pt</PaddingBottom>
 													</Style>
+												</Textbox>
 											</CellContents>
 										</TablixCell>
 										<TablixCell>
@@ -825,6 +833,7 @@
 														<PaddingTop>2pt</PaddingTop>
 														<PaddingBottom>2pt</PaddingBottom>
 													</Style>
+												</Textbox>
 											</CellContents>
 										</TablixCell>
 										<TablixCell>
@@ -855,6 +864,7 @@
 														<PaddingTop>2pt</PaddingTop>
 														<PaddingBottom>2pt</PaddingBottom>
 													</Style>
+												</Textbox>
 											</CellContents>
 										</TablixCell>
 									</TablixCells>
@@ -877,7 +887,7 @@
 								</TablixMember>
 								<TablixMember>
 									<Group Name="DetailsLicencias" />
-									<TablixMembers />
+
 								</TablixMember>
 							</TablixMembers>
 						</TablixRowHierarchy>
@@ -966,12 +976,13 @@
 														<Border>
 															<Style>Solid</Style>
 														</Border>
-														<BackgroundColor>LightGrey</BackgroundColor>
+														<BackgroundColor>LightGray</BackgroundColor>
 														<PaddingLeft>2pt</PaddingLeft>
 														<PaddingRight>2pt</PaddingRight>
 														<PaddingTop>2pt</PaddingTop>
 														<PaddingBottom>2pt</PaddingBottom>
 													</Style>
+												</Textbox>
 											</CellContents>
 										</TablixCell>
 										<TablixCell>
@@ -997,12 +1008,13 @@
 														<Border>
 															<Style>Solid</Style>
 														</Border>
-														<BackgroundColor>LightGrey</BackgroundColor>
+														<BackgroundColor>LightGray</BackgroundColor>
 														<PaddingLeft>2pt</PaddingLeft>
 														<PaddingRight>2pt</PaddingRight>
 														<PaddingTop>2pt</PaddingTop>
 														<PaddingBottom>2pt</PaddingBottom>
 													</Style>
+												</Textbox>
 											</CellContents>
 										</TablixCell>
 										<TablixCell>
@@ -1028,12 +1040,13 @@
 														<Border>
 															<Style>Solid</Style>
 														</Border>
-														<BackgroundColor>LightGrey</BackgroundColor>
+														<BackgroundColor>LightGray</BackgroundColor>
 														<PaddingLeft>2pt</PaddingLeft>
 														<PaddingRight>2pt</PaddingRight>
 														<PaddingTop>2pt</PaddingTop>
 														<PaddingBottom>2pt</PaddingBottom>
 													</Style>
+												</Textbox>
 											</CellContents>
 										</TablixCell>
 										<TablixCell>
@@ -1059,12 +1072,13 @@
 														<Border>
 															<Style>Solid</Style>
 														</Border>
-														<BackgroundColor>LightGrey</BackgroundColor>
+														<BackgroundColor>LightGray</BackgroundColor>
 														<PaddingLeft>2pt</PaddingLeft>
 														<PaddingRight>2pt</PaddingRight>
 														<PaddingTop>2pt</PaddingTop>
 														<PaddingBottom>2pt</PaddingBottom>
 													</Style>
+												</Textbox>
 											</CellContents>
 										</TablixCell>
 									</TablixCells>
@@ -1098,6 +1112,7 @@
 														<PaddingTop>2pt</PaddingTop>
 														<PaddingBottom>2pt</PaddingBottom>
 													</Style>
+												</Textbox>
 											</CellContents>
 										</TablixCell>
 										<TablixCell>
@@ -1126,6 +1141,7 @@
 														<PaddingTop>2pt</PaddingTop>
 														<PaddingBottom>2pt</PaddingBottom>
 													</Style>
+												</Textbox>
 											</CellContents>
 										</TablixCell>
 										<TablixCell>
@@ -1154,6 +1170,7 @@
 														<PaddingTop>2pt</PaddingTop>
 														<PaddingBottom>2pt</PaddingBottom>
 													</Style>
+												</Textbox>
 											</CellContents>
 										</TablixCell>
 										<TablixCell>
@@ -1182,6 +1199,7 @@
 														<PaddingTop>2pt</PaddingTop>
 														<PaddingBottom>2pt</PaddingBottom>
 													</Style>
+												</Textbox>
 											</CellContents>
 										</TablixCell>
 									</TablixCells>
@@ -1203,7 +1221,7 @@
 								</TablixMember>
 								<TablixMember>
 									<Group Name="DetailsSanciones" />
-									<TablixMembers />
+
 								</TablixMember>
 							</TablixMembers>
 						</TablixRowHierarchy>
