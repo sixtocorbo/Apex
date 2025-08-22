@@ -3,7 +3,6 @@ Imports System.Data.Entity
 
 ''' <summary>
 ''' Servicio para obtener los datos del informe de Concepto Funcional.
-''' VERSIÓN FINAL: Corregida para resolver errores de LINQ y usa la propiedad 'Activo' para determinar el estado de la sanción.
 ''' </summary>
 Public Class ConceptoFuncionalService
     Private ReadOnly _unitOfWork As IUnitOfWork
@@ -13,32 +12,35 @@ Public Class ConceptoFuncionalService
     End Sub
 
     ''' <summary>
-    ''' Obtiene incidencias (licencias médicas o sanciones leves) de un funcionario.
+    ''' Obtiene incidencias (licencias médicas o sanciones) de un funcionario.
     ''' </summary>
     Public Function ObtenerIncidencias(
         funcionarioId As Integer,
         fechaInicio As DateTime,
         fechaFin As DateTime,
         categoria As String
-    ) As IEnumerable(Of IncidenciaUI)
+    ) As List(Of IncidenciaUI)
 
-        ' 1. Se traen los datos filtrados desde la base de datos a memoria.
+        ' --- INICIO DE LA CORRECCIÓN ---
+        ' Se añade una verificación de NULL y se simplifica la comparación de strings.
         Dim licenciasDb = _unitOfWork.Repository(Of HistoricoLicencia).GetAll().
             Where(
                 Function(lic) lic.FuncionarioId = funcionarioId AndAlso
-                       lic.TipoLicencia.CategoriaAusencia.Nombre.Equals(categoria, StringComparison.OrdinalIgnoreCase) AndAlso
+                       lic.TipoLicencia IsNot Nothing AndAlso
+                       lic.TipoLicencia.CategoriaAusencia IsNot Nothing AndAlso
+                       lic.TipoLicencia.CategoriaAusencia.Nombre = categoria AndAlso
                        DbFunctions.TruncateTime(lic.inicio) >= fechaInicio.Date AndAlso
                        DbFunctions.TruncateTime(lic.inicio) <= fechaFin.Date
             ).ToList()
+        ' --- FIN DE LA CORRECCIÓN ---
 
-        ' 2. Se transforman los datos al formato de la UI, ya en memoria.
         Return licenciasDb.Select(
             Function(l) New IncidenciaUI With {
                 .FechaInicio = l.inicio,
                 .FechaFinal = l.finaliza,
                 .Tipo = l.TipoLicencia.Nombre,
                 .Observaciones = l.datos
-            })
+            }).ToList()
     End Function
 
     ''' <summary>
@@ -50,25 +52,28 @@ Public Class ConceptoFuncionalService
         fechaFin As DateTime
     ) As List(Of ObservacionUI)
 
-        ' --- 1. Obtener sanciones PUNTUALES ---
-        ' Se filtra en la DB y se trae la colección a memoria con ToList().
+        ' --- INICIO DE LA CORRECCIÓN ---
+        ' Se añade una verificación de NULL y se simplifica la comparación de strings.
         Dim estadosTransitoriosDb = _unitOfWork.Repository(Of EstadoTransitorio).GetAll().
             Where(
                 Function(et) et.FuncionarioId = funcionarioId AndAlso
-                       et.TipoEstadoTransitorio.Nombre.Equals(ModConstantesApex.CATEGORIA_ESTADO_SANCION, StringComparison.OrdinalIgnoreCase) AndAlso
+                       et.TipoEstadoTransitorio IsNot Nothing AndAlso
+                       et.TipoEstadoTransitorio.Nombre = ModConstantesApex.CATEGORIA_ESTADO_SANCION AndAlso
                        et.SancionDetalle IsNot Nothing AndAlso
                        DbFunctions.TruncateTime(et.SancionDetalle.FechaDesde) >= fechaInicio.Date AndAlso
                        DbFunctions.TruncateTime(et.SancionDetalle.FechaDesde) <= fechaFin.Date
             ).ToList()
+        ' --- FIN DE LA CORRECCIÓN ---
 
-        ' Se mapea la colección en memoria para evitar errores de conversión a SQL.
         Dim puntuales = estadosTransitoriosDb.Select(
-            Function(et) New ObservacionUI With {
-                .Fecha = et.SancionDetalle.FechaDesde,
-                .Causa = et.SancionDetalle.Observaciones,
-                .Sancion = If(Not et.SancionDetalle.FechaHasta.HasValue OrElse et.SancionDetalle.FechaHasta.Value >= Date.Today, "Abierta", "Cerrada")
-            }
-        ).ToList()
+            Function(et)
+                Dim estadoSancion As String = If(Not et.SancionDetalle.FechaHasta.HasValue OrElse et.SancionDetalle.FechaHasta.Value >= Date.Today, "Abierta", "Cerrada")
+                Return New ObservacionUI With {
+                    .Fecha = et.SancionDetalle.FechaDesde,
+                    .Causa = et.SancionDetalle.Observaciones,
+                    .Sancion = estadoSancion
+                }
+            End Function).ToList()
 
         ' --- 2. Obtener sanciones LEVES ---
         Dim leves = ObtenerIncidencias(funcionarioId, fechaInicio, fechaFin, ModConstantesApex.CATEGORIA_SANCION_LEVE) _
