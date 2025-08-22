@@ -523,6 +523,12 @@
     <Compile Include="UI\frmGestion.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="UI\frmGestionNomenclaturas.Designer.vb">
+      <DependentUpon>frmGestionNomenclaturas.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmGestionNomenclaturas.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="UI\frmGestionViaticos.Designer.vb">
       <DependentUpon>frmGestionViaticos.vb</DependentUpon>
     </Compile>
@@ -628,6 +634,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmNovedades.resx">
       <DependentUpon>frmNovedades.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmRenombrarPDF.resx">
+      <DependentUpon>frmRenombrarPDF.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmSancionCrear.resx">
       <DependentUpon>frmSancionCrear.vb</DependentUpon>

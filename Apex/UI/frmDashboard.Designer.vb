@@ -1,6 +1,4 @@
-﻿' Apex/UI/frmDashboard.Designer.vb
-
-<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class frmDashboard
     Inherits System.Windows.Forms.Form
 
@@ -29,14 +27,15 @@ Partial Class frmDashboard
         Me.btnReportes = New System.Windows.Forms.Button()
         Me.btnViaticos = New System.Windows.Forms.Button()
         Me.btnImportacion = New System.Windows.Forms.Button()
+        Me.btnNomenclaturas = New System.Windows.Forms.Button() ' <-- BOTÓN NUEVO
         Me.btnGestion = New System.Windows.Forms.Button()
         Me.btnNovedades = New System.Windows.Forms.Button()
         Me.btnFiltros = New System.Windows.Forms.Button()
         Me.btnFuncionarios = New System.Windows.Forms.Button()
         Me.panelLogo = New System.Windows.Forms.Panel()
+        Me.lblSemanaActual = New System.Windows.Forms.Label()
         Me.lblAppName = New System.Windows.Forms.Label()
         Me.panelContenido = New System.Windows.Forms.Panel()
-        Me.lblSemanaActual = New System.Windows.Forms.Label()
         Me.panelNavegacion.SuspendLayout()
         Me.panelLogo.SuspendLayout()
         Me.SuspendLayout()
@@ -48,6 +47,7 @@ Partial Class frmDashboard
         Me.panelNavegacion.Controls.Add(Me.btnReportes)
         Me.panelNavegacion.Controls.Add(Me.btnViaticos)
         Me.panelNavegacion.Controls.Add(Me.btnImportacion)
+        Me.panelNavegacion.Controls.Add(Me.btnNomenclaturas) ' <-- AÑADIDO AL PANEL
         Me.panelNavegacion.Controls.Add(Me.btnGestion)
         Me.panelNavegacion.Controls.Add(Me.btnNovedades)
         Me.panelNavegacion.Controls.Add(Me.btnFiltros)
@@ -59,6 +59,7 @@ Partial Class frmDashboard
         Me.panelNavegacion.Name = "panelNavegacion"
         Me.panelNavegacion.Size = New System.Drawing.Size(330, 1048)
         Me.panelNavegacion.TabIndex = 0
+        Me.panelNavegacion.AutoScroll = True
         '
         'btnConfiguracion
         '
@@ -67,7 +68,7 @@ Partial Class frmDashboard
         Me.btnConfiguracion.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnConfiguracion.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnConfiguracion.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnConfiguracion.Location = New System.Drawing.Point(0, 766)
+        Me.btnConfiguracion.Location = New System.Drawing.Point(0, 858)
         Me.btnConfiguracion.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnConfiguracion.Name = "btnConfiguracion"
         Me.btnConfiguracion.Padding = New System.Windows.Forms.Padding(18, 0, 0, 0)
@@ -84,7 +85,7 @@ Partial Class frmDashboard
         Me.btnReportes.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnReportes.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnReportes.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnReportes.Location = New System.Drawing.Point(0, 674)
+        Me.btnReportes.Location = New System.Drawing.Point(0, 766)
         Me.btnReportes.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnReportes.Name = "btnReportes"
         Me.btnReportes.Padding = New System.Windows.Forms.Padding(18, 0, 0, 0)
@@ -101,7 +102,7 @@ Partial Class frmDashboard
         Me.btnViaticos.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnViaticos.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnViaticos.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnViaticos.Location = New System.Drawing.Point(0, 582)
+        Me.btnViaticos.Location = New System.Drawing.Point(0, 674)
         Me.btnViaticos.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnViaticos.Name = "btnViaticos"
         Me.btnViaticos.Padding = New System.Windows.Forms.Padding(18, 0, 0, 0)
@@ -118,7 +119,7 @@ Partial Class frmDashboard
         Me.btnImportacion.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnImportacion.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnImportacion.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnImportacion.Location = New System.Drawing.Point(0, 490)
+        Me.btnImportacion.Location = New System.Drawing.Point(0, 582)
         Me.btnImportacion.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnImportacion.Name = "btnImportacion"
         Me.btnImportacion.Padding = New System.Windows.Forms.Padding(18, 0, 0, 0)
@@ -127,6 +128,23 @@ Partial Class frmDashboard
         Me.btnImportacion.Text = "   📥 Importar"
         Me.btnImportacion.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.btnImportacion.UseVisualStyleBackColor = True
+        '
+        'btnNomenclaturas
+        '
+        Me.btnNomenclaturas.Dock = System.Windows.Forms.DockStyle.Top
+        Me.btnNomenclaturas.FlatAppearance.BorderSize = 0
+        Me.btnNomenclaturas.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnNomenclaturas.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnNomenclaturas.ForeColor = System.Drawing.Color.Gainsboro
+        Me.btnNomenclaturas.Location = New System.Drawing.Point(0, 490)
+        Me.btnNomenclaturas.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnNomenclaturas.Name = "btnNomenclaturas"
+        Me.btnNomenclaturas.Padding = New System.Windows.Forms.Padding(18, 0, 0, 0)
+        Me.btnNomenclaturas.Size = New System.Drawing.Size(330, 92)
+        Me.btnNomenclaturas.TabIndex = 10
+        Me.btnNomenclaturas.Text = "   🗂️ Nomenclaturas"
+        Me.btnNomenclaturas.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnNomenclaturas.UseVisualStyleBackColor = True
         '
         'btnGestion
         '
@@ -208,6 +226,18 @@ Partial Class frmDashboard
         Me.panelLogo.Size = New System.Drawing.Size(330, 122)
         Me.panelLogo.TabIndex = 0
         '
+        'lblSemanaActual
+        '
+        Me.lblSemanaActual.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.lblSemanaActual.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblSemanaActual.ForeColor = System.Drawing.Color.Gold
+        Me.lblSemanaActual.Location = New System.Drawing.Point(0, 80)
+        Me.lblSemanaActual.Name = "lblSemanaActual"
+        Me.lblSemanaActual.Size = New System.Drawing.Size(330, 42)
+        Me.lblSemanaActual.TabIndex = 1
+        Me.lblSemanaActual.Text = "Semana: -"
+        Me.lblSemanaActual.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        '
         'lblAppName
         '
         Me.lblAppName.Dock = System.Windows.Forms.DockStyle.Top
@@ -230,18 +260,6 @@ Partial Class frmDashboard
         Me.panelContenido.Size = New System.Drawing.Size(1566, 1048)
         Me.panelContenido.TabIndex = 1
         '
-        'lblSemanaActual
-        '
-        Me.lblSemanaActual.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.lblSemanaActual.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblSemanaActual.ForeColor = System.Drawing.Color.Gold
-        Me.lblSemanaActual.Location = New System.Drawing.Point(0, 80)
-        Me.lblSemanaActual.Name = "lblSemanaActual"
-        Me.lblSemanaActual.Size = New System.Drawing.Size(330, 42)
-        Me.lblSemanaActual.TabIndex = 1
-        Me.lblSemanaActual.Text = "Semana: -"
-        Me.lblSemanaActual.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
-        '
         'frmDashboard
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -260,17 +278,18 @@ Partial Class frmDashboard
 
     End Sub
 
-    Friend WithEvents panelNavegacion As System.Windows.Forms.Panel
-    Friend WithEvents panelLogo As System.Windows.Forms.Panel
-    Friend WithEvents btnFuncionarios As System.Windows.Forms.Button
-    Friend WithEvents btnReportes As System.Windows.Forms.Button
-    Friend WithEvents btnConfiguracion As System.Windows.Forms.Button
-    Friend WithEvents lblAppName As System.Windows.Forms.Label
-    Friend WithEvents panelContenido As System.Windows.Forms.Panel
-    Friend WithEvents btnFiltros As System.Windows.Forms.Button
-    Friend WithEvents btnGestion As System.Windows.Forms.Button
-    Friend WithEvents btnNovedades As System.Windows.Forms.Button
-    Friend WithEvents btnViaticos As System.Windows.Forms.Button
-    Friend WithEvents btnImportacion As System.Windows.Forms.Button
+    Friend WithEvents panelNavegacion As Panel
+    Friend WithEvents panelLogo As Panel
+    Friend WithEvents btnFuncionarios As Button
+    Friend WithEvents btnReportes As Button
+    Friend WithEvents btnConfiguracion As Button
+    Friend WithEvents lblAppName As Label
+    Friend WithEvents panelContenido As Panel
+    Friend WithEvents btnFiltros As Button
+    Friend WithEvents btnGestion As Button
+    Friend WithEvents btnNovedades As Button
+    Friend WithEvents btnViaticos As Button
+    Friend WithEvents btnImportacion As Button
     Friend WithEvents lblSemanaActual As Label
+    Friend WithEvents btnNomenclaturas As Button ' <-- DECLARACIÓN DEL BOTÓN
 End Class

@@ -11,9 +11,15 @@ Imports System
 Imports System.Collections.Generic
 
 Partial Public Class Nomenclatura
-    Public Property id_nomenclatura As Integer
-    Public Property NOMECLATURA As String
-    Public Property FECHA As String
-    Public Property NCODE As String
+    Public Property Id As Integer
+    Public Property Nombre As String
+    Public Property Codigo As String
+    Public Property AreaResponsable As String
+    Public Property Patron As String
+    Public Property Ejemplo As String
+    Public Property UbicacionArchivo As String
+    Public Property Observaciones As String
+    Public Property UsaFecha As Boolean
+    Public Property UsaNomenclaturaCodigo As Boolean
 
 End Class

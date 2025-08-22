@@ -341,12 +341,18 @@
         </EntityType>
         <EntityType Name="Nomenclatura">
           <Key>
-            <PropertyRef Name="id_nomenclatura" />
+            <PropertyRef Name="Id" />
           </Key>
-          <Property Name="id_nomenclatura" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="NOMECLATURA" Type="nvarchar" MaxLength="100" Nullable="false" />
-          <Property Name="FECHA" Type="char" MaxLength="2" />
-          <Property Name="NCODE" Type="char" MaxLength="2" />
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Nombre" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="Codigo" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="AreaResponsable" Type="nvarchar" MaxLength="50" />
+          <Property Name="Patron" Type="nvarchar" MaxLength="255" />
+          <Property Name="Ejemplo" Type="nvarchar" MaxLength="255" />
+          <Property Name="UbicacionArchivo" Type="nvarchar" MaxLength="255" />
+          <Property Name="Observaciones" Type="nvarchar(max)" />
+          <Property Name="UsaFecha" Type="bit" Nullable="false" />
+          <Property Name="UsaNomenclaturaCodigo" Type="bit" Nullable="false" />
         </EntityType>
         <EntityType Name="NotificacionEstado">
           <Key>
@@ -2210,12 +2216,18 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
         </EntityType>
         <EntityType Name="Nomenclatura">
           <Key>
-            <PropertyRef Name="id_nomenclatura" />
+            <PropertyRef Name="Id" />
           </Key>
-          <Property Name="id_nomenclatura" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="NOMECLATURA" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="FECHA" Type="String" MaxLength="2" FixedLength="true" Unicode="false" />
-          <Property Name="NCODE" Type="String" MaxLength="2" FixedLength="true" Unicode="false" />
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Nombre" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Codigo" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="AreaResponsable" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Patron" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Ejemplo" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="UbicacionArchivo" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="UsaFecha" Type="Boolean" Nullable="false" />
+          <Property Name="UsaNomenclaturaCodigo" Type="Boolean" Nullable="false" />
         </EntityType>
         <EntityType Name="NotificacionEstado">
           <Key>
@@ -3970,10 +3982,16 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <EntitySetMapping Name="Nomenclatura">
             <EntityTypeMapping TypeName="ApexModel.Nomenclatura">
               <MappingFragment StoreEntitySet="Nomenclatura">
-                <ScalarProperty Name="id_nomenclatura" ColumnName="id_nomenclatura" />
-                <ScalarProperty Name="NOMECLATURA" ColumnName="NOMECLATURA" />
-                <ScalarProperty Name="FECHA" ColumnName="FECHA" />
-                <ScalarProperty Name="NCODE" ColumnName="NCODE" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+                <ScalarProperty Name="Codigo" ColumnName="Codigo" />
+                <ScalarProperty Name="AreaResponsable" ColumnName="AreaResponsable" />
+                <ScalarProperty Name="Patron" ColumnName="Patron" />
+                <ScalarProperty Name="Ejemplo" ColumnName="Ejemplo" />
+                <ScalarProperty Name="UbicacionArchivo" ColumnName="UbicacionArchivo" />
+                <ScalarProperty Name="Observaciones" ColumnName="Observaciones" />
+                <ScalarProperty Name="UsaFecha" ColumnName="UsaFecha" />
+                <ScalarProperty Name="UsaNomenclaturaCodigo" ColumnName="UsaNomenclaturaCodigo" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

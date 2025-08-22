@@ -12,6 +12,7 @@
 ' y el patrón de Unit of Work para el acceso a datos.
 ' =================================================================================================
 
+Imports System.Data.Entity
 Imports System.IO
 Imports System.Linq
 Imports System.Threading.Tasks
@@ -28,10 +29,13 @@ Public Class frmRenombrarPDF
     Private _unitOfWork As IUnitOfWork
     Private _funcionarioSeleccionado As Funcionario
 
-    ' === CARGA Y CONFIGURACIÓN INICIAL ===
     Private Async Sub frmRenombrarPDF_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Cursor = Cursors.WaitCursor
-        _unitOfWork = New UnitOfWork(New ApexEntities())
+
+        ' --- CORRECCIÓN AQUÍ ---
+        ' Se utiliza el constructor sin parámetros, que ya crea la instancia de ApexEntities.
+        _unitOfWork = New UnitOfWork()
+
         Timer1.Interval = 500 ' Intervalo para el debounce de la búsqueda
 
         Try
@@ -39,21 +43,22 @@ Public Class frmRenombrarPDF
         Catch ex As Exception
             MessageBox.Show($"Error al cargar las nomenclaturas: {ex.Message}", "Error de Carga", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
+
         Me.Cursor = Cursors.Default
     End Sub
 
     Private Sub btnBuscarFuncionario_Click(sender As Object, e As EventArgs) Handles btnBuscarFuncionario.Click
-        ' 1. Se llama al constructor SIN ARGUMENTOS, como está definido en tu proyecto.
-        Using form As New frmFuncionarioBuscar()
+        ' 1. Se llama al constructor con el modo de apertura correcto (Seleccion).
+        Using form As New frmFuncionarioBuscar(frmFuncionarioBuscar.ModoApertura.Seleccion)
             If form.ShowDialog() = DialogResult.OK Then
                 ' 2. Obtenemos el objeto FuncionarioMin del buscador.
                 Dim funcionarioMinimo = form.FuncionarioSeleccionado
 
                 If funcionarioMinimo IsNot Nothing Then
-                    ' 3. Usamos el método Get(id) SIN Await, porque no es asíncrono.
+                    ' 3. Usamos el método GetById(id) que sí existe en el repositorio.
                     Me.Cursor = Cursors.WaitCursor
                     Dim repo = _unitOfWork.Repository(Of Funcionario)()
-                    Me._funcionarioSeleccionado = repo.Get(funcionarioMinimo.Id) ' <--- CORREGIDO AQUÍ
+                    Me._funcionarioSeleccionado = repo.GetById(funcionarioMinimo.Id) ' <--- CORREGIDO AQUÍ
                     Me.Cursor = Cursors.Default
 
                     ' 4. Actualizamos la UI.
@@ -146,7 +151,11 @@ Public Class frmRenombrarPDF
     ' === CARGA Y CONFIGURACIÓN DE NOMENCLATURAS ===
     Private Async Function CargarNomenclatura() As Task
         Dim repo = _unitOfWork.Repository(Of Nomenclatura)()
-        dgvTiposNomenclaturas.DataSource = Await repo.GetAllAsync()
+
+        ' --- CORRECCIÓN AQUÍ ---
+        ' Se ejecuta la consulta con ToListAsync() para traer los datos a una lista en memoria.
+        dgvTiposNomenclaturas.DataSource = Await repo.GetAll().ToListAsync()
+
         ConfigurarDgvTiposNomenclaturas()
     End Function
 

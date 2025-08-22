@@ -1,7 +1,10 @@
-﻿' Apex/UI/frmDashboard.vb
-Imports System.Data.Entity
+﻿Imports System.Data.Entity
+Imports System.Drawing
+Imports System.Threading.Tasks
+Imports System.Windows.Forms
 
 Public Class frmDashboard
+    Inherits Form
 
     Private currentBtn As Button
     Private Shadows activeForm As Form
@@ -13,6 +16,7 @@ Public Class frmDashboard
     Private _novedadesInstancia As frmNovedades
     Private _viaticosInstancia As frmGestionViaticos
     Private _importacionInstancia As frmAsistenteImportacion
+    Private _gestionNomenclaturasInstancia As frmGestionNomenclaturas ' <-- INSTANCIA NUEVA
 
     Public Sub New()
         InitializeComponent()
@@ -21,19 +25,15 @@ Public Class frmDashboard
         AddHandler btnFiltros.Click, AddressOf ActivateButton
         AddHandler btnNovedades.Click, AddressOf ActivateButton
         AddHandler btnGestion.Click, AddressOf ActivateButton
+        AddHandler btnNomenclaturas.Click, AddressOf ActivateButton ' <-- MANEJADOR NUEVO
         AddHandler btnImportacion.Click, AddressOf ActivateButton
         AddHandler btnViaticos.Click, AddressOf ActivateButton
         AddHandler btnReportes.Click, AddressOf ActivateButton
         AddHandler btnConfiguracion.Click, AddressOf ActivateButton
 
-        ' --- INICIO DE LA MODIFICACIÓN ---
-        ' Se añade el manejador para el evento Shown
         AddHandler Me.Shown, AddressOf frmDashboard_Shown
-        ' --- FIN DE LA MODIFICACIÓN ---
     End Sub
 
-    ' --- INICIO DE LA MODIFICACIÓN ---
-    ' Se utiliza el evento Shown para asegurar que el formulario ya es visible
     Private Async Sub frmDashboard_Shown(sender As Object, e As EventArgs)
         Await CargarSemanaActualAsync()
     End Sub
@@ -41,7 +41,6 @@ Public Class frmDashboard
     Private Async Function CargarSemanaActualAsync() As Task
         Try
             Using uow As New UnitOfWork()
-                ' Ejecuta la función de la base de datos directamente
                 Dim semana = Await uow.Context.Database.SqlQuery(Of Integer)("SELECT dbo.RegimenActual(GETDATE())").FirstOrDefaultAsync()
                 If semana > 0 Then
                     lblSemanaActual.Text = $"SEMANA {semana}"
@@ -50,24 +49,20 @@ Public Class frmDashboard
                 End If
             End Using
         Catch ex As Exception
-            ' En caso de error, se muestra un mensaje genérico
             lblSemanaActual.Text = "Error al cargar"
         End Try
     End Function
-    ' --- FIN DE LA MODIFICACIÓN ---
 
     Private Sub ActivateButton(sender As Object, e As EventArgs)
         If sender Is Nothing Then Return
 
-        DisableButton() ' Desactivar el botón anterior
+        DisableButton()
 
-        ' Activar el nuevo botón
         currentBtn = CType(sender, Button)
-        currentBtn.BackColor = Color.FromArgb(81, 81, 112) ' Un color de resaltado
+        currentBtn.BackColor = Color.FromArgb(81, 81, 112)
         currentBtn.ForeColor = Color.White
         currentBtn.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
 
-        ' Abrir el formulario correspondiente
         Select Case currentBtn.Name
             Case "btnFuncionarios"
                 If _funcionarioBuscarInstancia Is Nothing OrElse _funcionarioBuscarInstancia.IsDisposed Then
@@ -93,6 +88,14 @@ Public Class frmDashboard
                 End If
                 AbrirFormEnPanel(_gestionInstancia)
 
+            ' --- CASE NUEVO AÑADIDO ---
+            Case "btnNomenclaturas"
+                If _gestionNomenclaturasInstancia Is Nothing OrElse _gestionNomenclaturasInstancia.IsDisposed Then
+                    _gestionNomenclaturasInstancia = New frmGestionNomenclaturas()
+                End If
+                AbrirFormEnPanel(_gestionNomenclaturasInstancia)
+            ' --- FIN DEL CASE ---
+
             Case "btnImportacion"
                 If _importacionInstancia Is Nothing OrElse _importacionInstancia.IsDisposed Then
                     _importacionInstancia = New frmAsistenteImportacion()
@@ -108,22 +111,18 @@ Public Class frmDashboard
             Case "btnReportes"
                 MessageBox.Show("Formulario de reportes aún no implementado.", "En desarrollo", MessageBoxButtons.OK, MessageBoxIcon.Information)
 
-            ' --- INICIO DE LA MODIFICACIÓN ---
             Case "btnConfiguracion"
-                ' Se abre el nuevo formulario en lugar de mostrar un mensaje.
                 Using frm As New frmConfiguracion()
                     frm.ShowDialog(Me)
                 End Using
-                ' Se desactiva el botón después de cerrar el diálogo para que no quede presionado.
                 DisableButton()
                 currentBtn = Nothing
-                ' --- FIN DE LA MODIFICACIÓN ---
         End Select
     End Sub
 
     Private Sub DisableButton()
         If currentBtn IsNot Nothing Then
-            currentBtn.BackColor = Color.FromArgb(51, 51, 76) ' Color original del panel
+            currentBtn.BackColor = Color.FromArgb(51, 51, 76)
             currentBtn.ForeColor = Color.Gainsboro
             currentBtn.Font = New Font("Segoe UI", 11.25F, FontStyle.Regular)
         End If

@@ -53,8 +53,15 @@ Public Class Repository(Of T As Class)
         _dbSet.AddRange(entities)
     End Sub
 
+    'Public Sub Remove(entity As T) Implements IRepository(Of T).Remove
+    '    _dbSet.Remove(entity)
+    'End Sub
     Public Sub Remove(entity As T) Implements IRepository(Of T).Remove
-        _dbSet.Remove(entity)
+        ' --- CORRECCIÓN AQUÍ ---
+        ' En lugar de usar _dbSet.Remove, que requiere que el objeto ya esté siendo rastreado,
+        ' cambiamos el estado de la entidad a 'Deleted'.
+        ' Esto adjunta automáticamente la entidad si no lo está y la marca para su eliminación.
+        _context.Entry(entity).State = EntityState.Deleted
     End Sub
 
     Public Sub RemoveRange(entities As IEnumerable(Of T)) Implements IRepository(Of T).RemoveRange
