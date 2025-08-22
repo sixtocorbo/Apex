@@ -21,7 +21,7 @@ Partial Class frmGestion
         Me.TabPageLicencias = New System.Windows.Forms.TabPage()
         Me.dgvLicencias = New System.Windows.Forms.DataGridView()
         Me.PanelLicencias = New System.Windows.Forms.Panel()
-        Me.btnConceptoFuncional = New System.Windows.Forms.Button() ' Botón añadido
+        Me.btnConceptoFuncional = New System.Windows.Forms.Button()
         Me.btnEliminarLicencia = New System.Windows.Forms.Button()
         Me.btnEditarLicencia = New System.Windows.Forms.Button()
         Me.btnNuevaLicencia = New System.Windows.Forms.Button()
@@ -122,7 +122,6 @@ Partial Class frmGestion
         '
         'btnConceptoFuncional
         '
-        Me.btnConceptoFuncional.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnConceptoFuncional.Location = New System.Drawing.Point(15, 12)
         Me.btnConceptoFuncional.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.btnConceptoFuncional.Name = "btnConceptoFuncional"
@@ -416,6 +415,7 @@ Partial Class frmGestion
         Me.Controls.Add(Me.TabControlGestion)
         Me.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.Name = "frmGestion"
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Gestión de Licencias y Notificaciones"
         Me.TabControlGestion.ResumeLayout(False)
         Me.TabPageLicencias.ResumeLayout(False)

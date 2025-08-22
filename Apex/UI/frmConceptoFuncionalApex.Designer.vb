@@ -67,67 +67,75 @@ Partial Class frmConceptoFuncionalApex
         Me.PanelFiltros.Controls.Add(Me.Label1)
         Me.PanelFiltros.Dock = System.Windows.Forms.DockStyle.Top
         Me.PanelFiltros.Location = New System.Drawing.Point(0, 0)
+        Me.PanelFiltros.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.PanelFiltros.Name = "PanelFiltros"
-        Me.PanelFiltros.Size = New System.Drawing.Size(800, 80)
+        Me.PanelFiltros.Size = New System.Drawing.Size(1200, 123)
         Me.PanelFiltros.TabIndex = 0
         '
         'btnBuscarFuncionario
         '
-        Me.btnBuscarFuncionario.Location = New System.Drawing.Point(330, 29)
+        Me.btnBuscarFuncionario.Location = New System.Drawing.Point(495, 45)
+        Me.btnBuscarFuncionario.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnBuscarFuncionario.Name = "btnBuscarFuncionario"
-        Me.btnBuscarFuncionario.Size = New System.Drawing.Size(28, 23)
+        Me.btnBuscarFuncionario.Size = New System.Drawing.Size(42, 35)
         Me.btnBuscarFuncionario.TabIndex = 6
         Me.btnBuscarFuncionario.Text = "..."
         Me.btnBuscarFuncionario.UseVisualStyleBackColor = True
         '
         'txtFuncionarioSeleccionado
         '
-        Me.txtFuncionarioSeleccionado.Location = New System.Drawing.Point(15, 31)
+        Me.txtFuncionarioSeleccionado.Location = New System.Drawing.Point(22, 48)
+        Me.txtFuncionarioSeleccionado.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtFuncionarioSeleccionado.Name = "txtFuncionarioSeleccionado"
         Me.txtFuncionarioSeleccionado.ReadOnly = True
-        Me.txtFuncionarioSeleccionado.Size = New System.Drawing.Size(309, 20)
+        Me.txtFuncionarioSeleccionado.Size = New System.Drawing.Size(462, 26)
         Me.txtFuncionarioSeleccionado.TabIndex = 5
         '
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(12, 15)
+        Me.Label3.Location = New System.Drawing.Point(18, 23)
+        Me.Label3.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(62, 13)
+        Me.Label3.Size = New System.Drawing.Size(92, 20)
         Me.Label3.TabIndex = 4
         Me.Label3.Text = "Funcionario"
         '
         'dtpFechaFin
         '
-        Me.dtpFechaFin.Format = System.Windows.Forms.DateTimePickerFormat.Short
-        Me.dtpFechaFin.Location = New System.Drawing.Point(520, 31)
+        Me.dtpFechaFin.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
+        Me.dtpFechaFin.Location = New System.Drawing.Point(780, 48)
+        Me.dtpFechaFin.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.dtpFechaFin.Name = "dtpFechaFin"
-        Me.dtpFechaFin.Size = New System.Drawing.Size(99, 20)
+        Me.dtpFechaFin.Size = New System.Drawing.Size(146, 26)
         Me.dtpFechaFin.TabIndex = 3
         '
         'dtpFechaInicio
         '
-        Me.dtpFechaInicio.Format = System.Windows.Forms.DateTimePickerFormat.Short
-        Me.dtpFechaInicio.Location = New System.Drawing.Point(398, 31)
+        Me.dtpFechaInicio.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
+        Me.dtpFechaInicio.Location = New System.Drawing.Point(597, 48)
+        Me.dtpFechaInicio.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.dtpFechaInicio.Name = "dtpFechaInicio"
-        Me.dtpFechaInicio.Size = New System.Drawing.Size(99, 20)
+        Me.dtpFechaInicio.Size = New System.Drawing.Size(146, 26)
         Me.dtpFechaInicio.TabIndex = 2
         '
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(517, 15)
+        Me.Label2.Location = New System.Drawing.Point(776, 23)
+        Me.Label2.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(35, 13)
+        Me.Label2.Size = New System.Drawing.Size(52, 20)
         Me.Label2.TabIndex = 1
         Me.Label2.Text = "Hasta"
         '
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(395, 15)
+        Me.Label1.Location = New System.Drawing.Point(592, 23)
+        Me.Label1.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(38, 13)
+        Me.Label1.Size = New System.Drawing.Size(56, 20)
         Me.Label1.TabIndex = 0
         Me.Label1.Text = "Desde"
         '
@@ -135,9 +143,10 @@ Partial Class frmConceptoFuncionalApex
         '
         Me.PanelPrincipal.Controls.Add(Me.TabControl1)
         Me.PanelPrincipal.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.PanelPrincipal.Location = New System.Drawing.Point(0, 80)
+        Me.PanelPrincipal.Location = New System.Drawing.Point(0, 123)
+        Me.PanelPrincipal.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.PanelPrincipal.Name = "PanelPrincipal"
-        Me.PanelPrincipal.Size = New System.Drawing.Size(800, 320)
+        Me.PanelPrincipal.Size = New System.Drawing.Size(1200, 492)
         Me.PanelPrincipal.TabIndex = 1
         '
         'TabControl1
@@ -147,18 +156,20 @@ Partial Class frmConceptoFuncionalApex
         Me.TabControl1.Controls.Add(Me.TabPage3)
         Me.TabControl1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TabControl1.Location = New System.Drawing.Point(0, 0)
+        Me.TabControl1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(800, 320)
+        Me.TabControl1.Size = New System.Drawing.Size(1200, 492)
         Me.TabControl1.TabIndex = 0
         '
         'TabPage1
         '
         Me.TabPage1.Controls.Add(Me.dgvLicenciasMedicas)
-        Me.TabPage1.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage1.Location = New System.Drawing.Point(4, 29)
+        Me.TabPage1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.TabPage1.Name = "TabPage1"
-        Me.TabPage1.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage1.Size = New System.Drawing.Size(792, 294)
+        Me.TabPage1.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.TabPage1.Size = New System.Drawing.Size(1192, 459)
         Me.TabPage1.TabIndex = 0
         Me.TabPage1.Text = "Licencias Médicas"
         Me.TabPage1.UseVisualStyleBackColor = True
@@ -169,19 +180,22 @@ Partial Class frmConceptoFuncionalApex
         Me.dgvLicenciasMedicas.AllowUserToDeleteRows = False
         Me.dgvLicenciasMedicas.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvLicenciasMedicas.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.dgvLicenciasMedicas.Location = New System.Drawing.Point(3, 3)
+        Me.dgvLicenciasMedicas.Location = New System.Drawing.Point(4, 5)
+        Me.dgvLicenciasMedicas.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.dgvLicenciasMedicas.Name = "dgvLicenciasMedicas"
         Me.dgvLicenciasMedicas.ReadOnly = True
-        Me.dgvLicenciasMedicas.Size = New System.Drawing.Size(786, 288)
+        Me.dgvLicenciasMedicas.RowHeadersWidth = 62
+        Me.dgvLicenciasMedicas.Size = New System.Drawing.Size(1184, 449)
         Me.dgvLicenciasMedicas.TabIndex = 0
         '
         'TabPage2
         '
         Me.TabPage2.Controls.Add(Me.dgvSanciones)
-        Me.TabPage2.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage2.Location = New System.Drawing.Point(4, 29)
+        Me.TabPage2.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.TabPage2.Name = "TabPage2"
-        Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage2.Size = New System.Drawing.Size(792, 294)
+        Me.TabPage2.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.TabPage2.Size = New System.Drawing.Size(1192, 459)
         Me.TabPage2.TabIndex = 1
         Me.TabPage2.Text = "Sanciones Graves"
         Me.TabPage2.UseVisualStyleBackColor = True
@@ -192,18 +206,21 @@ Partial Class frmConceptoFuncionalApex
         Me.dgvSanciones.AllowUserToDeleteRows = False
         Me.dgvSanciones.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvSanciones.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.dgvSanciones.Location = New System.Drawing.Point(3, 3)
+        Me.dgvSanciones.Location = New System.Drawing.Point(4, 5)
+        Me.dgvSanciones.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.dgvSanciones.Name = "dgvSanciones"
         Me.dgvSanciones.ReadOnly = True
-        Me.dgvSanciones.Size = New System.Drawing.Size(786, 288)
+        Me.dgvSanciones.RowHeadersWidth = 62
+        Me.dgvSanciones.Size = New System.Drawing.Size(1184, 449)
         Me.dgvSanciones.TabIndex = 0
         '
         'TabPage3
         '
         Me.TabPage3.Controls.Add(Me.dgvObservaciones)
-        Me.TabPage3.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage3.Location = New System.Drawing.Point(4, 29)
+        Me.TabPage3.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.TabPage3.Name = "TabPage3"
-        Me.TabPage3.Size = New System.Drawing.Size(792, 294)
+        Me.TabPage3.Size = New System.Drawing.Size(1192, 459)
         Me.TabPage3.TabIndex = 2
         Me.TabPage3.Text = "Observaciones (Puntuales y Leves)"
         Me.TabPage3.UseVisualStyleBackColor = True
@@ -215,9 +232,11 @@ Partial Class frmConceptoFuncionalApex
         Me.dgvObservaciones.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvObservaciones.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgvObservaciones.Location = New System.Drawing.Point(0, 0)
+        Me.dgvObservaciones.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.dgvObservaciones.Name = "dgvObservaciones"
         Me.dgvObservaciones.ReadOnly = True
-        Me.dgvObservaciones.Size = New System.Drawing.Size(792, 294)
+        Me.dgvObservaciones.RowHeadersWidth = 62
+        Me.dgvObservaciones.Size = New System.Drawing.Size(1192, 459)
         Me.dgvObservaciones.TabIndex = 0
         '
         'PanelFooter
@@ -225,17 +244,19 @@ Partial Class frmConceptoFuncionalApex
         Me.PanelFooter.Controls.Add(Me.btnInforme)
         Me.PanelFooter.Controls.Add(Me.lblTemporal)
         Me.PanelFooter.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.PanelFooter.Location = New System.Drawing.Point(0, 400)
+        Me.PanelFooter.Location = New System.Drawing.Point(0, 615)
+        Me.PanelFooter.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.PanelFooter.Name = "PanelFooter"
-        Me.PanelFooter.Size = New System.Drawing.Size(800, 50)
+        Me.PanelFooter.Size = New System.Drawing.Size(1200, 77)
         Me.PanelFooter.TabIndex = 2
         '
         'btnInforme
         '
         Me.btnInforme.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnInforme.Location = New System.Drawing.Point(684, 15)
+        Me.btnInforme.Location = New System.Drawing.Point(1026, 23)
+        Me.btnInforme.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnInforme.Name = "btnInforme"
-        Me.btnInforme.Size = New System.Drawing.Size(104, 23)
+        Me.btnInforme.Size = New System.Drawing.Size(156, 35)
         Me.btnInforme.TabIndex = 1
         Me.btnInforme.Text = "Generar Informe"
         Me.btnInforme.UseVisualStyleBackColor = True
@@ -243,21 +264,24 @@ Partial Class frmConceptoFuncionalApex
         'lblTemporal
         '
         Me.lblTemporal.AutoSize = True
-        Me.lblTemporal.Location = New System.Drawing.Point(12, 20)
+        Me.lblTemporal.Location = New System.Drawing.Point(18, 31)
+        Me.lblTemporal.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblTemporal.Name = "lblTemporal"
-        Me.lblTemporal.Size = New System.Drawing.Size(95, 13)
+        Me.lblTemporal.Size = New System.Drawing.Size(135, 20)
         Me.lblTemporal.TabIndex = 0
         Me.lblTemporal.Text = "Período evaluado:"
         '
         'frmConceptoFuncionalApex
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(800, 450)
+        Me.ClientSize = New System.Drawing.Size(1200, 692)
         Me.Controls.Add(Me.PanelPrincipal)
         Me.Controls.Add(Me.PanelFooter)
         Me.Controls.Add(Me.PanelFiltros)
+        Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Name = "frmConceptoFuncionalApex"
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Concepto Funcional"
         Me.PanelFiltros.ResumeLayout(False)
         Me.PanelFiltros.PerformLayout()
@@ -272,5 +296,6 @@ Partial Class frmConceptoFuncionalApex
         Me.PanelFooter.ResumeLayout(False)
         Me.PanelFooter.PerformLayout()
         Me.ResumeLayout(False)
+
     End Sub
 End Class
