@@ -406,6 +406,7 @@
     <Compile Include="Services\ModuloExtensions.vb" />
     <Compile Include="Services\NotificacionService.vb" />
     <Compile Include="Services\NovedadService.vb" />
+    <Compile Include="Services\ReportesService.vb" />
     <Compile Include="Services\SancionService.vb" />
     <Compile Include="Services\ViaticoService.vb" />
     <Compile Include="UI\FiltroAvanzadoUI.vb" />
@@ -443,6 +444,12 @@
       <DependentUpon>frmDashboard.vb</DependentUpon>
     </Compile>
     <Compile Include="UI\frmDashboard.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\frmFichaFuncionalRPT.Designer.vb">
+      <DependentUpon>frmFichaFuncionalRPT.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmFichaFuncionalRPT.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="UI\frmFiltroAvanzado.Designer.vb">
@@ -555,6 +562,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Reportes\ConceptoFuncional.rdlc" />
+    <EmbeddedResource Include="Reportes\FichaFuncional.rdlc" />
     <EmbeddedResource Include="UI\frmConceptoFuncionalApex.resx">
       <DependentUpon>frmConceptoFuncionalApex.vb</DependentUpon>
     </EmbeddedResource>

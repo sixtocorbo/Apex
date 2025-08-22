@@ -48,6 +48,7 @@ Public Class frmFuncionarioBuscar
         AppTheme.Aplicar(Me)
         ConfigurarGrilla()
         AddHandler btnVerSituacion.Click, AddressOf btnVerSituacion_Click
+        AddHandler btnGenerarFicha.Click, AddressOf btnGenerarFicha_Click
     End Sub
 
     Private Sub frmFuncionarioBuscar_Shown(sender As Object, e As EventArgs) Handles Me.Shown
@@ -235,17 +236,26 @@ Public Class frmFuncionarioBuscar
                 lblEstadoActividad.ForeColor = Color.Maroon
             End If
 
-            ' --- NUEVA LÓGICA PARA EL BOTÓN DE SITUACIÓN ---
-            Dim situacion = Await uow.Context.Database.SqlQuery(Of SituacionParaBoton)(
-            "SELECT TOP 1 Prioridad, Tipo, ColorIndicador FROM dbo.vw_FuncionarioSituacionActual WHERE FuncionarioId = @p0 ORDER BY Prioridad",
+            ' --- INICIO DE LA CORRECCIÓN ---
+            ' Se consulta la lista completa de situaciones en lugar de solo la primera.
+            Dim situaciones = Await uow.Context.Database.SqlQuery(Of SituacionParaBoton)(
+            "SELECT Prioridad, Tipo, ColorIndicador FROM dbo.vw_FuncionarioSituacionActual WHERE FuncionarioId = @p0 ORDER BY Prioridad",
             id
-        ).FirstOrDefaultAsync()
+        ).ToListAsync()
 
-            If situacion IsNot Nothing Then
+            If situaciones IsNot Nothing AndAlso situaciones.Any() Then
                 btnVerSituacion.Visible = True
-                btnVerSituacion.Text = situacion.Tipo
+                Dim primeraSituacion = situaciones.First()
+
+                ' Si hay más de una situación, se muestra el texto correspondiente.
+                If situaciones.Count > 1 Then
+                    btnVerSituacion.Text = "Situación Múltiple"
+                Else
+                    btnVerSituacion.Text = primeraSituacion.Tipo
+                End If
+
                 Try
-                    btnVerSituacion.BackColor = Color.FromName(situacion.ColorIndicador)
+                    btnVerSituacion.BackColor = Color.FromName(primeraSituacion.ColorIndicador)
                     btnVerSituacion.ForeColor = Color.White
                 Catch ex As Exception
                     btnVerSituacion.BackColor = SystemColors.Control
@@ -254,10 +264,11 @@ Public Class frmFuncionarioBuscar
             Else
                 btnVerSituacion.Visible = False
             End If
+            ' --- FIN DE LA CORRECCIÓN ---
 
             ' Determinar "Presencia"
             lblPresencia.Text = Await ObtenerPresenciaAsync(id, Date.Today)
-            If Not f.Activo AndAlso situacion Is Nothing Then
+            If Not f.Activo AndAlso (situaciones Is Nothing OrElse Not situaciones.Any()) Then
                 lblPresencia.Text = "Inactivo"
             End If
 
@@ -272,7 +283,7 @@ Public Class frmFuncionarioBuscar
     End Sub
 
     ' Agrega este nuevo manejador de eventos
-    Private Sub btnVerSituacion_Click(sender As Object, e As EventArgs) Handles btnVerSituacion.Click
+    Private Sub btnVerSituacion_Click(sender As Object, e As EventArgs)
         If dgvResultados.CurrentRow Is Nothing Then Return
         Dim id = CInt(dgvResultados.CurrentRow.Cells("Id").Value)
         Using frm As New frmFuncionarioSituacion(id)
@@ -286,9 +297,6 @@ Public Class frmFuncionarioBuscar
         Public Property Tipo As String
         Public Property ColorIndicador As String
     End Class
-
-    ' Elimina este método:
-    ' Private Sub lblEstadoTransitorio_DoubleClick...
 
     ''' <summary>
     ''' Maneja el doble clic para seleccionar o para abrir la ficha de edición.
@@ -363,7 +371,14 @@ Public Class frmFuncionarioBuscar
         Me.DialogResult = DialogResult.Cancel
         Me.Close()
     End Sub
-
+    Private Sub btnGenerarFicha_Click(sender As Object, e As EventArgs)
+        If FuncionarioSeleccionado IsNot Nothing Then
+            Dim frm As New frmFichaFuncionalRPT(FuncionarioSeleccionado.Id)
+            frm.Show()
+        Else
+            MessageBox.Show("Por favor, seleccione un funcionario de la lista.", "Selección requerida", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        End If
+    End Sub
 #End Region
 
 

@@ -30,6 +30,8 @@ Partial Class frmFuncionarioBuscar
         Me.splitContenedor = New System.Windows.Forms.SplitContainer()
         Me.dgvResultados = New System.Windows.Forms.DataGridView()
         Me.panelDetalle = New System.Windows.Forms.Panel()
+        Me.btnGenerarFicha = New System.Windows.Forms.Button()
+        Me.btnVerSituacion = New System.Windows.Forms.Button()
         Me.lblEstadoActividad = New System.Windows.Forms.Label()
         Me.lblHorarioCompleto = New System.Windows.Forms.Label()
         Me.lblHorarioCompletoHeader = New System.Windows.Forms.Label()
@@ -47,7 +49,6 @@ Partial Class frmFuncionarioBuscar
         Me.FlowLayoutPanelAcciones = New System.Windows.Forms.FlowLayoutPanel()
         Me.btnSeleccionar = New System.Windows.Forms.Button()
         Me.btnCancelar = New System.Windows.Forms.Button()
-        Me.btnVerSituacion = New System.Windows.Forms.Button()
         Me.panelFiltros.SuspendLayout()
         CType(Me.splitContenedor, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.splitContenedor.Panel1.SuspendLayout()
@@ -141,6 +142,7 @@ Partial Class frmFuncionarioBuscar
         'panelDetalle
         '
         Me.panelDetalle.BackColor = System.Drawing.Color.White
+        Me.panelDetalle.Controls.Add(Me.btnGenerarFicha)
         Me.panelDetalle.Controls.Add(Me.btnVerSituacion)
         Me.panelDetalle.Controls.Add(Me.lblEstadoActividad)
         Me.panelDetalle.Controls.Add(Me.lblHorarioCompleto)
@@ -163,6 +165,30 @@ Partial Class frmFuncionarioBuscar
         Me.panelDetalle.Padding = New System.Windows.Forms.Padding(15)
         Me.panelDetalle.Size = New System.Drawing.Size(1090, 958)
         Me.panelDetalle.TabIndex = 0
+        '
+        'btnGenerarFicha
+        '
+        Me.btnGenerarFicha.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnGenerarFicha.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.btnGenerarFicha.Location = New System.Drawing.Point(290, 853)
+        Me.btnGenerarFicha.Name = "btnGenerarFicha"
+        Me.btnGenerarFicha.Size = New System.Drawing.Size(250, 38)
+        Me.btnGenerarFicha.TabIndex = 16
+        Me.btnGenerarFicha.Text = "Ficha"
+        Me.btnGenerarFicha.UseVisualStyleBackColor = True
+        Me.btnGenerarFicha.Visible = False
+        '
+        'btnVerSituacion
+        '
+        Me.btnVerSituacion.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnVerSituacion.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.btnVerSituacion.Location = New System.Drawing.Point(34, 853)
+        Me.btnVerSituacion.Name = "btnVerSituacion"
+        Me.btnVerSituacion.Size = New System.Drawing.Size(250, 38)
+        Me.btnVerSituacion.TabIndex = 15
+        Me.btnVerSituacion.Text = "Ver Situación"
+        Me.btnVerSituacion.UseVisualStyleBackColor = True
+        Me.btnVerSituacion.Visible = False
         '
         'lblEstadoActividad
         '
@@ -376,15 +402,6 @@ Partial Class frmFuncionarioBuscar
         Me.btnCancelar.Text = "Cancelar"
         Me.btnCancelar.UseVisualStyleBackColor = True
         '
-        'btnVerSituacion
-        '
-        Me.btnVerSituacion.Location = New System.Drawing.Point(35, 864)
-        Me.btnVerSituacion.Name = "btnVerSituacion"
-        Me.btnVerSituacion.Size = New System.Drawing.Size(139, 37)
-        Me.btnVerSituacion.TabIndex = 15
-        Me.btnVerSituacion.Text = "Ver Situación"
-        Me.btnVerSituacion.UseVisualStyleBackColor = True
-        '
         'frmFuncionarioBuscar
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -438,4 +455,5 @@ Partial Class frmFuncionarioBuscar
     Friend WithEvents lblHorarioCompletoHeader As Label
     Friend WithEvents lblEstadoActividad As Label
     Friend WithEvents btnVerSituacion As Button
+    Friend WithEvents btnGenerarFicha As Button
 End Class
