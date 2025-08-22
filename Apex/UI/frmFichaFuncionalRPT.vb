@@ -23,8 +23,17 @@ Public Class frmFichaFuncionalRPT
             End If
 
             ReportViewer1.LocalReport.DataSources.Clear()
-            Dim rds = New ReportDataSource("FichaFuncionalDataSet", New List(Of FichaFuncionalDTO) From {datosFicha})
-            ReportViewer1.LocalReport.DataSources.Add(rds)
+
+            ' --- INICIO DE LA MODIFICACIÓN ---
+            Dim rdsFicha = New ReportDataSource("FichaFuncionalDataSet", New List(Of FichaFuncionalDTO) From {datosFicha})
+            Dim rdsLicencias = New ReportDataSource("LicenciasDataSet", datosFicha.Licencias)
+            Dim rdsSanciones = New ReportDataSource("SancionesDataSet", datosFicha.Sanciones)
+
+            ReportViewer1.LocalReport.DataSources.Add(rdsFicha)
+            ReportViewer1.LocalReport.DataSources.Add(rdsLicencias)
+            ReportViewer1.LocalReport.DataSources.Add(rdsSanciones)
+            ' --- FIN DE LA MODIFICACIÓN ---
+
             ReportViewer1.RefreshReport()
 
         Catch ex As Exception
