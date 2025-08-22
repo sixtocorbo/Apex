@@ -339,6 +339,15 @@
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="Nombre" Type="nvarchar" MaxLength="50" />
         </EntityType>
+        <EntityType Name="Nomenclatura">
+          <Key>
+            <PropertyRef Name="id_nomenclatura" />
+          </Key>
+          <Property Name="id_nomenclatura" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="NOMECLATURA" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="FECHA" Type="char" MaxLength="2" />
+          <Property Name="NCODE" Type="char" MaxLength="2" />
+        </EntityType>
         <EntityType Name="NotificacionEstado">
           <Key>
             <PropertyRef Name="Id" />
@@ -1454,6 +1463,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <EntitySet Name="MapPoliciaFunc" EntityType="Self.MapPoliciaFunc" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Movimiento" EntityType="Self.Movimiento" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="NivelEstudio" EntityType="Self.NivelEstudio" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Nomenclatura" EntityType="Self.Nomenclatura" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="NotificacionEstado" EntityType="Self.NotificacionEstado" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="NotificacionPersonal" EntityType="Self.NotificacionPersonal" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Novedad" EntityType="Self.Novedad" Schema="dbo" store:Type="Tables" />
@@ -2197,6 +2207,15 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Nombre" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="Funcionario" Relationship="Self.FK__Funcionar__Nivel__2BFE89A6" FromRole="NivelEstudio" ToRole="Funcionario" />
+        </EntityType>
+        <EntityType Name="Nomenclatura">
+          <Key>
+            <PropertyRef Name="id_nomenclatura" />
+          </Key>
+          <Property Name="id_nomenclatura" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="NOMECLATURA" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="FECHA" Type="String" MaxLength="2" FixedLength="true" Unicode="false" />
+          <Property Name="NCODE" Type="String" MaxLength="2" FixedLength="true" Unicode="false" />
         </EntityType>
         <EntityType Name="NotificacionEstado">
           <Key>
@@ -3298,6 +3317,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <EntitySet Name="MapPoliciaFunc" EntityType="Self.MapPoliciaFunc" />
           <EntitySet Name="Movimiento" EntityType="Self.Movimiento" />
           <EntitySet Name="NivelEstudio" EntityType="Self.NivelEstudio" />
+          <EntitySet Name="Nomenclatura" EntityType="Self.Nomenclatura" />
           <EntitySet Name="NotificacionEstado" EntityType="Self.NotificacionEstado" />
           <EntitySet Name="NotificacionPersonal" EntityType="Self.NotificacionPersonal" />
           <EntitySet Name="Novedad" EntityType="Self.Novedad" />
@@ -3944,6 +3964,16 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
               <MappingFragment StoreEntitySet="NivelEstudio">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Nomenclatura">
+            <EntityTypeMapping TypeName="ApexModel.Nomenclatura">
+              <MappingFragment StoreEntitySet="Nomenclatura">
+                <ScalarProperty Name="id_nomenclatura" ColumnName="id_nomenclatura" />
+                <ScalarProperty Name="NOMECLATURA" ColumnName="NOMECLATURA" />
+                <ScalarProperty Name="FECHA" ColumnName="FECHA" />
+                <ScalarProperty Name="NCODE" ColumnName="NCODE" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

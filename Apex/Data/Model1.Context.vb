@@ -54,6 +54,7 @@ Partial Public Class ApexEntities
     Public Overridable Property MapPoliciaFunc() As DbSet(Of MapPoliciaFunc)
     Public Overridable Property Movimiento() As DbSet(Of Movimiento)
     Public Overridable Property NivelEstudio() As DbSet(Of NivelEstudio)
+    Public Overridable Property Nomenclatura() As DbSet(Of Nomenclatura)
     Public Overridable Property NotificacionEstado() As DbSet(Of NotificacionEstado)
     Public Overridable Property NotificacionPersonal() As DbSet(Of NotificacionPersonal)
     Public Overridable Property Novedad() As DbSet(Of Novedad)
