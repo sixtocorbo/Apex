@@ -33,8 +33,6 @@ Partial Class frmFuncionarioBuscar
         Me.lblEstadoActividad = New System.Windows.Forms.Label()
         Me.lblHorarioCompleto = New System.Windows.Forms.Label()
         Me.lblHorarioCompletoHeader = New System.Windows.Forms.Label()
-        Me.lblEstadoTransitorio = New System.Windows.Forms.Label()
-        Me.lblEstadoTransitorioHeader = New System.Windows.Forms.Label()
         Me.lblPresencia = New System.Windows.Forms.Label()
         Me.lblPresenciaHeader = New System.Windows.Forms.Label()
         Me.lblFechaIngreso = New System.Windows.Forms.Label()
@@ -49,6 +47,7 @@ Partial Class frmFuncionarioBuscar
         Me.FlowLayoutPanelAcciones = New System.Windows.Forms.FlowLayoutPanel()
         Me.btnSeleccionar = New System.Windows.Forms.Button()
         Me.btnCancelar = New System.Windows.Forms.Button()
+        Me.btnVerSituacion = New System.Windows.Forms.Button()
         Me.panelFiltros.SuspendLayout()
         CType(Me.splitContenedor, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.splitContenedor.Panel1.SuspendLayout()
@@ -142,11 +141,10 @@ Partial Class frmFuncionarioBuscar
         'panelDetalle
         '
         Me.panelDetalle.BackColor = System.Drawing.Color.White
+        Me.panelDetalle.Controls.Add(Me.btnVerSituacion)
         Me.panelDetalle.Controls.Add(Me.lblEstadoActividad)
         Me.panelDetalle.Controls.Add(Me.lblHorarioCompleto)
         Me.panelDetalle.Controls.Add(Me.lblHorarioCompletoHeader)
-        Me.panelDetalle.Controls.Add(Me.lblEstadoTransitorio)
-        Me.panelDetalle.Controls.Add(Me.lblEstadoTransitorioHeader)
         Me.panelDetalle.Controls.Add(Me.lblPresencia)
         Me.panelDetalle.Controls.Add(Me.lblPresenciaHeader)
         Me.panelDetalle.Controls.Add(Me.lblFechaIngreso)
@@ -162,7 +160,7 @@ Partial Class frmFuncionarioBuscar
         Me.panelDetalle.Location = New System.Drawing.Point(0, 0)
         Me.panelDetalle.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.panelDetalle.Name = "panelDetalle"
-        Me.panelDetalle.Padding = New System.Windows.Forms.Padding(15, 15, 15, 15)
+        Me.panelDetalle.Padding = New System.Windows.Forms.Padding(15)
         Me.panelDetalle.Size = New System.Drawing.Size(1090, 958)
         Me.panelDetalle.TabIndex = 0
         '
@@ -202,30 +200,6 @@ Partial Class frmFuncionarioBuscar
         Me.lblHorarioCompletoHeader.Size = New System.Drawing.Size(85, 28)
         Me.lblHorarioCompletoHeader.TabIndex = 12
         Me.lblHorarioCompletoHeader.Text = "Horario:"
-        '
-        'lblEstadoTransitorio
-        '
-        Me.lblEstadoTransitorio.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.lblEstadoTransitorio.AutoSize = True
-        Me.lblEstadoTransitorio.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.lblEstadoTransitorio.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.lblEstadoTransitorio.ForeColor = System.Drawing.Color.Maroon
-        Me.lblEstadoTransitorio.Location = New System.Drawing.Point(180, 859)
-        Me.lblEstadoTransitorio.Name = "lblEstadoTransitorio"
-        Me.lblEstadoTransitorio.Size = New System.Drawing.Size(20, 28)
-        Me.lblEstadoTransitorio.TabIndex = 0
-        Me.lblEstadoTransitorio.Text = "-"
-        '
-        'lblEstadoTransitorioHeader
-        '
-        Me.lblEstadoTransitorioHeader.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.lblEstadoTransitorioHeader.AutoSize = True
-        Me.lblEstadoTransitorioHeader.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.lblEstadoTransitorioHeader.Location = New System.Drawing.Point(30, 859)
-        Me.lblEstadoTransitorioHeader.Name = "lblEstadoTransitorioHeader"
-        Me.lblEstadoTransitorioHeader.Size = New System.Drawing.Size(139, 28)
-        Me.lblEstadoTransitorioHeader.TabIndex = 1
-        Me.lblEstadoTransitorioHeader.Text = "Estado Actual:"
         '
         'lblPresencia
         '
@@ -377,7 +351,7 @@ Partial Class frmFuncionarioBuscar
         Me.FlowLayoutPanelAcciones.Location = New System.Drawing.Point(0, 1001)
         Me.FlowLayoutPanelAcciones.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.FlowLayoutPanelAcciones.Name = "FlowLayoutPanelAcciones"
-        Me.FlowLayoutPanelAcciones.Padding = New System.Windows.Forms.Padding(6, 6, 6, 6)
+        Me.FlowLayoutPanelAcciones.Padding = New System.Windows.Forms.Padding(6)
         Me.FlowLayoutPanelAcciones.Size = New System.Drawing.Size(1686, 49)
         Me.FlowLayoutPanelAcciones.TabIndex = 2
         '
@@ -401,6 +375,15 @@ Partial Class frmFuncionarioBuscar
         Me.btnCancelar.TabIndex = 1
         Me.btnCancelar.Text = "Cancelar"
         Me.btnCancelar.UseVisualStyleBackColor = True
+        '
+        'btnVerSituacion
+        '
+        Me.btnVerSituacion.Location = New System.Drawing.Point(35, 864)
+        Me.btnVerSituacion.Name = "btnVerSituacion"
+        Me.btnVerSituacion.Size = New System.Drawing.Size(139, 37)
+        Me.btnVerSituacion.TabIndex = 15
+        Me.btnVerSituacion.Text = "Ver Situación"
+        Me.btnVerSituacion.UseVisualStyleBackColor = True
         '
         'frmFuncionarioBuscar
         '
@@ -448,12 +431,11 @@ Partial Class frmFuncionarioBuscar
     Friend WithEvents lblFechaIngreso As System.Windows.Forms.Label
     Friend WithEvents lblPresencia As System.Windows.Forms.Label
     Friend WithEvents lblPresenciaHeader As System.Windows.Forms.Label
-    Friend WithEvents lblEstadoTransitorio As System.Windows.Forms.Label
-    Friend WithEvents lblEstadoTransitorioHeader As System.Windows.Forms.Label
     Friend WithEvents FlowLayoutPanelAcciones As FlowLayoutPanel
     Friend WithEvents btnSeleccionar As Button
     Friend WithEvents btnCancelar As Button
     Friend WithEvents lblHorarioCompleto As Label
     Friend WithEvents lblHorarioCompletoHeader As Label
     Friend WithEvents lblEstadoActividad As Label
+    Friend WithEvents btnVerSituacion As Button
 End Class

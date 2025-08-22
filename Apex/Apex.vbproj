@@ -492,6 +492,12 @@
     <Compile Include="UI\frmFuncionarioEstadoTransitorio.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="UI\frmFuncionarioSituacion.Designer.vb">
+      <DependentUpon>frmFuncionarioSituacion.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmFuncionarioSituacion.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="UI\frmGestion.Designer.vb">
       <DependentUpon>frmGestion.vb</DependentUpon>
     </Compile>

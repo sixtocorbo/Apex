@@ -297,6 +297,12 @@ Public Class frmFuncionarioCrear
         cboEstadoCivil.SelectedValue = If(_funcionario.EstadoCivilId.HasValue, CInt(_funcionario.EstadoCivilId), -1)
         cboGenero.SelectedValue = If(_funcionario.GeneroId.HasValue, CInt(_funcionario.GeneroId), -1)
         cboNivelEstudio.SelectedValue = If(_funcionario.NivelEstudioId.HasValue, CInt(_funcionario.NivelEstudioId), -1)
+
+        ' --- INICIO DE LA CORRECCIÓN ---
+        chkProcesado.Checked = _funcionario.Procesado
+        chkSeparado.Checked = _funcionario.SeparadoDeCargo
+        chkDesarmado.Checked = _funcionario.Desarmado
+        ' --- FIN DE LA CORRECCIÓN ---
     End Sub
 
     '------------------- Cambiar vista Activos / Historial --------------------------
