@@ -53,13 +53,8 @@ Partial Class frmFiltroAvanzado
         Me.Label2 = New System.Windows.Forms.Label()
         Me.Label3 = New System.Windows.Forms.Label()
         Me.pnlDerecho = New System.Windows.Forms.Panel()
-        Me.Panel2 = New System.Windows.Forms.Panel()
-        Me.flpChips = New System.Windows.Forms.FlowLayoutPanel()
-        Me.Panel1 = New System.Windows.Forms.Panel()
-        Me.dgvDatos = New System.Windows.Forms.DataGridView()
-        Me.gbxBusquedaGlobal = New System.Windows.Forms.GroupBox()
-        Me.txtBusquedaGlobal = New System.Windows.Forms.TextBox()
         Me.pnlAcciones = New System.Windows.Forms.Panel()
+        Me.lblConteoRegistros = New System.Windows.Forms.Label()
         Me.btnExportarExcel = New System.Windows.Forms.Button()
         Me.btnCopiarCorreos = New System.Windows.Forms.Button()
         Me.btnExportarFichasPDF = New System.Windows.Forms.Button()
@@ -71,7 +66,12 @@ Partial Class frmFiltroAvanzado
         Me.btnNuevaLicencia = New System.Windows.Forms.Button()
         Me.btnEditarLicencia = New System.Windows.Forms.Button()
         Me.btnEliminarLicencia = New System.Windows.Forms.Button()
-        Me.lblConteoRegistros = New System.Windows.Forms.Label()
+        Me.Panel2 = New System.Windows.Forms.Panel()
+        Me.flpChips = New System.Windows.Forms.FlowLayoutPanel()
+        Me.Panel1 = New System.Windows.Forms.Panel()
+        Me.dgvDatos = New System.Windows.Forms.DataGridView()
+        Me.gbxBusquedaGlobal = New System.Windows.Forms.GroupBox()
+        Me.txtBusquedaGlobal = New System.Windows.Forms.TextBox()
         CType(Me.splitContenedorPrincipal, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.splitContenedorPrincipal.Panel1.SuspendLayout()
         Me.splitContenedorPrincipal.Panel2.SuspendLayout()
@@ -83,11 +83,11 @@ Partial Class frmFiltroAvanzado
         Me.gbxOrigenDatos.SuspendLayout()
         Me.TableLayoutPanel2.SuspendLayout()
         Me.pnlDerecho.SuspendLayout()
+        Me.pnlAcciones.SuspendLayout()
         Me.Panel2.SuspendLayout()
         Me.Panel1.SuspendLayout()
         CType(Me.dgvDatos, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.gbxBusquedaGlobal.SuspendLayout()
-        Me.pnlAcciones.SuspendLayout()
         Me.SuspendLayout()
         '
         'splitContenedorPrincipal
@@ -118,7 +118,7 @@ Partial Class frmFiltroAvanzado
         Me.pnlIzquierdo.Dock = System.Windows.Forms.DockStyle.Fill
         Me.pnlIzquierdo.Location = New System.Drawing.Point(0, 0)
         Me.pnlIzquierdo.Name = "pnlIzquierdo"
-        Me.pnlIzquierdo.Padding = New System.Windows.Forms.Padding(12, 12, 12, 12)
+        Me.pnlIzquierdo.Padding = New System.Windows.Forms.Padding(12)
         Me.pnlIzquierdo.Size = New System.Drawing.Size(704, 937)
         Me.pnlIzquierdo.TabIndex = 0
         '
@@ -128,7 +128,7 @@ Partial Class frmFiltroAvanzado
         Me.gbxFiltros.Dock = System.Windows.Forms.DockStyle.Fill
         Me.gbxFiltros.Location = New System.Drawing.Point(12, 210)
         Me.gbxFiltros.Name = "gbxFiltros"
-        Me.gbxFiltros.Padding = New System.Windows.Forms.Padding(12, 12, 12, 12)
+        Me.gbxFiltros.Padding = New System.Windows.Forms.Padding(12)
         Me.gbxFiltros.Size = New System.Drawing.Size(680, 715)
         Me.gbxFiltros.TabIndex = 1
         Me.gbxFiltros.TabStop = False
@@ -208,7 +208,7 @@ Partial Class frmFiltroAvanzado
         Me.gbxOrigenDatos.Dock = System.Windows.Forms.DockStyle.Top
         Me.gbxOrigenDatos.Location = New System.Drawing.Point(12, 12)
         Me.gbxOrigenDatos.Name = "gbxOrigenDatos"
-        Me.gbxOrigenDatos.Padding = New System.Windows.Forms.Padding(12, 12, 12, 12)
+        Me.gbxOrigenDatos.Padding = New System.Windows.Forms.Padding(12)
         Me.gbxOrigenDatos.Size = New System.Drawing.Size(680, 198)
         Me.gbxOrigenDatos.TabIndex = 0
         Me.gbxOrigenDatos.TabStop = False
@@ -314,83 +314,9 @@ Partial Class frmFiltroAvanzado
         Me.pnlDerecho.Dock = System.Windows.Forms.DockStyle.Fill
         Me.pnlDerecho.Location = New System.Drawing.Point(0, 0)
         Me.pnlDerecho.Name = "pnlDerecho"
-        Me.pnlDerecho.Padding = New System.Windows.Forms.Padding(12, 12, 12, 12)
+        Me.pnlDerecho.Padding = New System.Windows.Forms.Padding(12)
         Me.pnlDerecho.Size = New System.Drawing.Size(1216, 937)
         Me.pnlDerecho.TabIndex = 0
-        '
-        'Panel2
-        '
-        Me.Panel2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Panel2.AutoScroll = True
-        Me.Panel2.Controls.Add(Me.flpChips)
-        Me.Panel2.Location = New System.Drawing.Point(12, 602)
-        Me.Panel2.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.Panel2.Name = "Panel2"
-        Me.Panel2.Size = New System.Drawing.Size(1192, 323)
-        Me.Panel2.TabIndex = 6
-        '
-        'flpChips
-        '
-        Me.flpChips.AutoScroll = True
-        Me.flpChips.AutoSize = True
-        Me.flpChips.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-        Me.flpChips.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.flpChips.Location = New System.Drawing.Point(0, 0)
-        Me.flpChips.MaximumSize = New System.Drawing.Size(0, 385)
-        Me.flpChips.Name = "flpChips"
-        Me.flpChips.Padding = New System.Windows.Forms.Padding(6, 6, 6, 6)
-        Me.flpChips.Size = New System.Drawing.Size(1192, 323)
-        Me.flpChips.TabIndex = 2
-        '
-        'Panel1
-        '
-        Me.Panel1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Panel1.Controls.Add(Me.dgvDatos)
-        Me.Panel1.Location = New System.Drawing.Point(12, 210)
-        Me.Panel1.Name = "Panel1"
-        Me.Panel1.Size = New System.Drawing.Size(1192, 367)
-        Me.Panel1.TabIndex = 5
-        '
-        'dgvDatos
-        '
-        Me.dgvDatos.AllowDrop = True
-        Me.dgvDatos.AllowUserToAddRows = False
-        Me.dgvDatos.AllowUserToDeleteRows = False
-        Me.dgvDatos.AllowUserToResizeColumns = False
-        Me.dgvDatos.AllowUserToResizeRows = False
-        Me.dgvDatos.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.dgvDatos.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.dgvDatos.Location = New System.Drawing.Point(0, 0)
-        Me.dgvDatos.Name = "dgvDatos"
-        Me.dgvDatos.ReadOnly = True
-        Me.dgvDatos.RowHeadersWidth = 51
-        Me.dgvDatos.RowTemplate.Height = 24
-        Me.dgvDatos.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgvDatos.Size = New System.Drawing.Size(1192, 367)
-        Me.dgvDatos.TabIndex = 4
-        '
-        'gbxBusquedaGlobal
-        '
-        Me.gbxBusquedaGlobal.Controls.Add(Me.txtBusquedaGlobal)
-        Me.gbxBusquedaGlobal.Dock = System.Windows.Forms.DockStyle.Top
-        Me.gbxBusquedaGlobal.Location = New System.Drawing.Point(12, 12)
-        Me.gbxBusquedaGlobal.Name = "gbxBusquedaGlobal"
-        Me.gbxBusquedaGlobal.Padding = New System.Windows.Forms.Padding(12, 12, 12, 12)
-        Me.gbxBusquedaGlobal.Size = New System.Drawing.Size(1192, 79)
-        Me.gbxBusquedaGlobal.TabIndex = 0
-        Me.gbxBusquedaGlobal.TabStop = False
-        Me.gbxBusquedaGlobal.Text = "Búsqueda Rápida en todos los campos de texto"
-        '
-        'txtBusquedaGlobal
-        '
-        Me.txtBusquedaGlobal.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.txtBusquedaGlobal.Location = New System.Drawing.Point(12, 31)
-        Me.txtBusquedaGlobal.Name = "txtBusquedaGlobal"
-        Me.txtBusquedaGlobal.Size = New System.Drawing.Size(1168, 26)
-        Me.txtBusquedaGlobal.TabIndex = 0
         '
         'pnlAcciones
         '
@@ -410,6 +336,17 @@ Partial Class frmFiltroAvanzado
         Me.pnlAcciones.Name = "pnlAcciones"
         Me.pnlAcciones.Size = New System.Drawing.Size(1189, 102)
         Me.pnlAcciones.TabIndex = 7
+        '
+        'lblConteoRegistros
+        '
+        Me.lblConteoRegistros.Anchor = System.Windows.Forms.AnchorStyles.Left
+        Me.lblConteoRegistros.AutoSize = True
+        Me.lblConteoRegistros.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblConteoRegistros.Location = New System.Drawing.Point(441, 28)
+        Me.lblConteoRegistros.Name = "lblConteoRegistros"
+        Me.lblConteoRegistros.Size = New System.Drawing.Size(106, 20)
+        Me.lblConteoRegistros.TabIndex = 23
+        Me.lblConteoRegistros.Text = "Registros: 0"
         '
         'btnExportarExcel
         '
@@ -510,16 +447,79 @@ Partial Class frmFiltroAvanzado
         Me.btnEliminarLicencia.Text = "Eliminar"
         Me.btnEliminarLicencia.UseVisualStyleBackColor = True
         '
-        'lblConteoRegistros
+        'Panel2
         '
-        Me.lblConteoRegistros.Anchor = System.Windows.Forms.AnchorStyles.Left
-        Me.lblConteoRegistros.AutoSize = True
-        Me.lblConteoRegistros.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblConteoRegistros.Location = New System.Drawing.Point(441, 28)
-        Me.lblConteoRegistros.Name = "lblConteoRegistros"
-        Me.lblConteoRegistros.Size = New System.Drawing.Size(106, 20)
-        Me.lblConteoRegistros.TabIndex = 23
-        Me.lblConteoRegistros.Text = "Registros: 0"
+        Me.Panel2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Panel2.AutoScroll = True
+        Me.Panel2.Controls.Add(Me.flpChips)
+        Me.Panel2.Location = New System.Drawing.Point(12, 602)
+        Me.Panel2.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.Panel2.Name = "Panel2"
+        Me.Panel2.Size = New System.Drawing.Size(1192, 323)
+        Me.Panel2.TabIndex = 6
+        '
+        'flpChips
+        '
+        Me.flpChips.AutoScroll = True
+        Me.flpChips.AutoSize = True
+        Me.flpChips.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+        Me.flpChips.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.flpChips.Location = New System.Drawing.Point(0, 0)
+        Me.flpChips.MaximumSize = New System.Drawing.Size(0, 385)
+        Me.flpChips.Name = "flpChips"
+        Me.flpChips.Padding = New System.Windows.Forms.Padding(6)
+        Me.flpChips.Size = New System.Drawing.Size(1192, 323)
+        Me.flpChips.TabIndex = 2
+        '
+        'Panel1
+        '
+        Me.Panel1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Panel1.Controls.Add(Me.dgvDatos)
+        Me.Panel1.Location = New System.Drawing.Point(12, 210)
+        Me.Panel1.Name = "Panel1"
+        Me.Panel1.Size = New System.Drawing.Size(1192, 367)
+        Me.Panel1.TabIndex = 5
+        '
+        'dgvDatos
+        '
+        Me.dgvDatos.AllowDrop = True
+        Me.dgvDatos.AllowUserToAddRows = False
+        Me.dgvDatos.AllowUserToDeleteRows = False
+        Me.dgvDatos.AllowUserToResizeColumns = False
+        Me.dgvDatos.AllowUserToResizeRows = False
+        Me.dgvDatos.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.dgvDatos.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.dgvDatos.Location = New System.Drawing.Point(0, 0)
+        Me.dgvDatos.Name = "dgvDatos"
+        Me.dgvDatos.ReadOnly = True
+        Me.dgvDatos.RowHeadersWidth = 51
+        Me.dgvDatos.RowTemplate.Height = 24
+        Me.dgvDatos.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
+        Me.dgvDatos.Size = New System.Drawing.Size(1192, 367)
+        Me.dgvDatos.TabIndex = 4
+        '
+        'gbxBusquedaGlobal
+        '
+        Me.gbxBusquedaGlobal.Controls.Add(Me.txtBusquedaGlobal)
+        Me.gbxBusquedaGlobal.Dock = System.Windows.Forms.DockStyle.Top
+        Me.gbxBusquedaGlobal.Location = New System.Drawing.Point(12, 12)
+        Me.gbxBusquedaGlobal.Name = "gbxBusquedaGlobal"
+        Me.gbxBusquedaGlobal.Padding = New System.Windows.Forms.Padding(12)
+        Me.gbxBusquedaGlobal.Size = New System.Drawing.Size(1192, 79)
+        Me.gbxBusquedaGlobal.TabIndex = 0
+        Me.gbxBusquedaGlobal.TabStop = False
+        Me.gbxBusquedaGlobal.Text = "Búsqueda Rápida en todos los campos de texto"
+        '
+        'txtBusquedaGlobal
+        '
+        Me.txtBusquedaGlobal.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.txtBusquedaGlobal.Location = New System.Drawing.Point(12, 31)
+        Me.txtBusquedaGlobal.Name = "txtBusquedaGlobal"
+        Me.txtBusquedaGlobal.Size = New System.Drawing.Size(1168, 26)
+        Me.txtBusquedaGlobal.TabIndex = 0
         '
         'frmFiltroAvanzado
         '
@@ -544,14 +544,14 @@ Partial Class frmFiltroAvanzado
         Me.TableLayoutPanel2.ResumeLayout(False)
         Me.TableLayoutPanel2.PerformLayout()
         Me.pnlDerecho.ResumeLayout(False)
+        Me.pnlAcciones.ResumeLayout(False)
+        Me.pnlAcciones.PerformLayout()
         Me.Panel2.ResumeLayout(False)
         Me.Panel2.PerformLayout()
         Me.Panel1.ResumeLayout(False)
         CType(Me.dgvDatos, System.ComponentModel.ISupportInitialize).EndInit()
         Me.gbxBusquedaGlobal.ResumeLayout(False)
         Me.gbxBusquedaGlobal.PerformLayout()
-        Me.pnlAcciones.ResumeLayout(False)
-        Me.pnlAcciones.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub

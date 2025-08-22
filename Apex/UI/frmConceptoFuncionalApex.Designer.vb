@@ -178,6 +178,8 @@ Partial Class frmConceptoFuncionalApex
         '
         Me.dgvLicenciasMedicas.AllowUserToAddRows = False
         Me.dgvLicenciasMedicas.AllowUserToDeleteRows = False
+        Me.dgvLicenciasMedicas.AllowUserToResizeColumns = False
+        Me.dgvLicenciasMedicas.AllowUserToResizeRows = False
         Me.dgvLicenciasMedicas.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvLicenciasMedicas.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgvLicenciasMedicas.Location = New System.Drawing.Point(4, 5)
@@ -204,6 +206,8 @@ Partial Class frmConceptoFuncionalApex
         '
         Me.dgvSanciones.AllowUserToAddRows = False
         Me.dgvSanciones.AllowUserToDeleteRows = False
+        Me.dgvSanciones.AllowUserToResizeColumns = False
+        Me.dgvSanciones.AllowUserToResizeRows = False
         Me.dgvSanciones.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvSanciones.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgvSanciones.Location = New System.Drawing.Point(4, 5)
@@ -229,6 +233,8 @@ Partial Class frmConceptoFuncionalApex
         '
         Me.dgvObservaciones.AllowUserToAddRows = False
         Me.dgvObservaciones.AllowUserToDeleteRows = False
+        Me.dgvObservaciones.AllowUserToResizeColumns = False
+        Me.dgvObservaciones.AllowUserToResizeRows = False
         Me.dgvObservaciones.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvObservaciones.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgvObservaciones.Location = New System.Drawing.Point(0, 0)

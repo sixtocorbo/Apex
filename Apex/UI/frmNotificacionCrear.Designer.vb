@@ -87,9 +87,9 @@ Partial Class frmNotificacionCrear
         '
         Me.lblFuncionario.Anchor = System.Windows.Forms.AnchorStyles.Right
         Me.lblFuncionario.AutoSize = True
-        Me.lblFuncionario.Location = New System.Drawing.Point(26, 5)
+        Me.lblFuncionario.Location = New System.Drawing.Point(28, 2)
         Me.lblFuncionario.Name = "lblFuncionario"
-        Me.lblFuncionario.Size = New System.Drawing.Size(89, 20)
+        Me.lblFuncionario.Size = New System.Drawing.Size(108, 25)
         Me.lblFuncionario.TabIndex = 0
         Me.lblFuncionario.Text = "Funcionario:"
         '
@@ -97,18 +97,18 @@ Partial Class frmNotificacionCrear
         '
         Me.cboFuncionario.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboFuncionario.FormattingEnabled = True
-        Me.cboFuncionario.Location = New System.Drawing.Point(121, 3)
+        Me.cboFuncionario.Location = New System.Drawing.Point(142, 3)
         Me.cboFuncionario.Name = "cboFuncionario"
-        Me.cboFuncionario.Size = New System.Drawing.Size(340, 28)
+        Me.cboFuncionario.Size = New System.Drawing.Size(319, 33)
         Me.cboFuncionario.TabIndex = 1
         '
         'lblTipo
         '
         Me.lblTipo.Anchor = System.Windows.Forms.AnchorStyles.Right
         Me.lblTipo.AutoSize = True
-        Me.lblTipo.Location = New System.Drawing.Point(73, 35)
+        Me.lblTipo.Location = New System.Drawing.Point(85, 32)
         Me.lblTipo.Name = "lblTipo"
-        Me.lblTipo.Size = New System.Drawing.Size(42, 20)
+        Me.lblTipo.Size = New System.Drawing.Size(51, 25)
         Me.lblTipo.TabIndex = 2
         Me.lblTipo.Text = "Tipo:"
         '
@@ -117,18 +117,18 @@ Partial Class frmNotificacionCrear
         Me.cboTipoNotificacion.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboTipoNotificacion.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboTipoNotificacion.FormattingEnabled = True
-        Me.cboTipoNotificacion.Location = New System.Drawing.Point(121, 33)
+        Me.cboTipoNotificacion.Location = New System.Drawing.Point(142, 33)
         Me.cboTipoNotificacion.Name = "cboTipoNotificacion"
-        Me.cboTipoNotificacion.Size = New System.Drawing.Size(340, 28)
+        Me.cboTipoNotificacion.Size = New System.Drawing.Size(319, 33)
         Me.cboTipoNotificacion.TabIndex = 3
         '
         'lblFecha
         '
         Me.lblFecha.Anchor = System.Windows.Forms.AnchorStyles.Right
         Me.lblFecha.AutoSize = True
-        Me.lblFecha.Location = New System.Drawing.Point(27, 65)
+        Me.lblFecha.Location = New System.Drawing.Point(28, 62)
         Me.lblFecha.Name = "lblFecha"
-        Me.lblFecha.Size = New System.Drawing.Size(88, 20)
+        Me.lblFecha.Size = New System.Drawing.Size(108, 25)
         Me.lblFecha.TabIndex = 4
         Me.lblFecha.Text = "Fecha Prog.:"
         '
@@ -136,101 +136,101 @@ Partial Class frmNotificacionCrear
         '
         Me.dtpFechaProgramada.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.dtpFechaProgramada.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.dtpFechaProgramada.Location = New System.Drawing.Point(121, 63)
+        Me.dtpFechaProgramada.Location = New System.Drawing.Point(142, 63)
         Me.dtpFechaProgramada.Name = "dtpFechaProgramada"
-        Me.dtpFechaProgramada.Size = New System.Drawing.Size(120, 27)
+        Me.dtpFechaProgramada.Size = New System.Drawing.Size(120, 31)
         Me.dtpFechaProgramada.TabIndex = 5
         '
         'lblMedio
         '
         Me.lblMedio.Anchor = System.Windows.Forms.AnchorStyles.Right
         Me.lblMedio.AutoSize = True
-        Me.lblMedio.Location = New System.Drawing.Point(67, 120)
+        Me.lblMedio.Location = New System.Drawing.Point(79, 117)
         Me.lblMedio.Name = "lblMedio"
-        Me.lblMedio.Size = New System.Drawing.Size(48, 20)
+        Me.lblMedio.Size = New System.Drawing.Size(57, 25)
         Me.lblMedio.TabIndex = 6
         Me.lblMedio.Text = "Texto:"
         '
         'txtMedio
         '
         Me.txtMedio.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.txtMedio.Location = New System.Drawing.Point(121, 93)
+        Me.txtMedio.Location = New System.Drawing.Point(142, 93)
         Me.txtMedio.Multiline = True
         Me.txtMedio.Name = "txtMedio"
         Me.txtMedio.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.txtMedio.Size = New System.Drawing.Size(340, 74)
+        Me.txtMedio.Size = New System.Drawing.Size(319, 74)
         Me.txtMedio.TabIndex = 7
         '
         'lblDocumento
         '
         Me.lblDocumento.Anchor = System.Windows.Forms.AnchorStyles.Right
         Me.lblDocumento.AutoSize = True
-        Me.lblDocumento.Location = New System.Drawing.Point(25, 175)
+        Me.lblDocumento.Location = New System.Drawing.Point(26, 172)
         Me.lblDocumento.Name = "lblDocumento"
-        Me.lblDocumento.Size = New System.Drawing.Size(90, 20)
+        Me.lblDocumento.Size = New System.Drawing.Size(110, 25)
         Me.lblDocumento.TabIndex = 8
         Me.lblDocumento.Text = "Documento:"
         '
         'txtDocumento
         '
         Me.txtDocumento.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtDocumento.Location = New System.Drawing.Point(121, 173)
+        Me.txtDocumento.Location = New System.Drawing.Point(142, 173)
         Me.txtDocumento.Name = "txtDocumento"
-        Me.txtDocumento.Size = New System.Drawing.Size(340, 27)
+        Me.txtDocumento.Size = New System.Drawing.Size(319, 31)
         Me.txtDocumento.TabIndex = 9
         '
         'lblExpMinisterial
         '
         Me.lblExpMinisterial.Anchor = System.Windows.Forms.AnchorStyles.Right
         Me.lblExpMinisterial.AutoSize = True
-        Me.lblExpMinisterial.Location = New System.Drawing.Point(3, 205)
+        Me.lblExpMinisterial.Location = New System.Drawing.Point(3, 202)
         Me.lblExpMinisterial.Name = "lblExpMinisterial"
-        Me.lblExpMinisterial.Size = New System.Drawing.Size(112, 20)
+        Me.lblExpMinisterial.Size = New System.Drawing.Size(133, 25)
         Me.lblExpMinisterial.TabIndex = 10
         Me.lblExpMinisterial.Text = "Exp. Ministerial:"
         '
         'txtExpMinisterial
         '
         Me.txtExpMinisterial.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtExpMinisterial.Location = New System.Drawing.Point(121, 203)
+        Me.txtExpMinisterial.Location = New System.Drawing.Point(142, 203)
         Me.txtExpMinisterial.Name = "txtExpMinisterial"
-        Me.txtExpMinisterial.Size = New System.Drawing.Size(340, 27)
+        Me.txtExpMinisterial.Size = New System.Drawing.Size(319, 31)
         Me.txtExpMinisterial.TabIndex = 11
         '
         'lblExpINR
         '
         Me.lblExpINR.Anchor = System.Windows.Forms.AnchorStyles.Right
         Me.lblExpINR.AutoSize = True
-        Me.lblExpINR.Location = New System.Drawing.Point(48, 235)
+        Me.lblExpINR.Location = New System.Drawing.Point(54, 232)
         Me.lblExpINR.Name = "lblExpINR"
-        Me.lblExpINR.Size = New System.Drawing.Size(67, 20)
+        Me.lblExpINR.Size = New System.Drawing.Size(82, 25)
         Me.lblExpINR.TabIndex = 12
         Me.lblExpINR.Text = "Exp. INR:"
         '
         'txtExpINR
         '
         Me.txtExpINR.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtExpINR.Location = New System.Drawing.Point(121, 233)
+        Me.txtExpINR.Location = New System.Drawing.Point(142, 233)
         Me.txtExpINR.Name = "txtExpINR"
-        Me.txtExpINR.Size = New System.Drawing.Size(340, 27)
+        Me.txtExpINR.Size = New System.Drawing.Size(319, 31)
         Me.txtExpINR.TabIndex = 13
         '
         'lblOficina
         '
         Me.lblOficina.Anchor = System.Windows.Forms.AnchorStyles.Right
         Me.lblOficina.AutoSize = True
-        Me.lblOficina.Location = New System.Drawing.Point(56, 265)
+        Me.lblOficina.Location = New System.Drawing.Point(65, 262)
         Me.lblOficina.Name = "lblOficina"
-        Me.lblOficina.Size = New System.Drawing.Size(59, 20)
+        Me.lblOficina.Size = New System.Drawing.Size(71, 25)
         Me.lblOficina.TabIndex = 14
         Me.lblOficina.Text = "Oficina:"
         '
         'txtOficina
         '
         Me.txtOficina.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtOficina.Location = New System.Drawing.Point(121, 263)
+        Me.txtOficina.Location = New System.Drawing.Point(142, 263)
         Me.txtOficina.Name = "txtOficina"
-        Me.txtOficina.Size = New System.Drawing.Size(340, 27)
+        Me.txtOficina.Size = New System.Drawing.Size(319, 31)
         Me.txtOficina.TabIndex = 15
         '
         'FlowLayoutPanel1
@@ -266,7 +266,7 @@ Partial Class frmNotificacionCrear
         'frmNotificacionCrear
         '
         Me.AcceptButton = Me.btnGuardar
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 20.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 25.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnCancelar
         Me.ClientSize = New System.Drawing.Size(484, 402)

@@ -54,7 +54,7 @@ Partial Class frmNotificaciones
         '
         Me.btnBuscar.Location = New System.Drawing.Point(338, 18)
         Me.btnBuscar.Name = "btnBuscar"
-        Me.btnBuscar.Size = New System.Drawing.Size(85, 25)
+        Me.btnBuscar.Size = New System.Drawing.Size(119, 33)
         Me.btnBuscar.TabIndex = 2
         Me.btnBuscar.Text = "Buscar"
         Me.btnBuscar.UseVisualStyleBackColor = True
@@ -63,7 +63,7 @@ Partial Class frmNotificaciones
         '
         Me.txtBusquedaFuncionario.Location = New System.Drawing.Point(107, 20)
         Me.txtBusquedaFuncionario.Name = "txtBusquedaFuncionario"
-        Me.txtBusquedaFuncionario.Size = New System.Drawing.Size(225, 27)
+        Me.txtBusquedaFuncionario.Size = New System.Drawing.Size(225, 31)
         Me.txtBusquedaFuncionario.TabIndex = 1
         '
         'lblFuncionario
@@ -71,7 +71,7 @@ Partial Class frmNotificaciones
         Me.lblFuncionario.AutoSize = True
         Me.lblFuncionario.Location = New System.Drawing.Point(12, 23)
         Me.lblFuncionario.Name = "lblFuncionario"
-        Me.lblFuncionario.Size = New System.Drawing.Size(89, 20)
+        Me.lblFuncionario.Size = New System.Drawing.Size(108, 25)
         Me.lblFuncionario.TabIndex = 0
         Me.lblFuncionario.Text = "Funcionario:"
         '
@@ -177,7 +177,7 @@ Partial Class frmNotificaciones
         '
         'frmNotificaciones
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 20.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 25.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(984, 562)
         Me.Controls.Add(Me.splitContenedor)

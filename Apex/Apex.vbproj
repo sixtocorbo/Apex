@@ -587,6 +587,9 @@
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmFuncionarioSituacion.resx">
+      <DependentUpon>frmFuncionarioSituacion.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\frmGestion.resx">
       <DependentUpon>frmGestion.vb</DependentUpon>
     </EmbeddedResource>
