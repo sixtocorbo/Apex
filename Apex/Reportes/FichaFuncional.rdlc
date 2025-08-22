@@ -69,6 +69,55 @@
 					<DataField>Foto</DataField>
 					<rd:TypeName>System.Byte[]</rd:TypeName>
 				</Field>
+				<!-- Newly added fields -->
+				<Field Name="Sexo">
+					<DataField>Sexo</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="Telefono">
+					<DataField>Telefono</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="Correo">
+					<DataField>Correo</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="Ciudad">
+					<DataField>Ciudad</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="Domicilio">
+					<DataField>Domicilio</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="Seccional">
+					<DataField>Seccional</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="EstadoCivil">
+					<DataField>EstadoCivil</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="Estudia">
+					<DataField>Estudia</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="NivelEstudios">
+					<DataField>NivelEstudios</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="Credencial">
+					<DataField>Credencial</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="DatosLaborales">
+					<DataField>DatosLaborales</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="SituacionGeneral">
+					<DataField>SituacionGeneral</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
 			</Fields>
 		</DataSet>
 		<DataSet Name="LicenciasDataSet">
@@ -395,6 +444,317 @@
 							</Border>
 						</Style>
 					</Rectangle>
+
+					<!-- New rectangle with the added personal/laboral/general fields -->
+					<Rectangle Name="InfoRectangle">
+						<ReportItems>
+							<!-- Left column -->
+							<Textbox Name="Sexo">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>="Sexo: " &amp; First(Fields!Sexo.Value, "FichaFuncionalDataSet")</Value>
+												<Style />
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<Top>0.05in</Top>
+								<Left>0.1in</Left>
+								<Height>0.22in</Height>
+								<Width>3.6in</Width>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+								</Style>
+							</Textbox>
+							<Textbox Name="Telefono">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>="Teléfono: " &amp; First(Fields!Telefono.Value, "FichaFuncionalDataSet")</Value>
+												<Style />
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<Top>0.32in</Top>
+								<Left>0.1in</Left>
+								<Height>0.22in</Height>
+								<Width>3.6in</Width>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+								</Style>
+							</Textbox>
+							<Textbox Name="Correo">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>="Correo: " &amp; First(Fields!Correo.Value, "FichaFuncionalDataSet")</Value>
+												<Style />
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<Top>0.59in</Top>
+								<Left>0.1in</Left>
+								<Height>0.22in</Height>
+								<Width>3.6in</Width>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+								</Style>
+							</Textbox>
+							<Textbox Name="Ciudad">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>="Ciudad: " &amp; First(Fields!Ciudad.Value, "FichaFuncionalDataSet")</Value>
+												<Style />
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<Top>0.86in</Top>
+								<Left>0.1in</Left>
+								<Height>0.22in</Height>
+								<Width>3.6in</Width>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+								</Style>
+							</Textbox>
+							<Textbox Name="Domicilio">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>="Domicilio: " &amp; First(Fields!Domicilio.Value, "FichaFuncionalDataSet")</Value>
+												<Style />
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<Top>1.13in</Top>
+								<Left>0.1in</Left>
+								<Height>0.22in</Height>
+								<Width>3.6in</Width>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+								</Style>
+							</Textbox>
+
+							<!-- Right column -->
+							<Textbox Name="Seccional">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>="Seccional: " &amp; First(Fields!Seccional.Value, "FichaFuncionalDataSet")</Value>
+												<Style />
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<Top>0.05in</Top>
+								<Left>3.9in</Left>
+								<Height>0.22in</Height>
+								<Width>3.5in</Width>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+								</Style>
+							</Textbox>
+							<Textbox Name="EstadoCivil">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>="Estado civil: " &amp; First(Fields!EstadoCivil.Value, "FichaFuncionalDataSet")</Value>
+												<Style />
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<Top>0.32in</Top>
+								<Left>3.9in</Left>
+								<Height>0.22in</Height>
+								<Width>3.5in</Width>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+								</Style>
+							</Textbox>
+							<Textbox Name="Estudia">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>="Estudia: " &amp; First(Fields!Estudia.Value, "FichaFuncionalDataSet")</Value>
+												<Style />
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<Top>0.59in</Top>
+								<Left>3.9in</Left>
+								<Height>0.22in</Height>
+								<Width>3.5in</Width>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+								</Style>
+							</Textbox>
+							<Textbox Name="NivelEstudios">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>="Nivel de estudios: " &amp; First(Fields!NivelEstudios.Value, "FichaFuncionalDataSet")</Value>
+												<Style />
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<Top>0.86in</Top>
+								<Left>3.9in</Left>
+								<Height>0.22in</Height>
+								<Width>3.5in</Width>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+								</Style>
+							</Textbox>
+							<Textbox Name="Credencial">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>="Credencial: " &amp; First(Fields!Credencial.Value, "FichaFuncionalDataSet")</Value>
+												<Style />
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<Top>1.13in</Top>
+								<Left>3.9in</Left>
+								<Height>0.22in</Height>
+								<Width>3.5in</Width>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+								</Style>
+							</Textbox>
+
+							<!-- Full width lines -->
+							<Textbox Name="DatosLaborales">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>="Datos laborales: " &amp; First(Fields!DatosLaborales.Value, "FichaFuncionalDataSet")</Value>
+												<Style />
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<Top>1.45in</Top>
+								<Left>0.1in</Left>
+								<Height>0.25in</Height>
+								<Width>7.3in</Width>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+								</Style>
+							</Textbox>
+							<Textbox Name="SituacionGeneral">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>="Situación general: " &amp; First(Fields!SituacionGeneral.Value, "FichaFuncionalDataSet")</Value>
+												<Style />
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<Top>1.75in</Top>
+								<Left>0.1in</Left>
+								<Height>0.25in</Height>
+								<Width>7.3in</Width>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+								</Style>
+							</Textbox>
+
+						</ReportItems>
+						<Top>2.0in</Top>
+						<Left>0in</Left>
+						<Height>2.1in</Height>
+						<Width>7.5in</Width>
+						<ZIndex>2</ZIndex>
+						<Style>
+							<Border>
+								<Style>Solid</Style>
+							</Border>
+						</Style>
+					</Rectangle>
+
 					<Textbox Name="LicenciasTitle">
 						<CanGrow>true</CanGrow>
 						<KeepTogether>true</KeepTogether>
@@ -412,10 +772,10 @@
 								<Style />
 							</Paragraph>
 						</Paragraphs>
-						<Top>2in</Top>
+						<Top>4.25in</Top>
 						<Height>0.25in</Height>
 						<Width>7.5in</Width>
-						<ZIndex>2</ZIndex>
+						<ZIndex>3</ZIndex>
 						<Style>
 							<Border>
 								<Style>None</Style>
@@ -426,6 +786,7 @@
 							<PaddingBottom>2pt</PaddingBottom>
 						</Style>
 					</Textbox>
+
 					<Tablix Name="TablixLicencias">
 						<TablixBody>
 							<TablixColumns>
@@ -887,21 +1248,21 @@
 								</TablixMember>
 								<TablixMember>
 									<Group Name="DetailsLicencias" />
-
 								</TablixMember>
 							</TablixMembers>
 						</TablixRowHierarchy>
 						<DataSetName>LicenciasDataSet</DataSetName>
-						<Top>2.3in</Top>
+						<Top>4.55in</Top>
 						<Height>0.5in</Height>
 						<Width>7.5in</Width>
-						<ZIndex>3</ZIndex>
+						<ZIndex>4</ZIndex>
 						<Style>
 							<Border>
 								<Style>None</Style>
 							</Border>
 						</Style>
 					</Tablix>
+
 					<Textbox Name="SancionesTitle">
 						<CanGrow>true</CanGrow>
 						<KeepTogether>true</KeepTogether>
@@ -919,10 +1280,10 @@
 								<Style />
 							</Paragraph>
 						</Paragraphs>
-						<Top>3in</Top>
+						<Top>5.35in</Top>
 						<Height>0.25in</Height>
 						<Width>7.5in</Width>
-						<ZIndex>4</ZIndex>
+						<ZIndex>5</ZIndex>
 						<Style>
 							<Border>
 								<Style>None</Style>
@@ -933,6 +1294,7 @@
 							<PaddingBottom>2pt</PaddingBottom>
 						</Style>
 					</Textbox>
+
 					<Tablix Name="TablixSanciones">
 						<TablixBody>
 							<TablixColumns>
@@ -1221,15 +1583,14 @@
 								</TablixMember>
 								<TablixMember>
 									<Group Name="DetailsSanciones" />
-
 								</TablixMember>
 							</TablixMembers>
 						</TablixRowHierarchy>
 						<DataSetName>SancionesDataSet</DataSetName>
-						<Top>3.3in</Top>
+						<Top>5.65in</Top>
 						<Height>0.5in</Height>
 						<Width>7.5in</Width>
-						<ZIndex>5</ZIndex>
+						<ZIndex>6</ZIndex>
 						<Style>
 							<Border>
 								<Style>None</Style>
@@ -1237,7 +1598,7 @@
 						</Style>
 					</Tablix>
 				</ReportItems>
-				<Height>4.5in</Height>
+				<Height>6.5in</Height>
 				<Style />
 			</Body>
 			<Width>7.5in</Width>

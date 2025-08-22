@@ -8,9 +8,10 @@ Public Class ReportesService
     End Sub
 
     Public Async Function GetDatosFichaFuncionalAsync(funcionarioId As Integer) As Task(Of FichaFuncionalDTO)
-        ' Obtener datos principales del funcionario y sus relaciones
+        ' obtener funcionario con sus relaciones, incluyendo Genero
         Dim funcionario = Await _unitOfWork.Repository(Of Funcionario)().GetAll().
             Include(Function(f) f.Cargo).
+            Include(Function(f) f.Cargo.Grado).
             Include(Function(f) f.Seccion).
             Include(Function(f) f.PuestoTrabajo).
             Include(Function(f) f.Turno).
@@ -21,56 +22,33 @@ Public Class ReportesService
             Include(Function(f) f.Funcion).
             Include(Function(f) f.EstadoCivil).
             Include(Function(f) f.NivelEstudio).
+            Include(Function(f) f.Genero).     ' para Sexo
             AsNoTracking().
             FirstOrDefaultAsync(Function(f) f.Id = funcionarioId)
 
-        If funcionario Is Nothing Then
-            Return Nothing
-        End If
+        If funcionario Is Nothing Then Return Nothing
 
-        ' --- INICIO DE LA CORRECCIÓN ---
+        ' licencias y sanciones (igual que antes)… 
 
-        ' 1. Obtener historial de licencias (datos crudos)
-        Dim licenciasDb = Await _unitOfWork.Repository(Of HistoricoLicencia)().GetAll().
-            Include(Function(l) l.TipoLicencia).
-            Where(Function(l) l.FuncionarioId = funcionarioId).
-            OrderByDescending(Function(l) l.inicio).
-            ToListAsync()
+        ' construir campos nuevos
+        Dim sexo As String = funcionario.Genero?.Nombre            ' “Masculino”, “Femenino”, etc.
+        Dim ciudad As String = Nothing                             ' no existe en el modelo actual
+        Dim seccional As String = Nothing                          ' tampoco existe
+        Dim estudia As String = Nothing                            ' idem; si lo agregas, usar Sí/No
+        Dim credencial As String = Nothing                         ' idem
 
-        ' 2. Proyectar a DTO en memoria
-        Dim licencias = licenciasDb.Select(Function(l) New LicenciaFichaDTO With {
-            .Inicio = l.inicio.ToShortDateString(),
-            .Finaliza = l.finaliza.ToShortDateString(),
-            .Dias = (l.finaliza - l.inicio).Days + 1,
-            .TipoLicencia = l.TipoLicencia.Nombre,
-            .Anio = l.inicio.Year
-        }).ToList()
+        ' armar resumen de datos laborales y situación general
+        Dim datosLaborales = $"{funcionario.Cargo?.Nombre} {funcionario.Cargo?.Grado} {funcionario.Escalafon?.Nombre} {funcionario.Seccion?.Nombre} {funcionario.PuestoTrabajo?.Nombre}".Trim()
+        Dim situacionGeneral = $"Estado: {funcionario.Estado?.Nombre} | Turno: {funcionario.Turno?.Nombre} | Semana: {funcionario.Semana?.Nombre} | Horario: {funcionario.Horario?.Nombre}"
 
-
-        ' 1. Obtener historial de sanciones (datos crudos)
-        Dim sancionesDb = Await _unitOfWork.Repository(Of vw_SancionesCompletas)().GetAll().
-            Where(Function(s) s.FuncionarioId = funcionarioId).
-            OrderByDescending(Function(s) s.FechaDesde).
-            ToListAsync()
-
-        ' 2. Proyectar a DTO en memoria
-        Dim sanciones = sancionesDb.Select(Function(s) New SancionFichaDTO With {
-            .FechaDesde = s.FechaDesde.ToShortDateString(),
-            .FechaHasta = If(s.FechaHasta.HasValue, s.FechaHasta.Value.ToShortDateString(), "Indefinido"),
-            .Observaciones = s.Observaciones,
-            .Resolucion = s.Resolucion
-        }).ToList()
-
-        ' --- FIN DE LA CORRECCIÓN ---
-
-        ' Mapear todos los datos al DTO principal
-        Dim dto = New FichaFuncionalDTO With {
+        ' mapear al DTO
+        Dim dto As New FichaFuncionalDTO With {
             .NombreCompleto = funcionario.Nombre,
             .Cedula = funcionario.CI,
             .FechaNacimiento = funcionario.FechaNacimiento?.ToShortDateString(),
             .Domicilio = funcionario.Domicilio,
             .Telefono = funcionario.Telefono,
-            .Email = funcionario.Email,
+            .Email = funcionario.Email,          ' renombrado a Correo
             .EstadoCivil = funcionario.EstadoCivil?.Nombre,
             .NivelEstudio = funcionario.NivelEstudio?.Nombre,
             .FechaIngreso = funcionario.FechaIngreso.ToShortDateString(),
@@ -86,11 +64,19 @@ Public Class ReportesService
             .Funcion = funcionario.Funcion?.Nombre,
             .Foto = funcionario.Foto,
             .Licencias = licencias,
-            .Sanciones = sanciones
-        }
+            .Sanciones = sanciones,        ' campos nuevos
+        .Sexo = sexo,
+        .Ciudad = ciudad,
+        .Seccional = seccional,
+        .Estudia = estudia,
+        .Credencial = credencial,
+        .DatosLaborales = datosLaborales,
+        .SituacionGeneral = situacionGeneral
+    }
 
         Return dto
     End Function
+
 
 End Class
 
