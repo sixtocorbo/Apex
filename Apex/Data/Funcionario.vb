@@ -40,6 +40,7 @@ Partial Public Class Funcionario
     Public Property Procesado As Boolean
     Public Property SeparadoDeCargo As Boolean
     Public Property Desarmado As Boolean
+    Public Property Ciudad As String
 
     Public Overridable Property Cargo As Cargo
     Public Overridable Property Escalafon As Escalafon

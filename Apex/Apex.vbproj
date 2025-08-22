@@ -378,6 +378,9 @@
     <Compile Include="Data\vw_FuncionarioEstadosConsolidados.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
+    <Compile Include="Data\vw_FuncionarioSituacionActual.vb">
+      <DependentUpon>Model1.tt</DependentUpon>
+    </Compile>
     <Compile Include="Data\vw_LicenciasCompletas.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>

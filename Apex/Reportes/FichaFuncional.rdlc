@@ -1,780 +1,1313 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
-  <AutoRefresh>0</AutoRefresh>
-  <DataSources>
-    <DataSource Name="DummyDataSource">
-      <ConnectionProperties>
-        <DataProvider>SQL</DataProvider>
-        <ConnectString />
-      </ConnectionProperties>
-      <rd:DataSourceID>b934c1a5-83c9-4623-a212-96f7c81a243a</rd:DataSourceID>
-    </DataSource>
-  </DataSources>
-  <DataSets>
-    <DataSet Name="FichaFuncionalDataSet">
-      <Query>
-        <DataSourceName>DummyDataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="NombreCompleto">
-          <DataField>NombreCompleto</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Cedula">
-          <DataField>Cedula</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Grado">
-          <DataField>Grado</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="FechaIngreso">
-          <DataField>FechaIngreso</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Estado">
-          <DataField>Estado</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Escalafon">
-          <DataField>Escalafon</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Funcion">
-          <DataField>Funcion</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Seccion">
-          <DataField>Seccion</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="PuestoTrabajo">
-          <DataField>PuestoTrabajo</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Turno">
-          <DataField>Turno</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Semana">
-          <DataField>Semana</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Horario">
-          <DataField>Horario</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Foto">
-          <DataField>Foto</DataField>
-          <rd:TypeName>System.Byte[]</rd:TypeName>
-        </Field>
-        <Field Name="Sexo">
-          <DataField>Sexo</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Telefono">
-          <DataField>Telefono</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Correo">
-          <DataField>Correo</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Ciudad">
-          <DataField>Ciudad</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Domicilio">
-          <DataField>Domicilio</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Seccional">
-          <DataField>Seccional</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="EstadoCivil">
-          <DataField>EstadoCivil</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Estudia">
-          <DataField>Estudia</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="NivelEstudios">
-          <DataField>NivelEstudios</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Credencial">
-          <DataField>Credencial</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="DatosLaborales">
-          <DataField>DatosLaborales</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="SituacionGeneral">
-          <DataField>SituacionGeneral</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-      </Fields>
-    </DataSet>
-    <DataSet Name="LicenciasDataSet">
-      <Query>
-        <DataSourceName>DummyDataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="Inicio">
-          <DataField>Inicio</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Finaliza">
-          <DataField>Finaliza</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Dias">
-          <DataField>Dias</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="TipoLicencia">
-          <DataField>TipoLicencia</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Anio">
-          <DataField>Anio</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-      </Fields>
-    </DataSet>
-    <DataSet Name="SancionesDataSet">
-      <Query>
-        <DataSourceName>DummyDataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="FechaDesde">
-          <DataField>FechaDesde</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="FechaHasta">
-          <DataField>FechaHasta</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Observaciones">
-          <DataField>Observaciones</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Resolucion">
-          <DataField>Resolucion</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
-  <ReportSections>
-    <ReportSection>
-      <Body>
-        <ReportItems>
-          <Textbox Name="ReportTitle">
-            <CanGrow>true</CanGrow>
-            <KeepTogether>true</KeepTogether>
-            <Paragraphs>
-              <Paragraph>
-                <TextRuns>
-                  <TextRun>
-                    <Value>Ficha Funcional</Value>
-                    <Style>
-                      <FontSize>18pt</FontSize>
-                      <FontWeight>Bold</FontWeight>
-                    </Style>
-                  </TextRun>
-                </TextRuns>
-                <Style>
-                  <TextAlign>Center</TextAlign>
-                </Style>
-              </Paragraph>
-            </Paragraphs>
-            <rd:DefaultName>ReportTitle</rd:DefaultName>
-            <Height>0.4in</Height>
-            <Width>6.05556in</Width>
-            <Style>
-              <Border>
-                <Style>None</Style>
-              </Border>
-              <PaddingLeft>2pt</PaddingLeft>
-              <PaddingRight>2pt</PaddingRight>
-              <PaddingTop>2pt</PaddingTop>
-              <PaddingBottom>2pt</PaddingBottom>
-            </Style>
-          </Textbox>
-          <Rectangle Name="HeaderRectangle">
-            <ReportItems>
-              <Image Name="FotoFuncionario">
-                <Source>Database</Source>
-                <Value>=First(Fields!Foto.Value, "FichaFuncionalDataSet")</Value>
-                <MIMEType>image/jpeg</MIMEType>
-                <Sizing>FitProportional</Sizing>
-                <Top>0.1in</Top>
-                <Left>0.1in</Left>
-                <Height>1.2in</Height>
-                <Width>1.2in</Width>
-                <Style>
-                  <Border>
-                    <Style>Solid</Style>
-                  </Border>
-                </Style>
-              </Image>
-              <Textbox Name="NombreCompleto">
-                <CanGrow>true</CanGrow>
-                <KeepTogether>true</KeepTogether>
-                <Paragraphs>
-                  <Paragraph>
-                    <TextRuns>
-                      <TextRun>
-                        <Value>=First(Fields!NombreCompleto.Value, "FichaFuncionalDataSet")</Value>
-                        <Style>
-                          <FontSize>14pt</FontSize>
-                          <FontWeight>Bold</FontWeight>
-                        </Style>
-                      </TextRun>
-                    </TextRuns>
-                    <Style />
-                  </Paragraph>
-                </Paragraphs>
-                <Top>0.1in</Top>
-                <Left>1.4in</Left>
-                <Height>0.3in</Height>
-                <Width>4in</Width>
-                <ZIndex>1</ZIndex>
-                <Style>
-                  <Border>
-                    <Style>None</Style>
-                  </Border>
-                  <PaddingLeft>2pt</PaddingLeft>
-                  <PaddingRight>2pt</PaddingRight>
-                  <PaddingTop>2pt</PaddingTop>
-                  <PaddingBottom>2pt</PaddingBottom>
-                </Style>
-              </Textbox>
-              <Textbox Name="Cedula">
-                <CanGrow>true</CanGrow>
-                <KeepTogether>true</KeepTogether>
-                <Paragraphs>
-                  <Paragraph>
-                    <TextRuns>
-                      <TextRun>
-                        <Value>="CI: " &amp; First(Fields!Cedula.Value, "FichaFuncionalDataSet")</Value>
-                        <Style />
-                      </TextRun>
-                    </TextRuns>
-                    <Style />
-                  </Paragraph>
-                </Paragraphs>
-                <Top>0.45in</Top>
-                <Left>1.4in</Left>
-                <Height>0.25in</Height>
-                <Width>2.27778in</Width>
-                <ZIndex>2</ZIndex>
-                <Style>
-                  <Border>
-                    <Style>None</Style>
-                  </Border>
-                  <PaddingLeft>2pt</PaddingLeft>
-                  <PaddingRight>2pt</PaddingRight>
-                  <PaddingTop>2pt</PaddingTop>
-                  <PaddingBottom>2pt</PaddingBottom>
-                </Style>
-              </Textbox>
-              <Textbox Name="Grado">
-                <CanGrow>true</CanGrow>
-                <KeepTogether>true</KeepTogether>
-                <Paragraphs>
-                  <Paragraph>
-                    <TextRuns>
-                      <TextRun>
-                        <Value>="Grado: " &amp; First(Fields!Grado.Value, "FichaFuncionalDataSet")</Value>
-                        <Style />
-                      </TextRun>
-                    </TextRuns>
-                    <Style />
-                  </Paragraph>
-                </Paragraphs>
-                <Top>0.7in</Top>
-                <Left>1.4in</Left>
-                <Height>0.25in</Height>
-                <Width>2.27778in</Width>
-                <ZIndex>3</ZIndex>
-                <Style>
-                  <Border>
-                    <Style>None</Style>
-                  </Border>
-                  <PaddingLeft>2pt</PaddingLeft>
-                  <PaddingRight>2pt</PaddingRight>
-                  <PaddingTop>2pt</PaddingTop>
-                  <PaddingBottom>2pt</PaddingBottom>
-                </Style>
-              </Textbox>
-              <Textbox Name="FechaIngreso">
-                <CanGrow>true</CanGrow>
-                <KeepTogether>true</KeepTogether>
-                <Paragraphs>
-                  <Paragraph>
-                    <TextRuns>
-                      <TextRun>
-                        <Value>="Fecha Ingreso: " &amp; First(Fields!FechaIngreso.Value, "FichaFuncionalDataSet")</Value>
-                        <Style />
-                      </TextRun>
-                    </TextRuns>
-                    <Style />
-                  </Paragraph>
-                </Paragraphs>
-                <Top>0.95in</Top>
-                <Left>1.4in</Left>
-                <Height>0.25in</Height>
-                <Width>2.27778in</Width>
-                <ZIndex>4</ZIndex>
-                <Style>
-                  <Border>
-                    <Style>None</Style>
-                  </Border>
-                  <PaddingLeft>2pt</PaddingLeft>
-                  <PaddingRight>2pt</PaddingRight>
-                  <PaddingTop>2pt</PaddingTop>
-                  <PaddingBottom>2pt</PaddingBottom>
-                </Style>
-              </Textbox>
-              <Textbox Name="Estado">
-                <CanGrow>true</CanGrow>
-                <KeepTogether>true</KeepTogether>
-                <Paragraphs>
-                  <Paragraph>
-                    <TextRuns>
-                      <TextRun>
-                        <Value>="Estado: " &amp; First(Fields!Estado.Value, "FichaFuncionalDataSet")</Value>
-                        <Style />
-                      </TextRun>
-                    </TextRuns>
-                    <Style />
-                  </Paragraph>
-                </Paragraphs>
-                <Top>0.45in</Top>
-                <Left>3.79861in</Left>
-                <Height>0.25in</Height>
-                <Width>2.19444in</Width>
-                <ZIndex>5</ZIndex>
-                <Style>
-                  <Border>
-                    <Style>None</Style>
-                  </Border>
-                  <PaddingLeft>2pt</PaddingLeft>
-                  <PaddingRight>2pt</PaddingRight>
-                  <PaddingTop>2pt</PaddingTop>
-                  <PaddingBottom>2pt</PaddingBottom>
-                </Style>
-              </Textbox>
-              <Textbox Name="Escalafon">
-                <CanGrow>true</CanGrow>
-                <KeepTogether>true</KeepTogether>
-                <Paragraphs>
-                  <Paragraph>
-                    <TextRuns>
-                      <TextRun>
-                        <Value>="Escalafón: " &amp; First(Fields!Escalafon.Value, "FichaFuncionalDataSet")</Value>
-                        <Style />
-                      </TextRun>
-                    </TextRuns>
-                    <Style />
-                  </Paragraph>
-                </Paragraphs>
-                <Top>0.7in</Top>
-                <Left>3.79861in</Left>
-                <Height>0.25in</Height>
-                <Width>2.19444in</Width>
-                <ZIndex>6</ZIndex>
-                <Style>
-                  <Border>
-                    <Style>None</Style>
-                  </Border>
-                  <PaddingLeft>2pt</PaddingLeft>
-                  <PaddingRight>2pt</PaddingRight>
-                  <PaddingTop>2pt</PaddingTop>
-                  <PaddingBottom>2pt</PaddingBottom>
-                </Style>
-              </Textbox>
-              <Textbox Name="Funcion">
-                <CanGrow>true</CanGrow>
-                <KeepTogether>true</KeepTogether>
-                <Paragraphs>
-                  <Paragraph>
-                    <TextRuns>
-                      <TextRun>
-                        <Value>="Función: " &amp; First(Fields!Funcion.Value, "FichaFuncionalDataSet")</Value>
-                        <Style />
-                      </TextRun>
-                    </TextRuns>
-                    <Style />
-                  </Paragraph>
-                </Paragraphs>
-                <Top>0.95in</Top>
-                <Left>3.79861in</Left>
-                <Height>0.25in</Height>
-                <Width>2.19444in</Width>
-                <ZIndex>7</ZIndex>
-                <Style>
-                  <Border>
-                    <Style>None</Style>
-                  </Border>
-                  <PaddingLeft>2pt</PaddingLeft>
-                  <PaddingRight>2pt</PaddingRight>
-                  <PaddingTop>2pt</PaddingTop>
-                  <PaddingBottom>2pt</PaddingBottom>
-                </Style>
-              </Textbox>
-            </ReportItems>
-            <KeepTogether>true</KeepTogether>
-            <Top>0.5in</Top>
-            <Height>1.4in</Height>
-            <Width>6.05556in</Width>
-            <ZIndex>1</ZIndex>
-            <Style>
-              <Border>
-                <Style>Solid</Style>
-              </Border>
-            </Style>
-          </Rectangle>
-          <Rectangle Name="InfoRectangle">
-            <ReportItems>
-              <Textbox Name="Sexo">
-                <CanGrow>true</CanGrow>
-                <KeepTogether>true</KeepTogether>
-                <Paragraphs>
-                  <Paragraph>
-                    <TextRuns>
-                      <TextRun>
-                        <Value>="Sexo: " &amp; First(Fields!Sexo.Value, "FichaFuncionalDataSet")</Value>
-                        <Style />
-                      </TextRun>
-                    </TextRuns>
-                    <Style />
-                  </Paragraph>
-                </Paragraphs>
-                <Top>0.05in</Top>
-                <Left>0.1in</Left>
-                <Height>0.22in</Height>
-                <Width>2.90556in</Width>
-                <Style>
-                  <Border>
-                    <Style>None</Style>
-                  </Border>
-                </Style>
-              </Textbox>
-              <Textbox Name="Telefono">
-                <CanGrow>true</CanGrow>
-                <KeepTogether>true</KeepTogether>
-                <Paragraphs>
-                  <Paragraph>
-                    <TextRuns>
-                      <TextRun>
-                        <Value>="Teléfono: " &amp; First(Fields!Telefono.Value, "FichaFuncionalDataSet")</Value>
-                        <Style />
-                      </TextRun>
-                    </TextRuns>
-                    <Style />
-                  </Paragraph>
-                </Paragraphs>
-                <Top>0.32in</Top>
-                <Left>0.1in</Left>
-                <Height>0.22in</Height>
-                <Width>2.90556in</Width>
-                <ZIndex>1</ZIndex>
-                <Style>
-                  <Border>
-                    <Style>None</Style>
-                  </Border>
-                </Style>
-              </Textbox>
-              <Textbox Name="Correo">
-                <CanGrow>true</CanGrow>
-                <KeepTogether>true</KeepTogether>
-                <Paragraphs>
-                  <Paragraph>
-                    <TextRuns>
-                      <TextRun>
-                        <Value>="Correo: " &amp; First(Fields!Correo.Value, "FichaFuncionalDataSet")</Value>
-                        <Style />
-                      </TextRun>
-                    </TextRuns>
-                    <Style />
-                  </Paragraph>
-                </Paragraphs>
-                <Top>0.59in</Top>
-                <Left>0.1in</Left>
-                <Height>0.22in</Height>
-                <Width>2.90556in</Width>
-                <ZIndex>2</ZIndex>
-                <Style>
-                  <Border>
-                    <Style>None</Style>
-                  </Border>
-                </Style>
-              </Textbox>
-              <Textbox Name="Ciudad">
-                <CanGrow>true</CanGrow>
-                <KeepTogether>true</KeepTogether>
-                <Paragraphs>
-                  <Paragraph>
-                    <TextRuns>
-                      <TextRun>
-                        <Value>="Ciudad: " &amp; First(Fields!Ciudad.Value, "FichaFuncionalDataSet")</Value>
-                        <Style />
-                      </TextRun>
-                    </TextRuns>
-                    <Style />
-                  </Paragraph>
-                </Paragraphs>
-                <Top>0.86in</Top>
-                <Left>0.1in</Left>
-                <Height>0.22in</Height>
-                <Width>2.90556in</Width>
-                <ZIndex>3</ZIndex>
-                <Style>
-                  <Border>
-                    <Style>None</Style>
-                  </Border>
-                </Style>
-              </Textbox>
-              <Textbox Name="Domicilio">
-                <CanGrow>true</CanGrow>
-                <KeepTogether>true</KeepTogether>
-                <Paragraphs>
-                  <Paragraph>
-                    <TextRuns>
-                      <TextRun>
-                        <Value>="Domicilio: " &amp; First(Fields!Domicilio.Value, "FichaFuncionalDataSet")</Value>
-                        <Style />
-                      </TextRun>
-                    </TextRuns>
-                    <Style />
-                  </Paragraph>
-                </Paragraphs>
-                <Top>1.13in</Top>
-                <Left>0.1in</Left>
-                <Height>0.22in</Height>
-                <Width>2.90556in</Width>
-                <ZIndex>4</ZIndex>
-                <Style>
-                  <Border>
-                    <Style>None</Style>
-                  </Border>
-                </Style>
-              </Textbox>
-              <Textbox Name="Seccional">
-                <CanGrow>true</CanGrow>
-                <KeepTogether>true</KeepTogether>
-                <Paragraphs>
-                  <Paragraph>
-                    <TextRuns>
-                      <TextRun>
-                        <Value>="Seccional: " &amp; First(Fields!Seccional.Value, "FichaFuncionalDataSet")</Value>
-                        <Style />
-                      </TextRun>
-                    </TextRuns>
-                    <Style />
-                  </Paragraph>
-                </Paragraphs>
-                <Top>0.05in</Top>
-                <Left>3.25in</Left>
-                <Height>0.22in</Height>
-                <Width>2.74306in</Width>
-                <ZIndex>5</ZIndex>
-                <Style>
-                  <Border>
-                    <Style>None</Style>
-                  </Border>
-                </Style>
-              </Textbox>
-              <Textbox Name="EstadoCivil">
-                <CanGrow>true</CanGrow>
-                <KeepTogether>true</KeepTogether>
-                <Paragraphs>
-                  <Paragraph>
-                    <TextRuns>
-                      <TextRun>
-                        <Value>="Estado civil: " &amp; First(Fields!EstadoCivil.Value, "FichaFuncionalDataSet")</Value>
-                        <Style />
-                      </TextRun>
-                    </TextRuns>
-                    <Style />
-                  </Paragraph>
-                </Paragraphs>
-                <Top>0.32in</Top>
-                <Left>3.25in</Left>
-                <Height>0.22in</Height>
-                <Width>2.74306in</Width>
-                <ZIndex>6</ZIndex>
-                <Style>
-                  <Border>
-                    <Style>None</Style>
-                  </Border>
-                </Style>
-              </Textbox>
-              <Textbox Name="Estudia">
-                <CanGrow>true</CanGrow>
-                <KeepTogether>true</KeepTogether>
-                <Paragraphs>
-                  <Paragraph>
-                    <TextRuns>
-                      <TextRun>
-                        <Value>="Estudia: " &amp; First(Fields!Estudia.Value, "FichaFuncionalDataSet")</Value>
-                        <Style />
-                      </TextRun>
-                    </TextRuns>
-                    <Style />
-                  </Paragraph>
-                </Paragraphs>
-                <Top>0.59in</Top>
-                <Left>3.25in</Left>
-                <Height>0.22in</Height>
-                <Width>2.74306in</Width>
-                <ZIndex>7</ZIndex>
-                <Style>
-                  <Border>
-                    <Style>None</Style>
-                  </Border>
-                </Style>
-              </Textbox>
-              <Textbox Name="NivelEstudios">
-                <CanGrow>true</CanGrow>
-                <KeepTogether>true</KeepTogether>
-                <Paragraphs>
-                  <Paragraph>
-                    <TextRuns>
-                      <TextRun>
-                        <Value>="Nivel de estudios: " &amp; First(Fields!NivelEstudios.Value, "FichaFuncionalDataSet")</Value>
-                        <Style />
-                      </TextRun>
-                    </TextRuns>
-                    <Style />
-                  </Paragraph>
-                </Paragraphs>
-                <Top>0.86in</Top>
-                <Left>3.25in</Left>
-                <Height>0.22in</Height>
-                <Width>2.74306in</Width>
-                <ZIndex>8</ZIndex>
-                <Style>
-                  <Border>
-                    <Style>None</Style>
-                  </Border>
-                </Style>
-              </Textbox>
-              <Textbox Name="Credencial">
-                <CanGrow>true</CanGrow>
-                <KeepTogether>true</KeepTogether>
-                <Paragraphs>
-                  <Paragraph>
-                    <TextRuns>
-                      <TextRun>
-                        <Value>="Credencial: " &amp; First(Fields!Credencial.Value, "FichaFuncionalDataSet")</Value>
-                        <Style />
-                      </TextRun>
-                    </TextRuns>
-                    <Style />
-                  </Paragraph>
-                </Paragraphs>
-                <Top>1.13in</Top>
-                <Left>3.25in</Left>
-                <Height>0.22in</Height>
-                <Width>2.74306in</Width>
-                <ZIndex>9</ZIndex>
-                <Style>
-                  <Border>
-                    <Style>None</Style>
-                  </Border>
-                </Style>
-              </Textbox>
-              <Textbox Name="DatosLaborales">
-                <CanGrow>true</CanGrow>
-                <KeepTogether>true</KeepTogether>
-                <Paragraphs>
-                  <Paragraph>
-                    <TextRuns>
-                      <TextRun>
-                        <Value>="Datos laborales: " &amp; First(Fields!DatosLaborales.Value, "FichaFuncionalDataSet")</Value>
-                        <Style />
-                      </TextRun>
-                    </TextRuns>
-                    <Style />
-                  </Paragraph>
-                </Paragraphs>
-                <Top>1.45in</Top>
-                <Left>0.1in</Left>
-                <Height>0.25in</Height>
-                <Width>5.89306in</Width>
-                <ZIndex>10</ZIndex>
-                <Style>
-                  <Border>
-                    <Style>None</Style>
-                  </Border>
-                </Style>
-              </Textbox>
-              <Textbox Name="SituacionGeneral">
-                <CanGrow>true</CanGrow>
-                <KeepTogether>true</KeepTogether>
-                <Paragraphs>
-                  <Paragraph>
-                    <TextRuns>
-                      <TextRun>
-                        <Value>="Situación general: " &amp; First(Fields!SituacionGeneral.Value, "FichaFuncionalDataSet")</Value>
-                        <Style />
-                      </TextRun>
-                    </TextRuns>
-                    <Style />
-                  </Paragraph>
-                </Paragraphs>
-                <Top>1.75in</Top>
-                <Left>0.1in</Left>
-                <Height>0.25in</Height>
-                <Width>5.89306in</Width>
-                <ZIndex>11</ZIndex>
-                <Style>
-                  <Border>
-                    <Style>None</Style>
-                  </Border>
-                </Style>
-              </Textbox>
-            </ReportItems>
-            <Top>2in</Top>
-            <Height>2.1in</Height>
-            <Width>6.05556in</Width>
-            <ZIndex>2</ZIndex>
-            <Style>
-              <Border>
-                <Style>Solid</Style>
-              </Border>
-            </Style>
-          </Rectangle>
-        </ReportItems>
-        <Height>6.5in</Height>
-        <Style />
-      </Body>
-      <Width>6.125in</Width>
-      <Page>
-        <LeftMargin>0.5in</LeftMargin>
-        <RightMargin>0.5in</RightMargin>
-        <TopMargin>0.5in</TopMargin>
-        <BottomMargin>0.5in</BottomMargin>
-        <Style />
-      </Page>
-    </ReportSection>
-  </ReportSections>
-  <ReportParametersLayout>
-    <GridLayoutDefinition>
-      <NumberOfColumns>4</NumberOfColumns>
-      <NumberOfRows>2</NumberOfRows>
-    </GridLayoutDefinition>
-  </ReportParametersLayout>
-  <rd:ReportUnitType>Inch</rd:ReportUnitType>
-  <rd:ReportID>f6dcf150-1c3b-4c2c-806b-3d6f731139e8</rd:ReportID>
+	<AutoRefresh>0</AutoRefresh>
+	<DataSources>
+		<DataSource Name="DummyDataSource">
+			<ConnectionProperties>
+				<DataProvider>SQL</DataProvider>
+				<ConnectString />
+			</ConnectionProperties>
+			<rd:DataSourceID>b934c1a5-83c9-4623-a212-96f7c81a243a</rd:DataSourceID>
+		</DataSource>
+	</DataSources>
+	<DataSets>
+		<DataSet Name="FichaFuncionalDataSet">
+			<Query>
+				<DataSourceName>DummyDataSource</DataSourceName>
+				<CommandText />
+			</Query>
+			<Fields>
+				<Field Name="NombreCompleto">
+					<DataField>NombreCompleto</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="Cedula">
+					<DataField>Cedula</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="Grado">
+					<DataField>Grado</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="FechaIngreso">
+					<DataField>FechaIngreso</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="Estado">
+					<DataField>Estado</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="Escalafon">
+					<DataField>Escalafon</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="Funcion">
+					<DataField>Funcion</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="Seccion">
+					<DataField>Seccion</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="PuestoTrabajo">
+					<DataField>PuestoTrabajo</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="Turno">
+					<DataField>Turno</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="Semana">
+					<DataField>Semana</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="Horario">
+					<DataField>Horario</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="Foto">
+					<DataField>Foto</DataField>
+					<rd:TypeName>System.Byte[]</rd:TypeName>
+				</Field>
+				<Field Name="Sexo">
+					<DataField>Sexo</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="Telefono">
+					<DataField>Telefono</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="Correo">
+					<DataField>Correo</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="Ciudad">
+					<DataField>Ciudad</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="Domicilio">
+					<DataField>Domicilio</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="Seccional">
+					<DataField>Seccional</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="EstadoCivil">
+					<DataField>EstadoCivil</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="Estudia">
+					<DataField>Estudia</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="NivelEstudios">
+					<DataField>NivelEstudios</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="Credencial">
+					<DataField>Credencial</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="DatosLaborales">
+					<DataField>DatosLaborales</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="SituacionGeneral">
+					<DataField>SituacionGeneral</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+			</Fields>
+		</DataSet>
+	</DataSets>
+	<ReportSections>
+		<ReportSection>
+			<Body>
+				<ReportItems>
+					<Textbox Name="ReportTitle">
+						<CanGrow>true</CanGrow>
+						<KeepTogether>true</KeepTogether>
+						<Paragraphs>
+							<Paragraph>
+								<TextRuns>
+									<TextRun>
+										<Value>Ficha Funcional</Value>
+										<Style>
+											<FontFamily>Segoe UI</FontFamily>
+											<FontSize>20pt</FontSize>
+											<FontWeight>Bold</FontWeight>
+											<Color>#2c3e50</Color>
+										</Style>
+									</TextRun>
+								</TextRuns>
+								<Style>
+									<TextAlign>Center</TextAlign>
+								</Style>
+							</Paragraph>
+						</Paragraphs>
+						<rd:DefaultName>ReportTitle</rd:DefaultName>
+						<Height>0.5in</Height>
+						<Width>7.5in</Width>
+						<Style>
+							<Border>
+								<Style>None</Style>
+							</Border>
+							<PaddingLeft>2pt</PaddingLeft>
+							<PaddingRight>2pt</PaddingRight>
+							<PaddingTop>2pt</PaddingTop>
+							<PaddingBottom>2pt</PaddingBottom>
+						</Style>
+					</Textbox>
+					<Rectangle Name="HeaderRectangle">
+						<ReportItems>
+							<Image Name="FotoFuncionario">
+								<Source>Database</Source>
+								<Value>=First(Fields!Foto.Value, "FichaFuncionalDataSet")</Value>
+								<MIMEType>image/jpeg</MIMEType>
+								<Sizing>FitProportional</Sizing>
+								<Top>0.1in</Top>
+								<Left>0.1in</Left>
+								<Height>1.5in</Height>
+								<Width>1.5in</Width>
+								<Style>
+									<Border>
+										<Color>LightGrey</Color>
+										<Style>Solid</Style>
+									</Border>
+								</Style>
+							</Image>
+							<Textbox Name="NombreCompleto">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>=First(Fields!NombreCompleto.Value, "FichaFuncionalDataSet")</Value>
+												<Style>
+													<FontFamily>Segoe UI</FontFamily>
+													<FontSize>16pt</FontSize>
+													<FontWeight>SemiBold</FontWeight>
+												</Style>
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<Top>0.1in</Top>
+								<Left>1.7in</Left>
+								<Height>0.35in</Height>
+								<Width>5.7in</Width>
+								<ZIndex>1</ZIndex>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+									<PaddingLeft>2pt</PaddingLeft>
+									<PaddingRight>2pt</PaddingRight>
+									<PaddingTop>2pt</PaddingTop>
+									<PaddingBottom>2pt</PaddingBottom>
+								</Style>
+							</Textbox>
+							<Textbox Name="Cedula">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>="CI: " &amp; First(Fields!Cedula.Value, "FichaFuncionalDataSet")</Value>
+												<Style>
+													<FontFamily>Segoe UI</FontFamily>
+													<FontSize>11pt</FontSize>
+													<Color>#34495e</Color>
+												</Style>
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<Top>0.5in</Top>
+								<Left>1.7in</Left>
+								<Height>0.25in</Height>
+								<Width>2.8in</Width>
+								<ZIndex>2</ZIndex>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+									<PaddingLeft>2pt</PaddingLeft>
+									<PaddingRight>2pt</PaddingRight>
+									<PaddingTop>2pt</PaddingTop>
+									<PaddingBottom>2pt</PaddingBottom>
+								</Style>
+							</Textbox>
+							<Textbox Name="Grado">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>="Grado: " &amp; First(Fields!Grado.Value, "FichaFuncionalDataSet")</Value>
+												<Style>
+													<FontFamily>Segoe UI</FontFamily>
+													<FontSize>11pt</FontSize>
+													<Color>#34495e</Color>
+												</Style>
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<Top>0.75in</Top>
+								<Left>1.7in</Left>
+								<Height>0.25in</Height>
+								<Width>2.8in</Width>
+								<ZIndex>3</ZIndex>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+									<PaddingLeft>2pt</PaddingLeft>
+									<PaddingRight>2pt</PaddingRight>
+									<PaddingTop>2pt</PaddingTop>
+									<PaddingBottom>2pt</PaddingBottom>
+								</Style>
+							</Textbox>
+							<Textbox Name="FechaIngreso">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>="Ingreso: " &amp; First(Fields!FechaIngreso.Value, "FichaFuncionalDataSet")</Value>
+												<Style>
+													<FontFamily>Segoe UI</FontFamily>
+													<FontSize>11pt</FontSize>
+													<Color>#34495e</Color>
+												</Style>
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<Top>1in</Top>
+								<Left>1.7in</Left>
+								<Height>0.25in</Height>
+								<Width>2.8in</Width>
+								<ZIndex>4</ZIndex>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+									<PaddingLeft>2pt</PaddingLeft>
+									<PaddingRight>2pt</PaddingRight>
+									<PaddingTop>2pt</PaddingTop>
+									<PaddingBottom>2pt</PaddingBottom>
+								</Style>
+							</Textbox>
+							<Textbox Name="Estado">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>="Estado: " &amp; First(Fields!Estado.Value, "FichaFuncionalDataSet")</Value>
+												<Style>
+													<FontFamily>Segoe UI</FontFamily>
+													<FontSize>11pt</FontSize>
+													<Color>#34495e</Color>
+												</Style>
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<Top>0.5in</Top>
+								<Left>4.6in</Left>
+								<Height>0.25in</Height>
+								<Width>2.8in</Width>
+								<ZIndex>5</ZIndex>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+									<PaddingLeft>2pt</PaddingLeft>
+									<PaddingRight>2pt</PaddingRight>
+									<PaddingTop>2pt</PaddingTop>
+									<PaddingBottom>2pt</PaddingBottom>
+								</Style>
+							</Textbox>
+							<Textbox Name="Escalafon">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>="Escalafón: " &amp; First(Fields!Escalafon.Value, "FichaFuncionalDataSet")</Value>
+												<Style>
+													<FontFamily>Segoe UI</FontFamily>
+													<FontSize>11pt</FontSize>
+													<Color>#34495e</Color>
+												</Style>
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<Top>0.75in</Top>
+								<Left>4.6in</Left>
+								<Height>0.25in</Height>
+								<Width>2.8in</Width>
+								<ZIndex>6</ZIndex>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+									<PaddingLeft>2pt</PaddingLeft>
+									<PaddingRight>2pt</PaddingRight>
+									<PaddingTop>2pt</PaddingTop>
+									<PaddingBottom>2pt</PaddingBottom>
+								</Style>
+							</Textbox>
+							<Textbox Name="Funcion">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>="Función: " &amp; First(Fields!Funcion.Value, "FichaFuncionalDataSet")</Value>
+												<Style>
+													<FontFamily>Segoe UI</FontFamily>
+													<FontSize>11pt</FontSize>
+													<Color>#34495e</Color>
+												</Style>
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<Top>1in</Top>
+								<Left>4.6in</Left>
+								<Height>0.25in</Height>
+								<Width>2.8in</Width>
+								<ZIndex>7</ZIndex>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+									<PaddingLeft>2pt</PaddingLeft>
+									<PaddingRight>2pt</PaddingRight>
+									<PaddingTop>2pt</PaddingTop>
+									<PaddingBottom>2pt</PaddingBottom>
+								</Style>
+							</Textbox>
+						</ReportItems>
+						<KeepTogether>true</KeepTogether>
+						<Top>0.6in</Top>
+						<Height>1.7in</Height>
+						<Width>7.5in</Width>
+						<ZIndex>1</ZIndex>
+						<Style>
+							<Border>
+								<Color>Gainsboro</Color>
+								<Style>Solid</Style>
+							</Border>
+							<BackgroundColor>#f8f9fa</BackgroundColor>
+						</Style>
+					</Rectangle>
+					<Rectangle Name="InfoRectangle">
+						<ReportItems>
+							<Textbox Name="Seccional">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>Seccional:</Value>
+												<Style>
+													<FontFamily>Segoe UI</FontFamily>
+													<FontWeight>SemiBold</FontWeight>
+												</Style>
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<Top>0.42in</Top>
+								<Left>3.8in</Left>
+								<Height>0.22in</Height>
+								<Width>1.2in</Width>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+									<PaddingRight>5pt</PaddingRight>
+								</Style>
+							</Textbox>
+							<Textbox Name="EstadoCivil">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>Estado civil:</Value>
+												<Style>
+													<FontFamily>Segoe UI</FontFamily>
+													<FontWeight>SemiBold</FontWeight>
+												</Style>
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<Top>0.69in</Top>
+								<Left>3.8in</Left>
+								<Height>0.22in</Height>
+								<Width>1.2in</Width>
+								<ZIndex>1</ZIndex>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+									<PaddingRight>5pt</PaddingRight>
+								</Style>
+							</Textbox>
+							<Textbox Name="Estudia">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>Estudia:</Value>
+												<Style>
+													<FontFamily>Segoe UI</FontFamily>
+													<FontWeight>SemiBold</FontWeight>
+												</Style>
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<Top>0.96in</Top>
+								<Left>3.8in</Left>
+								<Height>0.22in</Height>
+								<Width>1.2in</Width>
+								<ZIndex>2</ZIndex>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+									<PaddingRight>5pt</PaddingRight>
+								</Style>
+							</Textbox>
+							<Textbox Name="NivelEstudios">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>Nivel de estudios:</Value>
+												<Style>
+													<FontFamily>Segoe UI</FontFamily>
+													<FontWeight>SemiBold</FontWeight>
+												</Style>
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<Top>1.23in</Top>
+								<Left>3.8in</Left>
+								<Height>0.22in</Height>
+								<Width>1.2in</Width>
+								<ZIndex>3</ZIndex>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+									<PaddingRight>5pt</PaddingRight>
+								</Style>
+							</Textbox>
+							<Textbox Name="Credencial">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>Credencial:</Value>
+												<Style>
+													<FontFamily>Segoe UI</FontFamily>
+													<FontWeight>SemiBold</FontWeight>
+												</Style>
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<Top>1.5in</Top>
+								<Left>3.8in</Left>
+								<Height>0.22in</Height>
+								<Width>1.2in</Width>
+								<ZIndex>4</ZIndex>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+									<PaddingRight>5pt</PaddingRight>
+								</Style>
+							</Textbox>
+							<Textbox Name="DatosLaborales">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>Datos laborales:</Value>
+												<Style>
+													<FontFamily>Segoe UI</FontFamily>
+													<FontWeight>SemiBold</FontWeight>
+												</Style>
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<Top>1.8in</Top>
+								<Left>0.1in</Left>
+								<Height>0.25in</Height>
+								<Width>1.4in</Width>
+								<ZIndex>5</ZIndex>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+								</Style>
+							</Textbox>
+							<Textbox Name="SituacionGeneral">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>Situación general:</Value>
+												<Style>
+													<FontFamily>Segoe UI</FontFamily>
+													<FontWeight>SemiBold</FontWeight>
+												</Style>
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<Top>2.1in</Top>
+								<Left>0.1in</Left>
+								<Height>0.25in</Height>
+								<Width>1.4in</Width>
+								<ZIndex>6</ZIndex>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+								</Style>
+							</Textbox>
+							<Textbox Name="Sexo_1">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>Sexo:</Value>
+												<Style>
+													<FontFamily>Segoe UI</FontFamily>
+													<FontWeight>SemiBold</FontWeight>
+												</Style>
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<Top>0.15in</Top>
+								<Left>0.1in</Left>
+								<Height>0.22in</Height>
+								<Width>1.4in</Width>
+								<ZIndex>7</ZIndex>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+									<PaddingRight>5pt</PaddingRight>
+								</Style>
+							</Textbox>
+							<Textbox Name="Telefono">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>Teléfono:</Value>
+												<Style>
+													<FontFamily>Segoe UI</FontFamily>
+													<FontWeight>SemiBold</FontWeight>
+												</Style>
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<Top>0.42in</Top>
+								<Left>0.1in</Left>
+								<Height>0.22in</Height>
+								<Width>1.4in</Width>
+								<ZIndex>8</ZIndex>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+									<PaddingRight>5pt</PaddingRight>
+								</Style>
+							</Textbox>
+							<Textbox Name="Correo">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>Correo:</Value>
+												<Style>
+													<FontFamily>Segoe UI</FontFamily>
+													<FontWeight>SemiBold</FontWeight>
+												</Style>
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<Top>0.69in</Top>
+								<Left>0.1in</Left>
+								<Height>0.22in</Height>
+								<Width>1.4in</Width>
+								<ZIndex>9</ZIndex>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+									<PaddingRight>5pt</PaddingRight>
+								</Style>
+							</Textbox>
+							<Textbox Name="Ciudad">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>Ciudad:</Value>
+												<Style>
+													<FontFamily>Segoe UI</FontFamily>
+													<FontWeight>SemiBold</FontWeight>
+												</Style>
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<Top>0.96in</Top>
+								<Left>0.1in</Left>
+								<Height>0.22in</Height>
+								<Width>1.4in</Width>
+								<ZIndex>10</ZIndex>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+									<PaddingRight>5pt</PaddingRight>
+								</Style>
+							</Textbox>
+							<Textbox Name="Domicilio">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>Domicilio:</Value>
+												<Style>
+													<FontFamily>Segoe UI</FontFamily>
+													<FontWeight>SemiBold</FontWeight>
+												</Style>
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<Top>1.23in</Top>
+								<Left>0.1in</Left>
+								<Height>0.22in</Height>
+								<Width>1.4in</Width>
+								<ZIndex>11</ZIndex>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+									<PaddingRight>5pt</PaddingRight>
+								</Style>
+							</Textbox>
+							<Textbox Name="Textbox11">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>=First(Fields!Sexo.Value, "FichaFuncionalDataSet")</Value>
+												<Style>
+													<FontFamily>Segoe UI</FontFamily>
+													<Color>#34495e</Color>
+												</Style>
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<rd:DefaultName>Textbox11</rd:DefaultName>
+								<Top>0.15in</Top>
+								<Left>1.55in</Left>
+								<Height>0.22in</Height>
+								<Width>2.1in</Width>
+								<ZIndex>12</ZIndex>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+								</Style>
+							</Textbox>
+							<Textbox Name="Textbox12">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>=First(Fields!Telefono.Value, "FichaFuncionalDataSet")</Value>
+												<Style>
+													<FontFamily>Segoe UI</FontFamily>
+													<Color>#34495e</Color>
+												</Style>
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<rd:DefaultName>Textbox11</rd:DefaultName>
+								<Top>0.42in</Top>
+								<Left>1.55in</Left>
+								<Height>0.22in</Height>
+								<Width>2.1in</Width>
+								<ZIndex>13</ZIndex>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+								</Style>
+							</Textbox>
+							<Textbox Name="Textbox13">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>=First(Fields!Correo.Value, "FichaFuncionalDataSet")</Value>
+												<Style>
+													<FontFamily>Segoe UI</FontFamily>
+													<Color>#34495e</Color>
+												</Style>
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<rd:DefaultName>Textbox11</rd:DefaultName>
+								<Top>0.69in</Top>
+								<Left>1.55in</Left>
+								<Height>0.22in</Height>
+								<Width>2.1in</Width>
+								<ZIndex>14</ZIndex>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+								</Style>
+							</Textbox>
+							<Textbox Name="Textbox14">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>=First(Fields!Ciudad.Value, "FichaFuncionalDataSet")</Value>
+												<Style>
+													<FontFamily>Segoe UI</FontFamily>
+													<Color>#34495e</Color>
+												</Style>
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<rd:DefaultName>Textbox11</rd:DefaultName>
+								<Top>0.96in</Top>
+								<Left>1.55in</Left>
+								<Height>0.22in</Height>
+								<Width>2.1in</Width>
+								<ZIndex>15</ZIndex>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+								</Style>
+							</Textbox>
+							<Textbox Name="Textbox15">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>=First(Fields!Domicilio.Value, "FichaFuncionalDataSet")</Value>
+												<Style>
+													<FontFamily>Segoe UI</FontFamily>
+													<Color>#34495e</Color>
+												</Style>
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<rd:DefaultName>Textbox11</rd:DefaultName>
+								<Top>1.23in</Top>
+								<Left>1.55in</Left>
+								<Height>0.22in</Height>
+								<Width>2.1in</Width>
+								<ZIndex>16</ZIndex>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+								</Style>
+							</Textbox>
+							<Textbox Name="Textbox16">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>=First(Fields!Seccional.Value, "FichaFuncionalDataSet")</Value>
+												<Style>
+													<FontFamily>Segoe UI</FontFamily>
+													<Color>#34495e</Color>
+												</Style>
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<rd:DefaultName>Textbox11</rd:DefaultName>
+								<Top>0.42in</Top>
+								<Left>5.05in</Left>
+								<Height>0.22in</Height>
+								<Width>2.3in</Width>
+								<ZIndex>17</ZIndex>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+								</Style>
+							</Textbox>
+							<Textbox Name="Textbox17">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>=First(Fields!EstadoCivil.Value, "FichaFuncionalDataSet")</Value>
+												<Style>
+													<FontFamily>Segoe UI</FontFamily>
+													<Color>#34495e</Color>
+												</Style>
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<rd:DefaultName>Textbox11</rd:DefaultName>
+								<Top>0.69in</Top>
+								<Left>5.05in</Left>
+								<Height>0.22in</Height>
+								<Width>2.3in</Width>
+								<ZIndex>18</ZIndex>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+								</Style>
+							</Textbox>
+							<Textbox Name="Textbox18">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>=First(Fields!Estudia.Value, "FichaFuncionalDataSet")</Value>
+												<Style>
+													<FontFamily>Segoe UI</FontFamily>
+													<Color>#34495e</Color>
+												</Style>
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<rd:DefaultName>Textbox11</rd:DefaultName>
+								<Top>0.96in</Top>
+								<Left>5.05in</Left>
+								<Height>0.22in</Height>
+								<Width>2.3in</Width>
+								<ZIndex>19</ZIndex>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+								</Style>
+							</Textbox>
+							<Textbox Name="Textbox19">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>=First(Fields!NivelEstudios.Value, "FichaFuncionalDataSet")</Value>
+												<Style>
+													<FontFamily>Segoe UI</FontFamily>
+													<Color>#34495e</Color>
+												</Style>
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<rd:DefaultName>Textbox11</rd:DefaultName>
+								<Top>1.23in</Top>
+								<Left>5.05in</Left>
+								<Height>0.22in</Height>
+								<Width>2.3in</Width>
+								<ZIndex>20</ZIndex>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+								</Style>
+							</Textbox>
+							<Textbox Name="Textbox20">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>=First(Fields!Credencial.Value, "FichaFuncionalDataSet")</Value>
+												<Style>
+													<FontFamily>Segoe UI</FontFamily>
+													<Color>#34495e</Color>
+												</Style>
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<rd:DefaultName>Textbox11</rd:DefaultName>
+								<Top>1.5in</Top>
+								<Left>5.05in</Left>
+								<Height>0.22in</Height>
+								<Width>2.3in</Width>
+								<ZIndex>21</ZIndex>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+								</Style>
+							</Textbox>
+							<Textbox Name="Textbox21">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>=First(Fields!DatosLaborales.Value, "FichaFuncionalDataSet")</Value>
+												<Style>
+													<FontFamily>Segoe UI</FontFamily>
+													<Color>#34495e</Color>
+												</Style>
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<rd:DefaultName>Textbox11</rd:DefaultName>
+								<Top>1.8in</Top>
+								<Left>1.55in</Left>
+								<Height>0.25in</Height>
+								<Width>5.8in</Width>
+								<ZIndex>22</ZIndex>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+								</Style>
+							</Textbox>
+							<Textbox Name="Textbox22">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>=First(Fields!SituacionGeneral.Value, "FichaFuncionalDataSet")</Value>
+												<Style>
+													<FontFamily>Segoe UI</FontFamily>
+													<Color>#34495e</Color>
+												</Style>
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<rd:DefaultName>Textbox11</rd:DefaultName>
+								<Top>2.1in</Top>
+								<Left>1.55in</Left>
+								<Height>0.25in</Height>
+								<Width>5.8in</Width>
+								<ZIndex>23</ZIndex>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+								</Style>
+							</Textbox>
+							<Textbox Name="Textbox23">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>Información Adicional</Value>
+												<Style>
+													<FontFamily>Segoe UI</FontFamily>
+													<FontSize>12pt</FontSize>
+													<FontWeight>SemiBold</FontWeight>
+													<Color>#2c3e50</Color>
+												</Style>
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<rd:DefaultName>Textbox23</rd:DefaultName>
+								<Top>0.1in</Top>
+								<Left>3.8in</Left>
+								<Height>0.25in</Height>
+								<Width>3.5in</Width>
+								<ZIndex>24</ZIndex>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+									<PaddingLeft>2pt</PaddingLeft>
+									<PaddingRight>2pt</PaddingRight>
+									<PaddingTop>2pt</PaddingTop>
+									<PaddingBottom>2pt</PaddingBottom>
+								</Style>
+							</Textbox>
+							<Textbox Name="Textbox24">
+								<CanGrow>true</CanGrow>
+								<KeepTogether>true</KeepTogether>
+								<Paragraphs>
+									<Paragraph>
+										<TextRuns>
+											<TextRun>
+												<Value>Datos Personales</Value>
+												<Style>
+													<FontFamily>Segoe UI</FontFamily>
+													<FontSize>12pt</FontSize>
+													<FontWeight>SemiBold</FontWeight>
+													<Color>#2c3e50</Color>
+												</Style>
+											</TextRun>
+										</TextRuns>
+										<Style />
+									</Paragraph>
+								</Paragraphs>
+								<rd:DefaultName>Textbox23</rd:DefaultName>
+								<Top>0.1in</Top>
+								<Left>0.1in</Left>
+								<Height>0.25in</Height>
+								<Width>3.5in</Width>
+								<ZIndex>25</ZIndex>
+								<Style>
+									<Border>
+										<Style>None</Style>
+									</Border>
+									<PaddingLeft>2pt</PaddingLeft>
+									<PaddingRight>2pt</PaddingRight>
+									<PaddingTop>2pt</PaddingTop>
+									<PaddingBottom>2pt</PaddingBottom>
+								</Style>
+							</Textbox>
+							<Line Name="Line1">
+								<Top>1.75in</Top>
+								<Left>0.1in</Left>
+								<Height>0in</Height>
+								<Width>7.3in</Width>
+								<ZIndex>26</ZIndex>
+								<Style>
+									<Border>
+										<Color>LightGrey</Color>
+										<Style>Solid</Style>
+									</Border>
+								</Style>
+							</Line>
+						</ReportItems>
+						<Top>2.4in</Top>
+						<Height>2.5in</Height>
+						<Width>7.5in</Width>
+						<ZIndex>2</ZIndex>
+						<Style>
+							<Border>
+								<Color>Gainsboro</Color>
+								<Style>Solid</Style>
+							</Border>
+						</Style>
+					</Rectangle>
+				</ReportItems>
+				<Height>5in</Height>
+				<Style />
+			</Body>
+			<Width>7.5in</Width>
+			<Page>
+				<PageFooter>
+					<Height>0.5in</Height>
+					<PrintOnFirstPage>true</PrintOnFirstPage>
+					<PrintOnLastPage>true</PrintOnLastPage>
+					<ReportItems>
+						<Textbox Name="ExecutionTime">
+							<CanGrow>true</CanGrow>
+							<KeepTogether>true</KeepTogether>
+							<Paragraphs>
+								<Paragraph>
+									<TextRuns>
+										<TextRun>
+											<Value>=Globals!ExecutionTime</Value>
+											<Style>
+												<FontFamily>Segoe UI</FontFamily>
+												<FontSize>8pt</FontSize>
+												<Color>Gray</Color>
+											</Style>
+										</TextRun>
+									</TextRuns>
+									<Style>
+										<TextAlign>Left</TextAlign>
+									</Style>
+								</Paragraph>
+							</Paragraphs>
+							<rd:DefaultName>ExecutionTime</rd:DefaultName>
+							<Top>0.2in</Top>
+							<Left>0.1in</Left>
+							<Height>0.25in</Height>
+							<Width>2in</Width>
+							<Style>
+								<Border>
+									<Style>None</Style>
+								</Border>
+								<PaddingLeft>2pt</PaddingLeft>
+								<PaddingRight>2pt</PaddingRight>
+								<PaddingTop>2pt</PaddingTop>
+								<PaddingBottom>2pt</PaddingBottom>
+							</Style>
+						</Textbox>
+						<Textbox Name="PageNumber">
+							<CanGrow>true</CanGrow>
+							<KeepTogether>true</KeepTogether>
+							<Paragraphs>
+								<Paragraph>
+									<TextRuns>
+										<TextRun>
+											<Value>="Página " &amp; Globals!PageNumber &amp; " de " &amp; Globals!TotalPages</Value>
+											<Style>
+												<FontFamily>Segoe UI</FontFamily>
+												<FontSize>8pt</FontSize>
+												<Color>Gray</Color>
+											</Style>
+										</TextRun>
+									</TextRuns>
+									<Style>
+										<TextAlign>Right</TextAlign>
+									</Style>
+								</Paragraph>
+							</Paragraphs>
+							<rd:DefaultName>PageNumber</rd:DefaultName>
+							<Top>0.2in</Top>
+							<Left>5.4in</Left>
+							<Height>0.25in</Height>
+							<Width>2in</Width>
+							<ZIndex>1</ZIndex>
+							<Style>
+								<Border>
+									<Style>None</Style>
+								</Border>
+								<PaddingLeft>2pt</PaddingLeft>
+								<PaddingRight>2pt</PaddingRight>
+								<PaddingTop>2pt</PaddingTop>
+								<PaddingBottom>2pt</PaddingBottom>
+							</Style>
+						</Textbox>
+					</ReportItems>
+					<Style>
+						<Border>
+							<Style>None</Style>
+						</Border>
+					</Style>
+				</PageFooter>
+				<LeftMargin>0.5in</LeftMargin>
+				<RightMargin>0.5in</RightMargin>
+				<TopMargin>0.5in</TopMargin>
+				<BottomMargin>0.5in</BottomMargin>
+				<Style />
+			</Page>
+		</ReportSection>
+	</ReportSections>
+	<rd:ReportUnitType>Inch</rd:ReportUnitType>
+	<rd:ReportID>f6dcf150-1c3b-4c2c-806b-3d6f731139e8</rd:ReportID>
 </Report>

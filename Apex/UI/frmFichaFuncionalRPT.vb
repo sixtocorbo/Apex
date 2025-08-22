@@ -1,6 +1,8 @@
-﻿Imports Microsoft.Reporting.WinForms
+﻿' Apex/UI/frmFichaFuncionalRPT.vb
+Imports Microsoft.Reporting.WinForms
 
 Public Class frmFichaFuncionalRPT
+
     Private ReadOnly _funcionarioId As Integer
 
     Public Sub New(funcionarioId As Integer)
@@ -24,15 +26,11 @@ Public Class frmFichaFuncionalRPT
 
             ReportViewer1.LocalReport.DataSources.Clear()
 
-            ' --- INICIO DE LA MODIFICACIÓN ---
+            ' --- INICIO DE LA CORRECCIÓN ---
+            ' Se eliminan las referencias a los DataSets de licencias y sanciones que ya no existen en el reporte.
             Dim rdsFicha = New ReportDataSource("FichaFuncionalDataSet", New List(Of FichaFuncionalDTO) From {datosFicha})
-            Dim rdsLicencias = New ReportDataSource("LicenciasDataSet", datosFicha.Licencias)
-            Dim rdsSanciones = New ReportDataSource("SancionesDataSet", datosFicha.Sanciones)
-
             ReportViewer1.LocalReport.DataSources.Add(rdsFicha)
-            ReportViewer1.LocalReport.DataSources.Add(rdsLicencias)
-            ReportViewer1.LocalReport.DataSources.Add(rdsSanciones)
-            ' --- FIN DE LA MODIFICACIÓN ---
+            ' --- FIN DE LA CORRECCIÓN ---
 
             ReportViewer1.RefreshReport()
 

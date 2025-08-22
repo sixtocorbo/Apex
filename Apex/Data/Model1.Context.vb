@@ -80,6 +80,7 @@ Partial Public Class ApexEntities
     Public Overridable Property Usuario() As DbSet(Of Usuario)
     Public Overridable Property vw_EstadosTransitoriosCompletos() As DbSet(Of vw_EstadosTransitoriosCompletos)
     Public Overridable Property vw_FuncionarioEstadosConsolidados() As DbSet(Of vw_FuncionarioEstadosConsolidados)
+    Public Overridable Property vw_FuncionarioSituacionActual() As DbSet(Of vw_FuncionarioSituacionActual)
     Public Overridable Property vw_LicenciasCompletas() As DbSet(Of vw_LicenciasCompletas)
     Public Overridable Property vw_NotificacionesCompletas() As DbSet(Of vw_NotificacionesCompletas)
     Public Overridable Property vw_NovedadesAgrupadas() As DbSet(Of vw_NovedadesAgrupadas)
