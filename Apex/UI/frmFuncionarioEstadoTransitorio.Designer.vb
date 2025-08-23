@@ -18,7 +18,7 @@ Partial Class frmFuncionarioEstadoTransitorio
     Private components As System.ComponentModel.IContainer
 
     'NOTE: The following procedure is required by the Windows Form Designer
-    'It can be modified using the Windows Form Designer.  
+    'It can be modified using the Windows Form Designer.
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
@@ -41,10 +41,12 @@ Partial Class frmFuncionarioEstadoTransitorio
         Me.txtTurnoReten = New System.Windows.Forms.TextBox()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
+        Me.dgvAdjuntos = New System.Windows.Forms.DataGridView()
+        Me.pnlAdjuntosAcciones = New System.Windows.Forms.FlowLayoutPanel()
+        Me.btnAdjuntar = New System.Windows.Forms.Button()
         Me.btnVerAdjunto = New System.Windows.Forms.Button()
         Me.btnEliminarAdjunto = New System.Windows.Forms.Button()
-        Me.btnAdjuntar = New System.Windows.Forms.Button()
-        Me.dgvAdjuntos = New System.Windows.Forms.DataGridView()
+        Me.pnlPreview = New System.Windows.Forms.Panel()
         Me.lblPreviewNotAvailable = New System.Windows.Forms.Label()
         Me.wbPreview = New System.Windows.Forms.WebBrowser()
         Me.pbPreview = New System.Windows.Forms.PictureBox()
@@ -54,6 +56,8 @@ Partial Class frmFuncionarioEstadoTransitorio
         Me.SplitContainer1.Panel2.SuspendLayout()
         Me.SplitContainer1.SuspendLayout()
         CType(Me.dgvAdjuntos, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.pnlAdjuntosAcciones.SuspendLayout()
+        Me.pnlPreview.SuspendLayout()
         CType(Me.pbPreview, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -243,25 +247,59 @@ Partial Class frmFuncionarioEstadoTransitorio
         '
         'SplitContainer1.Panel1
         '
-        Me.SplitContainer1.Panel1.Controls.Add(Me.btnVerAdjunto)
-        Me.SplitContainer1.Panel1.Controls.Add(Me.btnEliminarAdjunto)
-        Me.SplitContainer1.Panel1.Controls.Add(Me.btnAdjuntar)
         Me.SplitContainer1.Panel1.Controls.Add(Me.dgvAdjuntos)
+        Me.SplitContainer1.Panel1.Controls.Add(Me.pnlAdjuntosAcciones)
         '
         'SplitContainer1.Panel2
         '
-        Me.SplitContainer1.Panel2.Controls.Add(Me.lblPreviewNotAvailable)
-        Me.SplitContainer1.Panel2.Controls.Add(Me.wbPreview)
-        Me.SplitContainer1.Panel2.Controls.Add(Me.pbPreview)
+        Me.SplitContainer1.Panel2.Controls.Add(Me.pnlPreview)
         Me.SplitContainer1.Size = New System.Drawing.Size(1128, 393)
         Me.SplitContainer1.SplitterDistance = 525
         Me.SplitContainer1.SplitterWidth = 6
         Me.SplitContainer1.TabIndex = 0
         '
+        'dgvAdjuntos
+        '
+        Me.dgvAdjuntos.AllowUserToAddRows = False
+        Me.dgvAdjuntos.AllowUserToDeleteRows = False
+        Me.dgvAdjuntos.AllowUserToResizeColumns = False
+        Me.dgvAdjuntos.AllowUserToResizeRows = False
+        Me.dgvAdjuntos.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.dgvAdjuntos.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.dgvAdjuntos.Location = New System.Drawing.Point(0, 0)
+        Me.dgvAdjuntos.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.dgvAdjuntos.MultiSelect = False
+        Me.dgvAdjuntos.Name = "dgvAdjuntos"
+        Me.dgvAdjuntos.ReadOnly = True
+        Me.dgvAdjuntos.RowHeadersWidth = 62
+        Me.dgvAdjuntos.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
+        Me.dgvAdjuntos.Size = New System.Drawing.Size(525, 343)
+        Me.dgvAdjuntos.TabIndex = 0
+        '
+        'pnlAdjuntosAcciones
+        '
+        Me.pnlAdjuntosAcciones.Controls.Add(Me.btnAdjuntar)
+        Me.pnlAdjuntosAcciones.Controls.Add(Me.btnVerAdjunto)
+        Me.pnlAdjuntosAcciones.Controls.Add(Me.btnEliminarAdjunto)
+        Me.pnlAdjuntosAcciones.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.pnlAdjuntosAcciones.Location = New System.Drawing.Point(0, 343)
+        Me.pnlAdjuntosAcciones.Name = "pnlAdjuntosAcciones"
+        Me.pnlAdjuntosAcciones.Size = New System.Drawing.Size(525, 50)
+        Me.pnlAdjuntosAcciones.TabIndex = 4
+        '
+        'btnAdjuntar
+        '
+        Me.btnAdjuntar.Location = New System.Drawing.Point(4, 5)
+        Me.btnAdjuntar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnAdjuntar.Name = "btnAdjuntar"
+        Me.btnAdjuntar.Size = New System.Drawing.Size(112, 35)
+        Me.btnAdjuntar.TabIndex = 1
+        Me.btnAdjuntar.Text = "Adjuntar"
+        Me.btnAdjuntar.UseVisualStyleBackColor = True
+        '
         'btnVerAdjunto
         '
-        Me.btnVerAdjunto.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnVerAdjunto.Location = New System.Drawing.Point(141, 353)
+        Me.btnVerAdjunto.Location = New System.Drawing.Point(124, 5)
         Me.btnVerAdjunto.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnVerAdjunto.Name = "btnVerAdjunto"
         Me.btnVerAdjunto.Size = New System.Drawing.Size(128, 35)
@@ -271,8 +309,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         '
         'btnEliminarAdjunto
         '
-        Me.btnEliminarAdjunto.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnEliminarAdjunto.Location = New System.Drawing.Point(408, 353)
+        Me.btnEliminarAdjunto.Location = New System.Drawing.Point(260, 5)
         Me.btnEliminarAdjunto.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnEliminarAdjunto.Name = "btnEliminarAdjunto"
         Me.btnEliminarAdjunto.Size = New System.Drawing.Size(112, 35)
@@ -280,36 +317,16 @@ Partial Class frmFuncionarioEstadoTransitorio
         Me.btnEliminarAdjunto.Text = "Eliminar"
         Me.btnEliminarAdjunto.UseVisualStyleBackColor = True
         '
-        'btnAdjuntar
+        'pnlPreview
         '
-        Me.btnAdjuntar.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnAdjuntar.Location = New System.Drawing.Point(4, 353)
-        Me.btnAdjuntar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnAdjuntar.Name = "btnAdjuntar"
-        Me.btnAdjuntar.Size = New System.Drawing.Size(112, 35)
-        Me.btnAdjuntar.TabIndex = 1
-        Me.btnAdjuntar.Text = "Adjuntar"
-        Me.btnAdjuntar.UseVisualStyleBackColor = True
-        '
-        'dgvAdjuntos
-        '
-        Me.dgvAdjuntos.AllowUserToAddRows = False
-        Me.dgvAdjuntos.AllowUserToDeleteRows = False
-        Me.dgvAdjuntos.AllowUserToResizeColumns = False
-        Me.dgvAdjuntos.AllowUserToResizeRows = False
-        Me.dgvAdjuntos.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.dgvAdjuntos.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.dgvAdjuntos.Location = New System.Drawing.Point(4, 5)
-        Me.dgvAdjuntos.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.dgvAdjuntos.MultiSelect = False
-        Me.dgvAdjuntos.Name = "dgvAdjuntos"
-        Me.dgvAdjuntos.ReadOnly = True
-        Me.dgvAdjuntos.RowHeadersWidth = 62
-        Me.dgvAdjuntos.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgvAdjuntos.Size = New System.Drawing.Size(516, 339)
-        Me.dgvAdjuntos.TabIndex = 0
+        Me.pnlPreview.Controls.Add(Me.lblPreviewNotAvailable)
+        Me.pnlPreview.Controls.Add(Me.wbPreview)
+        Me.pnlPreview.Controls.Add(Me.pbPreview)
+        Me.pnlPreview.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.pnlPreview.Location = New System.Drawing.Point(0, 0)
+        Me.pnlPreview.Name = "pnlPreview"
+        Me.pnlPreview.Size = New System.Drawing.Size(597, 393)
+        Me.pnlPreview.TabIndex = 3
         '
         'lblPreviewNotAvailable
         '
@@ -372,7 +389,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.MinimumSize = New System.Drawing.Size(1189, 739)
         Me.Name = "frmFuncionarioEstadoTransitorio"
-        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = "Estado Transitorio"
         Me.GroupBox1.ResumeLayout(False)
         Me.SplitContainer1.Panel1.ResumeLayout(False)
@@ -380,6 +397,8 @@ Partial Class frmFuncionarioEstadoTransitorio
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.SplitContainer1.ResumeLayout(False)
         CType(Me.dgvAdjuntos, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.pnlAdjuntosAcciones.ResumeLayout(False)
+        Me.pnlPreview.ResumeLayout(False)
         CType(Me.pbPreview, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
@@ -412,4 +431,6 @@ Partial Class frmFuncionarioEstadoTransitorio
     Friend WithEvents pbPreview As PictureBox
     Friend WithEvents wbPreview As WebBrowser
     Friend WithEvents lblPreviewNotAvailable As Label
+    Friend WithEvents pnlAdjuntosAcciones As FlowLayoutPanel
+    Friend WithEvents pnlPreview As Panel
 End Class

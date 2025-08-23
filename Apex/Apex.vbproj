@@ -211,6 +211,7 @@
     <Compile Include="Data\EstadoCivil.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
+    <Compile Include="Data\EstadoTransitorio.Custom.vb" />
     <Compile Include="Data\EstadoTransitorio.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>

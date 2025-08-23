@@ -9,7 +9,7 @@ Public Class frmFuncionarioEstadoTransitorio
     Private _tempFiles As New List(Of String) ' Lista para rastrear archivos PDF temporales
     Private _readOnly As Boolean = False
 
-    ' Propiedades para los nuevos detalles
+    ' Propiedades para los detalles
     Public DesignacionDetalle As DesignacionDetalle
     Public SancionDetalle As SancionDetalle
     Public SumarioDetalle As SumarioDetalle
@@ -41,9 +41,6 @@ Public Class frmFuncionarioEstadoTransitorio
         End Set
     End Property
 
-
-    ' Pega este código reemplazando el método Load completo en tu frmFuncionarioEstadoTransitorio.vb
-
     Private Sub frmFuncionarioEstadoTransitorio_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
         CargarCombos()
@@ -54,28 +51,27 @@ Public Class frmFuncionarioEstadoTransitorio
             cboTipoEstado.Enabled = False
             CargarDatosDeDetalle()
             CargarAdjuntos(Estado.Id)
+
             GroupBox1.Enabled = True
-
-            ' *** INICIO DE LA CORRECCIÓN ***
-            ' Ahora que el GroupBox está habilitado, gestionamos la visibilidad
-            ' del panel de vista previa.
             If dgvAdjuntos.Rows.Count = 0 Then
-                ' Si no hay adjuntos, nos aseguramos de mostrar el panel de mensaje.
-                ' Esto oculta el PictureBox y el WebBrowser, que son los que tapan los botones.
                 MostrarPanelMensaje("Haga clic en 'Adjuntar' para agregar un archivo.")
+                pnlPreview.Enabled = False
+                dgvAdjuntos.Enabled = False
             Else
-                ' Si ya hay adjuntos, forzamos la selección para que muestre la vista previa del primero.
-                dgvAdjuntos_SelectionChanged(Nothing, EventArgs.Empty)
+                dgvAdjuntos.Enabled = True
+                pnlPreview.Enabled = True
             End If
-            ' *** FIN DE LA CORRECCIÓN ***
-
         Else
             ' MODO CREACIÓN
             Estado = New EstadoTransitorio()
             chkFechaHasta.Checked = True
             cboTipoEstado.SelectedIndex = -1
-            GroupBox1.Enabled = False
-            MostrarPanelMensaje("Guarde el estado para poder adjuntar archivos.")
+
+            ' Habilitamos la sección de adjuntos desde el inicio
+            GroupBox1.Enabled = True
+            dgvAdjuntos.Enabled = True ' La grilla estará vacía pero funcional
+            pnlPreview.Enabled = False ' La previsualización no tiene sentido aún
+            MostrarPanelMensaje("Haga clic en 'Adjuntar' para agregar un archivo.")
         End If
 
         If _readOnly Then
@@ -96,16 +92,18 @@ Public Class frmFuncionarioEstadoTransitorio
         txtResolucion.ReadOnly = True
         txtDiagnostico.ReadOnly = True
         txtTurnoReten.ReadOnly = True
-        btnAdjuntar.Visible = False
-        btnEliminarAdjunto.Visible = False
+
+        ' Corrección: Cambiamos Visible a Enabled
+        btnAdjuntar.Enabled = False
+        btnEliminarAdjunto.Enabled = False
+        btnVerAdjunto.Enabled = dgvAdjuntos.Rows.Count > 0 ' Solo habilitado si hay algo que ver
+
         btnGuardar.Text = "Cerrar"
         btnCancelar.Visible = False
 
         ' Centrar el botón Cerrar
         btnGuardar.Location = New Point((Me.ClientSize.Width - btnGuardar.Width) / 2, btnGuardar.Location.Y)
-        dgvAdjuntos.ReadOnly = True
     End Sub
-
 
     Private Sub CargarDatosDeDetalle()
         Dim fechaHasta As Date? = Nothing
@@ -174,13 +172,15 @@ Public Class frmFuncionarioEstadoTransitorio
 
         Dim tipoId = CInt(cboTipoEstado.SelectedValue)
         Select Case tipoId
-            Case 1, 3, 4, 6
+            Case 1, 3, 6 ' Designación, Sanción, Sumario
                 lblResolucion.Visible = True
                 txtResolucion.Visible = True
-            Case 2
+            Case 2 ' Enfermedad
                 lblDiagnostico.Visible = True
                 txtDiagnostico.Visible = True
-            Case 5
+            Case 4 ' Orden Cinco
+                ' No tiene campos adicionales
+            Case 5 ' Retén
                 lblTurnoReten.Visible = True
                 txtTurnoReten.Visible = True
                 lblFechaDesde.Text = "Fecha Retén:"
@@ -281,17 +281,35 @@ Public Class frmFuncionarioEstadoTransitorio
 #Region "Lógica de Archivos Adjuntos"
 
     Private Sub CargarAdjuntos(estadoId As Integer)
-        Dim repo = _unitOfWork.Repository(Of EstadoTransitorioAdjunto)()
-        Dim adjuntos = repo.GetAll().Where(Function(a) a.EstadoTransitorioId = estadoId) _
-                                   .Select(Function(a) New With {a.Id, a.NombreArchivo, a.FechaCreacion}) _
-                                   .ToList()
-        dgvAdjuntos.DataSource = adjuntos
+        Dim adjuntosMostrados As New List(Of Object)
+
+        If estadoId > 0 Then
+            Dim repo = _unitOfWork.Repository(Of EstadoTransitorioAdjunto)()
+            Dim adjuntosDB = repo.GetAll().Where(Function(a) a.EstadoTransitorioId = estadoId) _
+                                    .Select(Function(a) New With {a.Id, a.NombreArchivo, a.FechaCreacion}) _
+                                    .ToList()
+            adjuntosMostrados.AddRange(adjuntosDB)
+        End If
+
+        If Estado IsNot Nothing AndAlso Estado.AdjuntosNuevos.Any() Then
+            Dim adjuntosMemoria = Estado.AdjuntosNuevos.Select(Function(a) New With {a.Id, a.NombreArchivo, a.FechaCreacion}).ToList()
+            adjuntosMostrados.AddRange(adjuntosMemoria)
+        End If
+
+        dgvAdjuntos.DataSource = Nothing
+        dgvAdjuntos.DataSource = adjuntosMostrados
 
         If dgvAdjuntos.Rows.Count > 0 Then
             dgvAdjuntos.Columns("Id").Visible = False
             dgvAdjuntos.Columns("NombreArchivo").HeaderText = "Nombre del Archivo"
             dgvAdjuntos.Columns("NombreArchivo").AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
             dgvAdjuntos.Columns("FechaCreacion").HeaderText = "Fecha de Carga"
+            dgvAdjuntos.Enabled = True
+            pnlPreview.Enabled = True
+        Else
+            dgvAdjuntos.Enabled = False
+            pnlPreview.Enabled = False
+            MostrarPanelMensaje("No hay archivos adjuntos.")
         End If
     End Sub
 
@@ -304,20 +322,23 @@ Public Class frmFuncionarioEstadoTransitorio
                 Try
                     Dim contenidoBytes = File.ReadAllBytes(openDialog.FileName)
                     Dim nuevoAdjunto As New EstadoTransitorioAdjunto With {
-                        .EstadoTransitorioId = Estado.Id,
                         .NombreArchivo = Path.GetFileName(openDialog.FileName),
                         .TipoMIME = GetMimeType(openDialog.FileName),
                         .Contenido = contenidoBytes,
                         .FechaCreacion = DateTime.Now
                     }
 
-                    Dim repo = _unitOfWork.Repository(Of EstadoTransitorioAdjunto)()
-                    repo.Add(nuevoAdjunto)
-                    _unitOfWork.Commit()
-
-                    MessageBox.Show("Archivo adjuntado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
-                    CargarAdjuntos(Estado.Id)
-
+                    If Estado.Id = 0 Then
+                        nuevoAdjunto.Id = -(Estado.AdjuntosNuevos.Count + 1)
+                        Estado.AdjuntosNuevos.Add(nuevoAdjunto)
+                        CargarAdjuntos(0)
+                    Else
+                        nuevoAdjunto.EstadoTransitorioId = Estado.Id
+                        Dim repo = _unitOfWork.Repository(Of EstadoTransitorioAdjunto)()
+                        repo.Add(nuevoAdjunto)
+                        _unitOfWork.Commit()
+                        CargarAdjuntos(Estado.Id)
+                    End If
                 Catch ex As Exception
                     MessageBox.Show($"Error al adjuntar el archivo: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
                 End Try
@@ -330,8 +351,14 @@ Public Class frmFuncionarioEstadoTransitorio
 
         Try
             Dim adjuntoId = CInt(dgvAdjuntos.CurrentRow.Cells("Id").Value)
-            Dim repo = _unitOfWork.Repository(Of EstadoTransitorioAdjunto)()
-            Dim adjunto = repo.GetById(adjuntoId)
+            Dim adjunto As EstadoTransitorioAdjunto
+
+            If adjuntoId < 0 Then
+                adjunto = Estado.AdjuntosNuevos.FirstOrDefault(Function(a) a.Id = adjuntoId)
+            Else
+                Dim repo = _unitOfWork.Repository(Of EstadoTransitorioAdjunto)()
+                adjunto = repo.GetById(adjuntoId)
+            End If
 
             If adjunto IsNot Nothing Then
                 Dim tempPath = Path.Combine(Path.GetTempPath(), adjunto.NombreArchivo)
@@ -349,10 +376,19 @@ Public Class frmFuncionarioEstadoTransitorio
         If MessageBox.Show("¿Está seguro de que desea eliminar este archivo adjunto?", "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) = DialogResult.Yes Then
             Try
                 Dim adjuntoId = CInt(dgvAdjuntos.CurrentRow.Cells("Id").Value)
-                Dim repo = _unitOfWork.Repository(Of EstadoTransitorioAdjunto)()
-                repo.RemoveById(adjuntoId)
-                _unitOfWork.Commit()
-                CargarAdjuntos(Estado.Id)
+
+                If adjuntoId < 0 Then
+                    Dim adjuntoAEliminar = Estado.AdjuntosNuevos.FirstOrDefault(Function(a) a.Id = adjuntoId)
+                    If adjuntoAEliminar IsNot Nothing Then
+                        Estado.AdjuntosNuevos.Remove(adjuntoAEliminar)
+                    End If
+                    CargarAdjuntos(Estado.Id)
+                Else
+                    Dim repo = _unitOfWork.Repository(Of EstadoTransitorioAdjunto)()
+                    repo.RemoveById(adjuntoId)
+                    _unitOfWork.Commit()
+                    CargarAdjuntos(Estado.Id)
+                End If
             Catch ex As Exception
                 MessageBox.Show($"No se pudo eliminar el archivo: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
@@ -367,8 +403,14 @@ Public Class frmFuncionarioEstadoTransitorio
 
         Try
             Dim adjuntoId = CInt(dgvAdjuntos.CurrentRow.Cells("Id").Value)
-            Dim repo = _unitOfWork.Repository(Of EstadoTransitorioAdjunto)()
-            Dim adjunto = repo.GetById(adjuntoId)
+            Dim adjunto As EstadoTransitorioAdjunto
+
+            If adjuntoId < 0 Then
+                adjunto = Estado.AdjuntosNuevos.FirstOrDefault(Function(a) a.Id = adjuntoId)
+            Else
+                Dim repo = _unitOfWork.Repository(Of EstadoTransitorioAdjunto)()
+                adjunto = repo.GetById(adjuntoId)
+            End If
 
             If adjunto Is Nothing Then Return
 
@@ -399,12 +441,10 @@ Public Class frmFuncionarioEstadoTransitorio
         pbPreview.Visible = False
         wbPreview.Visible = True
         lblPreviewNotAvailable.Visible = False
-
         Try
-            ' Crear un archivo temporal con la extensión .pdf
             Dim tempPdfPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.pdf")
             File.WriteAllBytes(tempPdfPath, contenido)
-            _tempFiles.Add(tempPdfPath) ' Añadir a la lista para limpieza posterior
+            _tempFiles.Add(tempPdfPath)
             wbPreview.Navigate(tempPdfPath)
         Catch ex As Exception
             MessageBox.Show($"No se pudo mostrar el PDF: {ex.Message}", "Error de Visualización", MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -429,24 +469,32 @@ Public Class frmFuncionarioEstadoTransitorio
     End Function
 
     Private Sub frmFuncionarioEstadoTransitorio_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
-        ' Limpiar la imagen para liberar memoria
         If pbPreview.Image IsNot Nothing Then
             pbPreview.Image.Dispose()
             pbPreview.Image = Nothing
         End If
-        ' Detener la navegación del WebBrowser
-        wbPreview.Stop()
-        wbPreview.Dispose()
 
-        ' Eliminar archivos temporales creados para los PDF
+        Try
+            If wbPreview IsNot Nothing AndAlso Not wbPreview.IsDisposed Then
+                wbPreview.Navigate("about:blank")
+                Application.DoEvents()
+                wbPreview.Stop()
+                wbPreview.Dispose()
+            End If
+        Catch ex As Exception
+            Console.WriteLine($"Error al disponer el WebBrowser: {ex.Message}")
+        End Try
+
+        GC.Collect()
+        GC.WaitForPendingFinalizers()
+
         For Each filePath In _tempFiles
             Try
                 If File.Exists(filePath) Then
                     File.Delete(filePath)
                 End If
             Catch ex As Exception
-                ' Opcional: registrar el error si la limpieza falla
-                Console.WriteLine($"No se pudo eliminar el archivo temporal: {filePath}")
+                Console.WriteLine($"No se pudo eliminar el archivo temporal: {filePath}. Error: {ex.Message}")
             End Try
         Next
     End Sub
