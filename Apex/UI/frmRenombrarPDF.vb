@@ -1,18 +1,4 @@
-﻿' =================================================================================================
-' A P E X  -  S I S T E M A   D E   G E S T I Ó N
-'
-' Módulo: Renombrado Inteligente de Archivos PDF
-'
-' Propósito:
-' Este formulario proporciona una interfaz para seleccionar archivos PDF de una carpeta,
-' asociarlos con un funcionario del sistema y renombrarlos de forma masiva siguiendo
-' una nomenclatura predefinida.
-'
-' Reutiliza componentes y lógica existente, como el buscador de funcionarios (frmFuncionarioBuscar)
-' y el patrón de Unit of Work para el acceso a datos.
-' =================================================================================================
-
-Imports System.Data.Entity
+﻿Imports System.Data.Entity
 Imports System.IO
 Imports System.Linq
 Imports System.Threading.Tasks
