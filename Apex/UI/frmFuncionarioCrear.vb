@@ -1,5 +1,4 @@
-﻿' Apex/UI/frmFuncionarioCrear.vb
-Option Strict On
+﻿Option Strict On
 Option Explicit On
 
 Imports System.IO
@@ -63,8 +62,8 @@ Public Class frmFuncionarioCrear
         _idFuncionario = id
         _uow = New UnitOfWork()
         _funcionario = _uow.Context.Set(Of Funcionario)().Include(Function(f) f.FuncionarioDotacion.Select(Function(fd) fd.DotacionItem)).
-                            Include(Function(f) f.EstadoTransitorio.Select(Function(et) et.TipoEstadoTransitorio)).
-                            FirstOrDefault(Function(f) f.Id = id)
+                        Include(Function(f) f.EstadoTransitorio.Select(Function(et) et.TipoEstadoTransitorio)).
+                        FirstOrDefault(Function(f) f.Id = id)
 
         If _funcionario IsNot Nothing AndAlso _funcionario.EstadoTransitorio IsNot Nothing Then
             For Each et In _funcionario.EstadoTransitorio
@@ -129,27 +128,19 @@ Public Class frmFuncionarioCrear
         End If
     End Sub
 
+    ' --- ESTA ES LA MODIFICACIÓN PRINCIPAL ---
     Private Sub DgvEstadosTransitorios_CellDoubleClick(sender As Object, e As DataGridViewCellEventArgs)
         If e.RowIndex < 0 Then Return
 
         Dim row = TryCast(dgvEstadosTransitorios.Rows(e.RowIndex).DataBoundItem, EstadoRow)
-        If row Is Nothing Then Return
+        If row Is Nothing OrElse row.EntityRef Is Nothing Then Return
 
-        Dim sb As New StringBuilder()
-        sb.AppendLine($"Tipo de Estado: {row.TipoEstado}")
-        sb.AppendLine()
-        If row.FechaDesde.HasValue Then
-            sb.AppendLine($"Fecha Desde: {row.FechaDesde.Value.ToShortDateString()}")
-        End If
-        If row.FechaHasta.HasValue Then
-            sb.AppendLine($"Fecha Hasta: {row.FechaHasta.Value.ToShortDateString()}")
-        End If
-        sb.AppendLine()
-        sb.AppendLine("Observaciones y Detalles:")
-        sb.AppendLine(If(String.IsNullOrWhiteSpace(row.Observaciones), "(Sin observaciones)", row.Observaciones))
-
-        MessageBox.Show(sb.ToString(), "Detalle del Estado Transitorio", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        ' Abrir el formulario de detalles en modo solo lectura
+        Using frm As New frmFuncionarioEstadoTransitorio(row.EntityRef, _uow, True)
+            frm.ShowDialog(Me)
+        End Using
     End Sub
+
 
     ' -------------------- Helpers de mapeo ---------------------
     Private Function MapEstadosActivos(source As IEnumerable(Of EstadoTransitorio)) As BindingList(Of EstadoRow)
@@ -806,14 +797,6 @@ Public Class frmFuncionarioCrear
                 _rutaFotoSeleccionada = ofd.FileName
                 pbFoto.Image = Image.FromFile(ofd.FileName)
             End If
-        End Using
-    End Sub
-
-    Private Sub btnDetallesEstadoTransitorio_Click(sender As Object, e As EventArgs) Handles btnDetallesEstadoTransitorio.Click
-        Using uow As New UnitOfWork()
-            Using frm As New frmEstadosTransitoriosGeneral(uow)
-                frm.ShowDialog()
-            End Using
         End Using
     End Sub
 End Class

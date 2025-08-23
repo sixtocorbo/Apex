@@ -99,7 +99,6 @@ Partial Class frmFuncionarioCrear
         Me.chkProcesado = New System.Windows.Forms.CheckBox()
         Me.chkSeparado = New System.Windows.Forms.CheckBox()
         Me.TabControlMain = New System.Windows.Forms.TabControl()
-        Me.btnDetallesEstadoTransitorio = New System.Windows.Forms.Button()
         Me.FlowLayoutPanel1.SuspendLayout()
         Me.TabPageEstadosTransitorios.SuspendLayout()
         Me.TableLayoutPanelEstados.SuspendLayout()
@@ -217,7 +216,6 @@ Partial Class frmFuncionarioCrear
         Me.FlowLayoutPanelEstados.Controls.Add(Me.btnQuitarEstado)
         Me.FlowLayoutPanelEstados.Controls.Add(Me.btnEditarEstado)
         Me.FlowLayoutPanelEstados.Controls.Add(Me.btnAñadirEstado)
-        Me.FlowLayoutPanelEstados.Controls.Add(Me.btnDetallesEstadoTransitorio)
         Me.FlowLayoutPanelEstados.Dock = System.Windows.Forms.DockStyle.Fill
         Me.FlowLayoutPanelEstados.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
         Me.FlowLayoutPanelEstados.Location = New System.Drawing.Point(3, 518)
@@ -1056,15 +1054,6 @@ Partial Class frmFuncionarioCrear
         Me.TabControlMain.Size = New System.Drawing.Size(1176, 624)
         Me.TabControlMain.TabIndex = 2
         '
-        'btnDetallesEstadoTransitorio
-        '
-        Me.btnDetallesEstadoTransitorio.Location = New System.Drawing.Point(669, 3)
-        Me.btnDetallesEstadoTransitorio.Name = "btnDetallesEstadoTransitorio"
-        Me.btnDetallesEstadoTransitorio.Size = New System.Drawing.Size(112, 40)
-        Me.btnDetallesEstadoTransitorio.TabIndex = 3
-        Me.btnDetallesEstadoTransitorio.Text = "Ver detalles"
-        Me.btnDetallesEstadoTransitorio.UseVisualStyleBackColor = True
-        '
         'frmFuncionarioCrear
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -1180,5 +1169,4 @@ Partial Class frmFuncionarioCrear
     Friend WithEvents lblCredencial As Label
     Friend WithEvents txtCredencial As TextBox
     Friend WithEvents chkEstudia As CheckBox
-    Friend WithEvents btnDetallesEstadoTransitorio As Button
 End Class
