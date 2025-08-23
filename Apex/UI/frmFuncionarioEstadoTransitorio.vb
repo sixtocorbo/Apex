@@ -42,6 +42,8 @@ Public Class frmFuncionarioEstadoTransitorio
     End Property
 
 
+    ' Pega este código reemplazando el método Load completo en tu frmFuncionarioEstadoTransitorio.vb
+
     Private Sub frmFuncionarioEstadoTransitorio_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
         CargarCombos()
@@ -53,12 +55,27 @@ Public Class frmFuncionarioEstadoTransitorio
             CargarDatosDeDetalle()
             CargarAdjuntos(Estado.Id)
             GroupBox1.Enabled = True
+
+            ' *** INICIO DE LA CORRECCIÓN ***
+            ' Ahora que el GroupBox está habilitado, gestionamos la visibilidad
+            ' del panel de vista previa.
+            If dgvAdjuntos.Rows.Count = 0 Then
+                ' Si no hay adjuntos, nos aseguramos de mostrar el panel de mensaje.
+                ' Esto oculta el PictureBox y el WebBrowser, que son los que tapan los botones.
+                MostrarPanelMensaje("Haga clic en 'Adjuntar' para agregar un archivo.")
+            Else
+                ' Si ya hay adjuntos, forzamos la selección para que muestre la vista previa del primero.
+                dgvAdjuntos_SelectionChanged(Nothing, EventArgs.Empty)
+            End If
+            ' *** FIN DE LA CORRECCIÓN ***
+
         Else
             ' MODO CREACIÓN
             Estado = New EstadoTransitorio()
             chkFechaHasta.Checked = True
             cboTipoEstado.SelectedIndex = -1
             GroupBox1.Enabled = False
+            MostrarPanelMensaje("Guarde el estado para poder adjuntar archivos.")
         End If
 
         If _readOnly Then

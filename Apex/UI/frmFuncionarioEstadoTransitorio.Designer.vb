@@ -295,6 +295,8 @@ Partial Class frmFuncionarioEstadoTransitorio
         '
         Me.dgvAdjuntos.AllowUserToAddRows = False
         Me.dgvAdjuntos.AllowUserToDeleteRows = False
+        Me.dgvAdjuntos.AllowUserToResizeColumns = False
+        Me.dgvAdjuntos.AllowUserToResizeRows = False
         Me.dgvAdjuntos.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
