@@ -35,6 +35,7 @@ Partial Public Class ApexEntities
     Public Overridable Property Estado() As DbSet(Of Estado)
     Public Overridable Property EstadoCivil() As DbSet(Of EstadoCivil)
     Public Overridable Property EstadoTransitorio() As DbSet(Of EstadoTransitorio)
+    Public Overridable Property EstadoTransitorioAdjuntos() As DbSet(Of EstadoTransitorioAdjuntos)
     Public Overridable Property Funcion() As DbSet(Of Funcion)
     Public Overridable Property Funcionario() As DbSet(Of Funcionario)
     Public Overridable Property FuncionarioArma() As DbSet(Of FuncionarioArma)

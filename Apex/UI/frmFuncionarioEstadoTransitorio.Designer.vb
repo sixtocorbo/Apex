@@ -35,7 +35,14 @@ Partial Class frmFuncionarioEstadoTransitorio
         Me.lblDiagnostico = New System.Windows.Forms.Label()
         Me.txtResolucion = New System.Windows.Forms.TextBox()
         Me.lblResolucion = New System.Windows.Forms.Label()
+        Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.btnEliminarAdjunto = New System.Windows.Forms.Button()
+        Me.btnVerAdjunto = New System.Windows.Forms.Button()
+        Me.btnAdjuntar = New System.Windows.Forms.Button()
+        Me.dgvAdjuntos = New System.Windows.Forms.DataGridView()
         Me.pnlDetallesEspecificos.SuspendLayout()
+        Me.GroupBox1.SuspendLayout()
+        CType(Me.dgvAdjuntos, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'lblTipoEstado
@@ -122,7 +129,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         'btnGuardar
         '
         Me.btnGuardar.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnGuardar.Location = New System.Drawing.Point(297, 327)
+        Me.btnGuardar.Location = New System.Drawing.Point(297, 526)
         Me.btnGuardar.Name = "btnGuardar"
         Me.btnGuardar.Size = New System.Drawing.Size(75, 23)
         Me.btnGuardar.TabIndex = 9
@@ -133,7 +140,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         '
         Me.btnCancelar.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancelar.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancelar.Location = New System.Drawing.Point(216, 327)
+        Me.btnCancelar.Location = New System.Drawing.Point(216, 526)
         Me.btnCancelar.Name = "btnCancelar"
         Me.btnCancelar.Size = New System.Drawing.Size(75, 23)
         Me.btnCancelar.TabIndex = 10
@@ -150,7 +157,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         Me.pnlDetallesEspecificos.Controls.Add(Me.lblResolucion)
         Me.pnlDetallesEspecificos.Location = New System.Drawing.Point(15, 197)
         Me.pnlDetallesEspecificos.Name = "pnlDetallesEspecificos"
-        Me.pnlDetallesEspecificos.Size = New System.Drawing.Size(357, 124)
+        Me.pnlDetallesEspecificos.Size = New System.Drawing.Size(357, 93)
         Me.pnlDetallesEspecificos.TabIndex = 11
         '
         'txtTurnoReten
@@ -207,13 +214,69 @@ Partial Class frmFuncionarioEstadoTransitorio
         Me.lblResolucion.Text = "Resolución:"
         Me.lblResolucion.Visible = False
         '
+        'GroupBox1
+        '
+        Me.GroupBox1.Controls.Add(Me.btnEliminarAdjunto)
+        Me.GroupBox1.Controls.Add(Me.btnVerAdjunto)
+        Me.GroupBox1.Controls.Add(Me.btnAdjuntar)
+        Me.GroupBox1.Controls.Add(Me.dgvAdjuntos)
+        Me.GroupBox1.Location = New System.Drawing.Point(15, 296)
+        Me.GroupBox1.Name = "GroupBox1"
+        Me.GroupBox1.Size = New System.Drawing.Size(357, 224)
+        Me.GroupBox1.TabIndex = 12
+        Me.GroupBox1.TabStop = False
+        Me.GroupBox1.Text = "Archivos Adjuntos"
+        '
+        'btnEliminarAdjunto
+        '
+        Me.btnEliminarAdjunto.Location = New System.Drawing.Point(245, 189)
+        Me.btnEliminarAdjunto.Name = "btnEliminarAdjunto"
+        Me.btnEliminarAdjunto.Size = New System.Drawing.Size(106, 29)
+        Me.btnEliminarAdjunto.TabIndex = 3
+        Me.btnEliminarAdjunto.Text = "Eliminar"
+        Me.btnEliminarAdjunto.UseVisualStyleBackColor = True
+        '
+        'btnVerAdjunto
+        '
+        Me.btnVerAdjunto.Location = New System.Drawing.Point(125, 189)
+        Me.btnVerAdjunto.Name = "btnVerAdjunto"
+        Me.btnVerAdjunto.Size = New System.Drawing.Size(114, 29)
+        Me.btnVerAdjunto.TabIndex = 2
+        Me.btnVerAdjunto.Text = "Ver/Abrir"
+        Me.btnVerAdjunto.UseVisualStyleBackColor = True
+        '
+        'btnAdjuntar
+        '
+        Me.btnAdjuntar.Location = New System.Drawing.Point(6, 189)
+        Me.btnAdjuntar.Name = "btnAdjuntar"
+        Me.btnAdjuntar.Size = New System.Drawing.Size(113, 29)
+        Me.btnAdjuntar.TabIndex = 1
+        Me.btnAdjuntar.Text = "Adjuntar..."
+        Me.btnAdjuntar.UseVisualStyleBackColor = True
+        '
+        'dgvAdjuntos
+        '
+        Me.dgvAdjuntos.AllowUserToAddRows = False
+        Me.dgvAdjuntos.AllowUserToDeleteRows = False
+        Me.dgvAdjuntos.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.dgvAdjuntos.Location = New System.Drawing.Point(6, 21)
+        Me.dgvAdjuntos.Name = "dgvAdjuntos"
+        Me.dgvAdjuntos.ReadOnly = True
+        Me.dgvAdjuntos.RowHeadersVisible = False
+        Me.dgvAdjuntos.RowHeadersWidth = 51
+        Me.dgvAdjuntos.RowTemplate.Height = 24
+        Me.dgvAdjuntos.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
+        Me.dgvAdjuntos.Size = New System.Drawing.Size(345, 162)
+        Me.dgvAdjuntos.TabIndex = 0
+        '
         'frmFuncionarioEstadoTransitorio
         '
         Me.AcceptButton = Me.btnGuardar
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnCancelar
-        Me.ClientSize = New System.Drawing.Size(384, 362)
+        Me.ClientSize = New System.Drawing.Size(384, 561)
+        Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.pnlDetallesEspecificos)
         Me.Controls.Add(Me.btnCancelar)
         Me.Controls.Add(Me.btnGuardar)
@@ -234,6 +297,8 @@ Partial Class frmFuncionarioEstadoTransitorio
         Me.Text = "Estado Transitorio"
         Me.pnlDetallesEspecificos.ResumeLayout(False)
         Me.pnlDetallesEspecificos.PerformLayout()
+        Me.GroupBox1.ResumeLayout(False)
+        CType(Me.dgvAdjuntos, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -257,4 +322,9 @@ Partial Class frmFuncionarioEstadoTransitorio
     Friend WithEvents lblDiagnostico As Label
     Friend WithEvents txtTurnoReten As TextBox
     Friend WithEvents lblTurnoReten As Label
+    Friend WithEvents GroupBox1 As GroupBox
+    Friend WithEvents btnEliminarAdjunto As Button
+    Friend WithEvents btnVerAdjunto As Button
+    Friend WithEvents btnAdjuntar As Button
+    Friend WithEvents dgvAdjuntos As DataGridView
 End Class

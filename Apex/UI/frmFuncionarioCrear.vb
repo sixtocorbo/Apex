@@ -15,15 +15,15 @@ Public Class frmFuncionarioCrear
         Editar
     End Enum
 
-    ' --- View model para mostrar Estados en la grilla sin CellFormatting ---
+    ' --- View model para mostrar Estados en la grilla ---
     Private Class EstadoRow
         Public Property Id As Integer
-        Public Property Origen As String ' "Estado" (editable) o "Historial" (solo lectura)
+        Public Property Origen As String
         Public Property TipoEstado As String
         Public Property FechaDesde As Date?
         Public Property FechaHasta As Date?
         Public Property Observaciones As String
-        Public Property EntityRef As EstadoTransitorio ' referencia al entity para editar/eliminar
+        Public Property EntityRef As EstadoTransitorio
     End Class
 
     ' --- Variables de la clase ---
@@ -40,7 +40,7 @@ Public Class frmFuncionarioCrear
     Private _dotaciones As BindingList(Of FuncionarioDotacion)
     Private _estadoRows As BindingList(Of EstadoRow)
 
-    ' BindingSources (evita flags y re-entradas)
+    ' BindingSources
     Private ReadOnly bsDotacion As New BindingSource()
     Private ReadOnly bsEstados As New BindingSource()
 
@@ -113,7 +113,7 @@ Public Class frmFuncionarioCrear
 
         ' Handlers mínimos
         AddHandler dgvDotacion.DataError, Sub(s, a) a.ThrowException = False
-        AddHandler dgvDotacion.CellFormatting, AddressOf dgvDotacion_CellFormatting ' para FechaAsign tolerante
+        AddHandler dgvDotacion.CellFormatting, AddressOf dgvDotacion_CellFormatting
         AddHandler chkVerHistorial.CheckedChanged, AddressOf chkVerHistorial_CheckedChanged
         AddHandler dgvEstadosTransitorios.SelectionChanged, AddressOf DgvEstadosTransitorios_SelectionChanged
         AddHandler dgvEstadosTransitorios.CellDoubleClick, AddressOf DgvEstadosTransitorios_CellDoubleClick
@@ -130,7 +130,7 @@ Public Class frmFuncionarioCrear
     End Sub
 
     Private Sub DgvEstadosTransitorios_CellDoubleClick(sender As Object, e As DataGridViewCellEventArgs)
-        If e.RowIndex < 0 Then Return ' Ignorar clics en la cabecera
+        If e.RowIndex < 0 Then Return
 
         Dim row = TryCast(dgvEstadosTransitorios.Rows(e.RowIndex).DataBoundItem, EstadoRow)
         If row Is Nothing Then Return
@@ -154,8 +154,8 @@ Public Class frmFuncionarioCrear
     ' -------------------- Helpers de mapeo ---------------------
     Private Function MapEstadosActivos(source As IEnumerable(Of EstadoTransitorio)) As BindingList(Of EstadoRow)
         Dim list As New BindingList(Of EstadoRow)
-        For Each e In source
-            Dim row = BuildEstadoRow(e, "Estado")
+        For Each et In source
+            Dim row = BuildEstadoRow(et, "Estado")
             list.Add(row)
         Next
         Return list
@@ -163,8 +163,8 @@ Public Class frmFuncionarioCrear
 
     Private Function MapEstadosHistorial(source As IEnumerable(Of EstadoTransitorio)) As BindingList(Of EstadoRow)
         Dim list As New BindingList(Of EstadoRow)
-        For Each e In source
-            Dim row = BuildEstadoRow(e, "Historial")
+        For Each et In source
+            Dim row = BuildEstadoRow(et, "Historial")
             list.Add(row)
         Next
         Return list
@@ -293,13 +293,10 @@ Public Class frmFuncionarioCrear
         chkSeparado.Checked = _funcionario.SeparadoDeCargo
         chkDesarmado.Checked = _funcionario.Desarmado
 
-        ' --- INICIO DE LA MODIFICACIÓN ---
-        ' Cargar datos de los nuevos campos
         txtCiudad.Text = _funcionario.Ciudad
         txtSeccional.Text = _funcionario.Seccional
         txtCredencial.Text = _funcionario.Credencial
         chkEstudia.Checked = _funcionario.Estudia
-        ' --- FIN DE LA MODIFICACIÓN ---
     End Sub
 
     '------------------- Cambiar vista Activos / Historial --------------------------
@@ -347,12 +344,11 @@ Public Class frmFuncionarioCrear
 
     Private Sub DgvEstadosTransitorios_SelectionChanged(sender As Object, e As EventArgs)
         Dim row = TryCast(dgvEstadosTransitorios.CurrentRow?.DataBoundItem, EstadoRow)
-        Dim editable = (row IsNot Nothing) ' Enable editing/deleting for any selected row
+        Dim editable = (row IsNot Nothing)
         btnEditarEstado.Enabled = editable
         btnQuitarEstado.Enabled = editable
         btnAñadirEstado.Enabled = True
     End Sub
-
 
     '------------------- Guardado / cierre --------------------------
     Private Async Function GuardarAsync() As Task(Of Boolean)
@@ -388,14 +384,10 @@ Public Class frmFuncionarioCrear
             _funcionario.SeparadoDeCargo = chkSeparado.Checked
             _funcionario.Desarmado = chkDesarmado.Checked
 
-            ' --- INICIO DE LA MODIFICACIÓN ---
-            ' Guardar los nuevos campos
             _funcionario.Ciudad = txtCiudad.Text.Trim()
             _funcionario.Seccional = txtSeccional.Text.Trim()
             _funcionario.Credencial = txtCredencial.Text.Trim()
             _funcionario.Estudia = chkEstudia.Checked
-            ' --- FIN DE LA MODIFICACIÓN ---
-
 
             If Not String.IsNullOrWhiteSpace(_rutaFotoSeleccionada) Then
                 _funcionario.Foto = File.ReadAllBytes(_rutaFotoSeleccionada)
@@ -447,7 +439,6 @@ Public Class frmFuncionarioCrear
         End If
     End Sub
 
-    ' ---------------- Sincronizar (si lo querés usar aún) ----------------
     Private Sub SincronizarColeccion(Of T As Class)(dbCollection As ICollection(Of T), formCollection As IEnumerable(Of T))
         Dim itemsParaAnadir = formCollection.Except(dbCollection).ToList()
         For Each item In itemsParaAnadir
@@ -478,7 +469,6 @@ Public Class frmFuncionarioCrear
         cboNivelEstudio.DataSource = Await _svc.ObtenerNivelesEstudioAsync()
         cboNivelEstudio.DisplayMember = "Value"
         cboNivelEstudio.ValueMember = "Key"
-
         cboEstado.DataSource = Await _svc.ObtenerEstadosAsync()
         cboEstado.DisplayMember = "Value"
         cboEstado.ValueMember = "Key"
@@ -618,7 +608,6 @@ Public Class frmFuncionarioCrear
         End With
     End Sub
 
-    ' ---- Formateo tolerante SOLO para Dotación (fecha / item) ----
     Private Sub dgvDotacion_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
         Dim dgv = CType(sender, DataGridView)
         If e.RowIndex < 0 OrElse e.ColumnIndex < 0 Then Return
@@ -726,7 +715,8 @@ Public Class frmFuncionarioCrear
 #Region "CRUD Estados Transitorios"
     Private Async Sub btnAñadirEstado_Click(sender As Object, e As EventArgs) Handles btnAñadirEstado.Click
         Dim nuevoEstado = New EstadoTransitorio()
-        Using frm As New frmFuncionarioEstadoTransitorio(nuevoEstado, _tiposEstadoTransitorio)
+        ' --- CORRECCIÓN AQUÍ ---
+        Using frm As New frmFuncionarioEstadoTransitorio(nuevoEstado, _tiposEstadoTransitorio, _uow)
             If frm.ShowDialog() = DialogResult.OK Then
                 Try
                     _funcionario.EstadoTransitorio.Add(frm.Estado)
@@ -749,7 +739,8 @@ Public Class frmFuncionarioCrear
         Dim row = TryCast(dgvEstadosTransitorios.CurrentRow?.DataBoundItem, EstadoRow)
         If row Is Nothing OrElse row.EntityRef Is Nothing Then Return
 
-        Using frm As New frmFuncionarioEstadoTransitorio(row.EntityRef, _tiposEstadoTransitorio)
+        ' --- CORRECCIÓN AQUÍ ---
+        Using frm As New frmFuncionarioEstadoTransitorio(row.EntityRef, _tiposEstadoTransitorio, _uow)
             If frm.ShowDialog() = DialogResult.OK Then
                 Try
                     _uow.Context.Entry(row.EntityRef).State = EntityState.Modified
@@ -781,16 +772,13 @@ Public Class frmFuncionarioCrear
         Try
             Dim eEntity = row.EntityRef
 
-            ' Romper vínculos y eliminar detalles primero
-            If eEntity.DesignacionDetalle IsNot Nothing Then _uow.Context.Set(Of DesignacionDetalle)().Remove(eEntity.DesignacionDetalle) : eEntity.DesignacionDetalle = Nothing
-            If eEntity.EnfermedadDetalle IsNot Nothing Then _uow.Context.Set(Of EnfermedadDetalle)().Remove(eEntity.EnfermedadDetalle) : eEntity.EnfermedadDetalle = Nothing
-            If eEntity.SancionDetalle IsNot Nothing Then _uow.Context.Set(Of SancionDetalle)().Remove(eEntity.SancionDetalle) : eEntity.SancionDetalle = Nothing
-            If eEntity.OrdenCincoDetalle IsNot Nothing Then _uow.Context.Set(Of OrdenCincoDetalle)().Remove(eEntity.OrdenCincoDetalle) : eEntity.OrdenCincoDetalle = Nothing
-            If eEntity.RetenDetalle IsNot Nothing Then _uow.Context.Set(Of RetenDetalle)().Remove(eEntity.RetenDetalle) : eEntity.RetenDetalle = Nothing
-            If eEntity.SumarioDetalle IsNot Nothing Then _uow.Context.Set(Of SumarioDetalle)().Remove(eEntity.SumarioDetalle) : eEntity.SumarioDetalle = Nothing
-
-            eEntity.Funcionario = Nothing
-            eEntity.TipoEstadoTransitorio = Nothing
+            ' Eliminar detalles primero
+            If eEntity.DesignacionDetalle IsNot Nothing Then _uow.Context.Set(Of DesignacionDetalle)().Remove(eEntity.DesignacionDetalle)
+            If eEntity.EnfermedadDetalle IsNot Nothing Then _uow.Context.Set(Of EnfermedadDetalle)().Remove(eEntity.EnfermedadDetalle)
+            If eEntity.SancionDetalle IsNot Nothing Then _uow.Context.Set(Of SancionDetalle)().Remove(eEntity.SancionDetalle)
+            If eEntity.OrdenCincoDetalle IsNot Nothing Then _uow.Context.Set(Of OrdenCincoDetalle)().Remove(eEntity.OrdenCincoDetalle)
+            If eEntity.RetenDetalle IsNot Nothing Then _uow.Context.Set(Of RetenDetalle)().Remove(eEntity.RetenDetalle)
+            If eEntity.SumarioDetalle IsNot Nothing Then _uow.Context.Set(Of SumarioDetalle)().Remove(eEntity.SumarioDetalle)
 
             _uow.Context.Set(Of EstadoTransitorio)().Remove(eEntity)
             Await _uow.CommitAsync()

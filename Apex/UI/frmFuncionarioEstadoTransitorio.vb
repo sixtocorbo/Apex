@@ -1,10 +1,14 @@
 ﻿' Apex/UI/frmFuncionarioEstadoTransitorio.vb
+Imports System.IO
+Imports System.Linq
+
 Public Class frmFuncionarioEstadoTransitorio
 
     Public Estado As EstadoTransitorio
     Private _tiposEstado As List(Of TipoEstadoTransitorio)
+    Private _unitOfWork As IUnitOfWork
 
-    ' Propiedades para los nuevos detalles (inicializadas en el constructor)
+    ' Propiedades para los nuevos detalles
     Public DesignacionDetalle As DesignacionDetalle
     Public SancionDetalle As SancionDetalle
     Public SumarioDetalle As SumarioDetalle
@@ -12,10 +16,11 @@ Public Class frmFuncionarioEstadoTransitorio
     Public EnfermedadDetalle As EnfermedadDetalle
     Public RetenDetalle As RetenDetalle
 
-    Public Sub New(estado As EstadoTransitorio, tiposEstado As List(Of TipoEstadoTransitorio))
+    Public Sub New(estado As EstadoTransitorio, tiposEstado As List(Of TipoEstadoTransitorio), uow As IUnitOfWork)
         InitializeComponent()
         Me.Estado = estado
         _tiposEstado = tiposEstado
+        _unitOfWork = uow
     End Sub
 
     Private Sub frmFuncionarioEstadoTransitorio_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -27,11 +32,14 @@ Public Class frmFuncionarioEstadoTransitorio
             cboTipoEstado.SelectedValue = Estado.TipoEstadoTransitorioId
             cboTipoEstado.Enabled = False
             CargarDatosDeDetalle()
+            CargarAdjuntos(Estado.Id)
+            GroupBox1.Enabled = True ' Habilitar la sección de adjuntos
         Else
             ' MODO CREACIÓN
             Estado = New EstadoTransitorio()
             chkFechaHasta.Checked = True
             cboTipoEstado.SelectedIndex = -1
+            GroupBox1.Enabled = False ' Deshabilitar adjuntos hasta que se guarde el estado
         End If
 
         AddHandler cboTipoEstado.SelectedIndexChanged, AddressOf TipoEstado_Changed
@@ -77,7 +85,7 @@ Public Class frmFuncionarioEstadoTransitorio
                 dtpFechaDesde.Value = SumarioDetalle.FechaDesde
                 fechaHasta = SumarioDetalle.FechaHasta
                 observaciones = SumarioDetalle.Observaciones
-                txtResolucion.Text = SumarioDetalle.Expediente ' Mapeado a Expediente
+                txtResolucion.Text = SumarioDetalle.Expediente
         End Select
 
         ' Asignar valores a los controles comunes
@@ -209,4 +217,106 @@ Public Class frmFuncionarioEstadoTransitorio
         DialogResult = DialogResult.Cancel
         Close()
     End Sub
+
+#Region "Lógica de Archivos Adjuntos"
+
+    Private Sub CargarAdjuntos(estadoId As Integer)
+        Dim repo = _unitOfWork.Repository(Of EstadoTransitorioAdjunto)()
+        Dim adjuntos = repo.GetAll().Where(Function(a) a.EstadoTransitorioId = estadoId) _
+                                   .Select(Function(a) New With {a.Id, a.NombreArchivo, a.FechaCreacion}) _
+                                   .ToList()
+        dgvAdjuntos.DataSource = adjuntos
+
+        ' Configurar columnas del DataGridView
+        If dgvAdjuntos.Rows.Count > 0 Then
+            dgvAdjuntos.Columns("Id").Visible = False
+            dgvAdjuntos.Columns("NombreArchivo").HeaderText = "Nombre del Archivo"
+            dgvAdjuntos.Columns("NombreArchivo").AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+            dgvAdjuntos.Columns("FechaCreacion").HeaderText = "Fecha de Carga"
+        End If
+    End Sub
+
+    Private Sub btnAdjuntar_Click(sender As Object, e As EventArgs) Handles btnAdjuntar.Click
+        Using openDialog As New OpenFileDialog()
+            openDialog.Title = "Seleccione un archivo (PDF o Imagen)"
+            openDialog.Filter = "Archivos PDF (*.pdf)|*.pdf|Imágenes (*.jpg;*.jpeg;*.png)|*.jpg;*.jpeg;*.png"
+
+            If openDialog.ShowDialog() = DialogResult.OK Then
+                Try
+                    Dim contenidoBytes = File.ReadAllBytes(openDialog.FileName)
+
+                    Dim nuevoAdjunto As New EstadoTransitorioAdjunto With {
+                        .EstadoTransitorioId = Estado.Id,
+                        .NombreArchivo = Path.GetFileName(openDialog.FileName),
+                        .TipoMIME = GetMimeType(openDialog.FileName), ' <-- CORRECCIÓN AQUÍ
+                        .Contenido = contenidoBytes,
+                        .FechaCreacion = DateTime.Now
+                    }
+
+                    Dim repo = _unitOfWork.Repository(Of EstadoTransitorioAdjunto)()
+                    repo.Add(nuevoAdjunto) ' <-- CORRECCIÓN AQUÍ
+                    _unitOfWork.Commit() ' <-- CORRECCIÓN AQUÍ
+
+                    MessageBox.Show("Archivo adjuntado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                    CargarAdjuntos(Estado.Id)
+
+                Catch ex As Exception
+                    MessageBox.Show($"Error al adjuntar el archivo: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                End Try
+            End If
+        End Using
+    End Sub
+
+    Private Sub btnVerAdjunto_Click(sender As Object, e As EventArgs) Handles btnVerAdjunto.Click
+        If dgvAdjuntos.CurrentRow Is Nothing Then Return
+
+        Try
+            Dim adjuntoId = CInt(dgvAdjuntos.CurrentRow.Cells("Id").Value)
+            Dim repo = _unitOfWork.Repository(Of EstadoTransitorioAdjunto)()
+            Dim adjunto = repo.GetById(adjuntoId)
+
+            If adjunto IsNot Nothing Then
+                Dim tempPath = Path.Combine(Path.GetTempPath(), adjunto.NombreArchivo)
+                File.WriteAllBytes(tempPath, adjunto.Contenido)
+                Process.Start(tempPath)
+            End If
+        Catch ex As Exception
+            MessageBox.Show($"No se pudo abrir el archivo: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
+
+    Private Sub btnEliminarAdjunto_Click(sender As Object, e As EventArgs) Handles btnEliminarAdjunto.Click
+        If dgvAdjuntos.CurrentRow Is Nothing Then Return
+
+        If MessageBox.Show("¿Está seguro de que desea eliminar este archivo adjunto?", "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) = DialogResult.Yes Then
+            Try
+                Dim adjuntoId = CInt(dgvAdjuntos.CurrentRow.Cells("Id").Value)
+                Dim repo = _unitOfWork.Repository(Of EstadoTransitorioAdjunto)()
+                repo.RemoveById(adjuntoId) ' <-- CORRECCIÓN AQUÍ
+                _unitOfWork.Commit() ' <-- CORRECCIÓN AQUÍ
+
+                CargarAdjuntos(Estado.Id)
+            Catch ex As Exception
+                MessageBox.Show($"No se pudo eliminar el archivo: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            End Try
+        End If
+    End Sub
+
+    ' Función de ayuda para obtener el tipo MIME sin usar System.Web
+    Private Function GetMimeType(fileName As String) As String
+        Dim extension = Path.GetExtension(fileName).ToLowerInvariant()
+        Select Case extension
+            Case ".pdf"
+                Return "application/pdf"
+            Case ".jpg", ".jpeg"
+                Return "image/jpeg"
+            Case ".png"
+                Return "image/png"
+            Case Else
+                Return "application/octet-stream" ' Tipo genérico para archivos desconocidos
+        End Select
+    End Function
+
+#End Region
+
 End Class
