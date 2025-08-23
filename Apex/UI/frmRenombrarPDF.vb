@@ -15,21 +15,51 @@ Public Class frmRenombrarPDF
     Private _unitOfWork As IUnitOfWork
     Private _funcionarioSeleccionado As Funcionario
 
-    Private Async Sub frmRenombrarPDF_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Public Sub New()
+        MyBase.New()
+        InitializeComponent() ' <- Esto crea Timer1 y todos los controles del Designer
+    End Sub
 
+
+    Private Async Sub frmRenombrarPDF_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        ' Mostrar cursor de espera mientras se carga
         Me.Cursor = Cursors.WaitCursor
+
+        ' Inicializar UnitOfWork y temporizador
         _unitOfWork = New UnitOfWork()
         Timer1.Interval = 500 ' Intervalo para el debounce de la búsqueda
 
+        ' Cargar nomenclaturas en el DataGridView
         Try
             Await CargarNomenclatura()
         Catch ex As Exception
-            MessageBox.Show($"Error al cargar las nomenclaturas: {ex.Message}", "Error de Carga", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            MessageBox.Show($"Error al cargar las nomenclaturas: {ex.Message}",
+                        "Error de Carga", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
 
+        ' === Ajustes para resoluciones pequeñas ===
+        ' Habilitar barras de desplazamiento en el formulario y paneles
+        Me.AutoScroll = True
+        PanelLeft.AutoScroll = True
+        PanelRight.AutoScroll = True
 
+        ' Cambiar el ancho de la primera columna a un porcentaje para que sea flexible
+        TableLayoutPanel1.ColumnStyles(0).SizeType = SizeType.Percent
+        TableLayoutPanel1.ColumnStyles(0).Width = 30
+        TableLayoutPanel1.ColumnStyles(1).SizeType = SizeType.Percent
+        TableLayoutPanel1.ColumnStyles(1).Width = 70
+
+        ' Ajustar el tamaño mínimo si deseas permitir ventanas más pequeñas (opcional)
+        Me.MinimumSize = New Size(600, 400)
+
+        ' Forzar el recalculado del diseño la primera vez (opcional)
+        Me.PerformLayout()
+
+        ' Devolver el cursor a su estado normal
         Me.Cursor = Cursors.Default
     End Sub
+
+
 
     Private Sub btnBuscarFuncionario_Click(sender As Object, e As EventArgs) Handles btnBuscarFuncionario.Click
         Using form As New frmFuncionarioBuscar(frmFuncionarioBuscar.ModoApertura.Seleccion)
