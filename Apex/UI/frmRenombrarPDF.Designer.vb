@@ -331,7 +331,7 @@
         Me.GroupBox1.Location = New System.Drawing.Point(4, 536)
         Me.GroupBox1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Padding = New System.Windows.Forms.Padding(15, 15, 15, 15)
+        Me.GroupBox1.Padding = New System.Windows.Forms.Padding(15)
         Me.GroupBox1.Size = New System.Drawing.Size(881, 324)
         Me.GroupBox1.TabIndex = 14
         Me.GroupBox1.TabStop = False
@@ -445,6 +445,7 @@
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.MinimumSize = New System.Drawing.Size(889, 585)
         Me.Name = "frmRenombrarPDF"
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Renombrado Inteligente de Archivos PDF"
         Me.SplitContainer1.Panel1.ResumeLayout(False)
         Me.SplitContainer1.Panel2.ResumeLayout(False)

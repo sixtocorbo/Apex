@@ -34,24 +34,29 @@ Partial Class frmEstadosTransitoriosGeneral
         '
         Me.dgvEstados.AllowUserToAddRows = False
         Me.dgvEstados.AllowUserToDeleteRows = False
+        Me.dgvEstados.AllowUserToResizeColumns = False
+        Me.dgvEstados.AllowUserToResizeRows = False
         Me.dgvEstados.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.dgvEstados.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.dgvEstados.Location = New System.Drawing.Point(12, 38)
+        Me.dgvEstados.Location = New System.Drawing.Point(18, 58)
+        Me.dgvEstados.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.dgvEstados.MultiSelect = False
         Me.dgvEstados.Name = "dgvEstados"
         Me.dgvEstados.ReadOnly = True
+        Me.dgvEstados.RowHeadersWidth = 62
         Me.dgvEstados.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgvEstados.Size = New System.Drawing.Size(760, 372)
+        Me.dgvEstados.Size = New System.Drawing.Size(1140, 572)
         Me.dgvEstados.TabIndex = 0
         '
         'btnVerDetalles
         '
         Me.btnVerDetalles.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnVerDetalles.Location = New System.Drawing.Point(697, 416)
+        Me.btnVerDetalles.Location = New System.Drawing.Point(1046, 640)
+        Me.btnVerDetalles.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnVerDetalles.Name = "btnVerDetalles"
-        Me.btnVerDetalles.Size = New System.Drawing.Size(75, 23)
+        Me.btnVerDetalles.Size = New System.Drawing.Size(112, 35)
         Me.btnVerDetalles.TabIndex = 1
         Me.btnVerDetalles.Text = "Ver Detalles"
         Me.btnVerDetalles.UseVisualStyleBackColor = True
@@ -59,9 +64,10 @@ Partial Class frmEstadosTransitoriosGeneral
         'btnCerrar
         '
         Me.btnCerrar.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnCerrar.Location = New System.Drawing.Point(12, 416)
+        Me.btnCerrar.Location = New System.Drawing.Point(18, 640)
+        Me.btnCerrar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnCerrar.Name = "btnCerrar"
-        Me.btnCerrar.Size = New System.Drawing.Size(75, 23)
+        Me.btnCerrar.Size = New System.Drawing.Size(112, 35)
         Me.btnCerrar.TabIndex = 2
         Me.btnCerrar.Text = "Cerrar"
         Me.btnCerrar.UseVisualStyleBackColor = True
@@ -69,9 +75,10 @@ Partial Class frmEstadosTransitoriosGeneral
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(12, 15)
+        Me.Label1.Location = New System.Drawing.Point(18, 23)
+        Me.Label1.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(183, 13)
+        Me.Label1.Size = New System.Drawing.Size(271, 20)
         Me.Label1.TabIndex = 3
         Me.Label1.Text = "Filtrar por Nombre, Apellido o Cédula:"
         '
@@ -79,23 +86,26 @@ Partial Class frmEstadosTransitoriosGeneral
         '
         Me.txtFiltro.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtFiltro.Location = New System.Drawing.Point(201, 12)
+        Me.txtFiltro.Location = New System.Drawing.Point(302, 18)
+        Me.txtFiltro.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtFiltro.Name = "txtFiltro"
-        Me.txtFiltro.Size = New System.Drawing.Size(571, 20)
+        Me.txtFiltro.Size = New System.Drawing.Size(854, 26)
         Me.txtFiltro.TabIndex = 4
         '
         'frmEstadosTransitoriosGeneral
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(784, 451)
+        Me.ClientSize = New System.Drawing.Size(1176, 694)
         Me.Controls.Add(Me.txtFiltro)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.btnCerrar)
         Me.Controls.Add(Me.btnVerDetalles)
         Me.Controls.Add(Me.dgvEstados)
-        Me.MinimumSize = New System.Drawing.Size(800, 490)
+        Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.MinimumSize = New System.Drawing.Size(1189, 724)
         Me.Name = "frmEstadosTransitoriosGeneral"
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Visor de Estados Transitorios"
         CType(Me.dgvEstados, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)

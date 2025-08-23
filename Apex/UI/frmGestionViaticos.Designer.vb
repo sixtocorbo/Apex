@@ -125,6 +125,7 @@ Partial Class frmGestionViaticos
         Me.Controls.Add(Me.pnlFiltros)
         Me.Font = New System.Drawing.Font("Segoe UI", 9.0!)
         Me.Name = "frmGestionViaticos"
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Gestión de Viáticos"
         Me.pnlFiltros.ResumeLayout(False)
         Me.pnlFiltros.PerformLayout()

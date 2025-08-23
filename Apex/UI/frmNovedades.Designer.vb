@@ -151,7 +151,7 @@ Partial Class frmNovedades
         'dtpFecha
         '
         Me.dtpFecha.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.dtpFecha.Format = System.Windows.Forms.DateTimePickerFormat.Short
+        Me.dtpFecha.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
         Me.dtpFecha.Location = New System.Drawing.Point(73, 15)
         Me.dtpFecha.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.dtpFecha.Name = "dtpFecha"
@@ -255,6 +255,7 @@ Partial Class frmNovedades
         Me.Controls.Add(Me.PanelPrincipal)
         Me.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.Name = "frmNovedades"
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Gestión de Novedades"
         Me.PanelPrincipal.ResumeLayout(False)
         Me.SplitContenedor.Panel1.ResumeLayout(False)

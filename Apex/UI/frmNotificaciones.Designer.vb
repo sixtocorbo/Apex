@@ -185,6 +185,7 @@ Partial Class frmNotificaciones
         Me.Controls.Add(Me.panelFiltros)
         Me.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Name = "frmNotificaciones"
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Gestión de Notificaciones"
         Me.panelFiltros.ResumeLayout(False)
         Me.panelFiltros.PerformLayout()

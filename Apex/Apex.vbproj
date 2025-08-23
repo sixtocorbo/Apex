@@ -419,12 +419,6 @@
     <Compile Include="Services\SancionService.vb" />
     <Compile Include="Services\ViaticoService.vb" />
     <Compile Include="UI\FiltroAvanzadoUI.vb" />
-    <Compile Include="UI\Form1.Designer.vb">
-      <DependentUpon>Form1.vb</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Form1.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="UI\frmAsistenteImportacion.Designer.vb">
       <DependentUpon>frmAsistenteImportacion.vb</DependentUpon>
     </Compile>
@@ -532,6 +526,12 @@
     <Compile Include="UI\frmGestion.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="UI\frmGestionIncidencias.Designer.vb">
+      <DependentUpon>frmGestionIncidencias.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmGestionIncidencias.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="UI\frmGestionNomenclaturas.Designer.vb">
       <DependentUpon>frmGestionNomenclaturas.vb</DependentUpon>
     </Compile>
@@ -542,6 +542,12 @@
       <DependentUpon>frmGestionViaticos.vb</DependentUpon>
     </Compile>
     <Compile Include="UI\frmGestionViaticos.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\frmIncidenciaDetalle.Designer.vb">
+      <DependentUpon>frmIncidenciaDetalle.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmIncidenciaDetalle.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="UI\frmLicenciaCrear.Designer.vb">
@@ -596,14 +602,23 @@
   <ItemGroup>
     <EmbeddedResource Include="Reportes\ConceptoFuncional.rdlc" />
     <EmbeddedResource Include="Reportes\FichaFuncional.rdlc" />
-    <EmbeddedResource Include="UI\Form1.resx">
-      <DependentUpon>Form1.vb</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="UI\frmConceptoFuncionalApex.resx">
       <DependentUpon>frmConceptoFuncionalApex.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmConceptoFuncionalRPT.resx">
+      <DependentUpon>frmConceptoFuncionalRPT.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmConfiguracion.resx">
+      <DependentUpon>frmConfiguracion.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\frmDashboard.resx">
       <DependentUpon>frmDashboard.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmEstadosTransitoriosGeneral.resx">
+      <DependentUpon>frmEstadosTransitoriosGeneral.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmFichaFuncionalRPT.resx">
+      <DependentUpon>frmFichaFuncionalRPT.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmFiltroAvanzado.resx">
       <DependentUpon>frmFiltroAvanzado.vb</DependentUpon>
@@ -620,11 +635,20 @@
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmFuncionarioEstadoTransitorio.resx">
+      <DependentUpon>frmFuncionarioEstadoTransitorio.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\frmFuncionarioSituacion.resx">
       <DependentUpon>frmFuncionarioSituacion.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmGestion.resx">
       <DependentUpon>frmGestion.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmGestionIncidencias.resx">
+      <DependentUpon>frmGestionIncidencias.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmGestionNomenclaturas.resx">
+      <DependentUpon>frmGestionNomenclaturas.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmGestionViaticos.resx">
       <DependentUpon>frmGestionViaticos.vb</DependentUpon>

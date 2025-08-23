@@ -2,6 +2,7 @@
 Partial Class frmConfiguracion
     Inherits System.Windows.Forms.Form
 
+    'Form overrides dispose to clean up the component list.
     <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
@@ -13,111 +14,100 @@ Partial Class frmConfiguracion
         End Try
     End Sub
 
+    'Required by the Windows Form Designer
     Private components As System.ComponentModel.IContainer
 
+    'NOTE: The following procedure is required by the Windows Form Designer
+    'It can be modified using the Windows Form Designer.  
+    'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Me.PanelPrincipal = New System.Windows.Forms.Panel()
-        Me.TabControlConfig = New System.Windows.Forms.TabControl()
-        Me.TabPageViaticos = New System.Windows.Forms.TabPage()
-        Me.txtReglasViaticos = New System.Windows.Forms.TextBox()
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
-        Me.btnCerrar = New System.Windows.Forms.Button()
-        Me.PanelPrincipal.SuspendLayout()
-        Me.TabControlConfig.SuspendLayout()
-        Me.TabPageViaticos.SuspendLayout()
+        Me.btnGestionarViaticos = New System.Windows.Forms.Button()
+        Me.btnGestionarIncidencias = New System.Windows.Forms.Button()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.btnVolver = New System.Windows.Forms.Button()
         Me.FlowLayoutPanel1.SuspendLayout()
         Me.SuspendLayout()
         '
-        'PanelPrincipal
-        '
-        Me.PanelPrincipal.Controls.Add(Me.TabControlConfig)
-        Me.PanelPrincipal.Controls.Add(Me.FlowLayoutPanel1)
-        Me.PanelPrincipal.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.PanelPrincipal.Location = New System.Drawing.Point(0, 0)
-        Me.PanelPrincipal.Name = "PanelPrincipal"
-        Me.PanelPrincipal.Padding = New System.Windows.Forms.Padding(10)
-        Me.PanelPrincipal.Size = New System.Drawing.Size(784, 461)
-        Me.PanelPrincipal.TabIndex = 0
-        '
-        'TabControlConfig
-        '
-        Me.TabControlConfig.Controls.Add(Me.TabPageViaticos)
-        Me.TabControlConfig.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.TabControlConfig.Font = New System.Drawing.Font("Segoe UI", 9.75!)
-        Me.TabControlConfig.Location = New System.Drawing.Point(10, 10)
-        Me.TabControlConfig.Name = "TabControlConfig"
-        Me.TabControlConfig.SelectedIndex = 0
-        Me.TabControlConfig.Size = New System.Drawing.Size(764, 395)
-        Me.TabControlConfig.TabIndex = 1
-        '
-        'TabPageViaticos
-        '
-        Me.TabPageViaticos.Controls.Add(Me.txtReglasViaticos)
-        Me.TabPageViaticos.Location = New System.Drawing.Point(4, 32)
-        Me.TabPageViaticos.Name = "TabPageViaticos"
-        Me.TabPageViaticos.Padding = New System.Windows.Forms.Padding(10)
-        Me.TabPageViaticos.Size = New System.Drawing.Size(756, 359)
-        Me.TabPageViaticos.TabIndex = 0
-        Me.TabPageViaticos.Text = "Reglas de Viáticos"
-        Me.TabPageViaticos.UseVisualStyleBackColor = True
-        '
-        'txtReglasViaticos
-        '
-        Me.txtReglasViaticos.BackColor = System.Drawing.SystemColors.ControlLightLight
-        Me.txtReglasViaticos.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.txtReglasViaticos.Font = New System.Drawing.Font("Consolas", 10.2!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtReglasViaticos.Location = New System.Drawing.Point(10, 10)
-        Me.txtReglasViaticos.Multiline = True
-        Me.txtReglasViaticos.Name = "txtReglasViaticos"
-        Me.txtReglasViaticos.ReadOnly = True
-        Me.txtReglasViaticos.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.txtReglasViaticos.Size = New System.Drawing.Size(736, 339)
-        Me.txtReglasViaticos.TabIndex = 0
-        '
         'FlowLayoutPanel1
         '
-        Me.FlowLayoutPanel1.Controls.Add(Me.btnCerrar)
-        Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.FlowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
-        Me.FlowLayoutPanel1.Location = New System.Drawing.Point(10, 405)
+        Me.FlowLayoutPanel1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.FlowLayoutPanel1.Controls.Add(Me.btnGestionarViaticos)
+        Me.FlowLayoutPanel1.Controls.Add(Me.btnGestionarIncidencias)
+        Me.FlowLayoutPanel1.Location = New System.Drawing.Point(18, 69)
+        Me.FlowLayoutPanel1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
-        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(764, 46)
+        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(1140, 468)
         Me.FlowLayoutPanel1.TabIndex = 0
         '
-        'btnCerrar
+        'btnGestionarViaticos
         '
-        Me.btnCerrar.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCerrar.Location = New System.Drawing.Point(658, 3)
-        Me.btnCerrar.Name = "btnCerrar"
-        Me.btnCerrar.Size = New System.Drawing.Size(103, 40)
-        Me.btnCerrar.TabIndex = 0
-        Me.btnCerrar.Text = "Cerrar"
-        Me.btnCerrar.UseVisualStyleBackColor = True
+        Me.btnGestionarViaticos.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnGestionarViaticos.Location = New System.Drawing.Point(4, 5)
+        Me.btnGestionarViaticos.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnGestionarViaticos.Name = "btnGestionarViaticos"
+        Me.btnGestionarViaticos.Size = New System.Drawing.Size(270, 77)
+        Me.btnGestionarViaticos.TabIndex = 0
+        Me.btnGestionarViaticos.Text = "Gestionar Tipos de Viático"
+        Me.btnGestionarViaticos.UseVisualStyleBackColor = True
+        '
+        'btnGestionarIncidencias
+        '
+        Me.btnGestionarIncidencias.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnGestionarIncidencias.Location = New System.Drawing.Point(282, 5)
+        Me.btnGestionarIncidencias.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnGestionarIncidencias.Name = "btnGestionarIncidencias"
+        Me.btnGestionarIncidencias.Size = New System.Drawing.Size(270, 77)
+        Me.btnGestionarIncidencias.TabIndex = 1
+        Me.btnGestionarIncidencias.Text = "Gestionar Incidencias"
+        Me.btnGestionarIncidencias.UseVisualStyleBackColor = True
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Font = New System.Drawing.Font("Segoe UI", 14.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label1.Location = New System.Drawing.Point(18, 14)
+        Me.Label1.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(337, 40)
+        Me.Label1.TabIndex = 1
+        Me.Label1.Text = "Panel de Configuración"
+        '
+        'btnVolver
+        '
+        Me.btnVolver.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnVolver.Location = New System.Drawing.Point(1046, 555)
+        Me.btnVolver.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnVolver.Name = "btnVolver"
+        Me.btnVolver.Size = New System.Drawing.Size(112, 35)
+        Me.btnVolver.TabIndex = 2
+        Me.btnVolver.Text = "Volver"
+        Me.btnVolver.UseVisualStyleBackColor = True
         '
         'frmConfiguracion
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.CancelButton = Me.btnCerrar
-        Me.ClientSize = New System.Drawing.Size(784, 461)
-        Me.Controls.Add(Me.PanelPrincipal)
-        Me.MinimumSize = New System.Drawing.Size(600, 400)
+        Me.ClientSize = New System.Drawing.Size(1176, 609)
+        Me.Controls.Add(Me.btnVolver)
+        Me.Controls.Add(Me.Label1)
+        Me.Controls.Add(Me.FlowLayoutPanel1)
+        Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Name = "frmConfiguracion"
-        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
-        Me.Text = "Configuración y Reglas de Negocio"
-        Me.PanelPrincipal.ResumeLayout(False)
-        Me.TabControlConfig.ResumeLayout(False)
-        Me.TabPageViaticos.ResumeLayout(False)
-        Me.TabPageViaticos.PerformLayout()
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
+        Me.Text = "Configuraciones Generales"
         Me.FlowLayoutPanel1.ResumeLayout(False)
         Me.ResumeLayout(False)
+        Me.PerformLayout()
+
     End Sub
 
-    Friend WithEvents PanelPrincipal As Panel
     Friend WithEvents FlowLayoutPanel1 As FlowLayoutPanel
-    Friend WithEvents btnCerrar As Button
-    Friend WithEvents TabControlConfig As TabControl
-    Friend WithEvents TabPageViaticos As TabPage
-    Friend WithEvents txtReglasViaticos As TextBox
+    Friend WithEvents btnGestionarViaticos As Button
+    Friend WithEvents btnGestionarIncidencias As Button
+    Friend WithEvents Label1 As Label
+    Friend WithEvents btnVolver As Button
 End Class

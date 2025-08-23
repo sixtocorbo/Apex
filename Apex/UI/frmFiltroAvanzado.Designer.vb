@@ -529,6 +529,7 @@ Partial Class frmFiltroAvanzado
         Me.Controls.Add(Me.splitContenedorPrincipal)
         Me.MinimumSize = New System.Drawing.Size(1008, 731)
         Me.Name = "frmFiltroAvanzado"
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Filtro Avanzado"
         Me.WindowState = System.Windows.Forms.FormWindowState.Maximized
         Me.splitContenedorPrincipal.Panel1.ResumeLayout(False)

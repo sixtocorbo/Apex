@@ -17,7 +17,8 @@ Public Class frmDashboard
     Private _viaticosInstancia As frmGestionViaticos
     Private _importacionInstancia As frmAsistenteImportacion
     Private _gestionNomenclaturasInstancia As frmGestionNomenclaturas
-    Private _renombrarPDFInstancia As frmRenombrarPDF ' --> INSTANCIA NUEVA
+    Private _renombrarPDFInstancia As frmRenombrarPDF
+    Private _configuracionInstancia As frmConfiguracion ' --> INSTANCIA PARA EL FORM DE CONFIGURACIÓN
 
     Public Sub New()
         InitializeComponent()
@@ -27,7 +28,7 @@ Public Class frmDashboard
         AddHandler btnNovedades.Click, AddressOf ActivateButton
         AddHandler btnGestion.Click, AddressOf ActivateButton
         AddHandler btnNomenclaturas.Click, AddressOf ActivateButton
-        AddHandler btnRenombrarPDFs.Click, AddressOf ActivateButton ' --> MANEJADOR NUEVO
+        AddHandler btnRenombrarPDFs.Click, AddressOf ActivateButton
         AddHandler btnImportacion.Click, AddressOf ActivateButton
         AddHandler btnViaticos.Click, AddressOf ActivateButton
         AddHandler btnReportes.Click, AddressOf ActivateButton
@@ -96,13 +97,11 @@ Public Class frmDashboard
                 End If
                 AbrirFormEnPanel(_gestionNomenclaturasInstancia)
 
-            ' --- CASE NUEVO PARA RENOMBRAR PDFS ---
             Case "btnRenombrarPDFs"
                 If _renombrarPDFInstancia Is Nothing OrElse _renombrarPDFInstancia.IsDisposed Then
                     _renombrarPDFInstancia = New frmRenombrarPDF()
                 End If
                 AbrirFormEnPanel(_renombrarPDFInstancia)
-            ' --- FIN DEL CASE ---
 
             Case "btnImportacion"
                 If _importacionInstancia Is Nothing OrElse _importacionInstancia.IsDisposed Then
@@ -120,11 +119,12 @@ Public Class frmDashboard
                 MessageBox.Show("Formulario de reportes aún no implementado.", "En desarrollo", MessageBoxButtons.OK, MessageBoxIcon.Information)
 
             Case "btnConfiguracion"
-                Using frm As New frmConfiguracion()
-                    frm.ShowDialog(Me)
-                End Using
-                DisableButton()
-                currentBtn = Nothing
+                ' --- CAMBIO AQUÍ: ABRIR DENTRO DEL PANEL ---
+                If _configuracionInstancia Is Nothing OrElse _configuracionInstancia.IsDisposed Then
+                    _configuracionInstancia = New frmConfiguracion()
+                End If
+                AbrirFormEnPanel(_configuracionInstancia)
+                ' --- FIN DEL CAMBIO ---
         End Select
     End Sub
 
