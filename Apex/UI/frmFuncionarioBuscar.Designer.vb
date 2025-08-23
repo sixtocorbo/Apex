@@ -176,6 +176,7 @@ Partial Class frmFuncionarioBuscar
         Me.btnGenerarFicha.TabIndex = 16
         Me.btnGenerarFicha.Text = "Ficha"
         Me.btnGenerarFicha.UseVisualStyleBackColor = True
+        Me.btnGenerarFicha.Visible = False
         '
         'btnVerSituacion
         '

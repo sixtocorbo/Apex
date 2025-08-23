@@ -134,6 +134,7 @@ Public Class frmFuncionarioBuscar
                     dgvResultados.ClearSelection()
                     dgvResultados.Rows(0).Selected = True
                     dgvResultados.CurrentCell = dgvResultados.Rows(0).Cells("CI")
+                    btnGenerarFicha.Visible = True
                 Else
                     LimpiarDetalle()
                 End If
@@ -341,6 +342,7 @@ Public Class frmFuncionarioBuscar
         pbFotoDetalle.Image = Nothing
         lblHorarioCompleto.Text = ""
         _detallesEstadoActual.Clear()
+        btnGenerarFicha.Visible = False
     End Sub
 
     Private Sub lblEstadoTransitorio_DoubleClick(sender As Object, e As EventArgs)

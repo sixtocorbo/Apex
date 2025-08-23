@@ -256,7 +256,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         Me.SplitContainer1.Size = New System.Drawing.Size(1128, 393)
         Me.SplitContainer1.SplitterDistance = 525
         Me.SplitContainer1.SplitterWidth = 6
-        Me.SplitContainer1.TabIndex = 4
+        Me.SplitContainer1.TabIndex = 0
         '
         'btnVerAdjunto
         '
@@ -295,8 +295,6 @@ Partial Class frmFuncionarioEstadoTransitorio
         '
         Me.dgvAdjuntos.AllowUserToAddRows = False
         Me.dgvAdjuntos.AllowUserToDeleteRows = False
-        Me.dgvAdjuntos.AllowUserToResizeColumns = False
-        Me.dgvAdjuntos.AllowUserToResizeRows = False
         Me.dgvAdjuntos.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
@@ -404,12 +402,12 @@ Partial Class frmFuncionarioEstadoTransitorio
     Friend WithEvents lblTurnoReten As Label
     Friend WithEvents txtTurnoReten As TextBox
     Friend WithEvents GroupBox1 As GroupBox
+    Friend WithEvents SplitContainer1 As SplitContainer
+    Friend WithEvents dgvAdjuntos As DataGridView
+    Friend WithEvents btnAdjuntar As Button
     Friend WithEvents btnVerAdjunto As Button
     Friend WithEvents btnEliminarAdjunto As Button
-    Friend WithEvents btnAdjuntar As Button
-    Friend WithEvents dgvAdjuntos As DataGridView
-    Friend WithEvents SplitContainer1 As SplitContainer
-    Friend WithEvents wbPreview As WebBrowser
     Friend WithEvents pbPreview As PictureBox
+    Friend WithEvents wbPreview As WebBrowser
     Friend WithEvents lblPreviewNotAvailable As Label
 End Class
