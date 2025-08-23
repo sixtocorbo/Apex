@@ -16,7 +16,8 @@ Public Class frmDashboard
     Private _novedadesInstancia As frmNovedades
     Private _viaticosInstancia As frmGestionViaticos
     Private _importacionInstancia As frmAsistenteImportacion
-    Private _gestionNomenclaturasInstancia As frmGestionNomenclaturas ' <-- INSTANCIA NUEVA
+    Private _gestionNomenclaturasInstancia As frmGestionNomenclaturas
+    Private _renombrarPDFInstancia As frmRenombrarPDF ' --> INSTANCIA NUEVA
 
     Public Sub New()
         InitializeComponent()
@@ -25,7 +26,8 @@ Public Class frmDashboard
         AddHandler btnFiltros.Click, AddressOf ActivateButton
         AddHandler btnNovedades.Click, AddressOf ActivateButton
         AddHandler btnGestion.Click, AddressOf ActivateButton
-        AddHandler btnNomenclaturas.Click, AddressOf ActivateButton ' <-- MANEJADOR NUEVO
+        AddHandler btnNomenclaturas.Click, AddressOf ActivateButton
+        AddHandler btnRenombrarPDFs.Click, AddressOf ActivateButton ' --> MANEJADOR NUEVO
         AddHandler btnImportacion.Click, AddressOf ActivateButton
         AddHandler btnViaticos.Click, AddressOf ActivateButton
         AddHandler btnReportes.Click, AddressOf ActivateButton
@@ -88,12 +90,18 @@ Public Class frmDashboard
                 End If
                 AbrirFormEnPanel(_gestionInstancia)
 
-            ' --- CASE NUEVO AÑADIDO ---
             Case "btnNomenclaturas"
                 If _gestionNomenclaturasInstancia Is Nothing OrElse _gestionNomenclaturasInstancia.IsDisposed Then
                     _gestionNomenclaturasInstancia = New frmGestionNomenclaturas()
                 End If
                 AbrirFormEnPanel(_gestionNomenclaturasInstancia)
+
+            ' --- CASE NUEVO PARA RENOMBRAR PDFS ---
+            Case "btnRenombrarPDFs"
+                If _renombrarPDFInstancia Is Nothing OrElse _renombrarPDFInstancia.IsDisposed Then
+                    _renombrarPDFInstancia = New frmRenombrarPDF()
+                End If
+                AbrirFormEnPanel(_renombrarPDFInstancia)
             ' --- FIN DEL CASE ---
 
             Case "btnImportacion"
