@@ -214,8 +214,7 @@
     <Compile Include="Data\EstadoTransitorio.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
-    <Compile Include="Data\EstadoTransitorioAdjunto.vb" />
-    <Compile Include="Data\EstadoTransitorioAdjuntos.vb">
+    <Compile Include="Data\EstadoTransitorioAdjunto.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\Funcion.vb">

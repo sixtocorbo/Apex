@@ -103,7 +103,7 @@
           <Property Name="CreatedAt" Type="datetime2" Precision="7" Nullable="false" />
           <Property Name="UpdatedAt" Type="datetime2" Precision="7" />
         </EntityType>
-        <EntityType Name="EstadoTransitorioAdjuntos">
+        <EntityType Name="EstadoTransitorioAdjunto">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
@@ -963,16 +963,16 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_EstadoTransitorioAdjuntos_EstadoTransitorio">
+        <Association Name="FK_EstadoTransitorioAdjunto_EstadoTransitorio">
           <End Role="EstadoTransitorio" Type="Self.EstadoTransitorio" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
-          <End Role="EstadoTransitorioAdjuntos" Type="Self.EstadoTransitorioAdjuntos" Multiplicity="*" />
+          <End Role="EstadoTransitorioAdjunto" Type="Self.EstadoTransitorioAdjunto" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="EstadoTransitorio">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="EstadoTransitorioAdjuntos">
+            <Dependent Role="EstadoTransitorioAdjunto">
               <PropertyRef Name="EstadoTransitorioId" />
             </Dependent>
           </ReferentialConstraint>
@@ -1476,7 +1476,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <EntitySet Name="Estado" EntityType="Self.Estado" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="EstadoCivil" EntityType="Self.EstadoCivil" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="EstadoTransitorio" EntityType="Self.EstadoTransitorio" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="EstadoTransitorioAdjuntos" EntityType="Self.EstadoTransitorioAdjuntos" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="EstadoTransitorioAdjunto" EntityType="Self.EstadoTransitorioAdjunto" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Funcion" EntityType="Self.Funcion" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Funcionario" EntityType="Self.Funcionario" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="FuncionarioArma" EntityType="Self.FuncionarioArma" Schema="dbo" store:Type="Tables" />
@@ -1683,9 +1683,9 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             <End Role="TipoEstadoTransitorio" EntitySet="TipoEstadoTransitorio" />
             <End Role="EstadoTransitorio" EntitySet="EstadoTransitorio" />
           </AssociationSet>
-          <AssociationSet Name="FK_EstadoTransitorioAdjuntos_EstadoTransitorio" Association="Self.FK_EstadoTransitorioAdjuntos_EstadoTransitorio">
+          <AssociationSet Name="FK_EstadoTransitorioAdjunto_EstadoTransitorio" Association="Self.FK_EstadoTransitorioAdjunto_EstadoTransitorio">
             <End Role="EstadoTransitorio" EntitySet="EstadoTransitorio" />
-            <End Role="EstadoTransitorioAdjuntos" EntitySet="EstadoTransitorioAdjuntos" />
+            <End Role="EstadoTransitorioAdjunto" EntitySet="EstadoTransitorioAdjunto" />
           </AssociationSet>
           <AssociationSet Name="FK_FuncFotoHist_Func" Association="Self.FK_FuncFotoHist_Func">
             <End Role="Funcionario" EntitySet="Funcionario" />
@@ -1953,13 +1953,13 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <NavigationProperty Name="EnfermedadDetalle" Relationship="Self.FK_EnfermedadDetalle_EstadoTransitorio" FromRole="EstadoTransitorio" ToRole="EnfermedadDetalle" />
           <NavigationProperty Name="Funcionario" Relationship="Self.FK_EstadoTransitorio_Funcionario" FromRole="EstadoTransitorio" ToRole="Funcionario" />
           <NavigationProperty Name="TipoEstadoTransitorio" Relationship="Self.FK_EstadoTransitorio_Tipo" FromRole="EstadoTransitorio" ToRole="TipoEstadoTransitorio" />
-          <NavigationProperty Name="EstadoTransitorioAdjuntos" Relationship="Self.FK_EstadoTransitorioAdjuntos_EstadoTransitorio" FromRole="EstadoTransitorio" ToRole="EstadoTransitorioAdjuntos" />
+          <NavigationProperty Name="EstadoTransitorioAdjunto" Relationship="Self.FK_EstadoTransitorioAdjunto_EstadoTransitorio" FromRole="EstadoTransitorio" ToRole="EstadoTransitorioAdjunto" />
           <NavigationProperty Name="OrdenCincoDetalle" Relationship="Self.FK_OrdenCincoDetalle_EstadoTransitorio" FromRole="EstadoTransitorio" ToRole="OrdenCincoDetalle" />
           <NavigationProperty Name="RetenDetalle" Relationship="Self.FK_RetenDetalle_EstadoTransitorio" FromRole="EstadoTransitorio" ToRole="RetenDetalle" />
           <NavigationProperty Name="SancionDetalle" Relationship="Self.FK_SancionDetalle_EstadoTransitorio" FromRole="EstadoTransitorio" ToRole="SancionDetalle" />
           <NavigationProperty Name="SumarioDetalle" Relationship="Self.FK_SumarioDetalle_EstadoTransitorio" FromRole="EstadoTransitorio" ToRole="SumarioDetalle" />
         </EntityType>
-        <EntityType Name="EstadoTransitorioAdjuntos">
+        <EntityType Name="EstadoTransitorioAdjunto">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
@@ -1970,7 +1970,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <Property Name="Contenido" Type="Binary" MaxLength="Max" FixedLength="false" Nullable="false" />
           <Property Name="FechaCreacion" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="Descripcion" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="EstadoTransitorio" Relationship="Self.FK_EstadoTransitorioAdjuntos_EstadoTransitorio" FromRole="EstadoTransitorioAdjuntos" ToRole="EstadoTransitorio" />
+          <NavigationProperty Name="EstadoTransitorio" Relationship="Self.FK_EstadoTransitorioAdjunto_EstadoTransitorio" FromRole="EstadoTransitorioAdjunto" ToRole="EstadoTransitorio" />
         </EntityType>
         <EntityType Name="Funcion">
           <Key>
@@ -2865,16 +2865,16 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_EstadoTransitorioAdjuntos_EstadoTransitorio">
+        <Association Name="FK_EstadoTransitorioAdjunto_EstadoTransitorio">
           <End Role="EstadoTransitorio" Type="Self.EstadoTransitorio" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
-          <End Role="EstadoTransitorioAdjuntos" Type="Self.EstadoTransitorioAdjuntos" Multiplicity="*" />
+          <End Role="EstadoTransitorioAdjunto" Type="Self.EstadoTransitorioAdjunto" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="EstadoTransitorio">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="EstadoTransitorioAdjuntos">
+            <Dependent Role="EstadoTransitorioAdjunto">
               <PropertyRef Name="EstadoTransitorioId" />
             </Dependent>
           </ReferentialConstraint>
@@ -3369,7 +3369,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <EntitySet Name="Estado" EntityType="Self.Estado" />
           <EntitySet Name="EstadoCivil" EntityType="Self.EstadoCivil" />
           <EntitySet Name="EstadoTransitorio" EntityType="Self.EstadoTransitorio" />
-          <EntitySet Name="EstadoTransitorioAdjuntos" EntityType="Self.EstadoTransitorioAdjuntos" />
+          <EntitySet Name="EstadoTransitorioAdjunto" EntityType="Self.EstadoTransitorioAdjunto" />
           <EntitySet Name="Funcion" EntityType="Self.Funcion" />
           <EntitySet Name="Funcionario" EntityType="Self.Funcionario" />
           <EntitySet Name="FuncionarioArma" EntityType="Self.FuncionarioArma" />
@@ -3474,9 +3474,9 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             <End Role="TipoEstadoTransitorio" EntitySet="TipoEstadoTransitorio" />
             <End Role="EstadoTransitorio" EntitySet="EstadoTransitorio" />
           </AssociationSet>
-          <AssociationSet Name="FK_EstadoTransitorioAdjuntos_EstadoTransitorio" Association="Self.FK_EstadoTransitorioAdjuntos_EstadoTransitorio">
+          <AssociationSet Name="FK_EstadoTransitorioAdjunto_EstadoTransitorio" Association="Self.FK_EstadoTransitorioAdjunto_EstadoTransitorio">
             <End Role="EstadoTransitorio" EntitySet="EstadoTransitorio" />
-            <End Role="EstadoTransitorioAdjuntos" EntitySet="EstadoTransitorioAdjuntos" />
+            <End Role="EstadoTransitorioAdjunto" EntitySet="EstadoTransitorioAdjunto" />
           </AssociationSet>
           <AssociationSet Name="FK_OrdenCincoDetalle_EstadoTransitorio" Association="Self.FK_OrdenCincoDetalle_EstadoTransitorio">
             <End Role="EstadoTransitorio" EntitySet="EstadoTransitorio" />
@@ -3795,9 +3795,9 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="EstadoTransitorioAdjuntos">
-            <EntityTypeMapping TypeName="ApexModel.EstadoTransitorioAdjuntos">
-              <MappingFragment StoreEntitySet="EstadoTransitorioAdjuntos">
+          <EntitySetMapping Name="EstadoTransitorioAdjunto">
+            <EntityTypeMapping TypeName="ApexModel.EstadoTransitorioAdjunto">
+              <MappingFragment StoreEntitySet="EstadoTransitorioAdjunto">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="EstadoTransitorioId" ColumnName="EstadoTransitorioId" />
                 <ScalarProperty Name="NombreArchivo" ColumnName="NombreArchivo" />

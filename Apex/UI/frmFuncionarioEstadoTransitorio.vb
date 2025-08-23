@@ -1,5 +1,4 @@
-﻿' Apex/UI/frmFuncionarioEstadoTransitorio.vb
-Imports System.IO
+﻿Imports System.IO
 Imports System.Linq
 
 Public Class frmFuncionarioEstadoTransitorio
@@ -248,14 +247,14 @@ Public Class frmFuncionarioEstadoTransitorio
                     Dim nuevoAdjunto As New EstadoTransitorioAdjunto With {
                         .EstadoTransitorioId = Estado.Id,
                         .NombreArchivo = Path.GetFileName(openDialog.FileName),
-                        .TipoMIME = GetMimeType(openDialog.FileName), ' <-- CORRECCIÓN AQUÍ
+                        .TipoMIME = GetMimeType(openDialog.FileName),
                         .Contenido = contenidoBytes,
                         .FechaCreacion = DateTime.Now
                     }
 
                     Dim repo = _unitOfWork.Repository(Of EstadoTransitorioAdjunto)()
-                    repo.Add(nuevoAdjunto) ' <-- CORRECCIÓN AQUÍ
-                    _unitOfWork.Commit() ' <-- CORRECCIÓN AQUÍ
+                    repo.Add(nuevoAdjunto)
+                    _unitOfWork.Commit()
 
                     MessageBox.Show("Archivo adjuntado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
                     CargarAdjuntos(Estado.Id)
@@ -292,8 +291,8 @@ Public Class frmFuncionarioEstadoTransitorio
             Try
                 Dim adjuntoId = CInt(dgvAdjuntos.CurrentRow.Cells("Id").Value)
                 Dim repo = _unitOfWork.Repository(Of EstadoTransitorioAdjunto)()
-                repo.RemoveById(adjuntoId) ' <-- CORRECCIÓN AQUÍ
-                _unitOfWork.Commit() ' <-- CORRECCIÓN AQUÍ
+                repo.RemoveById(adjuntoId)
+                _unitOfWork.Commit()
 
                 CargarAdjuntos(Estado.Id)
             Catch ex As Exception
