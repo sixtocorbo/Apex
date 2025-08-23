@@ -125,6 +125,14 @@ Public Class frmDashboard
                 End If
                 AbrirFormEnPanel(_configuracionInstancia)
                 ' --- FIN DEL CAMBIO ---
+            Case "btnReportes"
+                ' --- MODIFICACIÓN AQUÍ ---
+                ' Ahora el botón de reportes abrirá el nuevo formulario de novedades
+                If _reporteNovedadesInstancia Is Nothing OrElse _reporteNovedadesInstancia.IsDisposed Then
+                    _reporteNovedadesInstancia = New frmReporteNovedades()
+                End If
+                AbrirFormEnPanel(_reporteNovedadesInstancia)
+                ' --- FIN DE LA MODIFICACIÓN ---
         End Select
     End Sub
 

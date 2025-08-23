@@ -66,7 +66,7 @@ Partial Class frmGestionNomenclaturas
         Me.dgvNomenclaturas.ReadOnly = True
         Me.dgvNomenclaturas.RowHeadersWidth = 62
         Me.dgvNomenclaturas.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgvNomenclaturas.Size = New System.Drawing.Size(1590, 392)
+        Me.dgvNomenclaturas.Size = New System.Drawing.Size(783, 250)
         Me.dgvNomenclaturas.TabIndex = 1
         '
         'GroupBox1
@@ -89,11 +89,11 @@ Partial Class frmGestionNomenclaturas
         Me.GroupBox1.Controls.Add(Me.Label2)
         Me.GroupBox1.Controls.Add(Me.txtNombre)
         Me.GroupBox1.Controls.Add(Me.Label1)
-        Me.GroupBox1.Location = New System.Drawing.Point(18, 465)
+        Me.GroupBox1.Location = New System.Drawing.Point(18, 323)
         Me.GroupBox1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.GroupBox1.Size = New System.Drawing.Size(1394, 380)
+        Me.GroupBox1.Size = New System.Drawing.Size(783, 380)
         Me.GroupBox1.TabIndex = 2
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Detalles de la Nomenclatura"
@@ -102,7 +102,7 @@ Partial Class frmGestionNomenclaturas
         '
         Me.chkUsaNomenclaturaCodigo.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.chkUsaNomenclaturaCodigo.AutoSize = True
-        Me.chkUsaNomenclaturaCodigo.Location = New System.Drawing.Point(1196, 158)
+        Me.chkUsaNomenclaturaCodigo.Location = New System.Drawing.Point(585, 158)
         Me.chkUsaNomenclaturaCodigo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.chkUsaNomenclaturaCodigo.Name = "chkUsaNomenclaturaCodigo"
         Me.chkUsaNomenclaturaCodigo.Size = New System.Drawing.Size(189, 24)
@@ -114,7 +114,7 @@ Partial Class frmGestionNomenclaturas
         '
         Me.chkUsaFecha.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.chkUsaFecha.AutoSize = True
-        Me.chkUsaFecha.Location = New System.Drawing.Point(1169, 118)
+        Me.chkUsaFecha.Location = New System.Drawing.Point(558, 118)
         Me.chkUsaFecha.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.chkUsaFecha.Name = "chkUsaFecha"
         Me.chkUsaFecha.Size = New System.Drawing.Size(113, 24)
@@ -130,7 +130,7 @@ Partial Class frmGestionNomenclaturas
         Me.txtObservaciones.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtObservaciones.Multiline = True
         Me.txtObservaciones.Name = "txtObservaciones"
-        Me.txtObservaciones.Size = New System.Drawing.Size(1232, 84)
+        Me.txtObservaciones.Size = New System.Drawing.Size(621, 84)
         Me.txtObservaciones.TabIndex = 8
         '
         'Label7
@@ -150,7 +150,7 @@ Partial Class frmGestionNomenclaturas
         Me.txtUbicacion.Location = New System.Drawing.Point(150, 237)
         Me.txtUbicacion.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtUbicacion.Name = "txtUbicacion"
-        Me.txtUbicacion.Size = New System.Drawing.Size(511, 26)
+        Me.txtUbicacion.Size = New System.Drawing.Size(272, 26)
         Me.txtUbicacion.TabIndex = 5
         '
         'Label6
@@ -170,7 +170,7 @@ Partial Class frmGestionNomenclaturas
         Me.txtEjemplo.Location = New System.Drawing.Point(150, 197)
         Me.txtEjemplo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtEjemplo.Name = "txtEjemplo"
-        Me.txtEjemplo.Size = New System.Drawing.Size(511, 26)
+        Me.txtEjemplo.Size = New System.Drawing.Size(272, 26)
         Me.txtEjemplo.TabIndex = 4
         '
         'Label5
@@ -190,7 +190,7 @@ Partial Class frmGestionNomenclaturas
         Me.txtPatron.Location = New System.Drawing.Point(150, 157)
         Me.txtPatron.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtPatron.Name = "txtPatron"
-        Me.txtPatron.Size = New System.Drawing.Size(511, 26)
+        Me.txtPatron.Size = New System.Drawing.Size(272, 26)
         Me.txtPatron.TabIndex = 3
         '
         'Label4
@@ -210,7 +210,7 @@ Partial Class frmGestionNomenclaturas
         Me.txtArea.Location = New System.Drawing.Point(513, 115)
         Me.txtArea.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtArea.Name = "txtArea"
-        Me.txtArea.Size = New System.Drawing.Size(148, 26)
+        Me.txtArea.Size = New System.Drawing.Size(0, 26)
         Me.txtArea.TabIndex = 2
         '
         'Label3
@@ -249,7 +249,7 @@ Partial Class frmGestionNomenclaturas
         Me.txtNombre.Location = New System.Drawing.Point(14, 49)
         Me.txtNombre.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtNombre.Name = "txtNombre"
-        Me.txtNombre.Size = New System.Drawing.Size(1369, 35)
+        Me.txtNombre.Size = New System.Drawing.Size(758, 35)
         Me.txtNombre.TabIndex = 0
         '
         'Label1
@@ -266,7 +266,7 @@ Partial Class frmGestionNomenclaturas
         '
         Me.btnGuardar.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnGuardar.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnGuardar.Location = New System.Drawing.Point(1420, 734)
+        Me.btnGuardar.Location = New System.Drawing.Point(612, 713)
         Me.btnGuardar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnGuardar.Name = "btnGuardar"
         Me.btnGuardar.Size = New System.Drawing.Size(188, 51)
@@ -277,7 +277,7 @@ Partial Class frmGestionNomenclaturas
         'btnEliminar
         '
         Me.btnEliminar.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnEliminar.Location = New System.Drawing.Point(1420, 674)
+        Me.btnEliminar.Location = New System.Drawing.Point(328, 713)
         Me.btnEliminar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnEliminar.Name = "btnEliminar"
         Me.btnEliminar.Size = New System.Drawing.Size(188, 51)
@@ -288,7 +288,7 @@ Partial Class frmGestionNomenclaturas
         'btnNuevo
         '
         Me.btnNuevo.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnNuevo.Location = New System.Drawing.Point(1420, 614)
+        Me.btnNuevo.Location = New System.Drawing.Point(44, 713)
         Me.btnNuevo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnNuevo.Name = "btnNuevo"
         Me.btnNuevo.Size = New System.Drawing.Size(188, 51)
@@ -310,17 +310,17 @@ Partial Class frmGestionNomenclaturas
         '
         Me.txtBuscar.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtBuscar.Location = New System.Drawing.Point(100, 23)
+        Me.txtBuscar.Location = New System.Drawing.Point(102, 27)
         Me.txtBuscar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtBuscar.Name = "txtBuscar"
-        Me.txtBuscar.Size = New System.Drawing.Size(1506, 26)
+        Me.txtBuscar.Size = New System.Drawing.Size(699, 26)
         Me.txtBuscar.TabIndex = 0
         '
         'frmGestionNomenclaturas
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1626, 863)
+        Me.ClientSize = New System.Drawing.Size(1167, 837)
         Me.Controls.Add(Me.txtBuscar)
         Me.Controls.Add(Me.Label8)
         Me.Controls.Add(Me.btnNuevo)
