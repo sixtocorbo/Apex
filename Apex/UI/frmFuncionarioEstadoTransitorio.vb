@@ -6,6 +6,7 @@ Public Class frmFuncionarioEstadoTransitorio
     Public Estado As EstadoTransitorio
     Private _tiposEstado As List(Of TipoEstadoTransitorio)
     Private _unitOfWork As IUnitOfWork
+    Private _tempFiles As New List(Of String) ' Lista para rastrear archivos PDF temporales
 
     ' Propiedades para los nuevos detalles
     Public DesignacionDetalle As DesignacionDetalle
@@ -32,16 +33,17 @@ Public Class frmFuncionarioEstadoTransitorio
             cboTipoEstado.Enabled = False
             CargarDatosDeDetalle()
             CargarAdjuntos(Estado.Id)
-            GroupBox1.Enabled = True ' Habilitar la sección de adjuntos
+            GroupBox1.Enabled = True
         Else
             ' MODO CREACIÓN
             Estado = New EstadoTransitorio()
             chkFechaHasta.Checked = True
             cboTipoEstado.SelectedIndex = -1
-            GroupBox1.Enabled = False ' Deshabilitar adjuntos hasta que se guarde el estado
+            GroupBox1.Enabled = False
         End If
 
         AddHandler cboTipoEstado.SelectedIndexChanged, AddressOf TipoEstado_Changed
+        AddHandler dgvAdjuntos.SelectionChanged, AddressOf dgvAdjuntos_SelectionChanged
         TipoEstado_Changed(Nothing, EventArgs.Empty)
     End Sub
 
@@ -49,7 +51,6 @@ Public Class frmFuncionarioEstadoTransitorio
         Dim fechaHasta As Date? = Nothing
         Dim observaciones As String = ""
 
-        ' Obtiene el detalle correcto y sus datos comunes
         Select Case Estado.TipoEstadoTransitorioId
             Case 1 ' Designación
                 DesignacionDetalle = Estado.DesignacionDetalle
@@ -87,9 +88,8 @@ Public Class frmFuncionarioEstadoTransitorio
                 txtResolucion.Text = SumarioDetalle.Expediente
         End Select
 
-        ' Asignar valores a los controles comunes
         txtObservaciones.Text = observaciones
-        If Estado.TipoEstadoTransitorioId <> 5 Then ' Retén no tiene FechaHasta
+        If Estado.TipoEstadoTransitorioId <> 5 Then
             If fechaHasta.HasValue Then
                 dtpFechaHasta.Value = fechaHasta.Value
                 dtpFechaHasta.Enabled = True
@@ -102,12 +102,9 @@ Public Class frmFuncionarioEstadoTransitorio
     End Sub
 
     Private Sub TipoEstado_Changed(sender As Object, e As EventArgs)
-        ' Ocultar todos los campos específicos
         lblResolucion.Visible = False : txtResolucion.Visible = False
         lblDiagnostico.Visible = False : txtDiagnostico.Visible = False
         lblTurnoReten.Visible = False : txtTurnoReten.Visible = False
-
-        ' Restaurar visibilidad y texto por defecto de campos comunes
         lblFechaDesde.Text = "Fecha Desde:"
         lblFechaHasta.Visible = True
         dtpFechaHasta.Visible = True
@@ -115,16 +112,15 @@ Public Class frmFuncionarioEstadoTransitorio
 
         If cboTipoEstado.SelectedIndex = -1 Then Return
 
-        ' Mostrar campos según el tipo seleccionado
         Dim tipoId = CInt(cboTipoEstado.SelectedValue)
         Select Case tipoId
-            Case 1, 3, 4, 6 ' Designación, Sanción, Orden Cinco, Sumario
+            Case 1, 3, 4, 6
                 lblResolucion.Visible = True
                 txtResolucion.Visible = True
-            Case 2 ' Enfermedad
+            Case 2
                 lblDiagnostico.Visible = True
                 txtDiagnostico.Visible = True
-            Case 5 ' Retén
+            Case 5
                 lblTurnoReten.Visible = True
                 txtTurnoReten.Visible = True
                 lblFechaDesde.Text = "Fecha Retén:"
@@ -160,40 +156,40 @@ Public Class frmFuncionarioEstadoTransitorio
         Estado.TipoEstadoTransitorioId = tipoId
 
         Select Case tipoId
-            Case 1 ' Designación
+            Case 1
                 Dim detalle = If(Estado.Id > 0, Estado.DesignacionDetalle, New DesignacionDetalle())
                 detalle.FechaDesde = dtpFechaDesde.Value.Date
                 detalle.FechaHasta = If(chkFechaHasta.Checked, CType(Nothing, Date?), dtpFechaHasta.Value.Date)
                 detalle.Observaciones = txtObservaciones.Text.Trim()
                 detalle.DocResolucion = txtResolucion.Text.Trim()
                 Estado.DesignacionDetalle = detalle
-            Case 2 ' Enfermedad
+            Case 2
                 Dim detalle = If(Estado.Id > 0, Estado.EnfermedadDetalle, New EnfermedadDetalle())
                 detalle.FechaDesde = dtpFechaDesde.Value.Date
                 detalle.FechaHasta = If(chkFechaHasta.Checked, CType(Nothing, Date?), dtpFechaHasta.Value.Date)
                 detalle.Observaciones = txtObservaciones.Text.Trim()
                 detalle.Diagnostico = txtDiagnostico.Text.Trim()
                 Estado.EnfermedadDetalle = detalle
-            Case 3 ' Sanción
+            Case 3
                 Dim detalle = If(Estado.Id > 0, Estado.SancionDetalle, New SancionDetalle())
                 detalle.FechaDesde = dtpFechaDesde.Value.Date
                 detalle.FechaHasta = If(chkFechaHasta.Checked, CType(Nothing, Date?), dtpFechaHasta.Value.Date)
                 detalle.Observaciones = txtObservaciones.Text.Trim()
                 detalle.Resolucion = txtResolucion.Text.Trim()
                 Estado.SancionDetalle = detalle
-            Case 4 ' Orden Cinco
+            Case 4
                 Dim detalle = If(Estado.Id > 0, Estado.OrdenCincoDetalle, New OrdenCincoDetalle())
                 detalle.FechaDesde = dtpFechaDesde.Value.Date
                 detalle.FechaHasta = If(chkFechaHasta.Checked, CType(Nothing, Date?), dtpFechaHasta.Value.Date)
                 detalle.Observaciones = txtObservaciones.Text.Trim()
                 Estado.OrdenCincoDetalle = detalle
-            Case 5 ' Retén
+            Case 5
                 Dim detalle = If(Estado.Id > 0, Estado.RetenDetalle, New RetenDetalle())
                 detalle.FechaReten = dtpFechaDesde.Value.Date
                 detalle.Observaciones = txtObservaciones.Text.Trim()
                 detalle.Turno = txtTurnoReten.Text.Trim()
                 Estado.RetenDetalle = detalle
-            Case 6 ' Sumario
+            Case 6
                 Dim detalle = If(Estado.Id > 0, Estado.SumarioDetalle, New SumarioDetalle())
                 detalle.FechaDesde = dtpFechaDesde.Value.Date
                 detalle.FechaHasta = If(chkFechaHasta.Checked, CType(Nothing, Date?), dtpFechaHasta.Value.Date)
@@ -226,7 +222,6 @@ Public Class frmFuncionarioEstadoTransitorio
                                    .ToList()
         dgvAdjuntos.DataSource = adjuntos
 
-        ' Configurar columnas del DataGridView
         If dgvAdjuntos.Rows.Count > 0 Then
             dgvAdjuntos.Columns("Id").Visible = False
             dgvAdjuntos.Columns("NombreArchivo").HeaderText = "Nombre del Archivo"
@@ -238,12 +233,11 @@ Public Class frmFuncionarioEstadoTransitorio
     Private Sub btnAdjuntar_Click(sender As Object, e As EventArgs) Handles btnAdjuntar.Click
         Using openDialog As New OpenFileDialog()
             openDialog.Title = "Seleccione un archivo (PDF o Imagen)"
-            openDialog.Filter = "Archivos PDF (*.pdf)|*.pdf|Imágenes (*.jpg;*.jpeg;*.png)|*.jpg;*.jpeg;*.png"
+            openDialog.Filter = "Archivos Soportados (*.pdf;*.jpg;*.jpeg;*.png)|*.pdf;*.jpg;*.jpeg;*.png|Todos los archivos (*.*)|*.*"
 
             If openDialog.ShowDialog() = DialogResult.OK Then
                 Try
                     Dim contenidoBytes = File.ReadAllBytes(openDialog.FileName)
-
                     Dim nuevoAdjunto As New EstadoTransitorioAdjunto With {
                         .EstadoTransitorioId = Estado.Id,
                         .NombreArchivo = Path.GetFileName(openDialog.FileName),
@@ -293,7 +287,6 @@ Public Class frmFuncionarioEstadoTransitorio
                 Dim repo = _unitOfWork.Repository(Of EstadoTransitorioAdjunto)()
                 repo.RemoveById(adjuntoId)
                 _unitOfWork.Commit()
-
                 CargarAdjuntos(Estado.Id)
             Catch ex As Exception
                 MessageBox.Show($"No se pudo eliminar el archivo: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -301,20 +294,97 @@ Public Class frmFuncionarioEstadoTransitorio
         End If
     End Sub
 
-    ' Función de ayuda para obtener el tipo MIME sin usar System.Web
+    Private Sub dgvAdjuntos_SelectionChanged(sender As Object, e As EventArgs)
+        If dgvAdjuntos.CurrentRow Is Nothing Then
+            MostrarPanelMensaje("Seleccione un archivo para previsualizar")
+            Return
+        End If
+
+        Try
+            Dim adjuntoId = CInt(dgvAdjuntos.CurrentRow.Cells("Id").Value)
+            Dim repo = _unitOfWork.Repository(Of EstadoTransitorioAdjunto)()
+            Dim adjunto = repo.GetById(adjuntoId)
+
+            If adjunto Is Nothing Then Return
+
+            Select Case adjunto.TipoMIME.ToLower()
+                Case "image/jpeg", "image/png"
+                    MostrarImagenPreview(adjunto.Contenido)
+                Case "application/pdf"
+                    MostrarPdfPreview(adjunto.Contenido)
+                Case Else
+                    MostrarPanelMensaje("Vista previa no disponible para este tipo de archivo.")
+            End Select
+
+        Catch ex As Exception
+            MostrarPanelMensaje($"Error al cargar la vista previa: {ex.Message}")
+        End Try
+    End Sub
+
+    Private Sub MostrarImagenPreview(contenido As Byte())
+        pbPreview.Visible = True
+        wbPreview.Visible = False
+        lblPreviewNotAvailable.Visible = False
+        Using ms As New MemoryStream(contenido)
+            pbPreview.Image = Image.FromStream(ms)
+        End Using
+    End Sub
+
+    Private Sub MostrarPdfPreview(contenido As Byte())
+        pbPreview.Visible = False
+        wbPreview.Visible = True
+        lblPreviewNotAvailable.Visible = False
+
+        Try
+            ' Crear un archivo temporal con la extensión .pdf
+            Dim tempPdfPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.pdf")
+            File.WriteAllBytes(tempPdfPath, contenido)
+            _tempFiles.Add(tempPdfPath) ' Añadir a la lista para limpieza posterior
+            wbPreview.Navigate(tempPdfPath)
+        Catch ex As Exception
+            MessageBox.Show($"No se pudo mostrar el PDF: {ex.Message}", "Error de Visualización", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
+
+    Private Sub MostrarPanelMensaje(mensaje As String)
+        pbPreview.Visible = False
+        wbPreview.Visible = False
+        lblPreviewNotAvailable.Visible = True
+        lblPreviewNotAvailable.Text = mensaje
+    End Sub
+
     Private Function GetMimeType(fileName As String) As String
         Dim extension = Path.GetExtension(fileName).ToLowerInvariant()
         Select Case extension
-            Case ".pdf"
-                Return "application/pdf"
-            Case ".jpg", ".jpeg"
-                Return "image/jpeg"
-            Case ".png"
-                Return "image/png"
-            Case Else
-                Return "application/octet-stream" ' Tipo genérico para archivos desconocidos
+            Case ".pdf" : Return "application/pdf"
+            Case ".jpg", ".jpeg" : Return "image/jpeg"
+            Case ".png" : Return "image/png"
+            Case Else : Return "application/octet-stream"
         End Select
     End Function
+
+    Private Sub frmFuncionarioEstadoTransitorio_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
+        ' Limpiar la imagen para liberar memoria
+        If pbPreview.Image IsNot Nothing Then
+            pbPreview.Image.Dispose()
+            pbPreview.Image = Nothing
+        End If
+        ' Detener la navegación del WebBrowser
+        wbPreview.Stop()
+        wbPreview.Dispose()
+
+        ' Eliminar archivos temporales creados para los PDF
+        For Each filePath In _tempFiles
+            Try
+                If File.Exists(filePath) Then
+                    File.Delete(filePath)
+                End If
+            Catch ex As Exception
+                ' Opcional: registrar el error si la limpieza falla
+                Console.WriteLine($"No se pudo eliminar el archivo temporal: {filePath}")
+            End Try
+        Next
+    End Sub
 
 #End Region
 
