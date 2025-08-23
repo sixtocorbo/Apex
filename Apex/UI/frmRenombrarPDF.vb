@@ -30,6 +30,7 @@ Public Class frmRenombrarPDF
     Private _funcionarioSeleccionado As Funcionario
 
     Private Async Sub frmRenombrarPDF_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
         Me.Cursor = Cursors.WaitCursor
         _unitOfWork = New UnitOfWork()
         Timer1.Interval = 500 ' Intervalo para el debounce de la búsqueda
@@ -40,6 +41,7 @@ Public Class frmRenombrarPDF
             MessageBox.Show($"Error al cargar las nomenclaturas: {ex.Message}", "Error de Carga", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
 
+
         Me.Cursor = Cursors.Default
     End Sub
 
@@ -48,10 +50,12 @@ Public Class frmRenombrarPDF
             If form.ShowDialog() = DialogResult.OK Then
                 Dim funcionarioMinimo = form.FuncionarioSeleccionado
                 If funcionarioMinimo IsNot Nothing Then
+
                     Me.Cursor = Cursors.WaitCursor
                     Dim repo = _unitOfWork.Repository(Of Funcionario)()
                     Me._funcionarioSeleccionado = repo.GetById(funcionarioMinimo.Id)
                     Me.Cursor = Cursors.Default
+
                     ActualizarDatosFuncionario()
                 End If
             End If
@@ -62,6 +66,7 @@ Public Class frmRenombrarPDF
         If _funcionarioSeleccionado IsNot Nothing Then
             txtNombre.Text = _funcionarioSeleccionado.Nombre
             txtCedula.Text = _funcionarioSeleccionado.CI
+
             NombreCadena() ' Actualizar el nombre propuesto
         Else
             txtNombre.Clear()
@@ -72,6 +77,7 @@ Public Class frmRenombrarPDF
     ' === GESTIÓN DE ARCHIVOS Y CARPETAS ===
     Private Sub btnSeleccionarCarpeta_Click(sender As Object, e As EventArgs) Handles btnSeleccionarCarpeta.Click
         If FolderBrowserDialog1.ShowDialog() = DialogResult.OK Then
+
             directorioPDF = FolderBrowserDialog1.SelectedPath
             CargarArchivosEnListBox(directorioPDF)
         End If
@@ -83,7 +89,9 @@ Public Class frmRenombrarPDF
             archivosPDF = Directory.GetFiles(path, "*.pdf", SearchOption.AllDirectories).ToList()
             ActualizarListBox(archivosPDF)
         Catch ex As Exception
-            MessageBox.Show($"No se pudo leer la carpeta. Verifique los permisos. Error: {ex.Message}", "Error de Lectura", MessageBoxButtons.OK, MessageBoxIcon.Error)
+
+            MessageBox.Show($"No se pudo leer la carpeta. Verifique los permisos.
+Error: {ex.Message}", "Error de Lectura", MessageBoxButtons.OK, MessageBoxIcon.Error)
         Finally
             Me.Cursor = Cursors.Default
         End Try
@@ -96,6 +104,7 @@ Public Class frmRenombrarPDF
     End Sub
 
     ' === VISUALIZACIÓN Y SELECCIÓN DE PDF ===
+
     Private Sub ListBox1_Click(sender As Object, e As EventArgs) Handles ListBox1.Click
         If ListBox1.SelectedItem IsNot Nothing Then
             Dim ruta = ListBox1.SelectedItem.ToString()
@@ -113,7 +122,9 @@ Public Class frmRenombrarPDF
                 AxAcroPDF1.setShowToolbar(False)
                 AxAcroPDF1.setView("Fit")
             Catch ex As Exception
-                MessageBox.Show($"No se pudo cargar el visor de PDF. Error: {ex.Message}", "Error de Visualización", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+
+                MessageBox.Show($"No se pudo cargar el visor de PDF.
+Error: {ex.Message}", "Error de Visualización", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             End Try
         End If
     End Sub
@@ -126,19 +137,21 @@ Public Class frmRenombrarPDF
 
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
         Timer1.Stop()
+
         BuscarArchivoInterno(TextBox1.Text, TextBox2.Text)
     End Sub
 
     Private Sub BuscarArchivoInterno(busq1 As String, busq2 As String)
         Dim res = archivosPDF.Where(Function(f)
                                         Return f.ToUpper().Contains(busq1.ToUpper()) AndAlso
-                                               f.ToUpper().Contains(busq2.ToUpper())
+                                                f.ToUpper().Contains(busq2.ToUpper())
                                     End Function).ToList()
         ActualizarListBox(res)
     End Sub
 
     ' === CARGA Y CONFIGURACIÓN DE NOMENCLATURAS ===
     Private Async Function CargarNomenclatura() As Task
+
         Dim repo = _unitOfWork.Repository(Of Nomenclatura)()
         ' Se proyecta a un tipo anónimo para renombrar las columnas que necesita el DataGridView.
         Dim nomenclaturasParaGrid = Await repo.GetAll().Select(Function(n) New With {
@@ -149,6 +162,7 @@ Public Class frmRenombrarPDF
         }).ToListAsync()
 
         dgvTiposNomenclaturas.DataSource = nomenclaturasParaGrid
+
         ConfigurarDgvTiposNomenclaturas()
     End Function
 
