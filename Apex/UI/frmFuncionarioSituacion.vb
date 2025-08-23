@@ -1,5 +1,7 @@
-﻿Imports System.Data.Entity
+﻿' Apex/UI/frmFuncionarioSituacion.vb
+Imports System.Data.Entity
 Imports System.Text
+
 Public Class frmFuncionarioSituacion
 
     Private _funcionarioId As Integer
@@ -25,6 +27,11 @@ Public Class frmFuncionarioSituacion
         AddHandler MonthCalendar1.MouseMove, AddressOf MonthCalendar1_MouseMove
         AddHandler dgvEstados.CellFormatting, AddressOf dgvEstados_CellFormatting
         AddHandler dgvEstados.SelectionChanged, AddressOf dgvEstados_SelectionChanged
+
+        ' *** NUEVO: Añadir manejadores para DataBindingComplete ***
+        AddHandler dgvNovedades.DataBindingComplete, AddressOf DgvNovedades_DataBindingComplete
+        AddHandler dgvEstados.DataBindingComplete, AddressOf DgvEstados_DataBindingComplete
+
         Await CargarDatos()
     End Sub
 
@@ -122,30 +129,35 @@ Public Class frmFuncionarioSituacion
             Select(Function(n) New With {.Id = n.Id, n.Fecha, .Texto = n.Texto}).ToList()
 
         dgvNovedades.DataSource = novedadesDelMes
-        ConfigurarGrillaNovedades()
     End Sub
 
     Private Sub ConfigurarGrillaNovedades()
-        If dgvNovedades.DataSource Is Nothing Then Return
-        With dgvNovedades
-            .SuspendLayout()
-            .AutoGenerateColumns = False
-            If .Columns.Count = 0 Then
-                Dim colFecha As New DataGridViewTextBoxColumn With {.DataPropertyName = "Fecha", .HeaderText = "Fecha", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells}
-                colFecha.DefaultCellStyle.Format = "dd/MM/yyyy"
-                .Columns.Add(colFecha)
-                .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Texto", .HeaderText = "Novedad", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
-                ' (CAMBIO CLAVE) - Nos aseguramos que la columna ID exista pero esté oculta
-                .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Id", .Name = "Id", .Visible = False})
-            End If
-            .ResumeLayout()
-        End With
+        If dgvNovedades.Columns.Count > 0 Then Return ' Configurar solo una vez
+
+        dgvNovedades.AutoGenerateColumns = False
+        Dim colFecha As New DataGridViewTextBoxColumn With {
+            .DataPropertyName = "Fecha", .HeaderText = "Fecha", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+        }
+        colFecha.DefaultCellStyle.Format = "dd/MM/yyyy"
+        dgvNovedades.Columns.Add(colFecha)
+        dgvNovedades.Columns.Add(New DataGridViewTextBoxColumn With {
+            .DataPropertyName = "Texto", .HeaderText = "Novedad", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+        })
+    End Sub
+
+    Private Sub DgvNovedades_DataBindingComplete(sender As Object, e As DataGridViewBindingCompleteEventArgs)
+        Dim dgv = CType(sender, DataGridView)
+        If dgv.Columns.Contains("Id") Then
+            dgv.Columns("Id").Visible = False
+        End If
     End Sub
 
     Private Sub dgvNovedades_CellDoubleClick(sender As Object, e As DataGridViewCellEventArgs)
         If e.RowIndex < 0 OrElse dgvNovedades.CurrentRow Is Nothing Then Return
         Try
-            Dim novedadId = CInt(dgvNovedades.CurrentRow.Cells("Id").Value)
+            Dim rowData = dgvNovedades.CurrentRow.DataBoundItem
+            Dim novedadId = CInt(rowData.GetType().GetProperty("Id").GetValue(rowData, Nothing))
+
             If novedadId > 0 Then
                 Using frm As New frmNovedadCrear(novedadId)
                     frm.ShowDialog(Me)
@@ -171,7 +183,7 @@ Public Class frmFuncionarioSituacion
                                                  Case 6 : desde = s.SumarioDetalle?.FechaDesde : hasta = s.SumarioDetalle?.FechaHasta
                                              End Select
                                              Return New With {
-                                                 .Tipo = s.TipoEstadoTransitorio.Nombre,
+                                                    .Tipo = s.TipoEstadoTransitorio.Nombre,
                                                  .Desde = desde,
                                                  .Hasta = hasta,
                                                  .Entity = s
@@ -179,27 +191,26 @@ Public Class frmFuncionarioSituacion
                                          End Function).OrderBy(Function(x) x.Desde).ToList()
 
         dgvEstados.DataSource = dataSource
-        ConfigurarGrillaEstados()
     End Sub
 
     Private Sub ConfigurarGrillaEstados()
-        If dgvEstados.DataSource Is Nothing Then Return
-        With dgvEstados
-            .SuspendLayout()
-            .AutoGenerateColumns = False
-            If .Columns.Count = 0 Then
-                .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Tipo", .HeaderText = "Tipo de Estado", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells})
-                Dim colDesde As New DataGridViewTextBoxColumn With {.DataPropertyName = "Desde", .HeaderText = "Fecha Desde", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells}
-                colDesde.DefaultCellStyle.Format = "dd/MM/yyyy"
-                .Columns.Add(colDesde)
-                Dim colHasta As New DataGridViewTextBoxColumn With {.DataPropertyName = "Hasta", .HeaderText = "Fecha Hasta", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells}
-                colHasta.DefaultCellStyle.Format = "dd/MM/yyyy"
-                .Columns.Add(colHasta)
-                ' (CAMBIO CLAVE) - Ocultamos la columna del objeto "proxy"
-                .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Entity", .Visible = False})
-            End If
-            .ResumeLayout()
-        End With
+        If dgvEstados.Columns.Count > 0 Then Return ' Configurar solo una vez
+
+        dgvEstados.AutoGenerateColumns = False
+        dgvEstados.Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Tipo", .HeaderText = "Tipo de Estado", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells})
+        Dim colDesde As New DataGridViewTextBoxColumn With {.DataPropertyName = "Desde", .HeaderText = "Fecha Desde", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells}
+        colDesde.DefaultCellStyle.Format = "dd/MM/yyyy"
+        dgvEstados.Columns.Add(colDesde)
+        Dim colHasta As New DataGridViewTextBoxColumn With {.DataPropertyName = "Hasta", .HeaderText = "Fecha Hasta", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells}
+        colHasta.DefaultCellStyle.Format = "dd/MM/yyyy"
+        dgvEstados.Columns.Add(colHasta)
+    End Sub
+
+    Private Sub DgvEstados_DataBindingComplete(sender As Object, e As DataGridViewBindingCompleteEventArgs)
+        Dim dgv = CType(sender, DataGridView)
+        If dgv.Columns.Contains("Entity") Then
+            dgv.Columns("Entity").Visible = False
+        End If
     End Sub
 
     Private Sub dgvEstados_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)

@@ -12,13 +12,14 @@ Partial Class frmFuncionarioSituacion
         Finally
             MyBase.Dispose(disposing)
         End Try
+
     End Sub
 
     'Required by the Windows Form Designer
     Private components As System.ComponentModel.IContainer
 
     'NOTE: The following procedure is required by the Windows Form Designer
-    'It can be modified using the Windows Form Designer.  
+    'It can be modified using the Windows Form Designer.
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
@@ -221,6 +222,7 @@ Partial Class frmFuncionarioSituacion
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
+
     End Sub
 
     Friend WithEvents lblNombre As Label
@@ -234,4 +236,5 @@ Partial Class frmFuncionarioSituacion
     Friend WithEvents dgvNovedades As DataGridView
     Friend WithEvents TabPage2 As TabPage
     Friend WithEvents dgvEstados As DataGridView
+
 End Class
