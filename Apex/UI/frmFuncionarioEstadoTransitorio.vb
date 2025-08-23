@@ -7,6 +7,7 @@ Public Class frmFuncionarioEstadoTransitorio
     Private _tiposEstado As List(Of TipoEstadoTransitorio)
     Private _unitOfWork As IUnitOfWork
     Private _tempFiles As New List(Of String) ' Lista para rastrear archivos PDF temporales
+    Private _readOnly As Boolean = False
 
     ' Propiedades para los nuevos detalles
     Public DesignacionDetalle As DesignacionDetalle
@@ -23,12 +24,30 @@ Public Class frmFuncionarioEstadoTransitorio
         _unitOfWork = uow
     End Sub
 
+    Public Sub New(estado As EstadoTransitorio, uow As IUnitOfWork, readOnlyValue As Boolean)
+        InitializeComponent()
+        Me.Estado = estado
+        _unitOfWork = uow
+        _readOnly = readOnlyValue
+        _tiposEstado = _unitOfWork.Repository(Of TipoEstadoTransitorio)().GetAll().ToList()
+    End Sub
+
+    Public Property ReadOnlyProperty As Boolean
+        Get
+            Return _readOnly
+        End Get
+        Set(value As Boolean)
+            _readOnly = value
+        End Set
+    End Property
+
+
     Private Sub frmFuncionarioEstadoTransitorio_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
         CargarCombos()
 
         If Estado IsNot Nothing AndAlso Estado.Id > 0 Then
-            ' MODO EDICIÓN
+            ' MODO EDICIÓN O LECTURA
             cboTipoEstado.SelectedValue = Estado.TipoEstadoTransitorioId
             cboTipoEstado.Enabled = False
             CargarDatosDeDetalle()
@@ -42,10 +61,34 @@ Public Class frmFuncionarioEstadoTransitorio
             GroupBox1.Enabled = False
         End If
 
+        If _readOnly Then
+            SetReadOnlyMode()
+        End If
+
         AddHandler cboTipoEstado.SelectedIndexChanged, AddressOf TipoEstado_Changed
         AddHandler dgvAdjuntos.SelectionChanged, AddressOf dgvAdjuntos_SelectionChanged
         TipoEstado_Changed(Nothing, EventArgs.Empty)
     End Sub
+
+    Private Sub SetReadOnlyMode()
+        cboTipoEstado.Enabled = False
+        dtpFechaDesde.Enabled = False
+        dtpFechaHasta.Enabled = False
+        chkFechaHasta.Enabled = False
+        txtObservaciones.ReadOnly = True
+        txtResolucion.ReadOnly = True
+        txtDiagnostico.ReadOnly = True
+        txtTurnoReten.ReadOnly = True
+        btnAdjuntar.Visible = False
+        btnEliminarAdjunto.Visible = False
+        btnGuardar.Text = "Cerrar"
+        btnCancelar.Visible = False
+
+        ' Centrar el botón Cerrar
+        btnGuardar.Location = New Point((Me.ClientSize.Width - btnGuardar.Width) / 2, btnGuardar.Location.Y)
+        dgvAdjuntos.ReadOnly = True
+    End Sub
+
 
     Private Sub CargarDatosDeDetalle()
         Dim fechaHasta As Date? = Nothing
@@ -141,6 +184,11 @@ Public Class frmFuncionarioEstadoTransitorio
     End Sub
 
     Private Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
+        If _readOnly Then
+            Close()
+            Return
+        End If
+
         If cboTipoEstado.SelectedIndex = -1 Then
             MessageBox.Show("Debe seleccionar un tipo de estado.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             Return

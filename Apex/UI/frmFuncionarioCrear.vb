@@ -808,4 +808,12 @@ Public Class frmFuncionarioCrear
             End If
         End Using
     End Sub
+
+    Private Sub btnDetallesEstadoTransitorio_Click(sender As Object, e As EventArgs) Handles btnDetallesEstadoTransitorio.Click
+        Using uow As New UnitOfWork()
+            Using frm As New frmEstadosTransitoriosGeneral(uow)
+                frm.ShowDialog()
+            End Using
+        End Using
+    End Sub
 End Class

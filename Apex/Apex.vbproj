@@ -461,6 +461,12 @@
     <Compile Include="UI\frmDashboard.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="UI\frmEstadosTransitoriosGeneral.Designer.vb">
+      <DependentUpon>frmEstadosTransitoriosGeneral.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmEstadosTransitoriosGeneral.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="UI\frmFichaFuncionalRPT.Designer.vb">
       <DependentUpon>frmFichaFuncionalRPT.vb</DependentUpon>
     </Compile>
