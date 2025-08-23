@@ -31,11 +31,7 @@ Public Class frmRenombrarPDF
 
     Private Async Sub frmRenombrarPDF_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Cursor = Cursors.WaitCursor
-
-        ' --- CORRECCIÓN AQUÍ ---
-        ' Se utiliza el constructor sin parámetros, que ya crea la instancia de ApexEntities.
         _unitOfWork = New UnitOfWork()
-
         Timer1.Interval = 500 ' Intervalo para el debounce de la búsqueda
 
         Try
@@ -48,26 +44,19 @@ Public Class frmRenombrarPDF
     End Sub
 
     Private Sub btnBuscarFuncionario_Click(sender As Object, e As EventArgs) Handles btnBuscarFuncionario.Click
-        ' 1. Se llama al constructor con el modo de apertura correcto (Seleccion).
         Using form As New frmFuncionarioBuscar(frmFuncionarioBuscar.ModoApertura.Seleccion)
             If form.ShowDialog() = DialogResult.OK Then
-                ' 2. Obtenemos el objeto FuncionarioMin del buscador.
                 Dim funcionarioMinimo = form.FuncionarioSeleccionado
-
                 If funcionarioMinimo IsNot Nothing Then
-                    ' 3. Usamos el método GetById(id) que sí existe en el repositorio.
                     Me.Cursor = Cursors.WaitCursor
                     Dim repo = _unitOfWork.Repository(Of Funcionario)()
-                    Me._funcionarioSeleccionado = repo.GetById(funcionarioMinimo.Id) ' <--- CORREGIDO AQUÍ
+                    Me._funcionarioSeleccionado = repo.GetById(funcionarioMinimo.Id)
                     Me.Cursor = Cursors.Default
-
-                    ' 4. Actualizamos la UI.
                     ActualizarDatosFuncionario()
                 End If
             End If
         End Using
     End Sub
-
 
     Private Sub ActualizarDatosFuncionario()
         If _funcionarioSeleccionado IsNot Nothing Then
@@ -151,17 +140,23 @@ Public Class frmRenombrarPDF
     ' === CARGA Y CONFIGURACIÓN DE NOMENCLATURAS ===
     Private Async Function CargarNomenclatura() As Task
         Dim repo = _unitOfWork.Repository(Of Nomenclatura)()
+        ' Se proyecta a un tipo anónimo para renombrar las columnas que necesita el DataGridView.
+        Dim nomenclaturasParaGrid = Await repo.GetAll().Select(Function(n) New With {
+            .Id = n.Id,
+            .NOMECLATURA = n.Nombre, ' Se usa el campo 'Nombre' de la entidad
+            .FECHA = If(n.UsaFecha, "SI", "NO"),
+            .NCODE = If(n.UsaNomenclaturaCodigo, "SI", "NO")
+        }).ToListAsync()
 
-        ' --- CORRECCIÓN AQUÍ ---
-        ' Se ejecuta la consulta con ToListAsync() para traer los datos a una lista en memoria.
-        dgvTiposNomenclaturas.DataSource = Await repo.GetAll().ToListAsync()
-
+        dgvTiposNomenclaturas.DataSource = nomenclaturasParaGrid
         ConfigurarDgvTiposNomenclaturas()
     End Function
 
+
     Private Sub ConfigurarDgvTiposNomenclaturas()
         If dgvTiposNomenclaturas.Rows.Count > 0 Then
-            dgvTiposNomenclaturas.Columns("id_nomenclatura").Visible = False
+            ' --> AHORA LOS NOMBRES COINCIDEN CON EL OBJETO ANÓNIMO CREADO
+            dgvTiposNomenclaturas.Columns("Id").Visible = False
             dgvTiposNomenclaturas.Columns("FECHA").Visible = False
             dgvTiposNomenclaturas.Columns("NCODE").Visible = False
             dgvTiposNomenclaturas.Columns("NOMECLATURA").HeaderText = "Nomenclatura"
@@ -171,11 +166,16 @@ Public Class frmRenombrarPDF
 
     Private Sub dgvTiposNomenclaturas_SelectionChanged(sender As Object, e As EventArgs) Handles dgvTiposNomenclaturas.SelectionChanged
         If dgvTiposNomenclaturas.CurrentRow IsNot Nothing Then
-            txtFecha.Visible = dgvTiposNomenclaturas.CurrentRow.Cells("FECHA").Value.ToString().Trim().ToUpper() = "SI"
-            txtCodigo.Visible = dgvTiposNomenclaturas.CurrentRow.Cells("NCODE").Value.ToString().Trim().ToUpper() = "SI"
+            ' --> SE ACCEDE A LAS CELDAS CON LOS NOMBRES CORRECTOS
+            Dim usaFecha As Boolean = dgvTiposNomenclaturas.CurrentRow.Cells("FECHA").Value.ToString().Trim().ToUpper() = "SI"
+            Dim usaCodigo As Boolean = dgvTiposNomenclaturas.CurrentRow.Cells("NCODE").Value.ToString().Trim().ToUpper() = "SI"
+
+            txtFecha.Visible = usaFecha
+            txtCodigo.Visible = usaCodigo
             NombreCadena()
         End If
     End Sub
+
 
     ' === CONSTRUCCIÓN DE LA CADENA PARA RENOMBRAR ===
     Private Sub NombreCadena()
@@ -199,7 +199,6 @@ Public Class frmRenombrarPDF
     Private Sub CamposParaRenombrar_Changed(sender As Object, e As EventArgs) Handles txtCodigo.TextChanged, txtFecha.ValueChanged, CheckBox1.CheckedChanged
         NombreCadena()
     End Sub
-
 
     ' === ACCIÓN DE RENOMBRAR EL ARCHIVO ===
     Private Sub btnRenombrar_Click(sender As Object, e As EventArgs) Handles btnRenombrar.Click
@@ -259,4 +258,10 @@ Public Class frmRenombrarPDF
         If e.KeyCode = Keys.Escape Then Me.Close()
     End Sub
 
+    Private Sub frmRenombrarPDF_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+        ' Liberar recursos
+        If _unitOfWork IsNot Nothing Then
+            _unitOfWork.Dispose()
+        End If
+    End Sub
 End Class

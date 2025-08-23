@@ -27,7 +27,7 @@ Partial Class frmDashboard
         Me.btnReportes = New System.Windows.Forms.Button()
         Me.btnViaticos = New System.Windows.Forms.Button()
         Me.btnImportacion = New System.Windows.Forms.Button()
-        Me.btnRenombrarPDFs = New System.Windows.Forms.Button() ' --> BOTÓN NUEVO
+        Me.btnRenombrarPDFs = New System.Windows.Forms.Button()
         Me.btnNomenclaturas = New System.Windows.Forms.Button()
         Me.btnGestion = New System.Windows.Forms.Button()
         Me.btnNovedades = New System.Windows.Forms.Button()
@@ -43,12 +43,13 @@ Partial Class frmDashboard
         '
         'panelNavegacion
         '
+        Me.panelNavegacion.AutoScroll = True
         Me.panelNavegacion.BackColor = System.Drawing.Color.FromArgb(CType(CType(51, Byte), Integer), CType(CType(51, Byte), Integer), CType(CType(76, Byte), Integer))
         Me.panelNavegacion.Controls.Add(Me.btnConfiguracion)
         Me.panelNavegacion.Controls.Add(Me.btnReportes)
         Me.panelNavegacion.Controls.Add(Me.btnViaticos)
         Me.panelNavegacion.Controls.Add(Me.btnImportacion)
-        Me.panelNavegacion.Controls.Add(Me.btnRenombrarPDFs) ' --> AÑADIDO AL PANEL
+        Me.panelNavegacion.Controls.Add(Me.btnRenombrarPDFs)
         Me.panelNavegacion.Controls.Add(Me.btnNomenclaturas)
         Me.panelNavegacion.Controls.Add(Me.btnGestion)
         Me.panelNavegacion.Controls.Add(Me.btnNovedades)
@@ -61,7 +62,6 @@ Partial Class frmDashboard
         Me.panelNavegacion.Name = "panelNavegacion"
         Me.panelNavegacion.Size = New System.Drawing.Size(330, 1048)
         Me.panelNavegacion.TabIndex = 0
-        Me.panelNavegacion.AutoScroll = True
         '
         'btnConfiguracion
         '
@@ -70,7 +70,7 @@ Partial Class frmDashboard
         Me.btnConfiguracion.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnConfiguracion.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnConfiguracion.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnConfiguracion.Location = New System.Drawing.Point(0, 950) ' --> CAMBIO DE POSICIÓN
+        Me.btnConfiguracion.Location = New System.Drawing.Point(0, 950)
         Me.btnConfiguracion.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnConfiguracion.Name = "btnConfiguracion"
         Me.btnConfiguracion.Padding = New System.Windows.Forms.Padding(18, 0, 0, 0)
@@ -87,7 +87,7 @@ Partial Class frmDashboard
         Me.btnReportes.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnReportes.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnReportes.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnReportes.Location = New System.Drawing.Point(0, 858) ' --> CAMBIO DE POSICIÓN
+        Me.btnReportes.Location = New System.Drawing.Point(0, 858)
         Me.btnReportes.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnReportes.Name = "btnReportes"
         Me.btnReportes.Padding = New System.Windows.Forms.Padding(18, 0, 0, 0)
@@ -104,7 +104,7 @@ Partial Class frmDashboard
         Me.btnViaticos.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnViaticos.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnViaticos.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnViaticos.Location = New System.Drawing.Point(0, 766) ' --> CAMBIO DE POSICIÓN
+        Me.btnViaticos.Location = New System.Drawing.Point(0, 766)
         Me.btnViaticos.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnViaticos.Name = "btnViaticos"
         Me.btnViaticos.Padding = New System.Windows.Forms.Padding(18, 0, 0, 0)
@@ -121,7 +121,7 @@ Partial Class frmDashboard
         Me.btnImportacion.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnImportacion.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnImportacion.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnImportacion.Location = New System.Drawing.Point(0, 674) ' --> CAMBIO DE POSICIÓN
+        Me.btnImportacion.Location = New System.Drawing.Point(0, 674)
         Me.btnImportacion.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnImportacion.Name = "btnImportacion"
         Me.btnImportacion.Padding = New System.Windows.Forms.Padding(18, 0, 0, 0)
@@ -138,7 +138,7 @@ Partial Class frmDashboard
         Me.btnRenombrarPDFs.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnRenombrarPDFs.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnRenombrarPDFs.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnRenombrarPDFs.Location = New System.Drawing.Point(0, 582) ' --> NUEVO
+        Me.btnRenombrarPDFs.Location = New System.Drawing.Point(0, 582)
         Me.btnRenombrarPDFs.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnRenombrarPDFs.Name = "btnRenombrarPDFs"
         Me.btnRenombrarPDFs.Padding = New System.Windows.Forms.Padding(18, 0, 0, 0)
@@ -289,8 +289,8 @@ Partial Class frmDashboard
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.MinimumSize = New System.Drawing.Size(1430, 896)
         Me.Name = "frmDashboard"
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Sistema de Gestión Apex"
-        Me.WindowState = System.Windows.Forms.FormWindowState.Maximized
         Me.panelNavegacion.ResumeLayout(False)
         Me.panelLogo.ResumeLayout(False)
         Me.ResumeLayout(False)
