@@ -94,8 +94,9 @@ Partial Class frmGestionNomenclaturas
         '
         'chkUsaNomenclaturaCodigo
         '
+        Me.chkUsaNomenclaturaCodigo.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.chkUsaNomenclaturaCodigo.AutoSize = True
-        Me.chkUsaNomenclaturaCodigo.Location = New System.Drawing.Point(469, 103)
+        Me.chkUsaNomenclaturaCodigo.Location = New System.Drawing.Point(768, 103)
         Me.chkUsaNomenclaturaCodigo.Name = "chkUsaNomenclaturaCodigo"
         Me.chkUsaNomenclaturaCodigo.Size = New System.Drawing.Size(155, 17)
         Me.chkUsaNomenclaturaCodigo.TabIndex = 7
@@ -104,8 +105,9 @@ Partial Class frmGestionNomenclaturas
         '
         'chkUsaFecha
         '
+        Me.chkUsaFecha.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.chkUsaFecha.AutoSize = True
-        Me.chkUsaFecha.Location = New System.Drawing.Point(469, 77)
+        Me.chkUsaFecha.Location = New System.Drawing.Point(768, 77)
         Me.chkUsaFecha.Name = "chkUsaFecha"
         Me.chkUsaFecha.Size = New System.Drawing.Size(86, 17)
         Me.chkUsaFecha.TabIndex = 6
@@ -187,6 +189,8 @@ Partial Class frmGestionNomenclaturas
         '
         'txtArea
         '
+        Me.txtArea.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtArea.Location = New System.Drawing.Point(342, 75)
         Me.txtArea.Name = "txtArea"
         Me.txtArea.Size = New System.Drawing.Size(100, 20)
