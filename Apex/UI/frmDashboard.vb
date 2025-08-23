@@ -9,7 +9,6 @@ Public Class frmDashboard
     Private currentBtn As Button
     Private Shadows activeForm As Form
 
-    ' --- Instancias de los formularios para mantener su estado ---
     Private _funcionarioBuscarInstancia As frmFuncionarioBuscar
     Private _filtroAvanzadoInstancia As frmFiltroAvanzado
     Private _gestionInstancia As frmGestion
@@ -18,6 +17,7 @@ Public Class frmDashboard
     Private _importacionInstancia As frmAsistenteImportacion
     Private _gestionNomenclaturasInstancia As frmGestionNomenclaturas
     Private _renombrarPDFInstancia As frmRenombrarPDF
+    Private _reporteNovedadesInstancia As frmReporteNovedades
     Private _configuracionInstancia As frmConfiguracion ' --> INSTANCIA PARA EL FORM DE CONFIGURACIÓN
 
     Public Sub New()

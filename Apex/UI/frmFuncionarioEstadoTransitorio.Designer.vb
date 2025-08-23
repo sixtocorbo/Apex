@@ -271,7 +271,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         '
         'btnEliminarAdjunto
         '
-        Me.btnEliminarAdjunto.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnEliminarAdjunto.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnEliminarAdjunto.Location = New System.Drawing.Point(408, 353)
         Me.btnEliminarAdjunto.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnEliminarAdjunto.Name = "btnEliminarAdjunto"

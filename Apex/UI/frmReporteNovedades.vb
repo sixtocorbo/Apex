@@ -18,10 +18,14 @@ Public Class frmReporteNovedades
 
 #Region "Filtro de Funcionarios"
 
+    ' Apex/UI/frmReporteNovedades.vb
     Private Sub btnAgregarFuncionario_Click(sender As Object, e As EventArgs) Handles btnAgregarFuncionario.Click
-        Using frm As New frmFuncionarioBuscar()
+        Using frm As New frmFuncionarioBuscar(frmFuncionarioBuscar.ModoApertura.Seleccion)
             If frm.ShowDialog(Me) = DialogResult.OK Then
-                Dim funcId = frm.FuncionarioId
+                ' --- CORRECCIÓN AQUÍ ---
+                ' Se accede al ID a través del FuncionarioSeleccionado
+                Dim funcId = frm.FuncionarioSeleccionado.Id
+                ' --- FIN DE LA CORRECCIÓN ---
                 If funcId > 0 AndAlso Not _funcionariosSeleccionados.ContainsKey(funcId) Then
                     Dim repo = _uow.Repository(Of Funcionario)()
                     Dim funcionario = repo.GetById(funcId)
