@@ -1,5 +1,5 @@
 ﻿' Apex/UI/frmGestionViaticos.vb
-Public Class frmGestionViaticos
+Public Class frmReporteViaticos
 
     Private _viaticoService As New ViaticoService()
     ' --- INICIO DE LA MODIFICACIÓN ---

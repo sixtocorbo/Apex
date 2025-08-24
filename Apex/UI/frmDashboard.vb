@@ -13,7 +13,7 @@ Public Class frmDashboard
     Private _filtroAvanzadoInstancia As frmFiltroAvanzado
     Private _gestionInstancia As frmGestion
     Private _novedadesInstancia As frmNovedades
-    Private _viaticosInstancia As frmGestionViaticos
+    Private _viaticosInstancia As frmReporteViaticos
     Private _importacionInstancia As frmAsistenteImportacion
     Private _gestionNomenclaturasInstancia As frmGestionNomenclaturas
     Private _renombrarPDFInstancia As frmRenombrarPDF
@@ -111,7 +111,7 @@ Public Class frmDashboard
 
             Case "btnViaticos"
                 If _viaticosInstancia Is Nothing OrElse _viaticosInstancia.IsDisposed Then
-                    _viaticosInstancia = New frmGestionViaticos()
+                    _viaticosInstancia = New frmReporteViaticos()
                 End If
                 AbrirFormEnPanel(_viaticosInstancia)
 

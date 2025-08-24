@@ -404,6 +404,9 @@
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="Services\AppTheme.vb" />
+    <Compile Include="Services\AreaTrabajoService.vb" />
+    <Compile Include="Services\CargoService.vb" />
+    <Compile Include="Services\CategoriaAusenciaService.vb" />
     <Compile Include="Services\ChipControl.vb">
       <SubType>UserControl</SubType>
     </Compile>
@@ -418,6 +421,9 @@
     <Compile Include="Services\NovedadService.vb" />
     <Compile Include="Services\ReportesService.vb" />
     <Compile Include="Services\SancionService.vb" />
+    <Compile Include="Services\SeccionService.vb" />
+    <Compile Include="Services\TipoEstadoTransitorioService.vb" />
+    <Compile Include="Services\TurnoService.vb" />
     <Compile Include="Services\ViaticoService.vb" />
     <Compile Include="UI\FiltroAvanzadoUI.vb" />
     <Compile Include="UI\frmAsistenteImportacion.Designer.vb">
@@ -527,6 +533,24 @@
     <Compile Include="UI\frmGestion.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="UI\frmGestionAreasTrabajo.Designer.vb">
+      <DependentUpon>frmGestionAreasTrabajo.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmGestionAreasTrabajo.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\frmGestionCargos.Designer.vb">
+      <DependentUpon>frmGestionCargos.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmGestionCargos.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\frmGestionCategoriasAusencia.Designer.vb">
+      <DependentUpon>frmGestionCategoriasAusencia.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmGestionCategoriasAusencia.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="UI\frmGestionIncidencias.Designer.vb">
       <DependentUpon>frmGestionIncidencias.vb</DependentUpon>
     </Compile>
@@ -539,10 +563,28 @@
     <Compile Include="UI\frmGestionNomenclaturas.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\frmGestionViaticos.Designer.vb">
-      <DependentUpon>frmGestionViaticos.vb</DependentUpon>
+    <Compile Include="UI\frmGestionSecciones.Designer.vb">
+      <DependentUpon>frmGestionSecciones.vb</DependentUpon>
     </Compile>
-    <Compile Include="UI\frmGestionViaticos.vb">
+    <Compile Include="UI\frmGestionSecciones.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\frmGestionTiposEstadoTransitorio.Designer.vb">
+      <DependentUpon>frmGestionTiposEstadoTransitorio.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmGestionTiposEstadoTransitorio.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\frmGestionTurnos.Designer.vb">
+      <DependentUpon>frmGestionTurnos.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmGestionTurnos.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\frmReporteViaticos.Designer.vb">
+      <DependentUpon>frmReporteViaticos.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmReporteViaticos.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="UI\frmIncidenciaDetalle.Designer.vb">
@@ -651,14 +693,32 @@
     <EmbeddedResource Include="UI\frmGestion.resx">
       <DependentUpon>frmGestion.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmGestionAreasTrabajo.resx">
+      <DependentUpon>frmGestionAreasTrabajo.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmGestionCargos.resx">
+      <DependentUpon>frmGestionCargos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmGestionCategoriasAusencia.resx">
+      <DependentUpon>frmGestionCategoriasAusencia.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\frmGestionIncidencias.resx">
       <DependentUpon>frmGestionIncidencias.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmGestionNomenclaturas.resx">
       <DependentUpon>frmGestionNomenclaturas.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\frmGestionViaticos.resx">
-      <DependentUpon>frmGestionViaticos.vb</DependentUpon>
+    <EmbeddedResource Include="UI\frmGestionSecciones.resx">
+      <DependentUpon>frmGestionSecciones.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmGestionTiposEstadoTransitorio.resx">
+      <DependentUpon>frmGestionTiposEstadoTransitorio.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmGestionTurnos.resx">
+      <DependentUpon>frmGestionTurnos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmReporteViaticos.resx">
+      <DependentUpon>frmReporteViaticos.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmIncidenciaDetalle.resx">
       <DependentUpon>frmIncidenciaDetalle.vb</DependentUpon>

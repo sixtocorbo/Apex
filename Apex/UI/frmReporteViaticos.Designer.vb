@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
-Partial Class frmGestionViaticos
+Partial Class frmReporteViaticos
     Inherits System.Windows.Forms.Form
 
     <System.Diagnostics.DebuggerNonUserCode()>
