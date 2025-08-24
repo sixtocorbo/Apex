@@ -123,7 +123,9 @@ Public Module ConsultasGenericas
 
                 Case TipoOrigenDatos.Licencias
                     Dim licenciaService = New LicenciaService(uow)
-                    Dim licencias = Await licenciaService.GetAllConDetallesAsync(fechaInicio, fechaFin)
+                    ' --- LÍNEA CORREGIDA ---
+                    Dim licencias = Await licenciaService.GetAllConDetallesAsync(fechaDesde:=fechaInicio, fechaHasta:=fechaFin)
+                    ' --------------------
                     dt = licencias.ToDataTable()
 
                 Case TipoOrigenDatos.Novedades
