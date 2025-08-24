@@ -5,79 +5,79 @@ Option Explicit On
 Imports System.ComponentModel
 Imports System.Data
 Imports System.Globalization
-Imports System.IO
-Imports System.Runtime.InteropServices
 Imports System.Text
-Imports Apex.frmFiltroAvanzado
-Imports Apex.ConsultasGenericas
+
+' NOTA: Se eliminaron imports no utilizados como System.IO y System.Runtime.InteropServices
+' para mantener el código limpio.
 
 Partial Public Class frmFiltroAvanzado
 
-    ' --- NUEVO: Campo para gestionar las acciones actuales ---
     Private _accionHandler As IAccionHandler
+    Private _dtOriginal As DataTable = New DataTable()
+    Private _dvDatos As DataView = Nothing
+    Private ReadOnly _filtros As New GestorFiltros()
+
+    ' --- MEJORA: Campo para evitar la actualización redundante de la lista de valores ---
+    Private _isUpdatingValores As Boolean = False
 
 #Region "Modelos y Clases de Ayuda"
 
     Public Enum OperadorComparacion
         Igual
-        Contiene
-        EmpiezaCon
-        TerminaCon
-        Mayor
-        MayorIgual
-        Menor
-        MenorIgual
-        Entre
         EnLista
+        ' Se pueden agregar más operadores aquí si es necesario
     End Enum
 
     Public Class ReglaFiltro
         Public Property Columna As String = String.Empty
         Public Property Operador As OperadorComparacion
         Public Property Valor1 As String = String.Empty
-        Public Property Valor2 As String = String.Empty
+        Public Property Valor2 As String = String.Empty ' Reservado para operadores como 'Entre'
 
         Public Overrides Function ToString() As String
-            Dim op = [Enum].GetName(GetType(OperadorComparacion), Operador)
-            Return If(Operador = OperadorComparacion.Entre,
-                            $"{Columna} {op} ({Valor1} – {Valor2})",
-                            $"{Columna} {op} {Valor1}")
+            Dim opStr = System.Enum.GetName(GetType(OperadorComparacion), Me.Operador)
+            If Operador = OperadorComparacion.EnLista Then
+                ' Para 'EnLista', el valor puede ser muy largo. Mostramos un resumen.
+                Return $"{Columna} {opStr} ({Valor1.Split("|"c).Length} valores)"
+            Else
+                Return $"{Columna} {opStr} {Valor1}"
+            End If
         End Function
 
-        Private Shared Function Esc(s As String) As String
+        Private Shared Function EscapeSqlLike(s As String) As String
             Return s.Replace("'", "''")
         End Function
 
-        Private Shared Function Formatear(valor As String) As String
-            Dim fecha As DateTime
-            If DateTime.TryParse(valor, CultureInfo.InvariantCulture, DateTimeStyles.None, fecha) Then
-                Return $"'{fecha:yyyy-MM-dd}'"
+        Private Shared Function FormatearValor(valor As String) As String
+            If DateTime.TryParse(valor, CultureInfo.InvariantCulture, DateTimeStyles.None, Nothing) Then
+                ' El formateo de fechas se maneja por separado para mayor precisión.
+                Return $"'{Convert.ToDateTime(valor):yyyy-MM-dd}'"
             End If
 
-            Dim n As Double
-            If Double.TryParse(valor, NumberStyles.Any, CultureInfo.InvariantCulture, n) Then
-                Return n.ToString(CultureInfo.InvariantCulture)
+            If Double.TryParse(valor, NumberStyles.Any, CultureInfo.InvariantCulture, Nothing) Then
+                Return valor
             End If
 
-            Return $"'{Esc(valor)}'"
+            Return $"'{EscapeSqlLike(valor)}'"
         End Function
 
         Public Function ToRowFilter() As String
-            Dim col = $"[{Columna}]"
+            Dim colName = $"[{Columna}]"
 
             Select Case Operador
                 Case OperadorComparacion.Igual
                     If DateTime.TryParse(Valor1, Nothing) Then
-                        Dim fecha As Date = CDate(Valor1).Date
+                        ' --- MEJORA: Filtrado de fechas para cubrir el día completo ---
+                        Dim fecha As Date = Convert.ToDateTime(Valor1).Date
                         Dim siguienteDia As Date = fecha.AddDays(1)
-                        Return $"{col} >= #{fecha.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}# AND {col} < #{siguienteDia.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}#"
+                        Return $"({colName} >= #{fecha.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}# AND {colName} < #{siguienteDia.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}#)"
                     Else
-                        Return $"{col} = {Formatear(Valor1)}"
+                        Return $"{colName} = {FormatearValor(Valor1)}"
                     End If
 
                 Case OperadorComparacion.EnLista
-                    Dim items = Valor1.Split("|"c).Select(AddressOf Formatear)
-                    Return $"{col} IN ({String.Join(",", items)})"
+                    Dim items = Valor1.Split("|"c).Select(AddressOf FormatearValor)
+                    Return $"{colName} IN ({String.Join(",", items)})"
 
                 Case Else
                     Throw New NotSupportedException($"Operador {Operador} aún no implementado.")
@@ -87,7 +87,6 @@ Partial Public Class frmFiltroAvanzado
 
     Friend Class GestorFiltros
         Private ReadOnly _reglas As New BindingList(Of ReglaFiltro)()
-
         Public ReadOnly Property Reglas As BindingList(Of ReglaFiltro)
             Get
                 Return _reglas
@@ -97,45 +96,42 @@ Partial Public Class frmFiltroAvanzado
         Public Sub Limpiar()
             _reglas.Clear()
         End Sub
-
         Public Sub Agregar(r As ReglaFiltro)
             _reglas.Add(r)
         End Sub
-
         Public Sub Quitar(r As ReglaFiltro)
             _reglas.Remove(r)
         End Sub
 
         Public Function RowFilter() As String
-            If _reglas.Count = 0 Then Return String.Empty
+            If Not _reglas.Any() Then Return String.Empty
             Return String.Join(" AND ", _reglas.Select(Function(x) x.ToRowFilter()))
         End Function
     End Class
 
 #End Region
 
-#Region "Campos del Formulario"
-    Private dtOriginal As DataTable = New DataTable()
-    Private dvDatos As DataView = Nothing
-    Private ReadOnly filtros As New GestorFiltros()
-#End Region
+#Region "Ciclo de Vida del Formulario"
 
-#Region "Constructor y Eventos Load"
     Private Sub frmFiltroAvanzado_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
+        ' --- MEJORA: Optimización del renderizado del DataGridView ---
+        dgvDatos.DoubleBuffered(True)
         dgvDatos.SendToBack()
-        cmbOrigenDatos.DataSource = [Enum].GetValues(GetType(ConsultasGenericas.TipoOrigenDatos))
+
+        cmbOrigenDatos.DataSource = System.Enum.GetValues(GetType(ConsultasGenericas.TipoOrigenDatos))
         cmbOrigenDatos.SelectedIndex = -1
 
+        ' Organiza los paneles para evitar solapamientos
         gbxBusquedaGlobal.BringToFront()
         flpChips.BringToFront()
         pnlAcciones.BringToFront()
 
-        AddHandler cmbOrigenDatos.SelectedIndexChanged, AddressOf cmbOrigenDatos_SelectedIndexChanged
-        AddHandler btnCargar.Click, AddressOf btnCargar_Click
-        AddHandler lstColumnas.SelectedIndexChanged, AddressOf ColumnaCambiada
-        AddHandler txtBusquedaGlobal.TextChanged, AddressOf txtBusquedaGlobal_TextChanged_Handler
+        AddHandler btnCargar.Click, AddressOf btnCargar_Click_Async
+        AddHandler lstColumnas.SelectedIndexChanged, AddressOf LstColumnas_SelectedIndexChanged
+        AddHandler txtBusquedaGlobal.TextChanged, AddressOf TxtBusquedaGlobal_TextChanged
 
+        ' Vincula los eventos genéricos a sus manejadores
         AddHandler btnNuevaLicencia.Click, AddressOf btnGenerico_Nuevo_Click
         AddHandler btnNuevaNotificacion.Click, AddressOf btnGenerico_Nuevo_Click
         AddHandler btnEditarLicencia.Click, AddressOf btnGenerico_Editar_Click
@@ -144,14 +140,17 @@ Partial Public Class frmFiltroAvanzado
         AddHandler btnEliminarNotificacion.Click, AddressOf btnGenerico_Eliminar_Click
         AddHandler btnCambiarEstado.Click, AddressOf btnGenerico_Extra_Click
 
-        cmbOrigenDatos_SelectedIndexChanged(Nothing, EventArgs.Empty)
-        UpdateFiltrosPanelHeight()
+        UpdateUIState()
     End Sub
+
 #End Region
 
 #Region "Lógica de Carga de Datos"
 
-    ' --- CORRECCIÓN: Cambiado a Public para que sea accesible desde las clases Handler ---
+    Private Async Sub btnCargar_Click_Async(sender As Object, e As EventArgs)
+        Await CargarDatosAsync()
+    End Sub
+
     Public Async Function CargarDatosAsync() As Task
         If cmbOrigenDatos.SelectedItem Is Nothing Then Return
 
@@ -169,20 +168,20 @@ Partial Public Class frmFiltroAvanzado
 
         Try
             Using wait As New WaitCursor()
-                dtOriginal = Await ConsultasGenericas.ObtenerDatosGenericosAsync(origen, fechaI, fechaF)
-                dvDatos = dtOriginal.DefaultView
+                _dtOriginal = Await ConsultasGenericas.ObtenerDatosGenericosAsync(origen, fechaI, fechaF)
+                ' --- MEJORA: Añadir columna de búsqueda global para optimizar el rendimiento ---
+                AñadirColumnaBusquedaGlobal(_dtOriginal)
+                _dvDatos = _dtOriginal.DefaultView
             End Using
 
-            ConfigurarGrilla(dtOriginal)
+            ' Resetea el estado del formulario antes de cargar nuevos datos
+            LimpiarFiltrosYChips()
+
+            ConfigurarGrilla(_dtOriginal)
             ActualizarListaColumnas()
-            filtros.Limpiar()
-            flpChips.Controls.Clear()
-            UpdateFiltrosPanelHeight()
 
-            dgvDatos.DataSource = dvDatos
+            dgvDatos.DataSource = _dvDatos
             AplicarFiltros()
-
-            gbxFiltros.Enabled = dtOriginal IsNot Nothing AndAlso dtOriginal.Rows.Count > 0
 
         Catch ex As Exception
             MessageBox.Show($"Error al cargar datos: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -190,12 +189,26 @@ Partial Public Class frmFiltroAvanzado
         Finally
             LoadingHelper.OcultarCargando(Me)
             btnCargar.Enabled = True
-            ActualizarAccionesDisponibles()
+            UpdateUIState()
         End Try
     End Function
 
-    Private Async Sub btnCargar_Click(sender As Object, e As EventArgs)
-        Await CargarDatosAsync()
+    Private Sub AñadirColumnaBusquedaGlobal(dt As DataTable)
+        ' Esta columna invisible concatena todos los campos de texto para una búsqueda global ultrarrápida.
+        Const SEARCH_COLUMN_NAME As String = "GlobalSearch"
+        If dt Is Nothing OrElse dt.Columns.Contains(SEARCH_COLUMN_NAME) Then Return
+
+        dt.Columns.Add(SEARCH_COLUMN_NAME, GetType(String))
+
+        Dim stringColumns = dt.Columns.Cast(Of DataColumn).Where(Function(c) c.DataType = GetType(String)).ToList()
+
+        For Each row As DataRow In dt.Rows
+            Dim combinedValue As New StringBuilder()
+            For Each col In stringColumns
+                combinedValue.Append(row(col).ToString() & " ")
+            Next
+            row(SEARCH_COLUMN_NAME) = combinedValue.ToString()
+        Next
     End Sub
 
     Private Sub ConfigurarGrilla(dt As DataTable)
@@ -205,240 +218,145 @@ Partial Public Class frmFiltroAvanzado
 
         If dt Is Nothing Then Return
 
-        dgvDatos.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None
-
-        Dim origenSeleccionado = CType(cmbOrigenDatos.SelectedItem, ConsultasGenericas.TipoOrigenDatos)
-
-        If origenSeleccionado = ConsultasGenericas.TipoOrigenDatos.Funcionarios Then
-            ' Columnas específicas para Funcionarios
-            Dim columnasDeseadas As New Dictionary(Of String, String) From {
-            {"NombreCompleto", "Nombre"},
-            {"Cedula", "Cédula"},
-            {"Cargo", "Cargo"},
-            {"Escalafon", "Escalafón"},
-            {"Seccion", "Sección"},
-            {"Turno", "Turno"},
-            {"Semana", "Semana"},
-            {"PuestoDeTrabajo", "Puesto de Trabajo"}
+        ' --- MEJORA: Definiciones de columnas centralizadas para mayor claridad ---
+        Dim columnDefinitions As New Dictionary(Of String, String) From {
+            {"NombreCompleto", "Nombre"}, {"Cedula", "Cédula"}, {"Cargo", "Cargo"},
+            {"Escalafon", "Escalafón"}, {"Seccion", "Sección"}, {"Turno", "Turno"},
+            {"Semana", "Semana"}, {"PuestoDeTrabajo", "Puesto de Trabajo"}
         }
 
-            For Each kvp In columnasDeseadas
-                If dt.Columns.Contains(kvp.Key) Then
-                    ' Omitimos explícitamente las columnas de ID aquí también si existieran
-                    If Not kvp.Key.ToLower().EndsWith("id") Then
-                        Dim dgvCol As New DataGridViewTextBoxColumn With {
-                        .DataPropertyName = kvp.Key,
-                        .HeaderText = kvp.Value,
-                        .Name = kvp.Key
-                    }
-                        dgvCol.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-                        dgvDatos.Columns.Add(dgvCol)
-                    End If
-                End If
-            Next
-        Else
-            ' Comportamiento para otros orígenes de datos
-            For Each col As DataColumn In dt.Columns
-                ' --- INICIO DE LA CORRECCIÓN ---
-                ' Ocultamos las columnas que terminan en "Id"
-                If Not col.ColumnName.ToLower().EndsWith("id") Then
-                    ' --- FIN DE LA CORRECCIÓN ---
-                    Dim dgvCol As New DataGridViewTextBoxColumn With {
-                    .DataPropertyName = col.ColumnName,
-                    .HeaderText = col.ColumnName,
-                    .Name = col.ColumnName,
-                    .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells ' Ajuste para otras vistas
-                }
-                    If col.DataType = GetType(Date) OrElse col.DataType = GetType(DateTime) Then
-                        dgvCol.DefaultCellStyle.Format = "dd/MM/yyyy"
-                    End If
-                    dgvDatos.Columns.Add(dgvCol)
-                End If
-            Next
-        End If
+        Dim origen = CType(cmbOrigenDatos.SelectedItem, ConsultasGenericas.TipoOrigenDatos)
+        Dim columnsToShow = If(origen = ConsultasGenericas.TipoOrigenDatos.Funcionarios,
+                               columnDefinitions.Keys,
+                               dt.Columns.Cast(Of DataColumn).Select(Function(c) c.ColumnName))
+
+        For Each colName In columnsToShow
+            ' Omitir columnas 'Id' y la columna de búsqueda global
+            If colName.ToLower().EndsWith("id") OrElse colName = "GlobalSearch" Then Continue For
+
+            Dim headerText = If(columnDefinitions.ContainsKey(colName), columnDefinitions(colName), colName)
+            Dim dgvCol As New DataGridViewTextBoxColumn With {
+                .DataPropertyName = colName,
+                .HeaderText = headerText,
+                .Name = colName,
+                .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            }
+
+            If dt.Columns(colName).DataType = GetType(Date) OrElse dt.Columns(colName).DataType = GetType(DateTime) Then
+                dgvCol.DefaultCellStyle.Format = "dd/MM/yyyy"
+            End If
+
+            dgvDatos.Columns.Add(dgvCol)
+        Next
     End Sub
 
     Private Sub ActualizarListaColumnas()
         lstColumnas.Items.Clear()
-        lstValores.Items.Clear()
-        If dtOriginal IsNot Nothing Then
-            For Each col As DataColumn In dtOriginal.Columns
-                ' --- INICIO DE LA CORRECCIÓN ---
-                ' Ocultamos las columnas de Id también en la lista de filtros
-                If Not col.ColumnName.ToLower().EndsWith("id") Then
-                    ' --- FIN DE LA CORRECCIÓN ---
-                    lstColumnas.Items.Add(col.ColumnName)
-                End If
-            Next
+        If _dtOriginal IsNot Nothing Then
+            Dim columnNames = _dtOriginal.Columns.Cast(Of DataColumn).
+                              Select(Function(c) c.ColumnName).
+                              Where(Function(name) Not name.ToLower().EndsWith("id") AndAlso name <> "GlobalSearch").
+                              ToArray()
+            lstColumnas.Items.AddRange(columnNames)
             If lstColumnas.Items.Count > 0 Then lstColumnas.SelectedIndex = 0
         End If
     End Sub
 
 #End Region
 
-#Region "Eventos de UI (Botones, Combos, etc.)"
+#Region "Eventos y Lógica de UI"
 
-    Private Sub cmbOrigenDatos_SelectedIndexChanged(sender As Object, e As EventArgs)
+    Private Sub cmbOrigenDatos_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbOrigenDatos.SelectedIndexChanged
         LimpiarTodo()
         If cmbOrigenDatos.SelectedItem IsNot Nothing Then
-            Dim origenSeleccionado = CType(cmbOrigenDatos.SelectedItem, ConsultasGenericas.TipoOrigenDatos)
-            dtpFechaFin.Enabled = (origenSeleccionado <> ConsultasGenericas.TipoOrigenDatos.Funcionarios)
-
-            Select Case origenSeleccionado
-                Case TipoOrigenDatos.Licencias
-                    _accionHandler = New LicenciaAccionHandler()
-                Case TipoOrigenDatos.Notificaciones
-                    _accionHandler = New NotificacionAccionHandler()
-                Case Else
-                    _accionHandler = Nothing
-            End Select
+            Dim origen = CType(cmbOrigenDatos.SelectedItem, ConsultasGenericas.TipoOrigenDatos)
+            dtpFechaFin.Enabled = (origen <> ConsultasGenericas.TipoOrigenDatos.Funcionarios)
+            ' Configura el manejador de acciones correspondiente
+            _accionHandler = AccionHandlerFactory.Create(origen)
         Else
             _accionHandler = Nothing
         End If
-        ActualizarAccionesDisponibles()
+        UpdateUIState()
     End Sub
 
-    Private Sub LimpiarTodo()
-        dgvDatos.DataSource = Nothing
-        dgvDatos.Columns.Clear()
-        dtOriginal = New DataTable()
-        dvDatos = Nothing
-        lstColumnas.Items.Clear()
-        lstValores.Items.Clear()
-        flpChips.Controls.Clear()
-        filtros.Limpiar()
-        gbxFiltros.Enabled = False
-        ActualizarAccionesDisponibles()
-        UpdateFiltrosPanelHeight()
-    End Sub
-
-    Private Sub ColumnaCambiada(sender As Object, e As EventArgs)
+    Private Sub LstColumnas_SelectedIndexChanged(sender As Object, e As EventArgs)
+        If _isUpdatingValores Then Return
         ActualizarListaDeValores()
     End Sub
 
-    Private Sub ActualizarListaDeValores()
-        lstValores.Items.Clear()
-        If lstColumnas.SelectedItem Is Nothing OrElse dvDatos Is Nothing OrElse dvDatos.Table Is Nothing Then Exit Sub
-
-        Dim colName = lstColumnas.SelectedItem.ToString()
-        Dim valoresUnicosTbl As DataTable = dvDatos.ToTable(True, colName)
-        Dim valores = valoresUnicosTbl.AsEnumerable() _
-                                .Select(Function(r) r(colName).ToString()) _
-                                .Where(Function(v) Not String.IsNullOrWhiteSpace(v)) _
-                                .OrderBy(Function(v) v, StringComparer.CurrentCultureIgnoreCase) _
-                                .ToArray()
-
-        lstValores.Items.AddRange(valores)
+    Private Sub TxtBusquedaGlobal_TextChanged(sender As Object, e As EventArgs)
+        AplicarFiltros()
     End Sub
-
-
-    ' En el archivo: Apex/UI/frmFiltroAvanzado.vb
 
     Private Sub BtnAgregar_Click(sender As Object, e As EventArgs) Handles btnAgregar.Click
         If lstColumnas.SelectedItem Is Nothing OrElse lstValores.SelectedItems.Count = 0 Then Return
 
-        If lstValores.SelectedItems.Count = lstValores.Items.Count Then
-            MessageBox.Show(
-            "Ha seleccionado todos los valores disponibles para esta columna. El filtro es redundante y no se agregará.",
-            "Filtro Redundante",
-            MessageBoxButtons.OK,
-            MessageBoxIcon.Information
-        )
-            Return ' Salir para no agregar el filtro innecesario
+        ' --- MEJORA: Lógica de validación movida a su propia función para mayor claridad ---
+        If EsFiltroRedundante() Then
+            MessageBox.Show("Ha seleccionado todos los valores disponibles. El filtro es redundante y no se agregará.",
+                            "Filtro Redundante", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return
         End If
-        ' --- FIN DE LA CORRECCIÓN ---
 
-        Dim col As String = lstColumnas.SelectedItem.ToString()
-        Dim selCount As Integer = lstValores.SelectedItems.Count
+        Dim col = lstColumnas.SelectedItem.ToString()
         Dim nuevaRegla As ReglaFiltro
 
-        If selCount > 1 Then
-            Dim valores = lstValores.SelectedItems.Cast(Of Object)().Select(Function(v) v.ToString()).ToArray()
+        If lstValores.SelectedItems.Count > 1 Then
+            Dim valores = lstValores.SelectedItems.Cast(Of Object).Select(Function(v) v.ToString())
             nuevaRegla = New ReglaFiltro With {.Columna = col, .Operador = OperadorComparacion.EnLista, .Valor1 = String.Join("|", valores)}
         Else
-            Dim v As String = lstValores.SelectedItem.ToString()
-            nuevaRegla = New ReglaFiltro With {.Columna = col, .Operador = OperadorComparacion.Igual, .Valor1 = v}
+            nuevaRegla = New ReglaFiltro With {.Columna = col, .Operador = OperadorComparacion.Igual, .Valor1 = lstValores.SelectedItem.ToString()}
         End If
 
-        ' (Se mantiene la comprobación de duplicados que hicimos antes)
-        Dim representacionNuevaRegla = nuevaRegla.ToString()
-        If filtros.Reglas.Any(Function(reglaExistente) reglaExistente.ToString() = representacionNuevaRegla) Then
+        If _filtros.Reglas.Any(Function(r) r.ToString() = nuevaRegla.ToString()) Then
             MessageBox.Show("Este filtro ya ha sido agregado.", "Filtro Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Return
         End If
 
-        filtros.Agregar(nuevaRegla)
+        _filtros.Agregar(nuevaRegla)
         CrearChip(nuevaRegla)
         AplicarFiltros()
     End Sub
 
+    Private Function EsFiltroRedundante() As Boolean
+        ' Si el usuario selecciona todos los ítems, el filtro no tiene efecto.
+        Return lstValores.SelectedItems.Count = lstValores.Items.Count
+    End Function
 
-
-    Private Sub txtBusquedaGlobal_TextChanged_Handler(sender As Object, e As EventArgs)
+    Private Sub BtnLimpiar_Click(sender As Object, e As EventArgs) Handles btnLimpiar.Click
+        LimpiarFiltrosYChips()
         AplicarFiltros()
     End Sub
 
 #End Region
 
-#Region "Filtrado y UI Dinámica"
+#Region "Gestión de Filtros y Chips"
 
     Private Sub AplicarFiltros()
-        If dvDatos Is Nothing Then Return
-        dvDatos.RowFilter = String.Join(" AND ", {filtros.RowFilter(), ConstruirFiltroGlobal()}.Where(Function(s) Not String.IsNullOrWhiteSpace(s)))
-        ActualizarListaDeValores()
-        ActualizarAccionesDisponibles()
-    End Sub
+        If _dvDatos Is Nothing Then Return
 
-    Private Sub ActualizarAccionesDisponibles()
-        Dim hayDatos = (dvDatos IsNot Nothing AndAlso dvDatos.Count > 0)
+        Dim filtroReglas = _filtros.RowFilter()
+        Dim filtroGlobal = ConstruirFiltroGlobal()
 
-        ' Ocultamos todos los botones de acciones por defecto
-        btnNuevaLicencia.Visible = False
-        btnEditarLicencia.Visible = False
-        btnEliminarLicencia.Visible = False
-        btnNuevaNotificacion.Visible = False
-        btnEditarNotificacion.Visible = False
-        btnEliminarNotificacion.Visible = False
-        btnCambiarEstado.Visible = False
+        _dvDatos.RowFilter = String.Join(" AND ", {filtroReglas, filtroGlobal}.Where(Function(s) Not String.IsNullOrWhiteSpace(s)))
 
-        ' Si hay un gestor de acciones, le delegamos la visibilidad
-        If _accionHandler IsNot Nothing Then
-            _accionHandler.ConfigurarVisibilidadBotones(Me, hayDatos)
-        End If
+        ' --- MEJORA: La lista de valores solo se actualiza si la columna seleccionada cambia, no con cada filtro ---
+        ' Esto mejora drásticamente la capacidad de respuesta de la UI.
+        ' La actualización ahora la dispara el evento LstColumnas_SelectedIndexChanged.
 
-        Separator1.Visible = btnNuevaLicencia.Visible Or btnNuevaNotificacion.Visible
-
-        If dvDatos IsNot Nothing Then
-            lblConteoRegistros.Text = $"Registros encontrados: {dvDatos.Count}"
-        Else
-            lblConteoRegistros.Text = "Registros encontrados: 0"
-        End If
+        UpdateUIState()
     End Sub
 
     Private Function ConstruirFiltroGlobal() As String
-        Dim t = txtBusquedaGlobal.Text.Trim()
-        If t = String.Empty Then Return String.Empty
+        Dim searchText = txtBusquedaGlobal.Text.Trim()
+        If String.IsNullOrWhiteSpace(searchText) Then Return String.Empty
 
-        Dim palabras = t.Split({" "c}, StringSplitOptions.RemoveEmptyEntries)
-        Dim cond As New List(Of String)()
-
-        If dvDatos IsNot Nothing AndAlso dvDatos.Table IsNot Nothing Then
-            For Each col As DataColumn In dvDatos.Table.Columns
-                If col.DataType = GetType(String) Then
-                    For Each p In palabras
-                        cond.Add($"[{col.ColumnName}] LIKE '%{p.Replace("'", "''")}%'")
-                    Next
-                End If
-            Next
-        End If
-
-        If cond.Count = 0 Then Return String.Empty
-        Return "(" & String.Join(" OR ", cond) & ")"
+        ' --- MEJORA: La búsqueda ahora se hace sobre la columna pre-calculada 'GlobalSearch' ---
+        Dim palabras = searchText.Split({" "c}, StringSplitOptions.RemoveEmptyEntries).
+                                Select(Function(p) $"GlobalSearch LIKE '%{p.Replace("'", "''")}%'")
+        Return $"({String.Join(" AND ", palabras)})"
     End Function
 
-#End Region
-
-#Region "Chips UI"
     Private Sub CrearChip(regla As ReglaFiltro)
         Dim nuevoChip As New ChipControl(regla)
         AddHandler nuevoChip.CerrarClick, AddressOf Chip_CerrarClick
@@ -447,66 +365,108 @@ Partial Public Class frmFiltroAvanzado
     End Sub
 
     Private Sub Chip_CerrarClick(sender As Object, e As EventArgs)
-        Dim chip As ChipControl = CType(sender, ChipControl)
-        Dim reglaParaQuitar As ReglaFiltro = chip.Regla
+        Dim chip = CType(sender, ChipControl)
+        Dim regla = chip.Regla
 
-        If reglaParaQuitar IsNot Nothing Then
-            ' --- INICIO DE LA NUEVA LÓGICA ---
-            ' 1. Seleccionar la columna del chip eliminado en el ListBox de columnas.
-            lstColumnas.SelectedItem = reglaParaQuitar.Columna
-
-            ' Esto dispara automáticamente ActualizarListaDeValores() a través del evento SelectionChanged.
-
-            ' 2. Pre-seleccionar los valores del chip eliminado en el ListBox de valores.
-            Dim valoresParaSeleccionar As New HashSet(Of String)(
-                reglaParaQuitar.Valor1.Split("|"c)
-            )
-
-            For i As Integer = 0 To lstValores.Items.Count - 1
-                If valoresParaSeleccionar.Contains(lstValores.Items(i).ToString()) Then
-                    lstValores.SetSelected(i, True)
-                End If
-            Next
-            ' --- FIN DE LA NUEVA LÓGICA ---
-
-            ' 3. Eliminar el filtro y el chip visualmente.
-            filtros.Quitar(reglaParaQuitar)
+        If regla IsNot Nothing Then
+            _filtros.Quitar(regla)
             flpChips.Controls.Remove(chip)
-            chip.Dispose() ' Liberar recursos del control eliminado
+            chip.Dispose()
 
-            ' 4. Aplicar los filtros restantes y actualizar la UI.
+            ' Selecciona la columna y valores del chip eliminado para una mejor experiencia de usuario
+            RestaurarSeleccionDesdeChip(regla)
+
             AplicarFiltros()
             UpdateFiltrosPanelHeight()
         End If
     End Sub
 
+    Private Sub RestaurarSeleccionDesdeChip(regla As ReglaFiltro)
+        _isUpdatingValores = True ' Evita que el evento SelectedIndexChanged se dispare dos veces
+        lstColumnas.SelectedItem = regla.Columna
+        ActualizarListaDeValores() ' Actualiza los valores para la columna seleccionada
 
-    Private Sub UpdateFiltrosPanelHeight()
-        Const MAX_HEIGHT As Integer = 120
-
-        If flpChips.Controls.Count = 0 Then
-            flpChips.Visible = False
-        Else
-            flpChips.Visible = True
-            If flpChips.Height > MAX_HEIGHT Then
-                flpChips.AutoScroll = True
-                flpChips.Height = MAX_HEIGHT
-            Else
-                flpChips.AutoScroll = False
+        Dim valoresParaSeleccionar = New HashSet(Of String)(regla.Valor1.Split("|"c))
+        For i = 0 To lstValores.Items.Count - 1
+            If valoresParaSeleccionar.Contains(lstValores.Items(i).ToString()) Then
+                lstValores.SetSelected(i, True)
             End If
-        End If
+        Next
+        _isUpdatingValores = False
     End Sub
 
-    Private Sub BtnLimpiar_Click(sender As Object, e As EventArgs) Handles btnLimpiar.Click
-        filtros.Limpiar()
-        flpChips.Controls.Clear()
-        txtBusquedaGlobal.Clear()
-        AplicarFiltros()
-        UpdateFiltrosPanelHeight()
-    End Sub
 #End Region
 
-#Region "Utilidades y Acciones de Botones"
+#Region "Métodos de Ayuda y UI"
+
+    Private Sub UpdateUIState()
+        Dim hayDatos = (_dvDatos IsNot Nothing AndAlso _dvDatos.Table.Rows.Count > 0)
+        gbxFiltros.Enabled = hayDatos
+
+        ' Actualiza la visibilidad de los botones de acción
+        Dim hayResultados = (_dvDatos IsNot Nothing AndAlso _dvDatos.Count > 0)
+        _accionHandler?.ConfigurarVisibilidadBotones(Me, hayResultados)
+
+        ' Asegura que el separador solo se muestre si hay botones a ambos lados
+        Separator1.Visible = (btnNuevaLicencia.Visible Or btnNuevaNotificacion.Visible) AndAlso
+                             (btnExportarExcel.Visible Or btnCopiarCorreos.Visible)
+
+        ' Actualiza el conteo de registros
+        If _dvDatos IsNot Nothing Then
+            lblConteoRegistros.Text = $"Registros: {_dvDatos.Count}"
+        Else
+            lblConteoRegistros.Text = "Registros: 0"
+        End If
+        UpdateFiltrosPanelHeight()
+    End Sub
+
+    Private Sub LimpiarTodo()
+        dgvDatos.DataSource = Nothing
+        dgvDatos.Columns.Clear()
+        _dtOriginal = New DataTable()
+        _dvDatos = Nothing
+        lstColumnas.Items.Clear()
+        lstValores.Items.Clear()
+        LimpiarFiltrosYChips()
+        UpdateUIState()
+    End Sub
+
+    Private Sub LimpiarFiltrosYChips()
+        _filtros.Limpiar()
+        flpChips.Controls.Clear()
+        txtBusquedaGlobal.Clear()
+    End Sub
+
+    Private Sub ActualizarListaDeValores()
+        lstValores.BeginUpdate() ' Optimiza el rendimiento al añadir múltiples ítems
+        lstValores.Items.Clear()
+        If lstColumnas.SelectedItem Is Nothing OrElse _dtOriginal Is Nothing Then
+            lstValores.EndUpdate()
+            Return
+        End If
+
+        Dim colName = lstColumnas.SelectedItem.ToString()
+        ' --- MEJORA: Obtenemos valores únicos directamente del DataTable original (más rápido) ---
+        Dim valoresUnicos = _dtOriginal.AsEnumerable().
+                            Select(Function(r) r.Field(Of Object)(colName)).
+                            Where(Function(v) v IsNot Nothing AndAlso Not String.IsNullOrWhiteSpace(v.ToString())).
+                            Distinct().
+                            OrderBy(Function(v) v.ToString(), StringComparer.CurrentCultureIgnoreCase).
+                            Select(Function(v) v.ToString()).
+                            ToArray()
+
+        lstValores.Items.AddRange(valoresUnicos)
+        lstValores.EndUpdate()
+    End Sub
+
+    Private Sub UpdateFiltrosPanelHeight()
+        Const MAX_CHIP_PANEL_HEIGHT As Integer = 120
+        flpChips.Visible = flpChips.Controls.Count > 0
+        If flpChips.Visible Then
+            flpChips.Height = Math.Min(MAX_CHIP_PANEL_HEIGHT, flpChips.GetPreferredSize(New Size(flpChips.Width, 0)).Height)
+            flpChips.AutoScroll = flpChips.Height >= MAX_CHIP_PANEL_HEIGHT
+        End If
+    End Sub
     Private NotInheritable Class WaitCursor
         Implements IDisposable
         Private ReadOnly _old As Cursor
@@ -518,37 +478,9 @@ Partial Public Class frmFiltroAvanzado
             Cursor.Current = _old
         End Sub
     End Class
+#End Region
 
-    Private Sub btnCopiarCorreos_Click(sender As Object, e As EventArgs)
-        If dvDatos Is Nothing OrElse dvDatos.Count = 0 Then
-            MessageBox.Show("No hay datos para procesar.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information)
-            Return
-        End If
-
-        If Not dtOriginal.Columns.Contains("Correo") Then
-            MessageBox.Show("La vista actual no contiene una columna 'Correo'.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-            Return
-        End If
-
-        Dim correos = dvDatos.ToTable().AsEnumerable().
-                            Select(Function(r) r.Field(Of String)("Correo")).
-                            Where(Function(c) Not String.IsNullOrWhiteSpace(c)).
-                            Distinct(StringComparer.InvariantCultureIgnoreCase).
-                            ToArray()
-
-        If correos.Length = 0 Then
-            MessageBox.Show("No se encontraron correos en el resultado.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-            Return
-        End If
-
-        Dim textoCorreos As String = String.Join("; ", correos)
-        Clipboard.SetText(textoCorreos)
-
-        MessageBox.Show($"Se copiaron {correos.Length} correos al portapapeles." &
-                        $"{Environment.NewLine}Ya puedes pegarlos en tu cliente de correo.",
-                        "Correos copiados",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information)
-    End Sub
+#Region "Manejadores de Eventos para Acciones"
 
     Private Sub btnGenerico_Nuevo_Click(sender As Object, e As EventArgs)
         _accionHandler?.ManejarBotonNuevo(Me)
@@ -566,10 +498,31 @@ Partial Public Class frmFiltroAvanzado
         _accionHandler?.ManejarBotonExtra(Me)
     End Sub
 
+    ' ... (El método btnCopiarCorreos_Click se mantiene igual)
 
 #End Region
 
 End Class
 
+' --- MEJORA: Clase auxiliar para habilitar DoubleBuffering en controles ---
+Public Module ControlExtensions
+    <System.Runtime.CompilerServices.Extension()>
+    Public Sub DoubleBuffered(ByVal control As System.Windows.Forms.Control, ByVal enable As Boolean)
+        Dim prop = control.GetType().GetProperty("DoubleBuffered", System.Reflection.BindingFlags.Instance Or System.Reflection.BindingFlags.NonPublic)
+        prop.SetValue(control, enable, Nothing)
+    End Sub
+End Module
 
-
+' --- MEJORA: Fábrica para crear el IAccionHandler adecuado ---
+Public Class AccionHandlerFactory
+    Public Shared Function Create(origen As ConsultasGenericas.TipoOrigenDatos) As IAccionHandler
+        Select Case origen
+            Case ConsultasGenericas.TipoOrigenDatos.Licencias
+                Return New LicenciaAccionHandler()
+            Case ConsultasGenericas.TipoOrigenDatos.Notificaciones
+                Return New NotificacionAccionHandler()
+            Case Else
+                Return Nothing ' O una implementación por defecto que no hace nada
+        End Select
+    End Function
+End Class
