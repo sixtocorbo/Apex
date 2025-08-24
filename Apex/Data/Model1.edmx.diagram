@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="2532523929ea4c4baf47474ea8041551" Name="Diagram1">
+      <Diagram DiagramId="bb8b44f29fd94d5983c486017ad23990" Name="Diagram1">
         <EntityTypeShape EntityType="ApexModel.AreaTrabajo" Width="1.5" PointX="1.5" PointY="52.5" IsExpanded="true" />
         <EntityTypeShape EntityType="ApexModel.Arma" Width="1.5" PointX="6" PointY="19.375" IsExpanded="true" />
         <EntityTypeShape EntityType="ApexModel.Cargo" Width="1.5" PointX="0.75" PointY="26.375" IsExpanded="true" />

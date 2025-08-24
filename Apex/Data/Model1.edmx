@@ -622,7 +622,6 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_EstadosTransitoriosCompletos' no
             <PropertyRef Name="CI" />
             <PropertyRef Name="NombreFuncionario" />
             <PropertyRef Name="TipoEstadoNombre" />
-            <PropertyRef Name="FechaDesde" />
             <PropertyRef Name="CreatedAt" />
           </Key>
           <Property Name="Id" Type="int" Nullable="false" />
@@ -631,9 +630,9 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_EstadosTransitoriosCompletos' no
           <Property Name="CI" Type="char" MaxLength="8" Nullable="false" />
           <Property Name="NombreFuncionario" Type="nvarchar" MaxLength="60" Nullable="false" />
           <Property Name="TipoEstadoNombre" Type="nvarchar" MaxLength="60" Nullable="false" />
-          <Property Name="FechaDesde" Type="date" Nullable="false" />
-          <Property Name="FechaHasta" Type="date" />
-          <Property Name="Observaciones" Type="nvarchar(max)" />
+          <Property Name="FechaDesde" Type="datetime" />
+          <Property Name="FechaHasta" Type="datetime" />
+          <Property Name="Observaciones" Type="varchar" MaxLength="500" />
           <Property Name="CreatedAt" Type="datetime2" Precision="7" Nullable="false" />
           <Property Name="UpdatedAt" Type="datetime2" Precision="7" />
         </EntityType>
@@ -2562,7 +2561,6 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             <PropertyRef Name="CI" />
             <PropertyRef Name="NombreFuncionario" />
             <PropertyRef Name="TipoEstadoNombre" />
-            <PropertyRef Name="FechaDesde" />
             <PropertyRef Name="CreatedAt" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" />
@@ -2571,9 +2569,9 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <Property Name="CI" Type="String" MaxLength="8" FixedLength="true" Unicode="false" Nullable="false" />
           <Property Name="NombreFuncionario" Type="String" MaxLength="60" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="TipoEstadoNombre" Type="String" MaxLength="60" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="FechaDesde" Type="DateTime" Nullable="false" Precision="0" />
-          <Property Name="FechaHasta" Type="DateTime" Precision="0" />
-          <Property Name="Observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="FechaDesde" Type="DateTime" Precision="3" />
+          <Property Name="FechaHasta" Type="DateTime" Precision="3" />
+          <Property Name="Observaciones" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
           <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
           <Property Name="UpdatedAt" Type="DateTime" Precision="7" />
         </EntityType>

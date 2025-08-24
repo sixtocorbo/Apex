@@ -17,7 +17,7 @@ Partial Public Class vw_EstadosTransitoriosCompletos
     Public Property CI As String
     Public Property NombreFuncionario As String
     Public Property TipoEstadoNombre As String
-    Public Property FechaDesde As Date
+    Public Property FechaDesde As Nullable(Of Date)
     Public Property FechaHasta As Nullable(Of Date)
     Public Property Observaciones As String
     Public Property CreatedAt As Date
