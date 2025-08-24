@@ -259,6 +259,10 @@ Public Class frmGestion
         ' Primero, se asegura de que haya una fila seleccionada. Si no la hay, limpia el cuadro de texto y termina.
         If dgvNotificaciones.CurrentRow Is Nothing OrElse dgvNotificaciones.CurrentRow.DataBoundItem Is Nothing Then
             txtTextoNotificacion.Clear()
+            Dim haySeleccion As Boolean = (dgvNotificaciones.SelectedRows.Count > 0)
+            btnEditarNotificacion.Enabled = haySeleccion
+            btnEliminarNotificacion.Enabled = haySeleccion
+            btnImprimir.Enabled = haySeleccion
             Return
         End If
 
@@ -349,6 +353,21 @@ Public Class frmGestion
             Catch ex As Exception
                 MessageBox.Show("Error al eliminar la sanción: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
+        End If
+    End Sub
+
+    Private Sub btnImprimir_Click(sender As Object, e As EventArgs) Handles btnImprimir.Click
+        If dgvNotificaciones.CurrentRow IsNot Nothing Then
+            Dim notificacionSeleccionada = TryCast(dgvNotificaciones.CurrentRow.DataBoundItem, vw_NotificacionesCompletas)
+            If notificacionSeleccionada IsNot Nothing Then
+                Using frmReporte As New frmNotificacionRPT(notificacionSeleccionada.Id)
+                    frmReporte.ShowDialog(Me)
+                End Using
+            Else
+                MessageBox.Show("No se pudo obtener la información de la notificación.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            End If
+        Else
+            MessageBox.Show("Por favor, seleccione una notificación para imprimir.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
         End If
     End Sub
 

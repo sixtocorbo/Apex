@@ -49,6 +49,7 @@ Partial Class frmGestion
         Me.PanelBusquedaSanciones = New System.Windows.Forms.Panel()
         Me.txtBusquedaSancion = New System.Windows.Forms.TextBox()
         Me.Label3 = New System.Windows.Forms.Label()
+        Me.btnImprimir = New System.Windows.Forms.Button()
         Me.TabControlGestion.SuspendLayout()
         Me.TabPageLicencias.SuspendLayout()
         CType(Me.dgvLicencias, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -262,6 +263,7 @@ Partial Class frmGestion
         '
         'PanelNotificaciones
         '
+        Me.PanelNotificaciones.Controls.Add(Me.btnImprimir)
         Me.PanelNotificaciones.Controls.Add(Me.btnCambiarEstado)
         Me.PanelNotificaciones.Controls.Add(Me.btnEliminarNotificacion)
         Me.PanelNotificaciones.Controls.Add(Me.btnEditarNotificacion)
@@ -445,6 +447,17 @@ Partial Class frmGestion
         Me.Label3.TabIndex = 0
         Me.Label3.Text = "Funcionario:"
         '
+        'btnImprimir
+        '
+        Me.btnImprimir.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnImprimir.Location = New System.Drawing.Point(315, 12)
+        Me.btnImprimir.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.btnImprimir.Name = "btnImprimir"
+        Me.btnImprimir.Size = New System.Drawing.Size(96, 38)
+        Me.btnImprimir.TabIndex = 4
+        Me.btnImprimir.Text = "Imprimir"
+        Me.btnImprimir.UseVisualStyleBackColor = True
+        '
         'frmGestion
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -513,5 +526,6 @@ Partial Class frmGestion
     ' --- INICIO DE LA MODIFICACIÓN ---
     Friend WithEvents splitContenedorNotificaciones As SplitContainer
     Friend WithEvents txtTextoNotificacion As TextBox
+    Friend WithEvents btnImprimir As Button
     ' --- FIN DE LA MODIFICACIÓN ---
 End Class

@@ -1,265 +1,285 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2008/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
-	<Body>
-		<ReportItems>
-			<Textbox Name="Textbox1">
-				<CanGrow>true</CanGrow>
-				<KeepTogether>true</KeepTogether>
-				<Paragraphs>
-					<Paragraph>
-						<TextRuns>
-							<TextRun>
-								<Value>CONSTANCIA DE NOTIFICACIÓN</Value>
-								<Style>
-									<FontSize>14pt</FontSize>
-									<FontWeight>Bold</FontWeight>
-								</Style>
-							</TextRun>
-						</TextRuns>
-						<Style>
-							<TextAlign>Center</TextAlign>
-						</Style>
-					</Paragraph>
-				</Paragraphs>
-				<rd:DefaultName>Textbox1</rd:DefaultName>
-				<Top>0.5cm</Top>
-				<Left>0.5cm</Left>
-				<Height>0.8cm</Height>
-				<Width>16.5cm</Width>
-				<Style>
-					<Border>
-						<Style>None</Style>
-					</Border>
-					<PaddingLeft>2pt</PaddingLeft>
-					<PaddingRight>2pt</PaddingRight>
-					<PaddingTop>2pt</PaddingTop>
-					<PaddingBottom>2pt</PaddingBottom>
-				</Style>
-			</Textbox>
-			<Textbox Name="TextboxFuncionario">
-				<CanGrow>true</CanGrow>
-				<KeepTogether>true</KeepTogether>
-				<Paragraphs>
-					<Paragraph>
-						<TextRuns>
-							<TextRun>
-								<Value>="Funcionario: " &amp; First(Fields!NombreCompleto.Value, "DataSetNotificaciones")</Value>
-								<Style />
-							</TextRun>
-						</TextRuns>
-						<Style />
-					</Paragraph>
-				</Paragraphs>
-				<Top>2cm</Top>
-				<Left>0.5cm</Left>
-				<Height>0.6cm</Height>
-				<Width>16.5cm</Width>
-				<ZIndex>1</ZIndex>
-				<Style>
-					<Border>
-						<Style>None</Style>
-					</Border>
-					<PaddingLeft>2pt</PaddingLeft>
-					<PaddingRight>2pt</PaddingRight>
-					<PaddingTop>2pt</PaddingTop>
-					<PaddingBottom>2pt</PaddingBottom>
-				</Style>
-			</Textbox>
-			<Textbox Name="TextboxCedula">
-				<CanGrow>true</CanGrow>
-				<KeepTogether>true</KeepTogether>
-				<Paragraphs>
-					<Paragraph>
-						<TextRuns>
-							<TextRun>
-								<Value>="Cédula: " &amp; First(Fields!Cedula.Value, "DataSetNotificaciones")</Value>
-								<Style />
-							</TextRun>
-						</TextRuns>
-						<Style />
-					</Paragraph>
-				</Paragraphs>
-				<Top>2.8cm</Top>
-				<Left>0.5cm</Left>
-				<Height>0.6cm</Height>
-				<Width>8cm</Width>
-				<ZIndex>2</ZIndex>
-				<Style>
-					<Border>
-						<Style>None</Style>
-					</Border>
-					<PaddingLeft>2pt</PaddingLeft>
-					<PaddingRight>2pt</PaddingRight>
-					<PaddingTop>2pt</PaddingTop>
-					<PaddingBottom>2pt</PaddingBottom>
-				</Style>
-			</Textbox>
-			<Textbox Name="TextboxFecha">
-				<CanGrow>true</CanGrow>
-				<KeepTogether>true</KeepTogether>
-				<Paragraphs>
-					<Paragraph>
-						<TextRuns>
-							<TextRun>
-								<Value>="Fecha de Notificación: " &amp; Format(First(Fields!Fecha.Value, "DataSetNotificaciones"), "dd/MM/yyyy")</Value>
-								<Style />
-							</TextRun>
-						</TextRuns>
-						<Style>
-							<TextAlign>Right</TextAlign>
-						</Style>
-					</Paragraph>
-				</Paragraphs>
-				<Top>2.8cm</Top>
-				<Left>9cm</Left>
-				<Height>0.6cm</Height>
-				<Width>8cm</Width>
-				<ZIndex>3</ZIndex>
-				<Style>
-					<Border>
-						<Style>None</Style>
-					</Border>
-					<PaddingLeft>2pt</PaddingLeft>
-					<PaddingRight>2pt</PaddingRight>
-					<PaddingTop>2pt</PaddingTop>
-					<PaddingBottom>2pt</PaddingBottom>
-				</Style>
-			</Textbox>
-			<Textbox Name="TextboxMensaje">
-				<CanGrow>true</CanGrow>
-				<KeepTogether>true</KeepTogether>
-				<Paragraphs>
-					<Paragraph>
-						<TextRuns>
-							<TextRun>
-								<Value>=First(Fields!Mensaje.Value, "DataSetNotificaciones")</Value>
-								<Style />
-							</TextRun>
-						</TextRuns>
-						<Style />
-					</Paragraph>
-				</Paragraphs>
-				<Top>4.5cm</Top>
-				<Left>0.5cm</Left>
-				<Height>4cm</Height>
-				<Width>16.5cm</Width>
-				<ZIndex>4</ZIndex>
-				<Style>
-					<Border>
-						<Style>Solid</Style>
-					</Border>
-					<TopBorder>
-						<Style>Solid</Style>
-					</TopBorder>
-					<BottomBorder>
-						<Style>Solid</Style>
-					</BottomBorder>
-					<LeftBorder>
-						<Style>Solid</Style>
-					</LeftBorder>
-					<RightBorder>
-						<Style>Solid</Style>
-					</RightBorder>
-					<PaddingLeft>5pt</PaddingLeft>
-					<PaddingRight>5pt</PaddingRight>
-					<PaddingTop>5pt</PaddingTop>
-					<PaddingBottom>5pt</PaddingBottom>
-				</Style>
-			</Textbox>
-			<Line Name="Line1">
-				<Top>12cm</Top>
-				<Left>4cm</Left>
-				<Height>0cm</Height>
-				<Width>9.5cm</Width>
-				<ZIndex>5</ZIndex>
-				<Style>
-					<Border>
-						<Style>Solid</Style>
-					</Border>
-				</Style>
-			</Line>
-			<Textbox Name="TextboxFirmaAclaracion">
-				<CanGrow>true</CanGrow>
-				<KeepTogether>true</KeepTogether>
-				<Paragraphs>
-					<Paragraph>
-						<TextRuns>
-							<TextRun>
-								<Value>Firma y Aclaración</Value>
-								<Style />
-							</TextRun>
-						</TextRuns>
-						<Style>
-							<TextAlign>Center</TextAlign>
-						</Style>
-					</Paragraph>
-				</Paragraphs>
-				<Top>12.2cm</Top>
-				<Left>4cm</Left>
-				<Height>0.6cm</Height>
-				<Width>9.5cm</Width>
-				<ZIndex>6</ZIndex>
-				<Style>
-					<Border>
-						<Style>None</Style>
-					</Border>
-					<PaddingLeft>2pt</PaddingLeft>
-					<PaddingRight>2pt</PaddingRight>
-					<PaddingTop>2pt</PaddingTop>
-					<PaddingBottom>2pt</PaddingBottom>
-				</Style>
-			</Textbox>
-		</ReportItems>
-		<Height>14cm</Height>
-		<Style />
-	</Body>
-	<Width>17.5cm</Width>
-	<Page>
-		<PageHeight>29.7cm</PageHeight>
-		<PageWidth>21cm</PageWidth>
-		<LeftMargin>2cm</LeftMargin>
-		<RightMargin>2cm</RightMargin>
-		<TopMargin>2cm</TopMargin>
-		<BottomMargin>2cm</BottomMargin>
-		<ColumnSpacing>0.13cm</ColumnSpacing>
-		<Style />
-	</Page>
+<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
 	<AutoRefresh>0</AutoRefresh>
 	<DataSources>
-		<DataSource Name="DummySource">
+		<DataSource Name="DummyDataSource">
 			<ConnectionProperties>
 				<DataProvider>SQL</DataProvider>
 				<ConnectString />
 			</ConnectionProperties>
-			<rd:DataSourceID>c0a9bb1e-a492-4f9d-9076-a0b4d4f88e1a</rd:DataSourceID>
+			<rd:DataSourceID>f1b3f6f3-3a3b-45e2-8e7c-2b2a6c1a8d0a</rd:DataSourceID>
 		</DataSource>
 	</DataSources>
 	<DataSets>
 		<DataSet Name="DataSetNotificaciones">
 			<Query>
-				<DataSourceName>DummySource</DataSourceName>
-				<CommandText />
+				<DataSourceName>DummyDataSource</DataSourceName>
+				<CommandText>/* Local Query */</CommandText>
 			</Query>
 			<Fields>
-				<Field Name="NombreCompleto">
-					<DataField>NombreCompleto</DataField>
+				<Field Name="NombreFuncionario">
+					<DataField>NombreFuncionario</DataField>
 					<rd:TypeName>System.String</rd:TypeName>
 				</Field>
-				<Field Name="Cedula">
-					<DataField>Cedula</DataField>
+				<Field Name="CedulaFuncionario">
+					<DataField>CedulaFuncionario</DataField>
 					<rd:TypeName>System.String</rd:TypeName>
 				</Field>
-				<Field Name="Fecha">
-					<DataField>Fecha</DataField>
+				<Field Name="FechaProgramada">
+					<DataField>FechaProgramada</DataField>
 					<rd:TypeName>System.DateTime</rd:TypeName>
 				</Field>
-				<Field Name="Mensaje">
-					<DataField>Mensaje</DataField>
+				<Field Name="Texto">
+					<DataField>Texto</DataField>
 					<rd:TypeName>System.String</rd:TypeName>
 				</Field>
 			</Fields>
 		</DataSet>
 	</DataSets>
+	<ReportSections>
+		<ReportSection>
+			<Body>
+				<ReportItems>
+					<Textbox Name="Textbox1">
+						<CanGrow>true</CanGrow>
+						<KeepTogether>true</KeepTogether>
+						<Paragraphs>
+							<Paragraph>
+								<TextRuns>
+									<TextRun>
+										<Value>CONSTANCIA DE NOTIFICACIÓN</Value>
+										<Style>
+											<FontSize>16pt</FontSize>
+											<FontWeight>Bold</FontWeight>
+										</Style>
+									</TextRun>
+								</TextRuns>
+								<Style>
+									<TextAlign>Center</TextAlign>
+								</Style>
+							</Paragraph>
+						</Paragraphs>
+						<rd:DefaultName>Textbox1</rd:DefaultName>
+						<Top>0.60578cm</Top>
+						<Left>0.5cm</Left>
+						<Height>0.8cm</Height>
+						<Width>16.5cm</Width>
+						<Style>
+							<Border>
+								<Style>None</Style>
+							</Border>
+							<PaddingLeft>2pt</PaddingLeft>
+							<PaddingRight>2pt</PaddingRight>
+							<PaddingTop>2pt</PaddingTop>
+							<PaddingBottom>2pt</PaddingBottom>
+						</Style>
+					</Textbox>
+					<Textbox Name="TextboxFuncionario">
+						<CanGrow>true</CanGrow>
+						<KeepTogether>true</KeepTogether>
+						<Paragraphs>
+							<Paragraph>
+								<TextRuns>
+									<TextRun>
+										<Value>="Funcionario: " &amp; First(Fields!NombreFuncionario.Value, "DataSetNotificaciones")</Value>
+										<Style>
+											<FontSize>11pt</FontSize>
+										</Style>
+									</TextRun>
+								</TextRuns>
+								<Style />
+							</Paragraph>
+						</Paragraphs>
+						<Top>2.20578cm</Top>
+						<Left>0.5cm</Left>
+						<Height>0.7cm</Height>
+						<Width>16.5cm</Width>
+						<ZIndex>1</ZIndex>
+						<Style>
+							<Border>
+								<Style>None</Style>
+							</Border>
+							<PaddingLeft>2pt</PaddingLeft>
+							<PaddingRight>2pt</PaddingRight>
+							<PaddingTop>2pt</PaddingTop>
+							<PaddingBottom>2pt</PaddingBottom>
+						</Style>
+					</Textbox>
+					<Textbox Name="TextboxCedula">
+						<CanGrow>true</CanGrow>
+						<KeepTogether>true</KeepTogether>
+						<Paragraphs>
+							<Paragraph>
+								<TextRuns>
+									<TextRun>
+										<Value>="Cédula: " &amp; First(Fields!CedulaFuncionario.Value, "DataSetNotificaciones")</Value>
+										<Style>
+											<FontSize>11pt</FontSize>
+										</Style>
+									</TextRun>
+								</TextRuns>
+								<Style />
+							</Paragraph>
+						</Paragraphs>
+						<Top>3.10578cm</Top>
+						<Left>0.5cm</Left>
+						<Height>0.7cm</Height>
+						<Width>8cm</Width>
+						<ZIndex>2</ZIndex>
+						<Style>
+							<Border>
+								<Style>None</Style>
+							</Border>
+							<PaddingLeft>2pt</PaddingLeft>
+							<PaddingRight>2pt</PaddingRight>
+							<PaddingTop>2pt</PaddingTop>
+							<PaddingBottom>2pt</PaddingBottom>
+						</Style>
+					</Textbox>
+					<Textbox Name="TextboxFecha">
+						<CanGrow>true</CanGrow>
+						<KeepTogether>true</KeepTogether>
+						<Paragraphs>
+							<Paragraph>
+								<TextRuns>
+									<TextRun>
+										<Value>="Fecha: " &amp; Format(First(Fields!FechaProgramada.Value, "DataSetNotificaciones"), "dd/MM/yyyy HH:mm")</Value>
+										<Style>
+											<FontSize>11pt</FontSize>
+										</Style>
+									</TextRun>
+								</TextRuns>
+								<Style>
+									<TextAlign>Right</TextAlign>
+								</Style>
+							</Paragraph>
+						</Paragraphs>
+						<Top>3.10578cm</Top>
+						<Left>9cm</Left>
+						<Height>0.7cm</Height>
+						<Width>8cm</Width>
+						<ZIndex>3</ZIndex>
+						<Style>
+							<Border>
+								<Style>None</Style>
+							</Border>
+							<PaddingLeft>2pt</PaddingLeft>
+							<PaddingRight>2pt</PaddingRight>
+							<PaddingTop>2pt</PaddingTop>
+							<PaddingBottom>2pt</PaddingBottom>
+						</Style>
+					</Textbox>
+					<Textbox Name="TextboxMensaje">
+						<CanGrow>true</CanGrow>
+						<KeepTogether>true</KeepTogether>
+						<Paragraphs>
+							<Paragraph>
+								<TextRuns>
+									<TextRun>
+										<Value>=First(Fields!Texto.Value, "DataSetNotificaciones")</Value>
+										<Style>
+											<FontSize>11pt</FontSize>
+										</Style>
+									</TextRun>
+								</TextRuns>
+								<Style />
+							</Paragraph>
+						</Paragraphs>
+						<Top>4.5cm</Top>
+						<Left>0.5cm</Left>
+						<Height>6cm</Height>
+						<Width>16.5cm</Width>
+						<ZIndex>4</ZIndex>
+						<Style>
+							<Border>
+								<Style>Solid</Style>
+							</Border>
+							<TopBorder>
+								<Color>Black</Color>
+								<Style>Solid</Style>
+								<Width>1pt</Width>
+							</TopBorder>
+							<BottomBorder>
+								<Color>Black</Color>
+								<Style>Solid</Style>
+								<Width>1pt</Width>
+							</BottomBorder>
+							<LeftBorder>
+								<Color>Black</Color>
+								<Style>Solid</Style>
+								<Width>1pt</Width>
+							</LeftBorder>
+							<RightBorder>
+								<Color>Black</Color>
+								<Style>Solid</Style>
+								<Width>1pt</Width>
+							</RightBorder>
+							<PaddingLeft>5pt</PaddingLeft>
+							<PaddingRight>5pt</PaddingRight>
+							<PaddingTop>5pt</PaddingTop>
+							<PaddingBottom>5pt</PaddingBottom>
+						</Style>
+					</Textbox>
+					<Line Name="Line1">
+						<Top>13.5cm</Top>
+						<Left>4cm</Left>
+						<Height>0cm</Height>
+						<Width>9.5cm</Width>
+						<ZIndex>5</ZIndex>
+						<Style>
+							<Border>
+								<Style>Solid</Style>
+							</Border>
+						</Style>
+					</Line>
+					<Textbox Name="TextboxFirmaAclaracion">
+						<CanGrow>true</CanGrow>
+						<KeepTogether>true</KeepTogether>
+						<Paragraphs>
+							<Paragraph>
+								<TextRuns>
+									<TextRun>
+										<Value>Firma y Aclaración</Value>
+										<Style />
+									</TextRun>
+								</TextRuns>
+								<Style>
+									<TextAlign>Center</TextAlign>
+								</Style>
+							</Paragraph>
+						</Paragraphs>
+						<Top>13.7cm</Top>
+						<Left>4cm</Left>
+						<Height>0.6cm</Height>
+						<Width>9.5cm</Width>
+						<ZIndex>6</ZIndex>
+						<Style>
+							<Border>
+								<Style>None</Style>
+							</Border>
+							<PaddingLeft>2pt</PaddingLeft>
+							<PaddingRight>2pt</PaddingRight>
+							<PaddingTop>2pt</PaddingTop>
+							<PaddingBottom>2pt</PaddingBottom>
+						</Style>
+					</Textbox>
+				</ReportItems>
+				<Height>15cm</Height>
+				<Style />
+			</Body>
+			<Width>17.5cm</Width>
+			<Page>
+				<PageHeight>29.7cm</PageHeight>
+				<PageWidth>21cm</PageWidth>
+				<LeftMargin>2cm</LeftMargin>
+				<RightMargin>2cm</RightMargin>
+				<TopMargin>2cm</TopMargin>
+				<BottomMargin>2cm</BottomMargin>
+				<ColumnSpacing>0.13cm</ColumnSpacing>
+				<Style />
+			</Page>
+		</ReportSection>
+	</ReportSections>
 	<rd:ReportUnitType>Cm</rd:ReportUnitType>
 	<rd:ReportID>18e15244-1246-4a51-9f9b-118f6027b1a2</rd:ReportID>
 </Report>

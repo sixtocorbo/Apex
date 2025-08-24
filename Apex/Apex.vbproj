@@ -611,12 +611,6 @@
     <Compile Include="UI\frmNotificacionCrear.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\frmNotificaciones.Designer.vb">
-      <DependentUpon>frmNotificaciones.vb</DependentUpon>
-    </Compile>
-    <Compile Include="UI\frmNotificaciones.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="UI\frmNovedadCrear.Designer.vb">
       <DependentUpon>frmNovedadCrear.vb</DependentUpon>
     </Compile>
@@ -735,9 +729,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmNotificacionCrear.resx">
       <DependentUpon>frmNotificacionCrear.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UI\frmNotificaciones.resx">
-      <DependentUpon>frmNotificaciones.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmNovedadCrear.resx">
       <DependentUpon>frmNovedadCrear.vb</DependentUpon>
