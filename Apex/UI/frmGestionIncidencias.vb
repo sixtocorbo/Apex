@@ -67,7 +67,8 @@ Public Class frmGestionIncidencias
         End Using
     End Sub
 
-    ' Archivo: sixtocorbo/apex/Apex-0de320c5ad8f21b48a295ddfce12e6266297c13c/Apex/UI/frmGestionIncidencias.vb
+
+    ' Archivo: sixtocorbo/apex/Apex-aabdb9cacb3f1a24cadc076438a2c915e94e714c/Apex/UI/frmGestionIncidencias.vb
 
     Private Async Sub btnEditar_Click(sender As Object, e As EventArgs) Handles btnEditar.Click
         If dgvIncidencias.CurrentRow Is Nothing Then Return
@@ -77,9 +78,9 @@ Public Class frmGestionIncidencias
 
         ' Paso 1: Cargar una copia "desconectada" para la edición, para no interferir con el contexto.
         Dim tipoLicenciaParaEditar = Await repo.GetAll().
-        Include(Function(t) t.CategoriaAusencia).
-        AsNoTracking().
-        FirstOrDefaultAsync(Function(t) t.Id = idSeleccionado)
+    Include(Function(t) t.CategoriaAusencia).
+    AsNoTracking().
+    FirstOrDefaultAsync(Function(t) t.Id = idSeleccionado)
 
         If tipoLicenciaParaEditar Is Nothing Then
             MessageBox.Show("No se encontró el registro a editar.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -93,8 +94,9 @@ Public Class frmGestionIncidencias
                 ' --- INICIO DE LA SOLUCIÓN FINAL ---
 
                 ' Paso 3: Cargar la entidad ORIGINAL que el contexto SÍ está rastreando.
-                Dim entidadOriginal = Await repo.GetAll().
-                FirstOrDefaultAsync(Function(t) t.Id = idSeleccionado)
+                ' CORRECCIÓN: Se obtiene la entidad directamente del context para que sea rastreada.
+                Dim entidadOriginal = Await _uow.Context.Set(Of TipoLicencia)().
+                                    FirstOrDefaultAsync(Function(t) t.Id = idSeleccionado)
 
                 If entidadOriginal IsNot Nothing Then
                     ' Paso 4: Copiar los valores escalares (texto, checkboxes, etc.)
