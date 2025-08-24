@@ -581,6 +581,12 @@
     <Compile Include="UI\frmGestionTurnos.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="UI\frmNotificacionRPT.Designer.vb">
+      <DependentUpon>frmNotificacionRPT.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmNotificacionRPT.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="UI\frmReporteViaticos.Designer.vb">
       <DependentUpon>frmReporteViaticos.vb</DependentUpon>
     </Compile>
@@ -651,6 +657,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Reportes\ConceptoFuncional.rdlc" />
     <EmbeddedResource Include="Reportes\FichaFuncional.rdlc" />
+    <EmbeddedResource Include="Reportes\NotificacionImprimir.rdlc" />
     <EmbeddedResource Include="UI\frmConceptoFuncionalApex.resx">
       <DependentUpon>frmConceptoFuncionalApex.vb</DependentUpon>
     </EmbeddedResource>

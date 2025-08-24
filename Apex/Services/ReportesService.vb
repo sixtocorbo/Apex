@@ -68,7 +68,12 @@ Public Class ReportesService
 
         Return dto
     End Function
+    Public Async Function GetDatosNotificacionAsync(notificacionId As Integer) As Task(Of vw_NotificacionesCompletas)
+        Dim notificacion = Await _unitOfWork.Repository(Of vw_NotificacionesCompletas)().
+                                     GetAll().FirstOrDefaultAsync(Function(n) n.Id = notificacionId)
 
+        Return notificacion
+    End Function
 End Class
 
 ' --- DTOs para la Ficha Funcional (versión simplificada) ---

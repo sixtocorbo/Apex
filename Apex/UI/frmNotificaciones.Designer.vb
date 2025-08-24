@@ -26,6 +26,7 @@ Partial Class frmNotificaciones
         Me.btnEditar = New System.Windows.Forms.Button()
         Me.btnEliminar = New System.Windows.Forms.Button()
         Me.btnCambiarEstado = New System.Windows.Forms.Button()
+        Me.btnImprimir = New System.Windows.Forms.Button()
         Me.splitContenedor = New System.Windows.Forms.SplitContainer()
         Me.dgvNotificaciones = New System.Windows.Forms.DataGridView()
         Me.txtTextoNotificacion = New System.Windows.Forms.TextBox()
@@ -52,7 +53,7 @@ Partial Class frmNotificaciones
         '
         'btnBuscar
         '
-        Me.btnBuscar.Location = New System.Drawing.Point(338, 18)
+        Me.btnBuscar.Location = New System.Drawing.Point(359, 18)
         Me.btnBuscar.Name = "btnBuscar"
         Me.btnBuscar.Size = New System.Drawing.Size(119, 33)
         Me.btnBuscar.TabIndex = 2
@@ -61,7 +62,7 @@ Partial Class frmNotificaciones
         '
         'txtBusquedaFuncionario
         '
-        Me.txtBusquedaFuncionario.Location = New System.Drawing.Point(107, 20)
+        Me.txtBusquedaFuncionario.Location = New System.Drawing.Point(128, 20)
         Me.txtBusquedaFuncionario.Name = "txtBusquedaFuncionario"
         Me.txtBusquedaFuncionario.Size = New System.Drawing.Size(225, 31)
         Me.txtBusquedaFuncionario.TabIndex = 1
@@ -81,49 +82,59 @@ Partial Class frmNotificaciones
         Me.panelAcciones.Controls.Add(Me.btnEditar)
         Me.panelAcciones.Controls.Add(Me.btnEliminar)
         Me.panelAcciones.Controls.Add(Me.btnCambiarEstado)
+        Me.panelAcciones.Controls.Add(Me.btnImprimir)
         Me.panelAcciones.Dock = System.Windows.Forms.DockStyle.Bottom
         Me.panelAcciones.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
-        Me.panelAcciones.Location = New System.Drawing.Point(0, 520)
+        Me.panelAcciones.Location = New System.Drawing.Point(0, 494)
         Me.panelAcciones.Name = "panelAcciones"
         Me.panelAcciones.Padding = New System.Windows.Forms.Padding(10)
-        Me.panelAcciones.Size = New System.Drawing.Size(984, 42)
+        Me.panelAcciones.Size = New System.Drawing.Size(984, 68)
         Me.panelAcciones.TabIndex = 3
         '
         'btnNueva
         '
-        Me.btnNueva.Location = New System.Drawing.Point(886, 13)
+        Me.btnNueva.Location = New System.Drawing.Point(868, 13)
         Me.btnNueva.Name = "btnNueva"
-        Me.btnNueva.Size = New System.Drawing.Size(75, 23)
+        Me.btnNueva.Size = New System.Drawing.Size(93, 43)
         Me.btnNueva.TabIndex = 0
         Me.btnNueva.Text = "Nueva..."
         Me.btnNueva.UseVisualStyleBackColor = True
         '
         'btnEditar
         '
-        Me.btnEditar.Location = New System.Drawing.Point(805, 13)
+        Me.btnEditar.Location = New System.Drawing.Point(769, 13)
         Me.btnEditar.Name = "btnEditar"
-        Me.btnEditar.Size = New System.Drawing.Size(75, 23)
+        Me.btnEditar.Size = New System.Drawing.Size(93, 43)
         Me.btnEditar.TabIndex = 1
         Me.btnEditar.Text = "Editar..."
         Me.btnEditar.UseVisualStyleBackColor = True
         '
         'btnEliminar
         '
-        Me.btnEliminar.Location = New System.Drawing.Point(724, 13)
+        Me.btnEliminar.Location = New System.Drawing.Point(670, 13)
         Me.btnEliminar.Name = "btnEliminar"
-        Me.btnEliminar.Size = New System.Drawing.Size(75, 23)
+        Me.btnEliminar.Size = New System.Drawing.Size(93, 43)
         Me.btnEliminar.TabIndex = 2
         Me.btnEliminar.Text = "Eliminar"
         Me.btnEliminar.UseVisualStyleBackColor = True
         '
         'btnCambiarEstado
         '
-        Me.btnCambiarEstado.Location = New System.Drawing.Point(534, 13)
+        Me.btnCambiarEstado.Location = New System.Drawing.Point(462, 13)
         Me.btnCambiarEstado.Name = "btnCambiarEstado"
-        Me.btnCambiarEstado.Size = New System.Drawing.Size(184, 23)
+        Me.btnCambiarEstado.Size = New System.Drawing.Size(202, 43)
         Me.btnCambiarEstado.TabIndex = 3
         Me.btnCambiarEstado.Text = "Cambiar Estado..."
         Me.btnCambiarEstado.UseVisualStyleBackColor = True
+        '
+        'btnImprimir
+        '
+        Me.btnImprimir.Location = New System.Drawing.Point(254, 13)
+        Me.btnImprimir.Name = "btnImprimir"
+        Me.btnImprimir.Size = New System.Drawing.Size(202, 43)
+        Me.btnImprimir.TabIndex = 4
+        Me.btnImprimir.Text = "Imprimir"
+        Me.btnImprimir.UseVisualStyleBackColor = True
         '
         'splitContenedor
         '
@@ -140,8 +151,8 @@ Partial Class frmNotificaciones
         '
         Me.splitContenedor.Panel2.Controls.Add(Me.txtTextoNotificacion)
         Me.splitContenedor.Panel2.Padding = New System.Windows.Forms.Padding(5)
-        Me.splitContenedor.Size = New System.Drawing.Size(984, 460)
-        Me.splitContenedor.SplitterDistance = 280
+        Me.splitContenedor.Size = New System.Drawing.Size(984, 434)
+        Me.splitContenedor.SplitterDistance = 264
         Me.splitContenedor.TabIndex = 4
         '
         'dgvNotificaciones
@@ -159,7 +170,7 @@ Partial Class frmNotificaciones
         Me.dgvNotificaciones.ReadOnly = True
         Me.dgvNotificaciones.RowHeadersWidth = 51
         Me.dgvNotificaciones.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgvNotificaciones.Size = New System.Drawing.Size(984, 280)
+        Me.dgvNotificaciones.Size = New System.Drawing.Size(984, 264)
         Me.dgvNotificaciones.TabIndex = 2
         '
         'txtTextoNotificacion
@@ -172,7 +183,7 @@ Partial Class frmNotificaciones
         Me.txtTextoNotificacion.Name = "txtTextoNotificacion"
         Me.txtTextoNotificacion.ReadOnly = True
         Me.txtTextoNotificacion.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.txtTextoNotificacion.Size = New System.Drawing.Size(974, 166)
+        Me.txtTextoNotificacion.Size = New System.Drawing.Size(974, 156)
         Me.txtTextoNotificacion.TabIndex = 0
         '
         'frmNotificaciones
@@ -212,4 +223,5 @@ Partial Class frmNotificaciones
     Friend WithEvents btnCambiarEstado As Button
     Friend WithEvents splitContenedor As SplitContainer
     Friend WithEvents txtTextoNotificacion As TextBox
+    Friend WithEvents btnImprimir As Button
 End Class

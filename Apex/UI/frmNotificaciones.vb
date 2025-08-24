@@ -83,6 +83,7 @@ Public Class frmNotificaciones
             sb.AppendLine(If(String.IsNullOrWhiteSpace(notificacion.Texto), "(Esta notificación no tiene un texto detallado)", notificacion.Texto))
 
             txtTextoNotificacion.Text = sb.ToString()
+            btnImprimir.Enabled = (dgvNotificaciones.SelectedRows.Count > 0)
         Else
             txtTextoNotificacion.Clear()
         End If
@@ -154,4 +155,22 @@ Public Class frmNotificaciones
             End If
         End Using
     End Sub
+    Private Sub btnImprimir_Click(sender As Object, e As EventArgs) Handles btnImprimir.Click
+        If dgvNotificaciones.CurrentRow IsNot Nothing Then
+            ' Obtenemos el objeto completo de la fila seleccionada.
+            Dim notificacionSeleccionada = TryCast(dgvNotificaciones.CurrentRow.DataBoundItem, vw_NotificacionesCompletas)
+
+            If notificacionSeleccionada IsNot Nothing Then
+                ' Creamos una instancia del formulario del reporte, pasando el ID.
+                Dim frmReporte As New frmNotificacionRPT(notificacionSeleccionada.Id)
+                ' Mostramos el formulario.
+                frmReporte.Show()
+            Else
+                MessageBox.Show("No se pudo obtener la información de la notificación.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            End If
+        Else
+            MessageBox.Show("Por favor, seleccione una notificación para imprimir.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        End If
+    End Sub
+
 End Class
