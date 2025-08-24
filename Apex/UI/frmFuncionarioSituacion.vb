@@ -1,5 +1,5 @@
-﻿' Apex/UI/frmFuncionarioSituacion.vb
-Imports System.Data.Entity
+﻿Imports System.Data.Entity
+Imports System.Globalization
 Imports System.Text
 
 Public Class frmFuncionarioSituacion
@@ -9,9 +9,11 @@ Public Class frmFuncionarioSituacion
     Private _funcionario As Funcionario
     Private _estados As List(Of EstadoTransitorio)
     Private _novedadesDelPeriodo As List(Of vw_NovedadesCompletas) = New List(Of vw_NovedadesCompletas)
-
     Private _toolTipData As New Dictionary(Of Date, String)
-    Private _lastToolTipDate As Date
+
+    '--- Variables para el nuevo calendario ---
+    Private _currentDate As Date = Date.Now
+    Private _selectedDayControl As DayControl = Nothing
 
     Public Sub New(idFuncionario As Integer)
         InitializeComponent()
@@ -19,23 +21,29 @@ Public Class frmFuncionarioSituacion
         _uow = New UnitOfWork()
     End Sub
 
-    Private Async Sub frmFuncionarioSituacion_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Private Sub frmFuncionarioSituacion_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
+
+        '--- Eventos de Controles ---
         AddHandler dtpAño.ValueChanged, AddressOf dtpAño_ValueChanged
-        AddHandler MonthCalendar1.DateChanged, AddressOf MonthCalendar1_DateChanged
         AddHandler dgvNovedades.CellDoubleClick, AddressOf dgvNovedades_CellDoubleClick
-        AddHandler MonthCalendar1.MouseMove, AddressOf MonthCalendar1_MouseMove
         AddHandler dgvEstados.CellFormatting, AddressOf dgvEstados_CellFormatting
         AddHandler dgvEstados.SelectionChanged, AddressOf dgvEstados_SelectionChanged
+        AddHandler btnPrevMonth.Click, AddressOf btnPrevMonth_Click
+        AddHandler btnNextMonth.Click, AddressOf btnNextMonth_Click
 
-        ' *** NUEVO: Añadir manejadores para DataBindingComplete ***
+        '--- Eventos para ocultar columnas en grillas ---
         AddHandler dgvNovedades.DataBindingComplete, AddressOf DgvNovedades_DataBindingComplete
         AddHandler dgvEstados.DataBindingComplete, AddressOf DgvEstados_DataBindingComplete
 
+        '--- Fecha inicial para el calendario ---
+        _currentDate = New Date(dtpAño.Value.Year, Date.Now.Month, 1)
+    End Sub
+    Private Async Sub frmFuncionarioSituacion_Shown(sender As Object, e As EventArgs) Handles Me.Shown
         Await CargarDatos()
     End Sub
-
     Private Async Sub dtpAño_ValueChanged(sender As Object, e As EventArgs)
+        _currentDate = New Date(dtpAño.Value.Year, _currentDate.Month, 1)
         Await CargarDatos()
     End Sub
 
@@ -70,12 +78,11 @@ Public Class frmFuncionarioSituacion
                 OrderBy(Function(n) n.Fecha).
                 ToListAsync()
 
-            Dim fechasConNovedades = _novedadesDelPeriodo.Select(Function(n) n.Fecha).Distinct().ToArray()
-            MonthCalendar1.BoldedDates = fechasConNovedades
-
             GenerarDatosToolTip(fechaInicio, fechaFin)
             PoblarGrillaEstados()
-            ActualizarVistaDeNovedades(MonthCalendar1.SelectionStart)
+
+            '--- Generar el nuevo calendario ---
+            GenerateCalendar()
 
         Catch ex As Exception
             MessageBox.Show($"Error al cargar los datos: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -119,16 +126,98 @@ Public Class frmFuncionarioSituacion
         End While
     End Sub
 
-#Region "Lógica de Novedades"
-    Private Sub ActualizarVistaDeNovedades(fechaVisible As Date)
-        Dim primerDiaMes = New Date(fechaVisible.Year, fechaVisible.Month, 1)
-        Dim ultimoDiaMes = primerDiaMes.AddMonths(1).AddDays(-1)
+#Region "Lógica del Calendario Personalizado"
 
-        Dim novedadesDelMes = _novedadesDelPeriodo.
-            Where(Function(n) n.Fecha >= primerDiaMes AndAlso n.Fecha <= ultimoDiaMes).
+    Private Sub GenerateCalendar()
+        flpCalendar.SuspendLayout()
+        flpCalendar.Controls.Clear()
+
+        Dim firstDayOfMonth = New Date(_currentDate.Year, _currentDate.Month, 1)
+        Dim daysInMonth = Date.DaysInMonth(_currentDate.Year, _currentDate.Month)
+
+        lblMonthYear.Text = firstDayOfMonth.ToString("MMMM yyyy", New CultureInfo("es-ES")).ToUpper()
+
+        ' Añade espacios en blanco para los días antes del día 1 del mes
+        Dim startingDayOfWeek = CInt(firstDayOfMonth.DayOfWeek)
+        For i = 0 To startingDayOfWeek - 1
+            Dim blankControl = New Panel With {.Size = New Size(158, 80), .Margin = New Padding(2)}
+            flpCalendar.Controls.Add(blankControl)
+        Next
+
+        For day = 1 To daysInMonth
+            Dim dayDate = New Date(_currentDate.Year, _currentDate.Month, day)
+            Dim dayCtrl As New DayControl With {
+                .DayNumber = day,
+                .Size = New Size(158, 80),
+                .Margin = New Padding(2)
+            }
+
+            If _toolTipData.ContainsKey(dayDate) Then
+                dayCtrl.HasEvent = True
+            End If
+
+            AddHandler dayCtrl.DayClicked, AddressOf DayControl_Clicked
+            flpCalendar.Controls.Add(dayCtrl)
+        Next
+
+        flpCalendar.ResumeLayout()
+
+        ' Selecciona el primer día por defecto o el día actual si es el mes actual
+        Dim dayToSelect = 1
+        If _currentDate.Year = Date.Now.Year AndAlso _currentDate.Month = Date.Now.Month Then
+            dayToSelect = Date.Now.Day
+        End If
+
+        Dim dayControlToSelect As DayControl = flpCalendar.Controls.OfType(Of DayControl).FirstOrDefault(Function(dc) dc.DayNumber = dayToSelect)
+        If dayControlToSelect IsNot Nothing Then
+            SelectDay(dayControlToSelect)
+        Else ' si no se encuentra, selecciona el primero
+            Dim firstDay As DayControl = flpCalendar.Controls.OfType(Of DayControl).FirstOrDefault()
+            If firstDay IsNot Nothing Then
+                SelectDay(firstDay)
+            End If
+        End If
+    End Sub
+
+    Private Sub DayControl_Clicked(sender As Object, e As EventArgs)
+        Dim clickedDay = CType(sender, DayControl)
+        SelectDay(clickedDay)
+    End Sub
+
+    Private Sub SelectDay(dayCtrl As DayControl)
+        If dayCtrl Is Nothing Then Return
+
+        If _selectedDayControl IsNot Nothing Then
+            _selectedDayControl.IsSelected = False
+        End If
+
+        dayCtrl.IsSelected = True
+        _selectedDayControl = dayCtrl
+
+        Dim selectedDate = New Date(_currentDate.Year, _currentDate.Month, dayCtrl.DayNumber)
+        ActualizarVistaDeNovedades(selectedDate)
+    End Sub
+
+    Private Sub btnPrevMonth_Click(sender As Object, e As EventArgs)
+        _currentDate = _currentDate.AddMonths(-1)
+        GenerateCalendar()
+    End Sub
+
+    Private Sub btnNextMonth_Click(sender As Object, e As EventArgs)
+        _currentDate = _currentDate.AddMonths(1)
+        GenerateCalendar()
+    End Sub
+
+#End Region
+
+#Region "Lógica de Novedades"
+    Private Sub ActualizarVistaDeNovedades(selectedDate As Date)
+        Dim novedadesDelDia = _novedadesDelPeriodo.
+            Where(Function(n) n.Fecha.Date = selectedDate.Date).
             Select(Function(n) New With {.Id = n.Id, n.Fecha, .Texto = n.Texto}).ToList()
 
-        dgvNovedades.DataSource = novedadesDelMes
+        dgvNovedades.DataSource = novedadesDelDia
+        ConfigurarGrillaNovedades()
     End Sub
 
     Private Sub ConfigurarGrillaNovedades()
@@ -244,34 +333,14 @@ Public Class frmFuncionarioSituacion
         Try
             Dim rowData = dgvEstados.CurrentRow.DataBoundItem
             Dim fechaDesde As Date? = CType(rowData.GetType().GetProperty("Desde").GetValue(rowData, Nothing), Date?)
-            If fechaDesde.HasValue Then
-                MonthCalendar1.SetDate(fechaDesde.Value)
+
+            If fechaDesde.HasValue AndAlso (fechaDesde.Value.Month <> _currentDate.Month OrElse fechaDesde.Value.Year <> _currentDate.Year) Then
+                _currentDate = fechaDesde.Value
+                GenerateCalendar()
             End If
+
         Catch ex As Exception
         End Try
     End Sub
 #End Region
-
-    Private Sub MonthCalendar1_DateChanged(sender As Object, e As DateRangeEventArgs)
-        ActualizarVistaDeNovedades(e.Start)
-    End Sub
-
-    Private Sub MonthCalendar1_MouseMove(sender As Object, e As MouseEventArgs)
-        Dim hitTest = MonthCalendar1.HitTest(e.Location)
-        If hitTest.HitArea = MonthCalendar.HitArea.Date Then
-            Dim fecha As Date = hitTest.Time
-            If fecha <> _lastToolTipDate Then
-                _lastToolTipDate = fecha
-                If _toolTipData.ContainsKey(fecha) Then
-                    ToolTip1.SetToolTip(MonthCalendar1, _toolTipData(fecha))
-                Else
-                    ToolTip1.SetToolTip(MonthCalendar1, fecha.ToString("dd MMMM yyyy"))
-                End If
-            End If
-        Else
-            _lastToolTipDate = Date.MinValue
-            ToolTip1.SetToolTip(MonthCalendar1, String.Empty)
-        End If
-    End Sub
-
 End Class

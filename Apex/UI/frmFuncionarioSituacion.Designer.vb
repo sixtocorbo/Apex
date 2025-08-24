@@ -12,7 +12,6 @@ Partial Class frmFuncionarioSituacion
         Finally
             MyBase.Dispose(disposing)
         End Try
-
     End Sub
 
     'Required by the Windows Form Designer
@@ -30,7 +29,10 @@ Partial Class frmFuncionarioSituacion
         Me.dtpAño = New System.Windows.Forms.DateTimePicker()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
-        Me.MonthCalendar1 = New System.Windows.Forms.MonthCalendar()
+        Me.flpCalendar = New System.Windows.Forms.FlowLayoutPanel()
+        Me.lblMonthYear = New System.Windows.Forms.Label()
+        Me.btnNextMonth = New System.Windows.Forms.Button()
+        Me.btnPrevMonth = New System.Windows.Forms.Button()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.TabPage1 = New System.Windows.Forms.TabPage()
         Me.dgvNovedades = New System.Windows.Forms.DataGridView()
@@ -52,10 +54,9 @@ Partial Class frmFuncionarioSituacion
         '
         Me.lblNombre.AutoSize = True
         Me.lblNombre.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblNombre.Location = New System.Drawing.Point(20, 20)
-        Me.lblNombre.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.lblNombre.Location = New System.Drawing.Point(13, 13)
         Me.lblNombre.Name = "lblNombre"
-        Me.lblNombre.Size = New System.Drawing.Size(136, 29)
+        Me.lblNombre.Size = New System.Drawing.Size(95, 20)
         Me.lblNombre.TabIndex = 0
         Me.lblNombre.Text = "lblNombre"
         '
@@ -63,20 +64,18 @@ Partial Class frmFuncionarioSituacion
         '
         Me.dtpAño.CustomFormat = "yyyy"
         Me.dtpAño.Format = System.Windows.Forms.DateTimePickerFormat.Custom
-        Me.dtpAño.Location = New System.Drawing.Point(80, 69)
-        Me.dtpAño.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.dtpAño.Location = New System.Drawing.Point(53, 45)
         Me.dtpAño.Name = "dtpAño"
         Me.dtpAño.ShowUpDown = True
-        Me.dtpAño.Size = New System.Drawing.Size(96, 26)
+        Me.dtpAño.Size = New System.Drawing.Size(65, 20)
         Me.dtpAño.TabIndex = 1
         '
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(21, 74)
-        Me.Label1.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.Label1.Location = New System.Drawing.Point(14, 48)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(42, 20)
+        Me.Label1.Size = New System.Drawing.Size(29, 13)
         Me.Label1.TabIndex = 2
         Me.Label1.Text = "Año:"
         '
@@ -85,31 +84,64 @@ Partial Class frmFuncionarioSituacion
         Me.SplitContainer1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.SplitContainer1.Location = New System.Drawing.Point(18, 109)
-        Me.SplitContainer1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.SplitContainer1.Location = New System.Drawing.Point(12, 71)
         Me.SplitContainer1.Name = "SplitContainer1"
         Me.SplitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal
         '
         'SplitContainer1.Panel1
         '
-        Me.SplitContainer1.Panel1.Controls.Add(Me.MonthCalendar1)
+        Me.SplitContainer1.Panel1.Controls.Add(Me.flpCalendar)
+        Me.SplitContainer1.Panel1.Controls.Add(Me.lblMonthYear)
+        Me.SplitContainer1.Panel1.Controls.Add(Me.btnNextMonth)
+        Me.SplitContainer1.Panel1.Controls.Add(Me.btnPrevMonth)
         '
         'SplitContainer1.Panel2
         '
         Me.SplitContainer1.Panel2.Controls.Add(Me.TabControl1)
-        Me.SplitContainer1.Size = New System.Drawing.Size(1164, 565)
-        Me.SplitContainer1.SplitterDistance = 269
-        Me.SplitContainer1.SplitterWidth = 6
+        Me.SplitContainer1.Size = New System.Drawing.Size(776, 367)
+        Me.SplitContainer1.SplitterDistance = 175
         Me.SplitContainer1.TabIndex = 3
         '
-        'MonthCalendar1
+        'flpCalendar
         '
-        Me.MonthCalendar1.CalendarDimensions = New System.Drawing.Size(4, 1)
-        Me.MonthCalendar1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.MonthCalendar1.Location = New System.Drawing.Point(0, 0)
-        Me.MonthCalendar1.Margin = New System.Windows.Forms.Padding(14)
-        Me.MonthCalendar1.Name = "MonthCalendar1"
-        Me.MonthCalendar1.TabIndex = 0
+        Me.flpCalendar.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.flpCalendar.Location = New System.Drawing.Point(3, 30)
+        Me.flpCalendar.Name = "flpCalendar"
+        Me.flpCalendar.Size = New System.Drawing.Size(770, 142)
+        Me.flpCalendar.TabIndex = 3
+        '
+        'lblMonthYear
+        '
+        Me.lblMonthYear.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lblMonthYear.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblMonthYear.Location = New System.Drawing.Point(50, 4)
+        Me.lblMonthYear.Name = "lblMonthYear"
+        Me.lblMonthYear.Size = New System.Drawing.Size(676, 23)
+        Me.lblMonthYear.TabIndex = 2
+        Me.lblMonthYear.Text = "Month Year"
+        Me.lblMonthYear.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        '
+        'btnNextMonth
+        '
+        Me.btnNextMonth.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnNextMonth.Location = New System.Drawing.Point(732, 4)
+        Me.btnNextMonth.Name = "btnNextMonth"
+        Me.btnNextMonth.Size = New System.Drawing.Size(40, 23)
+        Me.btnNextMonth.TabIndex = 1
+        Me.btnNextMonth.Text = ">"
+        Me.btnNextMonth.UseVisualStyleBackColor = True
+        '
+        'btnPrevMonth
+        '
+        Me.btnPrevMonth.Location = New System.Drawing.Point(4, 4)
+        Me.btnPrevMonth.Name = "btnPrevMonth"
+        Me.btnPrevMonth.Size = New System.Drawing.Size(40, 23)
+        Me.btnPrevMonth.TabIndex = 0
+        Me.btnPrevMonth.Text = "<"
+        Me.btnPrevMonth.UseVisualStyleBackColor = True
         '
         'TabControl1
         '
@@ -117,22 +149,20 @@ Partial Class frmFuncionarioSituacion
         Me.TabControl1.Controls.Add(Me.TabPage2)
         Me.TabControl1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TabControl1.Location = New System.Drawing.Point(0, 0)
-        Me.TabControl1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(1164, 290)
+        Me.TabControl1.Size = New System.Drawing.Size(776, 188)
         Me.TabControl1.TabIndex = 0
         '
         'TabPage1
         '
         Me.TabPage1.Controls.Add(Me.dgvNovedades)
-        Me.TabPage1.Location = New System.Drawing.Point(4, 29)
-        Me.TabPage1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.TabPage1.Location = New System.Drawing.Point(4, 22)
         Me.TabPage1.Name = "TabPage1"
-        Me.TabPage1.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.TabPage1.Size = New System.Drawing.Size(1156, 257)
+        Me.TabPage1.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage1.Size = New System.Drawing.Size(768, 162)
         Me.TabPage1.TabIndex = 0
-        Me.TabPage1.Text = "Novedades del Mes"
+        Me.TabPage1.Text = "Novedades del Día"
         Me.TabPage1.UseVisualStyleBackColor = True
         '
         'dgvNovedades
@@ -150,24 +180,21 @@ Partial Class frmFuncionarioSituacion
         DataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
         Me.dgvNovedades.DefaultCellStyle = DataGridViewCellStyle1
         Me.dgvNovedades.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.dgvNovedades.Location = New System.Drawing.Point(4, 5)
-        Me.dgvNovedades.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.dgvNovedades.Location = New System.Drawing.Point(3, 3)
         Me.dgvNovedades.Name = "dgvNovedades"
         Me.dgvNovedades.ReadOnly = True
         Me.dgvNovedades.RowHeadersVisible = False
-        Me.dgvNovedades.RowHeadersWidth = 62
         Me.dgvNovedades.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgvNovedades.Size = New System.Drawing.Size(1148, 247)
+        Me.dgvNovedades.Size = New System.Drawing.Size(762, 156)
         Me.dgvNovedades.TabIndex = 1
         '
         'TabPage2
         '
         Me.TabPage2.Controls.Add(Me.dgvEstados)
-        Me.TabPage2.Location = New System.Drawing.Point(4, 29)
-        Me.TabPage2.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.TabPage2.Location = New System.Drawing.Point(4, 22)
         Me.TabPage2.Name = "TabPage2"
-        Me.TabPage2.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.TabPage2.Size = New System.Drawing.Size(1156, 257)
+        Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage2.Size = New System.Drawing.Size(768, 162)
         Me.TabPage2.TabIndex = 1
         Me.TabPage2.Text = "Estados del Año"
         Me.TabPage2.UseVisualStyleBackColor = True
@@ -187,26 +214,23 @@ Partial Class frmFuncionarioSituacion
         DataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
         Me.dgvEstados.DefaultCellStyle = DataGridViewCellStyle2
         Me.dgvEstados.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.dgvEstados.Location = New System.Drawing.Point(4, 5)
-        Me.dgvEstados.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.dgvEstados.Location = New System.Drawing.Point(3, 3)
         Me.dgvEstados.Name = "dgvEstados"
         Me.dgvEstados.ReadOnly = True
         Me.dgvEstados.RowHeadersVisible = False
-        Me.dgvEstados.RowHeadersWidth = 62
         Me.dgvEstados.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgvEstados.Size = New System.Drawing.Size(1148, 247)
+        Me.dgvEstados.Size = New System.Drawing.Size(762, 156)
         Me.dgvEstados.TabIndex = 2
         '
         'frmFuncionarioSituacion
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1200, 692)
+        Me.ClientSize = New System.Drawing.Size(800, 450)
         Me.Controls.Add(Me.SplitContainer1)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.dtpAño)
         Me.Controls.Add(Me.lblNombre)
-        Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Name = "frmFuncionarioSituacion"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Situación Anual del Funcionario"
@@ -222,19 +246,20 @@ Partial Class frmFuncionarioSituacion
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
-
     End Sub
 
     Friend WithEvents lblNombre As Label
     Friend WithEvents dtpAño As DateTimePicker
     Friend WithEvents Label1 As Label
     Friend WithEvents SplitContainer1 As SplitContainer
-    Friend WithEvents MonthCalendar1 As MonthCalendar
     Friend WithEvents ToolTip1 As ToolTip
     Friend WithEvents TabControl1 As TabControl
     Friend WithEvents TabPage1 As TabPage
     Friend WithEvents dgvNovedades As DataGridView
     Friend WithEvents TabPage2 As TabPage
     Friend WithEvents dgvEstados As DataGridView
-
+    Friend WithEvents flpCalendar As FlowLayoutPanel
+    Friend WithEvents lblMonthYear As Label
+    Friend WithEvents btnNextMonth As Button
+    Friend WithEvents btnPrevMonth As Button
 End Class
