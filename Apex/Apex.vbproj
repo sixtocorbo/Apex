@@ -419,12 +419,6 @@
     <Compile Include="Services\ReportesService.vb" />
     <Compile Include="Services\SancionService.vb" />
     <Compile Include="Services\ViaticoService.vb" />
-    <Compile Include="UI\DayControl.Designer.vb">
-      <DependentUpon>DayControl.vb</DependentUpon>
-    </Compile>
-    <Compile Include="UI\DayControl.vb">
-      <SubType>UserControl</SubType>
-    </Compile>
     <Compile Include="UI\FiltroAvanzadoUI.vb" />
     <Compile Include="UI\frmAsistenteImportacion.Designer.vb">
       <DependentUpon>frmAsistenteImportacion.vb</DependentUpon>
