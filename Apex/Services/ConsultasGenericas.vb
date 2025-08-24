@@ -2,7 +2,6 @@
 Imports System.Data
 Imports System.Data.Entity
 Imports System.Linq
-Imports System.Security.Cryptography
 Imports System.Threading.Tasks
 
 Public Module ConsultasGenericas
@@ -26,14 +25,14 @@ Public Module ConsultasGenericas
                     ' 1. Se obtienen los detalles de Sanciones
                     Dim sanciones = uow.Repository(Of SancionDetalle)().GetAll().
                         Include("EstadoTransitorio.Funcionario").
-                        Where(Function(det) det.FechaDesde <= fechaFin AndAlso det.FechaHasta >= fechaInicio).
+                        Where(Function(det) det.FechaDesde <= fechaFin AndAlso (Not det.FechaHasta.HasValue OrElse det.FechaHasta.Value >= fechaInicio)).
                         Select(Function(det) New With {
                             .FuncionarioId = det.EstadoTransitorio.FuncionarioId,
                             .NombreCompleto = det.EstadoTransitorio.Funcionario.Nombre,
                             .Cedula = det.EstadoTransitorio.Funcionario.CI,
                             .Tipo = "Sanción",
-                            .FechaInicio = det.FechaDesde,                            ' SOLUCIÓN: Forzamos la conversión a un tipo de fecha que acepta nulos (Nullable)
-                    .FechaFin = CType(det.FechaHasta, DateTime?),
+                            .FechaInicio = det.FechaDesde,
+                            .FechaFin = CType(det.FechaHasta, DateTime?),
                             .Observaciones = det.Observaciones
                         })
 
@@ -47,7 +46,7 @@ Public Module ConsultasGenericas
                             .Cedula = det.EstadoTransitorio.Funcionario.CI,
                             .Tipo = "Designación",
                             .FechaInicio = det.FechaDesde,
-                            .FechaFin = det.FechaHasta, ' Este ya es Nullable, no necesita conversión
+                            .FechaFin = det.FechaHasta,
                             .Observaciones = det.Observaciones
                         })
 
@@ -61,21 +60,21 @@ Public Module ConsultasGenericas
                             .Cedula = det.EstadoTransitorio.Funcionario.CI,
                             .Tipo = "Sumario",
                             .FechaInicio = det.FechaDesde,
-                            .FechaFin = det.FechaHasta, ' Este ya es Nullable
+                            .FechaFin = det.FechaHasta,
                             .Observaciones = det.Observaciones
                         })
 
                     ' 4. Se obtienen los detalles de Orden Cinco
                     Dim ordenCinco = uow.Repository(Of OrdenCincoDetalle)().GetAll().
                         Include("EstadoTransitorio.Funcionario").
-                        Where(Function(det) det.FechaDesde <= fechaFin AndAlso det.FechaHasta >= fechaInicio).
+                        Where(Function(det) det.FechaDesde <= fechaFin AndAlso (Not det.FechaHasta.HasValue OrElse det.FechaHasta.Value >= fechaInicio)).
                         Select(Function(det) New With {
                             .FuncionarioId = det.EstadoTransitorio.FuncionarioId,
                             .NombreCompleto = det.EstadoTransitorio.Funcionario.Nombre,
                             .Cedula = det.EstadoTransitorio.Funcionario.CI,
                             .Tipo = "Orden Cinco",
                             .FechaInicio = det.FechaDesde,
-                            .FechaFin = CType(det.FechaHasta, DateTime?), ' SOLUCIÓN: Conversión a Nullable
+                            .FechaFin = CType(det.FechaHasta, DateTime?),
                             .Observaciones = det.Observaciones
                         })
 
@@ -89,21 +88,21 @@ Public Module ConsultasGenericas
                             .Cedula = det.EstadoTransitorio.Funcionario.CI,
                             .Tipo = "Retén",
                             .FechaInicio = det.FechaReten,
-                            .FechaFin = CType(det.FechaReten, DateTime?), ' SOLUCIÓN: Conversión a Nullable
+                            .FechaFin = CType(det.FechaReten, DateTime?),
                             .Observaciones = det.Observaciones
                         })
 
                     ' 6. Se obtienen los detalles de Enfermedad
                     Dim enfermedades = uow.Repository(Of EnfermedadDetalle)().GetAll().
                         Include("EstadoTransitorio.Funcionario").
-                        Where(Function(det) det.FechaDesde <= fechaFin AndAlso det.FechaHasta >= fechaInicio).
+                        Where(Function(det) det.FechaDesde <= fechaFin AndAlso (Not det.FechaHasta.HasValue OrElse det.FechaHasta.Value >= fechaInicio)).
                         Select(Function(det) New With {
                             .FuncionarioId = det.EstadoTransitorio.FuncionarioId,
                             .NombreCompleto = det.EstadoTransitorio.Funcionario.Nombre,
                             .Cedula = det.EstadoTransitorio.Funcionario.CI,
                             .Tipo = "Enfermedad",
                             .FechaInicio = det.FechaDesde,
-                            .FechaFin = CType(det.FechaHasta, DateTime?), ' SOLUCIÓN: Conversión a Nullable
+                            .FechaFin = CType(det.FechaHasta, DateTime?),
                             .Observaciones = det.Observaciones
                         })
 
