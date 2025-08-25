@@ -1,6 +1,7 @@
-﻿Imports Microsoft.Reporting.WinForms
-Imports System.Collections.Generic
+﻿Imports System.Collections.Generic
+Imports System.IO
 Imports System.Windows.Forms
+Imports Microsoft.Reporting.WinForms
 
 Public Class frmNotificacionRPT
     Private ReadOnly _reportesService As New ReportesService()
@@ -21,27 +22,40 @@ Public Class frmNotificacionRPT
     Private Async Function CargarReporteAsync() As Task
         Try
             Me.Cursor = Cursors.WaitCursor
+
             ReportViewer1.ProcessingMode = ProcessingMode.Local
             ReportViewer1.LocalReport.DataSources.Clear()
-            ReportViewer1.LocalReport.ReportPath = "Reportes\NotificacionImprimir.rdlc"
 
-            ' 1. Obtenemos los datos desde el servicio.
+            ' Ruta absoluta a bin\...\Reportes\NotificacionImprimir.rdlc
+            Dim reportPath As String = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Reportes", "NotificacionImprimir.rdlc")
+
+            ' Fallback útil si corres desde VS y aún no está copiado
+            If Not File.Exists(reportPath) Then
+                reportPath = Path.GetFullPath(Path.Combine(Application.StartupPath, "..\..\", "Reportes", "NotificacionImprimir.rdlc"))
+            End If
+
+            If Not File.Exists(reportPath) Then
+                Throw New FileNotFoundException("No se encontró el RDLC en: " & reportPath)
+            End If
+
+            ReportViewer1.LocalReport.ReportPath = reportPath
+            ReportViewer1.LocalReport.DisplayName = $"Notificacion_{_notificacionId:000000}"
+
             Dim notificacionData = Await _reportesService.GetDatosNotificacionAsync(_notificacionId)
-
-            ' 2. Verificamos si obtuvimos datos.
             If notificacionData Is Nothing Then
                 MessageBox.Show("No se encontraron datos para la notificación seleccionada.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 Me.Close()
                 Return
             End If
 
-            ' 3. Creamos el origen de datos.
-            '    LA SIGUIENTE LÍNEA ES LA MÁS IMPORTANTE.
-            '    El nombre "DataSetNotificaciones" DEBE ser idéntico al del archivo .rdlc
-            Dim rds As New ReportDataSource("DataSetNotificaciones", New List(Of vw_NotificacionesCompletas) From {notificacionData})
-
-            ' 4. Añadimos el origen de datos al reporte y lo actualizamos.
+            Dim rds As New ReportDataSource("DataSetNotificaciones",
+                         New List(Of vw_NotificacionesCompletas) From {notificacionData})
             ReportViewer1.LocalReport.DataSources.Add(rds)
+
+            ReportViewer1.SetDisplayMode(DisplayMode.PrintLayout)
+            ReportViewer1.ZoomMode = ZoomMode.Percent
+            ReportViewer1.ZoomPercent = 100
+
             ReportViewer1.RefreshReport()
 
         Catch ex As Exception
