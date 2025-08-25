@@ -120,7 +120,7 @@
 													</Style>
 												</Textbox>
 												<Subreport Name="SubreportFuncionarios">
-													<ReportName>NovedadesDelDia_Funcionarios</ReportName>
+													<ReportName>Apex.Reportes.NovedadesDelDia_Funcionarios</ReportName>
 													<Parameters>
 														<Parameter Name="NovedadId">
 															<Value>=Fields!ID.Value</Value>
