@@ -115,9 +115,6 @@ Public Class frmDashboard
                 End If
                 AbrirFormEnPanel(_viaticosInstancia)
 
-            Case "btnReportes"
-                MessageBox.Show("Formulario de reportes aún no implementado.", "En desarrollo", MessageBoxButtons.OK, MessageBoxIcon.Information)
-
             Case "btnConfiguracion"
                 ' --- CAMBIO AQUÍ: ABRIR DENTRO DEL PANEL ---
                 If _configuracionInstancia Is Nothing OrElse _configuracionInstancia.IsDisposed Then

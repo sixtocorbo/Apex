@@ -1,4 +1,5 @@
 ﻿Imports System.Data.Entity
+Imports System.IO
 Imports System.Windows.Forms
 
 Public Class frmReporteNovedades
@@ -133,4 +134,94 @@ Public Class frmReporteNovedades
     Private Sub frmReporteNovedades_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
         _uow.Dispose()
     End Sub
+
+#Region "Impresión del Reporte"
+
+    Private Async Sub btnImprimir_Click(sender As Object, e As EventArgs) Handles btnImprimir.Click
+        ' 1. Verificamos si hay datos en la grilla para imprimir
+        If dgvNovedades.DataSource Is Nothing OrElse dgvNovedades.Rows.Count = 0 Then
+            MessageBox.Show("Primero debe generar un reporte para poder imprimirlo.", "Sin datos", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return
+        End If
+
+        LoadingHelper.MostrarCargando(Me)
+        Try
+            ' 2. Obtenemos los IDs de las novedades que se están mostrando en la grilla
+            Dim novedadesEnGrilla = CType(dgvNovedades.DataSource, List(Of vw_NovedadesAgrupadas))
+            Dim novedadIds = novedadesEnGrilla.Select(Function(n) n.Id).ToList()
+
+            ' 3. Buscamos los datos de las novedades desde el servicio
+            Dim novedadService As New NovedadService()
+            Dim datosCompletosParaReporte = Await novedadService.GetNovedadesCompletasByIds(novedadIds)
+
+            ' 3a. Obtenemos los Ids únicos de los funcionarios para buscar sus fotos eficientemente
+            Dim funcionarioIds = datosCompletosParaReporte.
+                Where(Function(n) n.FuncionarioId.HasValue).
+                Select(Function(n) n.FuncionarioId.Value).
+                Distinct().
+                ToList()
+
+            ' 3b. Buscamos las fotos de todos los funcionarios involucrados en una sola consulta
+            Dim fotosFuncionarios As New Dictionary(Of Integer, Byte())
+            If funcionarioIds.Any() Then
+                Using uow As New UnitOfWork()
+                    Dim repoFuncionarios = uow.Repository(Of Funcionario)()
+                    Dim funcionariosConFoto = Await repoFuncionarios.GetAll().
+                        Where(Function(f) funcionarioIds.Contains(f.Id) AndAlso f.Foto IsNot Nothing).
+                        Select(Function(f) New With {f.Id, f.Foto}).
+                        ToListAsync()
+
+                    For Each func In funcionariosConFoto
+                        fotosFuncionarios.Add(func.Id, func.Foto)
+                    Next
+                End Using
+            End If
+
+            ' 4. CORRECCIÓN: Agrupamos y mapeamos los datos en la estructura anidada para el reporte
+            Dim datosMapeados = datosCompletosParaReporte.
+                GroupBy(Function(n) n.Id).
+                Select(Function(g) New With {
+                    .ID = g.Key,
+                    .Fecha = g.First().Fecha,
+                    .Descripcion = g.First().Texto,
+                    .Funcionarios = g.Select(Function(n) New With {
+                        .FuncionarioId = n.FuncionarioId,
+                        .NombreFuncionario = n.NombreFuncionario,
+                        .Foto = If(n.FuncionarioId.HasValue AndAlso fotosFuncionarios.ContainsKey(n.FuncionarioId.Value),
+                                   fotosFuncionarios(n.FuncionarioId.Value),
+                                   ObtenerImagenPorDefecto())
+                    }).ToList()
+                }).
+                OrderByDescending(Function(n) n.Fecha).
+                ToList()
+
+
+            ' 5. Abrimos el formulario visor y le pasamos los datos
+            Using frmVisor As New frmVisorReporteNovedades(datosMapeados)
+                frmVisor.ShowDialog(Me)
+            End Using
+
+        Catch ex As Exception
+            MessageBox.Show($"Ocurrió un error al preparar la impresión: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        Finally
+            LoadingHelper.OcultarCargando(Me)
+        End Try
+    End Sub
+
+    ' Función auxiliar para cargar una imagen por defecto si el funcionario no tiene foto
+    Private Function ObtenerImagenPorDefecto() As Byte()
+        Try
+            Dim img As Image = My.Resources.Police ' Asegúrate de que este recurso exista
+            Using ms As New MemoryStream()
+                img.Save(ms, Imaging.ImageFormat.Png)
+                Return ms.ToArray()
+            End Using
+        Catch ex As Exception
+            Return New Byte() {} ' Devuelve un array vacío si hay un error
+        End Try
+    End Function
+
+#End Region
+    ' Función auxiliar para cargar una imagen por defecto si el funcionario no tiene foto
+
 End Class

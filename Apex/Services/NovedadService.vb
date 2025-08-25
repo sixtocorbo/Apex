@@ -101,7 +101,17 @@ Public Class NovedadService
             ' --- FIN DE LA CORRECCIÓN ---
         End If
     End Function
-
+    ''' <summary>
+    ''' Obtiene la información completa de una lista de novedades a partir de sus IDs.
+    ''' </summary>
+    ''' <param name="novedadIds">Lista de IDs de las novedades a buscar.</param>
+    ''' <returns></returns>
+    Public Async Function GetNovedadesCompletasByIds(novedadIds As List(Of Integer)) As Task(Of List(Of vw_NovedadesCompletas))
+        Using uow As New UnitOfWork()
+            Dim repo = uow.Repository(Of vw_NovedadesCompletas)()
+            Return Await repo.GetAll().Where(Function(n) novedadIds.Contains(n.Id)).ToListAsync()
+        End Using
+    End Function
     ''' <summary>
     ''' Actualiza una novedad existente, sincronizando la lista de funcionarios. (Versión Definitiva)
     ''' </summary>

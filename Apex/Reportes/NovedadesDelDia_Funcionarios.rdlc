@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2008/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+	<Body>
+		<ReportItems>
+			<Tablix Name="Tablix1">
+				<TablixBody>
+					<TablixColumns>
+						<TablixColumn>
+							<Width>1in</Width>
+						</TablixColumn>
+						<TablixColumn>
+							<Width>6.3in</Width>
+						</TablixColumn>
+					</TablixColumns>
+					<TablixRows>
+						<TablixRow>
+							<Height>0.8in</Height>
+							<TablixCells>
+								<TablixCell>
+									<CellContents>
+										<Image Name="Image1">
+											<Source>Database</Source>
+											<Value>=Fields!Foto.Value</Value>
+											<MIMEType>image/jpeg</MIMEType>
+											<Sizing>FitProportional</Sizing>
+											<Style>
+												<Border>
+													<Color>Gainsboro</Color>
+													<Style>Solid</Style>
+												</Border>
+												<PaddingLeft>5pt</PaddingLeft>
+												<PaddingRight>5pt</PaddingRight>
+												<PaddingTop>5pt</PaddingTop>
+												<PaddingBottom>5pt</PaddingBottom>
+											</Style>
+										</Image>
+									</CellContents>
+								</TablixCell>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="Textbox1">
+											<CanGrow>true</CanGrow>
+											<KeepTogether>true</KeepTogether>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>=Fields!NombreFuncionario.Value</Value>
+															<Style>
+																<FontFamily>Segoe UI</FontFamily>
+																<FontSize>11pt</FontSize>
+																<Color>#34495e</Color>
+															</Style>
+														</TextRun>
+													</TextRuns>
+													<Style>
+														<PaddingLeft>5pt</PaddingLeft>
+														<PaddingTop>5pt</PaddingTop>
+													</Style>
+												</Paragraph>
+											</Paragraphs>
+											<rd:DefaultName>Textbox1</rd:DefaultName>
+											<Style>
+												<Border>
+													<Style>None</Style>
+												</Border>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+							</TablixCells>
+						</TablixRow>
+					</TablixRows>
+				</TablixBody>
+				<TablixColumnHierarchy>
+					<TablixMembers>
+						<TablixMember />
+						<TablixMember />
+					</TablixMembers>
+				</TablixColumnHierarchy>
+				<TablixRowHierarchy>
+					<TablixMembers>
+						<TablixMember>
+							<Group Name="Details" />
+						</TablixMember>
+					</TablixMembers>
+				</TablixRowHierarchy>
+				<DataSetName>DataSetFuncionarios</DataSetName>
+				<Height>0.8in</Height>
+				<Width>7.3in</Width>
+				<Style>
+					<Border>
+						<Style>None</Style>
+					</Border>
+				</Style>
+			</Tablix>
+		</ReportItems>
+		<Height>0.8in</Height>
+		<Style />
+	</Body>
+	<Width>7.3in</Width>
+	<Page>
+		<Style />
+	</Page>
+	<AutoRefresh>0</AutoRefresh>
+	<DataSources>
+		<DataSource Name="DummyDataSource">
+			<ConnectionProperties>
+				<DataProvider>SQL</DataProvider>
+				<ConnectString />
+			</ConnectionProperties>
+			<rd:DataSourceID>a5c9f5a5-3a3f-4e2e-8e7c-2b2a6c1a8d0a</rd:DataSourceID>
+		</DataSource>
+	</DataSources>
+	<DataSets>
+		<DataSet Name="DataSetFuncionarios">
+			<Query>
+				<DataSourceName>DummyDataSource</DataSourceName>
+				<CommandText>/* Local Query */</CommandText>
+			</Query>
+			<Fields>
+				<Field Name="NombreFuncionario">
+					<DataField>NombreFuncionario</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="Foto">
+					<DataField>Foto</DataField>
+					<rd:TypeName>System.Byte[]</rd:TypeName>
+				</Field>
+			</Fields>
+		</DataSet>
+	</DataSets>
+	<rd:ReportUnitType>Inch</rd:ReportUnitType>
+	<rd:ReportID>a9e15244-1246-4a51-9f9b-118f6027b1a2</rd:ReportID>
+</Report>

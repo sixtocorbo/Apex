@@ -647,11 +647,19 @@
     <Compile Include="UI\frmVisorFoto.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="UI\frmVisorReporteNovedades.Designer.vb">
+      <DependentUpon>frmVisorReporteNovedades.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmVisorReporteNovedades.vb">
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Reportes\ConceptoFuncional.rdlc" />
     <EmbeddedResource Include="Reportes\FichaFuncional.rdlc" />
     <EmbeddedResource Include="Reportes\NotificacionImprimir.rdlc" />
+    <EmbeddedResource Include="Reportes\NovedadesDelDia.rdlc" />
+    <EmbeddedResource Include="Reportes\NovedadesDelDia_Funcionarios.rdlc" />
     <EmbeddedResource Include="UI\frmConceptoFuncionalApex.resx">
       <DependentUpon>frmConceptoFuncionalApex.vb</DependentUpon>
     </EmbeddedResource>
@@ -717,6 +725,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmGestionTurnos.resx">
       <DependentUpon>frmGestionTurnos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmReporteNovedades.resx">
+      <DependentUpon>frmReporteNovedades.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmReporteViaticos.resx">
       <DependentUpon>frmReporteViaticos.vb</DependentUpon>
