@@ -150,51 +150,24 @@ Public Class frmReporteNovedades
             Dim novedadesEnGrilla = CType(dgvNovedades.DataSource, List(Of vw_NovedadesAgrupadas))
             Dim novedadIds = novedadesEnGrilla.Select(Function(n) n.Id).ToList()
 
-            ' 3. Buscamos los datos de las novedades desde el servicio
+            ' 3. Buscamos los datos completos de las novedades desde el servicio
             Dim novedadService As New NovedadService()
             Dim datosCompletosParaReporte = Await novedadService.GetNovedadesCompletasByIds(novedadIds)
 
-            ' 3a. Obtenemos los Ids únicos de los funcionarios para buscar sus fotos eficientemente
-            Dim funcionarioIds = datosCompletosParaReporte.
-                Where(Function(n) n.FuncionarioId.HasValue).
-                Select(Function(n) n.FuncionarioId.Value).
-                Distinct().
-                ToList()
-
-            ' 3b. Buscamos las fotos de todos los funcionarios involucrados en una sola consulta
-            Dim fotosFuncionarios As New Dictionary(Of Integer, Byte())
-            If funcionarioIds.Any() Then
-                Using uow As New UnitOfWork()
-                    Dim repoFuncionarios = uow.Repository(Of Funcionario)()
-                    Dim funcionariosConFoto = Await repoFuncionarios.GetAll().
-                        Where(Function(f) funcionarioIds.Contains(f.Id) AndAlso f.Foto IsNot Nothing).
-                        Select(Function(f) New With {f.Id, f.Foto}).
-                        ToListAsync()
-
-                    For Each func In funcionariosConFoto
-                        fotosFuncionarios.Add(func.Id, func.Foto)
-                    Next
-                End Using
-            End If
-
-            ' 4. CORRECCIÓN: Agrupamos y mapeamos los datos en la estructura anidada para el reporte
+            ' 4. CORRECCIÓN: Agrupamos y mapeamos los datos para el nuevo reporte
+            '    Aseguramos que los nombres de las propiedades sean los correctos: Id, Texto y Funcionarios
             Dim datosMapeados = datosCompletosParaReporte.
-                GroupBy(Function(n) n.Id).
-                Select(Function(g) New With {
-                    .ID = g.Key,
-                    .Fecha = g.First().Fecha,
-                    .Descripcion = g.First().Texto,
-                    .Funcionarios = g.Select(Function(n) New With {
-                        .FuncionarioId = n.FuncionarioId,
-                        .NombreFuncionario = n.NombreFuncionario,
-                        .Foto = If(n.FuncionarioId.HasValue AndAlso fotosFuncionarios.ContainsKey(n.FuncionarioId.Value),
-                                   fotosFuncionarios(n.FuncionarioId.Value),
-                                   ObtenerImagenPorDefecto())
-                    }).ToList()
-                }).
-                OrderByDescending(Function(n) n.Fecha).
-                ToList()
-
+            GroupBy(Function(n) n.Id).
+            Select(Function(g) New With {
+                .Id = g.Key,
+                .Fecha = g.First().Fecha,
+                .Texto = g.First().Texto, ' Propiedad corregida de "Descripcion" a "Texto"
+                .Funcionarios = g.Select(Function(n) New With {
+                    .NombreFuncionario = n.NombreFuncionario
+                }).ToList() ' Propiedad corregida de "Funcionarios"
+            }).
+            OrderByDescending(Function(n) n.Fecha).
+            ToList()
 
             ' 5. Abrimos el formulario visor y le pasamos los datos
             Using frmVisor As New frmVisorReporteNovedades(datosMapeados)

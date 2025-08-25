@@ -1,4 +1,5 @@
 ﻿Imports Microsoft.Reporting.WinForms
+Imports System.IO
 Imports System.Linq
 
 Public Class frmVisorReporteNovedades
@@ -11,78 +12,53 @@ Public Class frmVisorReporteNovedades
     End Sub
 
     Private Sub frmVisorReporteNovedades_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        CargarReporte()
+    End Sub
+
+    Private Sub CargarReporte()
         Try
-            ReportViewer1.ProcessingMode = ProcessingMode.Local
-            ReportViewer1.LocalReport.EnableExternalImages = True
-            ReportViewer1.LocalReport.DataSources.Clear()
+            Me.ReportViewer1.LocalReport.DataSources.Clear()
 
-            ' 1) Cargar reporte principal desde el recurso incrustado
-            Dim asm = GetType(frmVisorReporteNovedades).Assembly
-            Using mainStream = asm.GetManifestResourceStream("Apex.Reportes.NovedadesDelDia.rdlc")
-                If mainStream Is Nothing Then
-                    Throw New ApplicationException("No se encuentra el recurso 'Apex.Reportes.NovedadesDelDia.rdlc'. " &
-                                               "Verifica Build Action = Embedded Resource y el namespace.")
-                End If
-                ReportViewer1.LocalReport.LoadReportDefinition(mainStream)
-            End Using
+            ' --- INICIO DE LA SOLUCIÓN ---
+            ' 1. Habilitamos la carga de recursos externos (esto es clave para los subreportes).
+            Me.ReportViewer1.LocalReport.EnableExternalImages = True
 
-            ' 2) Registrar el SUBREPORTE (el nombre lógico debe coincidir con ReportName del control Subreport)
-            Using subStream = asm.GetManifestResourceStream("Apex.Reportes.NovedadesDelDia_Funcionarios.rdlc")
-                If subStream Is Nothing Then
-                    Throw New ApplicationException("Falta el subreporte 'Apex.Reportes.NovedadesDelDia_Funcionarios.rdlc'.")
-                End If
-                ReportViewer1.LocalReport.LoadSubreportDefinition("NovedadesDelDia_Funcionarios", subStream)
-            End Using
+            ' 2. Especificamos la ruta exacta del archivo .rdlc principal.
+            Dim reportPath As String = Path.Combine(Application.StartupPath, "Reportes", "NovedadDetallada.rdlc")
 
-            ' 3) DataSet principal
-            Dim rds As New ReportDataSource("DataSetNovedades", CType(_datosParaReporte, IEnumerable(Of Object)))
-            ReportViewer1.LocalReport.DataSources.Add(rds)
+            If Not File.Exists(reportPath) Then
+                Throw New FileNotFoundException("No se pudo encontrar el archivo del reporte principal. Asegúrate de que su propiedad 'Copiar en el directorio de salida' esté configurada como 'Copiar si es más reciente'.", reportPath)
+            End If
 
-            ' 4) Handler para inyectar el datasource del subreporte
-            AddHandler ReportViewer1.LocalReport.SubreportProcessing,
-            Sub(s, args)
-                Dim idNovedadParam = args.Parameters("NovedadId")
-                If idNovedadParam Is Nothing OrElse idNovedadParam.Values.Count = 0 Then
-                    args.DataSources.Add(New ReportDataSource("DataSetFuncionarios", New List(Of Object)))
-                    Return
-                End If
+            Me.ReportViewer1.LocalReport.ReportPath = reportPath
+            ' --- FIN DE LA SOLUCIÓN ---
 
-                Dim idNovedad As Integer = CInt(idNovedadParam.Values(0))
-                Dim lista = CType(_datosParaReporte, IEnumerable(Of Object))
-                Dim nov = lista.FirstOrDefault(Function(n) CInt(n.GetType().GetProperty("ID").GetValue(n)) = idNovedad)
+            ' 3. Asignamos el origen de datos principal.
+            Dim rdsNovedades As New ReportDataSource("DataSetNovedades", _datosParaReporte)
+            Me.ReportViewer1.LocalReport.DataSources.Add(rdsNovedades)
 
-                Dim funcionarios As Object = Nothing
-                If nov IsNot Nothing Then
-                    Dim p = nov.GetType().GetProperty("Funcionarios")
-                    If p IsNot Nothing Then funcionarios = p.GetValue(nov)
-                End If
+            ' 4. Asignamos el manejador para los datos del subreporte.
+            AddHandler Me.ReportViewer1.LocalReport.SubreportProcessing, AddressOf SubreportProcessingHandler
 
-                If funcionarios Is Nothing Then funcionarios = New List(Of Object)
-                args.DataSources.Add(New ReportDataSource("DataSetFuncionarios", funcionarios))
-            End Sub
-
-            ReportViewer1.RefreshReport()
+            Me.ReportViewer1.RefreshReport()
 
         Catch ex As Exception
-            MessageBox.Show("Error al cargar el visor de reportes: " & ex.Message,
-                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            MessageBox.Show("Ocurrió un error al generar el reporte: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
     End Sub
 
-
-    Private Sub LocalReport_SubreportProcessing(sender As Object, e As SubreportProcessingEventArgs)
+    Private Sub SubreportProcessingHandler(sender As Object, e As SubreportProcessingEventArgs)
         Try
-            Dim idNovedad As Integer = CInt(e.Parameters("NovedadId").Values(0))
-            Dim novedadActual = CType(_datosParaReporte, IEnumerable(Of Object)).
-                              FirstOrDefault(Function(n) CInt(n.GetType().GetProperty("ID").GetValue(n, Nothing)) = idNovedad)
+            Dim idNovedadActual As Integer = CInt(e.Parameters("NovedadId").Values(0))
+            Dim listaCompleta = CType(_datosParaReporte, System.Collections.Generic.IEnumerable(Of Object))
+            Dim novedadEncontrada = listaCompleta.FirstOrDefault(Function(n) CInt(n.GetType().GetProperty("Id").GetValue(n)) = idNovedadActual)
 
-            If novedadActual IsNot Nothing Then
-                Dim funcionarios As Object = novedadActual.GetType().GetProperty("Funcionarios").GetValue(novedadActual, Nothing)
-                Dim rdsFuncionarios As New ReportDataSource("DataSetFuncionarios", funcionarios)
-                e.DataSources.Add(rdsFuncionarios)
+            If novedadEncontrada IsNot Nothing Then
+                Dim funcionariosDeLaNovedad = novedadEncontrada.GetType().GetProperty("Funcionarios").GetValue(novedadEncontrada, Nothing)
+                e.DataSources.Add(New ReportDataSource("DataSetFuncionarios", funcionariosDeLaNovedad))
             End If
         Catch ex As Exception
-            MessageBox.Show("Error dentro de SubreportProcessing: " & ex.Message)
+            MessageBox.Show("Error al procesar la lista de funcionarios: " & ex.Message)
         End Try
     End Sub
 

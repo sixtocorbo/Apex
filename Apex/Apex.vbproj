@@ -587,6 +587,12 @@
     <Compile Include="UI\frmNotificacionRPT.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="UI\frmNovedadesDelDia.Designer.vb">
+      <DependentUpon>frmNovedadesDelDia.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmNovedadesDelDia.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="UI\frmReporteViaticos.Designer.vb">
       <DependentUpon>frmReporteViaticos.vb</DependentUpon>
     </Compile>
@@ -658,6 +664,12 @@
     <EmbeddedResource Include="Reportes\ConceptoFuncional.rdlc" />
     <EmbeddedResource Include="Reportes\FichaFuncional.rdlc" />
     <EmbeddedResource Include="Reportes\NotificacionImprimir.rdlc" />
+    <EmbeddedResource Include="Reportes\ReporteNovedades_Funcionarios.rdlc">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\NovedadDetallada.rdlc">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\frmConceptoFuncionalApex.resx">
       <DependentUpon>frmConceptoFuncionalApex.vb</DependentUpon>
     </EmbeddedResource>
@@ -723,6 +735,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmGestionTurnos.resx">
       <DependentUpon>frmGestionTurnos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmNovedadesDelDia.resx">
+      <DependentUpon>frmNovedadesDelDia.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmReporteNovedades.resx">
       <DependentUpon>frmReporteNovedades.vb</DependentUpon>
