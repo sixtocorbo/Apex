@@ -658,8 +658,6 @@
     <EmbeddedResource Include="Reportes\ConceptoFuncional.rdlc" />
     <EmbeddedResource Include="Reportes\FichaFuncional.rdlc" />
     <EmbeddedResource Include="Reportes\NotificacionImprimir.rdlc" />
-    <EmbeddedResource Include="Reportes\NovedadesDelDia.rdlc" />
-    <EmbeddedResource Include="Reportes\NovedadesDelDia_Funcionarios.rdlc" />
     <EmbeddedResource Include="UI\frmConceptoFuncionalApex.resx">
       <DependentUpon>frmConceptoFuncionalApex.vb</DependentUpon>
     </EmbeddedResource>
