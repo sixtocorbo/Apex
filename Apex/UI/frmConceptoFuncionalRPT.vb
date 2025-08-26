@@ -43,7 +43,7 @@ Public Class frmConceptoFuncionalRPT
 
             Me.ReportViewer1.RefreshReport()
         Catch ex As Exception
-            MessageBox.Show("Error al generar el informe: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            MessageBox.Show("Error al generar el informe: " & ex.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
     End Sub
 End Class

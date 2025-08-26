@@ -2,17 +2,16 @@
 Imports System.Data.Entity
 
 ''' <summary>
-''' Clase DTO unificada y CORREGIDA para mostrar todas las incidencias.
+''' Clase DTO (Objeto de Transferencia de Datos) unificada para mostrar todas las incidencias en el reporte.
+''' ESTA ES LA ESTRUCTURA CORRECTA QUE EL REPORTE DEBE USAR EN TODOS SUS DATASETS.
 ''' </summary>
 Public Class ConceptoFuncionalItem
-    ' CORRECCIÓN: Renombramos 'Fecha' a 'FechaInicio' y añadimos 'FechaFin' que puede ser nula.
     Public Property FechaInicio As DateTime
-    Public Property FechaFin As Date?
+    Public Property FechaFinal As Date?
     Public Property Tipo As String
-    Public Property Detalle As String
+    Public Property Observaciones As String
     Public Property Origen As String
 End Class
-
 
 Public Class ConceptoFuncionalService
     Private ReadOnly _unitOfWork As IUnitOfWork
@@ -30,9 +29,9 @@ Public Class ConceptoFuncionalService
                                  DbFunctions.TruncateTime(lic.inicio) <= fechaFin.Date
             ).Select(Function(l) New ConceptoFuncionalItem With {
                 .FechaInicio = l.inicio,
-                .FechaFin = l.finaliza, ' <-- Mapeo correcto
+                .FechaFinal = l.finaliza,
                 .Tipo = l.TipoLicencia.Nombre,
-                .Detalle = l.datos,
+                .Observaciones = l.datos,
                 .Origen = "Licencia"
             }).ToList()
 
@@ -45,9 +44,9 @@ Public Class ConceptoFuncionalService
                                  DbFunctions.TruncateTime(et.EnfermedadDetalle.FechaDesde) <= fechaFin.Date
             ).Select(Function(et) New ConceptoFuncionalItem With {
                 .FechaInicio = et.EnfermedadDetalle.FechaDesde,
-                .FechaFin = et.EnfermedadDetalle.FechaHasta, ' <-- Mapeo correcto
+                .FechaFinal = et.EnfermedadDetalle.FechaHasta,
                 .Tipo = et.TipoEstadoTransitorio.Nombre,
-                .Detalle = et.EnfermedadDetalle.Observaciones,
+                .Observaciones = et.EnfermedadDetalle.Observaciones,
                 .Origen = "Estado Transitorio"
             }).ToList()
 
@@ -62,9 +61,9 @@ Public Class ConceptoFuncionalService
                                  DbFunctions.TruncateTime(lic.inicio) <= fechaFin.Date
             ).Select(Function(l) New ConceptoFuncionalItem With {
                 .FechaInicio = l.inicio,
-                .FechaFin = l.finaliza, ' <-- Mapeo correcto
+                .FechaFinal = l.finaliza,
                 .Tipo = l.TipoLicencia.Nombre,
-                .Detalle = l.datos,
+                .Observaciones = l.datos,
                 .Origen = "Sanción Grave"
             }).OrderBy(Function(i) i.FechaInicio).ToList()
     End Function
@@ -78,9 +77,9 @@ Public Class ConceptoFuncionalService
                                  DbFunctions.TruncateTime(lic.inicio) <= fechaFin.Date
             ).Select(Function(l) New ConceptoFuncionalItem With {
                 .FechaInicio = l.inicio,
-                .FechaFin = l.finaliza, ' <-- Mapeo correcto
+                .FechaFinal = l.finaliza,
                 .Tipo = l.TipoLicencia.Nombre,
-                .Detalle = l.datos,
+                .Observaciones = l.datos,
                 .Origen = "Sanción Leve"
             }).ToList()
 
@@ -93,9 +92,9 @@ Public Class ConceptoFuncionalService
                                  DbFunctions.TruncateTime(et.SancionDetalle.FechaDesde) <= fechaFin.Date
             ).Select(Function(et) New ConceptoFuncionalItem With {
                 .FechaInicio = et.SancionDetalle.FechaDesde,
-                .FechaFin = et.SancionDetalle.FechaHasta, ' <-- Mapeo correcto
+                .FechaFinal = et.SancionDetalle.FechaHasta,
                 .Tipo = et.TipoEstadoTransitorio.Nombre,
-                .Detalle = et.SancionDetalle.Observaciones,
+                .Observaciones = et.SancionDetalle.Observaciones,
                 .Origen = "Observación"
             }).ToList()
 
