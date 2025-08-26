@@ -26,11 +26,12 @@ Partial Class frmNovedades
         Me.SplitContenedor = New System.Windows.Forms.SplitContainer()
         Me.dgvNovedades = New System.Windows.Forms.DataGridView()
         Me.PanelEncabezadoLista = New System.Windows.Forms.Panel()
+        Me.btnBuscar = New System.Windows.Forms.Button()
+        Me.txtBusqueda = New System.Windows.Forms.TextBox()
+        Me.lblBusqueda = New System.Windows.Forms.Label()
         Me.btnEliminarNovedad = New System.Windows.Forms.Button()
         Me.btnEditarNovedad = New System.Windows.Forms.Button()
         Me.btnNuevaNovedad = New System.Windows.Forms.Button()
-        Me.dtpFecha = New System.Windows.Forms.DateTimePicker()
-        Me.Label1 = New System.Windows.Forms.Label()
         Me.TabControlDetalle = New System.Windows.Forms.TabControl()
         Me.TabPageTexto = New System.Windows.Forms.TabPage()
         Me.txtTextoNovedad = New System.Windows.Forms.TextBox()
@@ -89,84 +90,95 @@ Partial Class frmNovedades
         Me.dgvNovedades.AllowUserToResizeRows = False
         Me.dgvNovedades.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvNovedades.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.dgvNovedades.Location = New System.Drawing.Point(0, 62)
+        Me.dgvNovedades.Location = New System.Drawing.Point(0, 78)
         Me.dgvNovedades.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.dgvNovedades.Name = "dgvNovedades"
         Me.dgvNovedades.ReadOnly = True
         Me.dgvNovedades.RowHeadersWidth = 51
         Me.dgvNovedades.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgvNovedades.Size = New System.Drawing.Size(506, 615)
+        Me.dgvNovedades.Size = New System.Drawing.Size(506, 599)
         Me.dgvNovedades.TabIndex = 1
         '
         'PanelEncabezadoLista
         '
+        Me.PanelEncabezadoLista.Controls.Add(Me.btnBuscar)
+        Me.PanelEncabezadoLista.Controls.Add(Me.txtBusqueda)
+        Me.PanelEncabezadoLista.Controls.Add(Me.lblBusqueda)
         Me.PanelEncabezadoLista.Controls.Add(Me.btnEliminarNovedad)
         Me.PanelEncabezadoLista.Controls.Add(Me.btnEditarNovedad)
         Me.PanelEncabezadoLista.Controls.Add(Me.btnNuevaNovedad)
-        Me.PanelEncabezadoLista.Controls.Add(Me.dtpFecha)
-        Me.PanelEncabezadoLista.Controls.Add(Me.Label1)
         Me.PanelEncabezadoLista.Dock = System.Windows.Forms.DockStyle.Top
         Me.PanelEncabezadoLista.Location = New System.Drawing.Point(0, 0)
         Me.PanelEncabezadoLista.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.PanelEncabezadoLista.Name = "PanelEncabezadoLista"
-        Me.PanelEncabezadoLista.Size = New System.Drawing.Size(506, 62)
+        Me.PanelEncabezadoLista.Size = New System.Drawing.Size(506, 78)
         Me.PanelEncabezadoLista.TabIndex = 0
+        '
+        'btnBuscar
+        '
+        Me.btnBuscar.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnBuscar.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.btnBuscar.Location = New System.Drawing.Point(401, 10)
+        Me.btnBuscar.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.btnBuscar.Name = "btnBuscar"
+        Me.btnBuscar.Size = New System.Drawing.Size(94, 35)
+        Me.btnBuscar.TabIndex = 7
+        Me.btnBuscar.Text = "Buscar"
+        Me.btnBuscar.UseVisualStyleBackColor = True
+        '
+        'txtBusqueda
+        '
+        Me.txtBusqueda.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtBusqueda.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.txtBusqueda.Location = New System.Drawing.Point(69, 11)
+        Me.txtBusqueda.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.txtBusqueda.Name = "txtBusqueda"
+        Me.txtBusqueda.Size = New System.Drawing.Size(326, 27)
+        Me.txtBusqueda.TabIndex = 6
+        '
+        'lblBusqueda
+        '
+        Me.lblBusqueda.AutoSize = True
+        Me.lblBusqueda.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.lblBusqueda.Location = New System.Drawing.Point(3, 14)
+        Me.lblBusqueda.Name = "lblBusqueda"
+        Me.lblBusqueda.Size = New System.Drawing.Size(60, 20)
+        Me.lblBusqueda.TabIndex = 5
+        Me.lblBusqueda.Text = "Buscar:"
         '
         'btnEliminarNovedad
         '
-        Me.btnEliminarNovedad.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnEliminarNovedad.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.btnEliminarNovedad.Location = New System.Drawing.Point(94, 12)
+        Me.btnEliminarNovedad.Location = New System.Drawing.Point(220, 44)
         Me.btnEliminarNovedad.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.btnEliminarNovedad.Name = "btnEliminarNovedad"
-        Me.btnEliminarNovedad.Size = New System.Drawing.Size(120, 38)
+        Me.btnEliminarNovedad.Size = New System.Drawing.Size(80, 35)
         Me.btnEliminarNovedad.TabIndex = 4
         Me.btnEliminarNovedad.Text = "Eliminar"
         Me.btnEliminarNovedad.UseVisualStyleBackColor = True
         '
         'btnEditarNovedad
         '
-        Me.btnEditarNovedad.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnEditarNovedad.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.btnEditarNovedad.Location = New System.Drawing.Point(220, 12)
+        Me.btnEditarNovedad.Location = New System.Drawing.Point(119, 44)
         Me.btnEditarNovedad.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.btnEditarNovedad.Name = "btnEditarNovedad"
-        Me.btnEditarNovedad.Size = New System.Drawing.Size(120, 38)
+        Me.btnEditarNovedad.Size = New System.Drawing.Size(95, 35)
         Me.btnEditarNovedad.TabIndex = 3
         Me.btnEditarNovedad.Text = "Editar..."
         Me.btnEditarNovedad.UseVisualStyleBackColor = True
         '
         'btnNuevaNovedad
         '
-        Me.btnNuevaNovedad.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnNuevaNovedad.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.btnNuevaNovedad.Location = New System.Drawing.Point(346, 12)
+        Me.btnNuevaNovedad.Location = New System.Drawing.Point(7, 44)
         Me.btnNuevaNovedad.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.btnNuevaNovedad.Name = "btnNuevaNovedad"
-        Me.btnNuevaNovedad.Size = New System.Drawing.Size(150, 38)
+        Me.btnNuevaNovedad.Size = New System.Drawing.Size(106, 35)
         Me.btnNuevaNovedad.TabIndex = 2
-        Me.btnNuevaNovedad.Text = "Nueva Novedad"
+        Me.btnNuevaNovedad.Text = "Nueva"
         Me.btnNuevaNovedad.UseVisualStyleBackColor = True
-        '
-        'dtpFecha
-        '
-        Me.dtpFecha.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.dtpFecha.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.dtpFecha.Location = New System.Drawing.Point(73, 15)
-        Me.dtpFecha.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
-        Me.dtpFecha.Name = "dtpFecha"
-        Me.dtpFecha.Size = New System.Drawing.Size(131, 31)
-        Me.dtpFecha.TabIndex = 1
-        '
-        'Label1
-        '
-        Me.Label1.AutoSize = True
-        Me.Label1.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.Label1.Location = New System.Drawing.Point(11, 19)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(61, 25)
-        Me.Label1.TabIndex = 0
-        Me.Label1.Text = "Fecha:"
         '
         'TabControlDetalle
         '
@@ -249,7 +261,7 @@ Partial Class frmNovedades
         '
         'frmNovedades
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1107, 701)
         Me.Controls.Add(Me.PanelPrincipal)
@@ -279,8 +291,6 @@ Partial Class frmNovedades
     Friend WithEvents dgvNovedades As DataGridView
     Friend WithEvents PanelEncabezadoLista As Panel
     Friend WithEvents btnNuevaNovedad As Button
-    Friend WithEvents dtpFecha As DateTimePicker
-    Friend WithEvents Label1 As Label
     Friend WithEvents TabControlDetalle As TabControl
     Friend WithEvents TabPageTexto As TabPage
     Friend WithEvents TabPageFuncionarios As TabPage
@@ -290,4 +300,7 @@ Partial Class frmNovedades
     Friend WithEvents TabPageFotos As TabPage
     Friend WithEvents flpFotos As FlowLayoutPanel
     Friend WithEvents btnEliminarNovedad As Button
+    Friend WithEvents txtBusqueda As TextBox
+    Friend WithEvents lblBusqueda As Label
+    Friend WithEvents btnBuscar As Button
 End Class

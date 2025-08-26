@@ -1,6 +1,10 @@
 ﻿' Apex/UI/frmNovedades.vb
+Imports System.ComponentModel
 Imports System.Data.Entity
+Imports System.Data.SqlClient
+Imports System.Globalization
 Imports System.IO
+Imports System.Text
 
 Public Class frmNovedades
 
@@ -12,14 +16,15 @@ Public Class frmNovedades
         AppTheme.Aplicar(Me)
         ConfigurarGrilla()
         dgvNovedades.DataSource = _bsNovedades
-        Await CargarNovedadesAsync()
+        ' Carga las últimas novedades al abrir el formulario
+        Await BuscarAsync(String.Empty)
     End Sub
 
     Private Async Sub dgvNovedades_SelectionChanged(sender As Object, e As EventArgs) Handles dgvNovedades.SelectionChanged
         Await ActualizarDetalleDesdeSeleccion()
     End Sub
 
-#Region "Carga de Datos y Configuración"
+#Region "Carga de Datos y Búsqueda"
 
     Private Sub ConfigurarGrilla()
         With dgvNovedades
@@ -36,35 +41,41 @@ Public Class frmNovedades
         End With
     End Sub
 
-    Private Async Function CargarNovedadesAsync(Optional mantenerSeleccion As Boolean = True) As Task
+    Private Async Function BuscarAsync(Optional textoBusqueda As String = Nothing) As Task
+        If textoBusqueda Is Nothing Then textoBusqueda = txtBusqueda.Text
+
         LoadingHelper.MostrarCargando(Me)
-
-        If mantenerSeleccion AndAlso dgvNovedades.CurrentRow IsNot Nothing Then
-            _idNovedadSeleccionada = CInt(dgvNovedades.CurrentRow.Cells("Id").Value)
-        End If
-
-        RemoveHandler dgvNovedades.SelectionChanged, AddressOf dgvNovedades_SelectionChanged
+        btnBuscar.Enabled = False
+        _bsNovedades.DataSource = Nothing
+        LimpiarDetalles()
 
         Try
-            _bsNovedades.DataSource = Nothing
             Using svc As New NovedadService()
-                _bsNovedades.DataSource = Await svc.GetAllAgrupadasAsync()
+                _bsNovedades.DataSource = Await svc.BuscarNovedadesAgrupadasFTSAsync(textoBusqueda)
             End Using
 
-            If _idNovedadSeleccionada.HasValue Then
-                Dim itemToSelect = _bsNovedades.List.Cast(Of vw_NovedadesAgrupadas)().FirstOrDefault(Function(n) n.Id = _idNovedadSeleccionada.Value)
-                If itemToSelect IsNot Nothing Then
-                    _bsNovedades.Position = _bsNovedades.IndexOf(itemToSelect)
-                End If
-            End If
         Catch ex As Exception
-            MessageBox.Show("Error al cargar las novedades: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            MessageBox.Show("Ocurrió un error al buscar las novedades: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        Finally
+            LoadingHelper.OcultarCargando(Me)
+            btnBuscar.Enabled = True
         End Try
-
-        AddHandler dgvNovedades.SelectionChanged, AddressOf dgvNovedades_SelectionChanged
-        Await ActualizarDetalleDesdeSeleccion()
-        LoadingHelper.OcultarCargando(Me)
     End Function
+
+    Private Async Sub btnBuscar_Click(sender As Object, e As EventArgs) Handles btnBuscar.Click
+        Await BuscarAsync()
+    End Sub
+
+    Private Async Sub txtBusqueda_KeyDown(sender As Object, e As KeyEventArgs) Handles txtBusqueda.KeyDown
+        If e.KeyCode = Keys.Enter Then
+            e.SuppressKeyPress = True
+            Await BuscarAsync()
+        End If
+    End Sub
+
+#End Region
+
+#Region "Lógica del Detalle"
 
     Private Sub LimpiarDetalles()
         txtTextoNovedad.Clear()
@@ -97,6 +108,7 @@ Public Class frmNovedades
 #End Region
 
 #Region "Gestión de Fotos (Visualización)"
+
     Private Async Function CargarFotos(novedadId As Integer) As Task
         _pictureBoxSeleccionado = Nothing
         flpFotos.Controls.Clear()
@@ -141,35 +153,36 @@ Public Class frmNovedades
 #End Region
 
 #Region "Gestión de Novedades (CRUD)"
+
     Private Async Sub btnNuevaNovedad_Click(sender As Object, e As EventArgs) Handles btnNuevaNovedad.Click
         Using frm As New frmNovedadCrear()
             If frm.ShowDialog(Me) = DialogResult.OK Then
-                Await CargarNovedadesAsync(mantenerSeleccion:=False)
+                Await BuscarAsync()
             End If
         End Using
     End Sub
 
     Private Async Sub btnEditarNovedad_Click(sender As Object, e As EventArgs) Handles btnEditarNovedad.Click
         If dgvNovedades.CurrentRow Is Nothing Then
-            MessageBox.Show("Por favor, seleccione una novedad de la lista para editar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            MessageBox.Show("Por favor, seleccione una novedad para editar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Return
         End If
         Dim novedadId = CInt(dgvNovedades.CurrentRow.Cells("Id").Value)
         Using frm As New frmNovedadCrear(novedadId)
             If frm.ShowDialog(Me) = DialogResult.OK Then
-                Await CargarNovedadesAsync(mantenerSeleccion:=True)
+                Await BuscarAsync()
             End If
         End Using
     End Sub
 
     Private Async Sub btnEliminarNovedad_Click(sender As Object, e As EventArgs) Handles btnEliminarNovedad.Click
         If dgvNovedades.CurrentRow Is Nothing Then
-            MessageBox.Show("Por favor, seleccione una novedad de la lista para eliminar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            MessageBox.Show("Por favor, seleccione una novedad para eliminar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Return
         End If
 
         Dim novedadSeleccionada = CType(dgvNovedades.CurrentRow.DataBoundItem, vw_NovedadesAgrupadas)
-        Dim confirmResult = MessageBox.Show($"¿Está seguro de que desea eliminar la novedad del {novedadSeleccionada.Fecha.ToShortDateString()}?", "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Warning)
+        Dim confirmResult = MessageBox.Show($"¿Está seguro de que desea eliminar la novedad del {novedadSeleccionada.Fecha:d}?", "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Warning)
 
         If confirmResult = DialogResult.Yes Then
             LoadingHelper.MostrarCargando(Me)
@@ -178,7 +191,7 @@ Public Class frmNovedades
                     Await svc.DeleteNovedadCompletaAsync(novedadSeleccionada.Id)
                 End Using
                 _idNovedadSeleccionada = Nothing
-                Await CargarNovedadesAsync(mantenerSeleccion:=False)
+                Await BuscarAsync()
             Catch ex As Exception
                 MessageBox.Show("Ocurrió un error al eliminar la novedad: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             Finally

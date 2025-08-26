@@ -256,7 +256,7 @@ Partial Class frmFiltroAvanzado
         Me.btnCargar.Name = "btnCargar"
         Me.btnCargar.Size = New System.Drawing.Size(476, 35)
         Me.btnCargar.TabIndex = 3
-        Me.btnCargar.Text = "Cargar Origen"
+        Me.btnCargar.Text = "Cargar"
         Me.btnCargar.UseVisualStyleBackColor = True
         '
         'Label1

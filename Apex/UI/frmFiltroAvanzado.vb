@@ -48,8 +48,8 @@ Partial Public Class frmFiltroAvanzado
 
         Private Shared Function FormatearValor(valor As String) As String
             If DateTime.TryParse(valor, CultureInfo.InvariantCulture, DateTimeStyles.None, Nothing) Then
-                ' El formateo de fechas se maneja por separado para mayor precisión.
-                Return $"'{Convert.ToDateTime(valor):yyyy-MM-dd}'"
+                ' CORRECCIÓN: Usar # en lugar de ' para las fechas.
+                Return $"#{Convert.ToDateTime(valor).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}#"
             End If
 
             If Double.TryParse(valor, NumberStyles.Any, CultureInfo.InvariantCulture, Nothing) Then
@@ -498,6 +498,7 @@ Partial Public Class frmFiltroAvanzado
             MessageBox.Show("No se encontraron correos válidos en la selección actual.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning)
         End If
     End Sub
+
 
 End Class
 
