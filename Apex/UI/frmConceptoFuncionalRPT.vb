@@ -1,31 +1,31 @@
-﻿' Apex/UI/frmConceptoFuncionalRPT.vb
-Imports Microsoft.Reporting.WinForms
+﻿Imports Microsoft.Reporting.WinForms
 
 Public Class frmConceptoFuncionalRPT
 
     Private ReadOnly _funcionario As Funcionario
     Private ReadOnly _fechaInicio As Date
     Private ReadOnly _fechaFin As Date
-    Private ReadOnly _incidenciasSalud As List(Of IncidenciaUI)
-    Private ReadOnly _incidenciasSanciones As List(Of IncidenciaUI)
-    Private ReadOnly _observaciones As List(Of ObservacionUI)
+    Private ReadOnly _incidenciasSalud As List(Of ConceptoFuncionalItem)
+    Private ReadOnly _sancionesGraves As List(Of ConceptoFuncionalItem)
+    Private ReadOnly _observacionesYLeves As List(Of ConceptoFuncionalItem)
 
     Public Sub New(funcionario As Funcionario, fechaInicio As Date, fechaFin As Date,
-                   incidenciasSalud As List(Of IncidenciaUI),
-                   incidenciasSanciones As List(Of IncidenciaUI),
-                   observaciones As List(Of ObservacionUI))
+                   incidenciasSalud As List(Of ConceptoFuncionalItem),
+                   sancionesGraves As List(Of ConceptoFuncionalItem),
+                   observacionesYLeves As List(Of ConceptoFuncionalItem))
+
         InitializeComponent()
         _funcionario = funcionario
         _fechaInicio = fechaInicio
         _fechaFin = fechaFin
-        _incidenciasSalud = incidenciasSalud
-        _incidenciasSanciones = incidenciasSanciones
-        _observaciones = observaciones
+        ' Asegurarse de no pasar una referencia nula al reporte
+        _incidenciasSalud = If(incidenciasSalud, New List(Of ConceptoFuncionalItem)())
+        _sancionesGraves = If(sancionesGraves, New List(Of ConceptoFuncionalItem)())
+        _observacionesYLeves = If(observacionesYLeves, New List(Of ConceptoFuncionalItem)())
     End Sub
 
     Private Sub frmConceptoFuncionalRPT_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Try
-            ' Limpiar fuentes de datos anteriores
             Me.ReportViewer1.LocalReport.DataSources.Clear()
 
             ' Configurar los parámetros del informe
@@ -36,10 +36,10 @@ Public Class frmConceptoFuncionalRPT
             Dim pPeriodo As New ReportParameter("pPeriodo", $"{_fechaInicio:dd/MM/yyyy} al {_fechaFin:dd/MM/yyyy}")
             Me.ReportViewer1.LocalReport.SetParameters({pNombre, pCedula, pCargo, pFechaIngreso, pPeriodo})
 
-            ' Configurar las fuentes de datos (DataSets)
+            ' Configurar las fuentes de datos con los nombres exactos que espera el archivo .rdlc
             Me.ReportViewer1.LocalReport.DataSources.Add(New ReportDataSource("dsLicenciasMedicas", _incidenciasSalud))
-            Me.ReportViewer1.LocalReport.DataSources.Add(New ReportDataSource("dsSancionesGraves", _incidenciasSanciones))
-            Me.ReportViewer1.LocalReport.DataSources.Add(New ReportDataSource("dsObservaciones", _observaciones))
+            Me.ReportViewer1.LocalReport.DataSources.Add(New ReportDataSource("dsSancionesGraves", _sancionesGraves))
+            Me.ReportViewer1.LocalReport.DataSources.Add(New ReportDataSource("dsObservaciones", _observacionesYLeves))
 
             Me.ReportViewer1.RefreshReport()
         Catch ex As Exception

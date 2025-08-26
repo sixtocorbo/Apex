@@ -1,6 +1,4 @@
-﻿' Imports eliminados porque las clases están en el mismo espacio de nombres raíz 'Apex'
-
-Public Class frmConceptoFuncionalApex
+﻿Public Class frmConceptoFuncionalApex
 
     Private _funcionarioSeleccionado As Funcionario
     Private ReadOnly _unitOfWork As IUnitOfWork
@@ -23,15 +21,12 @@ Public Class frmConceptoFuncionalApex
     End Sub
 
     Private Async Sub btnBuscarFuncionario_Click(sender As Object, e As EventArgs) Handles btnBuscarFuncionario.Click
-        ' CORRECCIÓN: Se llama al constructor con el modo de apertura correcto.
         Using frm As New frmFuncionarioBuscar(frmFuncionarioBuscar.ModoApertura.Seleccion)
             If frm.ShowDialog() = DialogResult.OK AndAlso frm.FuncionarioSeleccionado IsNot Nothing Then
-                ' CORRECCIÓN: Se obtiene el ID del objeto FuncionarioMin y se busca el objeto completo.
                 Dim funcionarioMin = frm.FuncionarioSeleccionado
                 _funcionarioSeleccionado = Await _funcionarioService.GetByIdAsync(funcionarioMin.Id)
 
                 If _funcionarioSeleccionado IsNot Nothing Then
-                    ' CORRECCIÓN: Se usa la propiedad 'Nombre' en lugar de 'Apellido'.
                     txtFuncionarioSeleccionado.Text = _funcionarioSeleccionado.Nombre
                     ActualizarDatos()
                 End If
@@ -46,20 +41,24 @@ Public Class frmConceptoFuncionalApex
     Private Sub ActualizarDatos()
         If _funcionarioSeleccionado Is Nothing Then Return
 
-        ' MostrarCargando(Me) ' -> Asumo que tienes un helper para esto en Apex
         Try
             Dim funcionarioId = _funcionarioSeleccionado.Id
             Dim fechaInicio = dtpFechaInicio.Value.Date
             Dim fechaFin = dtpFechaFin.Value.Date
 
-            dgvLicenciasMedicas.DataSource = _conceptoService.ObtenerIncidencias(funcionarioId, fechaInicio, fechaFin, ModConstantesApex.CATEGORIA_SALUD)
-            dgvSanciones.DataSource = _conceptoService.ObtenerIncidencias(funcionarioId, fechaInicio, fechaFin, ModConstantesApex.CATEGORIA_SANCION_GRAVE)
-            dgvObservaciones.DataSource = _conceptoService.ObtenerObservaciones(funcionarioId, fechaInicio, fechaFin)
+            ' Llamadas a los nuevos métodos refactorizados del servicio
+            dgvLicenciasMedicas.DataSource = _conceptoService.ObtenerIncidenciasDeSalud(funcionarioId, fechaInicio, fechaFin)
+            dgvSanciones.DataSource = _conceptoService.ObtenerSancionesGraves(funcionarioId, fechaInicio, fechaFin)
+            dgvObservaciones.DataSource = _conceptoService.ObtenerObservacionesYLeves(funcionarioId, fechaInicio, fechaFin)
+
+            ' Forzar la actualización visual de las grillas
+            dgvLicenciasMedicas.Refresh()
+            dgvSanciones.Refresh()
+            dgvObservaciones.Refresh()
 
         Catch ex As Exception
             MessageBox.Show($"Error al obtener los datos: {ex.Message}", "Error Crítico", MessageBoxButtons.OK, MessageBoxIcon.Error)
         Finally
-            ' OcultarCargando(Me) ' -> Asumo que tienes un helper para esto
             ActualizarTemporalLabel()
         End Try
     End Sub
@@ -74,57 +73,35 @@ Public Class frmConceptoFuncionalApex
             Return
         End If
 
-        ' --- INICIO DE LA CORRECCIÓN ---
-        ' Recolectar los datos de las grillas y convertirlos a una Lista.
-        Dim licencias As List(Of IncidenciaUI) = CType(dgvLicenciasMedicas.DataSource, IEnumerable(Of IncidenciaUI)).ToList()
-        Dim sanciones As List(Of IncidenciaUI) = CType(dgvSanciones.DataSource, IEnumerable(Of IncidenciaUI)).ToList()
-        Dim observaciones As List(Of ObservacionUI) = CType(dgvObservaciones.DataSource, IEnumerable(Of ObservacionUI)).ToList()
-        ' --- FIN DE LA CORRECCIÓN ---
+        ' Recolectar los datos de las grillas usando la clase unificada ConceptoFuncionalItem
+        Dim salud = TryCast(dgvLicenciasMedicas.DataSource, List(Of ConceptoFuncionalItem))
+        Dim graves = TryCast(dgvSanciones.DataSource, List(Of ConceptoFuncionalItem))
+        Dim leves = TryCast(dgvObservaciones.DataSource, List(Of ConceptoFuncionalItem))
 
-        ' Crear y mostrar el formulario del reporte, pasándole todos los datos necesarios
-        Using frm As New frmConceptoFuncionalRPT(_funcionarioSeleccionado, dtpFechaInicio.Value, dtpFechaFin.Value,
-                                           licencias, sanciones, observaciones)
+        ' Crear y mostrar el formulario del reporte, pasándole las listas
+        Using frm As New frmConceptoFuncionalRPT(_funcionarioSeleccionado, dtpFechaInicio.Value, dtpFechaFin.Value, salud, graves, leves)
             frm.ShowDialog(Me)
         End Using
     End Sub
 
-    ' --- CONFIGURACIÓN DE GRIDS Y CLASES DTO ---
-
+    ''' <summary>
+    ''' Configura las 3 DataGridViews para que usen la clase DTO 'ConceptoFuncionalItem' corregida.
+    ''' </summary>
     Private Sub ConfigurarDataGridViews()
-        ConfigurarGridIncidencias(dgvLicenciasMedicas)
-        ConfigurarGridIncidencias(dgvSanciones)
-
-        dgvObservaciones.AutoGenerateColumns = False
-        dgvObservaciones.Columns.Clear()
-        dgvObservaciones.Columns.AddRange(
-            New DataGridViewTextBoxColumn With {.DataPropertyName = "Fecha", .HeaderText = "Fecha", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells},
-            New DataGridViewTextBoxColumn With {.DataPropertyName = "Causa", .HeaderText = "Causa", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill},
-            New DataGridViewTextBoxColumn With {.DataPropertyName = "Sancion", .HeaderText = "Estado", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells}
-        )
+        ConfigurarGridConcepto(dgvLicenciasMedicas)
+        ConfigurarGridConcepto(dgvSanciones)
+        ConfigurarGridConcepto(dgvObservaciones)
     End Sub
 
-    Private Sub ConfigurarGridIncidencias(ByVal dgv As DataGridView)
+    Private Sub ConfigurarGridConcepto(ByVal dgv As DataGridView)
         dgv.AutoGenerateColumns = False
         dgv.Columns.Clear()
         dgv.Columns.AddRange(
             New DataGridViewTextBoxColumn With {.DataPropertyName = "FechaInicio", .HeaderText = "Inicio", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells},
-            New DataGridViewTextBoxColumn With {.DataPropertyName = "FechaFinal", .HeaderText = "Fin", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells},
+            New DataGridViewTextBoxColumn With {.DataPropertyName = "FechaFin", .HeaderText = "Fin", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells},
             New DataGridViewTextBoxColumn With {.DataPropertyName = "Tipo", .HeaderText = "Tipo", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells},
-            New DataGridViewTextBoxColumn With {.DataPropertyName = "Observaciones", .HeaderText = "Observaciones", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill}
+            New DataGridViewTextBoxColumn With {.DataPropertyName = "Detalle", .HeaderText = "Detalle/Observaciones", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill},
+            New DataGridViewTextBoxColumn With {.DataPropertyName = "Origen", .HeaderText = "Origen", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells}
         )
     End Sub
-End Class
-
-' --- Clases DTO para el DataBinding ---
-Public Class IncidenciaUI
-    Public Property FechaInicio As DateTime
-    Public Property FechaFinal As DateTime?
-    Public Property Tipo As String
-    Public Property Observaciones As String
-End Class
-
-Public Class ObservacionUI
-    Public Property Fecha As DateTime
-    Public Property Causa As String
-    Public Property Sancion As String
 End Class

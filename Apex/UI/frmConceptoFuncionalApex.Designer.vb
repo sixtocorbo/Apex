@@ -2,28 +2,25 @@
 Partial Class frmConceptoFuncionalApex
     Inherits System.Windows.Forms.Form
 
-    ' ... (Contenido generado por el diseñador) ...
+    'Form overrides dispose to clean up the component list.
+    <System.Diagnostics.DebuggerNonUserCode()>
+    Protected Overrides Sub Dispose(ByVal disposing As Boolean)
+        Try
+            If disposing AndAlso components IsNot Nothing Then
+                components.Dispose()
+            End If
+        Finally
+            MyBase.Dispose(disposing)
+        End Try
+    End Sub
 
-    Friend WithEvents PanelFiltros As Panel
-    Friend WithEvents dtpFechaFin As DateTimePicker
-    Friend WithEvents dtpFechaInicio As DateTimePicker
-    Friend WithEvents Label2 As Label
-    Friend WithEvents Label1 As Label
-    Friend WithEvents btnBuscarFuncionario As Button
-    Friend WithEvents txtFuncionarioSeleccionado As TextBox
-    Friend WithEvents Label3 As Label
-    Friend WithEvents PanelPrincipal As Panel
-    Friend WithEvents TabControl1 As TabControl
-    Friend WithEvents TabPage1 As TabPage
-    Friend WithEvents dgvLicenciasMedicas As DataGridView
-    Friend WithEvents TabPage2 As TabPage
-    Friend WithEvents dgvSanciones As DataGridView
-    Friend WithEvents TabPage3 As TabPage
-    Friend WithEvents dgvObservaciones As DataGridView
-    Friend WithEvents PanelFooter As Panel
-    Friend WithEvents lblTemporal As Label
-    Friend WithEvents btnInforme As Button
+    'Required by the Windows Form Designer
+    Private components As System.ComponentModel.IContainer
 
+    'NOTE: The following procedure is required by the Windows Form Designer
+    'It can be modified using the Windows Form Designer.  
+    'Do not modify it using the code editor.
+    <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.PanelFiltros = New System.Windows.Forms.Panel()
         Me.btnBuscarFuncionario = New System.Windows.Forms.Button()
@@ -103,7 +100,7 @@ Partial Class frmConceptoFuncionalApex
         '
         'dtpFechaFin
         '
-        Me.dtpFechaFin.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
+        Me.dtpFechaFin.Format = System.Windows.Forms.DateTimePickerFormat.Short
         Me.dtpFechaFin.Location = New System.Drawing.Point(780, 48)
         Me.dtpFechaFin.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.dtpFechaFin.Name = "dtpFechaFin"
@@ -112,7 +109,7 @@ Partial Class frmConceptoFuncionalApex
         '
         'dtpFechaInicio
         '
-        Me.dtpFechaInicio.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
+        Me.dtpFechaInicio.Format = System.Windows.Forms.DateTimePickerFormat.Short
         Me.dtpFechaInicio.Location = New System.Drawing.Point(597, 48)
         Me.dtpFechaInicio.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.dtpFechaInicio.Name = "dtpFechaInicio"
@@ -171,7 +168,7 @@ Partial Class frmConceptoFuncionalApex
         Me.TabPage1.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.TabPage1.Size = New System.Drawing.Size(1192, 459)
         Me.TabPage1.TabIndex = 0
-        Me.TabPage1.Text = "Licencias Médicas"
+        Me.TabPage1.Text = "Incidencias de Salud"
         Me.TabPage1.UseVisualStyleBackColor = True
         '
         'dgvLicenciasMedicas
@@ -226,7 +223,7 @@ Partial Class frmConceptoFuncionalApex
         Me.TabPage3.Name = "TabPage3"
         Me.TabPage3.Size = New System.Drawing.Size(1192, 459)
         Me.TabPage3.TabIndex = 2
-        Me.TabPage3.Text = "Observaciones (Puntuales y Leves)"
+        Me.TabPage3.Text = "Observaciones y Sanciones Leves"
         Me.TabPage3.UseVisualStyleBackColor = True
         '
         'dgvObservaciones
@@ -304,4 +301,24 @@ Partial Class frmConceptoFuncionalApex
         Me.ResumeLayout(False)
 
     End Sub
+
+    Friend WithEvents PanelFiltros As Panel
+    Friend WithEvents dtpFechaFin As DateTimePicker
+    Friend WithEvents dtpFechaInicio As DateTimePicker
+    Friend WithEvents Label2 As Label
+    Friend WithEvents Label1 As Label
+    Friend WithEvents btnBuscarFuncionario As Button
+    Friend WithEvents txtFuncionarioSeleccionado As TextBox
+    Friend WithEvents Label3 As Label
+    Friend WithEvents PanelPrincipal As Panel
+    Friend WithEvents TabControl1 As TabControl
+    Friend WithEvents TabPage1 As TabPage
+    Friend WithEvents dgvLicenciasMedicas As DataGridView
+    Friend WithEvents TabPage2 As TabPage
+    Friend WithEvents dgvSanciones As DataGridView
+    Friend WithEvents TabPage3 As TabPage
+    Friend WithEvents dgvObservaciones As DataGridView
+    Friend WithEvents PanelFooter As Panel
+    Friend WithEvents lblTemporal As Label
+    Friend WithEvents btnInforme As Button
 End Class
