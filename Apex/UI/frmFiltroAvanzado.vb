@@ -11,8 +11,6 @@ Imports System.Text
 ' para mantener el código limpio.
 
 Partial Public Class frmFiltroAvanzado
-
-    Private _accionHandler As IAccionHandler
     Private _dtOriginal As DataTable = New DataTable()
     Private _dvDatos As DataView = Nothing
     Private ReadOnly _filtros As New GestorFiltros()
@@ -130,15 +128,6 @@ Partial Public Class frmFiltroAvanzado
         AddHandler btnCargar.Click, AddressOf btnCargar_Click_Async
         AddHandler lstColumnas.SelectedIndexChanged, AddressOf LstColumnas_SelectedIndexChanged
         AddHandler txtBusquedaGlobal.TextChanged, AddressOf TxtBusquedaGlobal_TextChanged
-
-        ' Vincula los eventos genéricos a sus manejadores
-        AddHandler btnNuevaLicencia.Click, AddressOf btnGenerico_Nuevo_Click
-        AddHandler btnNuevaNotificacion.Click, AddressOf btnGenerico_Nuevo_Click
-        AddHandler btnEditarLicencia.Click, AddressOf btnGenerico_Editar_Click
-        AddHandler btnEditarNotificacion.Click, AddressOf btnGenerico_Editar_Click
-        AddHandler btnEliminarLicencia.Click, AddressOf btnGenerico_Eliminar_Click
-        AddHandler btnEliminarNotificacion.Click, AddressOf btnGenerico_Eliminar_Click
-        AddHandler btnCambiarEstado.Click, AddressOf btnGenerico_Extra_Click
 
         UpdateUIState()
     End Sub
@@ -266,19 +255,6 @@ Partial Public Class frmFiltroAvanzado
 
 #Region "Eventos y Lógica de UI"
 
-    Private Sub cmbOrigenDatos_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbOrigenDatos.SelectedIndexChanged
-        LimpiarTodo()
-        If cmbOrigenDatos.SelectedItem IsNot Nothing Then
-            Dim origen = CType(cmbOrigenDatos.SelectedItem, ConsultasGenericas.TipoOrigenDatos)
-            dtpFechaFin.Enabled = (origen <> ConsultasGenericas.TipoOrigenDatos.Funcionarios)
-            ' Configura el manejador de acciones correspondiente
-            _accionHandler = AccionHandlerFactory.Create(origen)
-        Else
-            _accionHandler = Nothing
-        End If
-        UpdateUIState()
-    End Sub
-
     Private Sub LstColumnas_SelectedIndexChanged(sender As Object, e As EventArgs)
         If _isUpdatingValores Then Return
         ActualizarListaDeValores()
@@ -403,13 +379,8 @@ Partial Public Class frmFiltroAvanzado
         Dim hayDatos = (_dvDatos IsNot Nothing AndAlso _dvDatos.Table.Rows.Count > 0)
         gbxFiltros.Enabled = hayDatos
 
-        ' Actualiza la visibilidad de los botones de acción
-        Dim hayResultados = (_dvDatos IsNot Nothing AndAlso _dvDatos.Count > 0)
-        _accionHandler?.ConfigurarVisibilidadBotones(Me, hayResultados)
-
         ' Asegura que el separador solo se muestre si hay botones a ambos lados
-        Separator1.Visible = (btnNuevaLicencia.Visible Or btnNuevaNotificacion.Visible) AndAlso
-                             (btnExportarExcel.Visible Or btnCopiarCorreos.Visible)
+        Separator1.Visible = (btnExportarExcel.Visible Or btnCopiarCorreos.Visible)
 
         ' Actualiza el conteo de registros
         If _dvDatos IsNot Nothing Then
@@ -484,26 +455,6 @@ Partial Public Class frmFiltroAvanzado
     End Class
 #End Region
 
-#Region "Manejadores de Eventos para Acciones"
-
-    Private Sub btnGenerico_Nuevo_Click(sender As Object, e As EventArgs)
-        _accionHandler?.ManejarBotonNuevo(Me)
-    End Sub
-
-    Private Sub btnGenerico_Editar_Click(sender As Object, e As EventArgs)
-        _accionHandler?.ManejarBotonEditar(Me)
-    End Sub
-
-    Private Sub btnGenerico_Eliminar_Click(sender As Object, e As EventArgs)
-        _accionHandler?.ManejarBotonEliminar(Me)
-    End Sub
-
-    Private Sub btnGenerico_Extra_Click(sender As Object, e As EventArgs)
-        _accionHandler?.ManejarBotonExtra(Me)
-    End Sub
-    ' =================================================================
-    '       MÉTODO PARA COPIAR LOS CORREOS ELECTRÓNICOS
-    ' =================================================================
 
     Private Sub btnCopiarCorreos_Click(sender As Object, e As EventArgs) Handles btnCopiarCorreos.Click
         ' 1. Verifica si hay datos filtrados en la vista actual.
@@ -547,7 +498,6 @@ Partial Public Class frmFiltroAvanzado
             MessageBox.Show("No se encontraron correos válidos en la selección actual.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning)
         End If
     End Sub
-#End Region
 
 End Class
 
@@ -558,17 +508,3 @@ Public Module ControlExtensions
         prop.SetValue(control, enable, Nothing)
     End Sub
 End Module
-
-' --- MEJORA: Fábrica para crear el IAccionHandler adecuado ---
-Public Class AccionHandlerFactory
-    Public Shared Function Create(origen As ConsultasGenericas.TipoOrigenDatos) As IAccionHandler
-        Select Case origen
-            Case ConsultasGenericas.TipoOrigenDatos.Licencias
-                Return New LicenciaAccionHandler()
-            Case ConsultasGenericas.TipoOrigenDatos.Notificaciones
-                Return New NotificacionAccionHandler()
-            Case Else
-                Return Nothing ' O una implementación por defecto que no hace nada
-        End Select
-    End Function
-End Class

@@ -427,7 +427,6 @@
     <Compile Include="Services\TipoEstadoTransitorioService.vb" />
     <Compile Include="Services\TurnoService.vb" />
     <Compile Include="Services\ViaticoService.vb" />
-    <Compile Include="UI\FiltroAvanzadoUI.vb" />
     <Compile Include="UI\frmAnalisisEstacionalidad.Designer.vb">
       <DependentUpon>frmAnalisisEstacionalidad.vb</DependentUpon>
     </Compile>

@@ -52,13 +52,6 @@ Partial Class frmFiltroAvanzado
         Me.btnExportarFichasPDF = New System.Windows.Forms.Button()
         Me.lblConteoRegistros = New System.Windows.Forms.Label()
         Me.Separator1 = New System.Windows.Forms.Label()
-        Me.btnNuevaNotificacion = New System.Windows.Forms.Button()
-        Me.btnEditarNotificacion = New System.Windows.Forms.Button()
-        Me.btnEliminarNotificacion = New System.Windows.Forms.Button()
-        Me.btnCambiarEstado = New System.Windows.Forms.Button()
-        Me.btnNuevaLicencia = New System.Windows.Forms.Button()
-        Me.btnEditarLicencia = New System.Windows.Forms.Button()
-        Me.btnEliminarLicencia = New System.Windows.Forms.Button()
         Me.Panel1 = New System.Windows.Forms.Panel()
         Me.dgvDatos = New System.Windows.Forms.DataGridView()
         Me.Panel2 = New System.Windows.Forms.Panel()
@@ -348,32 +341,28 @@ Partial Class frmFiltroAvanzado
         'pnlAcciones
         '
         Me.pnlAcciones.AutoSize = True
+        Me.pnlAcciones.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
         Me.pnlAcciones.Controls.Add(Me.flpAcciones)
-        Me.pnlAcciones.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.pnlAcciones.Dock = System.Windows.Forms.DockStyle.Top
         Me.pnlAcciones.Location = New System.Drawing.Point(3, 88)
         Me.pnlAcciones.Name = "pnlAcciones"
-        Me.pnlAcciones.Size = New System.Drawing.Size(1294, 1)
+        Me.pnlAcciones.Size = New System.Drawing.Size(1294, 53)
         Me.pnlAcciones.TabIndex = 7
         '
         'flpAcciones
         '
+        Me.flpAcciones.AutoSize = True
+        Me.flpAcciones.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
         Me.flpAcciones.Controls.Add(Me.btnExportarExcel)
         Me.flpAcciones.Controls.Add(Me.btnCopiarCorreos)
         Me.flpAcciones.Controls.Add(Me.btnExportarFichasPDF)
         Me.flpAcciones.Controls.Add(Me.lblConteoRegistros)
         Me.flpAcciones.Controls.Add(Me.Separator1)
-        Me.flpAcciones.Controls.Add(Me.btnNuevaNotificacion)
-        Me.flpAcciones.Controls.Add(Me.btnEditarNotificacion)
-        Me.flpAcciones.Controls.Add(Me.btnEliminarNotificacion)
-        Me.flpAcciones.Controls.Add(Me.btnCambiarEstado)
-        Me.flpAcciones.Controls.Add(Me.btnNuevaLicencia)
-        Me.flpAcciones.Controls.Add(Me.btnEditarLicencia)
-        Me.flpAcciones.Controls.Add(Me.btnEliminarLicencia)
         Me.flpAcciones.Dock = System.Windows.Forms.DockStyle.Fill
         Me.flpAcciones.Location = New System.Drawing.Point(0, 0)
         Me.flpAcciones.Name = "flpAcciones"
         Me.flpAcciones.Padding = New System.Windows.Forms.Padding(5)
-        Me.flpAcciones.Size = New System.Drawing.Size(1294, 1)
+        Me.flpAcciones.Size = New System.Drawing.Size(1294, 53)
         Me.flpAcciones.TabIndex = 0
         '
         'btnExportarExcel
@@ -424,76 +413,13 @@ Partial Class frmFiltroAvanzado
         Me.Separator1.Size = New System.Drawing.Size(3, 37)
         Me.Separator1.TabIndex = 15
         '
-        'btnNuevaNotificacion
-        '
-        Me.btnNuevaNotificacion.Location = New System.Drawing.Point(562, 8)
-        Me.btnNuevaNotificacion.Name = "btnNuevaNotificacion"
-        Me.btnNuevaNotificacion.Size = New System.Drawing.Size(84, 37)
-        Me.btnNuevaNotificacion.TabIndex = 16
-        Me.btnNuevaNotificacion.Text = "Nueva"
-        Me.btnNuevaNotificacion.UseVisualStyleBackColor = True
-        '
-        'btnEditarNotificacion
-        '
-        Me.btnEditarNotificacion.Location = New System.Drawing.Point(652, 8)
-        Me.btnEditarNotificacion.Name = "btnEditarNotificacion"
-        Me.btnEditarNotificacion.Size = New System.Drawing.Size(84, 37)
-        Me.btnEditarNotificacion.TabIndex = 17
-        Me.btnEditarNotificacion.Text = "Editar"
-        Me.btnEditarNotificacion.UseVisualStyleBackColor = True
-        '
-        'btnEliminarNotificacion
-        '
-        Me.btnEliminarNotificacion.Location = New System.Drawing.Point(742, 8)
-        Me.btnEliminarNotificacion.Name = "btnEliminarNotificacion"
-        Me.btnEliminarNotificacion.Size = New System.Drawing.Size(84, 37)
-        Me.btnEliminarNotificacion.TabIndex = 18
-        Me.btnEliminarNotificacion.Text = "Eliminar"
-        Me.btnEliminarNotificacion.UseVisualStyleBackColor = True
-        '
-        'btnCambiarEstado
-        '
-        Me.btnCambiarEstado.Location = New System.Drawing.Point(832, 8)
-        Me.btnCambiarEstado.Name = "btnCambiarEstado"
-        Me.btnCambiarEstado.Size = New System.Drawing.Size(147, 37)
-        Me.btnCambiarEstado.TabIndex = 19
-        Me.btnCambiarEstado.Text = "Cambiar Estado"
-        Me.btnCambiarEstado.UseVisualStyleBackColor = True
-        '
-        'btnNuevaLicencia
-        '
-        Me.btnNuevaLicencia.Location = New System.Drawing.Point(985, 8)
-        Me.btnNuevaLicencia.Name = "btnNuevaLicencia"
-        Me.btnNuevaLicencia.Size = New System.Drawing.Size(84, 37)
-        Me.btnNuevaLicencia.TabIndex = 20
-        Me.btnNuevaLicencia.Text = "Nueva"
-        Me.btnNuevaLicencia.UseVisualStyleBackColor = True
-        '
-        'btnEditarLicencia
-        '
-        Me.btnEditarLicencia.Location = New System.Drawing.Point(1075, 8)
-        Me.btnEditarLicencia.Name = "btnEditarLicencia"
-        Me.btnEditarLicencia.Size = New System.Drawing.Size(84, 37)
-        Me.btnEditarLicencia.TabIndex = 21
-        Me.btnEditarLicencia.Text = "Editar"
-        Me.btnEditarLicencia.UseVisualStyleBackColor = True
-        '
-        'btnEliminarLicencia
-        '
-        Me.btnEliminarLicencia.Location = New System.Drawing.Point(1165, 8)
-        Me.btnEliminarLicencia.Name = "btnEliminarLicencia"
-        Me.btnEliminarLicencia.Size = New System.Drawing.Size(84, 37)
-        Me.btnEliminarLicencia.TabIndex = 22
-        Me.btnEliminarLicencia.Text = "Eliminar"
-        Me.btnEliminarLicencia.UseVisualStyleBackColor = True
-        '
         'Panel1
         '
         Me.Panel1.Controls.Add(Me.dgvDatos)
         Me.Panel1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.Panel1.Location = New System.Drawing.Point(3, 94)
+        Me.Panel1.Location = New System.Drawing.Point(3, 147)
         Me.Panel1.Name = "Panel1"
-        Me.Panel1.Size = New System.Drawing.Size(1294, 666)
+        Me.Panel1.Size = New System.Drawing.Size(1294, 613)
         Me.Panel1.TabIndex = 5
         '
         'dgvDatos
@@ -511,7 +437,7 @@ Partial Class frmFiltroAvanzado
         Me.dgvDatos.RowHeadersWidth = 51
         Me.dgvDatos.RowTemplate.Height = 24
         Me.dgvDatos.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgvDatos.Size = New System.Drawing.Size(1294, 666)
+        Me.dgvDatos.Size = New System.Drawing.Size(1294, 613)
         Me.dgvDatos.TabIndex = 4
         '
         'Panel2
@@ -562,6 +488,7 @@ Partial Class frmFiltroAvanzado
         Me.gbxBusquedaGlobal.ResumeLayout(False)
         Me.gbxBusquedaGlobal.PerformLayout()
         Me.pnlAcciones.ResumeLayout(False)
+        Me.pnlAcciones.PerformLayout()
         Me.flpAcciones.ResumeLayout(False)
         Me.flpAcciones.PerformLayout()
         Me.Panel1.ResumeLayout(False)
@@ -601,13 +528,6 @@ Partial Class frmFiltroAvanzado
     Friend WithEvents btnCopiarCorreos As Button
     Friend WithEvents btnExportarFichasPDF As Button
     Friend WithEvents Separator1 As Label
-    Friend WithEvents btnNuevaNotificacion As Button
-    Friend WithEvents btnEditarNotificacion As Button
-    Friend WithEvents btnEliminarNotificacion As Button
-    Friend WithEvents btnCambiarEstado As Button
-    Friend WithEvents btnNuevaLicencia As Button
-    Friend WithEvents btnEditarLicencia As Button
-    Friend WithEvents btnEliminarLicencia As Button
     Friend WithEvents lblConteoRegistros As Label
     Friend WithEvents TableLayoutPanel3 As TableLayoutPanel
     Friend WithEvents flpAcciones As FlowLayoutPanel
