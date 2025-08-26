@@ -1,6 +1,9 @@
 ﻿' Apex/Services/FuncionarioService.vb
 Imports System.Data.Entity
-
+Public Class EstadisticaItem
+    Public Property Etiqueta As String
+    Public Property Valor As Integer
+End Class
 Public Class FuncionarioService
     Inherits GenericService(Of Funcionario)
 
@@ -207,6 +210,82 @@ Public Class FuncionarioService
         .ToListAsync()
         Return funcionariosData.Select(Function(f) New KeyValuePair(Of Integer, String)(f.Id, f.Nombre)).ToList()
     End Function
+    ' --- INICIO DE LAS FUNCIONES DE ANÁLISIS ESTADÍSTICO ---
+
+    ' 1. Obtiene la cantidad de funcionarios por género (SOLO ACTIVOS)
+    Public Function GetDistribucionPorGenero() As List(Of EstadisticaItem)
+        Using context As New ApexEntities()
+            Return context.Funcionario _
+            .Where(Function(f) f.Activo) _
+            .GroupBy(Function(f) f.Genero.Nombre) _
+            .Select(Function(g) New EstadisticaItem With {
+                .Etiqueta = If(g.Key IsNot Nothing, g.Key, "Sin especificar"),
+                .Valor = g.Count()
+            }).ToList()
+        End Using
+    End Function
+
+    ' 2. Obtiene la cantidad de funcionarios por rango de edad (SOLO ACTIVOS)
+    Public Function GetDistribucionPorRangoEdad() As List(Of EstadisticaItem)
+        Using context As New ApexEntities()
+            Dim funcionarios = context.Funcionario _
+            .Where(Function(f) f.Activo AndAlso f.FechaNacimiento.HasValue) _
+            .Select(Function(f) New With {
+                .AnioNacimiento = f.FechaNacimiento.Value.Year
+            }).ToList()
+
+            Dim anioActual = DateTime.Now.Year
+
+            Return funcionarios _
+            .Select(Function(f) anioActual - f.AnioNacimiento) _
+            .GroupBy(Function(edad)
+                         Return If(edad <= 25, "18-25",
+                                If(edad <= 35, "26-35",
+                                   If(edad <= 45, "36-45",
+                                      If(edad <= 55, "46-55", "Más de 55"))))
+                     End Function) _
+            .Select(Function(g) New EstadisticaItem With {
+                .Etiqueta = g.Key,
+                .Valor = g.Count()
+            }) _
+            .OrderBy(Function(item) item.Etiqueta) _
+            .ToList()
+        End Using
+    End Function
+
+    ' 3. Obtiene la cantidad de funcionarios por Área de Trabajo (SOLO ACTIVOS)
+    ' Nota: Basado en tu código, usamos 'PuestoTrabajo' como equivalente a 'Área de Trabajo'.
+    Public Function GetDistribucionPorAreaTrabajo() As List(Of EstadisticaItem)
+        Using context As New ApexEntities()
+            Return context.Funcionario _
+            .Where(Function(f) f.Activo) _
+            .GroupBy(Function(f) f.PuestoTrabajo.Nombre) _
+            .Select(Function(g) New EstadisticaItem With {
+                .Etiqueta = If(g.Key IsNot Nothing, g.Key, "Sin especificar"),
+                .Valor = g.Count()
+            }) _
+            .OrderByDescending(Function(item) item.Valor) _
+            .ToList()
+        End Using
+    End Function
+
+    ' 4. Obtiene la cantidad de funcionarios por Cargo (SOLO ACTIVOS)
+    Public Function GetDistribucionPorCargo() As List(Of EstadisticaItem)
+        Using context As New ApexEntities()
+            Return context.Funcionario _
+            .Where(Function(f) f.Activo) _
+            .GroupBy(Function(f) f.Cargo.Nombre) _
+            .Select(Function(g) New EstadisticaItem With {
+                .Etiqueta = If(g.Key IsNot Nothing, g.Key, "Sin especificar"),
+                .Valor = g.Count()
+            }) _
+            .OrderByDescending(Function(item) item.Valor) _
+            .Take(10) _
+            .ToList()
+        End Using
+    End Function
+
+    ' --- FIN DE LAS NUEVAS FUNCIONES ---
 End Class
 Public Class FuncionarioVistaDTO
     Public Property Id As Integer

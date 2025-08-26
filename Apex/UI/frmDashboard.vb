@@ -9,7 +9,6 @@ Public Class frmDashboard
     Private currentBtn As Button
     Private Shadows activeForm As Form
 
-    ' Instancias de formularios existentes
     Private _funcionarioBuscarInstancia As frmFuncionarioBuscar
     Private _filtroAvanzadoInstancia As frmFiltroAvanzado
     Private _gestionInstancia As frmGestion
@@ -20,13 +19,11 @@ Public Class frmDashboard
     Private _renombrarPDFInstancia As frmRenombrarPDF
     Private _reporteNovedadesInstancia As frmReporteNovedades
     Private _configuracionInstancia As frmConfiguracion
-
-    ' --- NUEVA INSTANCIA PARA EL FORMULARIO DE ANÁLISIS ---
     Private _analisisEstacionalidadInstancia As frmAnalisisEstacionalidad
+    Private _analisisPersonalInstancia As frmAnalisisFuncionarios
 
     Public Sub New()
         InitializeComponent()
-        ' Asociar los manejadores de eventos a los botones de navegación
         AddHandler btnFuncionarios.Click, AddressOf ActivateButton
         AddHandler btnFiltros.Click, AddressOf ActivateButton
         AddHandler btnNovedades.Click, AddressOf ActivateButton
@@ -36,10 +33,9 @@ Public Class frmDashboard
         AddHandler btnImportacion.Click, AddressOf ActivateButton
         AddHandler btnViaticos.Click, AddressOf ActivateButton
         AddHandler btnReportes.Click, AddressOf ActivateButton
-        ' --- AÑADIR EL MANEJADOR PARA EL NUEVO BOTÓN ---
         AddHandler btnAnalisis.Click, AddressOf ActivateButton
+        AddHandler btnAnalisisPersonal.Click, AddressOf ActivateButton
         AddHandler btnConfiguracion.Click, AddressOf ActivateButton
-
         AddHandler Me.Shown, AddressOf frmDashboard_Shown
     End Sub
 
@@ -64,9 +60,7 @@ Public Class frmDashboard
 
     Private Sub ActivateButton(sender As Object, e As EventArgs)
         If sender Is Nothing Then Return
-
         DisableButton()
-
         currentBtn = CType(sender, Button)
         currentBtn.BackColor = Color.FromArgb(81, 81, 112)
         currentBtn.ForeColor = Color.White
@@ -121,25 +115,29 @@ Public Class frmDashboard
                 End If
                 AbrirFormEnPanel(_viaticosInstancia)
 
-            Case "btnConfiguracion"
-                If _configuracionInstancia Is Nothing OrElse _configuracionInstancia.IsDisposed Then
-                    _configuracionInstancia = New frmConfiguracion()
-                End If
-                AbrirFormEnPanel(_configuracionInstancia)
-
             Case "btnReportes"
                 If _reporteNovedadesInstancia Is Nothing OrElse _reporteNovedadesInstancia.IsDisposed Then
                     _reporteNovedadesInstancia = New frmReporteNovedades()
                 End If
                 AbrirFormEnPanel(_reporteNovedadesInstancia)
 
-            ' --- NUEVO CASE PARA EL BOTÓN DE ANÁLISIS ---
             Case "btnAnalisis"
                 If _analisisEstacionalidadInstancia Is Nothing OrElse _analisisEstacionalidadInstancia.IsDisposed Then
                     _analisisEstacionalidadInstancia = New frmAnalisisEstacionalidad()
                 End If
                 AbrirFormEnPanel(_analisisEstacionalidadInstancia)
-                ' --- FIN DE LA MODIFICACIÓN ---
+
+            Case "btnAnalisisPersonal"
+                If _analisisPersonalInstancia Is Nothing OrElse _analisisPersonalInstancia.IsDisposed Then
+                    _analisisPersonalInstancia = New frmAnalisisFuncionarios()
+                End If
+                AbrirFormEnPanel(_analisisPersonalInstancia)
+
+            Case "btnConfiguracion"
+                If _configuracionInstancia Is Nothing OrElse _configuracionInstancia.IsDisposed Then
+                    _configuracionInstancia = New frmConfiguracion()
+                End If
+                AbrirFormEnPanel(_configuracionInstancia)
         End Select
     End Sub
 
@@ -155,9 +153,7 @@ Public Class frmDashboard
         If activeForm IsNot Nothing AndAlso activeForm IsNot childForm Then
             activeForm.Hide()
         End If
-
         activeForm = childForm
-
         If Not Me.panelContenido.Controls.Contains(childForm) Then
             childForm.TopLevel = False
             childForm.FormBorderStyle = FormBorderStyle.None
@@ -165,7 +161,6 @@ Public Class frmDashboard
             Me.panelContenido.Controls.Add(childForm)
             Me.panelContenido.Tag = childForm
         End If
-
         childForm.BringToFront()
         childForm.Show()
     End Sub
