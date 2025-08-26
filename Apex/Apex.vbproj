@@ -541,12 +541,6 @@
     <Compile Include="UI\frmFuncionarioSituacion.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\frmGestion.Designer.vb">
-      <DependentUpon>frmGestion.vb</DependentUpon>
-    </Compile>
-    <Compile Include="UI\frmGestion.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="UI\frmGestionAreasTrabajo.Designer.vb">
       <DependentUpon>frmGestionAreasTrabajo.vb</DependentUpon>
     </Compile>
@@ -571,10 +565,28 @@
     <Compile Include="UI\frmGestionIncidencias.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="UI\frmGestionLicencias.Designer.vb">
+      <DependentUpon>frmGestionLicencias.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmGestionLicencias.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="UI\frmGestionNomenclaturas.Designer.vb">
       <DependentUpon>frmGestionNomenclaturas.vb</DependentUpon>
     </Compile>
     <Compile Include="UI\frmGestionNomenclaturas.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\frmGestionNotificaciones.Designer.vb">
+      <DependentUpon>frmGestionNotificaciones.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmGestionNotificaciones.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\frmGestionSanciones.Designer.vb">
+      <DependentUpon>frmGestionSanciones.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmGestionSanciones.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="UI\frmGestionSecciones.Designer.vb">
@@ -723,9 +735,6 @@
     <EmbeddedResource Include="UI\frmFuncionarioSituacion.resx">
       <DependentUpon>frmFuncionarioSituacion.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\frmGestion.resx">
-      <DependentUpon>frmGestion.vb</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="UI\frmGestionAreasTrabajo.resx">
       <DependentUpon>frmGestionAreasTrabajo.vb</DependentUpon>
     </EmbeddedResource>
@@ -737,6 +746,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmGestionIncidencias.resx">
       <DependentUpon>frmGestionIncidencias.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmGestionLicencias.resx">
+      <DependentUpon>frmGestionLicencias.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmGestionNomenclaturas.resx">
       <DependentUpon>frmGestionNomenclaturas.vb</DependentUpon>

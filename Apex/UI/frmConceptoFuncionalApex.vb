@@ -1,4 +1,5 @@
-﻿Public Class frmConceptoFuncionalApex
+﻿
+Public Class frmConceptoFuncionalApex
 
     Private _funcionarioSeleccionado As Funcionario
     Private ReadOnly _unitOfWork As IUnitOfWork

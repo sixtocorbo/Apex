@@ -6,12 +6,20 @@ Imports System.Windows.Forms
 Public Class frmDashboard
     Inherits Form
 
+    ' Botón y formulario activos actualmente
     Private currentBtn As Button
     Private Shadows activeForm As Form
 
+    ' --- MODIFICACIÓN: Instancias para los nuevos formularios de gestión ---
+    Private _licenciasInstancia As frmGestionLicencias
+    Private _notificacionesInstancia As frmGestionNotificaciones
+    Private _sancionesInstancia As frmGestionSanciones
+    Private _conceptoFuncionalInstancia As frmConceptoFuncionalApex
+    ' --- FIN MODIFICACIÓN ---
+
+    ' Instancias para los otros formularios (se mantienen igual)
     Private _funcionarioBuscarInstancia As frmFuncionarioBuscar
     Private _filtroAvanzadoInstancia As frmFiltroAvanzado
-    Private _gestionInstancia As frmGestion
     Private _novedadesInstancia As frmNovedades
     Private _viaticosInstancia As frmReporteViaticos
     Private _importacionInstancia As frmAsistenteImportacion
@@ -22,12 +30,22 @@ Public Class frmDashboard
     Private _analisisEstacionalidadInstancia As frmAnalisisEstacionalidad
     Private _analisisPersonalInstancia As frmAnalisisFuncionarios
 
+
     Public Sub New()
         InitializeComponent()
+        AddHandler Me.Shown, AddressOf frmDashboard_Shown
+
+        ' --- MODIFICACIÓN: Se reemplaza btnGestion por los nuevos botones ---
+        AddHandler btnLicencias.Click, AddressOf ActivateButton
+        AddHandler btnNotificaciones.Click, AddressOf ActivateButton
+        AddHandler btnSanciones.Click, AddressOf ActivateButton
+        AddHandler btnConceptoFuncional.Click, AddressOf ActivateButton ' Se añade botón para Concepto Funcional
+        ' --- FIN MODIFICACIÓN ---
+
+        ' Handlers para los botones existentes
         AddHandler btnFuncionarios.Click, AddressOf ActivateButton
         AddHandler btnFiltros.Click, AddressOf ActivateButton
         AddHandler btnNovedades.Click, AddressOf ActivateButton
-        AddHandler btnGestion.Click, AddressOf ActivateButton
         AddHandler btnNomenclaturas.Click, AddressOf ActivateButton
         AddHandler btnRenombrarPDFs.Click, AddressOf ActivateButton
         AddHandler btnImportacion.Click, AddressOf ActivateButton
@@ -36,11 +54,12 @@ Public Class frmDashboard
         AddHandler btnAnalisis.Click, AddressOf ActivateButton
         AddHandler btnAnalisisPersonal.Click, AddressOf ActivateButton
         AddHandler btnConfiguracion.Click, AddressOf ActivateButton
-        AddHandler Me.Shown, AddressOf frmDashboard_Shown
     End Sub
 
     Private Async Sub frmDashboard_Shown(sender As Object, e As EventArgs)
         Await CargarSemanaActualAsync()
+        ' Abrir el formulario de licencias por defecto al iniciar
+        btnLicencias.PerformClick()
     End Sub
 
     Private Async Function CargarSemanaActualAsync() As Task
@@ -66,7 +85,33 @@ Public Class frmDashboard
         currentBtn.ForeColor = Color.White
         currentBtn.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
 
+        ' --- MODIFICACIÓN: Lógica para manejar los nuevos formularios ---
         Select Case currentBtn.Name
+            Case "btnLicencias"
+                If _licenciasInstancia Is Nothing OrElse _licenciasInstancia.IsDisposed Then
+                    _licenciasInstancia = New frmGestionLicencias()
+                End If
+                AbrirFormEnPanel(_licenciasInstancia)
+
+            Case "btnNotificaciones"
+                If _notificacionesInstancia Is Nothing OrElse _notificacionesInstancia.IsDisposed Then
+                    _notificacionesInstancia = New frmGestionNotificaciones()
+                End If
+                AbrirFormEnPanel(_notificacionesInstancia)
+
+            Case "btnSanciones"
+                If _sancionesInstancia Is Nothing OrElse _sancionesInstancia.IsDisposed Then
+                    _sancionesInstancia = New frmGestionSanciones()
+                End If
+                AbrirFormEnPanel(_sancionesInstancia)
+
+            Case "btnConceptoFuncional"
+                If _conceptoFuncionalInstancia Is Nothing OrElse _conceptoFuncionalInstancia.IsDisposed Then
+                    _conceptoFuncionalInstancia = New frmConceptoFuncionalApex()
+                End If
+                AbrirFormEnPanel(_conceptoFuncionalInstancia)
+
+            ' --- Casos para los otros botones (se mantienen igual) ---
             Case "btnFuncionarios"
                 If _funcionarioBuscarInstancia Is Nothing OrElse _funcionarioBuscarInstancia.IsDisposed Then
                     _funcionarioBuscarInstancia = New frmFuncionarioBuscar()
@@ -84,12 +129,6 @@ Public Class frmDashboard
                     _novedadesInstancia = New frmNovedades()
                 End If
                 AbrirFormEnPanel(_novedadesInstancia)
-
-            Case "btnGestion"
-                If _gestionInstancia Is Nothing OrElse _gestionInstancia.IsDisposed Then
-                    _gestionInstancia = New frmGestion()
-                End If
-                AbrirFormEnPanel(_gestionInstancia)
 
             Case "btnNomenclaturas"
                 If _gestionNomenclaturasInstancia Is Nothing OrElse _gestionNomenclaturasInstancia.IsDisposed Then
@@ -149,7 +188,7 @@ Public Class frmDashboard
         End If
     End Sub
 
-    Private Sub AbrirFormEnPanel(childForm As Form)
+    Public Sub AbrirFormEnPanel(childForm As Form)
         If activeForm IsNot Nothing AndAlso activeForm IsNot childForm Then
             activeForm.Hide()
         End If
