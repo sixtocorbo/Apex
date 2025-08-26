@@ -288,7 +288,7 @@ Partial Public Class frmFiltroAvanzado
         AplicarFiltros()
     End Sub
 
-    Private Sub BtnAgregar_Click(sender As Object, e As EventArgs) Handles btnAgregar.Click
+    Private Sub btnFiltrar_Click(sender As Object, e As EventArgs) Handles btnFiltrar.Click
         If lstColumnas.SelectedItem Is Nothing OrElse lstValores.SelectedItems.Count = 0 Then Return
 
         ' --- MEJORA: Lógica de validación movida a su propia función para mayor claridad ---
@@ -338,12 +338,12 @@ Partial Public Class frmFiltroAvanzado
         Dim filtroReglas = _filtros.RowFilter()
         Dim filtroGlobal = ConstruirFiltroGlobal()
 
+        ' Se aplica el filtro combinado a la vista de datos
         _dvDatos.RowFilter = String.Join(" AND ", {filtroReglas, filtroGlobal}.Where(Function(s) Not String.IsNullOrWhiteSpace(s)))
 
-        ' --- MEJORA: La lista de valores solo se actualiza si la columna seleccionada cambia, no con cada filtro ---
-        ' Esto mejora drásticamente la capacidad de respuesta de la UI.
-        ' La actualización ahora la dispara el evento LstColumnas_SelectedIndexChanged.
+        ActualizarListaDeValores()
 
+        ' El resto del código se mantiene igual
         UpdateUIState()
     End Sub
 
@@ -438,22 +438,26 @@ Partial Public Class frmFiltroAvanzado
     End Sub
 
     Private Sub ActualizarListaDeValores()
-        lstValores.BeginUpdate() ' Optimiza el rendimiento al añadir múltiples ítems
+        lstValores.BeginUpdate() ' Optimiza el rendimiento
         lstValores.Items.Clear()
-        If lstColumnas.SelectedItem Is Nothing OrElse _dtOriginal Is Nothing Then
+
+        ' Verificamos que la columna esté seleccionada y que la vista de datos (_dvDatos) exista
+        If lstColumnas.SelectedItem Is Nothing OrElse _dvDatos Is Nothing Then
             lstValores.EndUpdate()
             Return
         End If
 
         Dim colName = lstColumnas.SelectedItem.ToString()
-        ' --- MEJORA: Obtenemos valores únicos directamente del DataTable original (más rápido) ---
-        Dim valoresUnicos = _dtOriginal.AsEnumerable().
-                            Select(Function(r) r.Field(Of Object)(colName)).
-                            Where(Function(v) v IsNot Nothing AndAlso Not String.IsNullOrWhiteSpace(v.ToString())).
-                            Distinct().
-                            OrderBy(Function(v) v.ToString(), StringComparer.CurrentCultureIgnoreCase).
-                            Select(Function(v) v.ToString()).
-                            ToArray()
+
+        Dim dtValoresUnicos As DataTable = _dvDatos.ToTable(True, colName)
+
+        ' Ahora extraemos los valores de esta nueva tabla pequeña y ordenada.
+        Dim valoresUnicos = dtValoresUnicos.AsEnumerable().
+                        Select(Function(r) r.Field(Of Object)(colName)).
+                        Where(Function(v) v IsNot Nothing AndAlso Not String.IsNullOrWhiteSpace(v.ToString())).
+                        OrderBy(Function(v) v.ToString(), StringComparer.CurrentCultureIgnoreCase).
+                        Select(Function(v) v.ToString()).
+                        ToArray()
 
         lstValores.Items.AddRange(valoresUnicos)
         lstValores.EndUpdate()
@@ -497,14 +501,56 @@ Partial Public Class frmFiltroAvanzado
     Private Sub btnGenerico_Extra_Click(sender As Object, e As EventArgs)
         _accionHandler?.ManejarBotonExtra(Me)
     End Sub
+    ' =================================================================
+    '       MÉTODO PARA COPIAR LOS CORREOS ELECTRÓNICOS
+    ' =================================================================
 
-    ' ... (El método btnCopiarCorreos_Click se mantiene igual)
+    Private Sub btnCopiarCorreos_Click(sender As Object, e As EventArgs) Handles btnCopiarCorreos.Click
+        ' 1. Verifica si hay datos filtrados en la vista actual.
+        If _dvDatos Is Nothing OrElse _dvDatos.Count = 0 Then
+            MessageBox.Show("No hay registros en la vista actual para copiar correos.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return
+        End If
 
+        ' 2. Define el nombre de la columna que contiene los correos.
+        '    ¡IMPORTANTE! Cambia "Email" por el nombre real de tu columna si es diferente.
+        Const NOMBRE_COLUMNA_CORREO As String = "Email"
+
+        ' 3. Comprueba si la columna de correo existe en los datos.
+        If Not _dvDatos.Table.Columns.Contains(NOMBRE_COLUMNA_CORREO) Then
+            MessageBox.Show($"No se encontró la columna '{NOMBRE_COLUMNA_CORREO}' en los datos.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Return
+        End If
+
+        ' 4. Recolecta todos los correos de la vista filtrada.
+        Dim correos As New List(Of String)
+        For Each rowView As DataRowView In _dvDatos
+            ' Obtiene el valor del correo de la fila actual.
+            Dim correo = rowView(NOMBRE_COLUMNA_CORREO)?.ToString()
+
+            ' Agrega el correo a la lista solo si no es nulo y no está vacío.
+            If Not String.IsNullOrWhiteSpace(correo) Then
+                correos.Add(correo.Trim())
+            End If
+        Next
+
+        ' 5. Si se encontraron correos, únelos y cópialos al portapapeles.
+        If correos.Any() Then
+            ' Une todos los correos con un punto y coma, que es el estándar para los clientes de correo.
+            Dim correosParaCopiar = String.Join("; ", correos.Distinct()) ' Distinct() para evitar duplicados.
+
+            ' Copia la cadena de correos al portapapeles.
+            Clipboard.SetText(correosParaCopiar)
+
+            MessageBox.Show($"{correos.Count} correos han sido copiados al portapapeles.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        Else
+            MessageBox.Show("No se encontraron correos válidos en la selección actual.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+        End If
+    End Sub
 #End Region
 
 End Class
 
-' --- MEJORA: Clase auxiliar para habilitar DoubleBuffering en controles ---
 Public Module ControlExtensions
     <System.Runtime.CompilerServices.Extension()>
     Public Sub DoubleBuffered(ByVal control As System.Windows.Forms.Control, ByVal enable As Boolean)

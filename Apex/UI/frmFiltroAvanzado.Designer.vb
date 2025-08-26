@@ -28,7 +28,7 @@ Partial Class frmFiltroAvanzado
         Me.gbxFiltros = New System.Windows.Forms.GroupBox()
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
         Me.pnlFiltroBotones = New System.Windows.Forms.FlowLayoutPanel()
-        Me.btnAgregar = New System.Windows.Forms.Button()
+        Me.btnFiltrar = New System.Windows.Forms.Button()
         Me.btnLimpiar = New System.Windows.Forms.Button()
         Me.lstColumnas = New System.Windows.Forms.ListBox()
         Me.lstValores = New System.Windows.Forms.ListBox()
@@ -99,7 +99,7 @@ Partial Class frmFiltroAvanzado
         Me.splitContenedorPrincipal.Panel2.Controls.Add(Me.pnlDerecho)
         Me.splitContenedorPrincipal.Panel2MinSize = 200
         Me.splitContenedorPrincipal.Size = New System.Drawing.Size(1924, 937)
-        Me.splitContenedorPrincipal.SplitterDistance = 450
+        Me.splitContenedorPrincipal.SplitterDistance = 596
         Me.splitContenedorPrincipal.TabIndex = 0
         '
         'pnlIzquierdo
@@ -110,7 +110,7 @@ Partial Class frmFiltroAvanzado
         Me.pnlIzquierdo.Location = New System.Drawing.Point(0, 0)
         Me.pnlIzquierdo.Name = "pnlIzquierdo"
         Me.pnlIzquierdo.Padding = New System.Windows.Forms.Padding(12)
-        Me.pnlIzquierdo.Size = New System.Drawing.Size(450, 937)
+        Me.pnlIzquierdo.Size = New System.Drawing.Size(596, 937)
         Me.pnlIzquierdo.TabIndex = 0
         '
         'gbxFiltros
@@ -120,7 +120,7 @@ Partial Class frmFiltroAvanzado
         Me.gbxFiltros.Location = New System.Drawing.Point(12, 210)
         Me.gbxFiltros.Name = "gbxFiltros"
         Me.gbxFiltros.Padding = New System.Windows.Forms.Padding(12)
-        Me.gbxFiltros.Size = New System.Drawing.Size(426, 715)
+        Me.gbxFiltros.Size = New System.Drawing.Size(572, 715)
         Me.gbxFiltros.TabIndex = 1
         Me.gbxFiltros.TabStop = False
         Me.gbxFiltros.Text = "2. Construir Filtro"
@@ -139,7 +139,7 @@ Partial Class frmFiltroAvanzado
         Me.TableLayoutPanel1.RowCount = 2
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle())
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-        Me.TableLayoutPanel1.Size = New System.Drawing.Size(402, 672)
+        Me.TableLayoutPanel1.Size = New System.Drawing.Size(548, 672)
         Me.TableLayoutPanel1.TabIndex = 0
         '
         'pnlFiltroBotones
@@ -147,21 +147,21 @@ Partial Class frmFiltroAvanzado
         Me.pnlFiltroBotones.Anchor = System.Windows.Forms.AnchorStyles.None
         Me.pnlFiltroBotones.AutoSize = True
         Me.TableLayoutPanel1.SetColumnSpan(Me.pnlFiltroBotones, 2)
-        Me.pnlFiltroBotones.Controls.Add(Me.btnAgregar)
+        Me.pnlFiltroBotones.Controls.Add(Me.btnFiltrar)
         Me.pnlFiltroBotones.Controls.Add(Me.btnLimpiar)
-        Me.pnlFiltroBotones.Location = New System.Drawing.Point(96, 3)
+        Me.pnlFiltroBotones.Location = New System.Drawing.Point(169, 3)
         Me.pnlFiltroBotones.Name = "pnlFiltroBotones"
         Me.pnlFiltroBotones.Size = New System.Drawing.Size(210, 37)
         Me.pnlFiltroBotones.TabIndex = 2
         '
-        'btnAgregar
+        'btnFiltrar
         '
-        Me.btnAgregar.Location = New System.Drawing.Point(3, 3)
-        Me.btnAgregar.Name = "btnAgregar"
-        Me.btnAgregar.Size = New System.Drawing.Size(99, 31)
-        Me.btnAgregar.TabIndex = 0
-        Me.btnAgregar.Text = "Agregar"
-        Me.btnAgregar.UseVisualStyleBackColor = True
+        Me.btnFiltrar.Location = New System.Drawing.Point(3, 3)
+        Me.btnFiltrar.Name = "btnFiltrar"
+        Me.btnFiltrar.Size = New System.Drawing.Size(99, 31)
+        Me.btnFiltrar.TabIndex = 0
+        Me.btnFiltrar.Text = "Filtrar"
+        Me.btnFiltrar.UseVisualStyleBackColor = True
         '
         'btnLimpiar
         '
@@ -179,7 +179,7 @@ Partial Class frmFiltroAvanzado
         Me.lstColumnas.ItemHeight = 20
         Me.lstColumnas.Location = New System.Drawing.Point(3, 46)
         Me.lstColumnas.Name = "lstColumnas"
-        Me.lstColumnas.Size = New System.Drawing.Size(195, 623)
+        Me.lstColumnas.Size = New System.Drawing.Size(268, 623)
         Me.lstColumnas.TabIndex = 0
         '
         'lstValores
@@ -187,10 +187,10 @@ Partial Class frmFiltroAvanzado
         Me.lstValores.Dock = System.Windows.Forms.DockStyle.Fill
         Me.lstValores.FormattingEnabled = True
         Me.lstValores.ItemHeight = 20
-        Me.lstValores.Location = New System.Drawing.Point(204, 46)
+        Me.lstValores.Location = New System.Drawing.Point(277, 46)
         Me.lstValores.Name = "lstValores"
         Me.lstValores.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended
-        Me.lstValores.Size = New System.Drawing.Size(195, 623)
+        Me.lstValores.Size = New System.Drawing.Size(268, 623)
         Me.lstValores.TabIndex = 1
         '
         'gbxOrigenDatos
@@ -200,7 +200,7 @@ Partial Class frmFiltroAvanzado
         Me.gbxOrigenDatos.Location = New System.Drawing.Point(12, 12)
         Me.gbxOrigenDatos.Name = "gbxOrigenDatos"
         Me.gbxOrigenDatos.Padding = New System.Windows.Forms.Padding(12)
-        Me.gbxOrigenDatos.Size = New System.Drawing.Size(426, 198)
+        Me.gbxOrigenDatos.Size = New System.Drawing.Size(572, 198)
         Me.gbxOrigenDatos.TabIndex = 0
         Me.gbxOrigenDatos.TabStop = False
         Me.gbxOrigenDatos.Text = "1. Origen de Datos"
@@ -225,7 +225,7 @@ Partial Class frmFiltroAvanzado
         Me.TableLayoutPanel2.RowStyles.Add(New System.Windows.Forms.RowStyle())
         Me.TableLayoutPanel2.RowStyles.Add(New System.Windows.Forms.RowStyle())
         Me.TableLayoutPanel2.RowStyles.Add(New System.Windows.Forms.RowStyle())
-        Me.TableLayoutPanel2.Size = New System.Drawing.Size(402, 155)
+        Me.TableLayoutPanel2.Size = New System.Drawing.Size(548, 155)
         Me.TableLayoutPanel2.TabIndex = 0
         '
         'cmbOrigenDatos
@@ -235,13 +235,13 @@ Partial Class frmFiltroAvanzado
         Me.cmbOrigenDatos.FormattingEnabled = True
         Me.cmbOrigenDatos.Location = New System.Drawing.Point(69, 3)
         Me.cmbOrigenDatos.Name = "cmbOrigenDatos"
-        Me.cmbOrigenDatos.Size = New System.Drawing.Size(330, 28)
+        Me.cmbOrigenDatos.Size = New System.Drawing.Size(476, 28)
         Me.cmbOrigenDatos.TabIndex = 0
         '
         'dtpFechaInicio
         '
         Me.dtpFechaInicio.Anchor = System.Windows.Forms.AnchorStyles.Left
-        Me.dtpFechaInicio.Format = System.Windows.Forms.DateTimePickerFormat.Short
+        Me.dtpFechaInicio.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
         Me.dtpFechaInicio.Location = New System.Drawing.Point(69, 37)
         Me.dtpFechaInicio.Name = "dtpFechaInicio"
         Me.dtpFechaInicio.Size = New System.Drawing.Size(132, 26)
@@ -250,7 +250,7 @@ Partial Class frmFiltroAvanzado
         'dtpFechaFin
         '
         Me.dtpFechaFin.Anchor = System.Windows.Forms.AnchorStyles.Left
-        Me.dtpFechaFin.Format = System.Windows.Forms.DateTimePickerFormat.Short
+        Me.dtpFechaFin.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
         Me.dtpFechaFin.Location = New System.Drawing.Point(69, 69)
         Me.dtpFechaFin.Name = "dtpFechaFin"
         Me.dtpFechaFin.Size = New System.Drawing.Size(132, 26)
@@ -259,11 +259,11 @@ Partial Class frmFiltroAvanzado
         'btnCargar
         '
         Me.btnCargar.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnCargar.Location = New System.Drawing.Point(293, 101)
+        Me.btnCargar.Location = New System.Drawing.Point(69, 101)
         Me.btnCargar.Name = "btnCargar"
-        Me.btnCargar.Size = New System.Drawing.Size(106, 35)
+        Me.btnCargar.Size = New System.Drawing.Size(476, 35)
         Me.btnCargar.TabIndex = 3
-        Me.btnCargar.Text = "Cargar"
+        Me.btnCargar.Text = "Cargar Origen"
         Me.btnCargar.UseVisualStyleBackColor = True
         '
         'Label1
@@ -303,7 +303,7 @@ Partial Class frmFiltroAvanzado
         Me.pnlDerecho.Location = New System.Drawing.Point(0, 0)
         Me.pnlDerecho.Name = "pnlDerecho"
         Me.pnlDerecho.Padding = New System.Windows.Forms.Padding(12)
-        Me.pnlDerecho.Size = New System.Drawing.Size(1470, 937)
+        Me.pnlDerecho.Size = New System.Drawing.Size(1324, 937)
         Me.pnlDerecho.TabIndex = 0
         '
         'TableLayoutPanel3
@@ -322,7 +322,7 @@ Partial Class frmFiltroAvanzado
         Me.TableLayoutPanel3.RowStyles.Add(New System.Windows.Forms.RowStyle())
         Me.TableLayoutPanel3.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
         Me.TableLayoutPanel3.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 150.0!))
-        Me.TableLayoutPanel3.Size = New System.Drawing.Size(1446, 913)
+        Me.TableLayoutPanel3.Size = New System.Drawing.Size(1300, 913)
         Me.TableLayoutPanel3.TabIndex = 8
         '
         'gbxBusquedaGlobal
@@ -332,7 +332,7 @@ Partial Class frmFiltroAvanzado
         Me.gbxBusquedaGlobal.Location = New System.Drawing.Point(3, 3)
         Me.gbxBusquedaGlobal.Name = "gbxBusquedaGlobal"
         Me.gbxBusquedaGlobal.Padding = New System.Windows.Forms.Padding(12)
-        Me.gbxBusquedaGlobal.Size = New System.Drawing.Size(1440, 79)
+        Me.gbxBusquedaGlobal.Size = New System.Drawing.Size(1294, 79)
         Me.gbxBusquedaGlobal.TabIndex = 0
         Me.gbxBusquedaGlobal.TabStop = False
         Me.gbxBusquedaGlobal.Text = "Búsqueda Rápida en todos los campos de texto"
@@ -342,7 +342,7 @@ Partial Class frmFiltroAvanzado
         Me.txtBusquedaGlobal.Dock = System.Windows.Forms.DockStyle.Fill
         Me.txtBusquedaGlobal.Location = New System.Drawing.Point(12, 31)
         Me.txtBusquedaGlobal.Name = "txtBusquedaGlobal"
-        Me.txtBusquedaGlobal.Size = New System.Drawing.Size(1416, 26)
+        Me.txtBusquedaGlobal.Size = New System.Drawing.Size(1270, 26)
         Me.txtBusquedaGlobal.TabIndex = 0
         '
         'pnlAcciones
@@ -352,7 +352,7 @@ Partial Class frmFiltroAvanzado
         Me.pnlAcciones.Dock = System.Windows.Forms.DockStyle.Fill
         Me.pnlAcciones.Location = New System.Drawing.Point(3, 88)
         Me.pnlAcciones.Name = "pnlAcciones"
-        Me.pnlAcciones.Size = New System.Drawing.Size(1440, 50)
+        Me.pnlAcciones.Size = New System.Drawing.Size(1294, 1)
         Me.pnlAcciones.TabIndex = 7
         '
         'flpAcciones
@@ -373,7 +373,7 @@ Partial Class frmFiltroAvanzado
         Me.flpAcciones.Location = New System.Drawing.Point(0, 0)
         Me.flpAcciones.Name = "flpAcciones"
         Me.flpAcciones.Padding = New System.Windows.Forms.Padding(5)
-        Me.flpAcciones.Size = New System.Drawing.Size(1440, 50)
+        Me.flpAcciones.Size = New System.Drawing.Size(1294, 1)
         Me.flpAcciones.TabIndex = 0
         '
         'btnExportarExcel
@@ -419,7 +419,7 @@ Partial Class frmFiltroAvanzado
         '
         Me.Separator1.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.Separator1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
-        Me.Separator1.Location = New System.Drawing.Point(553, 5)
+        Me.Separator1.Location = New System.Drawing.Point(553, 8)
         Me.Separator1.Name = "Separator1"
         Me.Separator1.Size = New System.Drawing.Size(3, 37)
         Me.Separator1.TabIndex = 15
@@ -491,9 +491,9 @@ Partial Class frmFiltroAvanzado
         '
         Me.Panel1.Controls.Add(Me.dgvDatos)
         Me.Panel1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.Panel1.Location = New System.Drawing.Point(3, 144)
+        Me.Panel1.Location = New System.Drawing.Point(3, 94)
         Me.Panel1.Name = "Panel1"
-        Me.Panel1.Size = New System.Drawing.Size(1440, 616)
+        Me.Panel1.Size = New System.Drawing.Size(1294, 666)
         Me.Panel1.TabIndex = 5
         '
         'dgvDatos
@@ -511,7 +511,7 @@ Partial Class frmFiltroAvanzado
         Me.dgvDatos.RowHeadersWidth = 51
         Me.dgvDatos.RowTemplate.Height = 24
         Me.dgvDatos.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgvDatos.Size = New System.Drawing.Size(1440, 616)
+        Me.dgvDatos.Size = New System.Drawing.Size(1294, 666)
         Me.dgvDatos.TabIndex = 4
         '
         'Panel2
@@ -520,7 +520,7 @@ Partial Class frmFiltroAvanzado
         Me.Panel2.Dock = System.Windows.Forms.DockStyle.Fill
         Me.Panel2.Location = New System.Drawing.Point(3, 766)
         Me.Panel2.Name = "Panel2"
-        Me.Panel2.Size = New System.Drawing.Size(1440, 144)
+        Me.Panel2.Size = New System.Drawing.Size(1294, 144)
         Me.Panel2.TabIndex = 6
         '
         'flpChips
@@ -530,7 +530,7 @@ Partial Class frmFiltroAvanzado
         Me.flpChips.Location = New System.Drawing.Point(0, 0)
         Me.flpChips.Name = "flpChips"
         Me.flpChips.Padding = New System.Windows.Forms.Padding(6)
-        Me.flpChips.Size = New System.Drawing.Size(1440, 144)
+        Me.flpChips.Size = New System.Drawing.Size(1294, 144)
         Me.flpChips.TabIndex = 2
         '
         'frmFiltroAvanzado
@@ -576,7 +576,7 @@ Partial Class frmFiltroAvanzado
     Friend WithEvents gbxFiltros As GroupBox
     Friend WithEvents TableLayoutPanel1 As TableLayoutPanel
     Friend WithEvents pnlFiltroBotones As FlowLayoutPanel
-    Friend WithEvents btnAgregar As Button
+    Friend WithEvents btnFiltrar As Button
     Friend WithEvents btnLimpiar As Button
     Friend WithEvents lstColumnas As ListBox
     Friend WithEvents lstValores As ListBox
