@@ -18,12 +18,14 @@ Partial Class frmDashboard
     Private components As System.ComponentModel.IContainer
 
     'NOTE: The following procedure is required by the Windows Form Designer
-    'It can be modified using the Windows Form Designer.
+    'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.panelNavegacion = New System.Windows.Forms.Panel()
         Me.btnConfiguracion = New System.Windows.Forms.Button()
+        ' --- DECLARACIÓN DEL NUEVO BOTÓN ---
+        Me.btnAnalisis = New System.Windows.Forms.Button()
         Me.btnReportes = New System.Windows.Forms.Button()
         Me.btnViaticos = New System.Windows.Forms.Button()
         Me.btnImportacion = New System.Windows.Forms.Button()
@@ -46,6 +48,8 @@ Partial Class frmDashboard
         Me.panelNavegacion.AutoScroll = True
         Me.panelNavegacion.BackColor = System.Drawing.Color.FromArgb(CType(CType(51, Byte), Integer), CType(CType(51, Byte), Integer), CType(CType(76, Byte), Integer))
         Me.panelNavegacion.Controls.Add(Me.btnConfiguracion)
+        ' --- AÑADIR EL NUEVO BOTÓN AL PANEL DE NAVEGACIÓN ---
+        Me.panelNavegacion.Controls.Add(Me.btnAnalisis)
         Me.panelNavegacion.Controls.Add(Me.btnReportes)
         Me.panelNavegacion.Controls.Add(Me.btnViaticos)
         Me.panelNavegacion.Controls.Add(Me.btnImportacion)
@@ -70,7 +74,7 @@ Partial Class frmDashboard
         Me.btnConfiguracion.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnConfiguracion.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnConfiguracion.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnConfiguracion.Location = New System.Drawing.Point(0, 950)
+        Me.btnConfiguracion.Location = New System.Drawing.Point(0, 1042) ' Ajustar la posición
         Me.btnConfiguracion.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnConfiguracion.Name = "btnConfiguracion"
         Me.btnConfiguracion.Padding = New System.Windows.Forms.Padding(18, 0, 0, 0)
@@ -79,6 +83,23 @@ Partial Class frmDashboard
         Me.btnConfiguracion.Text = "   ⚙️ Configuración"
         Me.btnConfiguracion.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.btnConfiguracion.UseVisualStyleBackColor = True
+        '
+        'btnAnalisis
+        '
+        Me.btnAnalisis.Dock = System.Windows.Forms.DockStyle.Top
+        Me.btnAnalisis.FlatAppearance.BorderSize = 0
+        Me.btnAnalisis.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnAnalisis.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnAnalisis.ForeColor = System.Drawing.Color.Gainsboro
+        Me.btnAnalisis.Location = New System.Drawing.Point(0, 950) ' Ubicado antes de Configuración
+        Me.btnAnalisis.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnAnalisis.Name = "btnAnalisis"
+        Me.btnAnalisis.Padding = New System.Windows.Forms.Padding(18, 0, 0, 0)
+        Me.btnAnalisis.Size = New System.Drawing.Size(330, 92)
+        Me.btnAnalisis.TabIndex = 12 ' Nuevo TabIndex
+        Me.btnAnalisis.Text = "   📊 Análisis"
+        Me.btnAnalisis.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnAnalisis.UseVisualStyleBackColor = True
         '
         'btnReportes
         '
@@ -311,5 +332,7 @@ Partial Class frmDashboard
     Friend WithEvents btnImportacion As Button
     Friend WithEvents lblSemanaActual As Label
     Friend WithEvents btnNomenclaturas As Button
-    Friend WithEvents btnRenombrarPDFs As Button ' --> DECLARACIÓN DEL BOTÓN
+    Friend WithEvents btnRenombrarPDFs As Button
+    ' --- DECLARACIÓN FINAL DEL NUEVO BOTÓN ---
+    Friend WithEvents btnAnalisis As Button
 End Class

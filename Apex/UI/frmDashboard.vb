@@ -9,6 +9,7 @@ Public Class frmDashboard
     Private currentBtn As Button
     Private Shadows activeForm As Form
 
+    ' Instancias de formularios existentes
     Private _funcionarioBuscarInstancia As frmFuncionarioBuscar
     Private _filtroAvanzadoInstancia As frmFiltroAvanzado
     Private _gestionInstancia As frmGestion
@@ -18,7 +19,10 @@ Public Class frmDashboard
     Private _gestionNomenclaturasInstancia As frmGestionNomenclaturas
     Private _renombrarPDFInstancia As frmRenombrarPDF
     Private _reporteNovedadesInstancia As frmReporteNovedades
-    Private _configuracionInstancia As frmConfiguracion ' --> INSTANCIA PARA EL FORM DE CONFIGURACIÓN
+    Private _configuracionInstancia As frmConfiguracion
+
+    ' --- NUEVA INSTANCIA PARA EL FORMULARIO DE ANÁLISIS ---
+    Private _analisisEstacionalidadInstancia As frmAnalisisEstacionalidad
 
     Public Sub New()
         InitializeComponent()
@@ -32,6 +36,8 @@ Public Class frmDashboard
         AddHandler btnImportacion.Click, AddressOf ActivateButton
         AddHandler btnViaticos.Click, AddressOf ActivateButton
         AddHandler btnReportes.Click, AddressOf ActivateButton
+        ' --- AÑADIR EL MANEJADOR PARA EL NUEVO BOTÓN ---
+        AddHandler btnAnalisis.Click, AddressOf ActivateButton
         AddHandler btnConfiguracion.Click, AddressOf ActivateButton
 
         AddHandler Me.Shown, AddressOf frmDashboard_Shown
@@ -116,19 +122,23 @@ Public Class frmDashboard
                 AbrirFormEnPanel(_viaticosInstancia)
 
             Case "btnConfiguracion"
-                ' --- CAMBIO AQUÍ: ABRIR DENTRO DEL PANEL ---
                 If _configuracionInstancia Is Nothing OrElse _configuracionInstancia.IsDisposed Then
                     _configuracionInstancia = New frmConfiguracion()
                 End If
                 AbrirFormEnPanel(_configuracionInstancia)
-                ' --- FIN DEL CAMBIO ---
+
             Case "btnReportes"
-                ' --- MODIFICACIÓN AQUÍ ---
-                ' Ahora el botón de reportes abrirá el nuevo formulario de novedades
                 If _reporteNovedadesInstancia Is Nothing OrElse _reporteNovedadesInstancia.IsDisposed Then
                     _reporteNovedadesInstancia = New frmReporteNovedades()
                 End If
                 AbrirFormEnPanel(_reporteNovedadesInstancia)
+
+            ' --- NUEVO CASE PARA EL BOTÓN DE ANÁLISIS ---
+            Case "btnAnalisis"
+                If _analisisEstacionalidadInstancia Is Nothing OrElse _analisisEstacionalidadInstancia.IsDisposed Then
+                    _analisisEstacionalidadInstancia = New frmAnalisisEstacionalidad()
+                End If
+                AbrirFormEnPanel(_analisisEstacionalidadInstancia)
                 ' --- FIN DE LA MODIFICACIÓN ---
         End Select
     End Sub
@@ -159,6 +169,5 @@ Public Class frmDashboard
         childForm.BringToFront()
         childForm.Show()
     End Sub
-
 
 End Class
