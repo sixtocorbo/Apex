@@ -189,6 +189,9 @@
     <Compile Include="Data\Arma.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
+    <Compile Include="Data\AuditoriaCambios.vb">
+      <DependentUpon>Model1.tt</DependentUpon>
+    </Compile>
     <Compile Include="Data\BajaDeFuncionarioDetalle.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
@@ -461,6 +464,12 @@
       <DependentUpon>frmAsistenteImportacion.vb</DependentUpon>
     </Compile>
     <Compile Include="UI\frmAsistenteImportacion.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\frmAuditoriaViewer.Designer.vb">
+      <DependentUpon>frmAuditoriaViewer.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmAuditoriaViewer.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="UI\frmCambiarEstadoNotificacion.Designer.vb">

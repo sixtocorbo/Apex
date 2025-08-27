@@ -99,6 +99,7 @@ Partial Class frmFuncionarioCrear
         Me.chkProcesado = New System.Windows.Forms.CheckBox()
         Me.chkSeparado = New System.Windows.Forms.CheckBox()
         Me.TabControlMain = New System.Windows.Forms.TabControl()
+        Me.btnAuditoria = New System.Windows.Forms.Button()
         Me.FlowLayoutPanel1.SuspendLayout()
         Me.TabPageEstadosTransitorios.SuspendLayout()
         Me.TableLayoutPanelEstados.SuspendLayout()
@@ -122,6 +123,7 @@ Partial Class frmFuncionarioCrear
         Me.FlowLayoutPanel1.AutoSize = True
         Me.FlowLayoutPanel1.Controls.Add(Me.btnGuardar)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnCancelar)
+        Me.FlowLayoutPanel1.Controls.Add(Me.btnAuditoria)
         Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Bottom
         Me.FlowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
         Me.FlowLayoutPanel1.Location = New System.Drawing.Point(0, 624)
@@ -1054,6 +1056,18 @@ Partial Class frmFuncionarioCrear
         Me.TabControlMain.Size = New System.Drawing.Size(1176, 624)
         Me.TabControlMain.TabIndex = 2
         '
+        'btnAuditoria
+        '
+        Me.btnAuditoria.AutoSize = True
+        Me.btnAuditoria.Location = New System.Drawing.Point(681, 13)
+        Me.btnAuditoria.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnAuditoria.Name = "btnAuditoria"
+        Me.btnAuditoria.Padding = New System.Windows.Forms.Padding(15, 3, 15, 3)
+        Me.btnAuditoria.Size = New System.Drawing.Size(153, 52)
+        Me.btnAuditoria.TabIndex = 18
+        Me.btnAuditoria.Text = "Auditoria"
+        Me.btnAuditoria.UseVisualStyleBackColor = True
+        '
         'frmFuncionarioCrear
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -1169,4 +1183,5 @@ Partial Class frmFuncionarioCrear
     Friend WithEvents lblCredencial As Label
     Friend WithEvents txtCredencial As TextBox
     Friend WithEvents chkEstudia As CheckBox
+    Friend WithEvents btnAuditoria As Button
 End Class

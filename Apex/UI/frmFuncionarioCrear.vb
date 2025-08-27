@@ -70,12 +70,21 @@ Public Class frmFuncionarioCrear
         If _funcionario IsNot Nothing AndAlso _funcionario.EstadoTransitorio IsNot Nothing Then
             For Each et In _funcionario.EstadoTransitorio
                 Select Case et.TipoEstadoTransitorioId
+            ' --- ESTADOS MANUALES ---
                     Case 1 : _uow.Context.Entry(et).Reference(Function(x) x.DesignacionDetalle).Load()
                     Case 2 : _uow.Context.Entry(et).Reference(Function(x) x.EnfermedadDetalle).Load()
                     Case 3 : _uow.Context.Entry(et).Reference(Function(x) x.SancionDetalle).Load()
                     Case 4 : _uow.Context.Entry(et).Reference(Function(x) x.OrdenCincoDetalle).Load()
                     Case 5 : _uow.Context.Entry(et).Reference(Function(x) x.RetenDetalle).Load()
                     Case 6 : _uow.Context.Entry(et).Reference(Function(x) x.SumarioDetalle).Load()
+                    Case 21 : _uow.Context.Entry(et).Reference(Function(x) x.TrasladoDetalle).Load()
+
+            ' --- EVENTOS AUTOMÁTICOS ---
+                    Case 19 : _uow.Context.Entry(et).Reference(Function(x) x.BajaDeFuncionarioDetalle).Load()
+                    Case 20 : _uow.Context.Entry(et).Reference(Function(x) x.CambioDeCargoDetalle).Load()
+                    Case 22 : _uow.Context.Entry(et).Reference(Function(x) x.ReactivacionDeFuncionarioDetalle).Load()
+                    Case 23 : _uow.Context.Entry(et).Reference(Function(x) x.SeparacionDelCargoDetalle).Load()
+                    Case 24 : _uow.Context.Entry(et).Reference(Function(x) x.InicioDeProcesamientoDetalle).Load()
                 End Select
             Next
         End If
@@ -201,6 +210,30 @@ Public Class frmFuncionarioCrear
                     fh = e.SumarioDetalle.FechaHasta
                     obs = e.SumarioDetalle.Observaciones
                     If Not String.IsNullOrWhiteSpace(e.SumarioDetalle.Expediente) Then det = $"Expediente: {e.SumarioDetalle.Expediente}"
+                End If
+            Case 19 ' Baja
+                If e.BajaDeFuncionarioDetalle IsNot Nothing Then
+                    fd = e.BajaDeFuncionarioDetalle.FechaDesde : obs = e.BajaDeFuncionarioDetalle.Observaciones
+                End If
+            Case 20 ' Cambio de Cargo
+                If e.CambioDeCargoDetalle IsNot Nothing Then
+                    fd = e.CambioDeCargoDetalle.FechaDesde : obs = e.CambioDeCargoDetalle.Observaciones
+                End If
+            Case 21 ' Traslado
+                If e.TrasladoDetalle IsNot Nothing Then
+                    fd = e.TrasladoDetalle.FechaDesde : obs = e.TrasladoDetalle.Observaciones
+                End If
+            Case 22 ' Reactivación
+                If e.ReactivacionDeFuncionarioDetalle IsNot Nothing Then
+                    fd = e.ReactivacionDeFuncionarioDetalle.FechaDesde : obs = e.ReactivacionDeFuncionarioDetalle.Observaciones
+                End If
+            Case 23 ' Separación del Cargo
+                If e.SeparacionDelCargoDetalle IsNot Nothing Then
+                    fd = e.SeparacionDelCargoDetalle.FechaDesde : obs = e.SeparacionDelCargoDetalle.Observaciones
+                End If
+            Case 24 ' Inicio de Procesamiento
+                If e.InicioDeProcesamientoDetalle IsNot Nothing Then
+                    fd = e.InicioDeProcesamientoDetalle.FechaDesde : obs = e.InicioDeProcesamientoDetalle.Observaciones
                 End If
         End Select
 
@@ -742,6 +775,18 @@ Public Class frmFuncionarioCrear
                 _rutaFotoSeleccionada = ofd.FileName
                 pbFoto.Image = Image.FromFile(ofd.FileName)
             End If
+        End Using
+    End Sub
+
+    Private Sub btnAuditoria_Click(sender As Object, e As EventArgs) Handles btnAuditoria.Click
+        If _modo = ModoFormulario.Crear Then
+            MessageBox.Show("Debe guardar el funcionario antes de poder ver su historial de cambios.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return
+        End If
+
+        ' Usamos el ID del funcionario para abrir el visor
+        Using frm As New frmAuditoriaViewer(_funcionario.Id.ToString())
+            frm.ShowDialog(Me)
         End Using
     End Sub
 End Class
