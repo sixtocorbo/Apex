@@ -26,6 +26,8 @@ Partial Public Class ApexEntities
 
     Public Overridable Property AreaTrabajo() As DbSet(Of AreaTrabajo)
     Public Overridable Property Arma() As DbSet(Of Arma)
+    Public Overridable Property BajaDeFuncionarioDetalle() As DbSet(Of BajaDeFuncionarioDetalle)
+    Public Overridable Property CambioDeCargoDetalle() As DbSet(Of CambioDeCargoDetalle)
     Public Overridable Property Cargo() As DbSet(Of Cargo)
     Public Overridable Property CategoriaAusencia() As DbSet(Of CategoriaAusencia)
     Public Overridable Property DesignacionDetalle() As DbSet(Of DesignacionDetalle)
@@ -52,6 +54,7 @@ Partial Public Class ApexEntities
     Public Overridable Property HistoricoPresentismo() As DbSet(Of HistoricoPresentismo)
     Public Overridable Property HistoricoViatico() As DbSet(Of HistoricoViatico)
     Public Overridable Property Horario() As DbSet(Of Horario)
+    Public Overridable Property InicioDeProcesamientoDetalle() As DbSet(Of InicioDeProcesamientoDetalle)
     Public Overridable Property MapPoliciaFunc() As DbSet(Of MapPoliciaFunc)
     Public Overridable Property Movimiento() As DbSet(Of Movimiento)
     Public Overridable Property NivelEstudio() As DbSet(Of NivelEstudio)
@@ -64,6 +67,7 @@ Partial Public Class ApexEntities
     Public Overridable Property NovedadGenerada() As DbSet(Of NovedadGenerada)
     Public Overridable Property OrdenCincoDetalle() As DbSet(Of OrdenCincoDetalle)
     Public Overridable Property PuestoTrabajo() As DbSet(Of PuestoTrabajo)
+    Public Overridable Property ReactivacionDeFuncionarioDetalle() As DbSet(Of ReactivacionDeFuncionarioDetalle)
     Public Overridable Property RegimenAlternancia() As DbSet(Of RegimenAlternancia)
     Public Overridable Property RegimenDetalle() As DbSet(Of RegimenDetalle)
     Public Overridable Property RegimenTrabajo() As DbSet(Of RegimenTrabajo)
@@ -72,6 +76,7 @@ Partial Public Class ApexEntities
     Public Overridable Property SancionDetalle() As DbSet(Of SancionDetalle)
     Public Overridable Property Seccion() As DbSet(Of Seccion)
     Public Overridable Property Semana() As DbSet(Of Semana)
+    Public Overridable Property SeparacionDelCargoDetalle() As DbSet(Of SeparacionDelCargoDetalle)
     Public Overridable Property SumarioDetalle() As DbSet(Of SumarioDetalle)
     Public Overridable Property sysdiagrams() As DbSet(Of sysdiagrams)
     Public Overridable Property TipoEstadoTransitorio() As DbSet(Of TipoEstadoTransitorio)
@@ -79,6 +84,7 @@ Partial Public Class ApexEntities
     Public Overridable Property TipoLicencia() As DbSet(Of TipoLicencia)
     Public Overridable Property TipoNotificacion() As DbSet(Of TipoNotificacion)
     Public Overridable Property TipoViatico() As DbSet(Of TipoViatico)
+    Public Overridable Property TrasladoDetalle() As DbSet(Of TrasladoDetalle)
     Public Overridable Property Turno() As DbSet(Of Turno)
     Public Overridable Property Usuario() As DbSet(Of Usuario)
     Public Overridable Property vw_EstadosTransitoriosCompletos() As DbSet(Of vw_EstadosTransitoriosCompletos)
@@ -172,10 +178,22 @@ Partial Public Class ApexEntities
         Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_DeleteFuncionario", funcionarioIdParameter)
     End Function
 
+    Public Overridable Function usp_LimpiarDatosDeApex() As Integer
+        Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_LimpiarDatosDeApex")
+    End Function
+
+    Public Overridable Function usp_MigrarDotacionesCompletas() As Integer
+        Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_MigrarDotacionesCompletas")
+    End Function
+
     Public Overridable Function usp_PresenciaFecha_Apex(fecha As Nullable(Of Date)) As Integer
         Dim fechaParameter As ObjectParameter = If(fecha.HasValue, New ObjectParameter("Fecha", fecha), New ObjectParameter("Fecha", GetType(Date)))
 
         Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_PresenciaFecha_Apex", fechaParameter)
+    End Function
+
+    Public Overridable Function usp_ProcesarEstadoNotificaciones() As Integer
+        Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_ProcesarEstadoNotificaciones")
     End Function
 
 End Class

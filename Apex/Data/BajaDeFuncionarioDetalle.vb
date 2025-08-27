@@ -10,14 +10,12 @@
 Imports System
 Imports System.Collections.Generic
 
-Partial Public Class vw_FuncionarioEstadosConsolidados
-    Public Property Id As Nullable(Of Integer)
-    Public Property FuncionarioId As Integer
-    Public Property TipoEstadoNombre As String
-    Public Property FechaDesde As Nullable(Of Date)
+Partial Public Class BajaDeFuncionarioDetalle
+    Public Property EstadoTransitorioId As Integer
+    Public Property FechaDesde As Date
     Public Property FechaHasta As Nullable(Of Date)
     Public Property Observaciones As String
-    Public Property Origen As String
-    Public Property TipoEstadoTransitorioId As Integer
+
+    Public Overridable Property EstadoTransitorio As EstadoTransitorio
 
 End Class
