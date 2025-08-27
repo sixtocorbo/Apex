@@ -4,8 +4,6 @@ Imports System.Data.Entity
 Imports System.Linq
 Imports System.Linq.Expressions
 Imports System.Threading.Tasks
-Imports Apex.Data ' Importación añadida para asegurar la visibilidad de todas las entidades
-
 Public Module ConsultasGenericas
 
     Public Enum TipoOrigenDatos
@@ -32,7 +30,7 @@ Public Module ConsultasGenericas
                         Throw New ArgumentNullException("Las fechas de inicio y fin son requeridas para EstadosTransitorios.")
                     End If
 
-                    ' Lógica para EstadosTransitorios (sin cambios)
+                    ' Lógica para EstadosTransitorios (sin cambios, ya era correcta)
                     Dim sanciones = uow.Repository(Of SancionDetalle)().GetAll().
                         Include("EstadoTransitorio.Funcionario").
                         Where(Function(det) det.FechaDesde <= fechaFin.Value AndAlso (Not det.FechaHasta.HasValue OrElse det.FechaHasta.Value >= fechaInicio.Value)).
@@ -119,9 +117,12 @@ Public Module ConsultasGenericas
                     dt = resultadoUnion.ToDataTable()
 
                 Case TipoOrigenDatos.Notificaciones
+                    If Not fechaInicio.HasValue OrElse Not fechaFin.HasValue Then
+                        Throw New ArgumentNullException("Las fechas de inicio y fin son requeridas para Notificaciones.")
+                    End If
                     Dim notificacionService = New NotificacionService(uow)
                     Dim notificaciones = Await notificacionService.GetAllConDetallesAsync()
-                    dt = notificaciones.Where(Function(n) n.FechaProgramada.Date >= fechaInicio AndAlso n.FechaProgramada.Date <= fechaFin).ToList().ToDataTable()
+                    dt = notificaciones.Where(Function(n) n.FechaProgramada.Date >= fechaInicio.Value AndAlso n.FechaProgramada.Date <= fechaFin.Value).ToList().ToDataTable()
 
                 Case TipoOrigenDatos.Licencias
                     Dim licenciaService = New LicenciaService(uow)
@@ -139,38 +140,68 @@ Public Module ConsultasGenericas
                     dt = funcionarios.ToDataTable()
 
                 Case TipoOrigenDatos.Auditoria
+                    ' --- SECCIÓN CORREGIDA Y OPTIMIZADA ---
+                    ' NOTA: La tabla 'AuditoriaCambios' no se encontró en el script SQL proporcionado.
+                    ' Se asume que esta entidad existe en tu modelo de datos.
                     Dim queryAuditoria = uow.Context.Set(Of AuditoriaCambios)().AsQueryable()
+
                     If filtros IsNot Nothing AndAlso filtros.Any() Then
                         queryAuditoria = ApplyAdvancedFilters(queryAuditoria, filtros)
                     End If
 
-                    Dim queryEnriquecida = From aud In queryAuditoria
-                                           Group Join func In uow.Context.Set(Of Funcionario)()
-                                               On aud.RegistroId Equals func.Id.ToString() Into gjFunc = Group
-                                           From f In gjFunc.DefaultIfEmpty()
-                                           Group Join et In uow.Context.Set(Of EstadoTransitorio)().Include("Funcionario")
-                                               On aud.RegistroId Equals et.Id.ToString() Into gjEt = Group
-                                           From estadoT In gjEt.DefaultIfEmpty()
-                                           Group Join lic In uow.Context.Set(Of Licencia)().Include("Funcionario")
-                                               On aud.RegistroId Equals lic.Id.ToString() Into gjLic = Group
-                                           From licencia In gjLic.DefaultIfEmpty()
-                                           Select New With {
-                                               aud.Id, aud.FechaHora, aud.UsuarioAccion, aud.TablaNombre, aud.CampoNombre, aud.ValorAnterior, aud.ValorNuevo,
-                                               .Cedula = If(f IsNot Nothing, f.CI,
-                                                         If(estadoT IsNot Nothing AndAlso estadoT.Funcionario IsNot Nothing, estadoT.Funcionario.CI,
-                                                         If(licencia IsNot Nothing AndAlso licencia.Funcionario IsNot Nothing, licencia.Funcionario.CI, Nothing))),
-                                               .NombreCompleto = If(f IsNot Nothing, f.Nombre,
-                                                                If(estadoT IsNot Nothing AndAlso estadoT.Funcionario IsNot Nothing, estadoT.Funcionario.Nombre,
-                                                                If(licencia IsNot Nothing AndAlso licencia.Funcionario IsNot Nothing, licencia.Funcionario.Nombre, Nothing)))
-                                           }
-
                     If fechaInicio.HasValue AndAlso fechaFin.HasValue Then
-                        queryEnriquecida = queryEnriquecida.Where(Function(a) a.FechaHora >= fechaInicio.Value AndAlso a.FechaHora <= fechaFin.Value)
+                        queryAuditoria = queryAuditoria.Where(Function(a) a.FechaHora >= fechaInicio.Value AndAlso a.FechaHora <= fechaFin.Value)
                     End If
 
-                    Dim resultados = Await queryEnriquecida.OrderByDescending(Function(a) a.FechaHora).ToListAsync()
-                    dt = resultados.ToDataTable()
+                    ' Subconsulta para cambios en la tabla 'Funcionario'
+                    Dim auditFuncionarios = From aud In queryAuditoria
+                                            Where aud.TablaNombre = "Funcionario"
+                                            Join f In uow.Context.Set(Of Funcionario)() On aud.RegistroId Equals f.Id.ToString()
+                                            Select New AuditoriaEnriquecida With {
+                                                .Id = aud.Id, .FechaHora = aud.FechaHora, .UsuarioAccion = aud.UsuarioAccion, .TablaNombre = aud.TablaNombre,
+                                                .CampoNombre = aud.CampoNombre, .ValorAnterior = aud.ValorAnterior, .ValorNuevo = aud.ValorNuevo,
+                                                .Cedula = f.CI, .NombreCompleto = f.Nombre
+                                            }
 
+                    ' Subconsulta para cambios en la tabla 'EstadoTransitorio'
+                    Dim auditEstados = From aud In queryAuditoria
+                                       Where aud.TablaNombre = "EstadoTransitorio"
+                                       Join et In uow.Context.Set(Of EstadoTransitorio)().Include("Funcionario") On aud.RegistroId Equals et.Id.ToString()
+                                       Select New AuditoriaEnriquecida With {
+                                           .Id = aud.Id, .FechaHora = aud.FechaHora, .UsuarioAccion = aud.UsuarioAccion, .TablaNombre = aud.TablaNombre,
+                                           .CampoNombre = aud.CampoNombre, .ValorAnterior = aud.ValorAnterior, .ValorNuevo = aud.ValorNuevo,
+                                           .Cedula = If(et.Funcionario IsNot Nothing, et.Funcionario.CI, Nothing),
+                                           .NombreCompleto = If(et.Funcionario IsNot Nothing, et.Funcionario.Nombre, Nothing)
+                                       }
+
+                    ' Subconsulta para cambios en la tabla 'HistoricoLicencia'
+                    ' Se corrige el nombre de la entidad de 'Licencia' a 'HistoricoLicencia'
+                    Dim auditLicencias = From aud In queryAuditoria
+                                         Where aud.TablaNombre = "HistoricoLicencia"
+                                         Join lic In uow.Context.Set(Of HistoricoLicencia)().Include("Funcionario") On aud.RegistroId Equals lic.Id.ToString()
+                                         Select New AuditoriaEnriquecida With {
+                                             .Id = aud.Id, .FechaHora = aud.FechaHora, .UsuarioAccion = aud.UsuarioAccion, .TablaNombre = aud.TablaNombre,
+                                             .CampoNombre = aud.CampoNombre, .ValorAnterior = aud.ValorAnterior, .ValorNuevo = aud.ValorNuevo,
+                                             .Cedula = If(lic.Funcionario IsNot Nothing, lic.Funcionario.CI, Nothing),
+                                             .NombreCompleto = If(lic.Funcionario IsNot Nothing, lic.Funcionario.Nombre, Nothing)
+                                         }
+
+                    ' Subconsulta para el resto de las tablas de auditoría
+                    Dim tablasConJoin = {"Funcionario", "EstadoTransitorio", "HistoricoLicencia"}
+                    Dim auditOtros = From aud In queryAuditoria
+                                     Where Not tablasConJoin.Contains(aud.TablaNombre)
+                                     Select New AuditoriaEnriquecida With {
+                                         .Id = aud.Id, .FechaHora = aud.FechaHora, .UsuarioAccion = aud.UsuarioAccion, .TablaNombre = aud.TablaNombre,
+                                         .CampoNombre = aud.CampoNombre, .ValorAnterior = aud.ValorAnterior, .ValorNuevo = aud.ValorNuevo,
+                                         .Cedula = Nothing, .NombreCompleto = Nothing
+                                     }
+
+                    ' Unir todas las consultas de auditoría en una sola
+                    Dim queryFinal = auditFuncionarios.Union(auditEstados).Union(auditLicencias).Union(auditOtros)
+
+                    Dim resultados = Await queryFinal.OrderByDescending(Function(a) a.FechaHora).ToListAsync()
+                    dt = resultados.ToDataTable()
+                    ' ---------------------------------------------------
                 Case Else
                     Throw New NotImplementedException($"La consulta para el tipo '{tipo.ToString()}' no está implementada.")
             End Select
@@ -202,13 +233,12 @@ Public Module ConsultasGenericas
 
             Dim convertedValue As Object
             Try
-                ' --- LÍNEA CORREGIDA ---
-                ' Se obtiene el tipo subyacente si es Nullable, o el tipo original si no lo es.
                 Dim underlyingType = Nullable.GetUnderlyingType(propertyType)
                 Dim targetType = If(underlyingType IsNot Nothing, underlyingType, propertyType)
-                ' -----------------------
                 convertedValue = Convert.ChangeType(valor, targetType)
             Catch ex As Exception
+                ' Es recomendable registrar este error para facilitar la depuración
+                ' System.Diagnostics.Debug.WriteLine($"Error al convertir valor para filtro: {ex.Message}")
                 Continue For
             End Try
 
@@ -241,5 +271,18 @@ Public Module ConsultasGenericas
 
         Return source
     End Function
+
+    ' Clase auxiliar para unificar los resultados de las consultas de auditoría
+    Private Class AuditoriaEnriquecida
+        Public Property Id As Integer
+        Public Property FechaHora As DateTime
+        Public Property UsuarioAccion As String
+        Public Property TablaNombre As String
+        Public Property CampoNombre As String
+        Public Property ValorAnterior As String
+        Public Property ValorNuevo As String
+        Public Property Cedula As String
+        Public Property NombreCompleto As String
+    End Class
 
 End Module
