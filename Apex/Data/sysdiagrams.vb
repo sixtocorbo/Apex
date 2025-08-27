@@ -10,10 +10,11 @@
 Imports System
 Imports System.Collections.Generic
 
-Partial Public Class usp_MigrarArmasYAsignaciones_Result
-    Public Property ArmasInsertadas As Nullable(Of Integer)
-    Public Property AsignacionesInsertadas As Nullable(Of Integer)
-    Public Property TotalArmas As Nullable(Of Integer)
-    Public Property TotalAsignaciones As Nullable(Of Integer)
+Partial Public Class sysdiagrams
+    Public Property name As String
+    Public Property principal_id As Integer
+    Public Property diagram_id As Integer
+    Public Property version As Nullable(Of Integer)
+    Public Property definition As Byte()
 
 End Class

@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="bb8b44f29fd94d5983c486017ad23990" Name="Diagram1" ZoomLevel="64">
+      <Diagram DiagramId="373467259e2040bc8c48be4c486d7e83" Name="Diagram1">
         <EntityTypeShape EntityType="ApexModel.AreaTrabajo" Width="1.5" PointX="1.5" PointY="52.5" IsExpanded="true" />
         <EntityTypeShape EntityType="ApexModel.Arma" Width="1.5" PointX="6" PointY="19.375" IsExpanded="true" />
         <EntityTypeShape EntityType="ApexModel.Cargo" Width="1.5" PointX="0.75" PointY="26.375" IsExpanded="true" />
@@ -54,6 +54,7 @@
         <EntityTypeShape EntityType="ApexModel.Seccion" Width="1.5" PointX="0.75" PointY="57.75" IsExpanded="true" />
         <EntityTypeShape EntityType="ApexModel.Semana" Width="1.5" PointX="0.75" PointY="60.375" IsExpanded="true" />
         <EntityTypeShape EntityType="ApexModel.SumarioDetalle" Width="1.5" PointX="7.5" PointY="62.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.sysdiagrams" Width="1.5" PointX="5.75" PointY="3.75" IsExpanded="true" />
         <EntityTypeShape EntityType="ApexModel.TipoEstadoTransitorio" Width="1.5" PointX="3" PointY="29.25" IsExpanded="true" />
         <EntityTypeShape EntityType="ApexModel.TipoFuncionario" Width="1.5" PointX="0.75" PointY="62.875" IsExpanded="true" />
         <EntityTypeShape EntityType="ApexModel.TipoLicencia" Width="1.5" PointX="6" PointY="22.75" IsExpanded="true" />
@@ -61,14 +62,14 @@
         <EntityTypeShape EntityType="ApexModel.TipoViatico" Width="1.5" PointX="1.5" PointY="55" IsExpanded="true" />
         <EntityTypeShape EntityType="ApexModel.Turno" Width="1.5" PointX="0.75" PointY="65.625" IsExpanded="true" />
         <EntityTypeShape EntityType="ApexModel.Usuario" Width="1.5" PointX="11.25" PointY="36.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.vw_EstadosTransitoriosCompletos" Width="1.5" PointX="5.75" PointY="3.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.vw_FuncionarioEstadosConsolidados" Width="1.5" PointX="7.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.vw_FuncionarioSituacionActual" Width="1.5" PointX="7.75" PointY="4.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.vw_LicenciasCompletas" Width="1.5" PointX="4.75" PointY="7.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.vw_NotificacionesCompletas" Width="1.5" PointX="6.75" PointY="7.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.vw_NovedadesAgrupadas" Width="1.5" PointX="8.75" PointY="7.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.vw_NovedadesCompletas" Width="1.5" PointX="9.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.vw_SancionesCompletas" Width="1.5" PointX="0.75" PointY="9.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.vw_EstadosTransitoriosCompletos" Width="1.5" PointX="4.75" PointY="6.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.vw_FuncionarioEstadosConsolidados" Width="1.5" PointX="6.75" PointY="6.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.vw_FuncionarioSituacionActual" Width="1.5" PointX="7.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.vw_LicenciasCompletas" Width="1.5" PointX="8.75" PointY="3.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.vw_NotificacionesCompletas" Width="1.5" PointX="8.75" PointY="7.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.vw_NovedadesAgrupadas" Width="1.5" PointX="9.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.vw_NovedadesCompletas" Width="1.5" PointX="0.75" PointY="9.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.vw_SancionesCompletas" Width="1.5" PointX="2.75" PointY="10.75" IsExpanded="true" />
         <AssociationConnector Association="ApexModel.FK_PuestoTrabajo_AreaTrabajo" ManuallyRouted="false" />
         <AssociationConnector Association="ApexModel.FK_FuncionarioArma_Arma" ManuallyRouted="false" />
         <AssociationConnector Association="ApexModel.FK_Funcionario_Cargo" ManuallyRouted="false" />

@@ -10,8 +10,8 @@
 Imports System
 Imports System.Collections.Generic
 
-Partial Public Class usp_MigrarArmas_Result
-    Public Property ArmasInsertadas As Nullable(Of Integer)
-    Public Property TotalArmasEnCatalogo As Nullable(Of Integer)
+Partial Public Class sp_helpdiagramdefinition_Result
+    Public Property version As Nullable(Of Integer)
+    Public Property definition As Byte()
 
 End Class

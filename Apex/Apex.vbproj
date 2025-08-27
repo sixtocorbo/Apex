@@ -184,226 +184,226 @@
     <Compile Include="Common\IRepository.vb" />
     <Compile Include="Common\StringExtensions.vb" />
     <Compile Include="Data\AreaTrabajo.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\Arma.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\Cargo.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\CategoriaAusencia.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\DesignacionDetalle.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\DotacionItem.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\EnfermedadDetalle.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\Escalafon.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\Estado.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\EstadoCivil.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\EstadoTransitorio.Custom.vb" />
     <Compile Include="Data\EstadoTransitorio.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\EstadoTransitorioAdjunto.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\Funcion.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\Funcionario.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\FuncionarioArma.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\FuncionarioChaleco.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\FuncionarioDispositivo.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\FuncionarioDotacion.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\FuncionarioEstadoLegal.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\FuncionarioFotoHistorico.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\FuncionarioSalud.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\GenericService.vb" />
     <Compile Include="Data\Genero.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\HistoricoCustodia.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\HistoricoLicencia.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\HistoricoNocturnidad.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\HistoricoPresentismo.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\HistoricoViatico.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\Horario.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\IGenericService.vb" />
     <Compile Include="Data\IUnitOfWork.vb" />
     <Compile Include="Data\MapPoliciaFunc.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
-    <Compile Include="Data\Model1.Context.vb">
+    <Compile Include="Data\ModeloApex.Context.vb">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>Model1.Context.tt</DependentUpon>
+      <DependentUpon>ModeloApex.Context.tt</DependentUpon>
     </Compile>
-    <Compile Include="Data\Model1.Designer.vb">
+    <Compile Include="Data\ModeloApex.Designer.vb">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>Model1.edmx</DependentUpon>
+      <DependentUpon>ModeloApex.edmx</DependentUpon>
     </Compile>
-    <Compile Include="Data\Model1.vb">
+    <Compile Include="Data\ModeloApex.vb">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\Movimiento.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\NivelEstudio.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\Nomenclatura.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\NotificacionEstado.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\NotificacionPersonal.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\Novedad.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\NovedadFoto.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\NovedadFuncionario.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\NovedadGenerada.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\OrdenCincoDetalle.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\PuestoTrabajo.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\RegimenAlternancia.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\RegimenDetalle.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\RegimenTrabajo.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\Repository.vb" />
     <Compile Include="Data\RetenDetalle.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\RolUsuario.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\SancionDetalle.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\Seccion.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\Semana.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\sp_helpdiagramdefinition_Result.vb">
+      <DependentUpon>ModeloApex.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\sp_helpdiagrams_Result.vb">
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\SumarioDetalle.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\sysdiagrams.vb">
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\TipoEstadoTransitorio.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\TipoFuncionario.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\TipoLicencia.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\TipoNotificacion.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\TipoViatico.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\Turno.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\UnitOfWork.vb" />
-    <Compile Include="Data\usp_MigrarArmasYAsignaciones_Result.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Data\usp_MigrarArmas_Result.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Data\usp_MigrarPuestosDeTrabajo_Result.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
-    </Compile>
     <Compile Include="Data\Usuario.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\vw_EstadosTransitoriosCompletos.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\vw_FuncionarioEstadosConsolidados.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\vw_FuncionarioSituacionActual.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\vw_LicenciasCompletas.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\vw_NotificacionesCompletas.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\vw_NovedadesAgrupadas.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\vw_NovedadesCompletas.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\vw_SancionesCompletas.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>ModeloApex.tt</DependentUpon>
     </Compile>
     <Compile Include="Services\AppTheme.vb" />
     <Compile Include="Services\AreaTrabajoService.vb" />
@@ -793,12 +793,12 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EntityDeploy Include="Data\Model1.edmx">
+    <EntityDeploy Include="Data\ModeloApex.edmx">
       <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>Model1.Designer.vb</LastGenOutput>
+      <LastGenOutput>ModeloApex.Designer.vb</LastGenOutput>
     </EntityDeploy>
-    <None Include="Data\Model1.edmx.diagram">
-      <DependentUpon>Model1.edmx</DependentUpon>
+    <None Include="Data\ModeloApex.edmx.diagram">
+      <DependentUpon>ModeloApex.edmx</DependentUpon>
     </None>
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
@@ -831,15 +831,15 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Data\Model1.Context.tt">
+    <Content Include="Data\ModeloApex.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>Model1.edmx</DependentUpon>
-      <LastGenOutput>Model1.Context.vb</LastGenOutput>
+      <DependentUpon>ModeloApex.edmx</DependentUpon>
+      <LastGenOutput>ModeloApex.Context.vb</LastGenOutput>
     </Content>
-    <Content Include="Data\Model1.tt">
+    <Content Include="Data\ModeloApex.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>Model1.edmx</DependentUpon>
-      <LastGenOutput>Model1.vb</LastGenOutput>
+      <DependentUpon>ModeloApex.edmx</DependentUpon>
+      <LastGenOutput>ModeloApex.vb</LastGenOutput>
     </Content>
     <Content Include="SqlServerTypes\Loader.cs" />
     <Content Include="SqlServerTypes\readme.htm" />

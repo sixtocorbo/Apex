@@ -10,9 +10,11 @@
 Imports System
 Imports System.Collections.Generic
 
-Partial Public Class usp_MigrarPuestosDeTrabajo_Result
-    Public Property TotalAreas As Nullable(Of Integer)
-    Public Property TotalTiposViatico As Nullable(Of Integer)
-    Public Property TotalPuestos As Nullable(Of Integer)
+Partial Public Class sp_helpdiagrams_Result
+    Public Property Database As String
+    Public Property Name As String
+    Public Property ID As Integer
+    Public Property Owner As String
+    Public Property OwnerID As Integer
 
 End Class
