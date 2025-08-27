@@ -28,19 +28,26 @@ Partial Class frmAuditoriaViewer
         '
         'dgvAuditoria
         '
+        Me.dgvAuditoria.AllowUserToAddRows = False
+        Me.dgvAuditoria.AllowUserToDeleteRows = False
+        Me.dgvAuditoria.AllowUserToResizeColumns = False
+        Me.dgvAuditoria.AllowUserToResizeRows = False
         Me.dgvAuditoria.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvAuditoria.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgvAuditoria.Location = New System.Drawing.Point(0, 0)
+        Me.dgvAuditoria.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.dgvAuditoria.Name = "dgvAuditoria"
-        Me.dgvAuditoria.Size = New System.Drawing.Size(784, 461)
+        Me.dgvAuditoria.RowHeadersWidth = 62
+        Me.dgvAuditoria.Size = New System.Drawing.Size(1176, 709)
         Me.dgvAuditoria.TabIndex = 0
         '
         'frmAuditoriaViewer
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(784, 461)
+        Me.ClientSize = New System.Drawing.Size(1176, 709)
         Me.Controls.Add(Me.dgvAuditoria)
+        Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Name = "frmAuditoriaViewer"
         Me.Text = "Visor de Auditoría"
         CType(Me.dgvAuditoria, System.ComponentModel.ISupportInitialize).EndInit()
