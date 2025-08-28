@@ -82,10 +82,12 @@ Public Module ConsultasGenericas
                             .FechaFin = CType(det.FechaHasta, DateTime?),
                             .Observaciones = det.Observaciones
                         })
+                    ' Se suma un día a la fecha 'fin' para que la consulta incluya todo el día.
+                    Dim fechaFinInclusive As Date = fechaFin.Value.AddDays(1)
 
                     Dim retenes = uow.Repository(Of RetenDetalle)().GetAll().
                         Include("EstadoTransitorio.Funcionario").
-                        Where(Function(det) det.FechaReten <= fechaFin.Value AndAlso det.FechaReten >= fechaInicio.Value).
+                        Where(Function(det) det.FechaReten >= fechaInicio.Value AndAlso det.FechaReten < fechaFinInclusive).
                         Select(Function(det) New With {
                             .FuncionarioId = det.EstadoTransitorio.FuncionarioId,
                             .NombreCompleto = det.EstadoTransitorio.Funcionario.Nombre,
@@ -140,18 +142,20 @@ Public Module ConsultasGenericas
                     dt = funcionarios.ToDataTable()
 
                 Case TipoOrigenDatos.Auditoria
-                    ' --- SECCIÓN CORREGIDA Y OPTIMIZADA ---
-                    ' NOTA: La tabla 'AuditoriaCambios' no se encontró en el script SQL proporcionado.
-                    ' Se asume que esta entidad existe en tu modelo de datos.
                     Dim queryAuditoria = uow.Context.Set(Of AuditoriaCambios)().AsQueryable()
 
                     If filtros IsNot Nothing AndAlso filtros.Any() Then
                         queryAuditoria = ApplyAdvancedFilters(queryAuditoria, filtros)
                     End If
 
+                    ' --- INICIO DE LA CORRECCIÓN ---
                     If fechaInicio.HasValue AndAlso fechaFin.HasValue Then
-                        queryAuditoria = queryAuditoria.Where(Function(a) a.FechaHora >= fechaInicio.Value AndAlso a.FechaHora <= fechaFin.Value)
+                        ' Se suma un día a la fecha 'fin' para que la consulta incluya todo el día.
+                        Dim fechaFinInclusive As Date = fechaFin.Value.AddDays(1)
+                        ' Se usa '<' en lugar de '<=' para la fecha final.
+                        queryAuditoria = queryAuditoria.Where(Function(a) a.FechaHora >= fechaInicio.Value AndAlso a.FechaHora < fechaFinInclusive)
                     End If
+                    ' --- FIN DE LA CORRECCIÓN ---
 
                     ' Subconsulta para cambios en la tabla 'Funcionario'
                     Dim auditFuncionarios = From aud In queryAuditoria
@@ -175,7 +179,6 @@ Public Module ConsultasGenericas
                                        }
 
                     ' Subconsulta para cambios en la tabla 'HistoricoLicencia'
-                    ' Se corrige el nombre de la entidad de 'Licencia' a 'HistoricoLicencia'
                     Dim auditLicencias = From aud In queryAuditoria
                                          Where aud.TablaNombre = "HistoricoLicencia"
                                          Join lic In uow.Context.Set(Of HistoricoLicencia)().Include("Funcionario") On aud.RegistroId Equals lic.Id.ToString()
@@ -201,7 +204,7 @@ Public Module ConsultasGenericas
 
                     Dim resultados = Await queryFinal.OrderByDescending(Function(a) a.FechaHora).ToListAsync()
                     dt = resultados.ToDataTable()
-                    ' ---------------------------------------------------
+
                 Case Else
                     Throw New NotImplementedException($"La consulta para el tipo '{tipo.ToString()}' no está implementada.")
             End Select
@@ -237,7 +240,6 @@ Public Module ConsultasGenericas
                 Dim targetType = If(underlyingType IsNot Nothing, underlyingType, propertyType)
                 convertedValue = Convert.ChangeType(valor, targetType)
             Catch ex As Exception
-                ' Es recomendable registrar este error para facilitar la depuración
                 ' System.Diagnostics.Debug.WriteLine($"Error al convertir valor para filtro: {ex.Message}")
                 Continue For
             End Try

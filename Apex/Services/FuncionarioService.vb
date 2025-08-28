@@ -201,7 +201,6 @@ Public Class FuncionarioService
     ' --- MÉTODO AÑADIDO ---
     Public Async Function ObtenerFuncionariosParaComboAsync() As Task(Of List(Of KeyValuePair(Of Integer, String)))
         Dim funcionariosData = Await _unitOfWork.Repository(Of Funcionario)().GetAll().AsNoTracking() _
-        .Where(Function(f) f.Activo) _
         .OrderBy(Function(f) f.Nombre) _
         .Select(Function(f) New With {
             Key .Id = f.Id,

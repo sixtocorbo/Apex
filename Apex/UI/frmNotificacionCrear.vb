@@ -6,7 +6,7 @@ Public Class frmNotificacionCrear
     Private _notificacion As NotificacionPersonal
     Private _modo As ModoFormulario
     Private _idNotificacion As Integer
-
+    Public Property NotificacionId As Integer? = Nothing
     Public Enum ModoFormulario
         Crear
         Editar

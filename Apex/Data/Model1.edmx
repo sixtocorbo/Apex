@@ -561,6 +561,7 @@
           <Property Name="FechaHasta" Type="date" />
           <Property Name="Observaciones" Type="nvarchar(max)" />
           <Property Name="Resolucion" Type="nvarchar" MaxLength="100" />
+          <Property Name="TipoSancion" Type="nvarchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="Seccion">
           <Key>
@@ -2696,6 +2697,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <Property Name="Observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="Resolucion" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="EstadoTransitorio" Relationship="Self.FK_SancionDetalle_EstadoTransitorio" FromRole="SancionDetalle" ToRole="EstadoTransitorio" />
+          <Property Name="TipoSancion" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="Seccion">
           <Key>
@@ -4690,6 +4692,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <EntitySetMapping Name="SancionDetalle">
             <EntityTypeMapping TypeName="ApexModel.SancionDetalle">
               <MappingFragment StoreEntitySet="SancionDetalle">
+                <ScalarProperty Name="TipoSancion" ColumnName="TipoSancion" />
                 <ScalarProperty Name="EstadoTransitorioId" ColumnName="EstadoTransitorioId" />
                 <ScalarProperty Name="FechaDesde" ColumnName="FechaDesde" />
                 <ScalarProperty Name="FechaHasta" ColumnName="FechaHasta" />

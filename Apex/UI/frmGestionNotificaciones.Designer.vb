@@ -2,6 +2,7 @@
 Partial Class frmGestionNotificaciones
     Inherits System.Windows.Forms.Form
 
+    'Form overrides dispose to clean up the component list.
     <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
@@ -13,212 +14,141 @@ Partial Class frmGestionNotificaciones
         End Try
     End Sub
 
+    'Required by the Windows Form Designer
     Private components As System.ComponentModel.IContainer
 
+    'NOTE: The following procedure is required by the Windows Form Designer
+    'It can be modified using the Windows Form Designer.  
+    'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Me.splitContenedorNotificaciones = New System.Windows.Forms.SplitContainer()
-        Me.dgvNotificaciones = New System.Windows.Forms.DataGridView()
-        Me.txtTextoNotificacion = New System.Windows.Forms.TextBox()
-        Me.PanelNotificaciones = New System.Windows.Forms.Panel()
+        Me.Panel1 = New System.Windows.Forms.Panel()
         Me.btnImprimir = New System.Windows.Forms.Button()
-        Me.btnCambiarEstado = New System.Windows.Forms.Button()
-        Me.btnEliminarNotificacion = New System.Windows.Forms.Button()
-        Me.btnEditarNotificacion = New System.Windows.Forms.Button()
-        Me.btnNuevaNotificacion = New System.Windows.Forms.Button()
-        Me.PanelBusquedaNotificaciones = New System.Windows.Forms.Panel()
-        Me.txtBusquedaNotificacion = New System.Windows.Forms.TextBox()
-        Me.Label2 = New System.Windows.Forms.Label()
-        CType(Me.splitContenedorNotificaciones, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.splitContenedorNotificaciones.Panel1.SuspendLayout()
-        Me.splitContenedorNotificaciones.Panel2.SuspendLayout()
-        Me.splitContenedorNotificaciones.SuspendLayout()
+        Me.btnEliminar = New System.Windows.Forms.Button()
+        Me.btnEditar = New System.Windows.Forms.Button()
+        Me.btnNuevo = New System.Windows.Forms.Button()
+        Me.Panel2 = New System.Windows.Forms.Panel()
+        Me.txtFiltro = New System.Windows.Forms.TextBox()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.dgvNotificaciones = New System.Windows.Forms.DataGridView()
+        Me.Panel1.SuspendLayout()
+        Me.Panel2.SuspendLayout()
         CType(Me.dgvNotificaciones, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.PanelNotificaciones.SuspendLayout()
-        Me.PanelBusquedaNotificaciones.SuspendLayout()
         Me.SuspendLayout()
         '
-        'splitContenedorNotificaciones
+        'Panel1
         '
-        Me.splitContenedorNotificaciones.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.splitContenedorNotificaciones.Location = New System.Drawing.Point(0, 62)
-        Me.splitContenedorNotificaciones.Name = "splitContenedorNotificaciones"
-        Me.splitContenedorNotificaciones.Orientation = System.Windows.Forms.Orientation.Horizontal
-        '
-        'splitContenedorNotificaciones.Panel1
-        '
-        Me.splitContenedorNotificaciones.Panel1.Controls.Add(Me.dgvNotificaciones)
-        '
-        'splitContenedorNotificaciones.Panel2
-        '
-        Me.splitContenedorNotificaciones.Panel2.Controls.Add(Me.txtTextoNotificacion)
-        Me.splitContenedorNotificaciones.Panel2.Padding = New System.Windows.Forms.Padding(5)
-        Me.splitContenedorNotificaciones.Size = New System.Drawing.Size(900, 438)
-        Me.splitContenedorNotificaciones.SplitterDistance = 216
-        Me.splitContenedorNotificaciones.TabIndex = 7
-        '
-        'dgvNotificaciones
-        '
-        Me.dgvNotificaciones.AllowUserToAddRows = False
-        Me.dgvNotificaciones.AllowUserToDeleteRows = False
-        Me.dgvNotificaciones.AllowUserToResizeColumns = False
-        Me.dgvNotificaciones.AllowUserToResizeRows = False
-        Me.dgvNotificaciones.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.dgvNotificaciones.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.dgvNotificaciones.Location = New System.Drawing.Point(0, 0)
-        Me.dgvNotificaciones.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
-        Me.dgvNotificaciones.Name = "dgvNotificaciones"
-        Me.dgvNotificaciones.ReadOnly = True
-        Me.dgvNotificaciones.RowHeadersWidth = 51
-        Me.dgvNotificaciones.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgvNotificaciones.Size = New System.Drawing.Size(900, 216)
-        Me.dgvNotificaciones.TabIndex = 2
-        '
-        'txtTextoNotificacion
-        '
-        Me.txtTextoNotificacion.BackColor = System.Drawing.SystemColors.Info
-        Me.txtTextoNotificacion.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.txtTextoNotificacion.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtTextoNotificacion.Location = New System.Drawing.Point(5, 5)
-        Me.txtTextoNotificacion.Multiline = True
-        Me.txtTextoNotificacion.Name = "txtTextoNotificacion"
-        Me.txtTextoNotificacion.ReadOnly = True
-        Me.txtTextoNotificacion.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.txtTextoNotificacion.Size = New System.Drawing.Size(890, 208)
-        Me.txtTextoNotificacion.TabIndex = 0
-        '
-        'PanelNotificaciones
-        '
-        Me.PanelNotificaciones.Controls.Add(Me.btnImprimir)
-        Me.PanelNotificaciones.Controls.Add(Me.btnCambiarEstado)
-        Me.PanelNotificaciones.Controls.Add(Me.btnEliminarNotificacion)
-        Me.PanelNotificaciones.Controls.Add(Me.btnEditarNotificacion)
-        Me.PanelNotificaciones.Controls.Add(Me.btnNuevaNotificacion)
-        Me.PanelNotificaciones.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.PanelNotificaciones.Location = New System.Drawing.Point(0, 500)
-        Me.PanelNotificaciones.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
-        Me.PanelNotificaciones.Name = "PanelNotificaciones"
-        Me.PanelNotificaciones.Size = New System.Drawing.Size(900, 62)
-        Me.PanelNotificaciones.TabIndex = 6
+        Me.Panel1.Controls.Add(Me.btnImprimir)
+        Me.Panel1.Controls.Add(Me.btnEliminar)
+        Me.Panel1.Controls.Add(Me.btnEditar)
+        Me.Panel1.Controls.Add(Me.btnNuevo)
+        Me.Panel1.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.Panel1.Location = New System.Drawing.Point(0, 400)
+        Me.Panel1.Name = "Panel1"
+        Me.Panel1.Size = New System.Drawing.Size(800, 50)
+        Me.Panel1.TabIndex = 0
         '
         'btnImprimir
         '
         Me.btnImprimir.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnImprimir.Location = New System.Drawing.Point(390, 12)
-        Me.btnImprimir.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.btnImprimir.Location = New System.Drawing.Point(440, 9)
         Me.btnImprimir.Name = "btnImprimir"
-        Me.btnImprimir.Size = New System.Drawing.Size(96, 38)
-        Me.btnImprimir.TabIndex = 4
+        Me.btnImprimir.Size = New System.Drawing.Size(94, 29)
+        Me.btnImprimir.TabIndex = 3
         Me.btnImprimir.Text = "Imprimir"
         Me.btnImprimir.UseVisualStyleBackColor = True
         '
-        'btnCambiarEstado
+        'btnEliminar
         '
-        Me.btnCambiarEstado.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnCambiarEstado.Location = New System.Drawing.Point(492, 12)
-        Me.btnCambiarEstado.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
-        Me.btnCambiarEstado.Name = "btnCambiarEstado"
-        Me.btnCambiarEstado.Size = New System.Drawing.Size(135, 38)
-        Me.btnCambiarEstado.TabIndex = 3
-        Me.btnCambiarEstado.Text = "Cambiar Estado..."
-        Me.btnCambiarEstado.UseVisualStyleBackColor = True
+        Me.btnEliminar.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnEliminar.Location = New System.Drawing.Point(550, 9)
+        Me.btnEliminar.Name = "btnEliminar"
+        Me.btnEliminar.Size = New System.Drawing.Size(94, 29)
+        Me.btnEliminar.TabIndex = 2
+        Me.btnEliminar.Text = "Eliminar"
+        Me.btnEliminar.UseVisualStyleBackColor = True
         '
-        'btnEliminarNotificacion
+        'btnEditar
         '
-        Me.btnEliminarNotificacion.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnEliminarNotificacion.Location = New System.Drawing.Point(633, 12)
-        Me.btnEliminarNotificacion.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
-        Me.btnEliminarNotificacion.Name = "btnEliminarNotificacion"
-        Me.btnEliminarNotificacion.Size = New System.Drawing.Size(96, 38)
-        Me.btnEliminarNotificacion.TabIndex = 2
-        Me.btnEliminarNotificacion.Text = "Eliminar"
-        Me.btnEliminarNotificacion.UseVisualStyleBackColor = True
+        Me.btnEditar.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnEditar.Location = New System.Drawing.Point(660, 9)
+        Me.btnEditar.Name = "btnEditar"
+        Me.btnEditar.Size = New System.Drawing.Size(94, 29)
+        Me.btnEditar.TabIndex = 1
+        Me.btnEditar.Text = "Editar"
+        Me.btnEditar.UseVisualStyleBackColor = True
         '
-        'btnEditarNotificacion
+        'btnNuevo
         '
-        Me.btnEditarNotificacion.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnEditarNotificacion.Location = New System.Drawing.Point(735, 12)
-        Me.btnEditarNotificacion.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
-        Me.btnEditarNotificacion.Name = "btnEditarNotificacion"
-        Me.btnEditarNotificacion.Size = New System.Drawing.Size(96, 38)
-        Me.btnEditarNotificacion.TabIndex = 1
-        Me.btnEditarNotificacion.Text = "Editar..."
-        Me.btnEditarNotificacion.UseVisualStyleBackColor = True
+        Me.btnNuevo.Location = New System.Drawing.Point(12, 9)
+        Me.btnNuevo.Name = "btnNuevo"
+        Me.btnNuevo.Size = New System.Drawing.Size(94, 29)
+        Me.btnNuevo.TabIndex = 0
+        Me.btnNuevo.Text = "Nuevo"
+        Me.btnNuevo.UseVisualStyleBackColor = True
         '
-        'btnNuevaNotificacion
+        'Panel2
         '
-        Me.btnNuevaNotificacion.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnNuevaNotificacion.Location = New System.Drawing.Point(837, 12)
-        Me.btnNuevaNotificacion.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
-        Me.btnNuevaNotificacion.Name = "btnNuevaNotificacion"
-        Me.btnNuevaNotificacion.Size = New System.Drawing.Size(96, 38)
-        Me.btnNuevaNotificacion.TabIndex = 0
-        Me.btnNuevaNotificacion.Text = "Nueva..."
-        Me.btnNuevaNotificacion.UseVisualStyleBackColor = True
+        Me.Panel2.Controls.Add(Me.txtFiltro)
+        Me.Panel2.Controls.Add(Me.Label1)
+        Me.Panel2.Dock = System.Windows.Forms.DockStyle.Top
+        Me.Panel2.Location = New System.Drawing.Point(0, 0)
+        Me.Panel2.Name = "Panel2"
+        Me.Panel2.Size = New System.Drawing.Size(800, 50)
+        Me.Panel2.TabIndex = 1
         '
-        'PanelBusquedaNotificaciones
+        'txtFiltro
         '
-        Me.PanelBusquedaNotificaciones.Controls.Add(Me.txtBusquedaNotificacion)
-        Me.PanelBusquedaNotificaciones.Controls.Add(Me.Label2)
-        Me.PanelBusquedaNotificaciones.Dock = System.Windows.Forms.DockStyle.Top
-        Me.PanelBusquedaNotificaciones.Location = New System.Drawing.Point(0, 0)
-        Me.PanelBusquedaNotificaciones.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
-        Me.PanelBusquedaNotificaciones.Name = "PanelBusquedaNotificaciones"
-        Me.PanelBusquedaNotificaciones.Size = New System.Drawing.Size(900, 62)
-        Me.PanelBusquedaNotificaciones.TabIndex = 8
+        Me.txtFiltro.Location = New System.Drawing.Point(70, 12)
+        Me.txtFiltro.Name = "txtFiltro"
+        Me.txtFiltro.Size = New System.Drawing.Size(300, 22)
+        Me.txtFiltro.TabIndex = 1
         '
-        'txtBusquedaNotificacion
+        'Label1
         '
-        Me.txtBusquedaNotificacion.Location = New System.Drawing.Point(131, 14)
-        Me.txtBusquedaNotificacion.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
-        Me.txtBusquedaNotificacion.Name = "txtBusquedaNotificacion"
-        Me.txtBusquedaNotificacion.Size = New System.Drawing.Size(380, 26)
-        Me.txtBusquedaNotificacion.TabIndex = 1
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(12, 15)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(52, 16)
+        Me.Label1.TabIndex = 0
+        Me.Label1.Text = "Buscar:"
         '
-        'Label2
+        'dgvNotificaciones
         '
-        Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(11, 18)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(96, 20)
-        Me.Label2.TabIndex = 0
-        Me.Label2.Text = "Funcionario:"
+        Me.dgvNotificaciones.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.dgvNotificaciones.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.dgvNotificaciones.Location = New System.Drawing.Point(0, 50)
+        Me.dgvNotificaciones.Name = "dgvNotificaciones"
+        Me.dgvNotificaciones.RowHeadersWidth = 51
+        Me.dgvNotificaciones.RowTemplate.Height = 24
+        Me.dgvNotificaciones.Size = New System.Drawing.Size(800, 350)
+        Me.dgvNotificaciones.TabIndex = 2
         '
         'frmGestionNotificaciones
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(900, 562)
-        Me.Controls.Add(Me.splitContenedorNotificaciones)
-        Me.Controls.Add(Me.PanelBusquedaNotificaciones)
-        Me.Controls.Add(Me.PanelNotificaciones)
-        Me.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.ClientSize = New System.Drawing.Size(800, 450)
+        Me.Controls.Add(Me.dgvNotificaciones)
+        Me.Controls.Add(Me.Panel2)
+        Me.Controls.Add(Me.Panel1)
         Me.Name = "frmGestionNotificaciones"
-        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Gestión de Notificaciones"
-        Me.splitContenedorNotificaciones.Panel1.ResumeLayout(False)
-        Me.splitContenedorNotificaciones.Panel2.ResumeLayout(False)
-        Me.splitContenedorNotificaciones.Panel2.PerformLayout()
-        CType(Me.splitContenedorNotificaciones, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.splitContenedorNotificaciones.ResumeLayout(False)
+        Me.Panel1.ResumeLayout(False)
+        Me.Panel2.ResumeLayout(False)
+        Me.Panel2.PerformLayout()
         CType(Me.dgvNotificaciones, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.PanelNotificaciones.ResumeLayout(False)
-        Me.PanelBusquedaNotificaciones.ResumeLayout(False)
-        Me.PanelBusquedaNotificaciones.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
 
-    Friend WithEvents splitContenedorNotificaciones As SplitContainer
+    Friend WithEvents Panel1 As Panel
+    Friend WithEvents btnEliminar As Button
+    Friend WithEvents btnEditar As Button
+    Friend WithEvents btnNuevo As Button
+    Friend WithEvents Panel2 As Panel
+    Friend WithEvents txtFiltro As TextBox
+    Friend WithEvents Label1 As Label
     Friend WithEvents dgvNotificaciones As DataGridView
-    Friend WithEvents txtTextoNotificacion As TextBox
-    Friend WithEvents PanelNotificaciones As Panel
     Friend WithEvents btnImprimir As Button
-    Friend WithEvents btnCambiarEstado As Button
-    Friend WithEvents btnEliminarNotificacion As Button
-    Friend WithEvents btnEditarNotificacion As Button
-    Friend WithEvents btnNuevaNotificacion As Button
-    Friend WithEvents PanelBusquedaNotificaciones As Panel
-    Friend WithEvents txtBusquedaNotificacion As TextBox
-    Friend WithEvents Label2 As Label
 End Class

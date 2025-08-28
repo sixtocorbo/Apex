@@ -24,6 +24,12 @@ Public Class frmSancionCrear
     Private Async Sub frmSancionCrear_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
 
+        ' --- AÑADIDO: Cargar el ComboBox de Tipo Sanción ---
+        cmbTipoSancion.Items.Clear()
+        cmbTipoSancion.Items.Add("Puntos de Demérito")
+        cmbTipoSancion.Items.Add("Observaciones Escritas")
+        ' ---------------------------------------------------
+
         ' Determina el modo basado en si se pasó un ID
         If SancionId.HasValue Then
             _modo = ModoFormulario.Editar
@@ -43,6 +49,7 @@ Public Class frmSancionCrear
             _detalle = New SancionDetalle()
             _sancion.SancionDetalle = _detalle
             chkFechaHasta.Checked = True ' Por defecto, sin fecha de fin
+            cmbTipoSancion.SelectedIndex = 0 ' Por defecto, "Puntos de Demérito"
         End If
     End Sub
 
@@ -88,6 +95,14 @@ Public Class frmSancionCrear
         End If
         txtResolucion.Text = _detalle.Resolucion
         txtObservaciones.Text = _detalle.Observaciones
+
+        ' --- AÑADIDO: Cargar el valor guardado del Tipo de Sanción ---
+        If Not String.IsNullOrEmpty(_detalle.TipoSancion) Then
+            cmbTipoSancion.SelectedItem = _detalle.TipoSancion
+        Else
+            cmbTipoSancion.SelectedIndex = 0 ' Valor por defecto si no hay nada guardado
+        End If
+        ' ----------------------------------------------------------
     End Function
 
     Private Sub chkFechaHasta_CheckedChanged(sender As Object, e As EventArgs) Handles chkFechaHasta.CheckedChanged
@@ -99,6 +114,13 @@ Public Class frmSancionCrear
             MessageBox.Show("Debe seleccionar un funcionario.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             Return
         End If
+
+        ' --- AÑADIDO: Validación para el nuevo ComboBox ---
+        If cmbTipoSancion.SelectedIndex = -1 Then
+            MessageBox.Show("Debe seleccionar un tipo de sanción.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return
+        End If
+        ' ------------------------------------------------
 
         If Not chkFechaHasta.Checked AndAlso dtpFechaHasta.Value < dtpFechaDesde.Value Then
             MessageBox.Show("La fecha de fin no puede ser anterior a la fecha de inicio.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
@@ -112,6 +134,10 @@ Public Class frmSancionCrear
         _detalle.FechaHasta = If(chkFechaHasta.Checked, CType(Nothing, Date?), dtpFechaHasta.Value.Date)
         _detalle.Resolucion = txtResolucion.Text.Trim()
         _detalle.Observaciones = txtObservaciones.Text.Trim()
+
+        ' --- AÑADIDO: Guardar el valor del ComboBox ---
+        _detalle.TipoSancion = cmbTipoSancion.SelectedItem.ToString()
+        ' --------------------------------------------
 
         Try
             If _modo = ModoFormulario.Crear Then

@@ -80,9 +80,14 @@ Public Class frmConceptoFuncionalApex
         Dim leves = TryCast(dgvObservaciones.DataSource, List(Of ConceptoFuncionalItem))
 
         ' Crear y mostrar el formulario del reporte, pasándole las listas
-        Using frm As New frmConceptoFuncionalRPT(_funcionarioSeleccionado, dtpFechaInicio.Value, dtpFechaFin.Value, salud, graves, leves)
-            frm.ShowDialog(Me)
-        End Using
+        Dim frm As New frmConceptoFuncionalRPT(_funcionarioSeleccionado, dtpFechaInicio.Value, dtpFechaFin.Value, salud, graves, leves)
+
+
+        ' Se obtiene una referencia al formulario Dashboard
+        Dim parentDashboard As frmDashboard = CType(Me.ParentForm, frmDashboard)
+
+        ' Se llama al método público del Dashboard para abrir el formulario en el panel
+        parentDashboard.AbrirFormEnPanel(frm)
     End Sub
 
     ''' <summary>

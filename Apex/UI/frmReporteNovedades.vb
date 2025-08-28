@@ -170,9 +170,14 @@ Public Class frmReporteNovedades
             ToList()
 
             ' 5. Abrimos el formulario visor y le pasamos los datos
-            Using frmVisor As New frmVisorReporteNovedades(datosMapeados)
-                frmVisor.ShowDialog(Me)
-            End Using
+            Dim frmVisor As New frmVisorReporteNovedades(datosMapeados)
+
+
+            ' Se obtiene una referencia al formulario Dashboard
+            Dim parentDashboard As frmDashboard = CType(Me.ParentForm, frmDashboard)
+
+            ' Se llama al método público del Dashboard para abrir el formulario en el panel
+            parentDashboard.AbrirFormEnPanel(frmVisor)
 
         Catch ex As Exception
             MessageBox.Show($"Ocurrió un error al preparar la impresión: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)

@@ -2,6 +2,7 @@
 Partial Class frmSancionCrear
     Inherits System.Windows.Forms.Form
 
+    'Form overrides dispose to clean up the component list.
     <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
@@ -13,8 +14,12 @@ Partial Class frmSancionCrear
         End Try
     End Sub
 
+    'Required by the Windows Form Designer
     Private components As System.ComponentModel.IContainer
 
+    'NOTE: The following procedure is required by the Windows Form Designer
+    'It can be modified using the Windows Form Designer.  
+    'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
@@ -27,6 +32,8 @@ Partial Class frmSancionCrear
         Me.chkFechaHasta = New System.Windows.Forms.CheckBox()
         Me.lblResolucion = New System.Windows.Forms.Label()
         Me.txtResolucion = New System.Windows.Forms.TextBox()
+        Me.lblTipoSancion = New System.Windows.Forms.Label()
+        Me.cmbTipoSancion = New System.Windows.Forms.ComboBox()
         Me.lblObservaciones = New System.Windows.Forms.Label()
         Me.txtObservaciones = New System.Windows.Forms.TextBox()
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
@@ -51,19 +58,22 @@ Partial Class frmSancionCrear
         Me.TableLayoutPanel1.Controls.Add(Me.chkFechaHasta, 2, 2)
         Me.TableLayoutPanel1.Controls.Add(Me.lblResolucion, 0, 3)
         Me.TableLayoutPanel1.Controls.Add(Me.txtResolucion, 1, 3)
-        Me.TableLayoutPanel1.Controls.Add(Me.lblObservaciones, 0, 4)
-        Me.TableLayoutPanel1.Controls.Add(Me.txtObservaciones, 1, 4)
+        Me.TableLayoutPanel1.Controls.Add(Me.lblTipoSancion, 0, 4)
+        Me.TableLayoutPanel1.Controls.Add(Me.cmbTipoSancion, 1, 4)
+        Me.TableLayoutPanel1.Controls.Add(Me.lblObservaciones, 0, 5)
+        Me.TableLayoutPanel1.Controls.Add(Me.txtObservaciones, 1, 5)
         Me.TableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TableLayoutPanel1.Location = New System.Drawing.Point(10, 10)
         Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
-        Me.TableLayoutPanel1.RowCount = 6
+        Me.TableLayoutPanel1.RowCount = 7
+        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-        Me.TableLayoutPanel1.Size = New System.Drawing.Size(524, 308)
+        Me.TableLayoutPanel1.Size = New System.Drawing.Size(524, 338)
         Me.TableLayoutPanel1.TabIndex = 0
         '
         'lblFuncionario
@@ -154,11 +164,32 @@ Partial Class frmSancionCrear
         Me.txtResolucion.Size = New System.Drawing.Size(380, 31)
         Me.txtResolucion.TabIndex = 8
         '
+        'lblTipoSancion
+        '
+        Me.lblTipoSancion.Anchor = System.Windows.Forms.AnchorStyles.Right
+        Me.lblTipoSancion.AutoSize = True
+        Me.lblTipoSancion.Location = New System.Drawing.Point(84, 122)
+        Me.lblTipoSancion.Name = "lblTipoSancion"
+        Me.lblTipoSancion.Size = New System.Drawing.Size(51, 25)
+        Me.lblTipoSancion.TabIndex = 11
+        Me.lblTipoSancion.Text = "Tipo:"
+        '
+        'cmbTipoSancion
+        '
+        Me.cmbTipoSancion.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.TableLayoutPanel1.SetColumnSpan(Me.cmbTipoSancion, 2)
+        Me.cmbTipoSancion.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cmbTipoSancion.FormattingEnabled = True
+        Me.cmbTipoSancion.Location = New System.Drawing.Point(141, 123)
+        Me.cmbTipoSancion.Name = "cmbTipoSancion"
+        Me.cmbTipoSancion.Size = New System.Drawing.Size(380, 33)
+        Me.cmbTipoSancion.TabIndex = 9
+        '
         'lblObservaciones
         '
         Me.lblObservaciones.Anchor = System.Windows.Forms.AnchorStyles.Right
         Me.lblObservaciones.AutoSize = True
-        Me.lblObservaciones.Location = New System.Drawing.Point(3, 191)
+        Me.lblObservaciones.Location = New System.Drawing.Point(3, 221)
         Me.lblObservaciones.Name = "lblObservaciones"
         Me.lblObservaciones.Size = New System.Drawing.Size(132, 25)
         Me.lblObservaciones.TabIndex = 9
@@ -168,7 +199,7 @@ Partial Class frmSancionCrear
         '
         Me.TableLayoutPanel1.SetColumnSpan(Me.txtObservaciones, 2)
         Me.txtObservaciones.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.txtObservaciones.Location = New System.Drawing.Point(141, 123)
+        Me.txtObservaciones.Location = New System.Drawing.Point(141, 153)
         Me.txtObservaciones.Multiline = True
         Me.txtObservaciones.Name = "txtObservaciones"
         Me.txtObservaciones.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
@@ -181,7 +212,7 @@ Partial Class frmSancionCrear
         Me.FlowLayoutPanel1.Controls.Add(Me.btnCancelar)
         Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Bottom
         Me.FlowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
-        Me.FlowLayoutPanel1.Location = New System.Drawing.Point(10, 318)
+        Me.FlowLayoutPanel1.Location = New System.Drawing.Point(10, 348)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
         Me.FlowLayoutPanel1.Size = New System.Drawing.Size(524, 40)
         Me.FlowLayoutPanel1.TabIndex = 1
@@ -211,7 +242,7 @@ Partial Class frmSancionCrear
         Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 25.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnCancelar
-        Me.ClientSize = New System.Drawing.Size(544, 368)
+        Me.ClientSize = New System.Drawing.Size(544, 398)
         Me.Controls.Add(Me.TableLayoutPanel1)
         Me.Controls.Add(Me.FlowLayoutPanel1)
         Me.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -244,4 +275,6 @@ Partial Class frmSancionCrear
     Friend WithEvents FlowLayoutPanel1 As FlowLayoutPanel
     Friend WithEvents btnGuardar As Button
     Friend WithEvents btnCancelar As Button
+    Friend WithEvents lblTipoSancion As Label
+    Friend WithEvents cmbTipoSancion As ComboBox
 End Class
