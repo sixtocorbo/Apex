@@ -63,6 +63,8 @@ Partial Class frmGestionSecciones
         '
         Me.dgvSecciones.AllowUserToAddRows = False
         Me.dgvSecciones.AllowUserToDeleteRows = False
+        Me.dgvSecciones.AllowUserToResizeColumns = False
+        Me.dgvSecciones.AllowUserToResizeRows = False
         Me.dgvSecciones.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvSecciones.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgvSecciones.Location = New System.Drawing.Point(0, 46)

@@ -18,25 +18,29 @@ Partial Class frmConfiguracion
     Private components As System.ComponentModel.IContainer
 
     'NOTE: The following procedure is required by the Windows Form Designer
-    'It can be modified using the Windows Form Designer.  
+    'It can be modified using the Windows Form Designer.
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.TabControlPrincipal = New System.Windows.Forms.TabControl()
         Me.tpEstructura = New System.Windows.Forms.TabPage()
+        Me.tpPersonal = New System.Windows.Forms.TabPage()
+        Me.tpCargos = New System.Windows.Forms.TabPage()
         Me.btnNomenclaturas = New System.Windows.Forms.Button()
         Me.btnTurnos = New System.Windows.Forms.Button()
         Me.btnAreasTrabajo = New System.Windows.Forms.Button()
         Me.btnSecciones = New System.Windows.Forms.Button()
         Me.btnCargos = New System.Windows.Forms.Button()
-        Me.tpPersonal = New System.Windows.Forms.TabPage()
         Me.btnCategoriasAusencia = New System.Windows.Forms.Button()
         Me.btnTiposEstadoTransitorio = New System.Windows.Forms.Button()
         Me.btnGestionarIncidencias = New System.Windows.Forms.Button()
         Me.btnVolver = New System.Windows.Forms.Button()
+        Me.dgvCargosTab = New System.Windows.Forms.DataGridView()
         Me.TabControlPrincipal.SuspendLayout()
         Me.tpEstructura.SuspendLayout()
         Me.tpPersonal.SuspendLayout()
+        Me.tpCargos.SuspendLayout()
+        CType(Me.dgvCargosTab, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'TabControlPrincipal
@@ -46,6 +50,7 @@ Partial Class frmConfiguracion
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.TabControlPrincipal.Controls.Add(Me.tpEstructura)
         Me.TabControlPrincipal.Controls.Add(Me.tpPersonal)
+        Me.TabControlPrincipal.Controls.Add(Me.tpCargos)
         Me.TabControlPrincipal.Location = New System.Drawing.Point(18, 18)
         Me.TabControlPrincipal.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.TabControlPrincipal.Name = "TabControlPrincipal"
@@ -68,6 +73,47 @@ Partial Class frmConfiguracion
         Me.tpEstructura.TabIndex = 0
         Me.tpEstructura.Text = "Gestión de Estructura Organizacional"
         Me.tpEstructura.UseVisualStyleBackColor = True
+        '
+        'tpPersonal
+        '
+        Me.tpPersonal.Controls.Add(Me.btnCategoriasAusencia)
+        Me.tpPersonal.Controls.Add(Me.btnTiposEstadoTransitorio)
+        Me.tpPersonal.Controls.Add(Me.btnGestionarIncidencias)
+        Me.tpPersonal.Location = New System.Drawing.Point(4, 29)
+        Me.tpPersonal.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.tpPersonal.Name = "tpPersonal"
+        Me.tpPersonal.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.tpPersonal.Size = New System.Drawing.Size(682, 287)
+        Me.tpPersonal.TabIndex = 1
+        Me.tpPersonal.Text = "Gestión de Personal y Ausencias"
+        Me.tpPersonal.UseVisualStyleBackColor = True
+        '
+        'tpCargos
+        '
+        Me.tpCargos.Controls.Add(Me.dgvCargosTab)
+        Me.tpCargos.Location = New System.Drawing.Point(4, 29)
+        Me.tpCargos.Name = "tpCargos"
+        Me.tpCargos.Padding = New System.Windows.Forms.Padding(3)
+        Me.tpCargos.Size = New System.Drawing.Size(682, 287)
+        Me.tpCargos.TabIndex = 2
+        Me.tpCargos.Text = "Ver Cargos"
+        Me.tpCargos.UseVisualStyleBackColor = True
+        '
+        'dgvCargosTab
+        '
+        Me.dgvCargosTab.AllowUserToAddRows = False
+        Me.dgvCargosTab.AllowUserToDeleteRows = False
+        Me.dgvCargosTab.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.dgvCargosTab.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.dgvCargosTab.Location = New System.Drawing.Point(3, 3)
+        Me.dgvCargosTab.Name = "dgvCargosTab"
+        Me.dgvCargosTab.ReadOnly = True
+        Me.dgvCargosTab.RowHeadersWidth = 62
+        Me.dgvCargosTab.RowTemplate.Height = 28
+        Me.dgvCargosTab.Size = New System.Drawing.Size(676, 281)
+        Me.dgvCargosTab.TabIndex = 0
         '
         'btnNomenclaturas
         '
@@ -118,20 +164,6 @@ Partial Class frmConfiguracion
         Me.btnCargos.TabIndex = 0
         Me.btnCargos.Text = "Gestionar Cargos"
         Me.btnCargos.UseVisualStyleBackColor = True
-        '
-        'tpPersonal
-        '
-        Me.tpPersonal.Controls.Add(Me.btnCategoriasAusencia)
-        Me.tpPersonal.Controls.Add(Me.btnTiposEstadoTransitorio)
-        Me.tpPersonal.Controls.Add(Me.btnGestionarIncidencias)
-        Me.tpPersonal.Location = New System.Drawing.Point(4, 29)
-        Me.tpPersonal.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.tpPersonal.Name = "tpPersonal"
-        Me.tpPersonal.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.tpPersonal.Size = New System.Drawing.Size(682, 287)
-        Me.tpPersonal.TabIndex = 1
-        Me.tpPersonal.Text = "Gestión de Personal y Ausencias"
-        Me.tpPersonal.UseVisualStyleBackColor = True
         '
         'btnCategoriasAusencia
         '
@@ -189,6 +221,8 @@ Partial Class frmConfiguracion
         Me.TabControlPrincipal.ResumeLayout(False)
         Me.tpEstructura.ResumeLayout(False)
         Me.tpPersonal.ResumeLayout(False)
+        Me.tpCargos.ResumeLayout(False)
+        CType(Me.dgvCargosTab, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
@@ -205,4 +239,6 @@ Partial Class frmConfiguracion
     Friend WithEvents btnGestionarIncidencias As Button
     Friend WithEvents btnTiposEstadoTransitorio As Button
     Friend WithEvents btnCategoriasAusencia As Button
+    Friend WithEvents tpCargos As TabPage
+    Friend WithEvents dgvCargosTab As DataGridView
 End Class

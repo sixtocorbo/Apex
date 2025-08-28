@@ -34,6 +34,8 @@ Partial Class frmGestionSanciones
         '
         Me.dgvSanciones.AllowUserToAddRows = False
         Me.dgvSanciones.AllowUserToDeleteRows = False
+        Me.dgvSanciones.AllowUserToResizeColumns = False
+        Me.dgvSanciones.AllowUserToResizeRows = False
         Me.dgvSanciones.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvSanciones.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgvSanciones.Location = New System.Drawing.Point(0, 62)
@@ -111,7 +113,7 @@ Partial Class frmGestionSanciones
         Me.Label3.AutoSize = True
         Me.Label3.Location = New System.Drawing.Point(11, 18)
         Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(95, 20)
+        Me.Label3.Size = New System.Drawing.Size(96, 20)
         Me.Label3.TabIndex = 0
         Me.Label3.Text = "Funcionario:"
         '

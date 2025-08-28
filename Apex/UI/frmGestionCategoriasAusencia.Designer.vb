@@ -63,6 +63,8 @@ Partial Class frmGestionCategoriasAusencia
         '
         Me.dgvCategorias.AllowUserToAddRows = False
         Me.dgvCategorias.AllowUserToDeleteRows = False
+        Me.dgvCategorias.AllowUserToResizeColumns = False
+        Me.dgvCategorias.AllowUserToResizeRows = False
         Me.dgvCategorias.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvCategorias.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgvCategorias.Location = New System.Drawing.Point(0, 46)

@@ -63,6 +63,8 @@ Partial Class frmGestionAreasTrabajo
         '
         Me.dgvAreas.AllowUserToAddRows = False
         Me.dgvAreas.AllowUserToDeleteRows = False
+        Me.dgvAreas.AllowUserToResizeColumns = False
+        Me.dgvAreas.AllowUserToResizeRows = False
         Me.dgvAreas.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvAreas.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgvAreas.Location = New System.Drawing.Point(0, 46)

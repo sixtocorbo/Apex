@@ -63,6 +63,8 @@ Partial Class frmGestionTiposEstadoTransitorio
         '
         Me.dgvTiposEstado.AllowUserToAddRows = False
         Me.dgvTiposEstado.AllowUserToDeleteRows = False
+        Me.dgvTiposEstado.AllowUserToResizeColumns = False
+        Me.dgvTiposEstado.AllowUserToResizeRows = False
         Me.dgvTiposEstado.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvTiposEstado.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgvTiposEstado.Location = New System.Drawing.Point(0, 46)

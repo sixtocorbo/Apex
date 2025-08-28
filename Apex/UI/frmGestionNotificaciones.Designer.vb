@@ -61,6 +61,8 @@ Partial Class frmGestionNotificaciones
         '
         Me.dgvNotificaciones.AllowUserToAddRows = False
         Me.dgvNotificaciones.AllowUserToDeleteRows = False
+        Me.dgvNotificaciones.AllowUserToResizeColumns = False
+        Me.dgvNotificaciones.AllowUserToResizeRows = False
         Me.dgvNotificaciones.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvNotificaciones.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgvNotificaciones.Location = New System.Drawing.Point(0, 0)
@@ -178,7 +180,7 @@ Partial Class frmGestionNotificaciones
         Me.Label2.AutoSize = True
         Me.Label2.Location = New System.Drawing.Point(11, 18)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(95, 20)
+        Me.Label2.Size = New System.Drawing.Size(96, 20)
         Me.Label2.TabIndex = 0
         Me.Label2.Text = "Funcionario:"
         '

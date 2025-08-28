@@ -68,6 +68,8 @@ Partial Class frmGestionTurnos
         '
         Me.dgvTurnos.AllowUserToAddRows = False
         Me.dgvTurnos.AllowUserToDeleteRows = False
+        Me.dgvTurnos.AllowUserToResizeColumns = False
+        Me.dgvTurnos.AllowUserToResizeRows = False
         Me.dgvTurnos.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvTurnos.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgvTurnos.Location = New System.Drawing.Point(0, 46)

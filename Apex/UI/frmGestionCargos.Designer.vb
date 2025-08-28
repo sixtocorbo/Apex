@@ -65,6 +65,8 @@ Partial Class frmGestionCargos
         '
         Me.dgvCargos.AllowUserToAddRows = False
         Me.dgvCargos.AllowUserToDeleteRows = False
+        Me.dgvCargos.AllowUserToResizeColumns = False
+        Me.dgvCargos.AllowUserToResizeRows = False
         Me.dgvCargos.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvCargos.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgvCargos.Location = New System.Drawing.Point(0, 46)

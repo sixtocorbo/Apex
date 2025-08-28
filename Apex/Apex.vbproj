@@ -782,6 +782,12 @@
     <EmbeddedResource Include="UI\frmGestionNomenclaturas.resx">
       <DependentUpon>frmGestionNomenclaturas.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmGestionNotificaciones.resx">
+      <DependentUpon>frmGestionNotificaciones.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmGestionSanciones.resx">
+      <DependentUpon>frmGestionSanciones.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\frmGestionSecciones.resx">
       <DependentUpon>frmGestionSecciones.vb</DependentUpon>
     </EmbeddedResource>

@@ -5,6 +5,10 @@ Imports System.ComponentModel
 
 Public Class frmGestionCargos
 
+    ' Definir un tipo de delegado explícito para el evento
+    Public Delegate Sub CargosModificadosEventHandler()
+    Public Event CargosModificados As CargosModificadosEventHandler
+
     Private _cargoService As New CargoService()
     Private _listaCargos As BindingList(Of Cargo)
     Private _cargoSeleccionado As Cargo
@@ -48,7 +52,13 @@ Public Class frmGestionCargos
     Private Sub MostrarDetalles()
         If _cargoSeleccionado IsNot Nothing Then
             txtNombre.Text = _cargoSeleccionado.Nombre
-            txtGrado.Text = _cargoSeleccionado.Grado.ToString()
+            ' **Líneas corregidas**
+            If _cargoSeleccionado.Grado.HasValue Then
+                txtGrado.Text = _cargoSeleccionado.Grado.Value.ToString()
+            Else
+                txtGrado.Text = ""
+            End If
+            ' **Fin de líneas corregidas**
             btnEliminar.Enabled = True
         Else
             LimpiarCampos()
@@ -83,8 +93,11 @@ Public Class frmGestionCargos
         End If
 
         _cargoSeleccionado.Nombre = txtNombre.Text.Trim()
-        If Integer.TryParse(txtGrado.Text.Trim(), _cargoSeleccionado.Grado) Then
-            ' Grado asignado correctamente
+
+        ' Lógica corregida para el Grado
+        Dim gradoTemp As Integer
+        If Integer.TryParse(txtGrado.Text.Trim(), gradoTemp) Then
+            _cargoSeleccionado.Grado = gradoTemp
         Else
             _cargoSeleccionado.Grado = Nothing
         End If
@@ -104,6 +117,9 @@ Public Class frmGestionCargos
             MessageBox.Show("Cargo guardado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Await CargarDatosAsync()
             LimpiarCampos()
+
+            ' Disparar el evento de modificación de cargos
+            RaiseEvent CargosModificados()
         Catch ex As Exception
             MessageBox.Show("Ocurrió un error al guardar el cargo: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         Finally
@@ -126,6 +142,9 @@ Public Class frmGestionCargos
                 MessageBox.Show("Cargo eliminado.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 Await CargarDatosAsync()
                 LimpiarCampos()
+
+                ' Disparar el evento de modificación de cargos
+                RaiseEvent CargosModificados()
             Catch ex As Exception
                 MessageBox.Show("Ocurrió un error al eliminar el cargo: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             Finally
