@@ -1,19 +1,21 @@
-﻿' Apex/UI/frmGestionNotificaciones.vb
+﻿' En tu archivo: Apex/UI/frmGestionNotificaciones.vb
+
 Imports System.ComponentModel
 
 Public Class frmGestionNotificaciones
     Private _svc As New NotificacionService()
-    Private _notificaciones As List(Of vw_NotificacionesCompletas)
-    Private _notificacionesFiltradas As BindingList(Of vw_NotificacionesCompletas)
 
     Public Sub New()
         InitializeComponent()
     End Sub
 
-    Private Async Sub frmGestionNotificaciones_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Private Sub frmGestionNotificaciones_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
         ConfigurarGrilla()
-        Await CargarDatos()
+    End Sub
+
+    Private Sub frmGestionNotificaciones_Shown(sender As Object, e As EventArgs) Handles Me.Shown
+        Me.ActiveControl = txtFiltro
     End Sub
 
     Private Sub ConfigurarGrilla()
@@ -27,54 +29,66 @@ Public Class frmGestionNotificaciones
             .RowHeadersVisible = False
 
             .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Id", .HeaderText = "ID", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "NombreCompleto", .HeaderText = "Funcionario", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
+            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "NombreFuncionario", .HeaderText = "Funcionario", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
             .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "CI", .HeaderText = "Cédula", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells})
             .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "FechaProgramada", .HeaderText = "Fecha Programada", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells})
             .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "TipoNotificacion", .HeaderText = "Tipo", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "EstadoActual", .HeaderText = "Estado", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells})
+            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Estado", .HeaderText = "Estado", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells})
 
             .ResumeLayout()
         End With
     End Sub
 
-    Private Async Function CargarDatos() As Task
+#Region "Lógica de Búsqueda"
+
+    Private Async Function BuscarAsync() As Task
         LoadingHelper.MostrarCargando(Me)
+        ' Asumo que tienes un botón de búsqueda llamado btnBuscar
+        ' btnBuscar.Enabled = False 
+
         Try
-            _notificaciones = Await _svc.GetAllConDetallesAsync()
-            _notificacionesFiltradas = New BindingList(Of vw_NotificacionesCompletas)(_notificaciones)
-            dgvNotificaciones.DataSource = _notificacionesFiltradas
+            Dim filtro = txtFiltro.Text.Trim()
+
+            ' Si el filtro está vacío, limpiamos la grilla y salimos.
+            If String.IsNullOrWhiteSpace(filtro) Then
+                dgvNotificaciones.DataSource = Nothing
+                Return
+            End If
+
+            ' Llamamos al servicio con el filtro
+            Dim resultados = Await _svc.GetAllConDetallesAsync(filtro)
+            dgvNotificaciones.DataSource = New BindingList(Of vw_NotificacionesCompletas)(resultados)
 
         Catch ex As Exception
-            MessageBox.Show($"Ocurrió un error al cargar las notificaciones: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            MessageBox.Show($"Ocurrió un error al buscar las notificaciones: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         Finally
             LoadingHelper.OcultarCargando(Me)
+            ' btnBuscar.Enabled = True
         End Try
     End Function
 
-    Private Sub FiltrarNotificacionesEnVivo()
-        Dim textoFiltro = txtFiltro.Text.ToLower().Trim()
-
-        If String.IsNullOrEmpty(textoFiltro) Then
-            _notificacionesFiltradas = New BindingList(Of vw_NotificacionesCompletas)(_notificaciones)
-        Else
-            ' CORRECCIÓN: Usar NombreCompleto y EstadoActual
-            Dim resultado = _notificaciones.Where(Function(n)
-                                                      Return (n.NombreFuncionario IsNot Nothing AndAlso n.NombreFuncionario.ToLower().Contains(textoFiltro)) OrElse
-                                                           (n.CI IsNot Nothing AndAlso n.CI.ToLower().Contains(textoFiltro)) OrElse
-                                                           (n.TipoNotificacion IsNot Nothing AndAlso n.TipoNotificacion.ToLower().Contains(textoFiltro)) OrElse
-                                                           (n.Estado IsNot Nothing AndAlso n.Estado.ToLower().Contains(textoFiltro))
-                                                  End Function).ToList()
-            _notificacionesFiltradas = New BindingList(Of vw_NotificacionesCompletas)(resultado)
+    ' Evento para buscar al presionar Enter en el cuadro de texto
+    Private Async Sub txtFiltro_KeyDown(sender As Object, e As KeyEventArgs) Handles txtFiltro.KeyDown
+        If e.KeyCode = Keys.Enter Then
+            e.Handled = True
+            e.SuppressKeyPress = True
+            Await BuscarAsync()
         End If
-
-        dgvNotificaciones.DataSource = _notificacionesFiltradas
-        dgvNotificaciones.Refresh()
     End Sub
+
+    ' Evento para el botón de búsqueda (si tienes uno)
+    ' Private Async Sub btnBuscar_Click(sender As Object, e As EventArgs) Handles btnBuscar.Click
+    '     Await BuscarAsync()
+    ' End Sub
+
+#End Region
+
+#Region "Acciones (CRUD)"
 
     Private Async Sub btnNuevo_Click(sender As Object, e As EventArgs) Handles btnNuevo.Click
         Using frm As New frmNotificacionCrear()
             If frm.ShowDialog() = DialogResult.OK Then
-                Await CargarDatos()
+                Await BuscarAsync() ' Refrescamos la búsqueda actual
             End If
         End Using
     End Sub
@@ -84,18 +98,13 @@ Public Class frmGestionNotificaciones
             MessageBox.Show("Seleccione una notificación para editar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Return
         End If
-        Dim idSeleccionado = CInt(dgvNotificaciones.SelectedRows(0).Cells(0).Value)
+        Dim idSeleccionado = CInt(dgvNotificaciones.SelectedRows(0).Cells("Id").Value)
         Using frm As New frmNotificacionCrear()
             frm.NotificacionId = idSeleccionado
             If frm.ShowDialog() = DialogResult.OK Then
-                Await CargarDatos()
+                Await BuscarAsync() ' Refrescamos la búsqueda actual
             End If
         End Using
-    End Sub
-
-    Private Sub txtFiltro_TextChanged(sender As Object, e As EventArgs) Handles txtFiltro.TextChanged
-        ' Este evento se dispara cada vez que el texto cambia
-        FiltrarNotificacionesEnVivo()
     End Sub
 
     Private Sub btnImprimir_Click(sender As Object, e As EventArgs) Handles btnImprimir.Click
@@ -103,7 +112,7 @@ Public Class frmGestionNotificaciones
             MessageBox.Show("Seleccione una notificación para imprimir.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Return
         End If
-        Dim idSeleccionado = CInt(dgvNotificaciones.SelectedRows(0).Cells(0).Value)
+        Dim idSeleccionado = CInt(dgvNotificaciones.SelectedRows(0).Cells("Id").Value)
         Using frm As New frmNotificacionRPT(idSeleccionado)
             frm.ShowDialog()
         End Using
@@ -115,16 +124,20 @@ Public Class frmGestionNotificaciones
             Return
         End If
 
-        Dim idSeleccionado = CInt(dgvNotificaciones.SelectedRows(0).Cells(0).Value)
-        Dim notificacion = _notificaciones.FirstOrDefault(Function(n) n.Id = idSeleccionado)
+        Dim filaSeleccionada = dgvNotificaciones.SelectedRows(0)
+        Dim idSeleccionado = CInt(filaSeleccionada.Cells("Id").Value)
+        Dim nombreFuncionario = filaSeleccionada.Cells("NombreFuncionario").Value.ToString()
 
-        If MessageBox.Show($"¿Está seguro de que desea eliminar la notificación para '{notificacion.NombreFuncionario}'?", "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
+        If MessageBox.Show($"¿Está seguro de que desea eliminar la notificación para '{nombreFuncionario}'?", "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
             Try
                 Await _svc.DeleteAsync(idSeleccionado)
-                Await CargarDatos()
+                Await BuscarAsync() ' Refrescamos la búsqueda actual
             Catch ex As Exception
                 MessageBox.Show($"Ocurrió un error al eliminar: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
         End If
     End Sub
+
+#End Region
+
 End Class

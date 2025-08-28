@@ -43,17 +43,19 @@ Partial Class frmGestionNotificaciones
         Me.Panel1.Controls.Add(Me.btnEditar)
         Me.Panel1.Controls.Add(Me.btnNuevo)
         Me.Panel1.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.Panel1.Location = New System.Drawing.Point(0, 400)
+        Me.Panel1.Location = New System.Drawing.Point(0, 500)
+        Me.Panel1.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.Panel1.Name = "Panel1"
-        Me.Panel1.Size = New System.Drawing.Size(800, 50)
+        Me.Panel1.Size = New System.Drawing.Size(900, 62)
         Me.Panel1.TabIndex = 0
         '
         'btnImprimir
         '
         Me.btnImprimir.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnImprimir.Location = New System.Drawing.Point(440, 9)
+        Me.btnImprimir.Location = New System.Drawing.Point(495, 11)
+        Me.btnImprimir.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.btnImprimir.Name = "btnImprimir"
-        Me.btnImprimir.Size = New System.Drawing.Size(94, 29)
+        Me.btnImprimir.Size = New System.Drawing.Size(106, 36)
         Me.btnImprimir.TabIndex = 3
         Me.btnImprimir.Text = "Imprimir"
         Me.btnImprimir.UseVisualStyleBackColor = True
@@ -61,9 +63,10 @@ Partial Class frmGestionNotificaciones
         'btnEliminar
         '
         Me.btnEliminar.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnEliminar.Location = New System.Drawing.Point(550, 9)
+        Me.btnEliminar.Location = New System.Drawing.Point(619, 11)
+        Me.btnEliminar.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.btnEliminar.Name = "btnEliminar"
-        Me.btnEliminar.Size = New System.Drawing.Size(94, 29)
+        Me.btnEliminar.Size = New System.Drawing.Size(106, 36)
         Me.btnEliminar.TabIndex = 2
         Me.btnEliminar.Text = "Eliminar"
         Me.btnEliminar.UseVisualStyleBackColor = True
@@ -71,18 +74,20 @@ Partial Class frmGestionNotificaciones
         'btnEditar
         '
         Me.btnEditar.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnEditar.Location = New System.Drawing.Point(660, 9)
+        Me.btnEditar.Location = New System.Drawing.Point(742, 11)
+        Me.btnEditar.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.btnEditar.Name = "btnEditar"
-        Me.btnEditar.Size = New System.Drawing.Size(94, 29)
+        Me.btnEditar.Size = New System.Drawing.Size(106, 36)
         Me.btnEditar.TabIndex = 1
         Me.btnEditar.Text = "Editar"
         Me.btnEditar.UseVisualStyleBackColor = True
         '
         'btnNuevo
         '
-        Me.btnNuevo.Location = New System.Drawing.Point(12, 9)
+        Me.btnNuevo.Location = New System.Drawing.Point(14, 11)
+        Me.btnNuevo.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.btnNuevo.Name = "btnNuevo"
-        Me.btnNuevo.Size = New System.Drawing.Size(94, 29)
+        Me.btnNuevo.Size = New System.Drawing.Size(106, 36)
         Me.btnNuevo.TabIndex = 0
         Me.btnNuevo.Text = "Nuevo"
         Me.btnNuevo.UseVisualStyleBackColor = True
@@ -93,45 +98,51 @@ Partial Class frmGestionNotificaciones
         Me.Panel2.Controls.Add(Me.Label1)
         Me.Panel2.Dock = System.Windows.Forms.DockStyle.Top
         Me.Panel2.Location = New System.Drawing.Point(0, 0)
+        Me.Panel2.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.Panel2.Name = "Panel2"
-        Me.Panel2.Size = New System.Drawing.Size(800, 50)
+        Me.Panel2.Size = New System.Drawing.Size(900, 62)
         Me.Panel2.TabIndex = 1
         '
         'txtFiltro
         '
-        Me.txtFiltro.Location = New System.Drawing.Point(70, 12)
+        Me.txtFiltro.Location = New System.Drawing.Point(79, 15)
+        Me.txtFiltro.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.txtFiltro.Name = "txtFiltro"
-        Me.txtFiltro.Size = New System.Drawing.Size(300, 22)
+        Me.txtFiltro.Size = New System.Drawing.Size(337, 26)
         Me.txtFiltro.TabIndex = 1
         '
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(12, 15)
+        Me.Label1.Location = New System.Drawing.Point(14, 19)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(52, 16)
+        Me.Label1.Size = New System.Drawing.Size(63, 20)
         Me.Label1.TabIndex = 0
         Me.Label1.Text = "Buscar:"
         '
         'dgvNotificaciones
         '
+        Me.dgvNotificaciones.AllowUserToResizeColumns = False
+        Me.dgvNotificaciones.AllowUserToResizeRows = False
         Me.dgvNotificaciones.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvNotificaciones.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.dgvNotificaciones.Location = New System.Drawing.Point(0, 50)
+        Me.dgvNotificaciones.Location = New System.Drawing.Point(0, 62)
+        Me.dgvNotificaciones.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.dgvNotificaciones.Name = "dgvNotificaciones"
         Me.dgvNotificaciones.RowHeadersWidth = 51
         Me.dgvNotificaciones.RowTemplate.Height = 24
-        Me.dgvNotificaciones.Size = New System.Drawing.Size(800, 350)
+        Me.dgvNotificaciones.Size = New System.Drawing.Size(900, 438)
         Me.dgvNotificaciones.TabIndex = 2
         '
         'frmGestionNotificaciones
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(800, 450)
+        Me.ClientSize = New System.Drawing.Size(900, 562)
         Me.Controls.Add(Me.dgvNotificaciones)
         Me.Controls.Add(Me.Panel2)
         Me.Controls.Add(Me.Panel1)
+        Me.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.Name = "frmGestionNotificaciones"
         Me.Text = "Gestión de Notificaciones"
         Me.Panel1.ResumeLayout(False)
