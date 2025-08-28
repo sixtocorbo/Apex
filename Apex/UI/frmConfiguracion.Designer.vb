@@ -22,41 +22,77 @@ Partial Class frmConfiguracion
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Me.TabControlPrincipal = New System.Windows.Forms.TabControl()
-        Me.tpEstructura = New System.Windows.Forms.TabPage()
-        Me.tpPersonal = New System.Windows.Forms.TabPage()
-        Me.tpCargos = New System.Windows.Forms.TabPage()
-        Me.btnNomenclaturas = New System.Windows.Forms.Button()
-        Me.btnTurnos = New System.Windows.Forms.Button()
-        Me.btnAreasTrabajo = New System.Windows.Forms.Button()
-        Me.btnSecciones = New System.Windows.Forms.Button()
-        Me.btnCargos = New System.Windows.Forms.Button()
-        Me.btnCategoriasAusencia = New System.Windows.Forms.Button()
-        Me.btnTiposEstadoTransitorio = New System.Windows.Forms.Button()
-        Me.btnGestionarIncidencias = New System.Windows.Forms.Button()
         Me.btnVolver = New System.Windows.Forms.Button()
-        Me.dgvCargosTab = New System.Windows.Forms.DataGridView()
-        Me.TabControlPrincipal.SuspendLayout()
-        Me.tpEstructura.SuspendLayout()
+        Me.tpPersonal = New System.Windows.Forms.TabPage()
+        Me.btnGestionarIncidencias = New System.Windows.Forms.Button()
+        Me.btnTiposEstadoTransitorio = New System.Windows.Forms.Button()
+        Me.btnCategoriasAusencia = New System.Windows.Forms.Button()
+        Me.tpEstructura = New System.Windows.Forms.TabPage()
+        Me.btnCargos = New System.Windows.Forms.Button()
+        Me.btnSecciones = New System.Windows.Forms.Button()
+        Me.btnAreasTrabajo = New System.Windows.Forms.Button()
+        Me.btnTurnos = New System.Windows.Forms.Button()
+        Me.btnNomenclaturas = New System.Windows.Forms.Button()
+        Me.TabControlPrincipal = New System.Windows.Forms.TabControl()
         Me.tpPersonal.SuspendLayout()
-        Me.tpCargos.SuspendLayout()
-        CType(Me.dgvCargosTab, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.tpEstructura.SuspendLayout()
+        Me.TabControlPrincipal.SuspendLayout()
         Me.SuspendLayout()
         '
-        'TabControlPrincipal
+        'btnVolver
         '
-        Me.TabControlPrincipal.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.TabControlPrincipal.Controls.Add(Me.tpEstructura)
-        Me.TabControlPrincipal.Controls.Add(Me.tpPersonal)
-        Me.TabControlPrincipal.Controls.Add(Me.tpCargos)
-        Me.TabControlPrincipal.Location = New System.Drawing.Point(18, 18)
-        Me.TabControlPrincipal.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.TabControlPrincipal.Name = "TabControlPrincipal"
-        Me.TabControlPrincipal.SelectedIndex = 0
-        Me.TabControlPrincipal.Size = New System.Drawing.Size(690, 320)
-        Me.TabControlPrincipal.TabIndex = 0
+        Me.btnVolver.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnVolver.Location = New System.Drawing.Point(596, 348)
+        Me.btnVolver.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnVolver.Name = "btnVolver"
+        Me.btnVolver.Size = New System.Drawing.Size(112, 35)
+        Me.btnVolver.TabIndex = 1
+        Me.btnVolver.Text = "Volver"
+        Me.btnVolver.UseVisualStyleBackColor = True
+        '
+        'tpPersonal
+        '
+        Me.tpPersonal.Controls.Add(Me.btnCategoriasAusencia)
+        Me.tpPersonal.Controls.Add(Me.btnTiposEstadoTransitorio)
+        Me.tpPersonal.Controls.Add(Me.btnGestionarIncidencias)
+        Me.tpPersonal.Location = New System.Drawing.Point(4, 29)
+        Me.tpPersonal.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.tpPersonal.Name = "tpPersonal"
+        Me.tpPersonal.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.tpPersonal.Size = New System.Drawing.Size(682, 287)
+        Me.tpPersonal.TabIndex = 1
+        Me.tpPersonal.Text = "Gestión de Personal y Ausencias"
+        Me.tpPersonal.UseVisualStyleBackColor = True
+        '
+        'btnGestionarIncidencias
+        '
+        Me.btnGestionarIncidencias.Location = New System.Drawing.Point(17, 10)
+        Me.btnGestionarIncidencias.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnGestionarIncidencias.Name = "btnGestionarIncidencias"
+        Me.btnGestionarIncidencias.Size = New System.Drawing.Size(285, 35)
+        Me.btnGestionarIncidencias.TabIndex = 1
+        Me.btnGestionarIncidencias.Text = "Gestionar Incidencias"
+        Me.btnGestionarIncidencias.UseVisualStyleBackColor = True
+        '
+        'btnTiposEstadoTransitorio
+        '
+        Me.btnTiposEstadoTransitorio.Location = New System.Drawing.Point(17, 55)
+        Me.btnTiposEstadoTransitorio.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnTiposEstadoTransitorio.Name = "btnTiposEstadoTransitorio"
+        Me.btnTiposEstadoTransitorio.Size = New System.Drawing.Size(285, 35)
+        Me.btnTiposEstadoTransitorio.TabIndex = 2
+        Me.btnTiposEstadoTransitorio.Text = "Gestionar Tipos de Estado"
+        Me.btnTiposEstadoTransitorio.UseVisualStyleBackColor = True
+        '
+        'btnCategoriasAusencia
+        '
+        Me.btnCategoriasAusencia.Location = New System.Drawing.Point(17, 100)
+        Me.btnCategoriasAusencia.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnCategoriasAusencia.Name = "btnCategoriasAusencia"
+        Me.btnCategoriasAusencia.Size = New System.Drawing.Size(285, 35)
+        Me.btnCategoriasAusencia.TabIndex = 3
+        Me.btnCategoriasAusencia.Text = "Gestionar Categorías de Ausencia"
+        Me.btnCategoriasAusencia.UseVisualStyleBackColor = True
         '
         'tpEstructura
         '
@@ -74,76 +110,15 @@ Partial Class frmConfiguracion
         Me.tpEstructura.Text = "Gestión de Estructura Organizacional"
         Me.tpEstructura.UseVisualStyleBackColor = True
         '
-        'tpPersonal
+        'btnCargos
         '
-        Me.tpPersonal.Controls.Add(Me.btnCategoriasAusencia)
-        Me.tpPersonal.Controls.Add(Me.btnTiposEstadoTransitorio)
-        Me.tpPersonal.Controls.Add(Me.btnGestionarIncidencias)
-        Me.tpPersonal.Location = New System.Drawing.Point(4, 29)
-        Me.tpPersonal.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.tpPersonal.Name = "tpPersonal"
-        Me.tpPersonal.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.tpPersonal.Size = New System.Drawing.Size(682, 287)
-        Me.tpPersonal.TabIndex = 1
-        Me.tpPersonal.Text = "Gestión de Personal y Ausencias"
-        Me.tpPersonal.UseVisualStyleBackColor = True
-        '
-        'tpCargos
-        '
-        Me.tpCargos.Controls.Add(Me.dgvCargosTab)
-        Me.tpCargos.Location = New System.Drawing.Point(4, 29)
-        Me.tpCargos.Name = "tpCargos"
-        Me.tpCargos.Padding = New System.Windows.Forms.Padding(3)
-        Me.tpCargos.Size = New System.Drawing.Size(682, 287)
-        Me.tpCargos.TabIndex = 2
-        Me.tpCargos.Text = "Ver Cargos"
-        Me.tpCargos.UseVisualStyleBackColor = True
-        '
-        'dgvCargosTab
-        '
-        Me.dgvCargosTab.AllowUserToAddRows = False
-        Me.dgvCargosTab.AllowUserToDeleteRows = False
-        Me.dgvCargosTab.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.dgvCargosTab.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.dgvCargosTab.Location = New System.Drawing.Point(3, 3)
-        Me.dgvCargosTab.Name = "dgvCargosTab"
-        Me.dgvCargosTab.ReadOnly = True
-        Me.dgvCargosTab.RowHeadersWidth = 62
-        Me.dgvCargosTab.RowTemplate.Height = 28
-        Me.dgvCargosTab.Size = New System.Drawing.Size(676, 281)
-        Me.dgvCargosTab.TabIndex = 0
-        '
-        'btnNomenclaturas
-        '
-        Me.btnNomenclaturas.Location = New System.Drawing.Point(30, 206)
-        Me.btnNomenclaturas.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnNomenclaturas.Name = "btnNomenclaturas"
-        Me.btnNomenclaturas.Size = New System.Drawing.Size(285, 35)
-        Me.btnNomenclaturas.TabIndex = 4
-        Me.btnNomenclaturas.Text = "Gestionar Nomenclaturas"
-        Me.btnNomenclaturas.UseVisualStyleBackColor = True
-        '
-        'btnTurnos
-        '
-        Me.btnTurnos.Location = New System.Drawing.Point(30, 162)
-        Me.btnTurnos.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnTurnos.Name = "btnTurnos"
-        Me.btnTurnos.Size = New System.Drawing.Size(285, 35)
-        Me.btnTurnos.TabIndex = 3
-        Me.btnTurnos.Text = "Gestionar Turnos"
-        Me.btnTurnos.UseVisualStyleBackColor = True
-        '
-        'btnAreasTrabajo
-        '
-        Me.btnAreasTrabajo.Location = New System.Drawing.Point(30, 117)
-        Me.btnAreasTrabajo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnAreasTrabajo.Name = "btnAreasTrabajo"
-        Me.btnAreasTrabajo.Size = New System.Drawing.Size(285, 35)
-        Me.btnAreasTrabajo.TabIndex = 2
-        Me.btnAreasTrabajo.Text = "Gestionar Áreas de Trabajo"
-        Me.btnAreasTrabajo.UseVisualStyleBackColor = True
+        Me.btnCargos.Location = New System.Drawing.Point(30, 28)
+        Me.btnCargos.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnCargos.Name = "btnCargos"
+        Me.btnCargos.Size = New System.Drawing.Size(285, 35)
+        Me.btnCargos.TabIndex = 0
+        Me.btnCargos.Text = "Gestionar Cargos"
+        Me.btnCargos.UseVisualStyleBackColor = True
         '
         'btnSecciones
         '
@@ -155,56 +130,49 @@ Partial Class frmConfiguracion
         Me.btnSecciones.Text = "Gestionar Secciones"
         Me.btnSecciones.UseVisualStyleBackColor = True
         '
-        'btnCargos
+        'btnAreasTrabajo
         '
-        Me.btnCargos.Location = New System.Drawing.Point(30, 28)
-        Me.btnCargos.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnCargos.Name = "btnCargos"
-        Me.btnCargos.Size = New System.Drawing.Size(285, 35)
-        Me.btnCargos.TabIndex = 0
-        Me.btnCargos.Text = "Gestionar Cargos"
-        Me.btnCargos.UseVisualStyleBackColor = True
+        Me.btnAreasTrabajo.Location = New System.Drawing.Point(30, 117)
+        Me.btnAreasTrabajo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnAreasTrabajo.Name = "btnAreasTrabajo"
+        Me.btnAreasTrabajo.Size = New System.Drawing.Size(285, 35)
+        Me.btnAreasTrabajo.TabIndex = 2
+        Me.btnAreasTrabajo.Text = "Gestionar Áreas de Trabajo"
+        Me.btnAreasTrabajo.UseVisualStyleBackColor = True
         '
-        'btnCategoriasAusencia
+        'btnTurnos
         '
-        Me.btnCategoriasAusencia.Location = New System.Drawing.Point(17, 100)
-        Me.btnCategoriasAusencia.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnCategoriasAusencia.Name = "btnCategoriasAusencia"
-        Me.btnCategoriasAusencia.Size = New System.Drawing.Size(285, 35)
-        Me.btnCategoriasAusencia.TabIndex = 3
-        Me.btnCategoriasAusencia.Text = "Gestionar Categorías de Ausencia"
-        Me.btnCategoriasAusencia.UseVisualStyleBackColor = True
+        Me.btnTurnos.Location = New System.Drawing.Point(30, 162)
+        Me.btnTurnos.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnTurnos.Name = "btnTurnos"
+        Me.btnTurnos.Size = New System.Drawing.Size(285, 35)
+        Me.btnTurnos.TabIndex = 3
+        Me.btnTurnos.Text = "Gestionar Turnos"
+        Me.btnTurnos.UseVisualStyleBackColor = True
         '
-        'btnTiposEstadoTransitorio
+        'btnNomenclaturas
         '
-        Me.btnTiposEstadoTransitorio.Location = New System.Drawing.Point(17, 55)
-        Me.btnTiposEstadoTransitorio.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnTiposEstadoTransitorio.Name = "btnTiposEstadoTransitorio"
-        Me.btnTiposEstadoTransitorio.Size = New System.Drawing.Size(285, 35)
-        Me.btnTiposEstadoTransitorio.TabIndex = 2
-        Me.btnTiposEstadoTransitorio.Text = "Gestionar Tipos de Estado"
-        Me.btnTiposEstadoTransitorio.UseVisualStyleBackColor = True
+        Me.btnNomenclaturas.Location = New System.Drawing.Point(30, 206)
+        Me.btnNomenclaturas.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnNomenclaturas.Name = "btnNomenclaturas"
+        Me.btnNomenclaturas.Size = New System.Drawing.Size(285, 35)
+        Me.btnNomenclaturas.TabIndex = 4
+        Me.btnNomenclaturas.Text = "Gestionar Nomenclaturas"
+        Me.btnNomenclaturas.UseVisualStyleBackColor = True
         '
-        'btnGestionarIncidencias
+        'TabControlPrincipal
         '
-        Me.btnGestionarIncidencias.Location = New System.Drawing.Point(17, 10)
-        Me.btnGestionarIncidencias.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnGestionarIncidencias.Name = "btnGestionarIncidencias"
-        Me.btnGestionarIncidencias.Size = New System.Drawing.Size(285, 35)
-        Me.btnGestionarIncidencias.TabIndex = 1
-        Me.btnGestionarIncidencias.Text = "Gestionar Incidencias"
-        Me.btnGestionarIncidencias.UseVisualStyleBackColor = True
-        '
-        'btnVolver
-        '
-        Me.btnVolver.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnVolver.Location = New System.Drawing.Point(596, 348)
-        Me.btnVolver.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnVolver.Name = "btnVolver"
-        Me.btnVolver.Size = New System.Drawing.Size(112, 35)
-        Me.btnVolver.TabIndex = 1
-        Me.btnVolver.Text = "Volver"
-        Me.btnVolver.UseVisualStyleBackColor = True
+        Me.TabControlPrincipal.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.TabControlPrincipal.Controls.Add(Me.tpEstructura)
+        Me.TabControlPrincipal.Controls.Add(Me.tpPersonal)
+        Me.TabControlPrincipal.Location = New System.Drawing.Point(18, 18)
+        Me.TabControlPrincipal.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.TabControlPrincipal.Name = "TabControlPrincipal"
+        Me.TabControlPrincipal.SelectedIndex = 0
+        Me.TabControlPrincipal.Size = New System.Drawing.Size(690, 320)
+        Me.TabControlPrincipal.TabIndex = 0
         '
         'frmConfiguracion
         '
@@ -218,27 +186,22 @@ Partial Class frmConfiguracion
         Me.Name = "frmConfiguracion"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = "Configuración del Sistema"
-        Me.TabControlPrincipal.ResumeLayout(False)
-        Me.tpEstructura.ResumeLayout(False)
         Me.tpPersonal.ResumeLayout(False)
-        Me.tpCargos.ResumeLayout(False)
-        CType(Me.dgvCargosTab, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.tpEstructura.ResumeLayout(False)
+        Me.TabControlPrincipal.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub
-
-    Friend WithEvents TabControlPrincipal As TabControl
-    Friend WithEvents tpEstructura As TabPage
     Friend WithEvents btnVolver As Button
+    Friend WithEvents tpPersonal As TabPage
+    Friend WithEvents btnCategoriasAusencia As Button
+    Friend WithEvents btnTiposEstadoTransitorio As Button
+    Friend WithEvents btnGestionarIncidencias As Button
+    Friend WithEvents tpEstructura As TabPage
     Friend WithEvents btnNomenclaturas As Button
     Friend WithEvents btnTurnos As Button
     Friend WithEvents btnAreasTrabajo As Button
     Friend WithEvents btnSecciones As Button
     Friend WithEvents btnCargos As Button
-    Friend WithEvents tpPersonal As TabPage
-    Friend WithEvents btnGestionarIncidencias As Button
-    Friend WithEvents btnTiposEstadoTransitorio As Button
-    Friend WithEvents btnCategoriasAusencia As Button
-    Friend WithEvents tpCargos As TabPage
-    Friend WithEvents dgvCargosTab As DataGridView
+    Friend WithEvents TabControlPrincipal As TabControl
 End Class

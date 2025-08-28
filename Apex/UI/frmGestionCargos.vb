@@ -5,9 +5,9 @@ Imports System.ComponentModel
 
 Public Class frmGestionCargos
 
-    ' Definir un tipo de delegado explícito para el evento
-    Public Delegate Sub CargosModificadosEventHandler()
-    Public Event CargosModificados As CargosModificadosEventHandler
+    ' Ya no se necesitan el delegado ni el evento
+    ' Public Delegate Sub CargosModificadosEventHandler()
+    ' Public Event CargosModificados As CargosModificadosEventHandler
 
     Private _cargoService As New CargoService()
     Private _listaCargos As BindingList(Of Cargo)
@@ -118,8 +118,7 @@ Public Class frmGestionCargos
             Await CargarDatosAsync()
             LimpiarCampos()
 
-            ' Disparar el evento de modificación de cargos
-            RaiseEvent CargosModificados()
+            ' Se eliminó el RaiseEvent CargosModificados()
         Catch ex As Exception
             MessageBox.Show("Ocurrió un error al guardar el cargo: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         Finally
@@ -143,8 +142,7 @@ Public Class frmGestionCargos
                 Await CargarDatosAsync()
                 LimpiarCampos()
 
-                ' Disparar el evento de modificación de cargos
-                RaiseEvent CargosModificados()
+                ' Se eliminó el RaiseEvent CargosModificados()
             Catch ex As Exception
                 MessageBox.Show("Ocurrió un error al eliminar el cargo: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             Finally
@@ -152,5 +150,4 @@ Public Class frmGestionCargos
             End Try
         End If
     End Sub
-
 End Class

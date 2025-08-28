@@ -1,6 +1,4 @@
-﻿Imports System.Data.Entity
-Imports System.Windows.Forms
-Imports System.ComponentModel
+﻿Imports System.ComponentModel
 
 Public Class frmConfiguracion
 
@@ -14,14 +12,6 @@ Public Class frmConfiguracion
     Private _gestionTiposEstadoTransitorioInstancia As frmGestionTiposEstadoTransitorio
     Private _gestionCategoriasAusenciaInstancia As frmGestionCategoriasAusencia
 
-    ' Variable para el delegado de eventos, usando el tipo correcto
-    Private cargosModificadosDelegate As frmGestionCargos.CargosModificadosEventHandler
-
-    Private Async Sub frmConfiguracion_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        ' Cargar la lista de cargos al iniciar el formulario
-        CargarCargosEnTab()
-    End Sub
-
     Private Sub btnGestionarIncidencias_Click(sender As Object, e As EventArgs) Handles btnGestionarIncidencias.Click
         If _gestionIncidenciasInstancia Is Nothing OrElse _gestionIncidenciasInstancia.IsDisposed Then
             _gestionIncidenciasInstancia = New frmGestionIncidencias()
@@ -31,28 +21,11 @@ Public Class frmConfiguracion
     End Sub
 
     Private Sub btnCargos_Click(sender As Object, e As EventArgs) Handles btnCargos.Click
-        If _gestionCargosInstancia Is Nothing OrElse _gestionCargosInstancia.IsDisposed Then
-            _gestionCargosInstancia = New frmGestionCargos()
-
-            ' Asignar el método a una variable delegada y suscribirse
-            cargosModificadosDelegate = AddressOf CargarCargosEnTab
-            AddHandler _gestionCargosInstancia.CargosModificados, cargosModificadosDelegate
-        End If
+        ' Ya no hay necesidad de verificar la instancia ni de delegados.
+        _gestionCargosInstancia = New frmGestionCargos()
 
         Dim parentDashboard As frmDashboard = CType(Me.ParentForm, frmDashboard)
         parentDashboard.AbrirFormEnPanel(_gestionCargosInstancia)
-
-        TabControlPrincipal.SelectedTab = tpCargos
-    End Sub
-
-    Private Async Sub CargarCargosEnTab()
-        Me.Cursor = Cursors.WaitCursor
-        Try
-            Dim lista = Await _cargoService.GetAllAsync()
-            dgvCargosTab.DataSource = New BindingList(Of Cargo)(lista.ToList())
-        Finally
-            Me.Cursor = Cursors.Default
-        End Try
     End Sub
 
     Private Sub btnSecciones_Click(sender As Object, e As EventArgs) Handles btnSecciones.Click
@@ -104,10 +77,7 @@ Public Class frmConfiguracion
     End Sub
 
     Private Sub btnVolver_Click(sender As Object, e As EventArgs) Handles btnVolver.Click
-        ' Desuscribirse del evento antes de cerrar el formulario para evitar fugas de memoria
-        If _gestionCargosInstancia IsNot Nothing Then
-            RemoveHandler _gestionCargosInstancia.CargosModificados, cargosModificadosDelegate
-        End If
+        ' Ya no hay delegados de los que desuscribirse
         Me.Close()
     End Sub
 End Class
