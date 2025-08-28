@@ -190,11 +190,17 @@ Public Class frmDashboard
 
     Public Sub AbrirFormEnPanel(childForm As Form)
         ' Verifica si hay un formulario activo y si es diferente al nuevo.
-        ' Si es así, lo oculta y libera sus recursos.
         If activeForm IsNot Nothing AndAlso activeForm IsNot childForm Then
             activeForm.Hide()
-            activeForm.Dispose()
+
+            ' --- MODIFICACIÓN ---
+            ' Solo desecha el formulario si NO es el de Filtro Avanzado.
+            If Not TypeOf activeForm Is frmFiltroAvanzado Then
+                activeForm.Dispose()
+            End If
+            ' --- FIN MODIFICACIÓN ---
         End If
+
         activeForm = childForm
         If Not Me.panelContenido.Controls.Contains(childForm) Then
             childForm.TopLevel = False
