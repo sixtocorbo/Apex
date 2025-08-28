@@ -287,9 +287,14 @@ Public Class frmFuncionarioBuscar
     Private Sub btnVerSituacion_Click(sender As Object, e As EventArgs)
         If dgvResultados.CurrentRow Is Nothing Then Return
         Dim id = CInt(dgvResultados.CurrentRow.Cells("Id").Value)
-        Using frm As New frmFuncionarioSituacion(id)
-            frm.ShowDialog(Me)
-        End Using
+        Dim frm As New frmFuncionarioSituacion(id)
+        ' Se obtiene una referencia al formulario Dashboard
+        Dim parentDashboard As frmDashboard = CType(Me.ParentForm, frmDashboard)
+
+            ' Se llama al método público del Dashboard para abrir el formulario en el panel
+            parentDashboard.AbrirFormEnPanel(frm)
+
+
     End Sub
 
     ' Clase DTO interna para el botón
@@ -375,8 +380,14 @@ Public Class frmFuncionarioBuscar
     End Sub
     Private Sub btnGenerarFicha_Click(sender As Object, e As EventArgs)
         If FuncionarioSeleccionado IsNot Nothing Then
+            ' Se crea una instancia del formulario que se quiere abrir
             Dim frm As New frmFichaFuncionalRPT(FuncionarioSeleccionado.Id)
-            frm.Show()
+
+            ' Se obtiene una referencia al formulario Dashboard
+            Dim parentDashboard As frmDashboard = CType(Me.ParentForm, frmDashboard)
+
+            ' Se llama al método público del Dashboard para abrir el formulario en el panel
+            parentDashboard.AbrirFormEnPanel(frm)
         Else
             MessageBox.Show("Por favor, seleccione un funcionario de la lista.", "Selección requerida", MessageBoxButtons.OK, MessageBoxIcon.Information)
         End If
@@ -395,6 +406,8 @@ Public Class frmFuncionarioBuscar
         Public Property FuncionarioId As Integer
         Public Property Resultado As String
     End Class
+
+
 
 #End Region
 
