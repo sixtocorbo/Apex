@@ -25,6 +25,7 @@ Partial Class frmFuncionarioCrear
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
         Me.btnGuardar = New System.Windows.Forms.Button()
         Me.btnCancelar = New System.Windows.Forms.Button()
+        Me.btnAuditoria = New System.Windows.Forms.Button()
         Me.TabPageEstadosTransitorios = New System.Windows.Forms.TabPage()
         Me.TableLayoutPanelEstados = New System.Windows.Forms.TableLayoutPanel()
         Me.dgvEstadosTransitorios = New System.Windows.Forms.DataGridView()
@@ -99,7 +100,6 @@ Partial Class frmFuncionarioCrear
         Me.chkProcesado = New System.Windows.Forms.CheckBox()
         Me.chkSeparado = New System.Windows.Forms.CheckBox()
         Me.TabControlMain = New System.Windows.Forms.TabControl()
-        Me.btnAuditoria = New System.Windows.Forms.Button()
         Me.FlowLayoutPanel1.SuspendLayout()
         Me.TabPageEstadosTransitorios.SuspendLayout()
         Me.TableLayoutPanelEstados.SuspendLayout()
@@ -148,6 +148,7 @@ Partial Class frmFuncionarioCrear
         'btnCancelar
         '
         Me.btnCancelar.AutoSize = True
+        Me.btnCancelar.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.btnCancelar.Location = New System.Drawing.Point(842, 13)
         Me.btnCancelar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnCancelar.Name = "btnCancelar"
@@ -156,6 +157,18 @@ Partial Class frmFuncionarioCrear
         Me.btnCancelar.TabIndex = 17
         Me.btnCancelar.Text = "Cancelar"
         Me.btnCancelar.UseVisualStyleBackColor = True
+        '
+        'btnAuditoria
+        '
+        Me.btnAuditoria.AutoSize = True
+        Me.btnAuditoria.Location = New System.Drawing.Point(681, 13)
+        Me.btnAuditoria.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnAuditoria.Name = "btnAuditoria"
+        Me.btnAuditoria.Padding = New System.Windows.Forms.Padding(15, 3, 15, 3)
+        Me.btnAuditoria.Size = New System.Drawing.Size(153, 52)
+        Me.btnAuditoria.TabIndex = 18
+        Me.btnAuditoria.Text = "Auditoria"
+        Me.btnAuditoria.UseVisualStyleBackColor = True
         '
         'TabPageEstadosTransitorios
         '
@@ -1056,25 +1069,15 @@ Partial Class frmFuncionarioCrear
         Me.TabControlMain.Size = New System.Drawing.Size(1176, 624)
         Me.TabControlMain.TabIndex = 2
         '
-        'btnAuditoria
-        '
-        Me.btnAuditoria.AutoSize = True
-        Me.btnAuditoria.Location = New System.Drawing.Point(681, 13)
-        Me.btnAuditoria.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnAuditoria.Name = "btnAuditoria"
-        Me.btnAuditoria.Padding = New System.Windows.Forms.Padding(15, 3, 15, 3)
-        Me.btnAuditoria.Size = New System.Drawing.Size(153, 52)
-        Me.btnAuditoria.TabIndex = 18
-        Me.btnAuditoria.Text = "Auditoria"
-        Me.btnAuditoria.UseVisualStyleBackColor = True
-        '
         'frmFuncionarioCrear
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.CancelButton = Me.btnCancelar
         Me.ClientSize = New System.Drawing.Size(1176, 702)
         Me.Controls.Add(Me.TabControlMain)
         Me.Controls.Add(Me.FlowLayoutPanel1)
+        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.MinimumSize = New System.Drawing.Size(1189, 728)
         Me.Name = "frmFuncionarioCrear"

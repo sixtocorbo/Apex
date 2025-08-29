@@ -42,7 +42,6 @@ Public Class frmFuncionarioBuscar
         FlowLayoutPanelAcciones.Visible = (_modo = ModoApertura.Seleccion)
     End Sub
 
-    ' --- INICIO DE LA CORRECCIÓN #1: Conectar al Notificador de Eventos ---
     Private Sub frmFuncionarioBuscar_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
         ConfigurarGrilla()
@@ -52,28 +51,29 @@ Public Class frmFuncionarioBuscar
         AddHandler NotificadorEventos.DatosActualizados, AddressOf OnDatosActualizados
     End Sub
 
+
+    Private Sub frmFuncionarioBuscar_Activated(sender As Object, e As EventArgs) Handles Me.Activated
+        ' Esto asegura que, sin importar cómo se active el formulario,
+        ' el foco siempre se establecerá en el cuadro de búsqueda.
+        txtBusqueda.Focus()
+    End Sub
+
     ''' <summary>
     ''' Este método se ejecutará automáticamente cuando otro formulario notifique un cambio.
     ''' </summary>
     Private Async Sub OnDatosActualizados(sender As Object, e As EventArgs)
-        ' --- INICIO DE LA CORRECCIÓN #2: Eliminar la condición Me.Visible ---
+
         ' El formulario se actualizará incluso si está oculto, asegurando que los datos
         ' estén frescos cuando el usuario vuelva a esta pantalla.
         If Me.IsHandleCreated Then
             Await BuscarAsync()
         End If
-        ' --- FIN DE LA CORRECCIÓN #2 ---
+
     End Sub
 
     ' Es una buena práctica desuscribirse para evitar fugas de memoria.
     Private Sub frmFuncionarioBuscar_FormClosed(sender As Object, e As FormClosedEventArgs) Handles Me.FormClosed
         RemoveHandler NotificadorEventos.DatosActualizados, AddressOf OnDatosActualizados
-    End Sub
-    ' --- FIN DE LA CORRECCIÓN #1 ---
-
-
-    Private Sub frmFuncionarioBuscar_Shown(sender As Object, e As EventArgs) Handles Me.Shown
-        Me.ActiveControl = txtBusqueda
     End Sub
 
 #Region "Diseño de grilla"

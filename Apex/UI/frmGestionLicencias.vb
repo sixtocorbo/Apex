@@ -92,12 +92,9 @@ Public Class frmGestionLicencias
         ' --- INICIO DE LA CORRECCIÓN ---
         ' Abrimos el formulario como un diálogo modal.
         ' La ejecución se detendrá aquí hasta que el formulario frmLicenciaCrear se cierre.
-        Using frm As New frmLicenciaCrear()
-            frm.ShowDialog(Me)
-            ' No necesitamos hacer nada después. Si el usuario guardó,
-            ' el evento OnDatosActualizados se encargará de refrescar la grilla automáticamente.
-        End Using
-        ' --- FIN DE LA CORRECCIÓN ---
+        Dim frm As New frmLicenciaCrear()
+        Dim parentDashboard As frmDashboard = CType(Me.ParentForm, frmDashboard)
+        parentDashboard.AbrirFormEnPanel(frm)
     End Sub
 
     Private Sub btnEditarLicencia_Click(sender As Object, e As EventArgs) Handles btnEditarLicencia.Click

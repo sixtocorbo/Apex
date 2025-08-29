@@ -281,5 +281,18 @@ Public Class frmFuncionarioSituacion
         Dim dgv = CType(sender, DataGridView)
         If dgv.Columns.Contains("Entity") Then dgv.Columns("Entity").Visible = False
     End Sub
+
+    ' --- INICIO DE LA MODIFICACIÓN #2 ---
+    ''' <summary>
+    ''' Este evento se dispara cada vez que se presiona una tecla mientras el formulario tiene el foco.
+    ''' </summary>
+    Private Sub Cerrando(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
+        ' Si la tecla presionada es Escape, se cierra el formulario.
+        If e.KeyCode = Keys.Escape Then
+            Me.Close()
+        End If
+    End Sub
+
+    ' --- FIN DE LA MODIFICACIÓN #2 ---
 #End Region
 End Class

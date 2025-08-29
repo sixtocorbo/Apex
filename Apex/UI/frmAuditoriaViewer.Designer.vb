@@ -47,6 +47,7 @@ Partial Class frmAuditoriaViewer
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1176, 709)
         Me.Controls.Add(Me.dgvAuditoria)
+        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Name = "frmAuditoriaViewer"
         Me.Text = "Visor de Auditoría"

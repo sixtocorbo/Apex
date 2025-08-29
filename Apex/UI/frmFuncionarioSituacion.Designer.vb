@@ -20,18 +20,18 @@ Partial Class frmFuncionarioSituacion
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
-        Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Me.lblNombre = New System.Windows.Forms.Label()
         Me.dtpDesde = New System.Windows.Forms.DateTimePicker()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
         Me.flpTimeline = New System.Windows.Forms.FlowLayoutPanel()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
-        Me.TabPage1 = New System.Windows.Forms.TabPage()
-        Me.dgvNovedades = New System.Windows.Forms.DataGridView()
         Me.TabPage2 = New System.Windows.Forms.TabPage()
         Me.dgvEstados = New System.Windows.Forms.DataGridView()
+        Me.TabPage1 = New System.Windows.Forms.TabPage()
+        Me.dgvNovedades = New System.Windows.Forms.DataGridView()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.Label2 = New System.Windows.Forms.Label()
         Me.dtpHasta = New System.Windows.Forms.DateTimePicker()
@@ -41,10 +41,10 @@ Partial Class frmFuncionarioSituacion
         Me.SplitContainer1.Panel2.SuspendLayout()
         Me.SplitContainer1.SuspendLayout()
         Me.TabControl1.SuspendLayout()
-        Me.TabPage1.SuspendLayout()
-        CType(Me.dgvNovedades, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabPage2.SuspendLayout()
         CType(Me.dgvEstados, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.TabPage1.SuspendLayout()
+        CType(Me.dgvNovedades, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'lblNombre
@@ -106,7 +106,7 @@ Partial Class frmFuncionarioSituacion
         Me.flpTimeline.Location = New System.Drawing.Point(0, 0)
         Me.flpTimeline.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.flpTimeline.Name = "flpTimeline"
-        Me.flpTimeline.Padding = New System.Windows.Forms.Padding(8, 8, 8, 8)
+        Me.flpTimeline.Padding = New System.Windows.Forms.Padding(8)
         Me.flpTimeline.Size = New System.Drawing.Size(387, 552)
         Me.flpTimeline.TabIndex = 0
         '
@@ -121,43 +121,6 @@ Partial Class frmFuncionarioSituacion
         Me.TabControl1.SelectedIndex = 0
         Me.TabControl1.Size = New System.Drawing.Size(771, 552)
         Me.TabControl1.TabIndex = 0
-        '
-        'TabPage1
-        '
-        Me.TabPage1.Controls.Add(Me.dgvNovedades)
-        Me.TabPage1.Location = New System.Drawing.Point(4, 29)
-        Me.TabPage1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.TabPage1.Name = "TabPage1"
-        Me.TabPage1.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.TabPage1.Size = New System.Drawing.Size(763, 519)
-        Me.TabPage1.TabIndex = 0
-        Me.TabPage1.Text = "Novedades del Día"
-        Me.TabPage1.UseVisualStyleBackColor = True
-        '
-        'dgvNovedades
-        '
-        Me.dgvNovedades.AllowUserToAddRows = False
-        Me.dgvNovedades.AllowUserToDeleteRows = False
-        Me.dgvNovedades.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill
-        Me.dgvNovedades.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        DataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window
-        DataGridViewCellStyle2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
-        DataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText
-        DataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.dgvNovedades.DefaultCellStyle = DataGridViewCellStyle2
-        Me.dgvNovedades.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.dgvNovedades.Location = New System.Drawing.Point(4, 5)
-        Me.dgvNovedades.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.dgvNovedades.Name = "dgvNovedades"
-        Me.dgvNovedades.ReadOnly = True
-        Me.dgvNovedades.RowHeadersVisible = False
-        Me.dgvNovedades.RowHeadersWidth = 62
-        Me.dgvNovedades.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgvNovedades.Size = New System.Drawing.Size(755, 509)
-        Me.dgvNovedades.TabIndex = 1
         '
         'TabPage2
         '
@@ -195,6 +158,43 @@ Partial Class frmFuncionarioSituacion
         Me.dgvEstados.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
         Me.dgvEstados.Size = New System.Drawing.Size(755, 509)
         Me.dgvEstados.TabIndex = 2
+        '
+        'TabPage1
+        '
+        Me.TabPage1.Controls.Add(Me.dgvNovedades)
+        Me.TabPage1.Location = New System.Drawing.Point(4, 29)
+        Me.TabPage1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.TabPage1.Name = "TabPage1"
+        Me.TabPage1.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.TabPage1.Size = New System.Drawing.Size(763, 519)
+        Me.TabPage1.TabIndex = 0
+        Me.TabPage1.Text = "Novedades del Día"
+        Me.TabPage1.UseVisualStyleBackColor = True
+        '
+        'dgvNovedades
+        '
+        Me.dgvNovedades.AllowUserToAddRows = False
+        Me.dgvNovedades.AllowUserToDeleteRows = False
+        Me.dgvNovedades.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill
+        Me.dgvNovedades.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        DataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window
+        DataGridViewCellStyle2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        DataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText
+        DataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.dgvNovedades.DefaultCellStyle = DataGridViewCellStyle2
+        Me.dgvNovedades.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.dgvNovedades.Location = New System.Drawing.Point(4, 5)
+        Me.dgvNovedades.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.dgvNovedades.Name = "dgvNovedades"
+        Me.dgvNovedades.ReadOnly = True
+        Me.dgvNovedades.RowHeadersVisible = False
+        Me.dgvNovedades.RowHeadersWidth = 62
+        Me.dgvNovedades.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
+        Me.dgvNovedades.Size = New System.Drawing.Size(755, 509)
+        Me.dgvNovedades.TabIndex = 1
         '
         'Label2
         '
@@ -237,6 +237,7 @@ Partial Class frmFuncionarioSituacion
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.dtpDesde)
         Me.Controls.Add(Me.lblNombre)
+        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Name = "frmFuncionarioSituacion"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
@@ -246,10 +247,10 @@ Partial Class frmFuncionarioSituacion
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.SplitContainer1.ResumeLayout(False)
         Me.TabControl1.ResumeLayout(False)
-        Me.TabPage1.ResumeLayout(False)
-        CType(Me.dgvNovedades, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TabPage2.ResumeLayout(False)
         CType(Me.dgvEstados, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.TabPage1.ResumeLayout(False)
+        CType(Me.dgvNovedades, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 

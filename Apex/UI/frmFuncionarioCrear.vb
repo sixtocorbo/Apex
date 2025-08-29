@@ -792,13 +792,33 @@ Public Class frmFuncionarioCrear
         End If
 
         ' Usamos el ID del funcionario para abrir el visor
-        Using frm As New frmAuditoriaViewer(_funcionario.Id.ToString())
-            frm.ShowDialog(Me)
-        End Using
+        Dim frm As New frmAuditoriaViewer(_funcionario.Id.ToString())
+        Dim parentDashboard As frmDashboard = CType(Me.ParentForm, frmDashboard)
+        parentDashboard.AbrirFormEnPanel(frm)
     End Sub
 
     Private Sub btnCancelar_Click(sender As Object, e As EventArgs) Handles btnCancelar.Click
         _cerrandoPorCodigo = True
         Close()
+    End Sub
+
+    ' --- INICIO DE LA MODIFICACIÓN #2 ---
+    ''' <summary>
+    ''' Maneja el evento de presión de teclas para todo el formulario.
+    ''' </summary>
+    Private Sub frmFuncionarioCrear_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
+        ' Si la tecla presionada es Escape...
+        If e.KeyCode = Keys.Escape Then
+            ' ...simulamos un clic en el botón Cancelar.
+            ' Esto asegura que se ejecute toda la lógica definida en btnCancelar_Click.
+            btnCancelar.PerformClick()
+        End If
+    End Sub
+    ' --- FIN DE LA MODIFICACIÓN #2 ---
+    ' ESTE ES EL NUEVO MÉTODO QUE DEBES AÑADIR
+    Private Sub Foco(sender As Object, e As EventArgs) Handles Me.Shown
+        ' Establecemos el foco en el campo de Cédula de Identidad
+        ' en cuanto el formulario se muestra por primera vez.
+        txtCI.Focus()
     End Sub
 End Class
