@@ -392,7 +392,7 @@ Public Class frmFuncionarioBuscar
     End Sub
     Private Sub btnGenerarFicha_Click(sender As Object, e As EventArgs)
         If FuncionarioSeleccionado IsNot Nothing Then
-            Dim frm As New frmFichaFuncionalRPT(FuncionarioSeleccionado.Id)
+            Dim frm As New frmFichaPersonalRPT(FuncionarioSeleccionado.Id)
             Dim parentDashboard As frmDashboard = CType(Me.ParentForm, frmDashboard)
             parentDashboard.AbrirFormEnPanel(frm)
         Else

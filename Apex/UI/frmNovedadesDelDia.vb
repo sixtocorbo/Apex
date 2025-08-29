@@ -120,7 +120,7 @@ Public Class frmNovedadesDelDia
             }).ToList()
 
             ' 4. Mostrar el visor de reportes
-            Using frmVisor As New frmVisorReporteNovedades(datosParaReporte)
+            Using frmVisor As New frmNovedadesRPT(datosParaReporte)
                 frmVisor.ShowDialog(Me)
             End Using
 

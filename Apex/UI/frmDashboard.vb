@@ -16,7 +16,7 @@ Public Class frmDashboard
     ' Agregá aquí otras pantallas si querés controlar su foco inicial.
     Private ReadOnly _controlFocoPreferido As New Dictionary(Of Type, String) From {
         {GetType(frmFuncionarioBuscar), "txtBusqueda"},
-        {GetType(frmFiltroAvanzado), "txtBusquedaGlobal"},
+        {GetType(frmFiltros), "txtBusquedaGlobal"},
          {GetType(frmFuncionarioCrear), "txtCI"}
     }
 
@@ -171,17 +171,17 @@ Public Class frmDashboard
     Private Function ObtenerTipoDeFormulario(nombreBoton As String) As Type
         Select Case nombreBoton
             Case "btnBuscarFuncionario" : Return GetType(frmFuncionarioBuscar)
-            Case "btnLicencias" : Return GetType(frmGestionLicencias)
-            Case "btnNotificaciones" : Return GetType(frmGestionNotificaciones)
-            Case "btnSanciones" : Return GetType(frmGestionSanciones)
-            Case "btnConceptoFuncional" : Return GetType(frmConceptoFuncionalApex)
-            Case "btnFiltros" : Return GetType(frmFiltroAvanzado)
+            Case "btnLicencias" : Return GetType(frmLicencias)
+            Case "btnNotificaciones" : Return GetType(frmNotificaciones)
+            Case "btnSanciones" : Return GetType(frmSanciones)
+            Case "btnConceptoFuncional" : Return GetType(frmConceptoFuncional)
+            Case "btnFiltros" : Return GetType(frmFiltros)
             Case "btnNovedades" : Return GetType(frmNovedades)
-            Case "btnNomenclaturas" : Return GetType(frmGestionNomenclaturas)
+            Case "btnNomenclaturas" : Return GetType(frmNemenclaturas)
             Case "btnRenombrarPDFs" : Return GetType(frmRenombrarPDF)
             Case "btnImportacion" : Return GetType(frmAsistenteImportacion)
-            Case "btnViaticos" : Return GetType(frmReporteViaticos)
-            Case "btnReportes" : Return GetType(frmReporteNovedades)
+            Case "btnViaticos" : Return GetType(frmViaticosListas)
+            Case "btnReportes" : Return GetType(frmNovedadesListas)
             Case "btnAnalisis" : Return GetType(frmAnalisisEstacionalidad)
             Case "btnAnalisisPersonal" : Return GetType(frmAnalisisFuncionarios)
             Case "btnConfiguracion" : Return GetType(frmConfiguracion)

@@ -3,18 +3,18 @@
 Public Class frmConfiguracion
 
     Private _cargoService As New CargoService()
-    Private _gestionIncidenciasInstancia As frmGestionIncidencias
-    Private _gestionCargosInstancia As frmGestionCargos
-    Private _gestionSeccionesInstancia As frmGestionSecciones
-    Private _gestionAreasTrabajoInstancia As frmGestionAreasTrabajo
-    Private _gestionTurnosInstancia As frmGestionTurnos
-    Private _gestionNomenclaturasInstancia As frmGestionNomenclaturas
-    Private _gestionTiposEstadoTransitorioInstancia As frmGestionTiposEstadoTransitorio
-    Private _gestionCategoriasAusenciaInstancia As frmGestionCategoriasAusencia
+    Private _gestionIncidenciasInstancia As frmIncidencias
+    Private _gestionCargosInstancia As frmGrados
+    Private _gestionSeccionesInstancia As frmSecciones
+    Private _gestionAreasTrabajoInstancia As frmAreaTrabajoCategorias
+    Private _gestionTurnosInstancia As frmTurnos
+    Private _gestionNomenclaturasInstancia As frmNemenclaturas
+    Private _gestionTiposEstadoTransitorioInstancia As frmEstadoTransitorioTipos
+    Private _gestionCategoriasAusenciaInstancia As frmIncidenciasCategorias
 
     Private Sub btnGestionarIncidencias_Click(sender As Object, e As EventArgs) Handles btnGestionarIncidencias.Click
         If _gestionIncidenciasInstancia Is Nothing OrElse _gestionIncidenciasInstancia.IsDisposed Then
-            _gestionIncidenciasInstancia = New frmGestionIncidencias()
+            _gestionIncidenciasInstancia = New frmIncidencias()
         End If
         Dim parentDashboard As frmDashboard = CType(Me.ParentForm, frmDashboard)
         parentDashboard.AbrirFormEnPanel(_gestionIncidenciasInstancia)
@@ -22,7 +22,7 @@ Public Class frmConfiguracion
 
     Private Sub btnCargos_Click(sender As Object, e As EventArgs) Handles btnCargos.Click
         ' Ya no hay necesidad de verificar la instancia ni de delegados.
-        _gestionCargosInstancia = New frmGestionCargos()
+        _gestionCargosInstancia = New frmGrados()
 
         Dim parentDashboard As frmDashboard = CType(Me.ParentForm, frmDashboard)
         parentDashboard.AbrirFormEnPanel(_gestionCargosInstancia)
@@ -30,7 +30,7 @@ Public Class frmConfiguracion
 
     Private Sub btnSecciones_Click(sender As Object, e As EventArgs) Handles btnSecciones.Click
         If _gestionSeccionesInstancia Is Nothing OrElse _gestionSeccionesInstancia.IsDisposed Then
-            _gestionSeccionesInstancia = New frmGestionSecciones()
+            _gestionSeccionesInstancia = New frmSecciones()
         End If
         Dim parentDashboard As frmDashboard = CType(Me.ParentForm, frmDashboard)
         parentDashboard.AbrirFormEnPanel(_gestionSeccionesInstancia)
@@ -38,7 +38,7 @@ Public Class frmConfiguracion
 
     Private Sub btnAreasTrabajo_Click(sender As Object, e As EventArgs) Handles btnAreasTrabajo.Click
         If _gestionAreasTrabajoInstancia Is Nothing OrElse _gestionAreasTrabajoInstancia.IsDisposed Then
-            _gestionAreasTrabajoInstancia = New frmGestionAreasTrabajo()
+            _gestionAreasTrabajoInstancia = New frmAreaTrabajoCategorias()
         End If
         Dim parentDashboard As frmDashboard = CType(Me.ParentForm, frmDashboard)
         parentDashboard.AbrirFormEnPanel(_gestionAreasTrabajoInstancia)
@@ -46,7 +46,7 @@ Public Class frmConfiguracion
 
     Private Sub btnTurnos_Click(sender As Object, e As EventArgs) Handles btnTurnos.Click
         If _gestionTurnosInstancia Is Nothing OrElse _gestionTurnosInstancia.IsDisposed Then
-            _gestionTurnosInstancia = New frmGestionTurnos()
+            _gestionTurnosInstancia = New frmTurnos()
         End If
         Dim parentDashboard As frmDashboard = CType(Me.ParentForm, frmDashboard)
         parentDashboard.AbrirFormEnPanel(_gestionTurnosInstancia)
@@ -54,7 +54,7 @@ Public Class frmConfiguracion
 
     Private Sub btnNomenclaturas_Click(sender As Object, e As EventArgs) Handles btnNomenclaturas.Click
         If _gestionNomenclaturasInstancia Is Nothing OrElse _gestionNomenclaturasInstancia.IsDisposed Then
-            _gestionNomenclaturasInstancia = New frmGestionNomenclaturas()
+            _gestionNomenclaturasInstancia = New frmNemenclaturas()
         End If
         Dim parentDashboard As frmDashboard = CType(Me.ParentForm, frmDashboard)
         parentDashboard.AbrirFormEnPanel(_gestionNomenclaturasInstancia)
@@ -62,7 +62,7 @@ Public Class frmConfiguracion
 
     Private Sub btnTiposEstadoTransitorio_Click(sender As Object, e As EventArgs) Handles btnTiposEstadoTransitorio.Click
         If _gestionTiposEstadoTransitorioInstancia Is Nothing OrElse _gestionTiposEstadoTransitorioInstancia.IsDisposed Then
-            _gestionTiposEstadoTransitorioInstancia = New frmGestionTiposEstadoTransitorio()
+            _gestionTiposEstadoTransitorioInstancia = New frmEstadoTransitorioTipos()
         End If
         Dim parentDashboard As frmDashboard = CType(Me.ParentForm, frmDashboard)
         parentDashboard.AbrirFormEnPanel(_gestionTiposEstadoTransitorioInstancia)
@@ -70,7 +70,7 @@ Public Class frmConfiguracion
 
     Private Sub btnCategoriasAusencia_Click(sender As Object, e As EventArgs) Handles btnCategoriasAusencia.Click
         If _gestionCategoriasAusenciaInstancia Is Nothing OrElse _gestionCategoriasAusenciaInstancia.IsDisposed Then
-            _gestionCategoriasAusenciaInstancia = New frmGestionCategoriasAusencia()
+            _gestionCategoriasAusenciaInstancia = New frmIncidenciasCategorias()
         End If
         Dim parentDashboard As frmDashboard = CType(Me.ParentForm, frmDashboard)
         parentDashboard.AbrirFormEnPanel(_gestionCategoriasAusenciaInstancia)

@@ -475,16 +475,16 @@
     <Compile Include="UI\frmAuditoriaViewer.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\frmCambiarEstadoNotificacion.Designer.vb">
-      <DependentUpon>frmCambiarEstadoNotificacion.vb</DependentUpon>
+    <Compile Include="UI\frmNotificacionCambiarEstado.Designer.vb">
+      <DependentUpon>frmNotificacionCambiarEstado.vb</DependentUpon>
     </Compile>
-    <Compile Include="UI\frmCambiarEstadoNotificacion.vb">
+    <Compile Include="UI\frmNotificacionCambiarEstado.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\frmConceptoFuncionalApex.Designer.vb">
-      <DependentUpon>frmConceptoFuncionalApex.vb</DependentUpon>
+    <Compile Include="UI\frmConceptoFuncional.Designer.vb">
+      <DependentUpon>frmConceptoFuncional.vb</DependentUpon>
     </Compile>
-    <Compile Include="UI\frmConceptoFuncionalApex.vb">
+    <Compile Include="UI\frmConceptoFuncional.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="UI\frmConceptoFuncionalRPT.Designer.vb">
@@ -511,16 +511,16 @@
     <Compile Include="UI\frmEstadosTransitoriosGeneral.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\frmFichaFuncionalRPT.Designer.vb">
-      <DependentUpon>frmFichaFuncionalRPT.vb</DependentUpon>
+    <Compile Include="UI\frmFichaPersonalRPT.Designer.vb">
+      <DependentUpon>frmFichaPersonalRPT.vb</DependentUpon>
     </Compile>
-    <Compile Include="UI\frmFichaFuncionalRPT.vb">
+    <Compile Include="UI\frmFichaPersonalRPT.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\frmFiltroAvanzado.Designer.vb">
-      <DependentUpon>frmFiltroAvanzado.vb</DependentUpon>
+    <Compile Include="UI\frmFiltros.Designer.vb">
+      <DependentUpon>frmFiltros.vb</DependentUpon>
     </Compile>
-    <Compile Include="UI\frmFiltroAvanzado.vb">
+    <Compile Include="UI\frmFiltros.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="UI\frmFuncionarioBuscar.Designer.vb">
@@ -570,70 +570,70 @@
     <Compile Include="UI\frmFuncionarioSituacion.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\frmGestionAreasTrabajo.Designer.vb">
-      <DependentUpon>frmGestionAreasTrabajo.vb</DependentUpon>
+    <Compile Include="UI\frmAreaTrabajoCategorias.Designer.vb">
+      <DependentUpon>frmAreaTrabajoCategorias.vb</DependentUpon>
     </Compile>
-    <Compile Include="UI\frmGestionAreasTrabajo.vb">
+    <Compile Include="UI\frmAreaTrabajoCategorias.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\frmGestionCargos.Designer.vb">
-      <DependentUpon>frmGestionCargos.vb</DependentUpon>
+    <Compile Include="UI\frmGrados.Designer.vb">
+      <DependentUpon>frmGrados.vb</DependentUpon>
     </Compile>
-    <Compile Include="UI\frmGestionCargos.vb">
+    <Compile Include="UI\frmGrados.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\frmGestionCategoriasAusencia.Designer.vb">
-      <DependentUpon>frmGestionCategoriasAusencia.vb</DependentUpon>
+    <Compile Include="UI\frmIncidenciasCategorias.Designer.vb">
+      <DependentUpon>frmIncidenciasCategorias.vb</DependentUpon>
     </Compile>
-    <Compile Include="UI\frmGestionCategoriasAusencia.vb">
+    <Compile Include="UI\frmIncidenciasCategorias.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\frmGestionIncidencias.Designer.vb">
-      <DependentUpon>frmGestionIncidencias.vb</DependentUpon>
+    <Compile Include="UI\frmIncidencias.Designer.vb">
+      <DependentUpon>frmIncidencias.vb</DependentUpon>
     </Compile>
-    <Compile Include="UI\frmGestionIncidencias.vb">
+    <Compile Include="UI\frmIncidencias.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\frmGestionLicencias.Designer.vb">
-      <DependentUpon>frmGestionLicencias.vb</DependentUpon>
+    <Compile Include="UI\frmLicencias.Designer.vb">
+      <DependentUpon>frmLicencias.vb</DependentUpon>
     </Compile>
-    <Compile Include="UI\frmGestionLicencias.vb">
+    <Compile Include="UI\frmLicencias.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\frmGestionNomenclaturas.Designer.vb">
-      <DependentUpon>frmGestionNomenclaturas.vb</DependentUpon>
+    <Compile Include="UI\frmNemenclaturas.Designer.vb">
+      <DependentUpon>frmNemenclaturas.vb</DependentUpon>
     </Compile>
-    <Compile Include="UI\frmGestionNomenclaturas.vb">
+    <Compile Include="UI\frmNemenclaturas.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\frmGestionNotificaciones.Designer.vb">
-      <DependentUpon>frmGestionNotificaciones.vb</DependentUpon>
+    <Compile Include="UI\frmNotificaciones.Designer.vb">
+      <DependentUpon>frmNotificaciones.vb</DependentUpon>
     </Compile>
-    <Compile Include="UI\frmGestionNotificaciones.vb">
+    <Compile Include="UI\frmNotificaciones.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\frmGestionSanciones.Designer.vb">
-      <DependentUpon>frmGestionSanciones.vb</DependentUpon>
+    <Compile Include="UI\frmSanciones.Designer.vb">
+      <DependentUpon>frmSanciones.vb</DependentUpon>
     </Compile>
-    <Compile Include="UI\frmGestionSanciones.vb">
+    <Compile Include="UI\frmSanciones.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\frmGestionSecciones.Designer.vb">
-      <DependentUpon>frmGestionSecciones.vb</DependentUpon>
+    <Compile Include="UI\frmSecciones.Designer.vb">
+      <DependentUpon>frmSecciones.vb</DependentUpon>
     </Compile>
-    <Compile Include="UI\frmGestionSecciones.vb">
+    <Compile Include="UI\frmSecciones.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\frmGestionTiposEstadoTransitorio.Designer.vb">
-      <DependentUpon>frmGestionTiposEstadoTransitorio.vb</DependentUpon>
+    <Compile Include="UI\frmEstadoTransitorioTipos.Designer.vb">
+      <DependentUpon>frmEstadoTransitorioTipos.vb</DependentUpon>
     </Compile>
-    <Compile Include="UI\frmGestionTiposEstadoTransitorio.vb">
+    <Compile Include="UI\frmEstadoTransitorioTipos.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\frmGestionTurnos.Designer.vb">
-      <DependentUpon>frmGestionTurnos.vb</DependentUpon>
+    <Compile Include="UI\frmTurnos.Designer.vb">
+      <DependentUpon>frmTurnos.vb</DependentUpon>
     </Compile>
-    <Compile Include="UI\frmGestionTurnos.vb">
+    <Compile Include="UI\frmTurnos.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="UI\frmNotificacionRPT.Designer.vb">
@@ -648,16 +648,16 @@
     <Compile Include="UI\frmNovedadesDelDia.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\frmReporteViaticos.Designer.vb">
-      <DependentUpon>frmReporteViaticos.vb</DependentUpon>
+    <Compile Include="UI\frmViaticosListas.Designer.vb">
+      <DependentUpon>frmViaticosListas.vb</DependentUpon>
     </Compile>
-    <Compile Include="UI\frmReporteViaticos.vb">
+    <Compile Include="UI\frmViaticosListas.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\frmIncidenciaDetalle.Designer.vb">
-      <DependentUpon>frmIncidenciaDetalle.vb</DependentUpon>
+    <Compile Include="UI\frmIncidenciasConfiguracion.Designer.vb">
+      <DependentUpon>frmIncidenciasConfiguracion.vb</DependentUpon>
     </Compile>
-    <Compile Include="UI\frmIncidenciaDetalle.vb">
+    <Compile Include="UI\frmIncidenciasConfiguracion.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="UI\frmLicenciaCrear.Designer.vb">
@@ -690,10 +690,10 @@
     <Compile Include="UI\frmRenombrarPDF.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\frmReporteNovedades.Designer.vb">
-      <DependentUpon>frmReporteNovedades.vb</DependentUpon>
+    <Compile Include="UI\frmNovedadesListas.Designer.vb">
+      <DependentUpon>frmNovedadesListas.vb</DependentUpon>
     </Compile>
-    <Compile Include="UI\frmReporteNovedades.vb">
+    <Compile Include="UI\frmNovedadesListas.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="UI\frmSancionCrear.Designer.vb">
@@ -702,16 +702,16 @@
     <Compile Include="UI\frmSancionCrear.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\frmVisorFoto.Designer.vb">
-      <DependentUpon>frmVisorFoto.vb</DependentUpon>
+    <Compile Include="UI\frmFotografiaNovedades.Designer.vb">
+      <DependentUpon>frmFotografiaNovedades.vb</DependentUpon>
     </Compile>
-    <Compile Include="UI\frmVisorFoto.vb">
+    <Compile Include="UI\frmFotografiaNovedades.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\frmVisorReporteNovedades.Designer.vb">
-      <DependentUpon>frmVisorReporteNovedades.vb</DependentUpon>
+    <Compile Include="UI\frmNovedadesRPT.Designer.vb">
+      <DependentUpon>frmNovedadesRPT.vb</DependentUpon>
     </Compile>
-    <Compile Include="UI\frmVisorReporteNovedades.vb">
+    <Compile Include="UI\frmNovedadesRPT.vb">
       <SubType>Form</SubType>
     </Compile>
   </ItemGroup>
@@ -728,8 +728,8 @@
     <EmbeddedResource Include="UI\frmAuditoriaViewer.resx">
       <DependentUpon>frmAuditoriaViewer.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\frmConceptoFuncionalApex.resx">
-      <DependentUpon>frmConceptoFuncionalApex.vb</DependentUpon>
+    <EmbeddedResource Include="UI\frmConceptoFuncional.resx">
+      <DependentUpon>frmConceptoFuncional.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmConceptoFuncionalRPT.resx">
       <DependentUpon>frmConceptoFuncionalRPT.vb</DependentUpon>
@@ -743,11 +743,11 @@
     <EmbeddedResource Include="UI\frmEstadosTransitoriosGeneral.resx">
       <DependentUpon>frmEstadosTransitoriosGeneral.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\frmFichaFuncionalRPT.resx">
-      <DependentUpon>frmFichaFuncionalRPT.vb</DependentUpon>
+    <EmbeddedResource Include="UI\frmFichaPersonalRPT.resx">
+      <DependentUpon>frmFichaPersonalRPT.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\frmFiltroAvanzado.resx">
-      <DependentUpon>frmFiltroAvanzado.vb</DependentUpon>
+    <EmbeddedResource Include="UI\frmFiltros.resx">
+      <DependentUpon>frmFiltros.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmFuncionarioBuscar.resx">
       <DependentUpon>frmFuncionarioBuscar.vb</DependentUpon>
@@ -767,50 +767,50 @@
     <EmbeddedResource Include="UI\frmFuncionarioSituacion.resx">
       <DependentUpon>frmFuncionarioSituacion.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\frmGestionAreasTrabajo.resx">
-      <DependentUpon>frmGestionAreasTrabajo.vb</DependentUpon>
+    <EmbeddedResource Include="UI\frmAreaTrabajoCategorias.resx">
+      <DependentUpon>frmAreaTrabajoCategorias.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\frmGestionCargos.resx">
-      <DependentUpon>frmGestionCargos.vb</DependentUpon>
+    <EmbeddedResource Include="UI\frmGrados.resx">
+      <DependentUpon>frmGrados.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\frmGestionCategoriasAusencia.resx">
-      <DependentUpon>frmGestionCategoriasAusencia.vb</DependentUpon>
+    <EmbeddedResource Include="UI\frmIncidenciasCategorias.resx">
+      <DependentUpon>frmIncidenciasCategorias.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\frmGestionIncidencias.resx">
-      <DependentUpon>frmGestionIncidencias.vb</DependentUpon>
+    <EmbeddedResource Include="UI\frmIncidencias.resx">
+      <DependentUpon>frmIncidencias.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\frmGestionLicencias.resx">
-      <DependentUpon>frmGestionLicencias.vb</DependentUpon>
+    <EmbeddedResource Include="UI\frmLicencias.resx">
+      <DependentUpon>frmLicencias.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\frmGestionNomenclaturas.resx">
-      <DependentUpon>frmGestionNomenclaturas.vb</DependentUpon>
+    <EmbeddedResource Include="UI\frmNemenclaturas.resx">
+      <DependentUpon>frmNemenclaturas.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\frmGestionNotificaciones.resx">
-      <DependentUpon>frmGestionNotificaciones.vb</DependentUpon>
+    <EmbeddedResource Include="UI\frmNotificaciones.resx">
+      <DependentUpon>frmNotificaciones.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\frmGestionSanciones.resx">
-      <DependentUpon>frmGestionSanciones.vb</DependentUpon>
+    <EmbeddedResource Include="UI\frmSanciones.resx">
+      <DependentUpon>frmSanciones.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\frmGestionSecciones.resx">
-      <DependentUpon>frmGestionSecciones.vb</DependentUpon>
+    <EmbeddedResource Include="UI\frmSecciones.resx">
+      <DependentUpon>frmSecciones.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\frmGestionTiposEstadoTransitorio.resx">
-      <DependentUpon>frmGestionTiposEstadoTransitorio.vb</DependentUpon>
+    <EmbeddedResource Include="UI\frmEstadoTransitorioTipos.resx">
+      <DependentUpon>frmEstadoTransitorioTipos.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\frmGestionTurnos.resx">
-      <DependentUpon>frmGestionTurnos.vb</DependentUpon>
+    <EmbeddedResource Include="UI\frmTurnos.resx">
+      <DependentUpon>frmTurnos.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmNovedadesDelDia.resx">
       <DependentUpon>frmNovedadesDelDia.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\frmReporteNovedades.resx">
-      <DependentUpon>frmReporteNovedades.vb</DependentUpon>
+    <EmbeddedResource Include="UI\frmNovedadesListas.resx">
+      <DependentUpon>frmNovedadesListas.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\frmReporteViaticos.resx">
-      <DependentUpon>frmReporteViaticos.vb</DependentUpon>
+    <EmbeddedResource Include="UI\frmViaticosListas.resx">
+      <DependentUpon>frmViaticosListas.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\frmIncidenciaDetalle.resx">
-      <DependentUpon>frmIncidenciaDetalle.vb</DependentUpon>
+    <EmbeddedResource Include="UI\frmIncidenciasConfiguracion.resx">
+      <DependentUpon>frmIncidenciasConfiguracion.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmLicenciaCrear.resx">
       <DependentUpon>frmLicenciaCrear.vb</DependentUpon>
@@ -830,8 +830,8 @@
     <EmbeddedResource Include="UI\frmSancionCrear.resx">
       <DependentUpon>frmSancionCrear.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\frmVisorFoto.resx">
-      <DependentUpon>frmVisorFoto.vb</DependentUpon>
+    <EmbeddedResource Include="UI\frmFotografiaNovedades.resx">
+      <DependentUpon>frmFotografiaNovedades.vb</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

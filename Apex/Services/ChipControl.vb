@@ -3,7 +3,7 @@ Option Strict On
 Option Explicit On
 Imports System.Drawing
 Imports System.Windows.Forms
-Imports Apex.frmFiltroAvanzado
+Imports Apex.frmFiltros
 
 Public Class ChipControl
     Inherits UserControl
