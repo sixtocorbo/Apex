@@ -4,6 +4,7 @@ Imports System.Data.Entity
 Imports System.Drawing
 Imports System.Threading.Tasks
 Imports System.Windows.Forms
+Imports System.Linq
 
 Public Class frmDashboard
     Inherits Form
@@ -11,9 +12,20 @@ Public Class frmDashboard
     ' Usamos un único diccionario para almacenar las instancias de los formularios reutilizables.
     Private ReadOnly _formularios As New Dictionary(Of String, Form)
 
+    ' Mapa: formulario -> nombre del control a enfocar al mostrarse.
+    ' Agregá aquí otras pantallas si querés controlar su foco inicial.
+    Private ReadOnly _controlFocoPreferido As New Dictionary(Of Type, String) From {
+        {GetType(frmFuncionarioBuscar), "txtBusqueda"},
+        {GetType(frmFiltroAvanzado), "txtBusquedaGlobal"},
+         {GetType(frmFuncionarioCrear), "txtCI"}
+    }
+
     ' Referencias al botón y formulario actualmente activos/visibles.
     Private _currentBtn As Button
     Private _activeForm As Form
+
+    ' Flag anti-reentrada / anti “spam click” de menú
+    Private _navBusy As Boolean = False
 
     Public Sub New()
         InitializeComponent()
@@ -43,6 +55,11 @@ Public Class frmDashboard
         Await CargarSemanaActualAsync()
         ' Abrir el formulario de búsqueda por defecto al iniciar la aplicación.
         btnBuscarFuncionario.PerformClick()
+
+        ' Asegurar foco en el control preferido del form activo después de cargar.
+        Me.BeginInvoke(Sub()
+                           If _activeForm IsNot Nothing Then EnfocarControlPreferido(_activeForm)
+                       End Sub)
     End Sub
 
 #Region "Lógica de Navegación Principal"
@@ -52,8 +69,9 @@ Public Class frmDashboard
     ''' Es el único punto de entrada para cambiar el formulario visible.
     ''' </summary>
     Public Sub AbrirFormEnPanel(formToShow As Form)
-        ' Si el formulario solicitado ya está activo, no hacemos nada.
+        ' Si el formulario solicitado ya está activo, igual forzamos el foco (por si clickean de nuevo el mismo botón del menú).
         If _activeForm Is formToShow Then
+            EnfocarControlPreferido(formToShow)
             Return
         End If
 
@@ -85,31 +103,52 @@ Public Class frmDashboard
         _activeForm = formToShow
         _activeForm.Show()
         _activeForm.BringToFront()
+
+        ' Clave: poner el foco al final del ciclo de mensajes.
+        EnfocarControlPreferido(_activeForm)
     End Sub
 
     ' Evento centralizado que se dispara al hacer clic en cualquier botón del menú.
     Private Sub AbrirFormularioDesdeMenu_Click(sender As Object, e As EventArgs)
-        Dim botonClickeado = CType(sender, Button)
-        ActivateButton(botonClickeado) ' Cambia el estilo visual del botón.
+        If _navBusy Then Return
+        _navBusy = True
 
-        Dim formToShow As Form = Nothing
+        Try
+            Dim botonClickeado = CType(sender, Button)
+            ActivateButton(botonClickeado) ' Cambia el estilo visual del botón.
 
-        Select Case botonClickeado.Name
-            ' Caso especial: "Nuevo Funcionario" siempre crea una instancia nueva y no se guarda para reutilizar.
-            Case "btnNuevoFuncionario"
-                formToShow = New frmFuncionarioCrear()
+            ' Saca el foco del botón del menú para que no "lo recupere" luego.
+            panelContenido.Select()
 
-                ' Todos los demás casos obtienen una instancia reutilizable.
-            Case Else
-                Dim formType As Type = ObtenerTipoDeFormulario(botonClickeado.Name)
-                If formType IsNot Nothing Then
-                    formToShow = ObtenerOcrearInstancia(formType)
-                End If
-        End Select
+            Dim formToShow As Form = Nothing
 
-        If formToShow IsNot Nothing Then
-            AbrirFormEnPanel(formToShow)
-        End If
+            Select Case botonClickeado.Name
+                ' Caso especial: "Nuevo Funcionario" -> NO crear duplicados
+                Case "btnNuevoFuncionario"
+                    ' Si ya existe una instancia embebida y visible/no disposed, reúsala.
+                    Dim existente = BuscarInstanciaExistente(Of frmFuncionarioCrear)()
+                    If existente IsNot Nothing Then
+                        formToShow = existente
+                    Else
+                        formToShow = New frmFuncionarioCrear()
+                    End If
+
+                    ' Todos los demás casos obtienen una instancia reutilizable.
+                Case Else
+                    Dim formType As Type = ObtenerTipoDeFormulario(botonClickeado.Name)
+                    If formType IsNot Nothing Then
+                        formToShow = ObtenerOcrearInstancia(formType)
+                    End If
+            End Select
+
+            If formToShow IsNot Nothing Then
+                AbrirFormEnPanel(formToShow)
+            End If
+
+        Finally
+            ' Liberamos el lock al final del ciclo de mensajes para permitir un nuevo click.
+            Me.BeginInvoke(Sub() _navBusy = False)
+        End Try
     End Sub
 
     ''' <summary>
@@ -172,6 +211,33 @@ Public Class frmDashboard
             _currentBtn.Font = New Font("Segoe UI", 11.25F, FontStyle.Regular)
         End If
     End Sub
+
+    ' Helper: enfoca el control preferido del formulario mostrado.
+    Private Sub EnfocarControlPreferido(form As Form)
+        Dim ctrlName As String = Nothing
+        If _controlFocoPreferido.TryGetValue(form.GetType(), ctrlName) Then
+            form.BeginInvoke(Sub()
+                                 If form.IsDisposed OrElse Not form.Visible Then Return
+                                 Dim arr = form.Controls.Find(ctrlName, True)
+                                 If arr.Length > 0 AndAlso arr(0).CanFocus Then
+                                     arr(0).Focus()
+                                     Dim tb = TryCast(arr(0), TextBoxBase)
+                                     If tb IsNot Nothing Then tb.SelectAll()
+                                 Else
+                                     form.Select() ' fallback si no se encontró el control
+                                 End If
+                             End Sub)
+        Else
+            ' Si no hay preferencia registrada, al menos sacamos el foco del botón del menú.
+            form.BeginInvoke(Sub() form.Select())
+        End If
+    End Sub
+
+    ' Helper: obtiene una instancia ya embebida de un tipo de Form (si existe y no está disposed).
+    Private Function BuscarInstanciaExistente(Of T As Form)() As T
+        Return Me.panelContenido.Controls.OfType(Of T)().
+               FirstOrDefault(Function(f) Not f.IsDisposed)
+    End Function
 
     ' Carga el número de semana actual en el logo.
     Private Async Function CargarSemanaActualAsync() As Task
