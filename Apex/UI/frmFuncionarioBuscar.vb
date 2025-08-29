@@ -1,5 +1,4 @@
-﻿' Apex/UI/frmFuncionarioBuscar.vb
-Option Strict On
+﻿Option Strict On
 Option Explicit On
 
 Imports System.Data.Entity
@@ -43,13 +42,35 @@ Public Class frmFuncionarioBuscar
         FlowLayoutPanelAcciones.Visible = (_modo = ModoApertura.Seleccion)
     End Sub
 
-
+    ' --- INICIO DE LA CORRECCIÓN #1: Conectar al Notificador de Eventos ---
     Private Sub frmFuncionarioBuscar_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
         ConfigurarGrilla()
         AddHandler btnVerSituacion.Click, AddressOf btnVerSituacion_Click
         AddHandler btnGenerarFicha.Click, AddressOf btnGenerarFicha_Click
+        ' Nos suscribimos al evento para que la grilla se refresque sola cuando haya cambios.
+        AddHandler NotificadorEventos.DatosActualizados, AddressOf OnDatosActualizados
     End Sub
+
+    ''' <summary>
+    ''' Este método se ejecutará automáticamente cuando otro formulario notifique un cambio.
+    ''' </summary>
+    Private Async Sub OnDatosActualizados(sender As Object, e As EventArgs)
+        ' --- INICIO DE LA CORRECCIÓN #2: Eliminar la condición Me.Visible ---
+        ' El formulario se actualizará incluso si está oculto, asegurando que los datos
+        ' estén frescos cuando el usuario vuelva a esta pantalla.
+        If Me.IsHandleCreated Then
+            Await BuscarAsync()
+        End If
+        ' --- FIN DE LA CORRECCIÓN #2 ---
+    End Sub
+
+    ' Es una buena práctica desuscribirse para evitar fugas de memoria.
+    Private Sub frmFuncionarioBuscar_FormClosed(sender As Object, e As FormClosedEventArgs) Handles Me.FormClosed
+        RemoveHandler NotificadorEventos.DatosActualizados, AddressOf OnDatosActualizados
+    End Sub
+    ' --- FIN DE LA CORRECCIÓN #1 ---
+
 
     Private Sub frmFuncionarioBuscar_Shown(sender As Object, e As EventArgs) Handles Me.Shown
         Me.ActiveControl = txtBusqueda
@@ -93,6 +114,13 @@ Public Class frmFuncionarioBuscar
 
 #Region "Búsqueda con Full-Text y CONTAINS"
     Private Async Function BuscarAsync() As Task
+        ' Si no hay texto en la caja de búsqueda, limpiamos la grilla y el detalle.
+        If String.IsNullOrWhiteSpace(txtBusqueda.Text) Then
+            dgvResultados.DataSource = New List(Of FuncionarioMin)()
+            LimpiarDetalle()
+            Return
+        End If
+
         LoadingHelper.MostrarCargando(Me)
         btnBuscar.Enabled = False
 
@@ -100,12 +128,6 @@ Public Class frmFuncionarioBuscar
             Using uow As New UnitOfWork()
                 Dim ctx = uow.Context
                 Dim filtro As String = txtBusqueda.Text.Trim()
-
-                If filtro.Length < 0 Then
-                    dgvResultados.DataSource = Nothing
-                    LimpiarDetalle()
-                    Return
-                End If
 
                 Dim terminos = filtro.Split(" "c) _
                                      .Where(Function(w) Not String.IsNullOrWhiteSpace(w)) _
@@ -141,7 +163,7 @@ Public Class frmFuncionarioBuscar
 
                 If lista.Count = LIMITE_FILAS Then
                     MessageBox.Show($"Mostrando los primeros {LIMITE_FILAS} resultados." &
-                                "Refiná la búsqueda para ver más.",
+                                    "Refiná la búsqueda para ver más.",
                                 "Aviso",
                                 MessageBoxButtons.OK, MessageBoxIcon.Information)
                 End If
@@ -202,9 +224,11 @@ Public Class frmFuncionarioBuscar
     End Sub
 
 #Region "Detalle lateral (Foto on-demand)"
-    ' Reemplaza este método completo
     Private Async Sub MostrarDetalle(sender As Object, e As EventArgs)
-        If dgvResultados.CurrentRow Is Nothing OrElse dgvResultados.CurrentRow.DataBoundItem Is Nothing Then Return
+        If dgvResultados.CurrentRow Is Nothing OrElse dgvResultados.CurrentRow.DataBoundItem Is Nothing Then
+            LimpiarDetalle()
+            Return
+        End If
         Dim id = CInt(dgvResultados.CurrentRow.Cells("Id").Value)
 
         Using uow As New UnitOfWork()
@@ -228,7 +252,6 @@ Public Class frmFuncionarioBuscar
             lblFechaIngreso.Text = f.FechaIngreso.ToShortDateString()
             lblHorarioCompleto.Text = $"{If(f.Semana IsNot Nothing, f.Semana.Nombre, "-")} / {If(f.Turno IsNot Nothing, f.Turno.Nombre, "-")} / {If(f.Horario IsNot Nothing, f.Horario.Nombre, "-")}"
 
-            ' Lógica para el label de estado de actividad
             If f.Activo Then
                 lblEstadoActividad.Text = "Estado: Activo"
                 lblEstadoActividad.ForeColor = Color.DarkGreen
@@ -237,8 +260,6 @@ Public Class frmFuncionarioBuscar
                 lblEstadoActividad.ForeColor = Color.Maroon
             End If
 
-            ' --- INICIO DE LA CORRECCIÓN ---
-            ' Se consulta la lista completa de situaciones en lugar de solo la primera.
             Dim situaciones = Await uow.Context.Database.SqlQuery(Of SituacionParaBoton)(
             "SELECT Prioridad, Tipo, ColorIndicador FROM dbo.vw_FuncionarioSituacionActual WHERE FuncionarioId = @p0 ORDER BY Prioridad",
             id
@@ -248,7 +269,6 @@ Public Class frmFuncionarioBuscar
                 btnVerSituacion.Visible = True
                 Dim primeraSituacion = situaciones.First()
 
-                ' Si hay más de una situación, se muestra el texto correspondiente.
                 If situaciones.Count > 1 Then
                     btnVerSituacion.Text = "Situación Múltiple"
                 Else
@@ -265,9 +285,7 @@ Public Class frmFuncionarioBuscar
             Else
                 btnVerSituacion.Visible = False
             End If
-            ' --- FIN DE LA CORRECCIÓN ---
 
-            ' Determinar "Presencia"
             lblPresencia.Text = Await ObtenerPresenciaAsync(id, Date.Today)
             If Not f.Activo AndAlso (situaciones Is Nothing OrElse Not situaciones.Any()) Then
                 lblPresencia.Text = "Inactivo"
@@ -283,55 +301,33 @@ Public Class frmFuncionarioBuscar
         End Using
     End Sub
 
-    ' Agrega este nuevo manejador de eventos
     Private Sub btnVerSituacion_Click(sender As Object, e As EventArgs)
         If dgvResultados.CurrentRow Is Nothing Then Return
         Dim id = CInt(dgvResultados.CurrentRow.Cells("Id").Value)
         Dim frm As New frmFuncionarioSituacion(id)
-        ' Se obtiene una referencia al formulario Dashboard
         Dim parentDashboard As frmDashboard = CType(Me.ParentForm, frmDashboard)
 
-        ' Se llama al método público del Dashboard para abrir el formulario en el panel
         parentDashboard.AbrirFormEnPanel(frm)
-
-
     End Sub
 
-    ' Clase DTO interna para el botón
     Private Class SituacionParaBoton
         Public Property Prioridad As Integer
         Public Property Tipo As String
         Public Property ColorIndicador As String
     End Class
 
-    ''' <summary>
-    ''' Maneja el doble clic para seleccionar o para abrir la ficha de edición.
-    ''' </summary>
-    Private Async Sub OnDgvDoubleClick(sender As Object, e As DataGridViewCellEventArgs)
+    Private Sub OnDgvDoubleClick(sender As Object, e As DataGridViewCellEventArgs)
         If dgvResultados.CurrentRow Is Nothing Then Return
 
         If _modo = ModoApertura.Seleccion Then
             SeleccionarYcerrar()
         Else ' Modo Navegacion
-            ' --- INICIO DE LA MODIFICACIÓN ---
-            ' En lugar de abrir el formulario como un diálogo modal, ahora se abre
-            ' dentro del panel de contenido del Dashboard principal.
-
-            ' 1. Se obtiene el ID del funcionario de la fila seleccionada.
             Dim id As Integer = CInt(dgvResultados.CurrentRow.Cells("Id").Value)
-
-            ' 2. Se crea la instancia del formulario que se quiere abrir.
             Dim frm As New frmFuncionarioCrear(id)
-
-            ' 3. Se obtiene una referencia al formulario Dashboard que contiene a este formulario.
-            '    'Me.ParentForm' funciona porque frmFuncionarioBuscar fue abierto con TopLevel = False.
             Dim parentDashboard As frmDashboard = CType(Me.ParentForm, frmDashboard)
-
-            ' 4. Se llama al método público del Dashboard para que cargue el nuevo formulario en su panel.
             If parentDashboard IsNot Nothing Then
                 parentDashboard.AbrirFormEnPanel(frm)
             End If
-            ' --- FIN DE LA MODIFICACIÓN ---
         End If
     End Sub
 
@@ -361,6 +357,7 @@ Public Class frmFuncionarioBuscar
         lblHorarioCompleto.Text = ""
         _detallesEstadoActual.Clear()
         btnGenerarFicha.Visible = False
+        btnVerSituacion.Visible = False
     End Sub
 
     Private Sub lblEstadoTransitorio_DoubleClick(sender As Object, e As EventArgs)
@@ -393,13 +390,8 @@ Public Class frmFuncionarioBuscar
     End Sub
     Private Sub btnGenerarFicha_Click(sender As Object, e As EventArgs)
         If FuncionarioSeleccionado IsNot Nothing Then
-            ' Se crea una instancia del formulario que se quiere abrir
             Dim frm As New frmFichaFuncionalRPT(FuncionarioSeleccionado.Id)
-
-            ' Se obtiene una referencia al formulario Dashboard
             Dim parentDashboard As frmDashboard = CType(Me.ParentForm, frmDashboard)
-
-            ' Se llama al método público del Dashboard para abrir el formulario en el panel
             parentDashboard.AbrirFormEnPanel(frm)
         Else
             MessageBox.Show("Por favor, seleccione un funcionario de la lista.", "Selección requerida", MessageBoxButtons.OK, MessageBoxIcon.Information)
@@ -415,13 +407,9 @@ Public Class frmFuncionarioBuscar
         Public Property Nombre As String
     End Class
     Public Class PresenciaDTO
-
         Public Property FuncionarioId As Integer
         Public Property Resultado As String
     End Class
-
-
-
 #End Region
 
 End Class

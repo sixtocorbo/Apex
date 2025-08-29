@@ -143,6 +143,11 @@
                 Await _svc.UpdateAsync(_licencia)
             End If
 
+            ' --- INICIO DE LA MODIFICACIÓN ---
+            ' Notificar a toda la aplicación que los datos han cambiado.
+            NotificadorEventos.NotificarActualizacion()
+            ' --- FIN DE LA MODIFICACIÓN ---
+
             DialogResult = DialogResult.OK
             Close()
         Catch ex As Exception

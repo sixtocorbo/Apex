@@ -535,6 +535,12 @@ Public Class frmFuncionarioCrear
         If Await GuardarAsync() Then
             LoadingHelper.OcultarCargando(Me)
             MessageBox.Show(If(_modo = ModoFormulario.Crear, "Funcionario creado", "Funcionario actualizado") & " correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
+
+            ' --- INICIO DE LA MODIFICACIÓN ---
+            ' Notificar a toda la aplicación que los datos han cambiado.
+            NotificadorEventos.NotificarActualizacion()
+            ' --- FIN DE LA MODIFICACIÓN ---
+
             Me.DialogResult = DialogResult.OK
             _cerrandoPorCodigo = True
             Close()
@@ -550,7 +556,8 @@ Public Class frmFuncionarioCrear
             Dim result = MessageBox.Show("Hay cambios sin guardar. ¿Desea guardarlos antes de salir?", "Cambios Pendientes", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning)
             Select Case result
                 Case DialogResult.Yes
-                    btnGuardar.PerformClick()
+                    ' Usamos BeginInvoke para permitir que el formulario se cierre después de hacer clic en guardar.
+                    Me.BeginInvoke(New MethodInvoker(AddressOf btnGuardar.PerformClick))
                     If Not _seGuardo Then e.Cancel = True
                 Case DialogResult.No
                     ' Permite el cierre sin guardar
@@ -788,5 +795,10 @@ Public Class frmFuncionarioCrear
         Using frm As New frmAuditoriaViewer(_funcionario.Id.ToString())
             frm.ShowDialog(Me)
         End Using
+    End Sub
+
+    Private Sub btnCancelar_Click(sender As Object, e As EventArgs) Handles btnCancelar.Click
+        _cerrandoPorCodigo = True
+        Close()
     End Sub
 End Class

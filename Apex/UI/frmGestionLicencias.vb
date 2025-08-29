@@ -3,11 +3,31 @@ Public Class frmGestionLicencias
 
     Private _licenciaSvc As New LicenciaService()
 
-    Private Sub frmGestionLicencias_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    ' --- INICIO DE LA MODIFICACIÓN #1: Conectar al Notificador de Eventos ---
+    Private Async Sub frmGestionLicencias_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
         ConfigurarGrillaLicencias()
         txtBusquedaLicencia.Focus()
+        ' Nos suscribimos al evento para enterarnos de cambios hechos en otros formularios.
+        AddHandler NotificadorEventos.DatosActualizados, AddressOf OnDatosActualizados
+        ' Forzamos una búsqueda inicial si hay texto en el cuadro de búsqueda.
+        If Not String.IsNullOrWhiteSpace(txtBusquedaLicencia.Text) Then
+            Await CargarDatosLicenciasAsync()
+        End If
     End Sub
+
+    ' Es una buena práctica desuscribirse para evitar fugas de memoria.
+    Private Sub frmGestionLicencias_FormClosed(sender As Object, e As FormClosedEventArgs) Handles Me.FormClosed
+        RemoveHandler NotificadorEventos.DatosActualizados, AddressOf OnDatosActualizados
+    End Sub
+
+    ' Este método se disparará automáticamente cuando se guarde una licencia.
+    Private Async Sub OnDatosActualizados(sender As Object, e As EventArgs)
+        If Me.IsHandleCreated AndAlso Me.Visible Then
+            Await CargarDatosLicenciasAsync()
+        End If
+    End Sub
+    ' --- FIN DE LA MODIFICACIÓN #1 ---
 
 #Region "Configuración y Carga de Datos"
 
@@ -37,8 +57,9 @@ Public Class frmGestionLicencias
 
     Private Async Function CargarDatosLicenciasAsync() As Task
         Dim filtro = txtBusquedaLicencia.Text.Trim()
+        ' Ahora solo no cargamos nada si el filtro está vacío.
         If String.IsNullOrWhiteSpace(filtro) Then
-            dgvLicencias.DataSource = Nothing
+            dgvLicencias.DataSource = New List(Of vw_LicenciasCompletas)() ' Asignar lista vacía
             Return
         End If
         LoadingHelper.MostrarCargando(Me)
@@ -67,36 +88,44 @@ Public Class frmGestionLicencias
 
 #Region "Acciones para Licencias"
 
-
-    Private Async Sub btnNuevaLicencia_Click(sender As Object, e As EventArgs) Handles btnNuevaLicencia.Click
+    Private Sub btnNuevaLicencia_Click(sender As Object, e As EventArgs) Handles btnNuevaLicencia.Click
+        ' --- INICIO DE LA CORRECCIÓN ---
+        ' Abrimos el formulario como un diálogo modal.
+        ' La ejecución se detendrá aquí hasta que el formulario frmLicenciaCrear se cierre.
         Using frm As New frmLicenciaCrear()
-            If frm.ShowDialog(Me) = DialogResult.OK Then
-                Await CargarDatosLicenciasAsync()
-            End If
+            frm.ShowDialog(Me)
+            ' No necesitamos hacer nada después. Si el usuario guardó,
+            ' el evento OnDatosActualizados se encargará de refrescar la grilla automáticamente.
         End Using
+        ' --- FIN DE LA CORRECCIÓN ---
     End Sub
 
-    Private Async Sub btnEditarLicencia_Click(sender As Object, e As EventArgs) Handles btnEditarLicencia.Click
+    Private Sub btnEditarLicencia_Click(sender As Object, e As EventArgs) Handles btnEditarLicencia.Click
         If dgvLicencias.CurrentRow Is Nothing Then Return
         Dim licenciaSeleccionada = CType(dgvLicencias.CurrentRow.DataBoundItem, vw_LicenciasCompletas)
         If licenciaSeleccionada Is Nothing Then Return
+
         Dim idSeleccionado = licenciaSeleccionada.Id
         Dim estadoActual = licenciaSeleccionada.Estado
+
+        ' --- INICIO DE LA CORRECCIÓN (consistencia) ---
+        ' El modo de edición ya usaba ShowDialog, lo cual es correcto. Lo mantenemos.
         Using frm As New frmLicenciaCrear(idSeleccionado, estadoActual)
-            If frm.ShowDialog(Me) = DialogResult.OK Then
-                Await CargarDatosLicenciasAsync()
-            End If
+            frm.ShowDialog(Me)
         End Using
+        ' --- FIN DE LA CORRECCIÓN ---
     End Sub
 
     Private Async Sub btnEliminarLicencia_Click(sender As Object, e As EventArgs) Handles btnEliminarLicencia.Click
         If dgvLicencias.CurrentRow Is Nothing Then Return
         Dim idSeleccionado = CInt(dgvLicencias.CurrentRow.Cells("Id").Value)
         Dim nombre = dgvLicencias.CurrentRow.Cells("NombreFuncionario").Value.ToString()
+
         If MessageBox.Show($"¿Está seguro de que desea eliminar la licencia para '{nombre}'?", "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
             Try
                 Await _licenciaSvc.DeleteAsync(idSeleccionado)
-                Await CargarDatosLicenciasAsync()
+                ' Notificamos la eliminación para que todos los formularios se actualicen.
+                NotificadorEventos.NotificarActualizacion()
             Catch ex As Exception
                 MessageBox.Show("Error al eliminar la licencia: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try

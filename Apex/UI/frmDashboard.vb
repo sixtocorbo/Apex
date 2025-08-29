@@ -8,13 +8,13 @@ Imports System.Windows.Forms
 Public Class frmDashboard
     Inherits Form
 
-    ' Usamos un Dictionary para almacenar las instancias únicas de los formularios reutilizables.
+    ' Usamos un Dictionary para almacenar las instancias de los formularios reutilizables.
     ' La clave (String) es el nombre del tipo de formulario, el valor (Form) es la instancia.
-    Private ReadOnly _formulariosAbiertos As New Dictionary(Of String, Form)
+    Private ReadOnly _formulariosReutilizables As New Dictionary(Of String, Form)
 
     ' Referencias al botón y formulario actualmente activos/visibles.
-    Private currentBtn As Button
-    Private Shadows activeForm As Form
+    Private _currentBtn As Button
+    Private _activeForm As Form
 
     Public Sub New()
         InitializeComponent()
@@ -22,34 +22,67 @@ Public Class frmDashboard
 
         ' Se asigna el mismo manejador de click a TODOS los botones del menú.
         ' Esto centraliza la lógica de navegación.
-        AddHandler btnNuevoFuncionario.Click, AddressOf AbrirFormulario_Click
-        AddHandler btnBuscarFuncionario.Click, AddressOf AbrirFormulario_Click
-        AddHandler btnLicencias.Click, AddressOf AbrirFormulario_Click
-        AddHandler btnNotificaciones.Click, AddressOf AbrirFormulario_Click
-        AddHandler btnSanciones.Click, AddressOf AbrirFormulario_Click
-        AddHandler btnConceptoFuncional.Click, AddressOf AbrirFormulario_Click
-        AddHandler btnFiltros.Click, AddressOf AbrirFormulario_Click
-        AddHandler btnNovedades.Click, AddressOf AbrirFormulario_Click
-        AddHandler btnNomenclaturas.Click, AddressOf AbrirFormulario_Click
-        AddHandler btnRenombrarPDFs.Click, AddressOf AbrirFormulario_Click
-        AddHandler btnImportacion.Click, AddressOf AbrirFormulario_Click
-        AddHandler btnViaticos.Click, AddressOf AbrirFormulario_Click
-        AddHandler btnReportes.Click, AddressOf AbrirFormulario_Click
-        AddHandler btnAnalisis.Click, AddressOf AbrirFormulario_Click
-        AddHandler btnAnalisisPersonal.Click, AddressOf AbrirFormulario_Click
-        AddHandler btnConfiguracion.Click, AddressOf AbrirFormulario_Click
+        AddHandler btnNuevoFuncionario.Click, AddressOf AbrirFormularioDesdeMenu_Click
+        AddHandler btnBuscarFuncionario.Click, AddressOf AbrirFormularioDesdeMenu_Click
+        AddHandler btnLicencias.Click, AddressOf AbrirFormularioDesdeMenu_Click
+        AddHandler btnNotificaciones.Click, AddressOf AbrirFormularioDesdeMenu_Click
+        AddHandler btnSanciones.Click, AddressOf AbrirFormularioDesdeMenu_Click
+        AddHandler btnConceptoFuncional.Click, AddressOf AbrirFormularioDesdeMenu_Click
+        AddHandler btnFiltros.Click, AddressOf AbrirFormularioDesdeMenu_Click
+        AddHandler btnNovedades.Click, AddressOf AbrirFormularioDesdeMenu_Click
+        AddHandler btnNomenclaturas.Click, AddressOf AbrirFormularioDesdeMenu_Click
+        AddHandler btnRenombrarPDFs.Click, AddressOf AbrirFormularioDesdeMenu_Click
+        AddHandler btnImportacion.Click, AddressOf AbrirFormularioDesdeMenu_Click
+        AddHandler btnViaticos.Click, AddressOf AbrirFormularioDesdeMenu_Click
+        AddHandler btnReportes.Click, AddressOf AbrirFormularioDesdeMenu_Click
+        AddHandler btnAnalisis.Click, AddressOf AbrirFormularioDesdeMenu_Click
+        AddHandler btnAnalisisPersonal.Click, AddressOf AbrirFormularioDesdeMenu_Click
+        AddHandler btnConfiguracion.Click, AddressOf AbrirFormularioDesdeMenu_Click
     End Sub
 
     Private Async Sub frmDashboard_Shown(sender As Object, e As EventArgs)
         Await CargarSemanaActualAsync()
-        ' Abrir el formulario de licencias por defecto al iniciar la aplicación.
-        btnLicencias.PerformClick()
+        ' Abrir el formulario de búsqueda por defecto al iniciar la aplicación.
+        btnBuscarFuncionario.PerformClick()
     End Sub
 
-#Region "Lógica de Navegación del Menú"
+#Region "Lógica de Navegación Principal"
+
+    ''' <summary>
+    ''' Método público que permite a un formulario hijo abrir otro formulario dentro del panel principal.
+    ''' Es el punto de entrada para la navegación entre formularios (ej: desde Buscar a Editar).
+    ''' </summary>
+    Public Sub AbrirFormEnPanel(formHijo As Form)
+        ' Oculta el formulario actualmente activo.
+        If _activeForm IsNot Nothing Then
+            _activeForm.Hide()
+        End If
+
+        ' Configura y muestra el nuevo formulario.
+        _activeForm = formHijo
+        _activeForm.TopLevel = False
+        _activeForm.FormBorderStyle = FormBorderStyle.None
+        _activeForm.Dock = DockStyle.Fill
+        Me.panelContenido.Controls.Add(_activeForm)
+        Me.panelContenido.Tag = _activeForm
+
+        ' Cuando el formulario hijo se cierre, volvemos a mostrar el de búsqueda.
+        AddHandler _activeForm.FormClosed, Sub(s, args)
+                                               ' Nos aseguramos de que el formulario de búsqueda exista.
+                                               If _formulariosReutilizables.ContainsKey(NameOf(frmFuncionarioBuscar)) Then
+                                                   Dim formBusqueda = _formulariosReutilizables(NameOf(frmFuncionarioBuscar))
+                                                   AbrirFormEnPanel(formBusqueda)
+                                                   ActivateButton(btnBuscarFuncionario)
+                                               End If
+                                           End Sub
+
+        _activeForm.BringToFront()
+        _activeForm.Show()
+    End Sub
+
 
     ' Evento centralizado que se dispara al hacer clic en cualquier botón del menú.
-    Private Sub AbrirFormulario_Click(sender As Object, e As EventArgs)
+    Private Sub AbrirFormularioDesdeMenu_Click(sender As Object, e As EventArgs)
         Dim botonClickeado = CType(sender, Button)
         ActivateButton(botonClickeado) ' Cambia el estilo visual del botón.
 
@@ -57,7 +90,7 @@ Public Class frmDashboard
         Select Case botonClickeado.Name
             ' Caso especial: "Nuevo Funcionario" siempre crea una instancia nueva.
             Case "btnNuevoFuncionario"
-                AbrirFormularioUnico(New frmFuncionarioCrear())
+                AbrirFormEnPanel(New frmFuncionarioCrear())
 
             ' Todos los demás casos reutilizan la misma instancia del formulario.
             Case "btnBuscarFuncionario"
@@ -94,91 +127,46 @@ Public Class frmDashboard
     End Sub
 
     ''' <summary>
-    ''' Gestiona la apertura de formularios que deben persistir en memoria (ser reutilizados).
+    ''' Gestiona la apertura de formularios que persisten en memoria (reutilizados).
     ''' </summary>
-    Public Sub AbrirFormularioReutilizable(formType As Type)
+    Private Sub AbrirFormularioReutilizable(formType As Type)
         Dim formName As String = formType.Name
-
-        ' Oculta el formulario que está activo actualmente.
-        If activeForm IsNot Nothing Then
-            activeForm.Hide()
-        End If
+        Dim formToShow As Form
 
         ' Verifica si el formulario ya fue creado y está en nuestro diccionario.
-        If _formulariosAbiertos.ContainsKey(formName) Then
-            ' Si ya existe, simplemente se activa y se muestra.
-            activeForm = _formulariosAbiertos(formName)
-            activeForm.Show()
-            activeForm.BringToFront()
-
-            ' Si el formulario puede actualizarse, se le ordena que lo haga.
-            If TypeOf activeForm Is IFormularioActualizable Then
-                CType(activeForm, IFormularioActualizable).ActualizarDatos()
-            End If
+        If _formulariosReutilizables.ContainsKey(formName) Then
+            ' Si ya existe, simplemente se obtiene la referencia.
+            formToShow = _formulariosReutilizables(formName)
         Else
-            ' Si no existe, se crea, configura, almacena y muestra.
-            Dim newForm = CType(Activator.CreateInstance(formType), Form)
-            activeForm = newForm
-            _formulariosAbiertos.Add(formName, activeForm)
-
-            activeForm.TopLevel = False
-            activeForm.FormBorderStyle = FormBorderStyle.None
-            activeForm.Dock = DockStyle.Fill
-            Me.panelContenido.Controls.Add(activeForm)
-            activeForm.Show()
-            activeForm.BringToFront()
-        End If
-    End Sub
-
-    ''' <summary>
-    ''' Gestiona la apertura de formularios que deben ser siempre una instancia nueva y se destruyen al cerrar.
-    ''' </summary>
-    Public Sub AbrirFormularioUnico(childForm As Form)
-        If activeForm IsNot Nothing Then
-            activeForm.Hide()
+            ' Si no existe, se crea, se almacena y se obtiene la referencia.
+            formToShow = CType(Activator.CreateInstance(formType), Form)
+            _formulariosReutilizables.Add(formName, formToShow)
         End If
 
-        activeForm = childForm
-        activeForm.TopLevel = False
-        activeForm.FormBorderStyle = FormBorderStyle.None
-        activeForm.Dock = DockStyle.Fill
-        Me.panelContenido.Controls.Add(activeForm)
-
-        ' Se añade un manejador al evento 'FormClosed'. Cuando el formulario se cierre,
-        ' se eliminará de los controles y se volverá a un formulario por defecto.
-        AddHandler activeForm.FormClosed, Sub(s, args)
-                                              Dim formCerrado = CType(s, Form)
-                                              Me.panelContenido.Controls.Remove(formCerrado)
-                                              formCerrado.Dispose()
-
-                                              ' Vuelve a activar el botón y el formulario de búsqueda.
-                                              btnBuscarFuncionario.PerformClick()
-                                              End AddHandler
-
-                                              activeForm.Show()
-                                              activeForm.BringToFront()
-                                          End Sub
+        ' Llama al método central para mostrar el formulario.
+        AbrirFormEnPanel(formToShow)
     End Sub
+
 #End Region
 
 #Region "UI Helpers (Estilos y Carga de Datos)"
 
     ' Cambia el estilo del botón activo.
     Private Sub ActivateButton(senderBtn As Object)
-        If senderBtn Is Nothing Then Return
+        If senderBtn Is Nothing OrElse TypeOf senderBtn IsNot Button Then Return
         DisableButton() ' Restablece el botón anteriormente activo.
-        currentBtn = CType(senderBtn, Button)
-        currentBtn.BackColor = Color.FromArgb(81, 81, 112)
-        currentBtn.ForeColor = Color.White
-        currentBtn.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
+        _currentBtn = CType(senderBtn, Button)
+        _currentBtn.BackColor = Color.FromArgb(81, 81, 112)
+        _currentBtn.ForeColor = Color.White
+        _currentBtn.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
     End Sub
 
     ' Restablece el estilo del botón que deja de estar activo.
     Private Sub DisableButton()
-        If currentBtn IsNot Nothing Then
-            currentBtn.BackColor = Color.FromArgb(51, 51, 76)
-            currentBtn.ForeColor = Color.Gainsboro
-            currentBtn.Font = New Font("Segoe UI", 11.25F, FontStyle.Regular)
+        If _currentBtn IsNot Nothing Then
+            _currentBtn.BackColor = Color.FromArgb(51, 51, 76)
+            _currentBtn.ForeColor = Color.Gainsboro
+            _currentBtn.Font = New Font("Segoe UI", 11.25F, FontStyle.Regular)
         End If
     End Sub
 
