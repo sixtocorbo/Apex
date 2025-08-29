@@ -246,9 +246,9 @@ Partial Class frmNotificacionCrear
         '
         'btnGuardar
         '
-        Me.btnGuardar.Location = New System.Drawing.Point(386, 3)
+        Me.btnGuardar.Location = New System.Drawing.Point(348, 3)
         Me.btnGuardar.Name = "btnGuardar"
-        Me.btnGuardar.Size = New System.Drawing.Size(75, 34)
+        Me.btnGuardar.Size = New System.Drawing.Size(113, 34)
         Me.btnGuardar.TabIndex = 0
         Me.btnGuardar.Text = "Guardar"
         Me.btnGuardar.UseVisualStyleBackColor = True
@@ -256,9 +256,9 @@ Partial Class frmNotificacionCrear
         'btnCancelar
         '
         Me.btnCancelar.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancelar.Location = New System.Drawing.Point(305, 3)
+        Me.btnCancelar.Location = New System.Drawing.Point(236, 3)
         Me.btnCancelar.Name = "btnCancelar"
-        Me.btnCancelar.Size = New System.Drawing.Size(75, 34)
+        Me.btnCancelar.Size = New System.Drawing.Size(106, 34)
         Me.btnCancelar.TabIndex = 1
         Me.btnCancelar.Text = "Cancelar"
         Me.btnCancelar.UseVisualStyleBackColor = True

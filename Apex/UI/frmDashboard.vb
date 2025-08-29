@@ -1,4 +1,6 @@
-﻿Imports System.Data.Entity
+﻿' /UI/frmDashboard.vb
+
+Imports System.Data.Entity
 Imports System.Drawing
 Imports System.Threading.Tasks
 Imports System.Windows.Forms
@@ -6,35 +8,20 @@ Imports System.Windows.Forms
 Public Class frmDashboard
     Inherits Form
 
-    ' Botón y formulario activos actualmente
+    ' Usamos un Dictionary para almacenar las instancias únicas de los formularios reutilizables.
+    ' La clave (String) es el nombre del tipo de formulario, el valor (Form) es la instancia.
+    Private ReadOnly _formulariosAbiertos As New Dictionary(Of String, Form)
+
+    ' Referencias al botón y formulario actualmente activos/visibles.
     Private currentBtn As Button
     Private Shadows activeForm As Form
-
-    ' --- Instancias de formularios para reutilización ---
-    Private _licenciasInstancia As frmGestionLicencias
-    Private _notificacionesInstancia As frmGestionNotificaciones
-    Private _sancionesInstancia As frmGestionSanciones
-    Private _conceptoFuncionalInstancia As frmConceptoFuncionalApex
-    Private _funcionarioBuscarInstancia As frmFuncionarioBuscar
-    Private _filtroAvanzadoInstancia As frmFiltroAvanzado
-    Private _novedadesInstancia As frmNovedades
-    Private _viaticosInstancia As frmReporteViaticos
-    Private _importacionInstancia As frmAsistenteImportacion
-    Private _gestionNomenclaturasInstancia As frmGestionNomenclaturas
-    Private _renombrarPDFInstancia As frmRenombrarPDF
-    Private _reporteNovedadesInstancia As frmReporteNovedades
-    Private _configuracionInstancia As frmConfiguracion
-    Private _analisisEstacionalidadInstancia As frmAnalisisEstacionalidad
-    Private _analisisPersonalInstancia As frmAnalisisFuncionarios
 
     Public Sub New()
         InitializeComponent()
         AddHandler Me.Shown, AddressOf frmDashboard_Shown
 
-        ' 1. El botón del menú principal SOLO gestiona el submenú y su apariencia.
-        AddHandler btnFuncionarios.Click, AddressOf ManejarClickMenuPrincipal
-
-        ' 2. TODOS los demás botones que abren un formulario usan el mismo manejador.
+        ' Se asigna el mismo manejador de click a TODOS los botones del menú.
+        ' Esto centraliza la lógica de navegación.
         AddHandler btnNuevoFuncionario.Click, AddressOf AbrirFormulario_Click
         AddHandler btnBuscarFuncionario.Click, AddressOf AbrirFormulario_Click
         AddHandler btnLicencias.Click, AddressOf AbrirFormulario_Click
@@ -55,167 +42,138 @@ Public Class frmDashboard
 
     Private Async Sub frmDashboard_Shown(sender As Object, e As EventArgs)
         Await CargarSemanaActualAsync()
-        ' Abrir un formulario por defecto al iniciar la aplicación
+        ' Abrir el formulario de licencias por defecto al iniciar la aplicación.
         btnLicencias.PerformClick()
     End Sub
 
 #Region "Lógica de Navegación del Menú"
 
-    ' Evento para el botón principal "Funcionarios"
-    Private Sub ManejarClickMenuPrincipal(sender As Object, e As EventArgs)
-        ActivateButton(sender) ' Activa visualmente el botón "Funcionarios"
-        pnlSubMenuFuncionario.Visible = Not pnlSubMenuFuncionario.Visible ' Muestra/oculta el submenú
-    End Sub
-
-    ' Evento centralizado para TODOS los botones que abren un formulario
+    ' Evento centralizado que se dispara al hacer clic en cualquier botón del menú.
     Private Sub AbrirFormulario_Click(sender As Object, e As EventArgs)
         Dim botonClickeado = CType(sender, Button)
-        ActivateButton(botonClickeado) ' Activa visualmente el botón clickeado
+        ActivateButton(botonClickeado) ' Cambia el estilo visual del botón.
 
-        ' Si el botón pertenece al submenú, oculta el panel después del click
-        If botonClickeado.Parent Is pnlSubMenuFuncionario Then
-            pnlSubMenuFuncionario.Visible = False
-        End If
-
-        ' --- Lógica central para abrir el formulario correcto ---
+        ' Decide qué formulario abrir basándose en el nombre del botón.
         Select Case botonClickeado.Name
-            ' --- Casos del submenú de Funcionarios ---
+            ' Caso especial: "Nuevo Funcionario" siempre crea una instancia nueva.
             Case "btnNuevoFuncionario"
-                AbrirFormEnPanel(New frmFuncionarioCrear())
+                AbrirFormularioUnico(New frmFuncionarioCrear())
 
+            ' Todos los demás casos reutilizan la misma instancia del formulario.
             Case "btnBuscarFuncionario"
-                If _funcionarioBuscarInstancia Is Nothing OrElse _funcionarioBuscarInstancia.IsDisposed Then
-                    _funcionarioBuscarInstancia = New frmFuncionarioBuscar()
-                End If
-                AbrirFormEnPanel(_funcionarioBuscarInstancia)
-
-            ' --- Casos de los otros menús principales ---
+                AbrirFormularioReutilizable(GetType(frmFuncionarioBuscar))
             Case "btnLicencias"
-                If _licenciasInstancia Is Nothing OrElse _licenciasInstancia.IsDisposed Then
-                    _licenciasInstancia = New frmGestionLicencias()
-                End If
-                AbrirFormEnPanel(_licenciasInstancia)
-
+                AbrirFormularioReutilizable(GetType(frmGestionLicencias))
             Case "btnNotificaciones"
-                If _notificacionesInstancia Is Nothing OrElse _notificacionesInstancia.IsDisposed Then
-                    _notificacionesInstancia = New frmGestionNotificaciones()
-                End If
-                AbrirFormEnPanel(_notificacionesInstancia)
-
+                AbrirFormularioReutilizable(GetType(frmGestionNotificaciones))
             Case "btnSanciones"
-                If _sancionesInstancia Is Nothing OrElse _sancionesInstancia.IsDisposed Then
-                    _sancionesInstancia = New frmGestionSanciones()
-                End If
-                AbrirFormEnPanel(_sancionesInstancia)
-
+                AbrirFormularioReutilizable(GetType(frmGestionSanciones))
             Case "btnConceptoFuncional"
-                If _conceptoFuncionalInstancia Is Nothing OrElse _conceptoFuncionalInstancia.IsDisposed Then
-                    _conceptoFuncionalInstancia = New frmConceptoFuncionalApex()
-                End If
-                AbrirFormEnPanel(_conceptoFuncionalInstancia)
-
+                AbrirFormularioReutilizable(GetType(frmConceptoFuncionalApex))
             Case "btnFiltros"
-                If _filtroAvanzadoInstancia Is Nothing OrElse _filtroAvanzadoInstancia.IsDisposed Then
-                    _filtroAvanzadoInstancia = New frmFiltroAvanzado()
-                End If
-                AbrirFormEnPanel(_filtroAvanzadoInstancia)
-
-            ' --- INICIO DE LA CORRECCIÓN: Casos Faltantes ---
+                AbrirFormularioReutilizable(GetType(frmFiltroAvanzado))
             Case "btnNovedades"
-                If _novedadesInstancia Is Nothing OrElse _novedadesInstancia.IsDisposed Then
-                    _novedadesInstancia = New frmNovedades()
-                End If
-                AbrirFormEnPanel(_novedadesInstancia)
-
+                AbrirFormularioReutilizable(GetType(frmNovedades))
             Case "btnNomenclaturas"
-                If _gestionNomenclaturasInstancia Is Nothing OrElse _gestionNomenclaturasInstancia.IsDisposed Then
-                    _gestionNomenclaturasInstancia = New frmGestionNomenclaturas()
-                End If
-                AbrirFormEnPanel(_gestionNomenclaturasInstancia)
-
+                AbrirFormularioReutilizable(GetType(frmGestionNomenclaturas))
             Case "btnRenombrarPDFs"
-                If _renombrarPDFInstancia Is Nothing OrElse _renombrarPDFInstancia.IsDisposed Then
-                    _renombrarPDFInstancia = New frmRenombrarPDF()
-                End If
-                AbrirFormEnPanel(_renombrarPDFInstancia)
-
+                AbrirFormularioReutilizable(GetType(frmRenombrarPDF))
             Case "btnImportacion"
-                If _importacionInstancia Is Nothing OrElse _importacionInstancia.IsDisposed Then
-                    _importacionInstancia = New frmAsistenteImportacion()
-                End If
-                AbrirFormEnPanel(_importacionInstancia)
-
+                AbrirFormularioReutilizable(GetType(frmAsistenteImportacion))
             Case "btnViaticos"
-                If _viaticosInstancia Is Nothing OrElse _viaticosInstancia.IsDisposed Then
-                    _viaticosInstancia = New frmReporteViaticos()
-                End If
-                AbrirFormEnPanel(_viaticosInstancia)
-
+                AbrirFormularioReutilizable(GetType(frmReporteViaticos))
             Case "btnReportes"
-                If _reporteNovedadesInstancia Is Nothing OrElse _reporteNovedadesInstancia.IsDisposed Then
-                    _reporteNovedadesInstancia = New frmReporteNovedades()
-                End If
-                AbrirFormEnPanel(_reporteNovedadesInstancia)
-
+                AbrirFormularioReutilizable(GetType(frmReporteNovedades))
             Case "btnAnalisis"
-                If _analisisEstacionalidadInstancia Is Nothing OrElse _analisisEstacionalidadInstancia.IsDisposed Then
-                    _analisisEstacionalidadInstancia = New frmAnalisisEstacionalidad()
-                End If
-                AbrirFormEnPanel(_analisisEstacionalidadInstancia)
-
+                AbrirFormularioReutilizable(GetType(frmAnalisisEstacionalidad))
             Case "btnAnalisisPersonal"
-                If _analisisPersonalInstancia Is Nothing OrElse _analisisPersonalInstancia.IsDisposed Then
-                    _analisisPersonalInstancia = New frmAnalisisFuncionarios()
-                End If
-                AbrirFormEnPanel(_analisisPersonalInstancia)
-            ' --- FIN DE LA CORRECCIÓN ---
-
+                AbrirFormularioReutilizable(GetType(frmAnalisisFuncionarios))
             Case "btnConfiguracion"
-                If _configuracionInstancia Is Nothing OrElse _configuracionInstancia.IsDisposed Then
-                    _configuracionInstancia = New frmConfiguracion()
-                End If
-                AbrirFormEnPanel(_configuracionInstancia)
+                AbrirFormularioReutilizable(GetType(frmConfiguracion))
         End Select
     End Sub
 
-    ' Método para gestionar la apertura de formularios en el panel principal
-    Public Sub AbrirFormEnPanel(childForm As Form)
-        ' Si ya hay un formulario abierto y es diferente al nuevo, ciérralo y límpialo de memoria.
-        If activeForm IsNot Nothing AndAlso activeForm IsNot childForm Then
-            activeForm.Close()
-            activeForm.Dispose()
+    ''' <summary>
+    ''' Gestiona la apertura de formularios que deben persistir en memoria (ser reutilizados).
+    ''' </summary>
+    Public Sub AbrirFormularioReutilizable(formType As Type)
+        Dim formName As String = formType.Name
+
+        ' Oculta el formulario que está activo actualmente.
+        If activeForm IsNot Nothing Then
+            activeForm.Hide()
         End If
 
-        ' Si el formulario que se quiere abrir es el mismo que ya está activo, no hagas nada.
-        If activeForm Is childForm AndAlso Not childForm.IsDisposed Then
-            Return
+        ' Verifica si el formulario ya fue creado y está en nuestro diccionario.
+        If _formulariosAbiertos.ContainsKey(formName) Then
+            ' Si ya existe, simplemente se activa y se muestra.
+            activeForm = _formulariosAbiertos(formName)
+            activeForm.Show()
+            activeForm.BringToFront()
+
+            ' Si el formulario puede actualizarse, se le ordena que lo haga.
+            If TypeOf activeForm Is IFormularioActualizable Then
+                CType(activeForm, IFormularioActualizable).ActualizarDatos()
+            End If
+        Else
+            ' Si no existe, se crea, configura, almacena y muestra.
+            Dim newForm = CType(Activator.CreateInstance(formType), Form)
+            activeForm = newForm
+            _formulariosAbiertos.Add(formName, activeForm)
+
+            activeForm.TopLevel = False
+            activeForm.FormBorderStyle = FormBorderStyle.None
+            activeForm.Dock = DockStyle.Fill
+            Me.panelContenido.Controls.Add(activeForm)
+            activeForm.Show()
+            activeForm.BringToFront()
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' Gestiona la apertura de formularios que deben ser siempre una instancia nueva y se destruyen al cerrar.
+    ''' </summary>
+    Public Sub AbrirFormularioUnico(childForm As Form)
+        If activeForm IsNot Nothing Then
+            activeForm.Hide()
         End If
 
         activeForm = childForm
-        childForm.TopLevel = False
-        childForm.FormBorderStyle = FormBorderStyle.None
-        childForm.Dock = DockStyle.Fill
-        Me.panelContenido.Controls.Add(childForm)
-        Me.panelContenido.Tag = childForm
-        childForm.BringToFront()
-        childForm.Show()
-    End Sub
+        activeForm.TopLevel = False
+        activeForm.FormBorderStyle = FormBorderStyle.None
+        activeForm.Dock = DockStyle.Fill
+        Me.panelContenido.Controls.Add(activeForm)
 
+        ' Se añade un manejador al evento 'FormClosed'. Cuando el formulario se cierre,
+        ' se eliminará de los controles y se volverá a un formulario por defecto.
+        AddHandler activeForm.FormClosed, Sub(s, args)
+                                              Dim formCerrado = CType(s, Form)
+                                              Me.panelContenido.Controls.Remove(formCerrado)
+                                              formCerrado.Dispose()
+
+                                              ' Vuelve a activar el botón y el formulario de búsqueda.
+                                              btnBuscarFuncionario.PerformClick()
+                                              End AddHandler
+
+                                              activeForm.Show()
+                                              activeForm.BringToFront()
+                                          End Sub
+    End Sub
 #End Region
 
-#Region "UI Helpers (Estilos de botones y carga de datos)"
+#Region "UI Helpers (Estilos y Carga de Datos)"
 
-    ' Cambia el estilo del botón activo
+    ' Cambia el estilo del botón activo.
     Private Sub ActivateButton(senderBtn As Object)
         If senderBtn Is Nothing Then Return
-        DisableButton() ' Restablece el botón anteriormente activo
+        DisableButton() ' Restablece el botón anteriormente activo.
         currentBtn = CType(senderBtn, Button)
         currentBtn.BackColor = Color.FromArgb(81, 81, 112)
         currentBtn.ForeColor = Color.White
         currentBtn.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
     End Sub
 
-    ' Restablece el estilo del botón que deja de estar activo
+    ' Restablece el estilo del botón que deja de estar activo.
     Private Sub DisableButton()
         If currentBtn IsNot Nothing Then
             currentBtn.BackColor = Color.FromArgb(51, 51, 76)
@@ -224,7 +182,7 @@ Public Class frmDashboard
         End If
     End Sub
 
-    ' Carga el número de semana actual en el logo
+    ' Carga el número de semana actual en el logo.
     Private Async Function CargarSemanaActualAsync() As Task
         Try
             Using uow As New UnitOfWork()

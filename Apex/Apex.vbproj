@@ -181,7 +181,9 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\IFormularioActualizable.vb" />
     <Compile Include="Common\IRepository.vb" />
+    <Compile Include="Common\NotificadorEventos.vb" />
     <Compile Include="Common\StringExtensions.vb" />
     <Compile Include="Data\AreaTrabajo.vb">
       <DependentUpon>Model1.tt</DependentUpon>
@@ -826,6 +828,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmSancionCrear.resx">
       <DependentUpon>frmSancionCrear.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmVisorFoto.resx">
+      <DependentUpon>frmVisorFoto.vb</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

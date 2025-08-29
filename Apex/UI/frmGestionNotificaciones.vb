@@ -76,10 +76,6 @@ Public Class frmGestionNotificaciones
         End If
     End Sub
 
-    ' Evento para el botón de búsqueda (si tienes uno)
-    ' Private Async Sub btnBuscar_Click(sender As Object, e As EventArgs) Handles btnBuscar.Click
-    '     Await BuscarAsync()
-    ' End Sub
 
 #End Region
 
@@ -113,9 +109,13 @@ Public Class frmGestionNotificaciones
             Return
         End If
         Dim idSeleccionado = CInt(dgvNotificaciones.SelectedRows(0).Cells("Id").Value)
-        Using frm As New frmNotificacionRPT(idSeleccionado)
-            frm.ShowDialog()
-        End Using
+        Dim frm As New frmNotificacionRPT(idSeleccionado)
+
+        ' Se obtiene una referencia al formulario Dashboard
+        Dim parentDashboard As frmDashboard = CType(Me.ParentForm, frmDashboard)
+
+        ' Se llama al método público del Dashboard para abrir el formulario en el panel
+        parentDashboard.AbrirFormEnPanel(frm)
     End Sub
 
     Private Async Sub btnEliminar_Click(sender As Object, e As EventArgs) Handles btnEliminar.Click

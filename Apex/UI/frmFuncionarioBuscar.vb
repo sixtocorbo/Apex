@@ -291,8 +291,8 @@ Public Class frmFuncionarioBuscar
         ' Se obtiene una referencia al formulario Dashboard
         Dim parentDashboard As frmDashboard = CType(Me.ParentForm, frmDashboard)
 
-            ' Se llama al método público del Dashboard para abrir el formulario en el panel
-            parentDashboard.AbrirFormEnPanel(frm)
+        ' Se llama al método público del Dashboard para abrir el formulario en el panel
+        parentDashboard.AbrirFormEnPanel(frm)
 
 
     End Sub
@@ -313,12 +313,25 @@ Public Class frmFuncionarioBuscar
         If _modo = ModoApertura.Seleccion Then
             SeleccionarYcerrar()
         Else ' Modo Navegacion
-            Dim id = CInt(dgvResultados.CurrentRow.Cells("Id").Value)
-            Using frm As New frmFuncionarioCrear(id)
-                If frm.ShowDialog() = DialogResult.OK Then
-                    Await BuscarAsync()
-                End If
-            End Using
+            ' --- INICIO DE LA MODIFICACIÓN ---
+            ' En lugar de abrir el formulario como un diálogo modal, ahora se abre
+            ' dentro del panel de contenido del Dashboard principal.
+
+            ' 1. Se obtiene el ID del funcionario de la fila seleccionada.
+            Dim id As Integer = CInt(dgvResultados.CurrentRow.Cells("Id").Value)
+
+            ' 2. Se crea la instancia del formulario que se quiere abrir.
+            Dim frm As New frmFuncionarioCrear(id)
+
+            ' 3. Se obtiene una referencia al formulario Dashboard que contiene a este formulario.
+            '    'Me.ParentForm' funciona porque frmFuncionarioBuscar fue abierto con TopLevel = False.
+            Dim parentDashboard As frmDashboard = CType(Me.ParentForm, frmDashboard)
+
+            ' 4. Se llama al método público del Dashboard para que cargue el nuevo formulario en su panel.
+            If parentDashboard IsNot Nothing Then
+                parentDashboard.AbrirFormEnPanel(frm)
+            End If
+            ' --- FIN DE LA MODIFICACIÓN ---
         End If
     End Sub
 

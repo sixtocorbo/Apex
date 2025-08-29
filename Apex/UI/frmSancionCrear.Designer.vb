@@ -112,7 +112,7 @@ Partial Class frmSancionCrear
         Me.dtpFechaDesde.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
         Me.dtpFechaDesde.Location = New System.Drawing.Point(141, 33)
         Me.dtpFechaDesde.Name = "dtpFechaDesde"
-        Me.dtpFechaDesde.Size = New System.Drawing.Size(120, 31)
+        Me.dtpFechaDesde.Size = New System.Drawing.Size(138, 31)
         Me.dtpFechaDesde.TabIndex = 3
         '
         'lblFechaHasta
@@ -131,7 +131,7 @@ Partial Class frmSancionCrear
         Me.dtpFechaHasta.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
         Me.dtpFechaHasta.Location = New System.Drawing.Point(141, 63)
         Me.dtpFechaHasta.Name = "dtpFechaHasta"
-        Me.dtpFechaHasta.Size = New System.Drawing.Size(120, 31)
+        Me.dtpFechaHasta.Size = New System.Drawing.Size(138, 31)
         Me.dtpFechaHasta.TabIndex = 5
         '
         'chkFechaHasta

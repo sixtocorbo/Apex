@@ -206,9 +206,9 @@ Partial Class frmLicenciaCrear
         '
         'btnGuardar
         '
-        Me.btnGuardar.Location = New System.Drawing.Point(386, 3)
+        Me.btnGuardar.Location = New System.Drawing.Point(359, 3)
         Me.btnGuardar.Name = "btnGuardar"
-        Me.btnGuardar.Size = New System.Drawing.Size(75, 34)
+        Me.btnGuardar.Size = New System.Drawing.Size(102, 34)
         Me.btnGuardar.TabIndex = 0
         Me.btnGuardar.Text = "Guardar"
         Me.btnGuardar.UseVisualStyleBackColor = True
@@ -216,9 +216,9 @@ Partial Class frmLicenciaCrear
         'btnCancelar
         '
         Me.btnCancelar.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancelar.Location = New System.Drawing.Point(305, 3)
+        Me.btnCancelar.Location = New System.Drawing.Point(249, 3)
         Me.btnCancelar.Name = "btnCancelar"
-        Me.btnCancelar.Size = New System.Drawing.Size(75, 34)
+        Me.btnCancelar.Size = New System.Drawing.Size(104, 34)
         Me.btnCancelar.TabIndex = 1
         Me.btnCancelar.Text = "Cancelar"
         Me.btnCancelar.UseVisualStyleBackColor = True
