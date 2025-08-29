@@ -82,6 +82,9 @@ Public Class frmNovedades
         lstFuncionarios.DataSource = Nothing
         flpFotos.Controls.Clear()
         _pictureBoxSeleccionado = Nothing
+        ' --- CORRECCIÓN ---
+        ' Es crucial resetear el ID seleccionado para permitir que la nueva selección se cargue.
+        _idNovedadSeleccionada = Nothing
     End Sub
 
     Private Async Function ActualizarDetalleDesdeSeleccion() As Task
@@ -91,6 +94,14 @@ Public Class frmNovedades
         End If
 
         Dim novedadSeleccionada = CType(dgvNovedades.CurrentRow.DataBoundItem, vw_NovedadesAgrupadas)
+
+        ' --- CORRECCIÓN ---
+        ' Evita la recarga innecesaria si el evento se dispara para una novedad que ya está mostrada.
+        ' Esto soluciona el problema de carga múltiple al asignar el DataSource.
+        If _idNovedadSeleccionada.HasValue AndAlso _idNovedadSeleccionada.Value = novedadSeleccionada.Id Then
+            Return
+        End If
+
         _idNovedadSeleccionada = novedadSeleccionada.Id
 
         Using svc As New NovedadService()
@@ -157,10 +168,6 @@ Public Class frmNovedades
     Private Async Sub btnNuevaNovedad_Click(sender As Object, e As EventArgs) Handles btnNuevaNovedad.Click
         Using frm As New frmNovedadCrear()
             If frm.ShowDialog(Me) = DialogResult.OK Then
-                ' --- CORRECCIÓN DEFINITIVA ---
-                ' Limpiamos el detalle actual ANTES de recargar la lista.
-                ' Esto elimina el estado "fantasma" de las fotos.
-                LimpiarDetalles()
                 Await BuscarAsync()
             End If
         End Using
@@ -174,9 +181,6 @@ Public Class frmNovedades
         Dim novedadId = CInt(dgvNovedades.CurrentRow.Cells("Id").Value)
         Using frm As New frmNovedadCrear(novedadId)
             If frm.ShowDialog(Me) = DialogResult.OK Then
-                ' --- CORRECCIÓN DEFINITIVA ---
-                ' También limpiamos aquí para consistencia.
-                LimpiarDetalles()
                 Await BuscarAsync()
             End If
         End Using
@@ -197,7 +201,6 @@ Public Class frmNovedades
                 Using svc As New NovedadService()
                     Await svc.DeleteNovedadCompletaAsync(novedadSeleccionada.Id)
                 End Using
-                _idNovedadSeleccionada = Nothing
                 Await BuscarAsync()
             Catch ex As Exception
                 MessageBox.Show("Ocurrió un error al eliminar la novedad: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
