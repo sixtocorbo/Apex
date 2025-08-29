@@ -10,14 +10,11 @@ Public Class frmDashboard
     Private currentBtn As Button
     Private Shadows activeForm As Form
 
-    ' --- MODIFICACIÓN: Instancias para los nuevos formularios de gestión ---
+    ' --- Instancias de formularios para reutilización ---
     Private _licenciasInstancia As frmGestionLicencias
     Private _notificacionesInstancia As frmGestionNotificaciones
     Private _sancionesInstancia As frmGestionSanciones
     Private _conceptoFuncionalInstancia As frmConceptoFuncionalApex
-    ' --- FIN MODIFICACIÓN ---
-
-    ' Instancias para los otros formularios (se mantienen igual)
     Private _funcionarioBuscarInstancia As frmFuncionarioBuscar
     Private _filtroAvanzadoInstancia As frmFiltroAvanzado
     Private _novedadesInstancia As frmNovedades
@@ -30,63 +27,69 @@ Public Class frmDashboard
     Private _analisisEstacionalidadInstancia As frmAnalisisEstacionalidad
     Private _analisisPersonalInstancia As frmAnalisisFuncionarios
 
-
     Public Sub New()
         InitializeComponent()
         AddHandler Me.Shown, AddressOf frmDashboard_Shown
 
-        ' --- MODIFICACIÓN: Se reemplaza btnGestion por los nuevos botones ---
-        AddHandler btnLicencias.Click, AddressOf ActivateButton
-        AddHandler btnNotificaciones.Click, AddressOf ActivateButton
-        AddHandler btnSanciones.Click, AddressOf ActivateButton
-        AddHandler btnConceptoFuncional.Click, AddressOf ActivateButton ' Se añade botón para Concepto Funcional
-        ' --- FIN MODIFICACIÓN ---
+        ' 1. El botón del menú principal SOLO gestiona el submenú y su apariencia.
+        AddHandler btnFuncionarios.Click, AddressOf ManejarClickMenuPrincipal
 
-        ' Handlers para los botones existentes
-        AddHandler btnFuncionarios.Click, AddressOf ActivateButton
-        AddHandler btnFiltros.Click, AddressOf ActivateButton
-        AddHandler btnNovedades.Click, AddressOf ActivateButton
-        AddHandler btnNomenclaturas.Click, AddressOf ActivateButton
-        AddHandler btnRenombrarPDFs.Click, AddressOf ActivateButton
-        AddHandler btnImportacion.Click, AddressOf ActivateButton
-        AddHandler btnViaticos.Click, AddressOf ActivateButton
-        AddHandler btnReportes.Click, AddressOf ActivateButton
-        AddHandler btnAnalisis.Click, AddressOf ActivateButton
-        AddHandler btnAnalisisPersonal.Click, AddressOf ActivateButton
-        AddHandler btnConfiguracion.Click, AddressOf ActivateButton
+        ' 2. TODOS los demás botones que abren un formulario usan el mismo manejador.
+        AddHandler btnNuevoFuncionario.Click, AddressOf AbrirFormulario_Click
+        AddHandler btnBuscarFuncionario.Click, AddressOf AbrirFormulario_Click
+        AddHandler btnLicencias.Click, AddressOf AbrirFormulario_Click
+        AddHandler btnNotificaciones.Click, AddressOf AbrirFormulario_Click
+        AddHandler btnSanciones.Click, AddressOf AbrirFormulario_Click
+        AddHandler btnConceptoFuncional.Click, AddressOf AbrirFormulario_Click
+        AddHandler btnFiltros.Click, AddressOf AbrirFormulario_Click
+        AddHandler btnNovedades.Click, AddressOf AbrirFormulario_Click
+        AddHandler btnNomenclaturas.Click, AddressOf AbrirFormulario_Click
+        AddHandler btnRenombrarPDFs.Click, AddressOf AbrirFormulario_Click
+        AddHandler btnImportacion.Click, AddressOf AbrirFormulario_Click
+        AddHandler btnViaticos.Click, AddressOf AbrirFormulario_Click
+        AddHandler btnReportes.Click, AddressOf AbrirFormulario_Click
+        AddHandler btnAnalisis.Click, AddressOf AbrirFormulario_Click
+        AddHandler btnAnalisisPersonal.Click, AddressOf AbrirFormulario_Click
+        AddHandler btnConfiguracion.Click, AddressOf AbrirFormulario_Click
     End Sub
 
     Private Async Sub frmDashboard_Shown(sender As Object, e As EventArgs)
         Await CargarSemanaActualAsync()
-        ' Abrir el formulario de licencias por defecto al iniciar
+        ' Abrir un formulario por defecto al iniciar la aplicación
         btnLicencias.PerformClick()
     End Sub
 
-    Private Async Function CargarSemanaActualAsync() As Task
-        Try
-            Using uow As New UnitOfWork()
-                Dim semana = Await uow.Context.Database.SqlQuery(Of Integer)("SELECT dbo.RegimenActual(GETDATE())").FirstOrDefaultAsync()
-                If semana > 0 Then
-                    lblSemanaActual.Text = $"SEMANA {semana}"
-                Else
-                    lblSemanaActual.Text = "Régimen no definido"
+#Region "Lógica de Navegación del Menú"
+
+    ' Evento para el botón principal "Funcionarios"
+    Private Sub ManejarClickMenuPrincipal(sender As Object, e As EventArgs)
+        ActivateButton(sender) ' Activa visualmente el botón "Funcionarios"
+        pnlSubMenuFuncionario.Visible = Not pnlSubMenuFuncionario.Visible ' Muestra/oculta el submenú
+    End Sub
+
+    ' Evento centralizado para TODOS los botones que abren un formulario
+    Private Sub AbrirFormulario_Click(sender As Object, e As EventArgs)
+        Dim botonClickeado = CType(sender, Button)
+        ActivateButton(botonClickeado) ' Activa visualmente el botón clickeado
+
+        ' Si el botón pertenece al submenú, oculta el panel después del click
+        If botonClickeado.Parent Is pnlSubMenuFuncionario Then
+            pnlSubMenuFuncionario.Visible = False
+        End If
+
+        ' --- Lógica central para abrir el formulario correcto ---
+        Select Case botonClickeado.Name
+            ' --- Casos del submenú de Funcionarios ---
+            Case "btnNuevoFuncionario"
+                AbrirFormEnPanel(New frmFuncionarioCrear())
+
+            Case "btnBuscarFuncionario"
+                If _funcionarioBuscarInstancia Is Nothing OrElse _funcionarioBuscarInstancia.IsDisposed Then
+                    _funcionarioBuscarInstancia = New frmFuncionarioBuscar()
                 End If
-            End Using
-        Catch ex As Exception
-            lblSemanaActual.Text = "Error al cargar"
-        End Try
-    End Function
+                AbrirFormEnPanel(_funcionarioBuscarInstancia)
 
-    Private Sub ActivateButton(sender As Object, e As EventArgs)
-        If sender Is Nothing Then Return
-        DisableButton()
-        currentBtn = CType(sender, Button)
-        currentBtn.BackColor = Color.FromArgb(81, 81, 112)
-        currentBtn.ForeColor = Color.White
-        currentBtn.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
-
-        ' --- MODIFICACIÓN: Lógica para manejar los nuevos formularios ---
-        Select Case currentBtn.Name
+            ' --- Casos de los otros menús principales ---
             Case "btnLicencias"
                 If _licenciasInstancia Is Nothing OrElse _licenciasInstancia.IsDisposed Then
                     _licenciasInstancia = New frmGestionLicencias()
@@ -111,19 +114,13 @@ Public Class frmDashboard
                 End If
                 AbrirFormEnPanel(_conceptoFuncionalInstancia)
 
-            ' --- Casos para los otros botones (se mantienen igual) ---
-            Case "btnFuncionarios"
-                If _funcionarioBuscarInstancia Is Nothing OrElse _funcionarioBuscarInstancia.IsDisposed Then
-                    _funcionarioBuscarInstancia = New frmFuncionarioBuscar()
-                End If
-                AbrirFormEnPanel(_funcionarioBuscarInstancia)
-
             Case "btnFiltros"
                 If _filtroAvanzadoInstancia Is Nothing OrElse _filtroAvanzadoInstancia.IsDisposed Then
                     _filtroAvanzadoInstancia = New frmFiltroAvanzado()
                 End If
                 AbrirFormEnPanel(_filtroAvanzadoInstancia)
 
+            ' --- INICIO DE LA CORRECCIÓN: Casos Faltantes ---
             Case "btnNovedades"
                 If _novedadesInstancia Is Nothing OrElse _novedadesInstancia.IsDisposed Then
                     _novedadesInstancia = New frmNovedades()
@@ -171,6 +168,7 @@ Public Class frmDashboard
                     _analisisPersonalInstancia = New frmAnalisisFuncionarios()
                 End If
                 AbrirFormEnPanel(_analisisPersonalInstancia)
+            ' --- FIN DE LA CORRECCIÓN ---
 
             Case "btnConfiguracion"
                 If _configuracionInstancia Is Nothing OrElse _configuracionInstancia.IsDisposed Then
@@ -180,6 +178,44 @@ Public Class frmDashboard
         End Select
     End Sub
 
+    ' Método para gestionar la apertura de formularios en el panel principal
+    Public Sub AbrirFormEnPanel(childForm As Form)
+        ' Si ya hay un formulario abierto y es diferente al nuevo, ciérralo y límpialo de memoria.
+        If activeForm IsNot Nothing AndAlso activeForm IsNot childForm Then
+            activeForm.Close()
+            activeForm.Dispose()
+        End If
+
+        ' Si el formulario que se quiere abrir es el mismo que ya está activo, no hagas nada.
+        If activeForm Is childForm AndAlso Not childForm.IsDisposed Then
+            Return
+        End If
+
+        activeForm = childForm
+        childForm.TopLevel = False
+        childForm.FormBorderStyle = FormBorderStyle.None
+        childForm.Dock = DockStyle.Fill
+        Me.panelContenido.Controls.Add(childForm)
+        Me.panelContenido.Tag = childForm
+        childForm.BringToFront()
+        childForm.Show()
+    End Sub
+
+#End Region
+
+#Region "UI Helpers (Estilos de botones y carga de datos)"
+
+    ' Cambia el estilo del botón activo
+    Private Sub ActivateButton(senderBtn As Object)
+        If senderBtn Is Nothing Then Return
+        DisableButton() ' Restablece el botón anteriormente activo
+        currentBtn = CType(senderBtn, Button)
+        currentBtn.BackColor = Color.FromArgb(81, 81, 112)
+        currentBtn.ForeColor = Color.White
+        currentBtn.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
+    End Sub
+
+    ' Restablece el estilo del botón que deja de estar activo
     Private Sub DisableButton()
         If currentBtn IsNot Nothing Then
             currentBtn.BackColor = Color.FromArgb(51, 51, 76)
@@ -188,29 +224,22 @@ Public Class frmDashboard
         End If
     End Sub
 
-    Public Sub AbrirFormEnPanel(childForm As Form)
-        ' Verifica si hay un formulario activo y si es diferente al nuevo.
-        If activeForm IsNot Nothing AndAlso activeForm IsNot childForm Then
-            activeForm.Hide()
+    ' Carga el número de semana actual en el logo
+    Private Async Function CargarSemanaActualAsync() As Task
+        Try
+            Using uow As New UnitOfWork()
+                Dim semana = Await uow.Context.Database.SqlQuery(Of Integer)("SELECT dbo.RegimenActual(GETDATE())").FirstOrDefaultAsync()
+                If semana > 0 Then
+                    lblSemanaActual.Text = $"SEMANA {semana}"
+                Else
+                    lblSemanaActual.Text = "Régimen no definido"
+                End If
+            End Using
+        Catch ex As Exception
+            lblSemanaActual.Text = "Error al cargar"
+        End Try
+    End Function
 
-            ' --- MODIFICACIÓN ---
-            ' Solo desecha el formulario si NO es el de Filtro Avanzado.
-            If Not TypeOf activeForm Is frmFiltroAvanzado Then
-                activeForm.Dispose()
-            End If
-            ' --- FIN MODIFICACIÓN ---
-        End If
-
-        activeForm = childForm
-        If Not Me.panelContenido.Controls.Contains(childForm) Then
-            childForm.TopLevel = False
-            childForm.FormBorderStyle = FormBorderStyle.None
-            childForm.Dock = DockStyle.Fill
-            Me.panelContenido.Controls.Add(childForm)
-            Me.panelContenido.Tag = childForm
-        End If
-        childForm.BringToFront()
-        childForm.Show()
-    End Sub
+#End Region
 
 End Class

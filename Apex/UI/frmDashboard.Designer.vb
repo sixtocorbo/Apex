@@ -2,6 +2,7 @@
 Partial Class frmDashboard
     Inherits System.Windows.Forms.Form
 
+    'Form overrides dispose to clean up the component list.
     <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
@@ -13,8 +14,12 @@ Partial Class frmDashboard
         End Try
     End Sub
 
+    'Required by the Windows Form Designer
     Private components As System.ComponentModel.IContainer
 
+    'NOTE: The following procedure is required by the Windows Form Designer
+    'It can be modified using the Windows Form Designer.
+    'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.panelNavegacion = New System.Windows.Forms.Panel()
@@ -32,12 +37,16 @@ Partial Class frmDashboard
         Me.btnLicencias = New System.Windows.Forms.Button()
         Me.btnNovedades = New System.Windows.Forms.Button()
         Me.btnFiltros = New System.Windows.Forms.Button()
+        Me.pnlSubMenuFuncionario = New System.Windows.Forms.Panel()
+        Me.btnBuscarFuncionario = New System.Windows.Forms.Button()
+        Me.btnNuevoFuncionario = New System.Windows.Forms.Button()
         Me.btnFuncionarios = New System.Windows.Forms.Button()
         Me.panelLogo = New System.Windows.Forms.Panel()
         Me.lblSemanaActual = New System.Windows.Forms.Label()
         Me.lblAppName = New System.Windows.Forms.Label()
         Me.panelContenido = New System.Windows.Forms.Panel()
         Me.panelNavegacion.SuspendLayout()
+        Me.pnlSubMenuFuncionario.SuspendLayout()
         Me.panelLogo.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -59,6 +68,7 @@ Partial Class frmDashboard
         Me.panelNavegacion.Controls.Add(Me.btnLicencias)
         Me.panelNavegacion.Controls.Add(Me.btnNovedades)
         Me.panelNavegacion.Controls.Add(Me.btnFiltros)
+        Me.panelNavegacion.Controls.Add(Me.pnlSubMenuFuncionario)
         Me.panelNavegacion.Controls.Add(Me.btnFuncionarios)
         Me.panelNavegacion.Controls.Add(Me.panelLogo)
         Me.panelNavegacion.Dock = System.Windows.Forms.DockStyle.Left
@@ -75,7 +85,7 @@ Partial Class frmDashboard
         Me.btnConfiguracion.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnConfiguracion.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnConfiguracion.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnConfiguracion.Location = New System.Drawing.Point(0, 1410)
+        Me.btnConfiguracion.Location = New System.Drawing.Point(0, 1594)
         Me.btnConfiguracion.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnConfiguracion.Name = "btnConfiguracion"
         Me.btnConfiguracion.Padding = New System.Windows.Forms.Padding(18, 0, 0, 0)
@@ -92,7 +102,7 @@ Partial Class frmDashboard
         Me.btnAnalisisPersonal.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnAnalisisPersonal.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnAnalisisPersonal.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnAnalisisPersonal.Location = New System.Drawing.Point(0, 1318)
+        Me.btnAnalisisPersonal.Location = New System.Drawing.Point(0, 1502)
         Me.btnAnalisisPersonal.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnAnalisisPersonal.Name = "btnAnalisisPersonal"
         Me.btnAnalisisPersonal.Padding = New System.Windows.Forms.Padding(18, 0, 0, 0)
@@ -109,7 +119,7 @@ Partial Class frmDashboard
         Me.btnAnalisis.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnAnalisis.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnAnalisis.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnAnalisis.Location = New System.Drawing.Point(0, 1226)
+        Me.btnAnalisis.Location = New System.Drawing.Point(0, 1410)
         Me.btnAnalisis.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnAnalisis.Name = "btnAnalisis"
         Me.btnAnalisis.Padding = New System.Windows.Forms.Padding(18, 0, 0, 0)
@@ -126,7 +136,7 @@ Partial Class frmDashboard
         Me.btnReportes.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnReportes.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnReportes.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnReportes.Location = New System.Drawing.Point(0, 1134)
+        Me.btnReportes.Location = New System.Drawing.Point(0, 1318)
         Me.btnReportes.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnReportes.Name = "btnReportes"
         Me.btnReportes.Padding = New System.Windows.Forms.Padding(18, 0, 0, 0)
@@ -143,7 +153,7 @@ Partial Class frmDashboard
         Me.btnViaticos.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnViaticos.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnViaticos.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnViaticos.Location = New System.Drawing.Point(0, 1042)
+        Me.btnViaticos.Location = New System.Drawing.Point(0, 1226)
         Me.btnViaticos.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnViaticos.Name = "btnViaticos"
         Me.btnViaticos.Padding = New System.Windows.Forms.Padding(18, 0, 0, 0)
@@ -160,7 +170,7 @@ Partial Class frmDashboard
         Me.btnImportacion.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnImportacion.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnImportacion.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnImportacion.Location = New System.Drawing.Point(0, 950)
+        Me.btnImportacion.Location = New System.Drawing.Point(0, 1134)
         Me.btnImportacion.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnImportacion.Name = "btnImportacion"
         Me.btnImportacion.Padding = New System.Windows.Forms.Padding(18, 0, 0, 0)
@@ -177,7 +187,7 @@ Partial Class frmDashboard
         Me.btnRenombrarPDFs.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnRenombrarPDFs.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnRenombrarPDFs.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnRenombrarPDFs.Location = New System.Drawing.Point(0, 858)
+        Me.btnRenombrarPDFs.Location = New System.Drawing.Point(0, 1042)
         Me.btnRenombrarPDFs.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnRenombrarPDFs.Name = "btnRenombrarPDFs"
         Me.btnRenombrarPDFs.Padding = New System.Windows.Forms.Padding(18, 0, 0, 0)
@@ -194,7 +204,7 @@ Partial Class frmDashboard
         Me.btnNomenclaturas.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnNomenclaturas.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnNomenclaturas.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnNomenclaturas.Location = New System.Drawing.Point(0, 766)
+        Me.btnNomenclaturas.Location = New System.Drawing.Point(0, 950)
         Me.btnNomenclaturas.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnNomenclaturas.Name = "btnNomenclaturas"
         Me.btnNomenclaturas.Padding = New System.Windows.Forms.Padding(18, 0, 0, 0)
@@ -211,7 +221,7 @@ Partial Class frmDashboard
         Me.btnConceptoFuncional.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnConceptoFuncional.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnConceptoFuncional.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnConceptoFuncional.Location = New System.Drawing.Point(0, 674)
+        Me.btnConceptoFuncional.Location = New System.Drawing.Point(0, 858)
         Me.btnConceptoFuncional.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnConceptoFuncional.Name = "btnConceptoFuncional"
         Me.btnConceptoFuncional.Padding = New System.Windows.Forms.Padding(18, 0, 0, 0)
@@ -228,7 +238,7 @@ Partial Class frmDashboard
         Me.btnSanciones.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnSanciones.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnSanciones.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnSanciones.Location = New System.Drawing.Point(0, 582)
+        Me.btnSanciones.Location = New System.Drawing.Point(0, 766)
         Me.btnSanciones.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnSanciones.Name = "btnSanciones"
         Me.btnSanciones.Padding = New System.Windows.Forms.Padding(18, 0, 0, 0)
@@ -245,7 +255,7 @@ Partial Class frmDashboard
         Me.btnNotificaciones.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnNotificaciones.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnNotificaciones.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnNotificaciones.Location = New System.Drawing.Point(0, 490)
+        Me.btnNotificaciones.Location = New System.Drawing.Point(0, 674)
         Me.btnNotificaciones.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnNotificaciones.Name = "btnNotificaciones"
         Me.btnNotificaciones.Padding = New System.Windows.Forms.Padding(18, 0, 0, 0)
@@ -262,7 +272,7 @@ Partial Class frmDashboard
         Me.btnLicencias.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnLicencias.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnLicencias.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnLicencias.Location = New System.Drawing.Point(0, 398)
+        Me.btnLicencias.Location = New System.Drawing.Point(0, 582)
         Me.btnLicencias.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnLicencias.Name = "btnLicencias"
         Me.btnLicencias.Padding = New System.Windows.Forms.Padding(18, 0, 0, 0)
@@ -279,7 +289,7 @@ Partial Class frmDashboard
         Me.btnNovedades.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnNovedades.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnNovedades.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnNovedades.Location = New System.Drawing.Point(0, 306)
+        Me.btnNovedades.Location = New System.Drawing.Point(0, 490)
         Me.btnNovedades.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnNovedades.Name = "btnNovedades"
         Me.btnNovedades.Padding = New System.Windows.Forms.Padding(18, 0, 0, 0)
@@ -296,7 +306,7 @@ Partial Class frmDashboard
         Me.btnFiltros.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnFiltros.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnFiltros.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnFiltros.Location = New System.Drawing.Point(0, 214)
+        Me.btnFiltros.Location = New System.Drawing.Point(0, 398)
         Me.btnFiltros.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnFiltros.Name = "btnFiltros"
         Me.btnFiltros.Padding = New System.Windows.Forms.Padding(18, 0, 0, 0)
@@ -305,6 +315,51 @@ Partial Class frmDashboard
         Me.btnFiltros.Text = "   🔍 Filtros"
         Me.btnFiltros.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.btnFiltros.UseVisualStyleBackColor = True
+        '
+        'pnlSubMenuFuncionario
+        '
+        ' *** LÍNEA CORREGIDA ***
+        Me.pnlSubMenuFuncionario.BackColor = System.Drawing.Color.FromArgb(CType(CType(71, Byte), Integer), CType(CType(71, Byte), Integer), CType(CType(102, Byte), Integer))
+        Me.pnlSubMenuFuncionario.Controls.Add(Me.btnBuscarFuncionario)
+        Me.pnlSubMenuFuncionario.Controls.Add(Me.btnNuevoFuncionario)
+        Me.pnlSubMenuFuncionario.Dock = System.Windows.Forms.DockStyle.Top
+        Me.pnlSubMenuFuncionario.Location = New System.Drawing.Point(0, 214)
+        Me.pnlSubMenuFuncionario.Name = "pnlSubMenuFuncionario"
+        Me.pnlSubMenuFuncionario.Size = New System.Drawing.Size(304, 184)
+        Me.pnlSubMenuFuncionario.TabIndex = 18
+        Me.pnlSubMenuFuncionario.Visible = False
+        '
+        'btnBuscarFuncionario
+        '
+        Me.btnBuscarFuncionario.Dock = System.Windows.Forms.DockStyle.Top
+        Me.btnBuscarFuncionario.FlatAppearance.BorderSize = 0
+        Me.btnBuscarFuncionario.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnBuscarFuncionario.Font = New System.Drawing.Font("Segoe UI", 10.0!)
+        Me.btnBuscarFuncionario.ForeColor = System.Drawing.Color.Gainsboro
+        Me.btnBuscarFuncionario.Location = New System.Drawing.Point(0, 92)
+        Me.btnBuscarFuncionario.Name = "btnBuscarFuncionario"
+        Me.btnBuscarFuncionario.Padding = New System.Windows.Forms.Padding(35, 0, 0, 0)
+        Me.btnBuscarFuncionario.Size = New System.Drawing.Size(304, 92)
+        Me.btnBuscarFuncionario.TabIndex = 1
+        Me.btnBuscarFuncionario.Text = "   🔎 Buscar / Editar"
+        Me.btnBuscarFuncionario.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnBuscarFuncionario.UseVisualStyleBackColor = True
+        '
+        'btnNuevoFuncionario
+        '
+        Me.btnNuevoFuncionario.Dock = System.Windows.Forms.DockStyle.Top
+        Me.btnNuevoFuncionario.FlatAppearance.BorderSize = 0
+        Me.btnNuevoFuncionario.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnNuevoFuncionario.Font = New System.Drawing.Font("Segoe UI", 10.0!)
+        Me.btnNuevoFuncionario.ForeColor = System.Drawing.Color.Gainsboro
+        Me.btnNuevoFuncionario.Location = New System.Drawing.Point(0, 0)
+        Me.btnNuevoFuncionario.Name = "btnNuevoFuncionario"
+        Me.btnNuevoFuncionario.Padding = New System.Windows.Forms.Padding(35, 0, 0, 0)
+        Me.btnNuevoFuncionario.Size = New System.Drawing.Size(304, 92)
+        Me.btnNuevoFuncionario.TabIndex = 0
+        Me.btnNuevoFuncionario.Text = "   ➕ Nuevo Funcionario"
+        Me.btnNuevoFuncionario.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnNuevoFuncionario.UseVisualStyleBackColor = True
         '
         'btnFuncionarios
         '
@@ -383,6 +438,7 @@ Partial Class frmDashboard
         Me.Text = "Sistema de Gestión Apex"
         Me.WindowState = System.Windows.Forms.FormWindowState.Maximized
         Me.panelNavegacion.ResumeLayout(False)
+        Me.pnlSubMenuFuncionario.ResumeLayout(False)
         Me.panelLogo.ResumeLayout(False)
         Me.ResumeLayout(False)
 
@@ -404,9 +460,11 @@ Partial Class frmDashboard
     Friend WithEvents btnRenombrarPDFs As Button
     Friend WithEvents btnAnalisis As Button
     Friend WithEvents btnAnalisisPersonal As Button
-    ' --- MODIFICACIÓN: Nuevos botones ---
     Friend WithEvents btnLicencias As Button
     Friend WithEvents btnNotificaciones As Button
     Friend WithEvents btnSanciones As Button
     Friend WithEvents btnConceptoFuncional As Button
+    Friend WithEvents pnlSubMenuFuncionario As Panel
+    Friend WithEvents btnBuscarFuncionario As Button
+    Friend WithEvents btnNuevoFuncionario As Button
 End Class
