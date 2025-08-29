@@ -294,5 +294,6 @@ Public Class frmFuncionarioSituacion
     End Sub
 
     ' --- FIN DE LA MODIFICACIÓN #2 ---
+
 #End Region
 End Class

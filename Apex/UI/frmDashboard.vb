@@ -8,9 +8,8 @@ Imports System.Windows.Forms
 Public Class frmDashboard
     Inherits Form
 
-    ' Usamos un Dictionary para almacenar las instancias de los formularios reutilizables.
-    ' La clave (String) es el nombre del tipo de formulario, el valor (Form) es la instancia.
-    Private ReadOnly _formulariosReutilizables As New Dictionary(Of String, Form)
+    ' Usamos un único diccionario para almacenar las instancias de los formularios reutilizables.
+    Private ReadOnly _formularios As New Dictionary(Of String, Form)
 
     ' Referencias al botón y formulario actualmente activos/visibles.
     Private _currentBtn As Button
@@ -49,103 +48,107 @@ Public Class frmDashboard
 #Region "Lógica de Navegación Principal"
 
     ''' <summary>
-    ''' Método público que permite a un formulario hijo abrir otro formulario dentro del panel principal.
-    ''' Es el punto de entrada para la navegación entre formularios (ej: desde Buscar a Editar).
+    ''' Método público y centralizado para mostrar cualquier formulario en el panel de contenido.
+    ''' Es el único punto de entrada para cambiar el formulario visible.
     ''' </summary>
-    Public Sub AbrirFormEnPanel(formHijo As Form)
-        ' Oculta el formulario actualmente activo.
+    Public Sub AbrirFormEnPanel(formToShow As Form)
+        ' Si el formulario solicitado ya está activo, no hacemos nada.
+        If _activeForm Is formToShow Then
+            Return
+        End If
+
+        ' Oculta el formulario que está activo actualmente.
         If _activeForm IsNot Nothing Then
             _activeForm.Hide()
         End If
 
-        ' Configura y muestra el nuevo formulario.
-        _activeForm = formHijo
-        _activeForm.TopLevel = False
-        _activeForm.FormBorderStyle = FormBorderStyle.None
-        _activeForm.Dock = DockStyle.Fill
-        Me.panelContenido.Controls.Add(_activeForm)
-        Me.panelContenido.Tag = _activeForm
+        ' Si el formulario es nuevo y nunca ha sido añadido al panel, lo configuramos.
+        If Not Me.panelContenido.Controls.Contains(formToShow) Then
+            formToShow.TopLevel = False
+            formToShow.FormBorderStyle = FormBorderStyle.None
+            formToShow.Dock = DockStyle.Fill
+            Me.panelContenido.Controls.Add(formToShow)
 
-        ' Cuando el formulario hijo se cierre, volvemos a mostrar el de búsqueda.
-        AddHandler _activeForm.FormClosed, Sub(s, args)
-                                               ' Nos aseguramos de que el formulario de búsqueda exista.
-                                               If _formulariosReutilizables.ContainsKey(NameOf(frmFuncionarioBuscar)) Then
-                                                   Dim formBusqueda = _formulariosReutilizables(NameOf(frmFuncionarioBuscar))
-                                                   AbrirFormEnPanel(formBusqueda)
-                                                   ActivateButton(btnBuscarFuncionario)
-                                               End If
-                                           End Sub
+            ' Si un formulario "temporal" (que no se reutiliza) se cierra, volvemos al buscador.
+            If Not _formularios.ContainsValue(formToShow) Then
+                AddHandler formToShow.FormClosed, Sub(s, args)
+                                                      ' Al cerrarse, quitamos el control del panel y lo liberamos de memoria.
+                                                      Me.panelContenido.Controls.Remove(CType(s, Form))
+                                                      CType(s, Form).Dispose()
+                                                      ' Y volvemos al formulario de búsqueda.
+                                                      btnBuscarFuncionario.PerformClick()
+                                                  End Sub
+            End If
+        End If
 
-        _activeForm.BringToFront()
+        ' Activamos el nuevo formulario.
+        _activeForm = formToShow
         _activeForm.Show()
+        _activeForm.BringToFront()
     End Sub
-
 
     ' Evento centralizado que se dispara al hacer clic en cualquier botón del menú.
     Private Sub AbrirFormularioDesdeMenu_Click(sender As Object, e As EventArgs)
         Dim botonClickeado = CType(sender, Button)
         ActivateButton(botonClickeado) ' Cambia el estilo visual del botón.
 
-        ' Decide qué formulario abrir basándose en el nombre del botón.
-        Select Case botonClickeado.Name
-            ' Caso especial: "Nuevo Funcionario" siempre crea una instancia nueva.
-            Case "btnNuevoFuncionario"
-                AbrirFormEnPanel(New frmFuncionarioCrear())
+        Dim formToShow As Form = Nothing
 
-            ' Todos los demás casos reutilizan la misma instancia del formulario.
-            Case "btnBuscarFuncionario"
-                AbrirFormularioReutilizable(GetType(frmFuncionarioBuscar))
-            Case "btnLicencias"
-                AbrirFormularioReutilizable(GetType(frmGestionLicencias))
-            Case "btnNotificaciones"
-                AbrirFormularioReutilizable(GetType(frmGestionNotificaciones))
-            Case "btnSanciones"
-                AbrirFormularioReutilizable(GetType(frmGestionSanciones))
-            Case "btnConceptoFuncional"
-                AbrirFormularioReutilizable(GetType(frmConceptoFuncionalApex))
-            Case "btnFiltros"
-                AbrirFormularioReutilizable(GetType(frmFiltroAvanzado))
-            Case "btnNovedades"
-                AbrirFormularioReutilizable(GetType(frmNovedades))
-            Case "btnNomenclaturas"
-                AbrirFormularioReutilizable(GetType(frmGestionNomenclaturas))
-            Case "btnRenombrarPDFs"
-                AbrirFormularioReutilizable(GetType(frmRenombrarPDF))
-            Case "btnImportacion"
-                AbrirFormularioReutilizable(GetType(frmAsistenteImportacion))
-            Case "btnViaticos"
-                AbrirFormularioReutilizable(GetType(frmReporteViaticos))
-            Case "btnReportes"
-                AbrirFormularioReutilizable(GetType(frmReporteNovedades))
-            Case "btnAnalisis"
-                AbrirFormularioReutilizable(GetType(frmAnalisisEstacionalidad))
-            Case "btnAnalisisPersonal"
-                AbrirFormularioReutilizable(GetType(frmAnalisisFuncionarios))
-            Case "btnConfiguracion"
-                AbrirFormularioReutilizable(GetType(frmConfiguracion))
+        Select Case botonClickeado.Name
+            ' Caso especial: "Nuevo Funcionario" siempre crea una instancia nueva y no se guarda para reutilizar.
+            Case "btnNuevoFuncionario"
+                formToShow = New frmFuncionarioCrear()
+
+                ' Todos los demás casos obtienen una instancia reutilizable.
+            Case Else
+                Dim formType As Type = ObtenerTipoDeFormulario(botonClickeado.Name)
+                If formType IsNot Nothing Then
+                    formToShow = ObtenerOcrearInstancia(formType)
+                End If
         End Select
+
+        If formToShow IsNot Nothing Then
+            AbrirFormEnPanel(formToShow)
+        End If
     End Sub
 
     ''' <summary>
-    ''' Gestiona la apertura de formularios que persisten en memoria (reutilizados).
+    ''' Busca una instancia de formulario en el diccionario. Si no existe, la crea y la guarda.
     ''' </summary>
-    Private Sub AbrirFormularioReutilizable(formType As Type)
+    Private Function ObtenerOcrearInstancia(formType As Type) As Form
         Dim formName As String = formType.Name
-        Dim formToShow As Form
-
-        ' Verifica si el formulario ya fue creado y está en nuestro diccionario.
-        If _formulariosReutilizables.ContainsKey(formName) Then
-            ' Si ya existe, simplemente se obtiene la referencia.
-            formToShow = _formulariosReutilizables(formName)
+        If _formularios.ContainsKey(formName) Then
+            Return _formularios(formName)
         Else
-            ' Si no existe, se crea, se almacena y se obtiene la referencia.
-            formToShow = CType(Activator.CreateInstance(formType), Form)
-            _formulariosReutilizables.Add(formName, formToShow)
+            Dim newForm = CType(Activator.CreateInstance(formType), Form)
+            _formularios.Add(formName, newForm)
+            Return newForm
         End If
+    End Function
 
-        ' Llama al método central para mostrar el formulario.
-        AbrirFormEnPanel(formToShow)
-    End Sub
+    ''' <summary>
+    ''' Devuelve el tipo de formulario correspondiente al nombre de un botón del menú.
+    ''' </summary>
+    Private Function ObtenerTipoDeFormulario(nombreBoton As String) As Type
+        Select Case nombreBoton
+            Case "btnBuscarFuncionario" : Return GetType(frmFuncionarioBuscar)
+            Case "btnLicencias" : Return GetType(frmGestionLicencias)
+            Case "btnNotificaciones" : Return GetType(frmGestionNotificaciones)
+            Case "btnSanciones" : Return GetType(frmGestionSanciones)
+            Case "btnConceptoFuncional" : Return GetType(frmConceptoFuncionalApex)
+            Case "btnFiltros" : Return GetType(frmFiltroAvanzado)
+            Case "btnNovedades" : Return GetType(frmNovedades)
+            Case "btnNomenclaturas" : Return GetType(frmGestionNomenclaturas)
+            Case "btnRenombrarPDFs" : Return GetType(frmRenombrarPDF)
+            Case "btnImportacion" : Return GetType(frmAsistenteImportacion)
+            Case "btnViaticos" : Return GetType(frmReporteViaticos)
+            Case "btnReportes" : Return GetType(frmReporteNovedades)
+            Case "btnAnalisis" : Return GetType(frmAnalisisEstacionalidad)
+            Case "btnAnalisisPersonal" : Return GetType(frmAnalisisFuncionarios)
+            Case "btnConfiguracion" : Return GetType(frmConfiguracion)
+            Case Else : Return Nothing
+        End Select
+    End Function
 
 #End Region
 
@@ -153,7 +156,7 @@ Public Class frmDashboard
 
     ' Cambia el estilo del botón activo.
     Private Sub ActivateButton(senderBtn As Object)
-        If senderBtn Is Nothing OrElse TypeOf senderBtn IsNot Button Then Return
+        If senderBtn Is Nothing OrElse Not TypeOf senderBtn Is Button Then Return
         DisableButton() ' Restablece el botón anteriormente activo.
         _currentBtn = CType(senderBtn, Button)
         _currentBtn.BackColor = Color.FromArgb(81, 81, 112)

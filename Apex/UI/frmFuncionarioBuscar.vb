@@ -58,6 +58,7 @@ Public Class frmFuncionarioBuscar
         txtBusqueda.Focus()
     End Sub
 
+
     ''' <summary>
     ''' Este método se ejecutará automáticamente cuando otro formulario notifique un cambio.
     ''' </summary>
