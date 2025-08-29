@@ -12,8 +12,9 @@ Public Class frmNovedadCrear
     Private _funcionariosSeleccionados As New BindingList(Of Funcionario)
 
     Private _fotosExistentes As New BindingList(Of NovedadFoto)
-    '--- CORRECCIÓN CLAVE: Lista para fotos nuevas antes de guardar ---
     Private _rutasFotosNuevas As New List(Of String)
+    ' --- MODIFICACIÓN: Lista para marcar fotos a eliminar ---
+    Private _fotosParaEliminar As New List(Of NovedadFoto)
     Private _pictureBoxSeleccionado As PictureBox = Nothing
 
     Public Enum ModoFormulario
@@ -149,59 +150,46 @@ Public Class frmNovedadCrear
         End If
     End Sub
 
-    Private Async Sub btnAgregarFoto_Click(sender As Object, e As EventArgs) Handles btnAgregarFoto.Click
+    Private Sub btnAgregarFoto_Click(sender As Object, e As EventArgs) Handles btnAgregarFoto.Click
         Using ofd As New OpenFileDialog With {
             .Filter = "Imágenes|*.jpg;*.jpeg;*.png;*.bmp",
             .Multiselect = True
         }
             If ofd.ShowDialog() = DialogResult.OK Then
-                If _modo = ModoFormulario.Crear Then
-                    For Each archivo In ofd.FileNames
-                        _rutasFotosNuevas.Add(archivo)
-                        AgregarPictureBox(File.ReadAllBytes(archivo), archivo)
-                    Next
-                Else ' Modo Editar
-                    LoadingHelper.MostrarCargando(Me)
-                    Try
-                        For Each archivo In ofd.FileNames
-                            Await _svc.AddFotoAsync(_novedadId, archivo)
-                        Next
-                        Await CargarFotosAsync()
-                    Catch ex As Exception
-                        MessageBox.Show("Error al agregar foto(s): " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                    Finally
-                        LoadingHelper.OcultarCargando(Me)
-                    End Try
-                End If
+                For Each archivo In ofd.FileNames
+                    ' Siempre añadimos las fotos nuevas a la lista temporal
+                    _rutasFotosNuevas.Add(archivo)
+                    ' Y mostramos una vista previa
+                    AgregarPictureBox(File.ReadAllBytes(archivo), archivo)
+                Next
             End If
         End Using
     End Sub
 
-    Private Async Sub btnEliminarFoto_Click(sender As Object, e As EventArgs) Handles btnEliminarFoto.Click
+    ' --- MODIFICACIÓN CLAVE: Lógica de eliminación ---
+    Private Sub btnEliminarFoto_Click(sender As Object, e As EventArgs) Handles btnEliminarFoto.Click
         If _pictureBoxSeleccionado Is Nothing Then
             MessageBox.Show("Por favor, seleccione una foto para eliminar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Return
         End If
 
         If MessageBox.Show("¿Está seguro de que desea eliminar la foto seleccionada?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
-            If TypeOf _pictureBoxSeleccionado.Tag Is NovedadFoto Then ' Es una foto existente
+
+            ' Si la foto ya existía en la BD, la añadimos a la lista de "pendientes para eliminar".
+            If TypeOf _pictureBoxSeleccionado.Tag Is NovedadFoto Then
                 Dim fotoAEliminar = CType(_pictureBoxSeleccionado.Tag, NovedadFoto)
-                LoadingHelper.MostrarCargando(Me)
-                Try
-                    Await _svc.DeleteFotoAsync(fotoAEliminar.Id)
-                    Await CargarFotosAsync()
-                Catch ex As Exception
-                    MessageBox.Show("Error al eliminar la foto: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                Finally
-                    LoadingHelper.OcultarCargando(Me)
-                End Try
-            ElseIf TypeOf _pictureBoxSeleccionado.Tag Is String Then ' Es una foto nueva (ruta)
+                _fotosParaEliminar.Add(fotoAEliminar)
+
+                ' Si la foto era nueva (aún no guardada), simplemente la quitamos de la lista de "pendientes para añadir".
+            ElseIf TypeOf _pictureBoxSeleccionado.Tag Is String Then
                 Dim rutaAEliminar = CType(_pictureBoxSeleccionado.Tag, String)
                 _rutasFotosNuevas.Remove(rutaAEliminar)
-                flpFotos.Controls.Remove(_pictureBoxSeleccionado)
-                _pictureBoxSeleccionado.Dispose()
-                _pictureBoxSeleccionado = Nothing
             End If
+
+            ' En ambos casos, quitamos el control visual de la pantalla.
+            flpFotos.Controls.Remove(_pictureBoxSeleccionado)
+            _pictureBoxSeleccionado.Dispose()
+            _pictureBoxSeleccionado = Nothing
         End If
     End Sub
 #End Region
@@ -225,17 +213,36 @@ Public Class frmNovedadCrear
                 ' 1. Crear la novedad principal
                 Dim nuevaNovedad = Await _svc.CrearNovedadCompletaAsync(dtpFecha.Value.Date, txtTexto.Text.Trim(), funcionarioIds)
 
-                ' 2. Si se creó con éxito, agregar las fotos de la lista temporal
+                ' 2. Si se creó, agregar las fotos nuevas
                 If nuevaNovedad IsNot Nothing AndAlso _rutasFotosNuevas.Any() Then
                     For Each ruta In _rutasFotosNuevas
                         Await _svc.AddFotoAsync(nuevaNovedad.Id, ruta)
                     Next
                 End If
                 MessageBox.Show("Novedad creada con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
+
             Else ' Modo Editar
+                ' --- MODIFICACIÓN CLAVE: Lógica de guardado en edición ---
+
+                ' 1. Eliminar las fotos que el usuario marcó para borrar
+                If _fotosParaEliminar.Any() Then
+                    For Each foto In _fotosParaEliminar
+                        Await _svc.DeleteFotoAsync(foto.Id)
+                    Next
+                End If
+
+                ' 2. Agregar las nuevas fotos que el usuario seleccionó
+                If _rutasFotosNuevas.Any() Then
+                    For Each ruta In _rutasFotosNuevas
+                        Await _svc.AddFotoAsync(_novedadId, ruta)
+                    Next
+                End If
+
+                ' 3. Actualizar los datos principales de la novedad
                 _novedad.Fecha = dtpFecha.Value.Date
                 _novedad.Texto = txtTexto.Text.Trim()
                 Await _svc.ActualizarNovedadCompletaAsync(_novedad, funcionarioIds)
+
                 MessageBox.Show("Novedad actualizada con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
             End If
 

@@ -47,7 +47,7 @@ Public Class frmNovedades
         LoadingHelper.MostrarCargando(Me)
         btnBuscar.Enabled = False
         _bsNovedades.DataSource = Nothing
-        LimpiarDetalles()
+        LimpiarDetalles() ' Limpia los detalles al iniciar la búsqueda
 
         Try
             Using svc As New NovedadService()
@@ -157,6 +157,10 @@ Public Class frmNovedades
     Private Async Sub btnNuevaNovedad_Click(sender As Object, e As EventArgs) Handles btnNuevaNovedad.Click
         Using frm As New frmNovedadCrear()
             If frm.ShowDialog(Me) = DialogResult.OK Then
+                ' --- CORRECCIÓN DEFINITIVA ---
+                ' Limpiamos el detalle actual ANTES de recargar la lista.
+                ' Esto elimina el estado "fantasma" de las fotos.
+                LimpiarDetalles()
                 Await BuscarAsync()
             End If
         End Using
@@ -170,6 +174,9 @@ Public Class frmNovedades
         Dim novedadId = CInt(dgvNovedades.CurrentRow.Cells("Id").Value)
         Using frm As New frmNovedadCrear(novedadId)
             If frm.ShowDialog(Me) = DialogResult.OK Then
+                ' --- CORRECCIÓN DEFINITIVA ---
+                ' También limpiamos aquí para consistencia.
+                LimpiarDetalles()
                 Await BuscarAsync()
             End If
         End Using

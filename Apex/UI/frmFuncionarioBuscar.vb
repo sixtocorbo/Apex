@@ -101,7 +101,7 @@ Public Class frmFuncionarioBuscar
                 Dim ctx = uow.Context
                 Dim filtro As String = txtBusqueda.Text.Trim()
 
-                If filtro.Length < 3 Then
+                If filtro.Length < 0 Then
                     dgvResultados.DataSource = Nothing
                     LimpiarDetalle()
                     Return
