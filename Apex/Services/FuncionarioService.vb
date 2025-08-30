@@ -1,5 +1,6 @@
 ﻿' Apex/Services/FuncionarioService.vb
 Imports System.Data.Entity
+Imports System.Data.SqlClient
 Public Class EstadisticaItem
     Public Property Etiqueta As String
     Public Property Valor As Integer
@@ -34,46 +35,72 @@ Public Class FuncionarioService
 
     Public Async Function GetFuncionariosParaVistaAsync() As Task(Of List(Of Object))
         Using uow As New UnitOfWork()
-            Dim query = uow.Repository(Of Funcionario)().GetAll().AsNoTracking().
-        Include(Function(f) f.Cargo).
-        Include(Function(f) f.TipoFuncionario).
-        Include(Function(f) f.Escalafon).
-        Include(Function(f) f.Funcion).
-        Include(Function(f) f.Estado).
-        Include(Function(f) f.Seccion).
-        Include(Function(f) f.PuestoTrabajo).
-        Include(Function(f) f.Turno).
-        Include(Function(f) f.Semana).
-        Include(Function(f) f.Horario).
-        Include(Function(f) f.Genero).
-        Include(Function(f) f.EstadoCivil).
-        Include(Function(f) f.NivelEstudio).
-        Select(Function(f) New With {
-            .NombreCompleto = f.Nombre,
-            .Cedula = f.CI,
+            ' Obtener presencias y guardarlas en un diccionario para acceso O(1).
+            Dim pFecha = New SqlParameter("@Fecha", Date.Today)
+            Dim presenciasList = Await uow.Context.Database _
+            .SqlQuery(Of PresenciaDTO)("EXEC dbo.usp_PresenciaFecha_Apex @Fecha", pFecha) _
+            .ToListAsync()
+            Dim presenciasDict = presenciasList.ToDictionary(Function(p) p.FuncionarioId, Function(p) p.Resultado)
+
+            ' Seleccionar sólo los campos necesarios; sin usar Include(), EF generará las uniones apropiadas.
+            Dim funcionarios = Await uow.Repository(Of Funcionario)().GetAll().AsNoTracking() _
+            .Select(Function(f) New With {
+                f.Id,
+                .NombreCompleto = f.Nombre,
+                .Cedula = f.CI,
+                f.FechaIngreso,
+                f.Activo,
+                .CorreoElectronico = f.Email,
+                f.FechaNacimiento,
+                .Domicilio = f.Domicilio,
+                .Cargo = If(f.Cargo IsNot Nothing, f.Cargo.Nombre, "N/A"),
+                .TipoDeFuncionario = If(f.TipoFuncionario IsNot Nothing, f.TipoFuncionario.Nombre, "N/A"),
+                .Escalafon = If(f.Escalafon IsNot Nothing, f.Escalafon.Nombre, "N/A"),
+                .Funcion = If(f.Funcion IsNot Nothing, f.Funcion.Nombre, "N/A"),
+                .EstadoActual = If(f.Estado IsNot Nothing, f.Estado.Nombre, "N/A"),
+                .Seccion = If(f.Seccion IsNot Nothing, f.Seccion.Nombre, "N/A"),
+                .PuestoDeTrabajo = If(f.PuestoTrabajo IsNot Nothing, f.PuestoTrabajo.Nombre, "N/A"),
+                .Turno = If(f.Turno IsNot Nothing, f.Turno.Nombre, "N/A"),
+                .Semana = If(f.Semana IsNot Nothing, f.Semana.Nombre, "N/A"),
+                .Horario = If(f.Horario IsNot Nothing, f.Horario.Nombre, "N/A"),
+                .Genero = If(f.Genero IsNot Nothing, f.Genero.Nombre, "N/A"),
+                .EstadoCivil = If(f.EstadoCivil IsNot Nothing, f.EstadoCivil.Nombre, "N/A"),
+                .NivelDeEstudio = If(f.NivelEstudio IsNot Nothing, f.NivelEstudio.Nombre, "N/A")
+            }) _
+            .ToListAsync()
+
+            ' Asignar presencia utilizando el diccionario
+            Dim resultado = funcionarios.Select(Function(f) New With {
+            f.NombreCompleto,
+            f.Cedula,
             f.FechaIngreso,
             f.Activo,
-            .CorreoElectronico = f.Email,
-            .FechaNacimiento = f.FechaNacimiento,
-             .Domicilio = f.Domicilio,
-            .Cargo = If(f.Cargo IsNot Nothing, f.Cargo.Nombre, "N/A"),
-            .TipoDeFuncionario = If(f.TipoFuncionario IsNot Nothing, f.TipoFuncionario.Nombre, "N/A"),
-            .Escalafon = If(f.Escalafon IsNot Nothing, f.Escalafon.Nombre, "N/A"),
-            .Funcion = If(f.Funcion IsNot Nothing, f.Funcion.Nombre, "N/A"),
-            .EstadoActual = If(f.Estado IsNot Nothing, f.Estado.Nombre, "N/A"),
-             .Seccion = If(f.Seccion IsNot Nothing, f.Seccion.Nombre, "N/A"),
-            .PuestoDeTrabajo = If(f.PuestoTrabajo IsNot Nothing, f.PuestoTrabajo.Nombre, "N/A"),
-            .Turno = If(f.Turno IsNot Nothing, f.Turno.Nombre, "N/A"),
-            .Semana = If(f.Semana IsNot Nothing, f.Semana.Nombre, "N/A"),
-            .Horario = If(f.Horario IsNot Nothing, f.Horario.Nombre, "N/A"),
-            .Genero = If(f.Genero IsNot Nothing, f.Genero.Nombre, "N/A"),
-            .EstadoCivil = If(f.EstadoCivil IsNot Nothing, f.EstadoCivil.Nombre, "N/A"),
-            .NivelDeEstudio = If(f.NivelEstudio IsNot Nothing, f.NivelEstudio.Nombre, "N/A")
-        })
-            Dim result = Await query.ToListAsync()
-            Return result.Cast(Of Object).ToList()
+            f.CorreoElectronico,
+            f.FechaNacimiento,
+            f.Domicilio,
+            f.Cargo,
+            f.TipoDeFuncionario,
+            f.Escalafon,
+            f.Funcion,
+            f.EstadoActual,
+            f.Seccion,
+            f.PuestoDeTrabajo,
+            f.Turno,
+            f.Semana,
+            f.Horario,
+            f.Genero,
+            f.EstadoCivil,
+            f.NivelDeEstudio,
+            .Presencia = If(presenciasDict.ContainsKey(f.Id), presenciasDict(f.Id), "-")
+        }).ToList()
+
+            Return resultado.Cast(Of Object).ToList()
         End Using
     End Function
+
+
+
+
 
 
     ' --- Métodos para poblar los ComboBox (Catálogos) ---
@@ -284,7 +311,22 @@ Public Class FuncionarioService
         End Using
     End Function
 
-    ' --- FIN DE LAS NUEVAS FUNCIONES ---
+    Public Async Function ObtenerPresenciasParaFechaAsync(fecha As Date) As Task(Of List(Of PresenciaDTO))
+        Using uow As New UnitOfWork()
+            Dim ctx = uow.Context
+            Dim pFecha = New SqlParameter("@Fecha", fecha.Date)
+            Dim lista = Await ctx.Database.SqlQuery(Of PresenciaDTO)(
+            "EXEC dbo.usp_PresenciaFecha_Apex @Fecha", pFecha
+        ).ToListAsync()
+            Return lista
+        End Using
+    End Function
+
+    Public Class PresenciaDTO
+        Public Property FuncionarioId As Integer
+        Public Property Resultado As String
+    End Class
+
 End Class
 Public Class FuncionarioVistaDTO
     Public Property Id As Integer

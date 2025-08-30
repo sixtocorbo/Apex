@@ -733,8 +733,6 @@ Partial Class frmFuncionarioCrear
         '
         Me.chkDesarmado.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.chkDesarmado.AutoSize = True
-        Me.chkDesarmado.Checked = True
-        Me.chkDesarmado.CheckState = System.Windows.Forms.CheckState.Checked
         Me.chkDesarmado.Location = New System.Drawing.Point(531, 501)
         Me.chkDesarmado.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.chkDesarmado.Name = "chkDesarmado"
@@ -1031,8 +1029,6 @@ Partial Class frmFuncionarioCrear
         '
         Me.chkProcesado.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.chkProcesado.AutoSize = True
-        Me.chkProcesado.Checked = True
-        Me.chkProcesado.CheckState = System.Windows.Forms.CheckState.Checked
         Me.chkProcesado.Location = New System.Drawing.Point(393, 501)
         Me.chkProcesado.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.chkProcesado.Name = "chkProcesado"
@@ -1045,8 +1041,6 @@ Partial Class frmFuncionarioCrear
         '
         Me.chkSeparado.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.chkSeparado.AutoSize = True
-        Me.chkSeparado.Checked = True
-        Me.chkSeparado.CheckState = System.Windows.Forms.CheckState.Checked
         Me.chkSeparado.Location = New System.Drawing.Point(90, 501)
         Me.chkSeparado.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.chkSeparado.Name = "chkSeparado"

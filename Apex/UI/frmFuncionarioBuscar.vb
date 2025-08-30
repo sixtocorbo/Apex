@@ -281,7 +281,7 @@ Public Class frmFuncionarioBuscar
 
             lblPresencia.Text = Await ObtenerPresenciaAsync(id, Date.Today)
             If Not f.Activo AndAlso (situaciones Is Nothing OrElse Not situaciones.Any()) Then
-                lblPresencia.Text = "Inactivo"
+                lblPresencia.Text = Await ObtenerPresenciaAsync(id, Date.Today)
             End If
 
             If f.Foto Is Nothing OrElse f.Foto.Length = 0 Then
