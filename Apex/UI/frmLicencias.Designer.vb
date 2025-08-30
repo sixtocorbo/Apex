@@ -128,7 +128,6 @@ Partial Class frmLicencias
         Me.Controls.Add(Me.dgvLicencias)
         Me.Controls.Add(Me.PanelBusquedaLicencias)
         Me.Controls.Add(Me.PanelLicencias)
-        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.Name = "frmLicencias"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen

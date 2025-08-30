@@ -142,7 +142,6 @@ Partial Class frmNotificaciones
         Me.Controls.Add(Me.dgvNotificaciones)
         Me.Controls.Add(Me.Panel2)
         Me.Controls.Add(Me.Panel1)
-        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.Name = "frmNotificaciones"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen

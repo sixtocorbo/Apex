@@ -441,7 +441,6 @@
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1356, 762)
         Me.Controls.Add(Me.SplitContainer1)
-        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.MinimumSize = New System.Drawing.Size(889, 585)
         Me.Name = "frmRenombrarPDF"

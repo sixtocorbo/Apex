@@ -181,7 +181,6 @@ Partial Class frmConfiguracion
         Me.ClientSize = New System.Drawing.Size(726, 402)
         Me.Controls.Add(Me.btnVolver)
         Me.Controls.Add(Me.TabControlPrincipal)
-        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.MinimumSize = New System.Drawing.Size(739, 431)
         Me.Name = "frmConfiguracion"

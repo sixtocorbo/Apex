@@ -483,7 +483,6 @@ Partial Class frmAsistenteImportacion
         Me.Controls.Add(Me.pnlPaso4_Resumen)
         Me.Font = New System.Drawing.Font("Segoe UI", 9.0!)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
-        Me.KeyPreview = True
         Me.MaximizeBox = False
         Me.MinimizeBox = False
         Me.Name = "frmAsistenteImportacion"

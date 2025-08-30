@@ -125,7 +125,6 @@ Partial Class frmSanciones
         Me.Controls.Add(Me.dgvSanciones)
         Me.Controls.Add(Me.PanelSanciones)
         Me.Controls.Add(Me.PanelBusquedaSanciones)
-        Me.KeyPreview = True
         Me.Name = "frmSanciones"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Gestión de Sanciones"

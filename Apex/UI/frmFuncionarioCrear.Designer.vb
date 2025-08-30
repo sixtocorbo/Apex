@@ -1077,7 +1077,6 @@ Partial Class frmFuncionarioCrear
         Me.ClientSize = New System.Drawing.Size(1176, 702)
         Me.Controls.Add(Me.TabControlMain)
         Me.Controls.Add(Me.FlowLayoutPanel1)
-        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.MinimumSize = New System.Drawing.Size(1189, 728)
         Me.Name = "frmFuncionarioCrear"

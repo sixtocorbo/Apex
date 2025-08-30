@@ -265,7 +265,6 @@ Partial Class frmNovedades
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1245, 701)
         Me.Controls.Add(Me.PanelPrincipal)
-        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.Name = "frmNovedades"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen

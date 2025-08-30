@@ -500,7 +500,6 @@ Partial Class frmFiltros
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(978, 544)
         Me.Controls.Add(Me.splitContenedorPrincipal)
-        Me.KeyPreview = True
         Me.MinimumSize = New System.Drawing.Size(800, 600)
         Me.Name = "frmFiltros"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen

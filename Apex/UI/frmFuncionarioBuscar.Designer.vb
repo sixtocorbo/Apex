@@ -410,7 +410,6 @@ Partial Class frmFuncionarioBuscar
         Me.Controls.Add(Me.FlowLayoutPanelAcciones)
         Me.Controls.Add(Me.splitContenedor)
         Me.Controls.Add(Me.panelFiltros)
-        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Name = "frmFuncionarioBuscar"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen

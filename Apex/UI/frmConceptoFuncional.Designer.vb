@@ -282,7 +282,6 @@ Partial Class frmConceptoFuncional
         Me.Controls.Add(Me.PanelPrincipal)
         Me.Controls.Add(Me.PanelFooter)
         Me.Controls.Add(Me.PanelFiltros)
-        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Name = "frmConceptoFuncional"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen

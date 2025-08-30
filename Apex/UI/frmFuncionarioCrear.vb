@@ -800,14 +800,6 @@ Public Class frmFuncionarioCrear
         Close()
     End Sub
 
-
-    Private Sub Cerrando(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
-        ' Si la tecla presionada es Escape, se cierra el formulario.
-        If e.KeyCode = Keys.Escape Then
-            btnCancelar.PerformClick()
-        End If
-    End Sub
-
     Private Sub Foco(sender As Object, e As EventArgs) Handles Me.Shown
         txtCI.Focus()
     End Sub
