@@ -52,14 +52,6 @@ Public Class frmFuncionarioBuscar
         AddHandler NotificadorEventos.DatosActualizados, AddressOf OnDatosActualizados
     End Sub
 
-
-    Private Sub frmFuncionarioBuscar_Activated(sender As Object, e As EventArgs) Handles Me.Activated
-        ' Esto asegura que, sin importar cómo se active el formulario,
-        ' el foco siempre se establecerá en el cuadro de búsqueda.
-        txtBusqueda.Focus()
-    End Sub
-
-
     ''' <summary>
     ''' Este método se ejecutará automáticamente cuando otro formulario notifique un cambio.
     ''' </summary>
@@ -112,7 +104,6 @@ Public Class frmFuncionarioBuscar
         AddHandler dgvResultados.DataError, Sub(s, ev) ev.ThrowException = False
     End Sub
 #End Region
-
 
 #Region "Búsqueda con Full-Text y CONTAINS"
     Private Async Function BuscarAsync() As Task
