@@ -125,4 +125,5 @@ Public Class frmIncidencias
     Private Sub frmGestionIncidencias_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
         _uow.Dispose()
     End Sub
+
 End Class

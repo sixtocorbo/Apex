@@ -50,6 +50,7 @@ Partial Class frmAuditoriaViewer
         Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Name = "frmAuditoriaViewer"
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Visor de Auditoría"
         CType(Me.dgvAuditoria, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)

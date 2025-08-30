@@ -349,15 +349,16 @@ Partial Class frmNomenclaturas
         Me.FlowLayoutPanel1.Size = New System.Drawing.Size(588, 61)
         Me.FlowLayoutPanel1.TabIndex = 3
         '
-        'frmGestionNomenclaturas
+        'frmNomenclaturas
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1167, 837)
         Me.Controls.Add(Me.TableLayoutPanel1)
+        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.MinimumSize = New System.Drawing.Size(850, 800)
-        Me.Name = "frmGestionNomenclaturas"
+        Me.Name = "frmNomenclaturas"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Gestor de Nomenclaturas"
         CType(Me.dgvNomenclaturas, System.ComponentModel.ISupportInitialize).EndInit()

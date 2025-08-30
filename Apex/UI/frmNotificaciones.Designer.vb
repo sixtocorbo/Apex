@@ -134,7 +134,7 @@ Partial Class frmNotificaciones
         Me.dgvNotificaciones.Size = New System.Drawing.Size(900, 438)
         Me.dgvNotificaciones.TabIndex = 2
         '
-        'frmGestionNotificaciones
+        'frmNotificaciones
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
@@ -142,8 +142,10 @@ Partial Class frmNotificaciones
         Me.Controls.Add(Me.dgvNotificaciones)
         Me.Controls.Add(Me.Panel2)
         Me.Controls.Add(Me.Panel1)
+        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
-        Me.Name = "frmGestionNotificaciones"
+        Me.Name = "frmNotificaciones"
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Gestión de Notificaciones"
         Me.Panel1.ResumeLayout(False)
         Me.Panel2.ResumeLayout(False)

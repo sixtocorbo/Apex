@@ -28,7 +28,7 @@ Partial Class frmNotificacionCambiarEstado
         Me.lblInstruccion.AutoSize = True
         Me.lblInstruccion.Location = New System.Drawing.Point(23, 22)
         Me.lblInstruccion.Name = "lblInstruccion"
-        Me.lblInstruccion.Size = New System.Drawing.Size(161, 20)
+        Me.lblInstruccion.Size = New System.Drawing.Size(229, 25)
         Me.lblInstruccion.TabIndex = 0
         Me.lblInstruccion.Text = "Seleccione el nuevo estado:"
         '
@@ -38,7 +38,7 @@ Partial Class frmNotificacionCambiarEstado
         Me.cboEstados.FormattingEnabled = True
         Me.cboEstados.Location = New System.Drawing.Point(27, 45)
         Me.cboEstados.Name = "cboEstados"
-        Me.cboEstados.Size = New System.Drawing.Size(325, 28)
+        Me.cboEstados.Size = New System.Drawing.Size(325, 33)
         Me.cboEstados.TabIndex = 1
         '
         'btnAceptar
@@ -60,10 +60,10 @@ Partial Class frmNotificacionCambiarEstado
         Me.btnCancelar.Text = "Cancelar"
         Me.btnCancelar.UseVisualStyleBackColor = True
         '
-        'frmCambiarEstadoNotificacion
+        'frmNotificacionCambiarEstado
         '
         Me.AcceptButton = Me.btnAceptar
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 20.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 25.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnCancelar
         Me.ClientSize = New System.Drawing.Size(382, 143)
@@ -73,9 +73,10 @@ Partial Class frmNotificacionCambiarEstado
         Me.Controls.Add(Me.lblInstruccion)
         Me.Font = New System.Drawing.Font("Segoe UI", 9.0!)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
+        Me.KeyPreview = True
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "frmCambiarEstadoNotificacion"
+        Me.Name = "frmNotificacionCambiarEstado"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = "Cambiar Estado"
         Me.ResumeLayout(False)

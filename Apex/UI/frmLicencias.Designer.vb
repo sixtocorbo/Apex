@@ -120,7 +120,7 @@ Partial Class frmLicencias
         Me.Label1.TabIndex = 0
         Me.Label1.Text = "Funcionario:"
         '
-        'frmGestionLicencias
+        'frmLicencias
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
@@ -128,8 +128,9 @@ Partial Class frmLicencias
         Me.Controls.Add(Me.dgvLicencias)
         Me.Controls.Add(Me.PanelBusquedaLicencias)
         Me.Controls.Add(Me.PanelLicencias)
+        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
-        Me.Name = "frmGestionLicencias"
+        Me.Name = "frmLicencias"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Gestión de Licencias"
         CType(Me.dgvLicencias, System.ComponentModel.ISupportInitialize).EndInit()

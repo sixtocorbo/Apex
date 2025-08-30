@@ -59,7 +59,7 @@ Partial Class frmNovedades
         Me.PanelPrincipal.Location = New System.Drawing.Point(0, 0)
         Me.PanelPrincipal.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.PanelPrincipal.Name = "PanelPrincipal"
-        Me.PanelPrincipal.Padding = New System.Windows.Forms.Padding(12, 12, 12, 12)
+        Me.PanelPrincipal.Padding = New System.Windows.Forms.Padding(12)
         Me.PanelPrincipal.Size = New System.Drawing.Size(1245, 701)
         Me.PanelPrincipal.TabIndex = 0
         '
@@ -223,7 +223,7 @@ Partial Class frmNovedades
         Me.TabPageFuncionarios.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.TabPageFuncionarios.Name = "TabPageFuncionarios"
         Me.TabPageFuncionarios.Padding = New System.Windows.Forms.Padding(3, 4, 3, 4)
-        Me.TabPageFuncionarios.Size = New System.Drawing.Size(639, 644)
+        Me.TabPageFuncionarios.Size = New System.Drawing.Size(640, 644)
         Me.TabPageFuncionarios.TabIndex = 1
         Me.TabPageFuncionarios.Text = "Funcionarios"
         Me.TabPageFuncionarios.UseVisualStyleBackColor = True
@@ -236,7 +236,7 @@ Partial Class frmNovedades
         Me.lstFuncionarios.Location = New System.Drawing.Point(3, 4)
         Me.lstFuncionarios.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.lstFuncionarios.Name = "lstFuncionarios"
-        Me.lstFuncionarios.Size = New System.Drawing.Size(633, 636)
+        Me.lstFuncionarios.Size = New System.Drawing.Size(634, 636)
         Me.lstFuncionarios.TabIndex = 1
         '
         'TabPageFotos
@@ -265,6 +265,7 @@ Partial Class frmNovedades
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1245, 701)
         Me.Controls.Add(Me.PanelPrincipal)
+        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.Name = "frmNovedades"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen

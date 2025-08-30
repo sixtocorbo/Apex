@@ -117,7 +117,7 @@ Partial Class frmSanciones
         Me.Label3.TabIndex = 0
         Me.Label3.Text = "Funcionario:"
         '
-        'frmGestionSanciones
+        'frmSanciones
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
@@ -125,7 +125,8 @@ Partial Class frmSanciones
         Me.Controls.Add(Me.dgvSanciones)
         Me.Controls.Add(Me.PanelSanciones)
         Me.Controls.Add(Me.PanelBusquedaSanciones)
-        Me.Name = "frmGestionSanciones"
+        Me.KeyPreview = True
+        Me.Name = "frmSanciones"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Gestión de Sanciones"
         CType(Me.dgvSanciones, System.ComponentModel.ISupportInitialize).EndInit()

@@ -775,7 +775,6 @@ Public Class frmFuncionarioCrear
     End Sub
 #End Region
 
-    ' --- Botones misceláneos ---
     Private Sub btnSeleccionarFoto_Click(sender As Object, e As EventArgs) Handles btnSeleccionarFoto.Click
         Using ofd As New OpenFileDialog() With {.Filter = "Imágenes|*.jpg;*.jpeg;*.png;*.bmp"}
             If ofd.ShowDialog() = DialogResult.OK Then
@@ -791,7 +790,6 @@ Public Class frmFuncionarioCrear
             Return
         End If
 
-        ' Usamos el ID del funcionario para abrir el visor
         Dim frm As New frmAuditoriaViewer(_funcionario.Id.ToString())
         Dim parentDashboard As frmDashboard = CType(Me.ParentForm, frmDashboard)
         parentDashboard.AbrirFormEnPanel(frm)
@@ -802,23 +800,15 @@ Public Class frmFuncionarioCrear
         Close()
     End Sub
 
-    ' --- INICIO DE LA MODIFICACIÓN #2 ---
-    ''' <summary>
-    ''' Maneja el evento de presión de teclas para todo el formulario.
-    ''' </summary>
-    Private Sub frmFuncionarioCrear_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
-        ' Si la tecla presionada es Escape...
+
+    Private Sub Cerrando(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
+        ' Si la tecla presionada es Escape, se cierra el formulario.
         If e.KeyCode = Keys.Escape Then
-            ' ...simulamos un clic en el botón Cancelar.
-            ' Esto asegura que se ejecute toda la lógica definida en btnCancelar_Click.
             btnCancelar.PerformClick()
         End If
     End Sub
-    ' --- FIN DE LA MODIFICACIÓN #2 ---
-    ' ESTE ES EL NUEVO MÉTODO QUE DEBES AÑADIR
+
     Private Sub Foco(sender As Object, e As EventArgs) Handles Me.Shown
-        ' Establecemos el foco en el campo de Cédula de Identidad
-        ' en cuanto el formulario se muestra por primera vez.
         txtCI.Focus()
     End Sub
 End Class

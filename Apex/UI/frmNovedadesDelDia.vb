@@ -152,4 +152,10 @@ Public Class frmNovedadesDelDia
             MessageBox.Show("Error dentro de SubreportProcessing: " & ex.Message)
         End Try
     End Sub
+    Private Sub Cerrando(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
+        ' Si la tecla presionada es Escape, se cierra el formulario.
+        If e.KeyCode = Keys.Escape Then
+            Me.Close()
+        End If
+    End Sub
 End Class

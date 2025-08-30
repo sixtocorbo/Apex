@@ -386,6 +386,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         Me.Controls.Add(Me.cboTipoEstado)
         Me.Controls.Add(Me.btnCancelar)
         Me.Controls.Add(Me.btnGuardar)
+        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.MinimumSize = New System.Drawing.Size(1189, 739)
         Me.Name = "frmFuncionarioEstadoTransitorio"

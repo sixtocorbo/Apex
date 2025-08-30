@@ -24,15 +24,15 @@ Partial Class frmConfiguracion
     Private Sub InitializeComponent()
         Me.btnVolver = New System.Windows.Forms.Button()
         Me.tpPersonal = New System.Windows.Forms.TabPage()
-        Me.btnGestionarIncidencias = New System.Windows.Forms.Button()
-        Me.btnTiposEstadoTransitorio = New System.Windows.Forms.Button()
         Me.btnCategoriasAusencia = New System.Windows.Forms.Button()
+        Me.btnTiposEstadoTransitorio = New System.Windows.Forms.Button()
+        Me.btnGestionarIncidencias = New System.Windows.Forms.Button()
         Me.tpEstructura = New System.Windows.Forms.TabPage()
-        Me.btnCargos = New System.Windows.Forms.Button()
-        Me.btnSecciones = New System.Windows.Forms.Button()
-        Me.btnAreasTrabajo = New System.Windows.Forms.Button()
-        Me.btnTurnos = New System.Windows.Forms.Button()
         Me.btnNomenclaturas = New System.Windows.Forms.Button()
+        Me.btnTurnos = New System.Windows.Forms.Button()
+        Me.btnAreasTrabajo = New System.Windows.Forms.Button()
+        Me.btnSecciones = New System.Windows.Forms.Button()
+        Me.btnCargos = New System.Windows.Forms.Button()
         Me.TabControlPrincipal = New System.Windows.Forms.TabControl()
         Me.tpPersonal.SuspendLayout()
         Me.tpEstructura.SuspendLayout()
@@ -64,15 +64,15 @@ Partial Class frmConfiguracion
         Me.tpPersonal.Text = "Gestión de Personal y Ausencias"
         Me.tpPersonal.UseVisualStyleBackColor = True
         '
-        'btnGestionarIncidencias
+        'btnCategoriasAusencia
         '
-        Me.btnGestionarIncidencias.Location = New System.Drawing.Point(17, 10)
-        Me.btnGestionarIncidencias.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnGestionarIncidencias.Name = "btnGestionarIncidencias"
-        Me.btnGestionarIncidencias.Size = New System.Drawing.Size(285, 35)
-        Me.btnGestionarIncidencias.TabIndex = 1
-        Me.btnGestionarIncidencias.Text = "Gestionar Incidencias"
-        Me.btnGestionarIncidencias.UseVisualStyleBackColor = True
+        Me.btnCategoriasAusencia.Location = New System.Drawing.Point(17, 100)
+        Me.btnCategoriasAusencia.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnCategoriasAusencia.Name = "btnCategoriasAusencia"
+        Me.btnCategoriasAusencia.Size = New System.Drawing.Size(285, 35)
+        Me.btnCategoriasAusencia.TabIndex = 3
+        Me.btnCategoriasAusencia.Text = "Gestionar Categorías de Ausencia"
+        Me.btnCategoriasAusencia.UseVisualStyleBackColor = True
         '
         'btnTiposEstadoTransitorio
         '
@@ -84,15 +84,15 @@ Partial Class frmConfiguracion
         Me.btnTiposEstadoTransitorio.Text = "Gestionar Tipos de Estado"
         Me.btnTiposEstadoTransitorio.UseVisualStyleBackColor = True
         '
-        'btnCategoriasAusencia
+        'btnGestionarIncidencias
         '
-        Me.btnCategoriasAusencia.Location = New System.Drawing.Point(17, 100)
-        Me.btnCategoriasAusencia.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnCategoriasAusencia.Name = "btnCategoriasAusencia"
-        Me.btnCategoriasAusencia.Size = New System.Drawing.Size(285, 35)
-        Me.btnCategoriasAusencia.TabIndex = 3
-        Me.btnCategoriasAusencia.Text = "Gestionar Categorías de Ausencia"
-        Me.btnCategoriasAusencia.UseVisualStyleBackColor = True
+        Me.btnGestionarIncidencias.Location = New System.Drawing.Point(17, 10)
+        Me.btnGestionarIncidencias.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnGestionarIncidencias.Name = "btnGestionarIncidencias"
+        Me.btnGestionarIncidencias.Size = New System.Drawing.Size(285, 35)
+        Me.btnGestionarIncidencias.TabIndex = 1
+        Me.btnGestionarIncidencias.Text = "Gestionar Incidencias"
+        Me.btnGestionarIncidencias.UseVisualStyleBackColor = True
         '
         'tpEstructura
         '
@@ -110,35 +110,15 @@ Partial Class frmConfiguracion
         Me.tpEstructura.Text = "Gestión de Estructura Organizacional"
         Me.tpEstructura.UseVisualStyleBackColor = True
         '
-        'btnCargos
+        'btnNomenclaturas
         '
-        Me.btnCargos.Location = New System.Drawing.Point(30, 28)
-        Me.btnCargos.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnCargos.Name = "btnCargos"
-        Me.btnCargos.Size = New System.Drawing.Size(285, 35)
-        Me.btnCargos.TabIndex = 0
-        Me.btnCargos.Text = "Gestionar Cargos"
-        Me.btnCargos.UseVisualStyleBackColor = True
-        '
-        'btnSecciones
-        '
-        Me.btnSecciones.Location = New System.Drawing.Point(30, 72)
-        Me.btnSecciones.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnSecciones.Name = "btnSecciones"
-        Me.btnSecciones.Size = New System.Drawing.Size(285, 35)
-        Me.btnSecciones.TabIndex = 1
-        Me.btnSecciones.Text = "Gestionar Secciones"
-        Me.btnSecciones.UseVisualStyleBackColor = True
-        '
-        'btnAreasTrabajo
-        '
-        Me.btnAreasTrabajo.Location = New System.Drawing.Point(30, 117)
-        Me.btnAreasTrabajo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnAreasTrabajo.Name = "btnAreasTrabajo"
-        Me.btnAreasTrabajo.Size = New System.Drawing.Size(285, 35)
-        Me.btnAreasTrabajo.TabIndex = 2
-        Me.btnAreasTrabajo.Text = "Gestionar Áreas de Trabajo"
-        Me.btnAreasTrabajo.UseVisualStyleBackColor = True
+        Me.btnNomenclaturas.Location = New System.Drawing.Point(30, 206)
+        Me.btnNomenclaturas.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnNomenclaturas.Name = "btnNomenclaturas"
+        Me.btnNomenclaturas.Size = New System.Drawing.Size(285, 35)
+        Me.btnNomenclaturas.TabIndex = 4
+        Me.btnNomenclaturas.Text = "Gestionar Nomenclaturas"
+        Me.btnNomenclaturas.UseVisualStyleBackColor = True
         '
         'btnTurnos
         '
@@ -150,15 +130,35 @@ Partial Class frmConfiguracion
         Me.btnTurnos.Text = "Gestionar Turnos"
         Me.btnTurnos.UseVisualStyleBackColor = True
         '
-        'btnNomenclaturas
+        'btnAreasTrabajo
         '
-        Me.btnNomenclaturas.Location = New System.Drawing.Point(30, 206)
-        Me.btnNomenclaturas.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnNomenclaturas.Name = "btnNomenclaturas"
-        Me.btnNomenclaturas.Size = New System.Drawing.Size(285, 35)
-        Me.btnNomenclaturas.TabIndex = 4
-        Me.btnNomenclaturas.Text = "Gestionar Nomenclaturas"
-        Me.btnNomenclaturas.UseVisualStyleBackColor = True
+        Me.btnAreasTrabajo.Location = New System.Drawing.Point(30, 117)
+        Me.btnAreasTrabajo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnAreasTrabajo.Name = "btnAreasTrabajo"
+        Me.btnAreasTrabajo.Size = New System.Drawing.Size(285, 35)
+        Me.btnAreasTrabajo.TabIndex = 2
+        Me.btnAreasTrabajo.Text = "Gestionar Áreas de Trabajo"
+        Me.btnAreasTrabajo.UseVisualStyleBackColor = True
+        '
+        'btnSecciones
+        '
+        Me.btnSecciones.Location = New System.Drawing.Point(30, 72)
+        Me.btnSecciones.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnSecciones.Name = "btnSecciones"
+        Me.btnSecciones.Size = New System.Drawing.Size(285, 35)
+        Me.btnSecciones.TabIndex = 1
+        Me.btnSecciones.Text = "Gestionar Secciones"
+        Me.btnSecciones.UseVisualStyleBackColor = True
+        '
+        'btnCargos
+        '
+        Me.btnCargos.Location = New System.Drawing.Point(30, 28)
+        Me.btnCargos.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnCargos.Name = "btnCargos"
+        Me.btnCargos.Size = New System.Drawing.Size(285, 35)
+        Me.btnCargos.TabIndex = 0
+        Me.btnCargos.Text = "Gestionar Cargos"
+        Me.btnCargos.UseVisualStyleBackColor = True
         '
         'TabControlPrincipal
         '
@@ -181,6 +181,7 @@ Partial Class frmConfiguracion
         Me.ClientSize = New System.Drawing.Size(726, 402)
         Me.Controls.Add(Me.btnVolver)
         Me.Controls.Add(Me.TabControlPrincipal)
+        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.MinimumSize = New System.Drawing.Size(739, 431)
         Me.Name = "frmConfiguracion"

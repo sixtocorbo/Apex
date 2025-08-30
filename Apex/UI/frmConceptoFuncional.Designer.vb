@@ -100,7 +100,7 @@ Partial Class frmConceptoFuncional
         '
         'dtpFechaFin
         '
-        Me.dtpFechaFin.Format = System.Windows.Forms.DateTimePickerFormat.Short
+        Me.dtpFechaFin.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
         Me.dtpFechaFin.Location = New System.Drawing.Point(780, 48)
         Me.dtpFechaFin.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.dtpFechaFin.Name = "dtpFechaFin"
@@ -109,7 +109,7 @@ Partial Class frmConceptoFuncional
         '
         'dtpFechaInicio
         '
-        Me.dtpFechaInicio.Format = System.Windows.Forms.DateTimePickerFormat.Short
+        Me.dtpFechaInicio.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
         Me.dtpFechaInicio.Location = New System.Drawing.Point(597, 48)
         Me.dtpFechaInicio.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.dtpFechaInicio.Name = "dtpFechaInicio"
@@ -274,7 +274,7 @@ Partial Class frmConceptoFuncional
         Me.lblTemporal.TabIndex = 0
         Me.lblTemporal.Text = "Período evaluado:"
         '
-        'frmConceptoFuncionalApex
+        'frmConceptoFuncional
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
@@ -282,8 +282,9 @@ Partial Class frmConceptoFuncional
         Me.Controls.Add(Me.PanelPrincipal)
         Me.Controls.Add(Me.PanelFooter)
         Me.Controls.Add(Me.PanelFiltros)
+        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.Name = "frmConceptoFuncionalApex"
+        Me.Name = "frmConceptoFuncional"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Concepto Funcional"
         Me.PanelFiltros.ResumeLayout(False)

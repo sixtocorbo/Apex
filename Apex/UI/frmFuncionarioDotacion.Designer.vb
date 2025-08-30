@@ -23,93 +23,84 @@ Partial Class frmFuncionarioDotacion
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.lblItem = New System.Windows.Forms.Label()
-        Me.cboItem = New System.Windows.Forms.ComboBox() ' Control actualizado
+        Me.cboItem = New System.Windows.Forms.ComboBox()
         Me.lblTalla = New System.Windows.Forms.Label()
         Me.txtTalla = New System.Windows.Forms.TextBox()
         Me.lblObservaciones = New System.Windows.Forms.Label()
         Me.txtObservaciones = New System.Windows.Forms.TextBox()
         Me.btnGuardar = New System.Windows.Forms.Button()
-        Me.btnCancelar = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
-        ' lblItem
+        'lblItem
         '
         Me.lblItem.AutoSize = True
-        Me.lblItem.Location = New System.Drawing.Point(12, 15)
+        Me.lblItem.Location = New System.Drawing.Point(14, 19)
         Me.lblItem.Name = "lblItem"
-        Me.lblItem.Size = New System.Drawing.Size(35, 17)
+        Me.lblItem.Size = New System.Drawing.Size(45, 20)
         Me.lblItem.TabIndex = 0
         Me.lblItem.Text = "Ítem:"
         '
-        ' cboItem
+        'cboItem
         '
         Me.cboItem.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboItem.FormattingEnabled = True
-        Me.cboItem.Location = New System.Drawing.Point(110, 12)
+        Me.cboItem.Location = New System.Drawing.Point(124, 15)
+        Me.cboItem.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.cboItem.Name = "cboItem"
-        Me.cboItem.Size = New System.Drawing.Size(262, 24)
+        Me.cboItem.Size = New System.Drawing.Size(294, 28)
         Me.cboItem.TabIndex = 1
         '
-        ' lblTalla
+        'lblTalla
         '
         Me.lblTalla.AutoSize = True
-        Me.lblTalla.Location = New System.Drawing.Point(12, 46)
+        Me.lblTalla.Location = New System.Drawing.Point(14, 58)
         Me.lblTalla.Name = "lblTalla"
-        Me.lblTalla.Size = New System.Drawing.Size(43, 17)
+        Me.lblTalla.Size = New System.Drawing.Size(46, 20)
         Me.lblTalla.TabIndex = 2
         Me.lblTalla.Text = "Talla:"
         '
-        ' txtTalla
+        'txtTalla
         '
-        Me.txtTalla.Location = New System.Drawing.Point(110, 43)
+        Me.txtTalla.Location = New System.Drawing.Point(124, 54)
+        Me.txtTalla.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.txtTalla.Name = "txtTalla"
-        Me.txtTalla.Size = New System.Drawing.Size(262, 22)
+        Me.txtTalla.Size = New System.Drawing.Size(294, 26)
         Me.txtTalla.TabIndex = 3
         '
-        ' lblObservaciones
+        'lblObservaciones
         '
         Me.lblObservaciones.AutoSize = True
-        Me.lblObservaciones.Location = New System.Drawing.Point(12, 74)
+        Me.lblObservaciones.Location = New System.Drawing.Point(14, 92)
         Me.lblObservaciones.Name = "lblObservaciones"
-        Me.lblObservaciones.Size = New System.Drawing.Size(103, 17)
+        Me.lblObservaciones.Size = New System.Drawing.Size(118, 20)
         Me.lblObservaciones.TabIndex = 4
         Me.lblObservaciones.Text = "Observaciones:"
         '
-        ' txtObservaciones
+        'txtObservaciones
         '
-        Me.txtObservaciones.Location = New System.Drawing.Point(110, 71)
+        Me.txtObservaciones.Location = New System.Drawing.Point(124, 89)
+        Me.txtObservaciones.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.txtObservaciones.Multiline = True
         Me.txtObservaciones.Name = "txtObservaciones"
-        Me.txtObservaciones.Size = New System.Drawing.Size(262, 80)
+        Me.txtObservaciones.Size = New System.Drawing.Size(294, 99)
         Me.txtObservaciones.TabIndex = 5
         '
-        ' btnGuardar
+        'btnGuardar
         '
-        Me.btnGuardar.Location = New System.Drawing.Point(297, 164)
+        Me.btnGuardar.Location = New System.Drawing.Point(334, 205)
+        Me.btnGuardar.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.btnGuardar.Name = "btnGuardar"
-        Me.btnGuardar.Size = New System.Drawing.Size(75, 23)
+        Me.btnGuardar.Size = New System.Drawing.Size(84, 29)
         Me.btnGuardar.TabIndex = 6
         Me.btnGuardar.Text = "Guardar"
         Me.btnGuardar.UseVisualStyleBackColor = True
         '
-        ' btnCancelar
-        '
-        Me.btnCancelar.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancelar.Location = New System.Drawing.Point(216, 164)
-        Me.btnCancelar.Name = "btnCancelar"
-        Me.btnCancelar.Size = New System.Drawing.Size(75, 23)
-        Me.btnCancelar.TabIndex = 7
-        Me.btnCancelar.Text = "Cancelar"
-        Me.btnCancelar.UseVisualStyleBackColor = True
-        '
-        ' frmFuncionarioDotacion
+        'frmFuncionarioDotacion
         '
         Me.AcceptButton = Me.btnGuardar
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.CancelButton = Me.btnCancelar
-        Me.ClientSize = New System.Drawing.Size(384, 199)
-        Me.Controls.Add(Me.btnCancelar)
+        Me.ClientSize = New System.Drawing.Size(432, 249)
         Me.Controls.Add(Me.btnGuardar)
         Me.Controls.Add(Me.txtObservaciones)
         Me.Controls.Add(Me.lblObservaciones)
@@ -118,6 +109,8 @@ Partial Class frmFuncionarioDotacion
         Me.Controls.Add(Me.cboItem)
         Me.Controls.Add(Me.lblItem)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
+        Me.KeyPreview = True
+        Me.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.MaximizeBox = False
         Me.MinimizeBox = False
         Me.Name = "frmFuncionarioDotacion"
@@ -135,5 +128,4 @@ Partial Class frmFuncionarioDotacion
     Friend WithEvents lblObservaciones As Label
     Friend WithEvents txtObservaciones As TextBox
     Friend WithEvents btnGuardar As Button
-    Friend WithEvents btnCancelar As Button
 End Class

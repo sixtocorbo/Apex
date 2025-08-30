@@ -31,14 +31,15 @@ Partial Class frmFichaPersonalRPT
         Me.ReportViewer1.Size = New System.Drawing.Size(882, 701)
         Me.ReportViewer1.TabIndex = 0
         '
-        'frmFichaFuncionalRPT
+        'frmFichaPersonalRPT
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(882, 701)
         Me.Controls.Add(Me.ReportViewer1)
+        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
-        Me.Name = "frmFichaFuncionalRPT"
+        Me.Name = "frmFichaPersonalRPT"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Ficha Funcional"
         Me.WindowState = System.Windows.Forms.FormWindowState.Maximized

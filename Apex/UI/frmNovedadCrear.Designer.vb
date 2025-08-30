@@ -82,10 +82,10 @@ Partial Class frmNovedadCrear
         'TabPageNovedad
         '
         Me.TabPageNovedad.Controls.Add(Me.txtTexto)
-        Me.TabPageNovedad.Location = New System.Drawing.Point(4, 30)
+        Me.TabPageNovedad.Location = New System.Drawing.Point(4, 37)
         Me.TabPageNovedad.Name = "TabPageNovedad"
         Me.TabPageNovedad.Padding = New System.Windows.Forms.Padding(10)
-        Me.TabPageNovedad.Size = New System.Drawing.Size(756, 316)
+        Me.TabPageNovedad.Size = New System.Drawing.Size(756, 309)
         Me.TabPageNovedad.TabIndex = 0
         Me.TabPageNovedad.Text = "Novedad"
         Me.TabPageNovedad.UseVisualStyleBackColor = True
@@ -97,16 +97,16 @@ Partial Class frmNovedadCrear
         Me.txtTexto.Multiline = True
         Me.txtTexto.Name = "txtTexto"
         Me.txtTexto.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.txtTexto.Size = New System.Drawing.Size(736, 296)
+        Me.txtTexto.Size = New System.Drawing.Size(736, 289)
         Me.txtTexto.TabIndex = 0
         '
         'TabPageFuncionarios
         '
         Me.TabPageFuncionarios.Controls.Add(Me.TableLayoutPanel2)
-        Me.TabPageFuncionarios.Location = New System.Drawing.Point(4, 30)
+        Me.TabPageFuncionarios.Location = New System.Drawing.Point(4, 37)
         Me.TabPageFuncionarios.Name = "TabPageFuncionarios"
         Me.TabPageFuncionarios.Padding = New System.Windows.Forms.Padding(10)
-        Me.TabPageFuncionarios.Size = New System.Drawing.Size(756, 316)
+        Me.TabPageFuncionarios.Size = New System.Drawing.Size(756, 309)
         Me.TabPageFuncionarios.TabIndex = 1
         Me.TabPageFuncionarios.Text = "Funcionarios"
         Me.TabPageFuncionarios.UseVisualStyleBackColor = True
@@ -123,18 +123,18 @@ Partial Class frmNovedadCrear
         Me.TableLayoutPanel2.RowCount = 2
         Me.TableLayoutPanel2.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
         Me.TableLayoutPanel2.RowStyles.Add(New System.Windows.Forms.RowStyle())
-        Me.TableLayoutPanel2.Size = New System.Drawing.Size(736, 296)
+        Me.TableLayoutPanel2.Size = New System.Drawing.Size(736, 289)
         Me.TableLayoutPanel2.TabIndex = 0
         '
         'lstFuncionariosSeleccionados
         '
         Me.lstFuncionariosSeleccionados.Dock = System.Windows.Forms.DockStyle.Fill
         Me.lstFuncionariosSeleccionados.FormattingEnabled = True
-        Me.lstFuncionariosSeleccionados.ItemHeight = 21
+        Me.lstFuncionariosSeleccionados.ItemHeight = 28
         Me.lstFuncionariosSeleccionados.Location = New System.Drawing.Point(3, 3)
         Me.lstFuncionariosSeleccionados.Name = "lstFuncionariosSeleccionados"
         Me.lstFuncionariosSeleccionados.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended
-        Me.lstFuncionariosSeleccionados.Size = New System.Drawing.Size(730, 244)
+        Me.lstFuncionariosSeleccionados.Size = New System.Drawing.Size(730, 237)
         Me.lstFuncionariosSeleccionados.TabIndex = 0
         '
         'FlowLayoutPanel1
@@ -144,7 +144,7 @@ Partial Class frmNovedadCrear
         Me.FlowLayoutPanel1.Controls.Add(Me.btnAgregarFuncionario)
         Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.FlowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
-        Me.FlowLayoutPanel1.Location = New System.Drawing.Point(3, 253)
+        Me.FlowLayoutPanel1.Location = New System.Drawing.Point(3, 246)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
         Me.FlowLayoutPanel1.Size = New System.Drawing.Size(730, 40)
         Me.FlowLayoutPanel1.TabIndex = 1
@@ -171,10 +171,10 @@ Partial Class frmNovedadCrear
         '
         Me.TabPageFotos.Controls.Add(Me.flpFotos)
         Me.TabPageFotos.Controls.Add(Me.FlowLayoutPanel3)
-        Me.TabPageFotos.Location = New System.Drawing.Point(4, 30)
+        Me.TabPageFotos.Location = New System.Drawing.Point(4, 37)
         Me.TabPageFotos.Name = "TabPageFotos"
         Me.TabPageFotos.Padding = New System.Windows.Forms.Padding(10)
-        Me.TabPageFotos.Size = New System.Drawing.Size(756, 316)
+        Me.TabPageFotos.Size = New System.Drawing.Size(756, 309)
         Me.TabPageFotos.TabIndex = 2
         Me.TabPageFotos.Text = "Fotos"
         Me.TabPageFotos.UseVisualStyleBackColor = True
@@ -185,7 +185,7 @@ Partial Class frmNovedadCrear
         Me.flpFotos.Dock = System.Windows.Forms.DockStyle.Fill
         Me.flpFotos.Location = New System.Drawing.Point(10, 10)
         Me.flpFotos.Name = "flpFotos"
-        Me.flpFotos.Size = New System.Drawing.Size(736, 250)
+        Me.flpFotos.Size = New System.Drawing.Size(736, 243)
         Me.flpFotos.TabIndex = 3
         '
         'FlowLayoutPanel3
@@ -195,7 +195,7 @@ Partial Class frmNovedadCrear
         Me.FlowLayoutPanel3.Controls.Add(Me.btnAgregarFoto)
         Me.FlowLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Bottom
         Me.FlowLayoutPanel3.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
-        Me.FlowLayoutPanel3.Location = New System.Drawing.Point(10, 260)
+        Me.FlowLayoutPanel3.Location = New System.Drawing.Point(10, 253)
         Me.FlowLayoutPanel3.Name = "FlowLayoutPanel3"
         Me.FlowLayoutPanel3.Size = New System.Drawing.Size(736, 46)
         Me.FlowLayoutPanel3.TabIndex = 2
@@ -230,10 +230,10 @@ Partial Class frmNovedadCrear
         '
         'dtpFecha
         '
-        Me.dtpFecha.Format = System.Windows.Forms.DateTimePickerFormat.Short
+        Me.dtpFecha.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
         Me.dtpFecha.Location = New System.Drawing.Point(68, 8)
         Me.dtpFecha.Name = "dtpFecha"
-        Me.dtpFecha.Size = New System.Drawing.Size(121, 29)
+        Me.dtpFecha.Size = New System.Drawing.Size(121, 33)
         Me.dtpFecha.TabIndex = 1
         '
         'Label1
@@ -241,7 +241,7 @@ Partial Class frmNovedadCrear
         Me.Label1.AutoSize = True
         Me.Label1.Location = New System.Drawing.Point(13, 12)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(49, 21)
+        Me.Label1.Size = New System.Drawing.Size(66, 28)
         Me.Label1.TabIndex = 0
         Me.Label1.Text = "Fecha:"
         '
@@ -278,12 +278,13 @@ Partial Class frmNovedadCrear
         'frmNovedadCrear
         '
         Me.AcceptButton = Me.btnGuardar
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 21.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(11.0!, 28.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnCancelar
         Me.ClientSize = New System.Drawing.Size(784, 461)
         Me.Controls.Add(Me.PanelPrincipal)
         Me.Font = New System.Drawing.Font("Segoe UI", 9.75!)
+        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.MinimumSize = New System.Drawing.Size(600, 400)
         Me.Name = "frmNovedadCrear"

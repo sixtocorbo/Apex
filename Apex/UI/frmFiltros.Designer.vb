@@ -494,14 +494,15 @@ Partial Class frmFiltros
         Me.flpChips.Size = New System.Drawing.Size(645, 91)
         Me.flpChips.TabIndex = 0
         '
-        'frmFiltroAvanzado
+        'frmFiltros
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(978, 544)
         Me.Controls.Add(Me.splitContenedorPrincipal)
+        Me.KeyPreview = True
         Me.MinimumSize = New System.Drawing.Size(800, 600)
-        Me.Name = "frmFiltroAvanzado"
+        Me.Name = "frmFiltros"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Filtro Avanzado"
         Me.WindowState = System.Windows.Forms.FormWindowState.Maximized

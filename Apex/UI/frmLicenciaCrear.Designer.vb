@@ -37,7 +37,6 @@ Partial Class frmLicenciaCrear
         Me.txtComentario = New System.Windows.Forms.TextBox()
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
         Me.btnGuardar = New System.Windows.Forms.Button()
-        Me.btnCancelar = New System.Windows.Forms.Button()
         Me.TableLayoutPanel1.SuspendLayout()
         Me.FlowLayoutPanel1.SuspendLayout()
         Me.SuspendLayout()
@@ -196,7 +195,6 @@ Partial Class frmLicenciaCrear
         'FlowLayoutPanel1
         '
         Me.FlowLayoutPanel1.Controls.Add(Me.btnGuardar)
-        Me.FlowLayoutPanel1.Controls.Add(Me.btnCancelar)
         Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Bottom
         Me.FlowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
         Me.FlowLayoutPanel1.Location = New System.Drawing.Point(10, 292)
@@ -213,27 +211,17 @@ Partial Class frmLicenciaCrear
         Me.btnGuardar.Text = "Guardar"
         Me.btnGuardar.UseVisualStyleBackColor = True
         '
-        'btnCancelar
-        '
-        Me.btnCancelar.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancelar.Location = New System.Drawing.Point(249, 3)
-        Me.btnCancelar.Name = "btnCancelar"
-        Me.btnCancelar.Size = New System.Drawing.Size(104, 34)
-        Me.btnCancelar.TabIndex = 1
-        Me.btnCancelar.Text = "Cancelar"
-        Me.btnCancelar.UseVisualStyleBackColor = True
-        '
         'frmLicenciaCrear
         '
         Me.AcceptButton = Me.btnGuardar
         Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 25.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.CancelButton = Me.btnCancelar
         Me.ClientSize = New System.Drawing.Size(484, 342)
         Me.Controls.Add(Me.TableLayoutPanel1)
         Me.Controls.Add(Me.FlowLayoutPanel1)
         Me.Font = New System.Drawing.Font("Segoe UI", 9.0!)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
+        Me.KeyPreview = True
         Me.MaximizeBox = False
         Me.MinimizeBox = False
         Me.Name = "frmLicenciaCrear"
@@ -256,7 +244,6 @@ Partial Class frmLicenciaCrear
     Friend WithEvents dtpFechaInicio As DateTimePicker
     Friend WithEvents FlowLayoutPanel1 As FlowLayoutPanel
     Friend WithEvents btnGuardar As Button
-    Friend WithEvents btnCancelar As Button
     Friend WithEvents lblFechaFin As Label
     Friend WithEvents dtpFechaFin As DateTimePicker
     Friend WithEvents lblComentario As Label

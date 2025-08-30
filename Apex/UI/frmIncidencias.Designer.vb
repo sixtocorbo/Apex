@@ -94,7 +94,7 @@ Partial Class frmIncidencias
         Me.Label1.TabIndex = 5
         Me.Label1.Text = "Mantenimiento de Incidencias"
         '
-        'frmGestionIncidencias
+        'frmIncidencias
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
@@ -104,9 +104,10 @@ Partial Class frmIncidencias
         Me.Controls.Add(Me.btnEditar)
         Me.Controls.Add(Me.btnAgregar)
         Me.Controls.Add(Me.dgvIncidencias)
+        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.MinimumSize = New System.Drawing.Size(889, 570)
-        Me.Name = "frmGestionIncidencias"
+        Me.Name = "frmIncidencias"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Gestión de Incidencias"
         CType(Me.dgvIncidencias, System.ComponentModel.ISupportInitialize).EndInit()

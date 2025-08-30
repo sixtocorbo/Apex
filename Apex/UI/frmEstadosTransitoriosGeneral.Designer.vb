@@ -24,7 +24,6 @@ Partial Class frmEstadosTransitoriosGeneral
     Private Sub InitializeComponent()
         Me.dgvEstados = New System.Windows.Forms.DataGridView()
         Me.btnVerDetalles = New System.Windows.Forms.Button()
-        Me.btnCerrar = New System.Windows.Forms.Button()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.txtFiltro = New System.Windows.Forms.TextBox()
         CType(Me.dgvEstados, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -61,17 +60,6 @@ Partial Class frmEstadosTransitoriosGeneral
         Me.btnVerDetalles.Text = "Ver Detalles"
         Me.btnVerDetalles.UseVisualStyleBackColor = True
         '
-        'btnCerrar
-        '
-        Me.btnCerrar.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnCerrar.Location = New System.Drawing.Point(18, 640)
-        Me.btnCerrar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnCerrar.Name = "btnCerrar"
-        Me.btnCerrar.Size = New System.Drawing.Size(112, 35)
-        Me.btnCerrar.TabIndex = 2
-        Me.btnCerrar.Text = "Cerrar"
-        Me.btnCerrar.UseVisualStyleBackColor = True
-        '
         'Label1
         '
         Me.Label1.AutoSize = True
@@ -99,9 +87,9 @@ Partial Class frmEstadosTransitoriosGeneral
         Me.ClientSize = New System.Drawing.Size(1176, 694)
         Me.Controls.Add(Me.txtFiltro)
         Me.Controls.Add(Me.Label1)
-        Me.Controls.Add(Me.btnCerrar)
         Me.Controls.Add(Me.btnVerDetalles)
         Me.Controls.Add(Me.dgvEstados)
+        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.MinimumSize = New System.Drawing.Size(1189, 724)
         Me.Name = "frmEstadosTransitoriosGeneral"
@@ -115,7 +103,6 @@ Partial Class frmEstadosTransitoriosGeneral
 
     Friend WithEvents dgvEstados As DataGridView
     Friend WithEvents btnVerDetalles As Button
-    Friend WithEvents btnCerrar As Button
     Friend WithEvents Label1 As Label
     Friend WithEvents txtFiltro As TextBox
 End Class

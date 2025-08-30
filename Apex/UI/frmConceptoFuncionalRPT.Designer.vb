@@ -37,6 +37,7 @@ Partial Class frmConceptoFuncionalRPT
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(900, 562)
         Me.Controls.Add(Me.ReportViewer1)
+        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.Name = "frmConceptoFuncionalRPT"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen

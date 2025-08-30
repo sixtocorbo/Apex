@@ -11,10 +11,10 @@ Public Class frmFotografiaNovedades
         pbFotoGrande.Image = imagen
     End Sub
 
-    ''' <summary>
-    ''' Cierra el formulario al hacer clic en la imagen.
-    ''' </summary>
-    Private Sub pbFotoGrande_Click(sender As Object, e As EventArgs) Handles pbFotoGrande.Click
-        Me.Close()
+    Private Sub Cerrando(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
+        ' Si la tecla presionada es Escape, se cierra el formulario.
+        If e.KeyCode = Keys.Escape Then
+            Me.Close()
+        End If
     End Sub
 End Class

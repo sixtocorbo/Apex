@@ -58,8 +58,10 @@ Public Class frmFuncionarioDotacion
     End Sub
 
 
-    Private Sub btnCancelar_Click(sender As Object, e As EventArgs) Handles btnCancelar.Click
-        DialogResult = DialogResult.Cancel
-        Close()
+    Private Sub Cerrando(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
+        ' Si la tecla presionada es Escape, se cierra el formulario.
+        If e.KeyCode = Keys.Escape Then
+            Close()
+        End If
     End Sub
 End Class

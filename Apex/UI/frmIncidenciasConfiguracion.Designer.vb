@@ -138,7 +138,7 @@ Partial Class frmIncidenciasConfiguracion
         Me.btnCancelar.Text = "Cancelar"
         Me.btnCancelar.UseVisualStyleBackColor = True
         '
-        'frmIncidenciaDetalle
+        'frmIncidenciasConfiguracion
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
@@ -154,10 +154,11 @@ Partial Class frmIncidenciasConfiguracion
         Me.Controls.Add(Me.txtNombre)
         Me.Controls.Add(Me.Label1)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
+        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "frmIncidenciaDetalle"
+        Me.Name = "frmIncidenciasConfiguracion"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = "Detalle de Incidencia"
         Me.ResumeLayout(False)

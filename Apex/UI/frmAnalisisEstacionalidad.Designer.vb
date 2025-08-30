@@ -43,8 +43,9 @@ Partial Class frmAnalisisEstacionalidad
         Legend1.Name = "Legend1"
         Me.Chart1.Legends.Add(Legend1)
         Me.Chart1.Location = New System.Drawing.Point(0, 0)
+        Me.Chart1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Chart1.Name = "Chart1"
-        Me.Chart1.Size = New System.Drawing.Size(952, 681)
+        Me.Chart1.Size = New System.Drawing.Size(1428, 1048)
         Me.Chart1.TabIndex = 0
         Me.Chart1.Text = "Chart1"
         '
@@ -61,8 +62,9 @@ Partial Class frmAnalisisEstacionalidad
         Me.PanelFiltros.Controls.Add(Me.Label1)
         Me.PanelFiltros.Dock = System.Windows.Forms.DockStyle.Left
         Me.PanelFiltros.Location = New System.Drawing.Point(0, 0)
+        Me.PanelFiltros.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.PanelFiltros.Name = "PanelFiltros"
-        Me.PanelFiltros.Size = New System.Drawing.Size(250, 681)
+        Me.PanelFiltros.Size = New System.Drawing.Size(375, 1048)
         Me.PanelFiltros.TabIndex = 1
         '
         'cboModeloPrediccion
@@ -70,9 +72,10 @@ Partial Class frmAnalisisEstacionalidad
         Me.cboModeloPrediccion.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cboModeloPrediccion.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboModeloPrediccion.FormattingEnabled = True
-        Me.cboModeloPrediccion.Location = New System.Drawing.Point(12, 574)
+        Me.cboModeloPrediccion.Location = New System.Drawing.Point(18, 883)
+        Me.cboModeloPrediccion.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.cboModeloPrediccion.Name = "cboModeloPrediccion"
-        Me.cboModeloPrediccion.Size = New System.Drawing.Size(226, 21)
+        Me.cboModeloPrediccion.Size = New System.Drawing.Size(337, 28)
         Me.cboModeloPrediccion.TabIndex = 7
         '
         'Label3
@@ -80,9 +83,10 @@ Partial Class frmAnalisisEstacionalidad
         Me.Label3.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.Label3.AutoSize = True
         Me.Label3.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label3.Location = New System.Drawing.Point(12, 554)
+        Me.Label3.Location = New System.Drawing.Point(18, 852)
+        Me.Label3.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(147, 17)
+        Me.Label3.Size = New System.Drawing.Size(218, 28)
         Me.Label3.TabIndex = 6
         Me.Label3.Text = "Modelo de Predicción"
         '
@@ -91,9 +95,10 @@ Partial Class frmAnalisisEstacionalidad
         Me.Label2.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.Label2.AutoSize = True
         Me.Label2.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label2.Location = New System.Drawing.Point(12, 420)
+        Me.Label2.Location = New System.Drawing.Point(18, 646)
+        Me.Label2.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(135, 20)
+        Me.Label2.Size = New System.Drawing.Size(204, 31)
         Me.Label2.TabIndex = 5
         Me.Label2.Text = "Años a considerar"
         '
@@ -102,9 +107,10 @@ Partial Class frmAnalisisEstacionalidad
         Me.chkAnios.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkAnios.CheckOnClick = True
         Me.chkAnios.FormattingEnabled = True
-        Me.chkAnios.Location = New System.Drawing.Point(12, 443)
+        Me.chkAnios.Location = New System.Drawing.Point(18, 682)
+        Me.chkAnios.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.chkAnios.Name = "chkAnios"
-        Me.chkAnios.Size = New System.Drawing.Size(226, 94)
+        Me.chkAnios.Size = New System.Drawing.Size(337, 142)
         Me.chkAnios.TabIndex = 4
         '
         'btnPredecir
@@ -112,9 +118,10 @@ Partial Class frmAnalisisEstacionalidad
         Me.btnPredecir.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnPredecir.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnPredecir.Location = New System.Drawing.Point(12, 607)
+        Me.btnPredecir.Location = New System.Drawing.Point(18, 934)
+        Me.btnPredecir.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnPredecir.Name = "btnPredecir"
-        Me.btnPredecir.Size = New System.Drawing.Size(226, 31)
+        Me.btnPredecir.Size = New System.Drawing.Size(339, 48)
         Me.btnPredecir.TabIndex = 3
         Me.btnPredecir.Text = "Predecir Próximo Año"
         Me.btnPredecir.UseVisualStyleBackColor = True
@@ -124,9 +131,10 @@ Partial Class frmAnalisisEstacionalidad
         Me.btnFiltrar.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnFiltrar.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnFiltrar.Location = New System.Drawing.Point(12, 644)
+        Me.btnFiltrar.Location = New System.Drawing.Point(18, 991)
+        Me.btnFiltrar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnFiltrar.Name = "btnFiltrar"
-        Me.btnFiltrar.Size = New System.Drawing.Size(226, 31)
+        Me.btnFiltrar.Size = New System.Drawing.Size(339, 48)
         Me.btnFiltrar.TabIndex = 2
         Me.btnFiltrar.Text = "Aplicar Filtro"
         Me.btnFiltrar.UseVisualStyleBackColor = True
@@ -139,18 +147,20 @@ Partial Class frmAnalisisEstacionalidad
         Me.chkTiposLicencia.CheckOnClick = True
         Me.chkTiposLicencia.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.chkTiposLicencia.FormattingEnabled = True
-        Me.chkTiposLicencia.Location = New System.Drawing.Point(12, 38)
+        Me.chkTiposLicencia.Location = New System.Drawing.Point(18, 58)
+        Me.chkTiposLicencia.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.chkTiposLicencia.Name = "chkTiposLicencia"
-        Me.chkTiposLicencia.Size = New System.Drawing.Size(226, 364)
+        Me.chkTiposLicencia.Size = New System.Drawing.Size(337, 536)
         Me.chkTiposLicencia.TabIndex = 1
         '
         'Label1
         '
         Me.Label1.AutoSize = True
         Me.Label1.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label1.Location = New System.Drawing.Point(12, 9)
+        Me.Label1.Location = New System.Drawing.Point(18, 14)
+        Me.Label1.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(130, 20)
+        Me.Label1.Size = New System.Drawing.Size(196, 31)
         Me.Label1.TabIndex = 0
         Me.Label1.Text = "Tipos de Licencia"
         '
@@ -158,18 +168,21 @@ Partial Class frmAnalisisEstacionalidad
         '
         Me.PanelGrafico.Controls.Add(Me.Chart1)
         Me.PanelGrafico.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.PanelGrafico.Location = New System.Drawing.Point(250, 0)
+        Me.PanelGrafico.Location = New System.Drawing.Point(375, 0)
+        Me.PanelGrafico.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.PanelGrafico.Name = "PanelGrafico"
-        Me.PanelGrafico.Size = New System.Drawing.Size(952, 681)
+        Me.PanelGrafico.Size = New System.Drawing.Size(1428, 1048)
         Me.PanelGrafico.TabIndex = 2
         '
         'frmAnalisisEstacionalidad
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1202, 681)
+        Me.ClientSize = New System.Drawing.Size(1803, 1048)
         Me.Controls.Add(Me.PanelGrafico)
         Me.Controls.Add(Me.PanelFiltros)
+        Me.KeyPreview = True
+        Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Name = "frmAnalisisEstacionalidad"
         Me.Text = "Análisis y Predicción de Licencias"
         CType(Me.Chart1, System.ComponentModel.ISupportInitialize).EndInit()

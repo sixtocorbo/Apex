@@ -116,7 +116,7 @@ Partial Class frmViaticosListas
         Me.dgvResultados.Size = New System.Drawing.Size(784, 261)
         Me.dgvResultados.TabIndex = 1
         '
-        'frmGestionViaticos
+        'frmViaticosListas
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 25.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
@@ -124,7 +124,8 @@ Partial Class frmViaticosListas
         Me.Controls.Add(Me.dgvResultados)
         Me.Controls.Add(Me.pnlFiltros)
         Me.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.Name = "frmGestionViaticos"
+        Me.KeyPreview = True
+        Me.Name = "frmViaticosListas"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Gestión de Viáticos"
         Me.pnlFiltros.ResumeLayout(False)

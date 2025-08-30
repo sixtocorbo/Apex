@@ -95,10 +95,10 @@ Partial Class frmAsistenteImportacion
         'lblEncabezados
         '
         Me.lblEncabezados.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.lblEncabezados.Location = New System.Drawing.Point(3, 23)
+        Me.lblEncabezados.Location = New System.Drawing.Point(3, 27)
         Me.lblEncabezados.Name = "lblEncabezados"
         Me.lblEncabezados.Padding = New System.Windows.Forms.Padding(5)
-        Me.lblEncabezados.Size = New System.Drawing.Size(711, 74)
+        Me.lblEncabezados.Size = New System.Drawing.Size(711, 70)
         Me.lblEncabezados.TabIndex = 0
         Me.lblEncabezados.Text = "Seleccione un tipo de importación para ver los encabezados requeridos."
         '
@@ -137,7 +137,7 @@ Partial Class frmAsistenteImportacion
         Me.lblDropZone.AutoSize = True
         Me.lblDropZone.Location = New System.Drawing.Point(240, 65)
         Me.lblDropZone.Name = "lblDropZone"
-        Me.lblDropZone.Size = New System.Drawing.Size(237, 20)
+        Me.lblDropZone.Size = New System.Drawing.Size(282, 25)
         Me.lblDropZone.TabIndex = 0
         Me.lblDropZone.Text = "Arrastre el archivo aquí o haga clic"
         '
@@ -146,7 +146,7 @@ Partial Class frmAsistenteImportacion
         Me.lblArchivoSeleccionado.AutoSize = True
         Me.lblArchivoSeleccionado.Location = New System.Drawing.Point(22, 340)
         Me.lblArchivoSeleccionado.Name = "lblArchivoSeleccionado"
-        Me.lblArchivoSeleccionado.Size = New System.Drawing.Size(0, 20)
+        Me.lblArchivoSeleccionado.Size = New System.Drawing.Size(0, 25)
         Me.lblArchivoSeleccionado.TabIndex = 2
         '
         'lblPaso2_Titulo
@@ -155,7 +155,7 @@ Partial Class frmAsistenteImportacion
         Me.lblPaso2_Titulo.Font = New System.Drawing.Font("Segoe UI", 14.0!, System.Drawing.FontStyle.Bold)
         Me.lblPaso2_Titulo.Location = New System.Drawing.Point(20, 20)
         Me.lblPaso2_Titulo.Name = "lblPaso2_Titulo"
-        Me.lblPaso2_Titulo.Size = New System.Drawing.Size(326, 32)
+        Me.lblPaso2_Titulo.Size = New System.Drawing.Size(376, 38)
         Me.lblPaso2_Titulo.TabIndex = 0
         Me.lblPaso2_Titulo.Text = "Paso 2: Cargar Archivo de..."
         '
@@ -181,7 +181,7 @@ Partial Class frmAsistenteImportacion
         Me.lblPaso3_Feedback.ForeColor = System.Drawing.SystemColors.ControlDarkDark
         Me.lblPaso3_Feedback.Location = New System.Drawing.Point(308, 396)
         Me.lblPaso3_Feedback.Name = "lblPaso3_Feedback"
-        Me.lblPaso3_Feedback.Size = New System.Drawing.Size(103, 20)
+        Me.lblPaso3_Feedback.Size = New System.Drawing.Size(116, 25)
         Me.lblPaso3_Feedback.TabIndex = 7
         Me.lblPaso3_Feedback.Text = "Importando..."
         '
@@ -219,7 +219,7 @@ Partial Class frmAsistenteImportacion
         Me.lblResumenErrores.ForeColor = System.Drawing.Color.Red
         Me.lblResumenErrores.Location = New System.Drawing.Point(22, 100)
         Me.lblResumenErrores.Name = "lblResumenErrores"
-        Me.lblResumenErrores.Size = New System.Drawing.Size(193, 23)
+        Me.lblResumenErrores.Size = New System.Drawing.Size(259, 28)
         Me.lblResumenErrores.TabIndex = 3
         Me.lblResumenErrores.Text = "❌ Errores Encontrados: 0"
         '
@@ -230,7 +230,7 @@ Partial Class frmAsistenteImportacion
         Me.lblResumenValidos.ForeColor = System.Drawing.Color.Green
         Me.lblResumenValidos.Location = New System.Drawing.Point(22, 70)
         Me.lblResumenValidos.Name = "lblResumenValidos"
-        Me.lblResumenValidos.Size = New System.Drawing.Size(183, 23)
+        Me.lblResumenValidos.Size = New System.Drawing.Size(230, 28)
         Me.lblResumenValidos.TabIndex = 2
         Me.lblResumenValidos.Text = "✔️ Registros Válidos: 0"
         '
@@ -253,7 +253,7 @@ Partial Class frmAsistenteImportacion
         Me.lblPaso3_Titulo.Font = New System.Drawing.Font("Segoe UI", 14.0!, System.Drawing.FontStyle.Bold)
         Me.lblPaso3_Titulo.Location = New System.Drawing.Point(20, 20)
         Me.lblPaso3_Titulo.Name = "lblPaso3_Titulo"
-        Me.lblPaso3_Titulo.Size = New System.Drawing.Size(328, 32)
+        Me.lblPaso3_Titulo.Size = New System.Drawing.Size(372, 38)
         Me.lblPaso3_Titulo.TabIndex = 0
         Me.lblPaso3_Titulo.Text = "Paso 3: Validar y Confirmar"
         '
@@ -287,10 +287,10 @@ Partial Class frmAsistenteImportacion
         '
         Me.lstNuevosTiposLicencia.Dock = System.Windows.Forms.DockStyle.Fill
         Me.lstNuevosTiposLicencia.FormattingEnabled = True
-        Me.lstNuevosTiposLicencia.ItemHeight = 20
-        Me.lstNuevosTiposLicencia.Location = New System.Drawing.Point(3, 23)
+        Me.lstNuevosTiposLicencia.ItemHeight = 25
+        Me.lstNuevosTiposLicencia.Location = New System.Drawing.Point(3, 27)
         Me.lstNuevosTiposLicencia.Name = "lstNuevosTiposLicencia"
-        Me.lstNuevosTiposLicencia.Size = New System.Drawing.Size(314, 114)
+        Me.lstNuevosTiposLicencia.Size = New System.Drawing.Size(314, 110)
         Me.lstNuevosTiposLicencia.TabIndex = 0
         '
         'gbxNuevosFuncionarios
@@ -308,10 +308,10 @@ Partial Class frmAsistenteImportacion
         '
         Me.lstNuevosFuncionarios.Dock = System.Windows.Forms.DockStyle.Fill
         Me.lstNuevosFuncionarios.FormattingEnabled = True
-        Me.lstNuevosFuncionarios.ItemHeight = 20
-        Me.lstNuevosFuncionarios.Location = New System.Drawing.Point(3, 23)
+        Me.lstNuevosFuncionarios.ItemHeight = 25
+        Me.lstNuevosFuncionarios.Location = New System.Drawing.Point(3, 27)
         Me.lstNuevosFuncionarios.Name = "lstNuevosFuncionarios"
-        Me.lstNuevosFuncionarios.Size = New System.Drawing.Size(314, 114)
+        Me.lstNuevosFuncionarios.Size = New System.Drawing.Size(314, 110)
         Me.lstNuevosFuncionarios.TabIndex = 0
         '
         'lblResumenTiempo
@@ -320,7 +320,7 @@ Partial Class frmAsistenteImportacion
         Me.lblResumenTiempo.Font = New System.Drawing.Font("Segoe UI", 12.0!)
         Me.lblResumenTiempo.Location = New System.Drawing.Point(50, 200)
         Me.lblResumenTiempo.Name = "lblResumenTiempo"
-        Me.lblResumenTiempo.Size = New System.Drawing.Size(262, 28)
+        Me.lblResumenTiempo.Size = New System.Drawing.Size(323, 32)
         Me.lblResumenTiempo.TabIndex = 5
         Me.lblResumenTiempo.Text = "• Tiempo de la Operación: 0s"
         '
@@ -348,7 +348,7 @@ Partial Class frmAsistenteImportacion
         Me.lblResumenErroresFinal.Font = New System.Drawing.Font("Segoe UI", 12.0!)
         Me.lblResumenErroresFinal.Location = New System.Drawing.Point(50, 150)
         Me.lblResumenErroresFinal.Name = "lblResumenErroresFinal"
-        Me.lblResumenErroresFinal.Size = New System.Drawing.Size(296, 28)
+        Me.lblResumenErroresFinal.Size = New System.Drawing.Size(382, 32)
         Me.lblResumenErroresFinal.TabIndex = 2
         Me.lblResumenErroresFinal.Text = "• Registros con Errores Omitidos: 0"
         '
@@ -358,7 +358,7 @@ Partial Class frmAsistenteImportacion
         Me.lblResumenImportados.Font = New System.Drawing.Font("Segoe UI", 12.0!)
         Me.lblResumenImportados.Location = New System.Drawing.Point(50, 100)
         Me.lblResumenImportados.Name = "lblResumenImportados"
-        Me.lblResumenImportados.Size = New System.Drawing.Size(262, 28)
+        Me.lblResumenImportados.Size = New System.Drawing.Size(280, 32)
         Me.lblResumenImportados.TabIndex = 1
         Me.lblResumenImportados.Text = "• Registros Importados: 0"
         '
@@ -368,7 +368,7 @@ Partial Class frmAsistenteImportacion
         Me.lblPaso4_Titulo.Font = New System.Drawing.Font("Segoe UI", 14.0!, System.Drawing.FontStyle.Bold)
         Me.lblPaso4_Titulo.Location = New System.Drawing.Point(20, 20)
         Me.lblPaso4_Titulo.Name = "lblPaso4_Titulo"
-        Me.lblPaso4_Titulo.Size = New System.Drawing.Size(370, 32)
+        Me.lblPaso4_Titulo.Size = New System.Drawing.Size(446, 38)
         Me.lblPaso4_Titulo.TabIndex = 0
         Me.lblPaso4_Titulo.Text = "Paso 4: Resumen de Importación"
         '
@@ -423,7 +423,7 @@ Partial Class frmAsistenteImportacion
         Me.rbDotaciones.AutoSize = True
         Me.rbDotaciones.Location = New System.Drawing.Point(30, 115)
         Me.rbDotaciones.Name = "rbDotaciones"
-        Me.rbDotaciones.Size = New System.Drawing.Size(104, 24)
+        Me.rbDotaciones.Size = New System.Drawing.Size(126, 29)
         Me.rbDotaciones.TabIndex = 3
         Me.rbDotaciones.TabStop = True
         Me.rbDotaciones.Text = "Dotaciones"
@@ -434,7 +434,7 @@ Partial Class frmAsistenteImportacion
         Me.rbLicencias.AutoSize = True
         Me.rbLicencias.Location = New System.Drawing.Point(30, 25)
         Me.rbLicencias.Name = "rbLicencias"
-        Me.rbLicencias.Size = New System.Drawing.Size(89, 24)
+        Me.rbLicencias.Size = New System.Drawing.Size(105, 29)
         Me.rbLicencias.TabIndex = 2
         Me.rbLicencias.TabStop = True
         Me.rbLicencias.Text = "Licencias"
@@ -445,7 +445,7 @@ Partial Class frmAsistenteImportacion
         Me.rbNocturnidad.AutoSize = True
         Me.rbNocturnidad.Location = New System.Drawing.Point(30, 85)
         Me.rbNocturnidad.Name = "rbNocturnidad"
-        Me.rbNocturnidad.Size = New System.Drawing.Size(110, 24)
+        Me.rbNocturnidad.Size = New System.Drawing.Size(136, 29)
         Me.rbNocturnidad.TabIndex = 1
         Me.rbNocturnidad.TabStop = True
         Me.rbNocturnidad.Text = "Nocturnidad"
@@ -456,7 +456,7 @@ Partial Class frmAsistenteImportacion
         Me.rbPresentismo.AutoSize = True
         Me.rbPresentismo.Location = New System.Drawing.Point(30, 55)
         Me.rbPresentismo.Name = "rbPresentismo"
-        Me.rbPresentismo.Size = New System.Drawing.Size(111, 24)
+        Me.rbPresentismo.Size = New System.Drawing.Size(134, 29)
         Me.rbPresentismo.TabIndex = 0
         Me.rbPresentismo.TabStop = True
         Me.rbPresentismo.Text = "Presentismo"
@@ -468,13 +468,13 @@ Partial Class frmAsistenteImportacion
         Me.lblPaso1_Titulo.Font = New System.Drawing.Font("Segoe UI", 14.0!, System.Drawing.FontStyle.Bold)
         Me.lblPaso1_Titulo.Location = New System.Drawing.Point(20, 20)
         Me.lblPaso1_Titulo.Name = "lblPaso1_Titulo"
-        Me.lblPaso1_Titulo.Size = New System.Drawing.Size(437, 32)
+        Me.lblPaso1_Titulo.Size = New System.Drawing.Size(490, 38)
         Me.lblPaso1_Titulo.TabIndex = 0
         Me.lblPaso1_Titulo.Text = "Paso 1: Seleccione el tipo de archivo"
         '
         'frmAsistenteImportacion
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 20.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 25.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(784, 461)
         Me.Controls.Add(Me.pnlPaso1_Seleccion)
@@ -483,6 +483,7 @@ Partial Class frmAsistenteImportacion
         Me.Controls.Add(Me.pnlPaso4_Resumen)
         Me.Font = New System.Drawing.Font("Segoe UI", 9.0!)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
+        Me.KeyPreview = True
         Me.MaximizeBox = False
         Me.MinimizeBox = False
         Me.Name = "frmAsistenteImportacion"

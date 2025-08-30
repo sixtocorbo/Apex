@@ -33,15 +33,16 @@ Partial Class frmFotografiaNovedades
         Me.pbFotoGrande.TabIndex = 0
         Me.pbFotoGrande.TabStop = False
         '
-        'frmVisorFoto
+        'frmFotografiaNovedades
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(882, 701)
         Me.Controls.Add(Me.pbFotoGrande)
+        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.MinimizeBox = False
-        Me.Name = "frmVisorFoto"
+        Me.Name = "frmFotografiaNovedades"
         Me.ShowIcon = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Visor de Foto"

@@ -205,7 +205,7 @@ Partial Class frmNovedadesListas
         Me.btnImprimir.Text = "Imprimir"
         Me.btnImprimir.UseVisualStyleBackColor = True
         '
-        'frmReporteNovedades
+        'frmNovedadesListas
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
@@ -214,8 +214,10 @@ Partial Class frmNovedadesListas
         Me.Controls.Add(Me.dgvNovedades)
         Me.Controls.Add(Me.btnGenerarReporte)
         Me.Controls.Add(Me.GroupBox1)
+        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.Name = "frmReporteNovedades"
+        Me.Name = "frmNovedadesListas"
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Reporte de Novedades"
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()

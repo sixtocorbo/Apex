@@ -104,10 +104,11 @@ Public Class frmConceptoFuncional
         dgv.Columns.Clear()
         dgv.Columns.AddRange(
             New DataGridViewTextBoxColumn With {.DataPropertyName = "FechaInicio", .HeaderText = "Inicio", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells},
-            New DataGridViewTextBoxColumn With {.DataPropertyName = "FechaFin", .HeaderText = "Fin", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells},
+            New DataGridViewTextBoxColumn With {.DataPropertyName = "FechaFinal", .HeaderText = "Fin", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells},
             New DataGridViewTextBoxColumn With {.DataPropertyName = "Tipo", .HeaderText = "Tipo", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells},
-            New DataGridViewTextBoxColumn With {.DataPropertyName = "Detalle", .HeaderText = "Detalle/Observaciones", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill},
+            New DataGridViewTextBoxColumn With {.DataPropertyName = "Observaciones", .HeaderText = "Detalle/Observaciones", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill},
             New DataGridViewTextBoxColumn With {.DataPropertyName = "Origen", .HeaderText = "Origen", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells}
         )
     End Sub
+
 End Class

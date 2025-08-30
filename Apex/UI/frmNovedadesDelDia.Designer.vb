@@ -24,11 +24,11 @@ Partial Class frmNovedadesDelDia
     Private Sub InitializeComponent()
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
         Me.Panel1 = New System.Windows.Forms.Panel()
+        Me.btnImprimir = New System.Windows.Forms.Button()
         Me.btnCargarNovedades = New System.Windows.Forms.Button()
         Me.dtpFecha = New System.Windows.Forms.DateTimePicker()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.dgvNovedadesDelDia = New System.Windows.Forms.DataGridView()
-        Me.btnImprimir = New System.Windows.Forms.Button()
         Me.TableLayoutPanel1.SuspendLayout()
         Me.Panel1.SuspendLayout()
         CType(Me.dgvNovedadesDelDia, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -62,6 +62,16 @@ Partial Class frmNovedadesDelDia
         Me.Panel1.Name = "Panel1"
         Me.Panel1.Size = New System.Drawing.Size(1192, 67)
         Me.Panel1.TabIndex = 0
+        '
+        'btnImprimir
+        '
+        Me.btnImprimir.Location = New System.Drawing.Point(713, 15)
+        Me.btnImprimir.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnImprimir.Name = "btnImprimir"
+        Me.btnImprimir.Size = New System.Drawing.Size(180, 35)
+        Me.btnImprimir.TabIndex = 3
+        Me.btnImprimir.Text = "Imprimir"
+        Me.btnImprimir.UseVisualStyleBackColor = True
         '
         'btnCargarNovedades
         '
@@ -105,24 +115,16 @@ Partial Class frmNovedadesDelDia
         Me.dgvNovedadesDelDia.Size = New System.Drawing.Size(1192, 605)
         Me.dgvNovedadesDelDia.TabIndex = 1
         '
-        'btnImprimir
-        '
-        Me.btnImprimir.Location = New System.Drawing.Point(713, 15)
-        Me.btnImprimir.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnImprimir.Name = "btnImprimir"
-        Me.btnImprimir.Size = New System.Drawing.Size(180, 35)
-        Me.btnImprimir.TabIndex = 3
-        Me.btnImprimir.Text = "Imprimir"
-        Me.btnImprimir.UseVisualStyleBackColor = True
-        '
         'frmNovedadesDelDia
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1200, 692)
         Me.Controls.Add(Me.TableLayoutPanel1)
+        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Name = "frmNovedadesDelDia"
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Novedades del Día"
         Me.TableLayoutPanel1.ResumeLayout(False)
         Me.Panel1.ResumeLayout(False)

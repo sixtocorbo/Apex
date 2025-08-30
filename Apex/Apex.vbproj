@@ -725,6 +725,15 @@
     <EmbeddedResource Include="Reportes\NovedadDetallada.rdlc">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmAnalisisEstacionalidad.resx">
+      <DependentUpon>frmAnalisisEstacionalidad.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmAnalisisFuncionarios.resx">
+      <DependentUpon>frmAnalisisFuncionarios.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmAsistenteImportacion.resx">
+      <DependentUpon>frmAsistenteImportacion.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\frmAuditoriaViewer.resx">
       <DependentUpon>frmAuditoriaViewer.vb</DependentUpon>
     </EmbeddedResource>
@@ -761,6 +770,9 @@
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmFuncionarioDotacion.resx">
+      <DependentUpon>frmFuncionarioDotacion.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\frmFuncionarioEstadoTransitorio.resx">
       <DependentUpon>frmFuncionarioEstadoTransitorio.vb</DependentUpon>
     </EmbeddedResource>
@@ -785,8 +797,17 @@
     <EmbeddedResource Include="UI\frmNomenclaturas.resx">
       <DependentUpon>frmNomenclaturas.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmNotificacionCambiarEstado.resx">
+      <DependentUpon>frmNotificacionCambiarEstado.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\frmNotificaciones.resx">
       <DependentUpon>frmNotificaciones.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmNotificacionRPT.resx">
+      <DependentUpon>frmNotificacionRPT.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmNovedadesRPT.resx">
+      <DependentUpon>frmNovedadesRPT.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmSanciones.resx">
       <DependentUpon>frmSanciones.vb</DependentUpon>
