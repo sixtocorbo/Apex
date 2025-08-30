@@ -98,11 +98,6 @@ Public Class FuncionarioService
         End Using
     End Function
 
-
-
-
-
-
     ' --- Métodos para poblar los ComboBox (Catálogos) ---
     Public Async Function ObtenerCargosAsync() As Task(Of List(Of KeyValuePair(Of Integer, String)))
         Dim lista = Await _unitOfWork.Repository(Of Cargo)().GetAll().AsNoTracking().OrderBy(Function(c) c.Nombre).ToListAsync()
