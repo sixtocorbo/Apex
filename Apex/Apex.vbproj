@@ -600,10 +600,10 @@
     <Compile Include="UI\frmLicencias.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\frmNemenclaturas.Designer.vb">
-      <DependentUpon>frmNemenclaturas.vb</DependentUpon>
+    <Compile Include="UI\frmNomenclaturas.Designer.vb">
+      <DependentUpon>frmNomenclaturas.vb</DependentUpon>
     </Compile>
-    <Compile Include="UI\frmNemenclaturas.vb">
+    <Compile Include="UI\frmNomenclaturas.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="UI\frmNotificaciones.Designer.vb">
@@ -782,8 +782,8 @@
     <EmbeddedResource Include="UI\frmLicencias.resx">
       <DependentUpon>frmLicencias.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\frmNemenclaturas.resx">
-      <DependentUpon>frmNemenclaturas.vb</DependentUpon>
+    <EmbeddedResource Include="UI\frmNomenclaturas.resx">
+      <DependentUpon>frmNomenclaturas.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmNotificaciones.resx">
       <DependentUpon>frmNotificaciones.vb</DependentUpon>

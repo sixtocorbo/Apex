@@ -1,7 +1,7 @@
 ﻿Imports System.Data.Entity
 Imports System.Windows.Forms
 
-Public Class frmNemenclaturas
+Public Class frmNomenclaturas
     Private _unitOfWork As New UnitOfWork()
     Private _listaNomenclaturas As List(Of Nomenclatura)
     Private _nomenclaturaSeleccionada As Nomenclatura

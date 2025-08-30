@@ -8,7 +8,7 @@ Public Class frmConfiguracion
     Private _gestionSeccionesInstancia As frmSecciones
     Private _gestionAreasTrabajoInstancia As frmAreaTrabajoCategorias
     Private _gestionTurnosInstancia As frmTurnos
-    Private _gestionNomenclaturasInstancia As frmNemenclaturas
+    Private _gestionNomenclaturasInstancia As frmNomenclaturas
     Private _gestionTiposEstadoTransitorioInstancia As frmEstadoTransitorioTipos
     Private _gestionCategoriasAusenciaInstancia As frmIncidenciasCategorias
 
@@ -54,7 +54,7 @@ Public Class frmConfiguracion
 
     Private Sub btnNomenclaturas_Click(sender As Object, e As EventArgs) Handles btnNomenclaturas.Click
         If _gestionNomenclaturasInstancia Is Nothing OrElse _gestionNomenclaturasInstancia.IsDisposed Then
-            _gestionNomenclaturasInstancia = New frmNemenclaturas()
+            _gestionNomenclaturasInstancia = New frmNomenclaturas()
         End If
         Dim parentDashboard As frmDashboard = CType(Me.ParentForm, frmDashboard)
         parentDashboard.AbrirFormEnPanel(_gestionNomenclaturasInstancia)

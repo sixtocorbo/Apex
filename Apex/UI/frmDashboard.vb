@@ -13,11 +13,22 @@ Public Class frmDashboard
 
     ' Mapa: formulario -> nombre del control a enfocar al mostrarse.
     ' Agregá aquí otras pantallas si querés controlar su foco inicial.
-    Private ReadOnly _controlFocoPreferido As New Dictionary(Of Type, String) From {
-        {GetType(frmFuncionarioBuscar), "txtBusqueda"},
-        {GetType(frmFiltros), "txtBusquedaGlobal"},
-         {GetType(frmFuncionarioCrear), "txtCI"}
-    }
+    Private ReadOnly _controlFocoPreferido As New Dictionary(Of Type, String()) From {
+    {GetType(frmFuncionarioBuscar), New String() {"txtBusqueda", "txtBuscar", "txtFiltro", "txtBusquedaGlobal"}},
+    {GetType(frmFiltros), New String() {"txtBusquedaGlobal", "txtBuscar", "txtFiltroGlobal", "txtFiltro"}},
+    {GetType(frmFuncionarioCrear), New String() {"txtCI", "txtCedula", "txtDocumento", "txtNombre"}},
+    {GetType(frmLicencias), New String() {"txtBuscar", "txtBusqueda", "txtFiltro"}},
+    {GetType(frmNotificaciones), New String() {"txtBuscar", "txtBusqueda", "txtFiltro", "txtAsunto"}},
+    {GetType(frmSanciones), New String() {"txtBuscar", "txtBusqueda", "txtFiltro"}},
+    {GetType(frmConceptoFuncional), New String() {"txtBuscar", "txtBusqueda", "txtNombre", "cmbConcepto"}},
+    {GetType(frmNovedades), New String() {"txtBuscar", "txtBusqueda", "txtFiltro"}},
+    {GetType(frmNomenclaturas), New String() {"txtBuscar", "txtBusqueda", "txtCodigo", "txtNombre"}},
+    {GetType(frmRenombrarPDF), New String() {"txtCarpeta", "txtRuta", "txtPrefijo", "btnSeleccionarCarpeta"}},
+    {GetType(frmAsistenteImportacion), New String() {"txtArchivo", "btnSeleccionarArchivo"}},
+    {GetType(frmViaticosListas), New String() {"txtBuscar", "txtBusqueda", "txtFiltro"}},
+    {GetType(frmConfiguracion), New String() {"txtBuscar", "txtBusqueda", "txtRuta", "txtCarpeta"}}
+}
+
 
     ' Referencias al botón y formulario actualmente activos/visibles.
     Private _currentBtn As Button
@@ -176,7 +187,7 @@ Public Class frmDashboard
             Case "btnConceptoFuncional" : Return GetType(frmConceptoFuncional)
             Case "btnFiltros" : Return GetType(frmFiltros)
             Case "btnNovedades" : Return GetType(frmNovedades)
-            Case "btnNomenclaturas" : Return GetType(frmNemenclaturas)
+            Case "btnNomenclaturas" : Return GetType(frmNomenclaturas)
             Case "btnRenombrarPDFs" : Return GetType(frmRenombrarPDF)
             Case "btnImportacion" : Return GetType(frmAsistenteImportacion)
             Case "btnViaticos" : Return GetType(frmViaticosListas)
@@ -212,25 +223,48 @@ Public Class frmDashboard
     End Sub
 
     ' Helper: enfoca el control preferido del formulario mostrado.
+    ' Helper: enfoca el control preferido del formulario mostrado.
     Private Sub EnfocarControlPreferido(form As Form)
-        Dim ctrlName As String = Nothing
-        If _controlFocoPreferido.TryGetValue(form.GetType(), ctrlName) Then
+        Dim preferidos As String() = Nothing
+        If _controlFocoPreferido.TryGetValue(form.GetType(), preferidos) Then
             form.BeginInvoke(Sub()
                                  If form.IsDisposed OrElse Not form.Visible Then Return
-                                 Dim arr = form.Controls.Find(ctrlName, True)
-                                 If arr.Length > 0 AndAlso arr(0).CanFocus Then
-                                     arr(0).Focus()
-                                     Dim tb = TryCast(arr(0), TextBoxBase)
-                                     If tb IsNot Nothing Then tb.SelectAll()
-                                 Else
-                                     form.Select() ' fallback si no se encontró el control
-                                 End If
+
+                                 For Each nombre In preferidos
+                                     Dim encontrados = form.Controls.Find(nombre, True)
+                                     If encontrados IsNot Nothing AndAlso encontrados.Length > 0 Then
+                                         Dim c = encontrados(0)
+
+                                         If c.Visible AndAlso c.Enabled AndAlso c.CanSelect Then
+                                             ' Si está dentro de un TabPage, seleccionamos la pestaña primero
+                                             Dim padre As Control = c
+                                             While padre IsNot Nothing
+                                                 Dim tp = TryCast(padre, TabPage)
+                                                 If tp IsNot Nothing Then
+                                                     Dim tc = TryCast(tp.Parent, TabControl)
+                                                     If tc IsNot Nothing Then tc.SelectedTab = tp
+                                                     Exit While
+                                                 End If
+                                                 padre = padre.Parent
+                                             End While
+
+                                             c.Select() ' mejor que Focus() para WinForms embebidos
+                                             Dim tb = TryCast(c, TextBoxBase)
+                                             If tb IsNot Nothing Then tb.SelectAll()
+                                             Exit Sub
+                                         End If
+                                     End If
+                                 Next
+
+                                 ' Fallback si ninguno de los preferidos estuvo disponible
+                                 form.Select()
                              End Sub)
         Else
-            ' Si no hay preferencia registrada, al menos sacamos el foco del botón del menú.
+            ' Si no hay preferencia registrada, al menos sacamos el foco del botón del menú
             form.BeginInvoke(Sub() form.Select())
         End If
     End Sub
+
 
     ' Helper: obtiene una instancia ya embebida de un tipo de Form (si existe y no está disposed).
     Private Function BuscarInstanciaExistente(Of T As Form)() As T
