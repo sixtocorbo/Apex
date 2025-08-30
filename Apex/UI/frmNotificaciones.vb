@@ -28,16 +28,48 @@ Public Class frmNotificaciones
             .SelectionMode = DataGridViewSelectionMode.FullRowSelect
             .RowHeadersVisible = False
 
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Id", .HeaderText = "ID", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "NombreFuncionario", .HeaderText = "Funcionario", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "CI", .HeaderText = "Cédula", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "FechaProgramada", .HeaderText = "Fecha Programada", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "TipoNotificacion", .HeaderText = "Tipo", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Estado", .HeaderText = "Estado", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells})
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "Id",
+            .DataPropertyName = "Id",
+            .HeaderText = "ID",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
+            .Visible = False ' si no querés verla
+        })
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "NombreFuncionario",
+            .DataPropertyName = "NombreFuncionario",
+            .HeaderText = "Funcionario",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+        })
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "CI",
+            .DataPropertyName = "CI",
+            .HeaderText = "Cédula",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+        })
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "FechaProgramada",
+            .DataPropertyName = "FechaProgramada",
+            .HeaderText = "Fecha Programada",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+        })
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "TipoNotificacion",
+            .DataPropertyName = "TipoNotificacion",
+            .HeaderText = "Tipo",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+        })
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "Estado",
+            .DataPropertyName = "Estado",
+            .HeaderText = "Estado",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+        })
 
             .ResumeLayout()
         End With
     End Sub
+
 
 #Region "Lógica de Búsqueda"
 

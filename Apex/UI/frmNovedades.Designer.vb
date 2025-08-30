@@ -212,6 +212,7 @@ Partial Class frmNovedades
         Me.txtTextoNovedad.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.txtTextoNovedad.Multiline = True
         Me.txtTextoNovedad.Name = "txtTextoNovedad"
+        Me.txtTextoNovedad.ReadOnly = True
         Me.txtTextoNovedad.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
         Me.txtTextoNovedad.Size = New System.Drawing.Size(634, 636)
         Me.txtTextoNovedad.TabIndex = 0

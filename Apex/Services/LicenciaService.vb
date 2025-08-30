@@ -98,45 +98,113 @@ Public Class LicenciaService
             .ToList()
         End Using
     End Function
-    ''' <summary>
-    ''' Obtiene licencias usando Full-Text Search de forma correcta.
-    ''' </summary>
+
     Public Async Function GetAllConDetallesAsync(
-        Optional filtroNombre As String = "",
-        Optional fechaDesde As Date? = Nothing,
-        Optional fechaHasta As Date? = Nothing
-    ) As Task(Of List(Of vw_LicenciasCompletas))
+    Optional filtroNombre As String = "",
+    Optional fechaDesde As Date? = Nothing,
+    Optional fechaHasta As Date? = Nothing,
+    Optional tiposLicenciaIds As List(Of Integer) = Nothing,
+    Optional soloActivos As Boolean? = Nothing
+) As Task(Of List(Of LicenciaConFuncionarioExtendidoDto))
 
-        Dim sqlBuilder As New System.Text.StringBuilder("SELECT * FROM vw_LicenciasCompletas WHERE 1=1")
-        Dim parameters As New List(Of Object)
+        Dim sql As New System.Text.StringBuilder()
+        sql.AppendLine("SELECT")
+        sql.AppendLine("    v.FuncionarioId,")
+        sql.AppendLine("    tl.Id AS TipoLicenciaId,")
+        sql.AppendLine("    tl.Nombre AS TipoLicencia,")
+        sql.AppendLine("    v.FechaInicio,")
+        sql.AppendLine("    v.FechaFin,")
+        sql.AppendLine("    v.Estado AS EstadoLicencia,")
+        sql.AppendLine("    f.CI,")
+        sql.AppendLine("    f.Nombre AS NombreFuncionario,")
+        sql.AppendLine("    f.Activo,")
+        sql.AppendLine("    f.FechaIngreso,")
+        sql.AppendLine("    f.FechaNacimiento,")
+        sql.AppendLine("    f.Domicilio,")
+        sql.AppendLine("    f.Email,")
+        sql.AppendLine("    COALESCE(c.Nombre, 'N/A')  AS Cargo,")
+        sql.AppendLine("    COALESCE(tf.Nombre, 'N/A') AS TipoDeFuncionario,")
+        sql.AppendLine("    COALESCE(ecl.Nombre, 'N/A') AS Escalafon,")
+        sql.AppendLine("    COALESCE(fun.Nombre, 'N/A') AS Funcion,")
+        sql.AppendLine("    COALESCE(est.Nombre, 'N/A') AS EstadoActual,")
+        sql.AppendLine("    COALESCE(sec.Nombre, 'N/A') AS Seccion,")
+        sql.AppendLine("    COALESCE(pt.Nombre, 'N/A')  AS PuestoDeTrabajo,")
+        sql.AppendLine("    COALESCE(tur.Nombre, 'N/A') AS Turno,")
+        sql.AppendLine("    COALESCE(sem.Nombre, 'N/A') AS Semana,")
+        sql.AppendLine("    COALESCE(hor.Nombre, 'N/A') AS Horario,")
+        sql.AppendLine("    COALESCE(gen.Nombre, 'N/A') AS Genero,")
+        sql.AppendLine("    COALESCE(ec.Nombre, 'N/A')  AS EstadoCivil,")
+        sql.AppendLine("    COALESCE(ne.Nombre, 'N/A')  AS NivelDeEstudio")
+        sql.AppendLine("FROM dbo.vw_LicenciasCompletas v")
+        sql.AppendLine("JOIN dbo.Funcionario f       ON f.Id = v.FuncionarioId")
+        sql.AppendLine("JOIN dbo.TipoLicencia tl     ON tl.Id = v.TipoLicenciaId")
+        ' --- LEFT JOIN a todas las relacionales del Funcionario ---
+        sql.AppendLine("LEFT JOIN dbo.Cargo c              ON c.Id = f.CargoId")
+        sql.AppendLine("LEFT JOIN dbo.TipoFuncionario tf   ON tf.Id = f.TipoFuncionarioId")
+        sql.AppendLine("LEFT JOIN dbo.Escalafon ecl        ON ecl.Id = f.EscalafonId")
+        sql.AppendLine("LEFT JOIN dbo.Funcion fun          ON fun.Id = f.FuncionId")
+        sql.AppendLine("LEFT JOIN dbo.Estado est           ON est.Id = f.EstadoId")
+        sql.AppendLine("LEFT JOIN dbo.Seccion sec          ON sec.Id = f.SeccionId")
+        sql.AppendLine("LEFT JOIN dbo.PuestoTrabajo pt     ON pt.Id = f.PuestoTrabajoId")
+        sql.AppendLine("LEFT JOIN dbo.Turno tur            ON tur.Id = f.TurnoId")
+        sql.AppendLine("LEFT JOIN dbo.Semana sem           ON sem.Id = f.SemanaId")
+        sql.AppendLine("LEFT JOIN dbo.Horario hor          ON hor.Id = f.HorarioId")
+        sql.AppendLine("LEFT JOIN dbo.Genero gen           ON gen.Id = f.GeneroId")
+        sql.AppendLine("LEFT JOIN dbo.EstadoCivil ec       ON ec.Id = f.EstadoCivilId")
+        sql.AppendLine("LEFT JOIN dbo.NivelEstudio ne      ON ne.Id = f.NivelEstudioId")
+        sql.AppendLine("WHERE 1 = 1")
 
+        Dim parameters As New List(Of SqlClient.SqlParameter)
+
+        ' --- Rango de fechas (coincide con tu convención: fin >= desde y inicio <= hasta) ---
         If fechaDesde.HasValue Then
-            sqlBuilder.Append(" AND FechaFin >= @p0")
-            parameters.Add(New SqlParameter("@p0", fechaDesde.Value))
+            sql.AppendLine("  AND v.FechaFin >= @p0")
+            parameters.Add(New SqlClient.SqlParameter("@p0", fechaDesde.Value))
         End If
-
         If fechaHasta.HasValue Then
-            sqlBuilder.Append(" AND FechaInicio <= @p" & parameters.Count)
-            parameters.Add(New SqlParameter("@p" & parameters.Count, fechaHasta.Value))
+            Dim pname = "@p" & parameters.Count
+            sql.AppendLine($"  AND v.FechaInicio <= {pname}")
+            parameters.Add(New SqlClient.SqlParameter(pname, fechaHasta.Value))
         End If
 
-        ' --- INICIO DE LA CORRECCIÓN ---
+        ' --- Filtro FTS sobre Funcionario(Nombre, CI) ---
         If Not String.IsNullOrWhiteSpace(filtroNombre) Then
-            Dim terminos = filtroNombre.Split({" "c}, StringSplitOptions.RemoveEmptyEntries).Select(Function(w) $"""{w}*""")
+            Dim terminos = filtroNombre.Split({" "c}, StringSplitOptions.RemoveEmptyEntries) _
+                                   .Select(Function(w) $"""{w}*""")
             Dim expresionFts = String.Join(" AND ", terminos)
-
-            ' Se busca en la tabla Funcionario y se usa el resultado para filtrar la vista
-            sqlBuilder.Append($" AND FuncionarioId IN (SELECT Id FROM dbo.Funcionario WHERE CONTAINS((Nombre, CI), @p{parameters.Count}))")
-            parameters.Add(New SqlParameter($"@p{parameters.Count}", expresionFts))
+            Dim pname = "@p" & parameters.Count
+            sql.AppendLine($"  AND CONTAINS((f.Nombre, f.CI), {pname})")
+            parameters.Add(New SqlClient.SqlParameter(pname, expresionFts))
         End If
-        ' --- FIN DE LA CORRECCIÓN ---
 
-        sqlBuilder.Append(" ORDER BY FechaInicio DESC")
+        ' --- Filtro por tipos de licencia (si se suministra lista) ---
+        If tiposLicenciaIds IsNot Nothing AndAlso tiposLicenciaIds.Count > 0 Then
+            Dim marcadores As New List(Of String)
+            For i = 0 To tiposLicenciaIds.Count - 1
+                Dim pname = "@p" & parameters.Count
+                marcadores.Add(pname)
+                parameters.Add(New SqlClient.SqlParameter(pname, tiposLicenciaIds(i)))
+            Next
+            sql.AppendLine("  AND tl.Id IN (" & String.Join(",", marcadores) & ")")
+        End If
 
-        Dim query = _unitOfWork.Context.Database.SqlQuery(Of vw_LicenciasCompletas)(sqlBuilder.ToString(), parameters.ToArray())
+        ' --- Filtro por activos/inactivos (opcional) ---
+        If soloActivos.HasValue Then
+            If soloActivos.Value Then
+                sql.AppendLine("  AND f.Activo = 1")
+            Else
+                sql.AppendLine("  AND f.Activo = 0")
+            End If
+        End If
+
+        sql.AppendLine("ORDER BY v.FechaInicio DESC")
+
+        Dim query = _unitOfWork.Context.Database _
+        .SqlQuery(Of LicenciaConFuncionarioExtendidoDto)(sql.ToString(), parameters.ToArray())
+
         Return Await query.ToListAsync()
     End Function
-    ' Sobrecargamos la función para que acepte una lista de IDs de TipoLicencia
+
 
     Public Function GetAllTiposLicencia() As List(Of TipoLicencia)
         Using context As New ApexEntities()
@@ -258,3 +326,90 @@ Public Class LicenciaService
     End Function
 
 End Class
+' Ponelo en el mismo archivo (arriba) o en un DTOs.vb
+Public Class LicenciaConFuncionarioExtendidoDto
+    ' --- Licencia ---
+    Public Property LicenciaId As Integer?            ' si la vista expone Id; sino dejalo en Nothing
+    Public Property FuncionarioId As Integer
+    Public Property TipoLicenciaId As Integer?
+    Public Property TipoLicencia As String
+    Public Property FechaInicio As Date
+    Public Property FechaFin As Date
+    Public Property EstadoLicencia As String
+    Public Property Observaciones As String           ' opcional según tu vista/tabla
+
+    ' --- Funcionario (base) ---
+    Public Property CI As String
+    Public Property NombreFuncionario As String
+    Public Property Activo As Boolean
+    Public Property FechaIngreso As Date?
+    Public Property FechaNacimiento As Date?
+    Public Property Domicilio As String
+    Public Property Email As String
+
+    ' --- Relaciones: IDs + Nombres ---
+    Public Property CargoId As Integer?
+    Public Property Cargo As String
+
+    Public Property TipoFuncionarioId As Integer?
+    Public Property TipoDeFuncionario As String
+
+    Public Property EscalafonId As Integer?
+    Public Property Escalafon As String
+
+    Public Property FuncionId As Integer?
+    Public Property Funcion As String
+
+    Public Property EstadoId As Integer?
+    Public Property EstadoActual As String
+
+    Public Property SeccionId As Integer?
+    Public Property Seccion As String
+
+    Public Property PuestoTrabajoId As Integer?
+    Public Property PuestoDeTrabajo As String
+
+    Public Property TurnoId As Integer?
+    Public Property Turno As String
+
+    Public Property SemanaId As Integer?
+    Public Property Semana As String
+
+    Public Property HorarioId As Integer?
+    Public Property Horario As String
+
+    Public Property GeneroId As Integer?
+    Public Property Genero As String
+
+    Public Property EstadoCivilId As Integer?
+    Public Property EstadoCivil As String
+
+    Public Property NivelEstudioId As Integer?
+    Public Property NivelDeEstudio As String
+
+    ' --- Extras útiles para filtros/ordenación ---
+    Public ReadOnly Property AnioInicio As Integer
+        Get
+            Return FechaInicio.Year
+        End Get
+    End Property
+
+    Public ReadOnly Property MesInicio As Integer
+        Get
+            Return FechaInicio.Month
+        End Get
+    End Property
+
+    Public ReadOnly Property DuracionDias As Integer
+        Get
+            Return CInt((FechaFin.Date - FechaInicio.Date).TotalDays) + 1
+        End Get
+    End Property
+
+    Public ReadOnly Property Rango As String
+        Get
+            Return $"{FechaInicio:yyyy-MM-dd} a {FechaFin:yyyy-MM-dd}"
+        End Get
+    End Property
+End Class
+
