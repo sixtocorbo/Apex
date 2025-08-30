@@ -214,7 +214,6 @@ Partial Class frmNovedadesListas
         Me.Controls.Add(Me.dgvNovedades)
         Me.Controls.Add(Me.btnGenerarReporte)
         Me.Controls.Add(Me.GroupBox1)
-        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Name = "frmNovedadesListas"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen

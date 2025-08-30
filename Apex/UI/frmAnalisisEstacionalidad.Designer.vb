@@ -181,7 +181,6 @@ Partial Class frmAnalisisEstacionalidad
         Me.ClientSize = New System.Drawing.Size(1803, 1048)
         Me.Controls.Add(Me.PanelGrafico)
         Me.Controls.Add(Me.PanelFiltros)
-        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Name = "frmAnalisisEstacionalidad"
         Me.Text = "Análisis y Predicción de Licencias"

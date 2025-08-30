@@ -17,18 +17,18 @@ Partial Class frmAnalisisFuncionarios
 
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Dim ChartArea5 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-        Dim Legend5 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
-        Dim Title5 As System.Windows.Forms.DataVisualization.Charting.Title = New System.Windows.Forms.DataVisualization.Charting.Title()
-        Dim ChartArea6 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-        Dim Legend6 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
-        Dim Title6 As System.Windows.Forms.DataVisualization.Charting.Title = New System.Windows.Forms.DataVisualization.Charting.Title()
-        Dim ChartArea7 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-        Dim Legend7 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
-        Dim Title7 As System.Windows.Forms.DataVisualization.Charting.Title = New System.Windows.Forms.DataVisualization.Charting.Title()
-        Dim ChartArea8 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-        Dim Legend8 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
-        Dim Title8 As System.Windows.Forms.DataVisualization.Charting.Title = New System.Windows.Forms.DataVisualization.Charting.Title()
+        Dim ChartArea1 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+        Dim Legend1 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+        Dim Title1 As System.Windows.Forms.DataVisualization.Charting.Title = New System.Windows.Forms.DataVisualization.Charting.Title()
+        Dim ChartArea2 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+        Dim Legend2 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+        Dim Title2 As System.Windows.Forms.DataVisualization.Charting.Title = New System.Windows.Forms.DataVisualization.Charting.Title()
+        Dim ChartArea3 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+        Dim Legend3 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+        Dim Title3 As System.Windows.Forms.DataVisualization.Charting.Title = New System.Windows.Forms.DataVisualization.Charting.Title()
+        Dim ChartArea4 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+        Dim Legend4 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+        Dim Title4 As System.Windows.Forms.DataVisualization.Charting.Title = New System.Windows.Forms.DataVisualization.Charting.Title()
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
         Me.chartGenero = New System.Windows.Forms.DataVisualization.Charting.Chart()
         Me.chartEdad = New System.Windows.Forms.DataVisualization.Charting.Chart()
@@ -62,12 +62,12 @@ Partial Class frmAnalisisFuncionarios
         '
         'chartGenero
         '
-        ChartArea5.Name = "ChartArea1"
-        Me.chartGenero.ChartAreas.Add(ChartArea5)
+        ChartArea1.Name = "ChartArea1"
+        Me.chartGenero.ChartAreas.Add(ChartArea1)
         Me.chartGenero.Dock = System.Windows.Forms.DockStyle.Fill
-        Legend5.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom
-        Legend5.Name = "Legend1"
-        Me.chartGenero.Legends.Add(Legend5)
+        Legend1.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom
+        Legend1.Name = "Legend1"
+        Me.chartGenero.Legends.Add(Legend1)
         Me.chartGenero.Location = New System.Drawing.Point(4, 5)
         Me.chartGenero.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.chartGenero.Name = "chartGenero"
@@ -75,19 +75,19 @@ Partial Class frmAnalisisFuncionarios
         Me.chartGenero.Size = New System.Drawing.Size(893, 514)
         Me.chartGenero.TabIndex = 0
         Me.chartGenero.Text = "Chart1"
-        Title5.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Title5.Name = "Title1"
-        Title5.Text = "Distribución por Género"
-        Me.chartGenero.Titles.Add(Title5)
+        Title1.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Title1.Name = "Title1"
+        Title1.Text = "Distribución por Género"
+        Me.chartGenero.Titles.Add(Title1)
         '
         'chartEdad
         '
-        ChartArea6.Name = "ChartArea1"
-        Me.chartEdad.ChartAreas.Add(ChartArea6)
+        ChartArea2.Name = "ChartArea1"
+        Me.chartEdad.ChartAreas.Add(ChartArea2)
         Me.chartEdad.Dock = System.Windows.Forms.DockStyle.Fill
-        Legend6.Enabled = False
-        Legend6.Name = "Legend1"
-        Me.chartEdad.Legends.Add(Legend6)
+        Legend2.Enabled = False
+        Legend2.Name = "Legend1"
+        Me.chartEdad.Legends.Add(Legend2)
         Me.chartEdad.Location = New System.Drawing.Point(905, 5)
         Me.chartEdad.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.chartEdad.Name = "chartEdad"
@@ -95,19 +95,19 @@ Partial Class frmAnalisisFuncionarios
         Me.chartEdad.Size = New System.Drawing.Size(894, 514)
         Me.chartEdad.TabIndex = 1
         Me.chartEdad.Text = "Chart2"
-        Title6.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Bold)
-        Title6.Name = "Title1"
-        Title6.Text = "Distribución por Rango de Edad"
-        Me.chartEdad.Titles.Add(Title6)
+        Title2.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Bold)
+        Title2.Name = "Title1"
+        Title2.Text = "Distribución por Rango de Edad"
+        Me.chartEdad.Titles.Add(Title2)
         '
         'chartAreaTrabajo
         '
-        ChartArea7.Name = "ChartArea1"
-        Me.chartAreaTrabajo.ChartAreas.Add(ChartArea7)
+        ChartArea3.Name = "ChartArea1"
+        Me.chartAreaTrabajo.ChartAreas.Add(ChartArea3)
         Me.chartAreaTrabajo.Dock = System.Windows.Forms.DockStyle.Fill
-        Legend7.Enabled = False
-        Legend7.Name = "Legend1"
-        Me.chartAreaTrabajo.Legends.Add(Legend7)
+        Legend3.Enabled = False
+        Legend3.Name = "Legend1"
+        Me.chartAreaTrabajo.Legends.Add(Legend3)
         Me.chartAreaTrabajo.Location = New System.Drawing.Point(4, 529)
         Me.chartAreaTrabajo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.chartAreaTrabajo.Name = "chartAreaTrabajo"
@@ -115,19 +115,19 @@ Partial Class frmAnalisisFuncionarios
         Me.chartAreaTrabajo.Size = New System.Drawing.Size(893, 514)
         Me.chartAreaTrabajo.TabIndex = 2
         Me.chartAreaTrabajo.Text = "Chart3"
-        Title7.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Bold)
-        Title7.Name = "Title1"
-        Title7.Text = "Distribución por Área de Trabajo"
-        Me.chartAreaTrabajo.Titles.Add(Title7)
+        Title3.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Bold)
+        Title3.Name = "Title1"
+        Title3.Text = "Distribución por Área de Trabajo"
+        Me.chartAreaTrabajo.Titles.Add(Title3)
         '
         'chartCargo
         '
-        ChartArea8.Name = "ChartArea1"
-        Me.chartCargo.ChartAreas.Add(ChartArea8)
+        ChartArea4.Name = "ChartArea1"
+        Me.chartCargo.ChartAreas.Add(ChartArea4)
         Me.chartCargo.Dock = System.Windows.Forms.DockStyle.Fill
-        Legend8.Enabled = False
-        Legend8.Name = "Legend1"
-        Me.chartCargo.Legends.Add(Legend8)
+        Legend4.Enabled = False
+        Legend4.Name = "Legend1"
+        Me.chartCargo.Legends.Add(Legend4)
         Me.chartCargo.Location = New System.Drawing.Point(905, 529)
         Me.chartCargo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.chartCargo.Name = "chartCargo"
@@ -135,10 +135,10 @@ Partial Class frmAnalisisFuncionarios
         Me.chartCargo.Size = New System.Drawing.Size(894, 514)
         Me.chartCargo.TabIndex = 3
         Me.chartCargo.Text = "Chart4"
-        Title8.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Bold)
-        Title8.Name = "Title1"
-        Title8.Text = "Top 10 Cargos con más personal"
-        Me.chartCargo.Titles.Add(Title8)
+        Title4.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Bold)
+        Title4.Name = "Title1"
+        Title4.Text = "Top 10 Cargos con más personal"
+        Me.chartCargo.Titles.Add(Title4)
         '
         'frmAnalisisFuncionarios
         '
@@ -146,7 +146,6 @@ Partial Class frmAnalisisFuncionarios
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1803, 1048)
         Me.Controls.Add(Me.TableLayoutPanel1)
-        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Name = "frmAnalisisFuncionarios"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
