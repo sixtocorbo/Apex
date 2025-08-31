@@ -304,90 +304,123 @@ Public Module ConsultasGenericas
         Public Property Cedula As String
         Public Property NombreCompleto As String
     End Class
+
     ''' <summary>
-    ''' Devuelve un DataTable con el histórico solicitado.
+    ''' Obtiene un DataTable con el histórico de conceptos.
     ''' </summary>
-    ''' <param name="uow">Unidad de trabajo con el contexto EF.</param>
-    ''' <param name="idPolicia">ID del funcionario al que pertenecen los registros.</param>
-    ''' <param name="tipo">Tipo de histórico a consultar.</param>
+    ''' <param name="uow">Unidad de trabajo (repositorio genérico).</param>
+    ''' <param name="tipo">Tipo de histórico a consultar (Nocturnidad, Presentismo, Viaticos o Custodias).</param>
+    ''' <param name="idPolicia">ID de funcionario para filtrar; si es Nothing, se devuelven todos.</param>
     ''' <param name="anio">Año a filtrar (opcional).</param>
     ''' <param name="mes">Mes a filtrar (opcional).</param>
     Public Async Function ObtenerHistoricoDataTableAsync(
     uow As IUnitOfWork,
-    idPolicia As Integer,
     tipo As TipoHistorico,
+    Optional idPolicia As Integer? = Nothing,
     Optional anio As Integer? = Nothing,
     Optional mes As Integer? = Nothing
 ) As Task(Of DataTable)
 
         Select Case tipo
 
+        ' ----- HISTÓRICO DE NOCTURNIDAD -----
             Case TipoHistorico.Nocturnidad
                 Dim lista As IEnumerable(Of HistoricoNocturnidad)
-                If anio.HasValue AndAlso mes.HasValue Then
-                    lista = Await uow.Repository(Of HistoricoNocturnidad)() _
-                    .FindAsync(Function(h) h.FuncionarioId = idPolicia AndAlso
-                                          h.Anio = anio.Value AndAlso
-                                          h.Mes = mes.Value)
+
+                ' Filtrado por funcionario y/o por año/mes si se indican
+                If idPolicia.HasValue AndAlso anio.HasValue AndAlso mes.HasValue Then
+                    lista = Await uow.Repository(Of HistoricoNocturnidad)().FindAsync(
+                    Function(h) h.FuncionarioId = idPolicia.Value _
+                             AndAlso h.Anio = anio.Value _
+                             AndAlso h.Mes = mes.Value)
+                ElseIf idPolicia.HasValue Then
+                    lista = Await uow.Repository(Of HistoricoNocturnidad)().FindAsync(
+                    Function(h) h.FuncionarioId = idPolicia.Value)
+                ElseIf anio.HasValue AndAlso mes.HasValue Then
+                    lista = Await uow.Repository(Of HistoricoNocturnidad)().FindAsync(
+                    Function(h) h.Anio = anio.Value AndAlso h.Mes = mes.Value)
                 Else
-                    lista = Await uow.Repository(Of HistoricoNocturnidad)() _
-                    .FindAsync(Function(h) h.FuncionarioId = idPolicia)
+                    lista = Await uow.Repository(Of HistoricoNocturnidad)().GetAllByPredicateAsync(Function(h) True)
                 End If
-                Dim dt = ModuloExtensions.ToDataTable(lista)
-                ' Oculta la propiedad de navegación
+
+                Dim dt As DataTable = ModuloExtensions.ToDataTable(lista)
                 If dt.Columns.Contains("Funcionario") Then dt.Columns.Remove("Funcionario")
                 Return dt
 
+        ' ----- HISTÓRICO DE PRESENTISMO -----
             Case TipoHistorico.Presentismo
                 Dim lista As IEnumerable(Of HistoricoPresentismo)
-                If anio.HasValue AndAlso mes.HasValue Then
-                    lista = Await uow.Repository(Of HistoricoPresentismo)() _
-                    .FindAsync(Function(h) h.FuncionarioId = idPolicia AndAlso
-                                          h.Anio = anio.Value AndAlso
-                                          h.Mes = mes.Value)
+
+                If idPolicia.HasValue AndAlso anio.HasValue AndAlso mes.HasValue Then
+                    lista = Await uow.Repository(Of HistoricoPresentismo)().FindAsync(
+                    Function(h) h.FuncionarioId = idPolicia.Value _
+                             AndAlso h.Anio = anio.Value _
+                             AndAlso h.Mes = mes.Value)
+                ElseIf idPolicia.HasValue Then
+                    lista = Await uow.Repository(Of HistoricoPresentismo)().FindAsync(
+                    Function(h) h.FuncionarioId = idPolicia.Value)
+                ElseIf anio.HasValue AndAlso mes.HasValue Then
+                    lista = Await uow.Repository(Of HistoricoPresentismo)().FindAsync(
+                    Function(h) h.Anio = anio.Value AndAlso h.Mes = mes.Value)
                 Else
-                    lista = Await uow.Repository(Of HistoricoPresentismo)() _
-                    .FindAsync(Function(h) h.FuncionarioId = idPolicia)
+                    lista = Await uow.Repository(Of HistoricoPresentismo)().GetAllByPredicateAsync(Function(h) True)
                 End If
-                Dim dt = ModuloExtensions.ToDataTable(lista)
+
+                Dim dt As DataTable = ModuloExtensions.ToDataTable(lista)
                 If dt.Columns.Contains("Funcionario") Then dt.Columns.Remove("Funcionario")
                 Return dt
 
+        ' ----- HISTÓRICO DE VIÁTICOS -----
             Case TipoHistorico.Viaticos
                 Dim lista As IEnumerable(Of HistoricoViatico)
-                If anio.HasValue AndAlso mes.HasValue Then
-                    lista = Await uow.Repository(Of HistoricoViatico)() _
-                    .FindAsync(Function(h) h.FuncionarioId = idPolicia AndAlso
-                                          h.Anio = anio.Value AndAlso
-                                          h.Mes = mes.Value)
+
+                If idPolicia.HasValue AndAlso anio.HasValue AndAlso mes.HasValue Then
+                    lista = Await uow.Repository(Of HistoricoViatico)().FindAsync(
+                    Function(h) h.FuncionarioId = idPolicia.Value _
+                             AndAlso h.Anio = anio.Value _
+                             AndAlso h.Mes = mes.Value)
+                ElseIf idPolicia.HasValue Then
+                    lista = Await uow.Repository(Of HistoricoViatico)().FindAsync(
+                    Function(h) h.FuncionarioId = idPolicia.Value)
+                ElseIf anio.HasValue AndAlso mes.HasValue Then
+                    lista = Await uow.Repository(Of HistoricoViatico)().FindAsync(
+                    Function(h) h.Anio = anio.Value AndAlso h.Mes = mes.Value)
                 Else
-                    lista = Await uow.Repository(Of HistoricoViatico)() _
-                    .FindAsync(Function(h) h.FuncionarioId = idPolicia)
+                    lista = Await uow.Repository(Of HistoricoViatico)().GetAllByPredicateAsync(Function(h) True)
                 End If
-                Dim dt = ModuloExtensions.ToDataTable(lista)
+
+                Dim dt As DataTable = ModuloExtensions.ToDataTable(lista)
                 If dt.Columns.Contains("Funcionario") Then dt.Columns.Remove("Funcionario")
                 Return dt
 
+        ' ----- HISTÓRICO DE CUSTODIAS -----
             Case TipoHistorico.Custodias
                 Dim lista As IEnumerable(Of HistoricoCustodia)
-                If anio.HasValue AndAlso mes.HasValue Then
-                    ' Para custodias se filtra por Año y Mes de la fecha
-                    lista = Await uow.Repository(Of HistoricoCustodia)() _
-                    .FindAsync(Function(h) h.FuncionarioId = idPolicia AndAlso
-                                          h.Fecha.Year = anio.Value AndAlso
-                                          h.Fecha.Month = mes.Value)
+
+                If idPolicia.HasValue AndAlso anio.HasValue AndAlso mes.HasValue Then
+                    lista = Await uow.Repository(Of HistoricoCustodia)().FindAsync(
+                    Function(h) h.FuncionarioId = idPolicia.Value _
+                             AndAlso h.Fecha.Year = anio.Value _
+                             AndAlso h.Fecha.Month = mes.Value)
+                ElseIf idPolicia.HasValue Then
+                    lista = Await uow.Repository(Of HistoricoCustodia)().FindAsync(
+                    Function(h) h.FuncionarioId = idPolicia.Value)
+                ElseIf anio.HasValue AndAlso mes.HasValue Then
+                    lista = Await uow.Repository(Of HistoricoCustodia)().FindAsync(
+                    Function(h) h.Fecha.Year = anio.Value AndAlso h.Fecha.Month = mes.Value)
                 Else
-                    lista = Await uow.Repository(Of HistoricoCustodia)() _
-                    .FindAsync(Function(h) h.FuncionarioId = idPolicia)
+                    lista = Await uow.Repository(Of HistoricoCustodia)().GetAllByPredicateAsync(Function(h) True)
                 End If
-                Dim dt = ModuloExtensions.ToDataTable(lista)
+
+                Dim dt As DataTable = ModuloExtensions.ToDataTable(lista)
                 If dt.Columns.Contains("Funcionario") Then dt.Columns.Remove("Funcionario")
                 Return dt
 
             Case Else
-                ' Si se pasa un tipo no contemplado, devuelve una tabla vacía
+                ' Si llega un tipo no reconocido, se devuelve un DataTable vacío
                 Return New DataTable()
 
         End Select
+
     End Function
 End Module
