@@ -1,6 +1,4 @@
-﻿' Archivo: sixtocorbo/apex/Apex-0de320c5ad8f21b48a295ddfce12e6266297c13c/Apex/UI/frmFuncionarioSituacion.vb
-
-Imports System.Data.Entity
+﻿Imports System.Data.Entity
 Imports System.Globalization
 Imports System.Text
 
@@ -21,13 +19,15 @@ Public Class frmFuncionarioSituacion
 
     Private Async Sub frmFuncionarioSituacion_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
+
+        ' Handlers UI
         AddHandler btnGenerar.Click, AddressOf btnGenerar_Click
         AddHandler dgvNovedades.CellDoubleClick, AddressOf dgvNovedades_CellDoubleClick
         AddHandler dgvEstados.CellFormatting, AddressOf dgvEstados_CellFormatting
         AddHandler dgvNovedades.DataBindingComplete, AddressOf DgvNovedades_DataBindingComplete
         AddHandler dgvEstados.DataBindingComplete, AddressOf DgvEstados_DataBindingComplete
 
-        ' Establecer un rango de fechas por defecto (ej. el año actual)
+        ' Rango por defecto: año actual
         dtpDesde.Value = New Date(Date.Now.Year, 1, 1)
         dtpHasta.Value = New Date(Date.Now.Year, 12, 31)
 
@@ -46,7 +46,7 @@ Public Class frmFuncionarioSituacion
 
             lblNombre.Text = $"Situación de: {_funcionario.Nombre} ({_funcionario.CI})"
 
-            ' Cargar TODAS las novedades y estados del funcionario una sola vez
+            ' Cargar todo una vez (carga ansiosa)
             _todosLosEstados = Await _uow.Repository(Of EstadoTransitorio)().GetAll().
                 Include(Function(et) et.TipoEstadoTransitorio).
                 Include(Function(et) et.DesignacionDetalle).
@@ -56,14 +56,16 @@ Public Class frmFuncionarioSituacion
                 Include(Function(et) et.RetenDetalle).
                 Include(Function(et) et.SumarioDetalle).
                 Where(Function(et) et.FuncionarioId = _funcionarioId).
+                AsNoTracking().
                 ToListAsync()
 
             _todasLasNovedades = Await _uow.Context.Set(Of vw_NovedadesCompletas)().
                 Where(Function(n) n.FuncionarioId = _funcionario.Id).
                 OrderBy(Function(n) n.Fecha).
+                AsNoTracking().
                 ToListAsync()
 
-            ' Generar el timeline inicial con el rango por defecto
+            ' Generar vista inicial con el rango por defecto
             btnGenerar.PerformClick()
 
         Catch ex As Exception
@@ -84,20 +86,24 @@ Public Class frmFuncionarioSituacion
 
         GenerarTimeline(fechaInicio, fechaFin)
         PoblarGrillaEstados(fechaInicio, fechaFin)
+
+        ' Si hay días, seleccionar el primero automáticamente
+        SeleccionarPrimerDiaSiExiste()
     End Sub
 
     Private Sub GenerarTimeline(fechaInicio As Date, fechaFin As Date)
+        flpTimeline.SuspendLayout()
         flpTimeline.Controls.Clear()
         _selectedTimelineButton = Nothing
         dgvNovedades.DataSource = Nothing
 
-        ' Obtener fechas únicas con novedades en el rango
+        ' Fechas con novedades en el rango
         Dim fechasConNovedades = _todasLasNovedades.
             Where(Function(n) n.Fecha.Date >= fechaInicio AndAlso n.Fecha.Date <= fechaFin).
             Select(Function(n) n.Fecha.Date).
             Distinct()
 
-        ' Obtener fechas únicas de inicio/fin de estados en el rango
+        ' Fechas con estados (inicios/fin) en el rango
         Dim fechasConEstados = New List(Of Date)
         For Each estado In _todosLosEstados
             Dim desde As Date? = Nothing
@@ -114,7 +120,6 @@ Public Class frmFuncionarioSituacion
             If hasta.HasValue AndAlso hasta.Value.Date >= fechaInicio AndAlso hasta.Value.Date <= fechaFin Then fechasConEstados.Add(hasta.Value.Date)
         Next
 
-        ' Combinar todas las fechas, ordenarlas y eliminar duplicados
         Dim todasLasFechas = fechasConNovedades.Union(fechasConEstados).Distinct().OrderBy(Function(d) d).ToList()
 
         If Not todasLasFechas.Any() Then
@@ -124,6 +129,7 @@ Public Class frmFuncionarioSituacion
                 .Margin = New Padding(10)
             }
             flpTimeline.Controls.Add(lblEmpty)
+            flpTimeline.ResumeLayout()
             Return
         End If
 
@@ -131,21 +137,32 @@ Public Class frmFuncionarioSituacion
             Dim btnDia As New Button With {
                 .Text = fecha.ToString("dd MMM yyyy"),
                 .Tag = fecha,
-                .Size = New Size(220, 30),
+                .Width = flpTimeline.ClientSize.Width - 20, ' margen de padding
+                .Height = 30,
                 .FlatStyle = FlatStyle.Flat,
-                .TextAlign = ContentAlignment.MiddleLeft
+                .TextAlign = ContentAlignment.MiddleLeft,
+                .Margin = New Padding(0, 0, 0, 6)
             }
             btnDia.FlatAppearance.BorderSize = 1
             AddHandler btnDia.Click, AddressOf TimelineDia_Click
             flpTimeline.Controls.Add(btnDia)
         Next
+
+        flpTimeline.ResumeLayout()
+    End Sub
+
+    Private Sub SeleccionarPrimerDiaSiExiste()
+        Dim firstBtn = flpTimeline.Controls.OfType(Of Button)().FirstOrDefault()
+        If firstBtn IsNot Nothing Then
+            TimelineDia_Click(firstBtn, EventArgs.Empty)
+        End If
     End Sub
 
     Private Sub TimelineDia_Click(sender As Object, e As EventArgs)
         Dim clickedButton = CType(sender, Button)
         Dim fechaSeleccionada = CType(clickedButton.Tag, Date)
 
-        ' Resaltar el botón seleccionado
+        ' Resaltar seleccionado
         If _selectedTimelineButton IsNot Nothing Then
             _selectedTimelineButton.BackColor = SystemColors.Control
             _selectedTimelineButton.ForeColor = SystemColors.ControlText
@@ -154,7 +171,7 @@ Public Class frmFuncionarioSituacion
         clickedButton.ForeColor = SystemColors.HighlightText
         _selectedTimelineButton = clickedButton
 
-        ' Actualizar la grilla de novedades
+        ' Actualizar novedades del día
         ActualizarVistaDeNovedades(fechaSeleccionada)
     End Sub
 
@@ -169,16 +186,26 @@ Public Class frmFuncionarioSituacion
     End Sub
 
     Private Sub ConfigurarGrillaNovedades()
-        If dgvNovedades.Columns.Contains("Fecha") Then Return
-        dgvNovedades.AutoGenerateColumns = False
-        Dim colFecha As New DataGridViewTextBoxColumn With {
-            .DataPropertyName = "Fecha", .HeaderText = "Fecha", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-        }
-        colFecha.DefaultCellStyle.Format = "dd/MM/yyyy"
-        dgvNovedades.Columns.Add(colFecha)
-        dgvNovedades.Columns.Add(New DataGridViewTextBoxColumn With {
-            .DataPropertyName = "Texto", .HeaderText = "Novedad", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-        })
+        If dgvNovedades.Columns.Count = 0 OrElse Not dgvNovedades.Columns.Contains("Fecha") Then
+            dgvNovedades.AutoGenerateColumns = False
+            dgvNovedades.Columns.Clear()
+
+            Dim colFecha As New DataGridViewTextBoxColumn With {
+                .Name = "Fecha",
+                .DataPropertyName = "Fecha",
+                .HeaderText = "Fecha",
+                .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            }
+            colFecha.DefaultCellStyle.Format = "dd/MM/yyyy"
+            dgvNovedades.Columns.Add(colFecha)
+
+            dgvNovedades.Columns.Add(New DataGridViewTextBoxColumn With {
+                .Name = "Texto",
+                .DataPropertyName = "Texto",
+                .HeaderText = "Novedad",
+                .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+            })
+        End If
     End Sub
 #End Region
 
@@ -196,7 +223,7 @@ Public Class frmFuncionarioSituacion
                     Case 5 : desde = s.RetenDetalle?.FechaReten
                     Case 6 : desde = s.SumarioDetalle?.FechaDesde : hasta = s.SumarioDetalle?.FechaHasta
                 End Select
-                ' Lógica para verificar si el rango del estado se superpone con el rango seleccionado
+
                 If Not desde.HasValue Then Return False
                 Dim rangoEstadoFin = If(hasta, desde.Value)
                 Return desde.Value <= fechaFin AndAlso rangoEstadoFin >= fechaInicio
@@ -214,26 +241,49 @@ Public Class frmFuncionarioSituacion
                                                          Case 6 : desde = s.SumarioDetalle?.FechaDesde : hasta = s.SumarioDetalle?.FechaHasta
                                                      End Select
                                                      Return New With {
-                                                       .Tipo = s.TipoEstadoTransitorio.Nombre,
-                                                       .Desde = desde,
-                                                       .Hasta = hasta,
-                                                       .Entity = s
+                                                         .Tipo = s.TipoEstadoTransitorio.Nombre,
+                                                         .Desde = desde,
+                                                         .Hasta = hasta,
+                                                         .Entity = s
                                                      }
-                                                 End Function).OrderBy(Function(x) x.Desde).ToList()
+                                                 End Function).
+                                                 OrderBy(Function(x) x.Desde).
+                                                 ToList()
+
         dgvEstados.DataSource = dataSource
         ConfigurarGrillaEstados()
     End Sub
 
     Private Sub ConfigurarGrillaEstados()
-        If dgvEstados.Columns.Contains("Tipo") Then Return
-        dgvEstados.AutoGenerateColumns = False
-        dgvEstados.Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Tipo", .HeaderText = "Tipo de Estado", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells})
-        Dim colDesde As New DataGridViewTextBoxColumn With {.DataPropertyName = "Desde", .HeaderText = "Fecha Desde", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells}
-        colDesde.DefaultCellStyle.Format = "dd/MM/yyyy"
-        dgvEstados.Columns.Add(colDesde)
-        Dim colHasta As New DataGridViewTextBoxColumn With {.DataPropertyName = "Hasta", .HeaderText = "Fecha Hasta", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells}
-        colHasta.DefaultCellStyle.Format = "dd/MM/yyyy"
-        dgvEstados.Columns.Add(colHasta)
+        If dgvEstados.Columns.Count = 0 OrElse Not dgvEstados.Columns.Contains("Tipo") Then
+            dgvEstados.AutoGenerateColumns = False
+            dgvEstados.Columns.Clear()
+
+            dgvEstados.Columns.Add(New DataGridViewTextBoxColumn With {
+                .Name = "Tipo",
+                .DataPropertyName = "Tipo",
+                .HeaderText = "Tipo de Estado",
+                .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            })
+
+            Dim colDesde As New DataGridViewTextBoxColumn With {
+                .Name = "Desde",
+                .DataPropertyName = "Desde",
+                .HeaderText = "Fecha Desde",
+                .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            }
+            colDesde.DefaultCellStyle.Format = "dd/MM/yyyy"
+            dgvEstados.Columns.Add(colDesde)
+
+            Dim colHasta As New DataGridViewTextBoxColumn With {
+                .Name = "Hasta",
+                .DataPropertyName = "Hasta",
+                .HeaderText = "Fecha Hasta",
+                .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            }
+            colHasta.DefaultCellStyle.Format = "dd/MM/yyyy"
+            dgvEstados.Columns.Add(colHasta)
+        End If
     End Sub
 #End Region
 
@@ -258,18 +308,20 @@ Public Class frmFuncionarioSituacion
         If e.RowIndex < 0 Then Return
         Dim dgv = CType(sender, DataGridView)
         Dim rowData = dgv.Rows(e.RowIndex).DataBoundItem
-        Dim estado As EstadoTransitorio = rowData.GetType().GetProperty("Entity").GetValue(rowData, Nothing)
-        If estado IsNot Nothing Then
-            Select Case estado.TipoEstadoTransitorioId
-                Case 1 : e.CellStyle.BackColor = Color.LightSkyBlue
-                Case 2 : e.CellStyle.BackColor = Color.LightCoral
-                Case 3 : e.CellStyle.BackColor = Color.Khaki
-                Case 4 : e.CellStyle.BackColor = Color.Plum
-                Case 5 : e.CellStyle.BackColor = Color.LightGray
-                Case 6 : e.CellStyle.BackColor = Color.LightSalmon
-                Case Else : e.CellStyle.BackColor = Color.White
-            End Select
-        End If
+        If rowData Is Nothing Then Return
+
+        Dim estado As EstadoTransitorio = TryCast(rowData.GetType().GetProperty("Entity")?.GetValue(rowData, Nothing), EstadoTransitorio)
+        If estado Is Nothing Then Return
+
+        Select Case estado.TipoEstadoTransitorioId
+            Case 1 : e.CellStyle.BackColor = Color.LightSkyBlue     ' Designación
+            Case 2 : e.CellStyle.BackColor = Color.LightCoral       ' Enfermedad
+            Case 3 : e.CellStyle.BackColor = Color.Khaki            ' Sanción
+            Case 4 : e.CellStyle.BackColor = Color.Plum             ' Orden Cinco
+            Case 5 : e.CellStyle.BackColor = Color.LightGray        ' Retén
+            Case 6 : e.CellStyle.BackColor = Color.LightSalmon      ' Sumario
+            Case Else : e.CellStyle.BackColor = Color.White
+        End Select
     End Sub
 
     Private Sub DgvNovedades_DataBindingComplete(sender As Object, e As DataGridViewBindingCompleteEventArgs)
@@ -283,11 +335,10 @@ Public Class frmFuncionarioSituacion
     End Sub
 
     Private Sub Cerrando(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
-
         If e.KeyCode = Keys.Escape Then
             Me.Close()
         End If
     End Sub
-
 #End Region
+
 End Class
