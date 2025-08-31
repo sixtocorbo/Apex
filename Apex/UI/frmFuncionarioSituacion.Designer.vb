@@ -138,6 +138,8 @@ Partial Class frmFuncionarioSituacion
         '
         Me.dgvEstados.AllowUserToAddRows = False
         Me.dgvEstados.AllowUserToDeleteRows = False
+        Me.dgvEstados.AllowUserToResizeColumns = False
+        Me.dgvEstados.AllowUserToResizeRows = False
         Me.dgvEstados.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill
         Me.dgvEstados.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         DataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
@@ -175,6 +177,8 @@ Partial Class frmFuncionarioSituacion
         '
         Me.dgvNovedades.AllowUserToAddRows = False
         Me.dgvNovedades.AllowUserToDeleteRows = False
+        Me.dgvNovedades.AllowUserToResizeColumns = False
+        Me.dgvNovedades.AllowUserToResizeRows = False
         Me.dgvNovedades.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill
         Me.dgvNovedades.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         DataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
