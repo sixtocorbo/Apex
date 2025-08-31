@@ -33,25 +33,47 @@ Public Class FuncionarioService
         FirstOrDefaultAsync(Function(f) f.Id = id)
     End Function
 
-    Public Async Function GetFuncionariosParaVistaAsync() As Task(Of List(Of Object))
+    Public Async Function GetFuncionariosParaVistaAsync(
+    Optional fecha As Date? = Nothing,
+    Optional incluirSoloConPresencia As Boolean = False,
+    Optional ordenarComoPersonal As Boolean = False
+) As Task(Of List(Of Object))
         Using uow As New UnitOfWork()
-            ' Obtener presencias y guardarlas en un diccionario para acceso O(1).
-            Dim pFecha = New SqlParameter("@Fecha", Date.Today)
+
+            ' 1) Fecha para presencia (hoy si no viene)
+            Dim ffecha = If(fecha.HasValue, fecha.Value.Date, Date.Today)
+            Dim pFecha = New SqlParameter("@Fecha", ffecha)
+
+            ' 2) Ejecutar SP de presencias (Apex: FuncionarioId, Resultado) y tolerar duplicados
             Dim presenciasList = Await uow.Context.Database _
             .SqlQuery(Of PresenciaDTO)("EXEC dbo.usp_PresenciaFecha_Apex @Fecha", pFecha) _
             .ToListAsync()
-            Dim presenciasDict = presenciasList.ToDictionary(Function(p) p.FuncionarioId, Function(p) p.Resultado)
 
-            ' Seleccionar sólo los campos necesarios; sin usar Include(), EF generará las uniones apropiadas.
-            Dim funcionarios = Await uow.Repository(Of Funcionario)().GetAll().AsNoTracking() _
+            Dim presenciasDict As Dictionary(Of Integer, String) =
+            presenciasList _
+                .GroupBy(Function(p) p.FuncionarioId) _
+                .ToDictionary(Function(g) g.Key, Function(g) g.First().Resultado)
+
+            ' 3) Base de funcionarios SIN prefiltrado (activos/inactivos, todos)
+            '    Uso el DbSet directo para evitar cualquier filtro implícito del repositorio.
+            Dim q = uow.Context.Set(Of Funcionario)().AsNoTracking().AsQueryable()
+
+            ' (Opcional) si querés traer SOLO los que aparecen en el SP (comportamiento del sistema anterior):
+            If incluirSoloConPresencia AndAlso presenciasDict.Count > 0 Then
+                Dim ids = presenciasDict.Keys.ToList()
+                q = q.Where(Function(f) ids.Contains(f.Id))
+            End If
+
+            ' 4) Proyección: mismos campos que ya usás (nada extra)
+            Dim funcionarios = Await q _
             .Select(Function(f) New With {
-                f.Id,
+                .Id = f.Id,
                 .NombreCompleto = f.Nombre,
                 .Cedula = f.CI,
-                f.FechaIngreso,
-                f.Activo,
+                .FechaIngreso = f.FechaIngreso,
+                .Activo = f.Activo,
                 .CorreoElectronico = f.Email,
-                f.FechaNacimiento,
+                .FechaNacimiento = f.FechaNacimiento,
                 .Domicilio = f.Domicilio,
                 .Cargo = If(f.Cargo IsNot Nothing, f.Cargo.Nombre, "N/A"),
                 .TipoDeFuncionario = If(f.TipoFuncionario IsNot Nothing, f.TipoFuncionario.Nombre, "N/A"),
@@ -69,8 +91,9 @@ Public Class FuncionarioService
             }) _
             .ToListAsync()
 
-            ' Asignar presencia utilizando el diccionario
-            Dim resultado = funcionarios.Select(Function(f) New With {
+            ' 5) Superponer presencia SIN excluir a nadie
+            Dim mezclado = funcionarios.Select(Function(f) New With {
+            f.Id,
             f.NombreCompleto,
             f.Cedula,
             f.FechaIngreso,
@@ -92,11 +115,25 @@ Public Class FuncionarioService
             f.EstadoCivil,
             f.NivelDeEstudio,
             .Presencia = If(presenciasDict.ContainsKey(f.Id), presenciasDict(f.Id), "-")
-        }).ToList()
+        })
 
-            Return resultado.Cast(Of Object).ToList()
+            ' 6) Orden: por defecto nada especial; si querés emular el viejo (Sección, Resultado desc):
+            Dim resultado As IEnumerable(Of Object)
+            If ordenarComoPersonal Then
+                resultado = mezclado _
+                .OrderBy(Function(x) x.Seccion) _
+                .ThenByDescending(Function(x) x.Presencia) _
+                .Cast(Of Object)()
+            Else
+                resultado = mezclado.Cast(Of Object)()
+            End If
+
+            Return resultado.ToList()
         End Using
     End Function
+
+
+
 
     ' --- Métodos para poblar los ComboBox (Catálogos) ---
     Public Async Function ObtenerCargosAsync() As Task(Of List(Of KeyValuePair(Of Integer, String)))
@@ -178,41 +215,6 @@ Public Class FuncionarioService
         Return Await _unitOfWork.Repository(Of TipoEstadoTransitorio)().
         GetAll().OrderBy(Function(t) t.Nombre).
             ToListAsync()
-    End Function
-    Public Async Function BuscarConFiltrosDinamicosAsync(
-       textoLibre As String,
-       filtros As Dictionary(Of String, String)
-   ) As Task(Of List(Of FuncionarioVistaDTO))
-
-        Dim query = _unitOfWork.Repository(Of Funcionario)().GetAll().AsNoTracking()
-
-        If Not String.IsNullOrWhiteSpace(textoLibre) Then
-            Dim palabrasLibres = textoLibre.Split({" "c}, StringSplitOptions.RemoveEmptyEntries)
-            For Each palabra In palabrasLibres
-                query = query.Where(Function(f) f.Nombre.Contains(palabra) Or f.CI.Contains(palabra))
-            Next
-        End If
-
-        For Each filtro In filtros
-            Select Case filtro.Key.ToLower()
-                Case "cargo"
-                    query = query.Where(Function(f) f.Cargo IsNot Nothing AndAlso f.Cargo.Nombre.Contains(filtro.Value))
-                Case "ci"
-                    query = query.Where(Function(f) f.CI.Contains(filtro.Value))
-                Case "activo"
-                    Dim esActivo As Boolean = (filtro.Value.ToLower() = "si" OrElse filtro.Value.ToLower() = "true")
-                    query = query.Where(Function(f) f.Activo = esActivo)
-            End Select
-        Next
-
-        Return Await query.Select(Function(f) New FuncionarioVistaDTO With {
-            .Id = f.Id,
-            .CI = f.CI,
-            .Nombre = f.Nombre,
-            .CargoNombre = If(f.Cargo IsNot Nothing, f.Cargo.Nombre, "N/A"),
-            .Activo = f.Activo
-        }).OrderBy(Function(f) f.Nombre).Take(500).ToListAsync()
-
     End Function
 
     Public Async Function ObtenerTiposEstadoTransitorioAsync() As Task(Of List(Of KeyValuePair(Of Integer, String)))

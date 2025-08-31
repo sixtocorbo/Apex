@@ -11,6 +11,7 @@ Public Class frmNomenclaturas
         Await CargarDatosAsync()
         ConfigurarGrilla()
         LimpiarCampos()
+        AppTheme.Aplicar(Me)
         Me.Cursor = Cursors.Default
     End Sub
 

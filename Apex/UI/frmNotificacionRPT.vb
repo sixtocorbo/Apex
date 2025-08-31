@@ -17,6 +17,7 @@ Public Class frmNotificacionRPT
 
     Private Async Sub frmNotificacionRPT_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Await CargarReporteAsync()
+        AppTheme.Aplicar(Me)
     End Sub
 
     Private Async Function CargarReporteAsync() As Task

@@ -12,6 +12,7 @@ Public Class frmNovedadesListas
     End Sub
 
     Private Sub frmReporteNovedades_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        AppTheme.Aplicar(Me)
         ' Configuración inicial de los controles de fecha
         dtpFechaDesde.Value = DateTime.Now.AddMonths(-1)
         dtpFechaHasta.Value = DateTime.Now

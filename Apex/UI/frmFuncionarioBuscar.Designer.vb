@@ -30,8 +30,8 @@ Partial Class frmFuncionarioBuscar
         Me.splitContenedor = New System.Windows.Forms.SplitContainer()
         Me.dgvResultados = New System.Windows.Forms.DataGridView()
         Me.panelDetalle = New System.Windows.Forms.Panel()
-        Me.btnGenerarFicha = New System.Windows.Forms.Button()
         Me.btnVerSituacion = New System.Windows.Forms.Button()
+        Me.btnGenerarFicha = New System.Windows.Forms.Button()
         Me.lblEstadoActividad = New System.Windows.Forms.Label()
         Me.lblHorarioCompleto = New System.Windows.Forms.Label()
         Me.lblHorarioCompletoHeader = New System.Windows.Forms.Label()
@@ -142,8 +142,8 @@ Partial Class frmFuncionarioBuscar
         'panelDetalle
         '
         Me.panelDetalle.BackColor = System.Drawing.Color.White
-        Me.panelDetalle.Controls.Add(Me.btnGenerarFicha)
         Me.panelDetalle.Controls.Add(Me.btnVerSituacion)
+        Me.panelDetalle.Controls.Add(Me.btnGenerarFicha)
         Me.panelDetalle.Controls.Add(Me.lblEstadoActividad)
         Me.panelDetalle.Controls.Add(Me.lblHorarioCompleto)
         Me.panelDetalle.Controls.Add(Me.lblHorarioCompletoHeader)
@@ -166,6 +166,18 @@ Partial Class frmFuncionarioBuscar
         Me.panelDetalle.Size = New System.Drawing.Size(1090, 958)
         Me.panelDetalle.TabIndex = 0
         '
+        'btnVerSituacion
+        '
+        Me.btnVerSituacion.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnVerSituacion.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.btnVerSituacion.Location = New System.Drawing.Point(34, 853)
+        Me.btnVerSituacion.Name = "btnVerSituacion"
+        Me.btnVerSituacion.Size = New System.Drawing.Size(250, 38)
+        Me.btnVerSituacion.TabIndex = 17
+        Me.btnVerSituacion.Text = "Ver Situación"
+        Me.btnVerSituacion.UseVisualStyleBackColor = True
+        Me.btnVerSituacion.Visible = False
+        '
         'btnGenerarFicha
         '
         Me.btnGenerarFicha.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
@@ -177,18 +189,6 @@ Partial Class frmFuncionarioBuscar
         Me.btnGenerarFicha.Text = "Ficha"
         Me.btnGenerarFicha.UseVisualStyleBackColor = True
         Me.btnGenerarFicha.Visible = False
-        '
-        'btnVerSituacion
-        '
-        Me.btnVerSituacion.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnVerSituacion.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.btnVerSituacion.Location = New System.Drawing.Point(34, 853)
-        Me.btnVerSituacion.Name = "btnVerSituacion"
-        Me.btnVerSituacion.Size = New System.Drawing.Size(250, 38)
-        Me.btnVerSituacion.TabIndex = 15
-        Me.btnVerSituacion.Text = "Ver Situación"
-        Me.btnVerSituacion.UseVisualStyleBackColor = True
-        Me.btnVerSituacion.Visible = False
         '
         'lblEstadoActividad
         '
@@ -454,6 +454,6 @@ Partial Class frmFuncionarioBuscar
     Friend WithEvents lblHorarioCompleto As Label
     Friend WithEvents lblHorarioCompletoHeader As Label
     Friend WithEvents lblEstadoActividad As Label
-    Friend WithEvents btnVerSituacion As Button
     Friend WithEvents btnGenerarFicha As Button
+    Friend WithEvents btnVerSituacion As Button
 End Class

@@ -76,4 +76,7 @@ Public Class frmConfiguracion
         parentDashboard.AbrirFormEnPanel(_gestionCategoriasAusenciaInstancia)
     End Sub
 
+    Private Sub frmConfiguracion_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        AppTheme.Aplicar(Me)
+    End Sub
 End Class

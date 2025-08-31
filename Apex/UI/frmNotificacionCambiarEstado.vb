@@ -16,6 +16,7 @@ Public Class frmNotificacionCambiarEstado
     ' --- FIN DE LA CORRECCIÓN ---
 
     Private Async Sub frmCambiarEstadoNotificacion_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        AppTheme.Aplicar(Me)
         _svc = New NotificacionService()
         Await CargarCombosAsync()
 

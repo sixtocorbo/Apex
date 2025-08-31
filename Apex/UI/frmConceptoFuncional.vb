@@ -111,4 +111,7 @@ Public Class frmConceptoFuncional
         )
     End Sub
 
+    Private Sub frmConceptoFuncional_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        AppTheme.Aplicar(Me)
+    End Sub
 End Class

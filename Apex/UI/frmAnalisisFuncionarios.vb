@@ -4,6 +4,7 @@ Public Class frmAnalisisFuncionarios
     Private _funcionarioService As New FuncionarioService()
 
     Private Sub frmAnalisisFuncionarios_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        AppTheme.Aplicar(Me)
         CargarGraficos()
     End Sub
 

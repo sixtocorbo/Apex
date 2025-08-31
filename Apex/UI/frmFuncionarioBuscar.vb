@@ -44,13 +44,16 @@ Public Class frmFuncionarioBuscar
     End Sub
 
     Private Sub frmFuncionarioBuscar_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        ' Este botón indica estado prioritario: que no cambie de color al pasar el mouse
+        btnVerSituacion.Tag = "KeepBackColor"
+
         AppTheme.Aplicar(Me)
         ConfigurarGrilla()
         AddHandler btnVerSituacion.Click, AddressOf btnVerSituacion_Click
         AddHandler btnGenerarFicha.Click, AddressOf btnGenerarFicha_Click
-        ' Nos suscribimos al evento para que la grilla se refresque sola cuando haya cambios.
         AddHandler NotificadorEventos.DatosActualizados, AddressOf OnDatosActualizados
     End Sub
+
 
     ''' <summary>
     ''' Este método se ejecutará automáticamente cuando otro formulario notifique un cambio.
@@ -403,6 +406,8 @@ Public Class frmFuncionarioBuscar
         Public Property FuncionarioId As Integer
         Public Property Resultado As String
     End Class
+
+
 #End Region
 
 End Class

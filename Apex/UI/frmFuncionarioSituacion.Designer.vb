@@ -28,24 +28,26 @@ Partial Class frmFuncionarioSituacion
         Me.btnGenerar = New System.Windows.Forms.Button()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
-        Me.flpTimeline = New System.Windows.Forms.FlowLayoutPanel()
-        Me.SplitContainerRight = New System.Windows.Forms.SplitContainer()
-        Me.gbxEstados = New System.Windows.Forms.GroupBox()
+        Me.grpEstados = New System.Windows.Forms.GroupBox()
         Me.dgvEstados = New System.Windows.Forms.DataGridView()
-        Me.gbxNovedades = New System.Windows.Forms.GroupBox()
+        Me.SplitContainerRight = New System.Windows.Forms.SplitContainer()
+        Me.grpNovedades = New System.Windows.Forms.GroupBox()
         Me.dgvNovedades = New System.Windows.Forms.DataGridView()
+        Me.grpFechas = New System.Windows.Forms.GroupBox()
+        Me.flpTimeline = New System.Windows.Forms.FlowLayoutPanel()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
         Me.SplitContainer1.SuspendLayout()
+        Me.grpEstados.SuspendLayout()
+        CType(Me.dgvEstados, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.SplitContainerRight, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainerRight.Panel1.SuspendLayout()
         Me.SplitContainerRight.Panel2.SuspendLayout()
         Me.SplitContainerRight.SuspendLayout()
-        Me.gbxEstados.SuspendLayout()
-        CType(Me.dgvEstados, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.gbxNovedades.SuspendLayout()
+        Me.grpNovedades.SuspendLayout()
         CType(Me.dgvNovedades, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.grpFechas.SuspendLayout()
         Me.SuspendLayout()
         '
         'lblNombre
@@ -106,41 +108,68 @@ Partial Class frmFuncionarioSituacion
         Me.btnGenerar.TabIndex = 6
         Me.btnGenerar.Text = "Generar"
         Me.btnGenerar.UseVisualStyleBackColor = True
+        Me.btnGenerar.Visible = False ' se oculta (actualización automática por cambio de fechas)
         '
         'SplitContainer1
         '
         Me.SplitContainer1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.SplitContainer1.Location = New System.Drawing.Point(18, 122)
+        Me.SplitContainer1.Location = New System.Drawing.Point(24, 110)
         Me.SplitContainer1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.SplitContainer1.Name = "SplitContainer1"
         '
         'SplitContainer1.Panel1
         '
-        Me.SplitContainer1.Panel1.Controls.Add(Me.flpTimeline)
+        Me.SplitContainer1.Panel1.Controls.Add(Me.grpEstados)
         '
         'SplitContainer1.Panel2
         '
         Me.SplitContainer1.Panel2.Controls.Add(Me.SplitContainerRight)
-        Me.SplitContainer1.Size = New System.Drawing.Size(1164, 552)
-        Me.SplitContainer1.SplitterDistance = 360
+        Me.SplitContainer1.Size = New System.Drawing.Size(668, 429)
+        Me.SplitContainer1.SplitterDistance = 379
         Me.SplitContainer1.SplitterWidth = 6
         Me.SplitContainer1.TabIndex = 3
         '
-        'flpTimeline
+        'grpEstados
         '
-        Me.flpTimeline.AutoScroll = True
-        Me.flpTimeline.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.flpTimeline.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.flpTimeline.FlowDirection = System.Windows.Forms.FlowDirection.TopDown
-        Me.flpTimeline.Location = New System.Drawing.Point(0, 0)
-        Me.flpTimeline.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.flpTimeline.Name = "flpTimeline"
-        Me.flpTimeline.Padding = New System.Windows.Forms.Padding(8)
-        Me.flpTimeline.Size = New System.Drawing.Size(360, 552)
-        Me.flpTimeline.TabIndex = 0
-        Me.flpTimeline.WrapContents = False
+        Me.grpEstados.Controls.Add(Me.dgvEstados)
+        Me.grpEstados.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.grpEstados.Location = New System.Drawing.Point(0, 0)
+        Me.grpEstados.Name = "grpEstados"
+        Me.grpEstados.Padding = New System.Windows.Forms.Padding(8)
+        Me.grpEstados.Size = New System.Drawing.Size(379, 429)
+        Me.grpEstados.TabIndex = 0
+        Me.grpEstados.TabStop = False
+        Me.grpEstados.Text = "Estados en el período"
+        '
+        'dgvEstados
+        '
+        Me.dgvEstados.AllowUserToAddRows = False
+        Me.dgvEstados.AllowUserToDeleteRows = False
+        Me.dgvEstados.AllowUserToResizeColumns = False
+        Me.dgvEstados.AllowUserToResizeRows = False
+        Me.dgvEstados.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill
+        Me.dgvEstados.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells
+        Me.dgvEstados.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        DataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window
+        DataGridViewCellStyle1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        DataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.ControlText
+        DataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.[True]
+        Me.dgvEstados.DefaultCellStyle = DataGridViewCellStyle1
+        Me.dgvEstados.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.dgvEstados.Location = New System.Drawing.Point(8, 27)
+        Me.dgvEstados.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.dgvEstados.Name = "dgvEstados"
+        Me.dgvEstados.ReadOnly = True
+        Me.dgvEstados.RowHeadersVisible = False
+        Me.dgvEstados.RowHeadersWidth = 62
+        Me.dgvEstados.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
+        Me.dgvEstados.Size = New System.Drawing.Size(363, 394)
+        Me.dgvEstados.TabIndex = 2
         '
         'SplitContainerRight
         '
@@ -152,67 +181,27 @@ Partial Class frmFuncionarioSituacion
         '
         'SplitContainerRight.Panel1
         '
-        Me.SplitContainerRight.Panel1.Controls.Add(Me.gbxEstados)
+        Me.SplitContainerRight.Panel1.Controls.Add(Me.grpNovedades)
         '
         'SplitContainerRight.Panel2
         '
-        Me.SplitContainerRight.Panel2.Controls.Add(Me.gbxNovedades)
-        Me.SplitContainerRight.Size = New System.Drawing.Size(798, 552)
-        Me.SplitContainerRight.SplitterDistance = 170
+        Me.SplitContainerRight.Panel2.Controls.Add(Me.grpFechas)
+        Me.SplitContainerRight.Size = New System.Drawing.Size(283, 429)
+        Me.SplitContainerRight.SplitterDistance = 200
         Me.SplitContainerRight.SplitterWidth = 6
         Me.SplitContainerRight.TabIndex = 0
         '
-        'gbxEstados
+        'grpNovedades
         '
-        Me.gbxEstados.Controls.Add(Me.dgvEstados)
-        Me.gbxEstados.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.gbxEstados.Location = New System.Drawing.Point(0, 0)
-        Me.gbxEstados.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.gbxEstados.Name = "gbxEstados"
-        Me.gbxEstados.Padding = New System.Windows.Forms.Padding(8)
-        Me.gbxEstados.Size = New System.Drawing.Size(798, 170)
-        Me.gbxEstados.TabIndex = 0
-        Me.gbxEstados.TabStop = False
-        Me.gbxEstados.Text = "Estados en el período"
-        '
-        'dgvEstados
-        '
-        Me.dgvEstados.AllowUserToAddRows = False
-        Me.dgvEstados.AllowUserToDeleteRows = False
-        Me.dgvEstados.AllowUserToResizeColumns = False
-        Me.dgvEstados.AllowUserToResizeRows = False
-        Me.dgvEstados.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        DataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window
-        DataGridViewCellStyle1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
-        DataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.ControlText
-        DataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.dgvEstados.DefaultCellStyle = DataGridViewCellStyle1
-        Me.dgvEstados.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.dgvEstados.Location = New System.Drawing.Point(8, 27)
-        Me.dgvEstados.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.dgvEstados.Name = "dgvEstados"
-        Me.dgvEstados.ReadOnly = True
-        Me.dgvEstados.RowHeadersVisible = False
-        Me.dgvEstados.RowHeadersWidth = 62
-        Me.dgvEstados.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgvEstados.Size = New System.Drawing.Size(782, 135)
-        Me.dgvEstados.TabIndex = 2
-        '
-        'gbxNovedades
-        '
-        Me.gbxNovedades.Controls.Add(Me.dgvNovedades)
-        Me.gbxNovedades.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.gbxNovedades.Location = New System.Drawing.Point(0, 0)
-        Me.gbxNovedades.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.gbxNovedades.Name = "gbxNovedades"
-        Me.gbxNovedades.Padding = New System.Windows.Forms.Padding(8)
-        Me.gbxNovedades.Size = New System.Drawing.Size(798, 376)
-        Me.gbxNovedades.TabIndex = 0
-        Me.gbxNovedades.TabStop = False
-        Me.gbxNovedades.Text = "Novedades del día (según selección en Timeline)"
+        Me.grpNovedades.Controls.Add(Me.dgvNovedades)
+        Me.grpNovedades.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.grpNovedades.Location = New System.Drawing.Point(0, 0)
+        Me.grpNovedades.Name = "grpNovedades"
+        Me.grpNovedades.Padding = New System.Windows.Forms.Padding(8)
+        Me.grpNovedades.Size = New System.Drawing.Size(283, 200)
+        Me.grpNovedades.TabIndex = 0
+        Me.grpNovedades.TabStop = False
+        Me.grpNovedades.Text = "Panel de Novedades"
         '
         'dgvNovedades
         '
@@ -220,6 +209,7 @@ Partial Class frmFuncionarioSituacion
         Me.dgvNovedades.AllowUserToDeleteRows = False
         Me.dgvNovedades.AllowUserToResizeColumns = False
         Me.dgvNovedades.AllowUserToResizeRows = False
+        Me.dgvNovedades.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill
         Me.dgvNovedades.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         DataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
         DataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window
@@ -237,14 +227,40 @@ Partial Class frmFuncionarioSituacion
         Me.dgvNovedades.RowHeadersVisible = False
         Me.dgvNovedades.RowHeadersWidth = 62
         Me.dgvNovedades.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgvNovedades.Size = New System.Drawing.Size(782, 341)
+        Me.dgvNovedades.Size = New System.Drawing.Size(267, 165)
         Me.dgvNovedades.TabIndex = 1
+        '
+        'grpFechas
+        '
+        Me.grpFechas.Controls.Add(Me.flpTimeline)
+        Me.grpFechas.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.grpFechas.Location = New System.Drawing.Point(0, 0)
+        Me.grpFechas.Name = "grpFechas"
+        Me.grpFechas.Padding = New System.Windows.Forms.Padding(8)
+        Me.grpFechas.Size = New System.Drawing.Size(283, 223)
+        Me.grpFechas.TabIndex = 1
+        Me.grpFechas.TabStop = False
+        Me.grpFechas.Text = "Fechas de Novedades"
+        '
+        'flpTimeline
+        '
+        Me.flpTimeline.AutoScroll = True
+        Me.flpTimeline.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.flpTimeline.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.flpTimeline.FlowDirection = System.Windows.Forms.FlowDirection.TopDown
+        Me.flpTimeline.Location = New System.Drawing.Point(8, 27)
+        Me.flpTimeline.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.flpTimeline.Name = "flpTimeline"
+        Me.flpTimeline.Padding = New System.Windows.Forms.Padding(8)
+        Me.flpTimeline.Size = New System.Drawing.Size(267, 188)
+        Me.flpTimeline.TabIndex = 0
+        Me.flpTimeline.WrapContents = False
         '
         'frmFuncionarioSituacion
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1200, 692)
+        Me.ClientSize = New System.Drawing.Size(710, 565)
         Me.Controls.Add(Me.btnGenerar)
         Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.dtpHasta)
@@ -261,14 +277,15 @@ Partial Class frmFuncionarioSituacion
         Me.SplitContainer1.Panel2.ResumeLayout(False)
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.SplitContainer1.ResumeLayout(False)
+        Me.grpEstados.ResumeLayout(False)
+        CType(Me.dgvEstados, System.ComponentModel.ISupportInitialize).EndInit()
         Me.SplitContainerRight.Panel1.ResumeLayout(False)
         Me.SplitContainerRight.Panel2.ResumeLayout(False)
         CType(Me.SplitContainerRight, System.ComponentModel.ISupportInitialize).EndInit()
         Me.SplitContainerRight.ResumeLayout(False)
-        Me.gbxEstados.ResumeLayout(False)
-        CType(Me.dgvEstados, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.gbxNovedades.ResumeLayout(False)
+        Me.grpNovedades.ResumeLayout(False)
         CType(Me.dgvNovedades, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.grpFechas.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -282,10 +299,11 @@ Partial Class frmFuncionarioSituacion
     Friend WithEvents btnGenerar As Button
     Friend WithEvents ToolTip1 As ToolTip
     Friend WithEvents SplitContainer1 As SplitContainer
-    Friend WithEvents flpTimeline As FlowLayoutPanel
     Friend WithEvents SplitContainerRight As SplitContainer
-    Friend WithEvents gbxEstados As GroupBox
+    Friend WithEvents flpTimeline As FlowLayoutPanel
     Friend WithEvents dgvEstados As DataGridView
-    Friend WithEvents gbxNovedades As GroupBox
     Friend WithEvents dgvNovedades As DataGridView
+    Friend WithEvents grpEstados As GroupBox
+    Friend WithEvents grpNovedades As GroupBox
+    Friend WithEvents grpFechas As GroupBox
 End Class

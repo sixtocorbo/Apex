@@ -12,6 +12,7 @@ Public Class frmFichaPersonalRPT
 
     Private Async Sub frmFichaFuncionalRPT_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Await CargarReporteAsync()
+        AppTheme.Aplicar(Me)
     End Sub
 
     Private Async Function CargarReporteAsync() As Task

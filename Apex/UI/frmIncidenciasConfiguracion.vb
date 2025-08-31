@@ -29,6 +29,7 @@ Public Class frmIncidenciasConfiguracion
     Private Async Sub frmIncidenciaDetalle_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Await CargarCategorias()
         SiEsEdicionCargarDatos()
+        AppTheme.Aplicar(Me)
     End Sub
 
     Private Async Function CargarCategorias() As Task

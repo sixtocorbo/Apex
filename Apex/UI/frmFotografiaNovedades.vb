@@ -17,4 +17,8 @@ Public Class frmFotografiaNovedades
             Me.Close()
         End If
     End Sub
+
+    Private Sub frmFotografiaNovedades_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        AppTheme.Aplicar(Me)
+    End Sub
 End Class

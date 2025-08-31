@@ -11,6 +11,7 @@ Public Class frmNovedadesDelDia
     End Sub
 
     Private Async Sub frmNovedadesDelDia_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        AppTheme.Aplicar(Me)
         ' Inicializa el selector de fecha con el día actual
         dtpFecha.Value = DateTime.Now.Date
         ' Carga las novedades del día actual al abrir el formulario

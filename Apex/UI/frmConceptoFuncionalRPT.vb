@@ -25,6 +25,7 @@ Public Class frmConceptoFuncionalRPT
     End Sub
 
     Private Sub frmConceptoFuncionalRPT_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        AppTheme.Aplicar(Me)
         Try
             Me.ReportViewer1.LocalReport.DataSources.Clear()
 

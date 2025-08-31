@@ -21,6 +21,7 @@ Public Class frmRenombrarPDF
     End Sub
 
     Private Async Sub frmRenombrarPDF_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        AppTheme.Aplicar(Me)
         ' Mostrar cursor de espera mientras se carga
         Me.Cursor = Cursors.WaitCursor
 

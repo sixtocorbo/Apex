@@ -13,6 +13,7 @@ Public Class frmIncidencias
 
     Private Async Sub frmGestionIncidencias_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Await CargarDatos()
+        AppTheme.Aplicar(Me)
     End Sub
 
     Private Async Function CargarDatos() As Task

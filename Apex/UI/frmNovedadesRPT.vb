@@ -12,6 +12,7 @@ Public Class frmNovedadesRPT
     End Sub
 
     Private Sub frmVisorReporteNovedades_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        AppTheme.Aplicar(Me)
         CargarReporte()
     End Sub
 
