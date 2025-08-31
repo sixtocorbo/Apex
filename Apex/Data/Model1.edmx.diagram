@@ -136,6 +136,7 @@
         <AssociationConnector Association="ApexModel.FK_RegimenDetalle_RegimenTrabajo" ManuallyRouted="false" />
         <AssociationConnector Association="ApexModel.FK_Usuario_Rol" ManuallyRouted="false" />
         <EntityTypeShape EntityType="ApexModel.AuditoriaCambios" Width="1.5" PointX="11.375" PointY="3.75" />
+        <EntityTypeShape EntityType="ApexModel.vw_LicenciasConFuncionario" Width="1.5" PointX="11.375" PointY="7.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

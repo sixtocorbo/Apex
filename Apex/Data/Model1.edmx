@@ -773,6 +773,25 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_LicenciasCompletas' no tiene def
           <Property Name="Comentario" Type="varchar(max)" />
         </EntityType>
         <!--Errores durante la generación:
+advertencia 6002: La tabla o vista 'Apex.dbo.vw_LicenciasConFuncionario' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
+        <EntityType Name="vw_LicenciasConFuncionario">
+          <Key>
+            <PropertyRef Name="Id" />
+            <PropertyRef Name="CI" />
+            <PropertyRef Name="NombreFuncionario" />
+            <PropertyRef Name="TipoLicencia" />
+            <PropertyRef Name="inicio" />
+            <PropertyRef Name="finaliza" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" />
+          <Property Name="CI" Type="char" MaxLength="8" Nullable="false" />
+          <Property Name="NombreFuncionario" Type="nvarchar" MaxLength="60" Nullable="false" />
+          <Property Name="TipoLicencia" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="inicio" Type="date" Nullable="false" />
+          <Property Name="finaliza" Type="date" Nullable="false" />
+          <Property Name="estado" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <!--Errores durante la generación:
 advertencia 6002: La tabla o vista 'Apex.dbo.vw_NotificacionesCompletas' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
         <EntityType Name="vw_NotificacionesCompletas">
           <Key>
@@ -1757,6 +1776,17 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
     [vw_LicenciasCompletas].[Estado] AS [Estado], 
     [vw_LicenciasCompletas].[Comentario] AS [Comentario]
     FROM [dbo].[vw_LicenciasCompletas] AS [vw_LicenciasCompletas]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="vw_LicenciasConFuncionario" EntityType="Self.vw_LicenciasConFuncionario" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [vw_LicenciasConFuncionario].[Id] AS [Id], 
+    [vw_LicenciasConFuncionario].[CI] AS [CI], 
+    [vw_LicenciasConFuncionario].[NombreFuncionario] AS [NombreFuncionario], 
+    [vw_LicenciasConFuncionario].[TipoLicencia] AS [TipoLicencia], 
+    [vw_LicenciasConFuncionario].[inicio] AS [inicio], 
+    [vw_LicenciasConFuncionario].[finaliza] AS [finaliza], 
+    [vw_LicenciasConFuncionario].[estado] AS [estado]
+    FROM [dbo].[vw_LicenciasConFuncionario] AS [vw_LicenciasConFuncionario]</DefiningQuery>
           </EntitySet>
           <EntitySet Name="vw_NotificacionesCompletas" EntityType="Self.vw_NotificacionesCompletas" store:Type="Views" store:Schema="dbo">
             <DefiningQuery>SELECT 
@@ -4082,6 +4112,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           </FunctionImport>
           <FunctionImport Name="usp_ProcesarEstadoNotificaciones" />
           <EntitySet Name="AuditoriaCambios" EntityType="ApexModel.AuditoriaCambios" />
+          <EntitySet Name="vw_LicenciasConFuncionario" EntityType="ApexModel.vw_LicenciasConFuncionario" />
         </EntityContainer>
         <ComplexType Name="sp_helpdiagramdefinition_Result">
           <Property Type="Int32" Name="version" Nullable="true" />
@@ -4107,6 +4138,23 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <Property Name="CampoNombre" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
           <Property Name="ValorAnterior" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="ValorNuevo" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="vw_LicenciasConFuncionario">
+          <Key>
+            <PropertyRef Name="Id" />
+            <PropertyRef Name="CI" />
+            <PropertyRef Name="NombreFuncionario" />
+            <PropertyRef Name="TipoLicencia" />
+            <PropertyRef Name="inicio" />
+            <PropertyRef Name="finaliza" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" />
+          <Property Name="CI" Type="String" Nullable="false" MaxLength="8" FixedLength="true" Unicode="false" />
+          <Property Name="NombreFuncionario" Type="String" Nullable="false" MaxLength="60" FixedLength="false" Unicode="true" />
+          <Property Name="TipoLicencia" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="inicio" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="finaliza" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="estado" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -5003,6 +5051,19 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
                 <ScalarProperty Name="UsuarioAccion" ColumnName="UsuarioAccion" />
                 <ScalarProperty Name="TipoOperacion" ColumnName="TipoOperacion" />
                 <ScalarProperty Name="FechaHora" ColumnName="FechaHora" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vw_LicenciasConFuncionario">
+            <EntityTypeMapping TypeName="ApexModel.vw_LicenciasConFuncionario">
+              <MappingFragment StoreEntitySet="vw_LicenciasConFuncionario">
+                <ScalarProperty Name="estado" ColumnName="estado" />
+                <ScalarProperty Name="finaliza" ColumnName="finaliza" />
+                <ScalarProperty Name="inicio" ColumnName="inicio" />
+                <ScalarProperty Name="TipoLicencia" ColumnName="TipoLicencia" />
+                <ScalarProperty Name="NombreFuncionario" ColumnName="NombreFuncionario" />
+                <ScalarProperty Name="CI" ColumnName="CI" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>

@@ -386,12 +386,14 @@
     <Compile Include="Data\TipoFuncionario.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
+    <Compile Include="Data\TipoHistorico.vb" />
     <Compile Include="Data\TipoLicencia.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\TipoNotificacion.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
+    <Compile Include="Data\TipoOrigenDatos.vb" />
     <Compile Include="Data\TipoViatico.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
@@ -415,6 +417,9 @@
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\vw_LicenciasCompletas.vb">
+      <DependentUpon>Model1.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\vw_LicenciasConFuncionario.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\vw_NotificacionesCompletas.vb">

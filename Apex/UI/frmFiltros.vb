@@ -117,7 +117,7 @@ Partial Public Class frmFiltros
         dgvDatos.DoubleBuffered(True)
         dgvDatos.SendToBack()
 
-        cmbOrigenDatos.DataSource = System.Enum.GetValues(GetType(ConsultasGenericas.TipoOrigenDatos))
+        cmbOrigenDatos.DataSource = System.Enum.GetValues(GetType(TipoOrigenDatos))
         cmbOrigenDatos.SelectedIndex = -1
 
         ' Organiza los paneles para evitar solapamientos
@@ -143,11 +143,11 @@ Partial Public Class frmFiltros
     Public Async Function CargarDatosAsync() As Task
         If cmbOrigenDatos.SelectedItem Is Nothing Then Return
 
-        Dim origen = CType(cmbOrigenDatos.SelectedItem, ConsultasGenericas.TipoOrigenDatos)
+        Dim origen = CType(cmbOrigenDatos.SelectedItem, TipoOrigenDatos)
         Dim fechaI = dtpFechaInicio.Value.Date
         Dim fechaF = dtpFechaFin.Value.Date
 
-        If origen <> ConsultasGenericas.TipoOrigenDatos.Funcionarios AndAlso fechaI > fechaF Then
+        If origen <> TipoOrigenDatos.Funcionarios AndAlso fechaI > fechaF Then
             MessageBox.Show("La fecha de inicio no puede ser mayor que la fecha de fin.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             Return
         End If
@@ -214,8 +214,8 @@ Partial Public Class frmFiltros
             {"Semana", "Semana"}, {"PuestoDeTrabajo", "Puesto de Trabajo"}
         }
 
-        Dim origen = CType(cmbOrigenDatos.SelectedItem, ConsultasGenericas.TipoOrigenDatos)
-        Dim columnsToShow = If(origen = ConsultasGenericas.TipoOrigenDatos.Funcionarios,
+        Dim origen = CType(cmbOrigenDatos.SelectedItem, TipoOrigenDatos)
+        Dim columnsToShow = If(origen = TipoOrigenDatos.Funcionarios,
                                columnDefinitions.Keys,
                                dt.Columns.Cast(Of DataColumn).Select(Function(c) c.ColumnName))
 

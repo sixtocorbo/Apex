@@ -6,14 +6,7 @@ Imports System.Linq.Expressions
 Imports System.Threading.Tasks
 Public Module ConsultasGenericas
 
-    Public Enum TipoOrigenDatos
-        Funcionarios
-        Licencias
-        Notificaciones
-        Novedades
-        EstadosTransitorios
-        Auditoria
-    End Enum
+
 
     Public Async Function ObtenerDatosGenericosAsync(
         tipo As TipoOrigenDatos,
@@ -204,6 +197,31 @@ Public Module ConsultasGenericas
 
                     Dim resultados = Await queryFinal.OrderByDescending(Function(a) a.FechaHora).ToListAsync()
                     dt = resultados.ToDataTable()
+                Case TipoOrigenDatos.HistoricoConceptos
+                    ' El histórico de conceptos requiere conocer el policía y, opcionalmente, año/mes.
+                    ' IdPolicia, Año y Mes pueden venir de los filtros o de tu interfaz (ajusta según tu implementación).
+                    ' Aquí se asume que "filtros" contiene tuplas (columna, operador, valor) donde
+                    ' el valor para "IdPolicia" es un entero.
+                    Dim idPolicia As Integer = 0
+                    Dim año As Integer? = Nothing
+                    Dim mes As Integer? = Nothing
+
+                    ' Si has pasado parámetros adicionales en "filtros", extrae el idPolicia (y opcionalmente año/mes).
+                    If filtros IsNot Nothing Then
+                        Dim filtroPolicia = filtros.FirstOrDefault(Function(t) t.Item1.Equals("IdPolicia", StringComparison.OrdinalIgnoreCase))
+                        If filtroPolicia IsNot Nothing Then
+                            Integer.TryParse(filtroPolicia.Item3, idPolicia)
+                        End If
+                    End If
+
+                    ' Si deseas usar el rango de fechas del formulario como año/mes, usa fechaInicio/fechaFin:
+                    If fechaInicio.HasValue Then
+                        año = fechaInicio.Value.Year
+                        mes = fechaInicio.Value.Month
+                    End If
+
+                    ' Llama a tu método para obtener el DataTable consolidado de histórico
+                    dt = Await ConsultasGenericas.ObtenerHistoricoDataTableAsync(uow, idPolicia, año, mes)
 
                 Case Else
                     Throw New NotImplementedException($"La consulta para el tipo '{tipo.ToString()}' no está implementada.")
@@ -286,5 +304,90 @@ Public Module ConsultasGenericas
         Public Property Cedula As String
         Public Property NombreCompleto As String
     End Class
+    ''' <summary>
+    ''' Devuelve un DataTable con el histórico solicitado.
+    ''' </summary>
+    ''' <param name="uow">Unidad de trabajo con el contexto EF.</param>
+    ''' <param name="idPolicia">ID del funcionario al que pertenecen los registros.</param>
+    ''' <param name="tipo">Tipo de histórico a consultar.</param>
+    ''' <param name="anio">Año a filtrar (opcional).</param>
+    ''' <param name="mes">Mes a filtrar (opcional).</param>
+    Public Async Function ObtenerHistoricoDataTableAsync(
+    uow As IUnitOfWork,
+    idPolicia As Integer,
+    tipo As TipoHistorico,
+    Optional anio As Integer? = Nothing,
+    Optional mes As Integer? = Nothing
+) As Task(Of DataTable)
 
+        Select Case tipo
+
+            Case TipoHistorico.Nocturnidad
+                Dim lista As IEnumerable(Of HistoricoNocturnidad)
+                If anio.HasValue AndAlso mes.HasValue Then
+                    lista = Await uow.Repository(Of HistoricoNocturnidad)() _
+                    .FindAsync(Function(h) h.FuncionarioId = idPolicia AndAlso
+                                          h.Anio = anio.Value AndAlso
+                                          h.Mes = mes.Value)
+                Else
+                    lista = Await uow.Repository(Of HistoricoNocturnidad)() _
+                    .FindAsync(Function(h) h.FuncionarioId = idPolicia)
+                End If
+                Dim dt = ModuloExtensions.ToDataTable(lista)
+                ' Oculta la propiedad de navegación
+                If dt.Columns.Contains("Funcionario") Then dt.Columns.Remove("Funcionario")
+                Return dt
+
+            Case TipoHistorico.Presentismo
+                Dim lista As IEnumerable(Of HistoricoPresentismo)
+                If anio.HasValue AndAlso mes.HasValue Then
+                    lista = Await uow.Repository(Of HistoricoPresentismo)() _
+                    .FindAsync(Function(h) h.FuncionarioId = idPolicia AndAlso
+                                          h.Anio = anio.Value AndAlso
+                                          h.Mes = mes.Value)
+                Else
+                    lista = Await uow.Repository(Of HistoricoPresentismo)() _
+                    .FindAsync(Function(h) h.FuncionarioId = idPolicia)
+                End If
+                Dim dt = ModuloExtensions.ToDataTable(lista)
+                If dt.Columns.Contains("Funcionario") Then dt.Columns.Remove("Funcionario")
+                Return dt
+
+            Case TipoHistorico.Viaticos
+                Dim lista As IEnumerable(Of HistoricoViatico)
+                If anio.HasValue AndAlso mes.HasValue Then
+                    lista = Await uow.Repository(Of HistoricoViatico)() _
+                    .FindAsync(Function(h) h.FuncionarioId = idPolicia AndAlso
+                                          h.Anio = anio.Value AndAlso
+                                          h.Mes = mes.Value)
+                Else
+                    lista = Await uow.Repository(Of HistoricoViatico)() _
+                    .FindAsync(Function(h) h.FuncionarioId = idPolicia)
+                End If
+                Dim dt = ModuloExtensions.ToDataTable(lista)
+                If dt.Columns.Contains("Funcionario") Then dt.Columns.Remove("Funcionario")
+                Return dt
+
+            Case TipoHistorico.Custodias
+                Dim lista As IEnumerable(Of HistoricoCustodia)
+                If anio.HasValue AndAlso mes.HasValue Then
+                    ' Para custodias se filtra por Año y Mes de la fecha
+                    lista = Await uow.Repository(Of HistoricoCustodia)() _
+                    .FindAsync(Function(h) h.FuncionarioId = idPolicia AndAlso
+                                          h.Fecha.Year = anio.Value AndAlso
+                                          h.Fecha.Month = mes.Value)
+                Else
+                    lista = Await uow.Repository(Of HistoricoCustodia)() _
+                    .FindAsync(Function(h) h.FuncionarioId = idPolicia)
+                End If
+                Dim dt = ModuloExtensions.ToDataTable(lista)
+                If dt.Columns.Contains("Funcionario") Then dt.Columns.Remove("Funcionario")
+                Return dt
+
+            Case Else
+                ' Si se pasa un tipo no contemplado, devuelve una tabla vacía
+                Return New DataTable()
+
+        End Select
+    End Function
 End Module

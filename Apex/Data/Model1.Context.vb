@@ -96,6 +96,7 @@ Partial Public Class ApexEntities
     Public Overridable Property vw_NovedadesCompletas() As DbSet(Of vw_NovedadesCompletas)
     Public Overridable Property vw_SancionesCompletas() As DbSet(Of vw_SancionesCompletas)
     Public Overridable Property AuditoriaCambios() As DbSet(Of AuditoriaCambios)
+    Public Overridable Property vw_LicenciasConFuncionario() As DbSet(Of vw_LicenciasConFuncionario)
 
     Public Overridable Function sp_alterdiagram(diagramname As String, owner_id As Nullable(Of Integer), version As Nullable(Of Integer), definition As Byte()) As Integer
         Dim diagramnameParameter As ObjectParameter = If(diagramname IsNot Nothing, New ObjectParameter("diagramname", diagramname), New ObjectParameter("diagramname", GetType(String)))
