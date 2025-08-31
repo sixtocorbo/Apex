@@ -288,10 +288,6 @@ Public Class frmDashboard
         End Try
     End Function
 
-    Private Sub frmDashboard_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        AppTheme.Aplicar(Me)
-    End Sub
-
 #End Region
 
 End Class
