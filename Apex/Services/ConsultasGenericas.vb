@@ -203,12 +203,16 @@ Public Module ConsultasGenericas
                     Dim idPolicia As Integer? = Nothing
 
                     If filtros IsNot Nothing Then
+                        ' TipoHistorico: puede ser "Nocturnidad", "Presentismo", "Viaticos" o "Custodias".
                         Dim ft = filtros.FirstOrDefault(Function(t) t.Item1.Equals("TipoHistorico", StringComparison.OrdinalIgnoreCase))
                         If ft IsNot Nothing Then
                             Dim aux As TipoHistorico
                             If [Enum].TryParse(ft.Item3, True, aux) Then tipoHist = aux
                         End If
-                        Dim fp = filtros.FirstOrDefault(Function(t) t.Item1.Equals("FuncionarioId", StringComparison.OrdinalIgnoreCase) OrElse t.Item1.Equals("IdPolicia", StringComparison.OrdinalIgnoreCase))
+
+                        ' Id del funcionario (puede llamarse "FuncionarioId" o "IdPolicia" en tus filtros)
+                        Dim fp = filtros.FirstOrDefault(Function(t) t.Item1.Equals("FuncionarioId", StringComparison.OrdinalIgnoreCase) _
+                                     OrElse t.Item1.Equals("IdPolicia", StringComparison.OrdinalIgnoreCase))
                         If fp IsNot Nothing Then
                             Dim val As Integer
                             If Integer.TryParse(fp.Item3, val) Then idPolicia = val
@@ -216,7 +220,13 @@ Public Module ConsultasGenericas
                     End If
 
                     ' No pases anio/mes a menos que realmente quieras filtrarlos.
-                    dt = Await ConsultasGenericas.ObtenerHistoricoDataTableAsync(uow, tipoHist, idPolicia, Nothing, Nothing)
+                    ' El método unificado se encarga de unir las tablas históricas con la tabla Funcionario.
+                    dt = Await ConsultasGenericas.ObtenerHistoricoDataTableAsync(
+            uow,
+            tipoHist,
+            idPolicia,
+            Nothing,  ' año
+            Nothing)  ' mes
 
                 Case Else
                     Throw New NotImplementedException($"La consulta para el tipo '{tipo.ToString()}' no está implementada.")
@@ -299,135 +309,173 @@ Public Module ConsultasGenericas
         Public Property Cedula As String
         Public Property NombreCompleto As String
     End Class
-    ''' <summary>
-    ''' Obtiene un DataTable con los históricos de Nocturnidad, Presentismo, Viáticos y Custodias.
-    ''' </summary>
-    ''' <param name="uow">Unidad de trabajo.</param>
-    ''' <param name="tipo">Tipo de histórico a consultar (si se omite, se devuelven todos).</param>
-    ''' <param name="idPolicia">ID del funcionario para filtrar (Nothing = todos).</param>
-    ''' <param name="anio">Año a filtrar (opcional).</param>
-    ''' <param name="mes">Mes a filtrar (opcional).</param>
+
     Public Async Function ObtenerHistoricoDataTableAsync(
-        uow As IUnitOfWork,
-        Optional tipo As TipoHistorico? = Nothing,
-        Optional idPolicia As Integer? = Nothing,
-        Optional anio As Integer? = Nothing,
-        Optional mes As Integer? = Nothing
-    ) As Task(Of DataTable)
+    uow As IUnitOfWork,
+    Optional tipo As TipoHistorico? = Nothing,
+    Optional idPolicia As Integer? = Nothing,
+    Optional anio As Integer? = Nothing,
+    Optional mes As Integer? = Nothing
+) As Task(Of DataTable)
+
+        ' --- Precargar funcionarios ---
+        Dim funcionarios = Await uow.Repository(Of Funcionario)() _
+                                .GetAllByPredicateAsync(Function(f) True)
+        Dim dicF As Dictionary(Of Integer, Funcionario) =
+        funcionarios.ToDictionary(Function(f) f.Id)
 
         Dim datos As New List(Of Object)()
 
+        ' Función auxiliar para obtener Cedula y Nombre
+        Dim getFuncionarioInfo As Func(Of Integer, (CI As String, Nombre As String)) =
+        Function(fid As Integer)
+            Dim f As Funcionario = Nothing
+            If dicF.TryGetValue(fid, f) Then
+                Return (f.CI, f.Nombre)
+            Else
+                Return (Nothing, Nothing)
+            End If
+        End Function
+
         ' --- Nocturnidad ---
         If Not tipo.HasValue OrElse tipo.Value = TipoHistorico.Nocturnidad Then
-            Dim nocturnos As IEnumerable(Of HistoricoNocturnidad)
+            Dim noctList As IEnumerable(Of HistoricoNocturnidad)
             If idPolicia.HasValue Then
-                nocturnos = Await uow.Repository(Of HistoricoNocturnidad)().FindAsync(Function(h) h.FuncionarioId = idPolicia.Value)
+                noctList = Await uow.Repository(Of HistoricoNocturnidad)().FindAsync(
+                Function(h) h.FuncionarioId = idPolicia.Value)
             Else
-                nocturnos = Await uow.Repository(Of HistoricoNocturnidad)().GetAllByPredicateAsync(Function(h) True)
+                noctList = Await uow.Repository(Of HistoricoNocturnidad)().GetAllByPredicateAsync(
+                Function(h) True)
             End If
-            For Each h In nocturnos
-                If (Not anio.HasValue OrElse h.Anio = anio.Value) AndAlso (Not mes.HasValue OrElse h.Mes = mes.Value) Then
+
+            For Each h In noctList
+                If (Not anio.HasValue OrElse h.Anio = anio.Value) AndAlso
+               (Not mes.HasValue OrElse h.Mes = mes.Value) Then
+                    Dim info = getFuncionarioInfo(h.FuncionarioId)
                     datos.Add(New With {
-                        .FuncionarioId = h.FuncionarioId,
-                        .Tipo = "Nocturnidad",
-                        .Anio = CInt(h.Anio),
-                        .Mes = CInt(h.Mes),
-                        .Fecha = CType(Nothing, Date?),
-                        .Minutos = If(h.Minutos.HasValue, CType(h.Minutos.Value, Integer?), CType(Nothing, Integer?)),
-                        .Dias = CType(Nothing, Integer?),
-                        .Incidencia = CType(Nothing, String),
-                        .Observaciones = CType(Nothing, String),
-                        .Motivo = CType(Nothing, String),
-                        .Area = CType(Nothing, String)
-                    })
+                    .FuncionarioId = h.FuncionarioId,
+                    .Cedula = info.CI,
+                    .NombreCompleto = info.Nombre,
+                    .Tipo = "Nocturnidad",
+                    .Anio = CInt(h.Anio),
+                    .Mes = CInt(h.Mes),
+                    .Fecha = CType(Nothing, Date?),
+                    .Minutos = If(h.Minutos.HasValue, CType(h.Minutos.Value, Integer?), CType(Nothing, Integer?)),
+                    .Dias = CType(Nothing, Integer?),
+                    .Incidencia = CType(Nothing, String),
+                    .Observaciones = CType(Nothing, String),
+                    .Motivo = CType(Nothing, String),
+                    .Area = CType(Nothing, String)
+                })
                 End If
             Next
         End If
 
         ' --- Presentismo ---
         If Not tipo.HasValue OrElse tipo.Value = TipoHistorico.Presentismo Then
-            Dim presentes As IEnumerable(Of HistoricoPresentismo)
+            Dim presList As IEnumerable(Of HistoricoPresentismo)
             If idPolicia.HasValue Then
-                presentes = Await uow.Repository(Of HistoricoPresentismo)().FindAsync(Function(h) h.FuncionarioId = idPolicia.Value)
+                presList = Await uow.Repository(Of HistoricoPresentismo)().FindAsync(
+                Function(h) h.FuncionarioId = idPolicia.Value)
             Else
-                presentes = Await uow.Repository(Of HistoricoPresentismo)().GetAllByPredicateAsync(Function(h) True)
+                presList = Await uow.Repository(Of HistoricoPresentismo)().GetAllByPredicateAsync(
+                Function(h) True)
             End If
-            For Each h In presentes
-                If (Not anio.HasValue OrElse h.Anio = anio.Value) AndAlso (Not mes.HasValue OrElse h.Mes = mes.Value) Then
+
+            For Each h In presList
+                If (Not anio.HasValue OrElse h.Anio = anio.Value) AndAlso
+               (Not mes.HasValue OrElse h.Mes = mes.Value) Then
+                    Dim info = getFuncionarioInfo(h.FuncionarioId)
                     datos.Add(New With {
-                        .FuncionarioId = h.FuncionarioId,
-                        .Tipo = "Presentismo",
-                        .Anio = CInt(h.Anio),
-                        .Mes = CInt(h.Mes),
-                        .Fecha = CType(Nothing, Date?),
-                        .Minutos = If(h.Minutos.HasValue, CType(h.Minutos.Value, Integer?), CType(Nothing, Integer?)),
-                        .Dias = If(h.Dias.HasValue, CType(h.Dias.Value, Integer?), CType(Nothing, Integer?)),
-                        .Incidencia = h.Incidencia,
-                        .Observaciones = h.Observaciones,
-                        .Motivo = CType(Nothing, String),
-                        .Area = CType(Nothing, String)
-                    })
+                    .FuncionarioId = h.FuncionarioId,
+                    .Cedula = info.CI,
+                    .NombreCompleto = info.Nombre,
+                    .Tipo = "Presentismo",
+                    .Anio = CInt(h.Anio),
+                    .Mes = CInt(h.Mes),
+                    .Fecha = CType(Nothing, Date?),
+                    .Minutos = If(h.Minutos.HasValue, CType(h.Minutos.Value, Integer?), CType(Nothing, Integer?)),
+                    .Dias = If(h.Dias.HasValue, CType(h.Dias.Value, Integer?), CType(Nothing, Integer?)),
+                    .Incidencia = h.Incidencia,
+                    .Observaciones = h.Observaciones,
+                    .Motivo = CType(Nothing, String),
+                    .Area = CType(Nothing, String)
+                })
                 End If
             Next
         End If
 
         ' --- Viáticos ---
         If Not tipo.HasValue OrElse tipo.Value = TipoHistorico.Viaticos Then
-            Dim viaticos As IEnumerable(Of HistoricoViatico)
+            Dim viatList As IEnumerable(Of HistoricoViatico)
             If idPolicia.HasValue Then
-                viaticos = Await uow.Repository(Of HistoricoViatico)().FindAsync(Function(h) h.FuncionarioId = idPolicia.Value)
+                viatList = Await uow.Repository(Of HistoricoViatico)().FindAsync(
+                Function(h) h.FuncionarioId = idPolicia.Value)
             Else
-                viaticos = Await uow.Repository(Of HistoricoViatico)().GetAllByPredicateAsync(Function(h) True)
+                viatList = Await uow.Repository(Of HistoricoViatico)().GetAllByPredicateAsync(
+                Function(h) True)
             End If
-            For Each h In viaticos
-                If (Not anio.HasValue OrElse h.Anio = anio.Value) AndAlso (Not mes.HasValue OrElse h.Mes = mes.Value) Then
+
+            For Each h In viatList
+                If (Not anio.HasValue OrElse h.Anio = anio.Value) AndAlso
+               (Not mes.HasValue OrElse h.Mes = mes.Value) Then
+                    Dim info = getFuncionarioInfo(h.FuncionarioId)
                     datos.Add(New With {
-                        .FuncionarioId = h.FuncionarioId,
-                        .Tipo = "Viáticos",
-                        .Anio = CInt(h.Anio),
-                        .Mes = CInt(h.Mes),
-                        .Fecha = CType(Nothing, Date?),
-                        .Minutos = CType(Nothing, Integer?),
-                        .Dias = CType(Nothing, Integer?),
-                        .Incidencia = h.Incidencia,
-                        .Observaciones = CType(Nothing, String),
-                        .Motivo = h.Motivo,
-                        .Area = CType(Nothing, String)
-                    })
+                    .FuncionarioId = h.FuncionarioId,
+                    .Cedula = info.CI,
+                    .NombreCompleto = info.Nombre,
+                    .Tipo = "Viáticos",
+                    .Anio = CInt(h.Anio),
+                    .Mes = CInt(h.Mes),
+                    .Fecha = CType(Nothing, Date?),
+                    .Minutos = CType(Nothing, Integer?),
+                    .Dias = CType(Nothing, Integer?),
+                    .Incidencia = h.Incidencia,
+                    .Observaciones = CType(Nothing, String),
+                    .Motivo = h.Motivo,
+                    .Area = CType(Nothing, String)
+                })
                 End If
             Next
         End If
 
         ' --- Custodias ---
         If Not tipo.HasValue OrElse tipo.Value = TipoHistorico.Custodias Then
-            Dim custodias As IEnumerable(Of HistoricoCustodia)
+            Dim custList As IEnumerable(Of HistoricoCustodia)
             If idPolicia.HasValue Then
-                custodias = Await uow.Repository(Of HistoricoCustodia)().FindAsync(Function(h) h.FuncionarioId = idPolicia.Value)
+                custList = Await uow.Repository(Of HistoricoCustodia)().FindAsync(
+                Function(h) h.FuncionarioId = idPolicia.Value)
             Else
-                custodias = Await uow.Repository(Of HistoricoCustodia)().GetAllByPredicateAsync(Function(h) True)
+                custList = Await uow.Repository(Of HistoricoCustodia)().GetAllByPredicateAsync(
+                Function(h) True)
             End If
-            For Each h In custodias
-                Dim y As Integer = h.Fecha.Year
+
+            For Each h In custList
+                Dim a As Integer = h.Fecha.Year
                 Dim m As Integer = h.Fecha.Month
-                If (Not anio.HasValue OrElse y = anio.Value) AndAlso (Not mes.HasValue OrElse m = mes.Value) Then
+                If (Not anio.HasValue OrElse a = anio.Value) AndAlso
+               (Not mes.HasValue OrElse m = mes.Value) Then
+                    Dim info = getFuncionarioInfo(h.FuncionarioId)
                     datos.Add(New With {
-                        .FuncionarioId = h.FuncionarioId,
-                        .Tipo = "Custodias",
-                        .Anio = y,
-                        .Mes = m,
-                        .Fecha = CType(h.Fecha, Date?),
-                        .Minutos = CType(Nothing, Integer?),
-                        .Dias = CType(Nothing, Integer?),
-                        .Incidencia = CType(Nothing, String),
-                        .Observaciones = CType(Nothing, String),
-                        .Motivo = CType(Nothing, String),
-                        .Area = h.Area
-                    })
+                    .FuncionarioId = h.FuncionarioId,
+                    .Cedula = info.CI,
+                    .NombreCompleto = info.Nombre,
+                    .Tipo = "Custodias",
+                    .Anio = a,
+                    .Mes = m,
+                    .Fecha = CType(h.Fecha, Date?),
+                    .Minutos = CType(Nothing, Integer?),
+                    .Dias = CType(Nothing, Integer?),
+                    .Incidencia = CType(Nothing, String),
+                    .Observaciones = CType(Nothing, String),
+                    .Motivo = CType(Nothing, String),
+                    .Area = h.Area
+                })
                 End If
             Next
         End If
 
-        ' Construye el DataTable a partir de la colección unificada.
+        ' Construye el DataTable con todas las columnas (FuncionarioId, Cedula, NombreCompleto, Tipo, Anio, Mes, Fecha, Minutos, Dias, Incidencia, Observaciones, Motivo, Area)
         Return ModuloExtensions.ToDataTable(datos)
     End Function
 End Module
