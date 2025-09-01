@@ -348,19 +348,19 @@ Public Class frmFuncionarioCrear
     End Sub
 
     Private Sub SincronizarEstados()
-        For Each estadoAEliminar In _estadosParaEliminar
-            Dim estadoEnDb = _uow.Context.Set(Of EstadoTransitorio).Find(estadoAEliminar.Id)
-            If estadoEnDb IsNot Nothing Then _uow.Repository(Of EstadoTransitorio).Remove(estadoEnDb)
-        Next
+        ' Borrados: ya están marcados como Deleted en el click
+
         For Each row In _estadoRows
             Dim estado = row.EntityRef
             If estado.Id <= 0 Then
                 _funcionario.EstadoTransitorio.Add(estado)
             Else
+                estado.Funcionario = _funcionario
                 _uow.Context.Entry(estado).State = EntityState.Modified
             End If
         Next
     End Sub
+
 
 #End Region
 
@@ -465,12 +465,30 @@ Public Class frmFuncionarioCrear
     Private Sub btnQuitarEstado_Click(sender As Object, e As EventArgs) Handles btnQuitarEstado.Click
         Dim row = TryCast(dgvEstadosTransitorios.CurrentRow?.DataBoundItem, EstadoRow)
         If row?.EntityRef Is Nothing Then Return
-        If MessageBox.Show("¿Está seguro de que desea quitar este estado transitorio?", "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
-            If row.EntityRef.Id > 0 Then _estadosParaEliminar.Add(row.EntityRef)
-            _estadoRows.Remove(row)
-            bsEstados.ResetBindings(False)
+
+        If MessageBox.Show("¿Está seguro de que desea quitar este estado transitorio?", "Confirmar Eliminación",
+                       MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then Return
+
+        Dim entidad = row.EntityRef
+
+        If entidad.Id > 0 Then
+            ' Importante: NO rompas la relación de navegación.
+            ' NO hagas: _funcionario.EstadoTransitorio.Remove(entidad)
+
+            ' Marcá la entidad (y su detalle) como Deleted ya, así EF no intenta nullear FKs
+            MarcarParaEliminar(entidad)
+        Else
+            ' Era nuevo/no persistido: simplemente sacalo del contexto
+            If _uow.Context.Entry(entidad).State <> EntityState.Detached Then
+                _uow.Context.Entry(entidad).State = EntityState.Detached
+            End If
         End If
+
+        ' Actualizá solo la UI
+        _estadoRows.Remove(row)
+        bsEstados.ResetBindings(False)
     End Sub
+
 
     Private Sub dgvDotacion_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
         Dim dgv = CType(sender, DataGridView)
@@ -629,5 +647,29 @@ Public Class frmFuncionarioCrear
         End If
     End Sub
 #End Region
+    Private Sub MarcarParaEliminar(estado As EstadoTransitorio)
+        ' Attach si viniera detached
+        If _uow.Context.Entry(estado).State = EntityState.Detached Then
+            _uow.Context.Set(Of EstadoTransitorio)().Attach(estado)
+        End If
+
+        ' Si NO tenés ON DELETE CASCADE en BD, eliminá explícitamente el detalle correspondiente
+        If estado.DesignacionDetalle IsNot Nothing Then _uow.Context.Entry(estado.DesignacionDetalle).State = EntityState.Deleted
+        If estado.EnfermedadDetalle IsNot Nothing Then _uow.Context.Entry(estado.EnfermedadDetalle).State = EntityState.Deleted
+        If estado.SancionDetalle IsNot Nothing Then _uow.Context.Entry(estado.SancionDetalle).State = EntityState.Deleted
+        If estado.OrdenCincoDetalle IsNot Nothing Then _uow.Context.Entry(estado.OrdenCincoDetalle).State = EntityState.Deleted
+        If estado.RetenDetalle IsNot Nothing Then _uow.Context.Entry(estado.RetenDetalle).State = EntityState.Deleted
+        If estado.SumarioDetalle IsNot Nothing Then _uow.Context.Entry(estado.SumarioDetalle).State = EntityState.Deleted
+        If estado.TrasladoDetalle IsNot Nothing Then _uow.Context.Entry(estado.TrasladoDetalle).State = EntityState.Deleted
+        If estado.BajaDeFuncionarioDetalle IsNot Nothing Then _uow.Context.Entry(estado.BajaDeFuncionarioDetalle).State = EntityState.Deleted
+        If estado.CambioDeCargoDetalle IsNot Nothing Then _uow.Context.Entry(estado.CambioDeCargoDetalle).State = EntityState.Deleted
+        If estado.ReactivacionDeFuncionarioDetalle IsNot Nothing Then _uow.Context.Entry(estado.ReactivacionDeFuncionarioDetalle).State = EntityState.Deleted
+        If estado.SeparacionDelCargoDetalle IsNot Nothing Then _uow.Context.Entry(estado.SeparacionDelCargoDetalle).State = EntityState.Deleted
+        If estado.InicioDeProcesamientoDetalle IsNot Nothing Then _uow.Context.Entry(estado.InicioDeProcesamientoDetalle).State = EntityState.Deleted
+        If estado.DesarmadoDetalle IsNot Nothing Then _uow.Context.Entry(estado.DesarmadoDetalle).State = EntityState.Deleted
+
+        ' Ahora sí: eliminá el estado
+        _uow.Context.Entry(estado).State = EntityState.Deleted
+    End Sub
 
 End Class
