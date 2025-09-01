@@ -106,45 +106,143 @@ Public Class frmFuncionarioCrear
 
     Private Sub LoadEstadoTransitorioDetails(et As EstadoTransitorio)
         Select Case et.TipoEstadoTransitorioId
-            Case 1 : _uow.Context.Entry(et).Reference(Function(x) x.DesignacionDetalle).Load()
-            Case 2 : _uow.Context.Entry(et).Reference(Function(x) x.EnfermedadDetalle).Load()
-            Case 3 : _uow.Context.Entry(et).Reference(Function(x) x.SancionDetalle).Load()
-            Case 4 : _uow.Context.Entry(et).Reference(Function(x) x.OrdenCincoDetalle).Load()
-            Case 5 : _uow.Context.Entry(et).Reference(Function(x) x.RetenDetalle).Load()
-            Case 6 : _uow.Context.Entry(et).Reference(Function(x) x.SumarioDetalle).Load()
-            Case 19 : _uow.Context.Entry(et).Reference(Function(x) x.BajaDeFuncionarioDetalle).Load()
-            Case 20 : _uow.Context.Entry(et).Reference(Function(x) x.CambioDeCargoDetalle).Load()
-            Case 21 : _uow.Context.Entry(et).Reference(Function(x) x.TrasladoDetalle).Load()
-            Case 22 : _uow.Context.Entry(et).Reference(Function(x) x.ReactivacionDeFuncionarioDetalle).Load()
-        ' IDs para los nuevos estados
-            Case 23 : _uow.Context.Entry(et).Reference(Function(x) x.SeparacionDelCargoDetalle).Load()
-            Case 24 : _uow.Context.Entry(et).Reference(Function(x) x.InicioDeProcesamientoDetalle).Load()
-            Case 25 : _uow.Context.Entry(et).Reference(Function(x) x.DesarmadoDetalle).Load()
+            Case TiposEstadoCatalog.Designacion
+                _uow.Context.Entry(et).Reference(Function(x) x.DesignacionDetalle).Load()
+
+            Case TiposEstadoCatalog.Enfermedad
+                _uow.Context.Entry(et).Reference(Function(x) x.EnfermedadDetalle).Load()
+
+            Case TiposEstadoCatalog.Sancion
+                _uow.Context.Entry(et).Reference(Function(x) x.SancionDetalle).Load()
+
+            Case TiposEstadoCatalog.OrdenCinco
+                _uow.Context.Entry(et).Reference(Function(x) x.OrdenCincoDetalle).Load()
+
+            Case TiposEstadoCatalog.Reten
+                _uow.Context.Entry(et).Reference(Function(x) x.RetenDetalle).Load()
+
+            Case TiposEstadoCatalog.Sumario
+                _uow.Context.Entry(et).Reference(Function(x) x.SumarioDetalle).Load()
+
+            Case TiposEstadoCatalog.BajaDeFuncionario
+                _uow.Context.Entry(et).Reference(Function(x) x.BajaDeFuncionarioDetalle).Load()
+
+            Case TiposEstadoCatalog.CambioDeCargo
+                _uow.Context.Entry(et).Reference(Function(x) x.CambioDeCargoDetalle).Load()
+
+            Case TiposEstadoCatalog.Traslado
+                _uow.Context.Entry(et).Reference(Function(x) x.TrasladoDetalle).Load()
+
+            Case TiposEstadoCatalog.ReactivacionDeFuncionario
+                _uow.Context.Entry(et).Reference(Function(x) x.ReactivacionDeFuncionarioDetalle).Load()
+
+            Case TiposEstadoCatalog.SeparacionDelCargo
+                _uow.Context.Entry(et).Reference(Function(x) x.SeparacionDelCargoDetalle).Load()
+
+            Case TiposEstadoCatalog.InicioDeProcesamiento
+                _uow.Context.Entry(et).Reference(Function(x) x.InicioDeProcesamientoDetalle).Load()
+
+            Case TiposEstadoCatalog.Desarmado
+                _uow.Context.Entry(et).Reference(Function(x) x.DesarmadoDetalle).Load()
         End Select
     End Sub
 
 
+
     Private Function BuildEstadoRow(e As EstadoTransitorio, origen As String) As EstadoRow
-        Dim tipoNombre = _tiposEstadoTransitorio.FirstOrDefault(Function(t) t.Id = e.TipoEstadoTransitorioId)?.Nombre
-        Dim fd As Date? = Nothing, fh As Date? = Nothing, obs As String = "", det As String = ""
+        ' Nombre del tipo
+        Dim tipoNombre = _tiposEstadoTransitorio _
+        .FirstOrDefault(Function(t) t.Id = e.TipoEstadoTransitorioId)?.Nombre
+
+        ' Fechas (centralizado, sin duplicar lógica)
+        Dim fd As Date? = Nothing, fh As Date? = Nothing
+        e.GetFechas(fd, fh)
+
+        Dim obs As String = String.Empty
+        Dim det As String = String.Empty
+
         Select Case e.TipoEstadoTransitorioId
-            Case 1 : If e.DesignacionDetalle IsNot Nothing Then fd = e.DesignacionDetalle.FechaDesde : fh = e.DesignacionDetalle.FechaHasta : obs = e.DesignacionDetalle.Observaciones : If Not String.IsNullOrWhiteSpace(e.DesignacionDetalle.DocResolucion) Then det = $"Resolución: {e.DesignacionDetalle.DocResolucion}"
-            Case 2 : If e.EnfermedadDetalle IsNot Nothing Then fd = e.EnfermedadDetalle.FechaDesde : fh = e.EnfermedadDetalle.FechaHasta : obs = e.EnfermedadDetalle.Observaciones : If Not String.IsNullOrWhiteSpace(e.EnfermedadDetalle.Diagnostico) Then det = $"Diagnóstico: {e.EnfermedadDetalle.Diagnostico}"
-            Case 3 : If e.SancionDetalle IsNot Nothing Then fd = e.SancionDetalle.FechaDesde : fh = e.SancionDetalle.FechaHasta : obs = e.SancionDetalle.Observaciones : If Not String.IsNullOrWhiteSpace(e.SancionDetalle.Resolucion) Then det = $"Resolución: {e.SancionDetalle.Resolucion}"
-            Case 4 : If e.OrdenCincoDetalle IsNot Nothing Then fd = e.OrdenCincoDetalle.FechaDesde : fh = e.OrdenCincoDetalle.FechaHasta : obs = e.OrdenCincoDetalle.Observaciones
-            Case 5 : If e.RetenDetalle IsNot Nothing Then fd = e.RetenDetalle.FechaReten : fh = Nothing : obs = e.RetenDetalle.Observaciones : If Not String.IsNullOrWhiteSpace(e.RetenDetalle.Turno) Then det = $"Turno: {e.RetenDetalle.Turno}"
-            Case 6 : If e.SumarioDetalle IsNot Nothing Then fd = e.SumarioDetalle.FechaDesde : fh = e.SumarioDetalle.FechaHasta : obs = e.SumarioDetalle.Observaciones : If Not String.IsNullOrWhiteSpace(e.SumarioDetalle.Expediente) Then det = $"Expediente: {e.SumarioDetalle.Expediente}"
-            Case 19 : If e.BajaDeFuncionarioDetalle IsNot Nothing Then fd = e.BajaDeFuncionarioDetalle.FechaDesde : obs = e.BajaDeFuncionarioDetalle.Observaciones
-            Case 20 : If e.CambioDeCargoDetalle IsNot Nothing Then fd = e.CambioDeCargoDetalle.FechaDesde : obs = e.CambioDeCargoDetalle.Observaciones
-            Case 21 : If e.TrasladoDetalle IsNot Nothing Then fd = e.TrasladoDetalle.FechaDesde : obs = e.TrasladoDetalle.Observaciones
-            Case 22 : If e.ReactivacionDeFuncionarioDetalle IsNot Nothing Then fd = e.ReactivacionDeFuncionarioDetalle.FechaDesde : obs = e.ReactivacionDeFuncionarioDetalle.Observaciones
-            Case 23 : If e.SeparacionDelCargoDetalle IsNot Nothing Then fd = e.SeparacionDelCargoDetalle.FechaDesde : fh = e.SeparacionDelCargoDetalle.FechaHasta : obs = e.SeparacionDelCargoDetalle.Observaciones
-            Case 24 : If e.InicioDeProcesamientoDetalle IsNot Nothing Then fd = e.InicioDeProcesamientoDetalle.FechaDesde : fh = e.InicioDeProcesamientoDetalle.FechaHasta : obs = e.InicioDeProcesamientoDetalle.Observaciones
-            Case 25 : If e.DesarmadoDetalle IsNot Nothing Then fd = e.DesarmadoDetalle.FechaDesde : fh = e.DesarmadoDetalle.FechaHasta : obs = e.DesarmadoDetalle.Observaciones
+            Case TiposEstadoCatalog.Designacion
+                Dim d = e.DesignacionDetalle
+                If d IsNot Nothing Then
+                    obs = d.Observaciones
+                    If Not String.IsNullOrWhiteSpace(d.DocResolucion) Then det = $"Resolución: {d.DocResolucion}"
+                End If
+
+            Case TiposEstadoCatalog.Enfermedad
+                Dim d = e.EnfermedadDetalle
+                If d IsNot Nothing Then
+                    obs = d.Observaciones
+                    If Not String.IsNullOrWhiteSpace(d.Diagnostico) Then det = $"Diagnóstico: {d.Diagnostico}"
+                End If
+
+            Case TiposEstadoCatalog.Sancion
+                Dim d = e.SancionDetalle
+                If d IsNot Nothing Then
+                    obs = d.Observaciones
+                    If Not String.IsNullOrWhiteSpace(d.Resolucion) Then det = $"Resolución: {d.Resolucion}"
+                End If
+
+            Case TiposEstadoCatalog.OrdenCinco
+                Dim d = e.OrdenCincoDetalle
+                If d IsNot Nothing Then obs = d.Observaciones
+
+            Case TiposEstadoCatalog.Reten
+                Dim d = e.RetenDetalle
+                If d IsNot Nothing Then
+                    obs = d.Observaciones
+                    If Not String.IsNullOrWhiteSpace(d.Turno) Then det = $"Turno: {d.Turno}"
+                End If
+
+            Case TiposEstadoCatalog.Sumario
+                Dim d = e.SumarioDetalle
+                If d IsNot Nothing Then
+                    obs = d.Observaciones
+                    If Not String.IsNullOrWhiteSpace(d.Expediente) Then det = $"Expediente: {d.Expediente}"
+                End If
+
+            Case TiposEstadoCatalog.Traslado
+                Dim d = e.TrasladoDetalle
+                If d IsNot Nothing Then obs = d.Observaciones
+
+            Case TiposEstadoCatalog.BajaDeFuncionario
+                Dim d = e.BajaDeFuncionarioDetalle
+                If d IsNot Nothing Then obs = d.Observaciones
+
+            Case TiposEstadoCatalog.CambioDeCargo
+                Dim d = e.CambioDeCargoDetalle
+                If d IsNot Nothing Then obs = d.Observaciones
+
+            Case TiposEstadoCatalog.ReactivacionDeFuncionario
+                Dim d = e.ReactivacionDeFuncionarioDetalle
+                If d IsNot Nothing Then obs = d.Observaciones
+
+            Case TiposEstadoCatalog.SeparacionDelCargo
+                Dim d = e.SeparacionDelCargoDetalle
+                If d IsNot Nothing Then obs = d.Observaciones
+
+            Case TiposEstadoCatalog.InicioDeProcesamiento
+                Dim d = e.InicioDeProcesamientoDetalle
+                If d IsNot Nothing Then obs = d.Observaciones
+
+            Case TiposEstadoCatalog.Desarmado
+                Dim d = e.DesarmadoDetalle
+                If d IsNot Nothing Then obs = d.Observaciones
         End Select
+
         Dim obsFinal = If(String.IsNullOrWhiteSpace(det), obs, $"{det} | {obs}")
-        Return New EstadoRow With {.Id = e.Id, .Origen = origen, .TipoEstado = If(tipoNombre, String.Empty), .FechaDesde = fd, .FechaHasta = fh, .Observaciones = obsFinal, .EntityRef = e}
+
+        Return New EstadoRow With {
+        .Id = e.Id,
+        .Origen = origen,
+        .TipoEstado = If(tipoNombre, String.Empty),
+        .FechaDesde = fd,
+        .FechaHasta = fh,
+        .Observaciones = obsFinal,
+        .EntityRef = e
+    }
     End Function
+
 
     Private Sub CargarDatosEnControles()
         txtCI.Text = _funcionario.CI
