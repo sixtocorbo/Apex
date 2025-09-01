@@ -69,7 +69,6 @@ Partial Class frmFuncionarioCrear
         Me.pbFoto = New System.Windows.Forms.PictureBox()
         Me.btnSeleccionarFoto = New System.Windows.Forms.Button()
         Me.TableLayoutPanelDatosGenerales = New System.Windows.Forms.TableLayoutPanel()
-        Me.chkDesarmado = New System.Windows.Forms.CheckBox()
         Me.lblCI = New System.Windows.Forms.Label()
         Me.txtCI = New System.Windows.Forms.TextBox()
         Me.lblNombre = New System.Windows.Forms.Label()
@@ -97,8 +96,6 @@ Partial Class frmFuncionarioCrear
         Me.lblHorario = New System.Windows.Forms.Label()
         Me.cboHorario = New System.Windows.Forms.ComboBox()
         Me.chkActivo = New System.Windows.Forms.CheckBox()
-        Me.chkProcesado = New System.Windows.Forms.CheckBox()
-        Me.chkSeparado = New System.Windows.Forms.CheckBox()
         Me.TabControlMain = New System.Windows.Forms.TabControl()
         Me.FlowLayoutPanel1.SuspendLayout()
         Me.TabPageEstadosTransitorios.SuspendLayout()
@@ -682,7 +679,6 @@ Partial Class frmFuncionarioCrear
         Me.TableLayoutPanelDatosGenerales.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
         Me.TableLayoutPanelDatosGenerales.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
         Me.TableLayoutPanelDatosGenerales.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-        Me.TableLayoutPanelDatosGenerales.Controls.Add(Me.chkDesarmado, 3, 7)
         Me.TableLayoutPanelDatosGenerales.Controls.Add(Me.lblCI, 0, 0)
         Me.TableLayoutPanelDatosGenerales.Controls.Add(Me.txtCI, 1, 0)
         Me.TableLayoutPanelDatosGenerales.Controls.Add(Me.lblNombre, 0, 1)
@@ -710,8 +706,6 @@ Partial Class frmFuncionarioCrear
         Me.TableLayoutPanelDatosGenerales.Controls.Add(Me.lblHorario, 2, 5)
         Me.TableLayoutPanelDatosGenerales.Controls.Add(Me.cboHorario, 3, 5)
         Me.TableLayoutPanelDatosGenerales.Controls.Add(Me.chkActivo, 0, 7)
-        Me.TableLayoutPanelDatosGenerales.Controls.Add(Me.chkProcesado, 2, 7)
-        Me.TableLayoutPanelDatosGenerales.Controls.Add(Me.chkSeparado, 1, 7)
         Me.TableLayoutPanelDatosGenerales.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TableLayoutPanelDatosGenerales.Location = New System.Drawing.Point(304, 5)
         Me.TableLayoutPanelDatosGenerales.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
@@ -728,18 +722,6 @@ Partial Class frmFuncionarioCrear
         Me.TableLayoutPanelDatosGenerales.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 12.5!))
         Me.TableLayoutPanelDatosGenerales.Size = New System.Drawing.Size(830, 551)
         Me.TableLayoutPanelDatosGenerales.TabIndex = 2
-        '
-        'chkDesarmado
-        '
-        Me.chkDesarmado.Anchor = System.Windows.Forms.AnchorStyles.Left
-        Me.chkDesarmado.AutoSize = True
-        Me.chkDesarmado.Location = New System.Drawing.Point(531, 501)
-        Me.chkDesarmado.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.chkDesarmado.Name = "chkDesarmado"
-        Me.chkDesarmado.Size = New System.Drawing.Size(118, 24)
-        Me.chkDesarmado.TabIndex = 29
-        Me.chkDesarmado.Text = "Desarmado"
-        Me.chkDesarmado.UseVisualStyleBackColor = True
         '
         'lblCI
         '
@@ -1025,30 +1007,6 @@ Partial Class frmFuncionarioCrear
         Me.chkActivo.Text = "Activo"
         Me.chkActivo.UseVisualStyleBackColor = True
         '
-        'chkProcesado
-        '
-        Me.chkProcesado.Anchor = System.Windows.Forms.AnchorStyles.Left
-        Me.chkProcesado.AutoSize = True
-        Me.chkProcesado.Location = New System.Drawing.Point(393, 501)
-        Me.chkProcesado.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.chkProcesado.Name = "chkProcesado"
-        Me.chkProcesado.Size = New System.Drawing.Size(111, 24)
-        Me.chkProcesado.TabIndex = 30
-        Me.chkProcesado.Text = "Procesado"
-        Me.chkProcesado.UseVisualStyleBackColor = True
-        '
-        'chkSeparado
-        '
-        Me.chkSeparado.Anchor = System.Windows.Forms.AnchorStyles.Left
-        Me.chkSeparado.AutoSize = True
-        Me.chkSeparado.Location = New System.Drawing.Point(90, 501)
-        Me.chkSeparado.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.chkSeparado.Name = "chkSeparado"
-        Me.chkSeparado.Size = New System.Drawing.Size(152, 24)
-        Me.chkSeparado.TabIndex = 27
-        Me.chkSeparado.Text = "Separado Cargo"
-        Me.chkSeparado.UseVisualStyleBackColor = True
-        '
         'TabControlMain
         '
         Me.TabControlMain.Controls.Add(Me.TabPageGeneral)
@@ -1169,9 +1127,6 @@ Partial Class frmFuncionarioCrear
     Friend WithEvents cboSemana As ComboBox
     Friend WithEvents lblHorario As Label
     Friend WithEvents cboHorario As ComboBox
-    Friend WithEvents chkProcesado As CheckBox
-    Friend WithEvents chkDesarmado As CheckBox
-    Friend WithEvents chkSeparado As CheckBox
     Friend WithEvents lblCiudad As Label
     Friend WithEvents txtCiudad As TextBox
     Friend WithEvents lblSeccional As Label

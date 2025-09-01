@@ -37,9 +37,6 @@ Partial Public Class Funcionario
     Public Property FuncionId As Nullable(Of Integer)
     Public Property LastPictureId As Nullable(Of Integer)
     Public Property Telefono As String
-    Public Property Procesado As Boolean
-    Public Property SeparadoDeCargo As Boolean
-    Public Property Desarmado As Boolean
     Public Property Ciudad As String
     Public Property Credencial As String
     Public Property Seccional As String

@@ -26,10 +26,12 @@ Partial Public Class ApexEntities
 
     Public Overridable Property AreaTrabajo() As DbSet(Of AreaTrabajo)
     Public Overridable Property Arma() As DbSet(Of Arma)
+    Public Overridable Property AuditoriaCambios() As DbSet(Of AuditoriaCambios)
     Public Overridable Property BajaDeFuncionarioDetalle() As DbSet(Of BajaDeFuncionarioDetalle)
     Public Overridable Property CambioDeCargoDetalle() As DbSet(Of CambioDeCargoDetalle)
     Public Overridable Property Cargo() As DbSet(Of Cargo)
     Public Overridable Property CategoriaAusencia() As DbSet(Of CategoriaAusencia)
+    Public Overridable Property DesarmadoDetalle() As DbSet(Of DesarmadoDetalle)
     Public Overridable Property DesignacionDetalle() As DbSet(Of DesignacionDetalle)
     Public Overridable Property DotacionItem() As DbSet(Of DotacionItem)
     Public Overridable Property EnfermedadDetalle() As DbSet(Of EnfermedadDetalle)
@@ -91,12 +93,11 @@ Partial Public Class ApexEntities
     Public Overridable Property vw_FuncionarioEstadosConsolidados() As DbSet(Of vw_FuncionarioEstadosConsolidados)
     Public Overridable Property vw_FuncionarioSituacionActual() As DbSet(Of vw_FuncionarioSituacionActual)
     Public Overridable Property vw_LicenciasCompletas() As DbSet(Of vw_LicenciasCompletas)
+    Public Overridable Property vw_LicenciasConFuncionario() As DbSet(Of vw_LicenciasConFuncionario)
     Public Overridable Property vw_NotificacionesCompletas() As DbSet(Of vw_NotificacionesCompletas)
     Public Overridable Property vw_NovedadesAgrupadas() As DbSet(Of vw_NovedadesAgrupadas)
     Public Overridable Property vw_NovedadesCompletas() As DbSet(Of vw_NovedadesCompletas)
     Public Overridable Property vw_SancionesCompletas() As DbSet(Of vw_SancionesCompletas)
-    Public Overridable Property AuditoriaCambios() As DbSet(Of AuditoriaCambios)
-    Public Overridable Property vw_LicenciasConFuncionario() As DbSet(Of vw_LicenciasConFuncionario)
 
     Public Overridable Function sp_alterdiagram(diagramname As String, owner_id As Nullable(Of Integer), version As Nullable(Of Integer), definition As Byte()) As Integer
         Dim diagramnameParameter As ObjectParameter = If(diagramname IsNot Nothing, New ObjectParameter("diagramname", diagramname), New ObjectParameter("diagramname", GetType(String)))
@@ -188,10 +189,10 @@ Partial Public Class ApexEntities
         Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_MigrarDotacionesCompletas")
     End Function
 
-    Public Overridable Function usp_PresenciaFecha_Apex(fecha As Nullable(Of Date)) As Integer
+    Public Overridable Function usp_PresenciaFecha_Apex(fecha As Nullable(Of Date)) As ObjectResult(Of usp_PresenciaFecha_Apex_Result)
         Dim fechaParameter As ObjectParameter = If(fecha.HasValue, New ObjectParameter("Fecha", fecha), New ObjectParameter("Fecha", GetType(Date)))
 
-        Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_PresenciaFecha_Apex", fechaParameter)
+        Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction(Of usp_PresenciaFecha_Apex_Result)("usp_PresenciaFecha_Apex", fechaParameter)
     End Function
 
     Public Overridable Function usp_ProcesarEstadoNotificaciones() As Integer

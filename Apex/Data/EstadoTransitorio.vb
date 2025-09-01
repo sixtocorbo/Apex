@@ -19,6 +19,7 @@ Partial Public Class EstadoTransitorio
 
     Public Overridable Property BajaDeFuncionarioDetalle As BajaDeFuncionarioDetalle
     Public Overridable Property CambioDeCargoDetalle As CambioDeCargoDetalle
+    Public Overridable Property DesarmadoDetalle As DesarmadoDetalle
     Public Overridable Property DesignacionDetalle As DesignacionDetalle
     Public Overridable Property EnfermedadDetalle As EnfermedadDetalle
     Public Overridable Property Funcionario As Funcionario

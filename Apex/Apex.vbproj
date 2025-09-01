@@ -207,6 +207,9 @@
     <Compile Include="Data\CategoriaAusencia.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
+    <Compile Include="Data\DesarmadoDetalle.vb">
+      <DependentUpon>Model1.tt</DependentUpon>
+    </Compile>
     <Compile Include="Data\DesignacionDetalle.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
@@ -404,6 +407,9 @@
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\UnitOfWork.vb" />
+    <Compile Include="Data\usp_PresenciaFecha_Apex_Result.vb">
+      <DependentUpon>Model1.tt</DependentUpon>
+    </Compile>
     <Compile Include="Data\Usuario.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
