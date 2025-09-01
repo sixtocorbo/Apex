@@ -1,5 +1,7 @@
 ﻿' Apex/Services/ReportesService.vb
 Imports System.Data.Entity
+Imports System.Linq
+Imports System.Threading.Tasks
 
 Public Class ReportesService
     Private ReadOnly _unitOfWork As IUnitOfWork
@@ -8,9 +10,35 @@ Public Class ReportesService
         _unitOfWork = New UnitOfWork()
     End Sub
 
+    ' Une sólo las partes no vacías con el separador indicado.
+    Private Shared Function JoinNonEmpty(sep As String, ParamArray items() As String) As String
+        If items Is Nothing Then Return String.Empty
+        Dim parts = items.
+            Where(Function(s) Not String.IsNullOrWhiteSpace(s)).
+            Select(Function(s) s.Trim())
+        Return String.Join(sep, parts)
+    End Function
+
+    ' Devuelve "Etiqueta: valor" sólo si value tiene contenido.
+    Private Shared Function Labeled(label As String, value As String) As String
+        If String.IsNullOrWhiteSpace(value) Then Return Nothing
+        Return $"{label}{value.Trim()}"
+    End Function
+
+    ' Normaliza el texto de Estado: SI/SÍ -> Activo, NO -> Inactivo, otro -> tal cual
+    Private Shared Function EstadoDisplay(valor As String) As String
+        If String.IsNullOrWhiteSpace(valor) Then Return Nothing
+        Dim raw = valor.Trim()
+        Dim v = raw.ToUpperInvariant()
+        If v = "SI" OrElse v = "SÍ" Then Return "Activo"
+        If v = "NO" Then Return "Inactivo"
+        Return raw
+    End Function
+
     Public Async Function GetDatosFichaFuncionalAsync(funcionarioId As Integer) As Task(Of FichaFuncionalDTO)
-        ' Se mantiene la consulta principal del funcionario con sus datos relacionados
-        Dim funcionario = Await _unitOfWork.Repository(Of Funcionario)().GetAll().
+        ' Consulta del funcionario con sus relaciones
+        Dim funcionario = Await _unitOfWork.Repository(Of Funcionario)().
+            GetAll().
             Include(Function(f) f.Cargo).
             Include(Function(f) f.Seccion).
             Include(Function(f) f.PuestoTrabajo).
@@ -28,14 +56,26 @@ Public Class ReportesService
 
         If funcionario Is Nothing Then Return Nothing
 
-        ' Se obtiene el valor del nuevo campo y se convierte a "Sí" o "No".
+        ' Estudia -> "Sí"/"No"
         Dim estudia As String = If(funcionario.Estudia, "Sí", "No")
 
-        ' Armar resumen de datos laborales y situación general
-        Dim datosLaborales = $"{funcionario.Cargo?.Nombre} {funcionario.Escalafon?.Nombre} {funcionario.Seccion?.Nombre} {funcionario.PuestoTrabajo?.Nombre}".Trim()
-        Dim situacionGeneral = $"Estado: {funcionario.Estado?.Nombre} | Turno: {funcionario.Turno?.Nombre} | Semana: {funcionario.Semana?.Nombre} | Horario: {funcionario.Horario?.Nombre}"
+        ' --- Datos Laborales (con etiquetas + separadores sólo entre partes no vacías) ---
+        Dim datosLaborales As String = JoinNonEmpty(" | ",
+            Labeled("Grado: ", funcionario.Cargo?.Grado?.ToString()),
+            Labeled("Escalafón: ", funcionario.Escalafon?.Nombre),
+            Labeled("Unidad: ", funcionario.Seccion?.Nombre),
+            Labeled("Puesto de trabajo: ", funcionario.PuestoTrabajo?.Nombre)
+        )
 
-        ' Mapear al DTO simplificado
+        ' --- Situación General (usa EstadoDisplay) ---
+        Dim situacionGeneral As String = JoinNonEmpty(" | ",
+            Labeled("Estado: ", EstadoDisplay(funcionario.Estado?.Nombre)),
+            Labeled("Turno: ", funcionario.Turno?.Nombre),
+            Labeled("Semana: ", funcionario.Semana?.Nombre),
+            Labeled("Horario: ", funcionario.Horario?.Nombre)
+        )
+
+        ' Mapear DTO (Estado ya normalizado)
         Dim dto As New FichaFuncionalDTO With {
             .NombreCompleto = funcionario.Nombre,
             .Cedula = funcionario.CI,
@@ -53,7 +93,7 @@ Public Class ReportesService
             .Turno = funcionario.Turno?.Nombre,
             .Semana = funcionario.Semana?.Nombre,
             .Horario = funcionario.Horario?.Nombre,
-            .Estado = funcionario.Estado?.Nombre,
+            .Estado = EstadoDisplay(funcionario.Estado?.Nombre),
             .Escalafon = funcionario.Escalafon?.Nombre,
             .Funcion = funcionario.Funcion?.Nombre,
             .Foto = funcionario.Foto,
@@ -68,9 +108,11 @@ Public Class ReportesService
 
         Return dto
     End Function
+
     Public Async Function GetDatosNotificacionAsync(notificacionId As Integer) As Task(Of vw_NotificacionesCompletas)
         Dim notificacion = Await _unitOfWork.Repository(Of vw_NotificacionesCompletas)().
-                                     GetAll().FirstOrDefaultAsync(Function(n) n.Id = notificacionId)
+            GetAll().
+            FirstOrDefaultAsync(Function(n) n.Id = notificacionId)
 
         Return notificacion
     End Function
