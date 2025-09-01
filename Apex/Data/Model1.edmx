@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="ApexModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="ApexModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="AreaTrabajo">
           <Key>
             <PropertyRef Name="Id" />
@@ -593,8 +593,8 @@
           </Key>
           <Property Name="EstadoTransitorioId" Type="int" Nullable="false" />
           <Property Name="FechaDesde" Type="date" Nullable="false" />
-          <Property Name="Observaciones" Type="nvarchar(max)" />
           <Property Name="FechaHasta" Type="date" />
+          <Property Name="Observaciones" Type="nvarchar(max)" />
         </EntityType>
         <EntityType Name="SumarioDetalle">
           <Key>
@@ -717,9 +717,9 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_EstadosTransitoriosCompletos' no
           <Property Name="CI" Type="char" MaxLength="8" Nullable="false" />
           <Property Name="NombreFuncionario" Type="nvarchar" MaxLength="60" Nullable="false" />
           <Property Name="TipoEstadoNombre" Type="nvarchar" MaxLength="60" Nullable="false" />
-          <Property Name="FechaDesde" Type="datetime" />
-          <Property Name="FechaHasta" Type="datetime" />
-          <Property Name="Observaciones" Type="varchar" MaxLength="500" />
+          <Property Name="FechaDesde" Type="date" />
+          <Property Name="FechaHasta" Type="date" />
+          <Property Name="Observaciones" Type="nvarchar(max)" />
           <Property Name="CreatedAt" Type="datetime2" Precision="7" Nullable="false" />
           <Property Name="UpdatedAt" Type="datetime2" Precision="7" />
         </EntityType>
@@ -1555,7 +1555,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_SeparacionCargo_EstadoTransitorio">
+        <Association Name="FK_SeparacionDelCargo_EstadoTransitorio">
           <End Role="EstadoTransitorio" Type="Self.EstadoTransitorio" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -2079,7 +2079,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             <End Role="EstadoTransitorio" EntitySet="EstadoTransitorio" />
             <End Role="SancionDetalle" EntitySet="SancionDetalle" />
           </AssociationSet>
-          <AssociationSet Name="FK_SeparacionCargo_EstadoTransitorio" Association="Self.FK_SeparacionCargo_EstadoTransitorio">
+          <AssociationSet Name="FK_SeparacionDelCargo_EstadoTransitorio" Association="Self.FK_SeparacionDelCargo_EstadoTransitorio">
             <End Role="EstadoTransitorio" EntitySet="EstadoTransitorio" />
             <End Role="SeparacionDelCargoDetalle" EntitySet="SeparacionDelCargoDetalle" />
           </AssociationSet>
@@ -2104,8 +2104,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             <End Role="Usuario" EntitySet="Usuario" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="ApexModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -2274,7 +2273,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <NavigationProperty Name="ReactivacionDeFuncionarioDetalle" Relationship="Self.FK_Reactivacion_EstadoTransitorio" FromRole="EstadoTransitorio" ToRole="ReactivacionDeFuncionarioDetalle" />
           <NavigationProperty Name="RetenDetalle" Relationship="Self.FK_RetenDetalle_EstadoTransitorio" FromRole="EstadoTransitorio" ToRole="RetenDetalle" />
           <NavigationProperty Name="SancionDetalle" Relationship="Self.FK_SancionDetalle_EstadoTransitorio" FromRole="EstadoTransitorio" ToRole="SancionDetalle" />
-          <NavigationProperty Name="SeparacionDelCargoDetalle" Relationship="Self.FK_SeparacionCargo_EstadoTransitorio" FromRole="EstadoTransitorio" ToRole="SeparacionDelCargoDetalle" />
+          <NavigationProperty Name="SeparacionDelCargoDetalle" Relationship="Self.FK_SeparacionDelCargo_EstadoTransitorio" FromRole="EstadoTransitorio" ToRole="SeparacionDelCargoDetalle" />
           <NavigationProperty Name="SumarioDetalle" Relationship="Self.FK_SumarioDetalle_EstadoTransitorio" FromRole="EstadoTransitorio" ToRole="SumarioDetalle" />
           <NavigationProperty Name="TrasladoDetalle" Relationship="Self.FK_TrasladoDetalle_EstadoTransitorio" FromRole="EstadoTransitorio" ToRole="TrasladoDetalle" />
         </EntityType>
@@ -2805,9 +2804,9 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           </Key>
           <Property Name="EstadoTransitorioId" Type="Int32" Nullable="false" />
           <Property Name="FechaDesde" Type="DateTime" Nullable="false" Precision="0" />
-          <Property Name="Observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="FechaHasta" Type="DateTime" Precision="0" />
-          <NavigationProperty Name="EstadoTransitorio" Relationship="Self.FK_SeparacionCargo_EstadoTransitorio" FromRole="SeparacionDelCargoDetalle" ToRole="EstadoTransitorio" />
+          <Property Name="Observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="EstadoTransitorio" Relationship="Self.FK_SeparacionDelCargo_EstadoTransitorio" FromRole="SeparacionDelCargoDetalle" ToRole="EstadoTransitorio" />
         </EntityType>
         <EntityType Name="SumarioDetalle">
           <Key>
@@ -2939,9 +2938,9 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <Property Name="CI" Type="String" MaxLength="8" FixedLength="true" Unicode="false" Nullable="false" />
           <Property Name="NombreFuncionario" Type="String" MaxLength="60" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="TipoEstadoNombre" Type="String" MaxLength="60" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="FechaDesde" Type="DateTime" Precision="3" />
-          <Property Name="FechaHasta" Type="DateTime" Precision="3" />
-          <Property Name="Observaciones" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="FechaDesde" Type="DateTime" Precision="0" />
+          <Property Name="FechaHasta" Type="DateTime" Precision="0" />
+          <Property Name="Observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
           <Property Name="UpdatedAt" Type="DateTime" Precision="7" />
         </EntityType>
@@ -3375,7 +3374,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_SeparacionCargo_EstadoTransitorio">
+        <Association Name="FK_SeparacionDelCargo_EstadoTransitorio">
           <End Role="EstadoTransitorio" Type="Self.EstadoTransitorio" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -4002,7 +4001,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             <End Role="EstadoTransitorio" EntitySet="EstadoTransitorio" />
             <End Role="SancionDetalle" EntitySet="SancionDetalle" />
           </AssociationSet>
-          <AssociationSet Name="FK_SeparacionCargo_EstadoTransitorio" Association="Self.FK_SeparacionCargo_EstadoTransitorio">
+          <AssociationSet Name="FK_SeparacionDelCargo_EstadoTransitorio" Association="Self.FK_SeparacionDelCargo_EstadoTransitorio">
             <End Role="EstadoTransitorio" EntitySet="EstadoTransitorio" />
             <End Role="SeparacionDelCargoDetalle" EntitySet="SeparacionDelCargoDetalle" />
           </AssociationSet>
@@ -4190,15 +4189,15 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           </FunctionImport>
           <FunctionImport Name="usp_Apex_ImportarDotacionFuncionario" />
           <FunctionImport Name="usp_Apex_ImportarLicenciasMasivas">
-            <Parameter Name="RegistrosAfectados" Mode="InOut" Type="Int32" />
+          <Parameter Name="RegistrosAfectados" Mode="InOut" Type="Int32" />
           </FunctionImport>
           <FunctionImport Name="usp_DeleteFuncionario">
-            <Parameter Name="FuncionarioId" Mode="In" Type="Int32" />
+          <Parameter Name="FuncionarioId" Mode="In" Type="Int32" />
           </FunctionImport>
           <FunctionImport Name="usp_LimpiarDatosDeApex" />
           <FunctionImport Name="usp_MigrarDotacionesCompletas" />
           <FunctionImport Name="usp_PresenciaFecha_Apex" ReturnType="Collection(ApexModel.usp_PresenciaFecha_Apex_Result)">
-            <Parameter Name="Fecha" Mode="In" Type="DateTime" />
+          <Parameter Name="Fecha" Mode="In" Type="DateTime" />
           </FunctionImport>
           <FunctionImport Name="usp_ProcesarEstadoNotificaciones" />
         </EntityContainer>
@@ -4857,8 +4856,8 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
               <MappingFragment StoreEntitySet="SeparacionDelCargoDetalle">
                 <ScalarProperty Name="EstadoTransitorioId" ColumnName="EstadoTransitorioId" />
                 <ScalarProperty Name="FechaDesde" ColumnName="FechaDesde" />
-                <ScalarProperty Name="Observaciones" ColumnName="Observaciones" />
                 <ScalarProperty Name="FechaHasta" ColumnName="FechaHasta" />
+                <ScalarProperty Name="Observaciones" ColumnName="Observaciones" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

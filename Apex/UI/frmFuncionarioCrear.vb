@@ -102,6 +102,8 @@ Public Class frmFuncionarioCrear
 
 #Region " Lógica de Carga y Mapeo de Datos "
 
+    ' Archivo: Apex/UI/frmFuncionarioCrear.vb
+
     Private Sub LoadEstadoTransitorioDetails(et As EstadoTransitorio)
         Select Case et.TipoEstadoTransitorioId
             Case 1 : _uow.Context.Entry(et).Reference(Function(x) x.DesignacionDetalle).Load()
@@ -114,11 +116,13 @@ Public Class frmFuncionarioCrear
             Case 20 : _uow.Context.Entry(et).Reference(Function(x) x.CambioDeCargoDetalle).Load()
             Case 21 : _uow.Context.Entry(et).Reference(Function(x) x.TrasladoDetalle).Load()
             Case 22 : _uow.Context.Entry(et).Reference(Function(x) x.ReactivacionDeFuncionarioDetalle).Load()
+        ' IDs para los nuevos estados
             Case 23 : _uow.Context.Entry(et).Reference(Function(x) x.SeparacionDelCargoDetalle).Load()
             Case 24 : _uow.Context.Entry(et).Reference(Function(x) x.InicioDeProcesamientoDetalle).Load()
             Case 25 : _uow.Context.Entry(et).Reference(Function(x) x.DesarmadoDetalle).Load()
         End Select
     End Sub
+
 
     Private Function BuildEstadoRow(e As EstadoTransitorio, origen As String) As EstadoRow
         Dim tipoNombre = _tiposEstadoTransitorio.FirstOrDefault(Function(t) t.Id = e.TipoEstadoTransitorioId)?.Nombre
@@ -134,11 +138,8 @@ Public Class frmFuncionarioCrear
             Case 20 : If e.CambioDeCargoDetalle IsNot Nothing Then fd = e.CambioDeCargoDetalle.FechaDesde : obs = e.CambioDeCargoDetalle.Observaciones
             Case 21 : If e.TrasladoDetalle IsNot Nothing Then fd = e.TrasladoDetalle.FechaDesde : obs = e.TrasladoDetalle.Observaciones
             Case 22 : If e.ReactivacionDeFuncionarioDetalle IsNot Nothing Then fd = e.ReactivacionDeFuncionarioDetalle.FechaDesde : obs = e.ReactivacionDeFuncionarioDetalle.Observaciones
-
-        ' LÍNEAS CORREGIDAS: Ahora también leen el campo FechaHasta
             Case 23 : If e.SeparacionDelCargoDetalle IsNot Nothing Then fd = e.SeparacionDelCargoDetalle.FechaDesde : fh = e.SeparacionDelCargoDetalle.FechaHasta : obs = e.SeparacionDelCargoDetalle.Observaciones
             Case 24 : If e.InicioDeProcesamientoDetalle IsNot Nothing Then fd = e.InicioDeProcesamientoDetalle.FechaDesde : fh = e.InicioDeProcesamientoDetalle.FechaHasta : obs = e.InicioDeProcesamientoDetalle.Observaciones
-
             Case 25 : If e.DesarmadoDetalle IsNot Nothing Then fd = e.DesarmadoDetalle.FechaDesde : fh = e.DesarmadoDetalle.FechaHasta : obs = e.DesarmadoDetalle.Observaciones
         End Select
         Dim obsFinal = If(String.IsNullOrWhiteSpace(det), obs, $"{det} | {obs}")
@@ -313,6 +314,8 @@ Public Class frmFuncionarioCrear
         End Try
     End Sub
 
+    ' Archivo: Apex/UI/frmFuncionarioCrear.vb
+
     Private Async Function CargarHistorialCompleto() As Task
         LoadingHelper.MostrarCargando(Me)
         Try
@@ -320,16 +323,16 @@ Public Class frmFuncionarioCrear
 
             ' CONSULTA CORREGIDA: Se añaden los .Include() que faltaban
             Dim historial = Await query.Include(Function(et) et.TipoEstadoTransitorio) _
-                                 .Include(Function(et) et.DesignacionDetalle) _
-                                 .Include(Function(et) et.SancionDetalle) _
-                                 .Include(Function(et) et.SumarioDetalle) _
-                                 .Include(Function(et) et.OrdenCincoDetalle) _
-                                 .Include(Function(et) et.EnfermedadDetalle) _
-                                 .Include(Function(et) et.RetenDetalle) _
-                                 .Include(Function(et) et.DesarmadoDetalle) _
-                                 .Include(Function(et) et.SeparacionDelCargoDetalle) _
-                                 .Include(Function(et) et.InicioDeProcesamientoDetalle) _
-                                 .OrderByDescending(Function(et) et.Id).ToListAsync()
+                             .Include(Function(et) et.DesignacionDetalle) _
+                             .Include(Function(et) et.SancionDetalle) _
+                             .Include(Function(et) et.SumarioDetalle) _
+                             .Include(Function(et) et.OrdenCincoDetalle) _
+                             .Include(Function(et) et.EnfermedadDetalle) _
+                             .Include(Function(et) et.RetenDetalle) _
+                             .Include(Function(et) et.DesarmadoDetalle) _
+                             .Include(Function(et) et.SeparacionDelCargoDetalle) _
+                             .Include(Function(et) et.InicioDeProcesamientoDetalle) _
+                             .OrderByDescending(Function(et) et.Id).ToListAsync()
 
             _estadoRows = MapEstadosHistorial(historial)
             bsEstados.DataSource = _estadoRows

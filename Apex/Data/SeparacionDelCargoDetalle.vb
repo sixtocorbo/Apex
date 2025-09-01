@@ -13,8 +13,8 @@ Imports System.Collections.Generic
 Partial Public Class SeparacionDelCargoDetalle
     Public Property EstadoTransitorioId As Integer
     Public Property FechaDesde As Date
-    Public Property Observaciones As String
     Public Property FechaHasta As Nullable(Of Date)
+    Public Property Observaciones As String
 
     Public Overridable Property EstadoTransitorio As EstadoTransitorio
 
