@@ -16,7 +16,6 @@ Public Class frmFuncionarioCrear
         Editar
     End Enum
 
-    ' --- View model para mostrar Estados en la grilla ---
     Private Class EstadoRow
         Public Property Id As Integer
         Public Property Origen As String
@@ -27,7 +26,6 @@ Public Class frmFuncionarioCrear
         Public Property EntityRef As EstadoTransitorio
     End Class
 
-    ' --- Variables de la clase ---
     Private ReadOnly _uow As UnitOfWork
     Private _funcionario As Funcionario
     Private ReadOnly _svc As FuncionarioService
@@ -36,16 +34,11 @@ Public Class frmFuncionarioCrear
     Private _rutaFotoSeleccionada As String
     Private _tiposEstadoTransitorio As List(Of TipoEstadoTransitorio)
     Private _itemsDotacion As List(Of DotacionItem)
-
     Private _dotaciones As BindingList(Of FuncionarioDotacion)
     Private _estadoRows As BindingList(Of EstadoRow)
     Private _estadosParaEliminar As New List(Of EstadoTransitorio)
-
-    ' BindingSources
     Private ReadOnly bsDotacion As New BindingSource()
     Private ReadOnly bsEstados As New BindingSource()
-
-    ' Estado de guardado / cierre
     Private _seGuardo As Boolean = False
     Private _cerrandoPorCodigo As Boolean = False
 
@@ -53,7 +46,6 @@ Public Class frmFuncionarioCrear
 
 #Region " Constructores y Carga del Formulario "
 
-    ' Constructor para modo CREAR
     Public Sub New()
         InitializeComponent()
         _modo = ModoFormulario.Crear
@@ -63,21 +55,16 @@ Public Class frmFuncionarioCrear
         _estadoRows = New BindingList(Of EstadoRow)()
     End Sub
 
-    ' Constructor para modo EDITAR
     Public Sub New(id As Integer)
         InitializeComponent()
         _modo = ModoFormulario.Editar
         _idFuncionario = id
         _uow = New UnitOfWork()
         _svc = New FuncionarioService(_uow)
-
-        ' Carga inicial del funcionario y sus relaciones
         _funcionario = _uow.Context.Set(Of Funcionario)().
             Include(Function(f) f.FuncionarioDotacion.Select(Function(fd) fd.DotacionItem)).
             Include(Function(f) f.EstadoTransitorio.Select(Function(et) et.TipoEstadoTransitorio)).
             FirstOrDefault(Function(f) f.Id = id)
-
-        ' Carga ansiosa (eager loading) de los detalles de cada estado transitorio
         If _funcionario?.EstadoTransitorio IsNot Nothing Then
             For Each et In _funcionario.EstadoTransitorio
                 LoadEstadoTransitorioDetails(et)
@@ -87,25 +74,19 @@ Public Class frmFuncionarioCrear
 
     Private Async Sub frmFuncionarioCrear_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
-
         If _funcionario Is Nothing AndAlso _modo = ModoFormulario.Editar Then
             MessageBox.Show("No se encontró el registro del funcionario.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             Close()
             Return
         End If
-
         Await CargarCombosAsync()
-
         _tiposEstadoTransitorio = Await _svc.ObtenerTiposEstadoTransitorioCompletosAsync()
         _itemsDotacion = Await _svc.ObtenerItemsDotacionCompletosAsync()
-
         _dotaciones = New BindingList(Of FuncionarioDotacion)(_funcionario.FuncionarioDotacion.ToList())
         _estadoRows = If(_modo = ModoFormulario.Editar, MapEstadosActivos(_funcionario.EstadoTransitorio.Where(AddressOf IsEstadoActivo)), New BindingList(Of EstadoRow)())
-
         ConfigurarGrillas()
         ConfigurarBindingSources()
         SuscribirEventosUI()
-
         If _modo = ModoFormulario.Editar Then
             Me.Text = "Editar Funcionario"
             btnGuardar.Text = "Actualizar"
@@ -122,7 +103,6 @@ Public Class frmFuncionarioCrear
 #Region " Lógica de Carga y Mapeo de Datos "
 
     Private Sub LoadEstadoTransitorioDetails(et As EstadoTransitorio)
-        ' (*** CAMBIO ***) Se incluyen los nuevos tipos de estado transitorio y el nuevo detalle de Desarmado
         Select Case et.TipoEstadoTransitorioId
             Case 1 : _uow.Context.Entry(et).Reference(Function(x) x.DesignacionDetalle).Load()
             Case 2 : _uow.Context.Entry(et).Reference(Function(x) x.EnfermedadDetalle).Load()
@@ -136,69 +116,30 @@ Public Class frmFuncionarioCrear
             Case 22 : _uow.Context.Entry(et).Reference(Function(x) x.ReactivacionDeFuncionarioDetalle).Load()
             Case 23 : _uow.Context.Entry(et).Reference(Function(x) x.SeparacionDelCargoDetalle).Load()
             Case 24 : _uow.Context.Entry(et).Reference(Function(x) x.InicioDeProcesamientoDetalle).Load()
-            Case 25 : _uow.Context.Entry(et).Reference(Function(x) x.DesarmadoDetalle).Load() ' Nuevo
+            Case 25 : _uow.Context.Entry(et).Reference(Function(x) x.DesarmadoDetalle).Load()
         End Select
     End Sub
 
     Private Function BuildEstadoRow(e As EstadoTransitorio, origen As String) As EstadoRow
         Dim tipoNombre = _tiposEstadoTransitorio.FirstOrDefault(Function(t) t.Id = e.TipoEstadoTransitorioId)?.Nombre
         Dim fd As Date? = Nothing, fh As Date? = Nothing, obs As String = "", det As String = ""
-
-        ' (*** CAMBIO ***) Se incluyen los nuevos tipos de estado transitorio y el nuevo detalle de Desarmado
         Select Case e.TipoEstadoTransitorioId
-            Case 1 ' Designación
-                If e.DesignacionDetalle IsNot Nothing Then
-                    fd = e.DesignacionDetalle.FechaDesde : fh = e.DesignacionDetalle.FechaHasta : obs = e.DesignacionDetalle.Observaciones
-                    If Not String.IsNullOrWhiteSpace(e.DesignacionDetalle.DocResolucion) Then det = $"Resolución: {e.DesignacionDetalle.DocResolucion}"
-                End If
-            Case 2 ' Enfermedad
-                If e.EnfermedadDetalle IsNot Nothing Then
-                    fd = e.EnfermedadDetalle.FechaDesde : fh = e.EnfermedadDetalle.FechaHasta : obs = e.EnfermedadDetalle.Observaciones
-                    If Not String.IsNullOrWhiteSpace(e.EnfermedadDetalle.Diagnostico) Then det = $"Diagnóstico: {e.EnfermedadDetalle.Diagnostico}"
-                End If
-            Case 3 ' Sanción
-                If e.SancionDetalle IsNot Nothing Then
-                    fd = e.SancionDetalle.FechaDesde : fh = e.SancionDetalle.FechaHasta : obs = e.SancionDetalle.Observaciones
-                    If Not String.IsNullOrWhiteSpace(e.SancionDetalle.Resolucion) Then det = $"Resolución: {e.SancionDetalle.Resolucion}"
-                End If
-            Case 4 ' Orden Cinco
-                If e.OrdenCincoDetalle IsNot Nothing Then
-                    fd = e.OrdenCincoDetalle.FechaDesde : fh = e.OrdenCincoDetalle.FechaHasta : obs = e.OrdenCincoDetalle.Observaciones
-                End If
-            Case 5 ' Retén
-                If e.RetenDetalle IsNot Nothing Then
-                    fd = e.RetenDetalle.FechaReten : fh = Nothing : obs = e.RetenDetalle.Observaciones
-                    If Not String.IsNullOrWhiteSpace(e.RetenDetalle.Turno) Then det = $"Turno: {e.RetenDetalle.Turno}"
-                End If
-            Case 6 ' Sumario
-                If e.SumarioDetalle IsNot Nothing Then
-                    fd = e.SumarioDetalle.FechaDesde : fh = e.SumarioDetalle.FechaHasta : obs = e.SumarioDetalle.Observaciones
-                    If Not String.IsNullOrWhiteSpace(e.SumarioDetalle.Expediente) Then det = $"Expediente: {e.SumarioDetalle.Expediente}"
-                End If
+            Case 1 : If e.DesignacionDetalle IsNot Nothing Then fd = e.DesignacionDetalle.FechaDesde : fh = e.DesignacionDetalle.FechaHasta : obs = e.DesignacionDetalle.Observaciones : If Not String.IsNullOrWhiteSpace(e.DesignacionDetalle.DocResolucion) Then det = $"Resolución: {e.DesignacionDetalle.DocResolucion}"
+            Case 2 : If e.EnfermedadDetalle IsNot Nothing Then fd = e.EnfermedadDetalle.FechaDesde : fh = e.EnfermedadDetalle.FechaHasta : obs = e.EnfermedadDetalle.Observaciones : If Not String.IsNullOrWhiteSpace(e.EnfermedadDetalle.Diagnostico) Then det = $"Diagnóstico: {e.EnfermedadDetalle.Diagnostico}"
+            Case 3 : If e.SancionDetalle IsNot Nothing Then fd = e.SancionDetalle.FechaDesde : fh = e.SancionDetalle.FechaHasta : obs = e.SancionDetalle.Observaciones : If Not String.IsNullOrWhiteSpace(e.SancionDetalle.Resolucion) Then det = $"Resolución: {e.SancionDetalle.Resolucion}"
+            Case 4 : If e.OrdenCincoDetalle IsNot Nothing Then fd = e.OrdenCincoDetalle.FechaDesde : fh = e.OrdenCincoDetalle.FechaHasta : obs = e.OrdenCincoDetalle.Observaciones
+            Case 5 : If e.RetenDetalle IsNot Nothing Then fd = e.RetenDetalle.FechaReten : fh = Nothing : obs = e.RetenDetalle.Observaciones : If Not String.IsNullOrWhiteSpace(e.RetenDetalle.Turno) Then det = $"Turno: {e.RetenDetalle.Turno}"
+            Case 6 : If e.SumarioDetalle IsNot Nothing Then fd = e.SumarioDetalle.FechaDesde : fh = e.SumarioDetalle.FechaHasta : obs = e.SumarioDetalle.Observaciones : If Not String.IsNullOrWhiteSpace(e.SumarioDetalle.Expediente) Then det = $"Expediente: {e.SumarioDetalle.Expediente}"
             Case 19 : If e.BajaDeFuncionarioDetalle IsNot Nothing Then fd = e.BajaDeFuncionarioDetalle.FechaDesde : obs = e.BajaDeFuncionarioDetalle.Observaciones
             Case 20 : If e.CambioDeCargoDetalle IsNot Nothing Then fd = e.CambioDeCargoDetalle.FechaDesde : obs = e.CambioDeCargoDetalle.Observaciones
             Case 21 : If e.TrasladoDetalle IsNot Nothing Then fd = e.TrasladoDetalle.FechaDesde : obs = e.TrasladoDetalle.Observaciones
             Case 22 : If e.ReactivacionDeFuncionarioDetalle IsNot Nothing Then fd = e.ReactivacionDeFuncionarioDetalle.FechaDesde : obs = e.ReactivacionDeFuncionarioDetalle.Observaciones
-            Case 23 ' Separación del Cargo
-                If e.SeparacionDelCargoDetalle IsNot Nothing Then
-                    fd = e.SeparacionDelCargoDetalle.FechaDesde : obs = e.SeparacionDelCargoDetalle.Observaciones
-                End If
-            Case 24 ' Inicio de Procesamiento
-                If e.InicioDeProcesamientoDetalle IsNot Nothing Then
-                    fd = e.InicioDeProcesamientoDetalle.FechaDesde : obs = e.InicioDeProcesamientoDetalle.Observaciones
-                End If
-            Case 25 ' Desarmado (Nuevo)
-                If e.DesarmadoDetalle IsNot Nothing Then
-                    fd = e.DesarmadoDetalle.FechaDesde : fh = e.DesarmadoDetalle.FechaHasta : obs = e.DesarmadoDetalle.Observaciones
-                End If
+            Case 23 : If e.SeparacionDelCargoDetalle IsNot Nothing Then fd = e.SeparacionDelCargoDetalle.FechaDesde : obs = e.SeparacionDelCargoDetalle.Observaciones
+            Case 24 : If e.InicioDeProcesamientoDetalle IsNot Nothing Then fd = e.InicioDeProcesamientoDetalle.FechaDesde : obs = e.InicioDeProcesamientoDetalle.Observaciones
+            Case 25 : If e.DesarmadoDetalle IsNot Nothing Then fd = e.DesarmadoDetalle.FechaDesde : fh = e.DesarmadoDetalle.FechaHasta : obs = e.DesarmadoDetalle.Observaciones
         End Select
-
         Dim obsFinal = If(String.IsNullOrWhiteSpace(det), obs, $"{det} | {obs}")
-
-        Return New EstadoRow With {
-            .Id = e.Id, .Origen = origen, .TipoEstado = If(tipoNombre, String.Empty),
-            .FechaDesde = fd, .FechaHasta = fh, .Observaciones = obsFinal, .EntityRef = e
-        }
+        Return New EstadoRow With {.Id = e.Id, .Origen = origen, .TipoEstado = If(tipoNombre, String.Empty), .FechaDesde = fd, .FechaHasta = fh, .Observaciones = obsFinal, .EntityRef = e}
     End Function
 
     Private Sub CargarDatosEnControles()
@@ -216,13 +157,7 @@ Public Class frmFuncionarioCrear
         cboTurno.SelectedValue = If(_funcionario.TurnoId.HasValue, CInt(_funcionario.TurnoId), -1)
         cboSemana.SelectedValue = If(_funcionario.SemanaId.HasValue, CInt(_funcionario.SemanaId), -1)
         cboHorario.SelectedValue = If(_funcionario.HorarioId.HasValue, CInt(_funcionario.HorarioId), -1)
-
-        If _funcionario.Foto IsNot Nothing AndAlso _funcionario.Foto.Length > 0 Then
-            pbFoto.Image = New Bitmap(New MemoryStream(_funcionario.Foto))
-        Else
-            pbFoto.Image = My.Resources.Police
-        End If
-
+        If _funcionario.Foto IsNot Nothing AndAlso _funcionario.Foto.Length > 0 Then pbFoto.Image = New Bitmap(New MemoryStream(_funcionario.Foto)) Else pbFoto.Image = My.Resources.Police
         dtpFechaNacimiento.Value = If(_funcionario.FechaNacimiento.HasValue, _funcionario.FechaNacimiento.Value, dtpFechaNacimiento.MinDate)
         txtDomicilio.Text = _funcionario.Domicilio
         txtEmail.Text = _funcionario.Email
@@ -230,7 +165,6 @@ Public Class frmFuncionarioCrear
         cboEstadoCivil.SelectedValue = If(_funcionario.EstadoCivilId.HasValue, CInt(_funcionario.EstadoCivilId), -1)
         cboGenero.SelectedValue = If(_funcionario.GeneroId.HasValue, CInt(_funcionario.GeneroId), -1)
         cboNivelEstudio.SelectedValue = If(_funcionario.NivelEstudioId.HasValue, CInt(_funcionario.NivelEstudioId), -1)
-
         txtCiudad.Text = _funcionario.Ciudad
         txtSeccional.Text = _funcionario.Seccional
         txtCredencial.Text = _funcionario.Credencial
@@ -246,10 +180,7 @@ Public Class frmFuncionarioCrear
         If Await GuardarAsync() Then
             LoadingHelper.OcultarCargando(Me)
             MessageBox.Show(If(_modo = ModoFormulario.Crear, "Funcionario creado", "Funcionario actualizado") & " correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
-
-            ' (*** CAMBIO ***) Notificar con el ID específico del funcionario
             NotificadorEventos.NotificarActualizacionFuncionario(_funcionario.Id)
-
             Me.DialogResult = DialogResult.OK
             _cerrandoPorCodigo = True
             Close()
@@ -261,22 +192,16 @@ Public Class frmFuncionarioCrear
     Private Async Function GuardarAsync() As Task(Of Boolean)
         Try
             If Not ValidarDatos() Then Return False
-
             MapearControlesAFuncionario()
-
             If _modo = ModoFormulario.Crear Then
                 _uow.Repository(Of Funcionario).Add(_funcionario)
             Else
                 _uow.Repository(Of Funcionario).Update(_funcionario)
             End If
-
-            ' Sincronizar estados transitorios ANTES del guardado final
             SincronizarEstados()
-
             Await _uow.CommitAsync()
             _seGuardo = True
             Return True
-
         Catch ex As Exception
             MessageBox.Show("Ocurrió un error al guardar: " & ex.Message & vbCrLf & ex.InnerException?.Message, "Error de Guardado", MessageBoxButtons.OK, MessageBoxIcon.Error)
             Return False
@@ -317,31 +242,19 @@ Public Class frmFuncionarioCrear
         _funcionario.Seccional = txtSeccional.Text.Trim()
         _funcionario.Credencial = txtCredencial.Text.Trim()
         _funcionario.Estudia = chkEstudia.Checked
-
-        If Not String.IsNullOrWhiteSpace(_rutaFotoSeleccionada) Then
-            _funcionario.Foto = File.ReadAllBytes(_rutaFotoSeleccionada)
-        End If
+        If Not String.IsNullOrWhiteSpace(_rutaFotoSeleccionada) Then _funcionario.Foto = File.ReadAllBytes(_rutaFotoSeleccionada)
     End Sub
 
     Private Sub SincronizarEstados()
-        ' (*** CAMBIO ***) Lógica de sincronización simplificada
-
-        ' 1. Eliminar los estados marcados para eliminación
         For Each estadoAEliminar In _estadosParaEliminar
-            ' Si el estado ya existe en la BD, lo buscamos en el contexto para eliminarlo correctamente
             Dim estadoEnDb = _uow.Context.Set(Of EstadoTransitorio).Find(estadoAEliminar.Id)
-            If estadoEnDb IsNot Nothing Then
-                _uow.Repository(Of EstadoTransitorio).Remove(estadoEnDb)
-            End If
+            If estadoEnDb IsNot Nothing Then _uow.Repository(Of EstadoTransitorio).Remove(estadoEnDb)
         Next
-
-        ' 2. Añadir/Actualizar los estados de la grilla
         For Each row In _estadoRows
             Dim estado = row.EntityRef
-            If estado.Id <= 0 Then ' Es un estado nuevo
+            If estado.Id <= 0 Then
                 _funcionario.EstadoTransitorio.Add(estado)
-            Else ' Es un estado existente
-                ' EF se encarga de detectar los cambios en las propiedades de la entidad
+            Else
                 _uow.Context.Entry(estado).State = EntityState.Modified
             End If
         Next
@@ -371,30 +284,18 @@ Public Class frmFuncionarioCrear
         dgvEstadosTransitorios.DataSource = bsEstados
     End Sub
 
-    ' Resto de métodos de UI (ConfigurarGrillaDotacion, btnAñadirEstado_Click, etc.) sin cambios
-
     Private Function IsEstadoActivo(et As EstadoTransitorio) As Boolean
-        Dim fechaActual = Date.Today
-        Dim fechaDesde As Date? = Nothing
-        Dim fechaHasta As Date? = Nothing
-
-        ' (*** CAMBIO ***) Utiliza el nuevo método de ayuda para obtener las fechas
+        Dim fechaActual = Date.Today, fechaDesde As Date? = Nothing, fechaHasta As Date? = Nothing
         et.GetFechas(fechaDesde, fechaHasta)
-
-        If et.TipoEstadoTransitorioId = 5 Then ' Retén es solo para el día
-            Return If(fechaDesde.HasValue, fechaDesde.Value.Date = fechaActual, False)
-        End If
-
+        If et.TipoEstadoTransitorioId = 5 Then Return If(fechaDesde.HasValue, fechaDesde.Value.Date = fechaActual, False)
         If Not fechaDesde.HasValue Then Return False
         Return fechaDesde.Value.Date <= fechaActual AndAlso (Not fechaHasta.HasValue OrElse fechaHasta.Value.Date >= fechaActual)
     End Function
 
     Private Sub UpdateRowFromEntity(row As EstadoRow, e As EstadoTransitorio)
         Dim updated = BuildEstadoRow(e, row.Origen)
-        row.TipoEstado = updated.TipoEstado
-        row.FechaDesde = updated.FechaDesde
-        row.FechaHasta = updated.FechaHasta
-        row.Observaciones = updated.Observaciones
+        row.TipoEstado = updated.TipoEstado : row.FechaDesde = updated.FechaDesde
+        row.FechaHasta = updated.FechaHasta : row.Observaciones = updated.Observaciones
     End Sub
 
     Private _estaCargandoHistorial As Boolean = False
@@ -402,13 +303,7 @@ Public Class frmFuncionarioCrear
         If _estaCargandoHistorial Then Return
         _estaCargandoHistorial = True
         Try
-            If chkVerHistorial.Checked Then
-                Await CargarHistorialCompleto()
-            Else
-                _estadoRows = MapEstadosActivos(_funcionario.EstadoTransitorio.Where(AddressOf IsEstadoActivo))
-                bsEstados.DataSource = _estadoRows
-                bsEstados.ResetBindings(False)
-            End If
+            If chkVerHistorial.Checked Then Await CargarHistorialCompleto() Else _estadoRows = MapEstadosActivos(_funcionario.EstadoTransitorio.Where(AddressOf IsEstadoActivo)) : bsEstados.DataSource = _estadoRows : bsEstados.ResetBindings(False)
         Finally
             _estaCargandoHistorial = False
             DgvEstadosTransitorios_SelectionChanged(Nothing, EventArgs.Empty)
@@ -419,7 +314,6 @@ Public Class frmFuncionarioCrear
         LoadingHelper.MostrarCargando(Me)
         Try
             Dim query = _uow.Context.Set(Of EstadoTransitorio)().Where(Function(et) et.FuncionarioId = _idFuncionario)
-            ' Carga ansiosa de todos los detalles posibles
             Dim historial = Await query.Include(Function(et) et.TipoEstadoTransitorio).Include(Function(et) et.DesignacionDetalle).Include(Function(et) et.SancionDetalle).Include(Function(et) et.SumarioDetalle).Include(Function(et) et.OrdenCincoDetalle).Include(Function(et) et.EnfermedadDetalle).Include(Function(et) et.RetenDetalle).Include(Function(et) et.DesarmadoDetalle).OrderByDescending(Function(et) et.Id).ToListAsync()
             _estadoRows = MapEstadosHistorial(historial)
             bsEstados.DataSource = _estadoRows
@@ -432,31 +326,21 @@ Public Class frmFuncionarioCrear
     Private Sub DgvEstadosTransitorios_SelectionChanged(sender As Object, e As EventArgs)
         Dim row = TryCast(dgvEstadosTransitorios.CurrentRow?.DataBoundItem, EstadoRow)
         Dim editable = (row IsNot Nothing)
-        btnEditarEstado.Enabled = editable
-        btnQuitarEstado.Enabled = editable
-        btnAñadirEstado.Enabled = True
+        btnEditarEstado.Enabled = editable : btnQuitarEstado.Enabled = editable : btnAñadirEstado.Enabled = True
     End Sub
 
     Private Sub btnAñadirEstado_Click(sender As Object, e As EventArgs) Handles btnAñadirEstado.Click
         Dim nuevoEstado = New EstadoTransitorio()
         Using frm As New frmFuncionarioEstadoTransitorio(nuevoEstado, _tiposEstadoTransitorio, _uow)
-            If frm.ShowDialog(Me) = DialogResult.OK Then
-                Dim newRow = BuildEstadoRow(frm.Estado, "Nuevo")
-                _estadoRows.Add(newRow)
-                bsEstados.ResetBindings(False)
-            End If
+            If frm.ShowDialog(Me) = DialogResult.OK Then _estadoRows.Add(BuildEstadoRow(frm.Estado, "Nuevo")) : bsEstados.ResetBindings(False)
         End Using
     End Sub
 
     Private Sub btnEditarEstado_Click(sender As Object, e As EventArgs) Handles btnEditarEstado.Click
         Dim row = TryCast(dgvEstadosTransitorios.CurrentRow?.DataBoundItem, EstadoRow)
         If row?.EntityRef Is Nothing Then Return
-
         Using frm As New frmFuncionarioEstadoTransitorio(row.EntityRef, _tiposEstadoTransitorio, _uow)
-            If frm.ShowDialog(Me) = DialogResult.OK Then
-                UpdateRowFromEntity(row, frm.Estado)
-                bsEstados.ResetBindings(False)
-            End If
+            If frm.ShowDialog(Me) = DialogResult.OK Then UpdateRowFromEntity(row, frm.Estado) : bsEstados.ResetBindings(False)
         End Using
     End Sub
 
@@ -475,54 +359,40 @@ Public Class frmFuncionarioCrear
         If e.RowIndex < 0 OrElse e.ColumnIndex < 0 OrElse e.ColumnIndex >= dgv.Columns.Count Then Return
         Dim dataItem = TryCast(dgv.Rows(e.RowIndex).DataBoundItem, FuncionarioDotacion)
         If dataItem Is Nothing Then Return
-
         Dim colName = dgv.Columns(e.ColumnIndex).Name
-        If colName = "colItem" Then
-            e.Value = _itemsDotacion?.FirstOrDefault(Function(i) i.Id = dataItem.DotacionItemId)?.Nombre
-            e.FormattingApplied = True
-        ElseIf colName = "FechaAsign" AndAlso e.Value IsNot Nothing Then
-            e.Value = CType(e.Value, DateTime).ToString("dd/MM/yyyy")
-            e.FormattingApplied = True
-        End If
+        If colName = "colItem" Then e.Value = _itemsDotacion?.FirstOrDefault(Function(i) i.Id = dataItem.DotacionItemId)?.Nombre : e.FormattingApplied = True
+        If colName = "FechaAsign" AndAlso e.Value IsNot Nothing Then e.Value = CType(e.Value, DateTime).ToString("dd/MM/yyyy") : e.FormattingApplied = True
     End Sub
 
     Private Sub ConfigurarGrillaDotacion()
-        dgvDotacion.AutoGenerateColumns = False
-        dgvDotacion.Columns.Clear()
+        dgvDotacion.AutoGenerateColumns = False : dgvDotacion.Columns.Clear()
         dgvDotacion.Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Id", .Visible = False})
         dgvDotacion.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "colItem", .HeaderText = "Ítem", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
         dgvDotacion.Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Talla", .HeaderText = "Talla"})
         dgvDotacion.Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Observaciones", .HeaderText = "Observaciones", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
-        Dim colFecha As New DataGridViewTextBoxColumn With {.DataPropertyName = "FechaAsign", .Name = "FechaAsign", .HeaderText = "Fecha Asignación"}
-        dgvDotacion.Columns.Add(colFecha)
+        dgvDotacion.Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "FechaAsign", .Name = "FechaAsign", .HeaderText = "Fecha Asignación"})
     End Sub
 
     Private Sub ConfigurarGrillaEstados()
-        dgvEstadosTransitorios.AutoGenerateColumns = False
-        dgvEstadosTransitorios.Columns.Clear()
+        dgvEstadosTransitorios.AutoGenerateColumns = False : dgvEstadosTransitorios.Columns.Clear()
         dgvEstadosTransitorios.Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "TipoEstado", .HeaderText = "Tipo de Estado", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells})
-        Dim colDesde As New DataGridViewTextBoxColumn With {.DataPropertyName = "FechaDesde", .HeaderText = "Desde", .Width = 100}
-        colDesde.DefaultCellStyle.Format = "dd/MM/yyyy"
+        Dim colDesde As New DataGridViewTextBoxColumn With {.DataPropertyName = "FechaDesde", .HeaderText = "Desde", .Width = 100} : colDesde.DefaultCellStyle.Format = "dd/MM/yyyy"
         dgvEstadosTransitorios.Columns.Add(colDesde)
-        Dim colHasta As New DataGridViewTextBoxColumn With {.DataPropertyName = "FechaHasta", .HeaderText = "Hasta", .Width = 100}
-        colHasta.DefaultCellStyle.Format = "dd/MM/yyyy"
+        Dim colHasta As New DataGridViewTextBoxColumn With {.DataPropertyName = "FechaHasta", .HeaderText = "Hasta", .Width = 100} : colHasta.DefaultCellStyle.Format = "dd/MM/yyyy"
         dgvEstadosTransitorios.Columns.Add(colHasta)
         dgvEstadosTransitorios.Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Observaciones", .HeaderText = "Observaciones / Detalles", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
     End Sub
 
     Private Sub btnSeleccionarFoto_Click(sender As Object, e As EventArgs) Handles btnSeleccionarFoto.Click
         Using ofd As New OpenFileDialog() With {.Filter = "Imágenes|*.jpg;*.jpeg;*.png;*.bmp"}
-            If ofd.ShowDialog() = DialogResult.OK Then
-                _rutaFotoSeleccionada = ofd.FileName
-                pbFoto.Image = Image.FromFile(ofd.FileName)
-            End If
+            If ofd.ShowDialog() = DialogResult.OK Then _rutaFotoSeleccionada = ofd.FileName : pbFoto.Image = Image.FromFile(ofd.FileName)
         End Using
     End Sub
 
     Private Sub btnCancelar_Click(sender As Object, e As EventArgs) Handles btnCancelar.Click
-        _cerrandoPorCodigo = True
-        Close()
+        _cerrandoPorCodigo = True : Close()
     End Sub
+
 #End Region
 
 #Region " Cierre y Métodos Misceláneos "
@@ -536,9 +406,7 @@ Public Class frmFuncionarioCrear
                     Me.BeginInvoke(New MethodInvoker(AddressOf btnGuardar.PerformClick))
                     If Not _seGuardo Then e.Cancel = True
                 Case DialogResult.No
-                    ' Permite cerrar sin guardar
-                Case DialogResult.Cancel
-                    e.Cancel = True
+                Case DialogResult.Cancel : e.Cancel = True
             End Select
         End If
     End Sub
@@ -547,35 +415,20 @@ Public Class frmFuncionarioCrear
         txtCI.Focus()
     End Sub
 
-    ' ... Resto de los métodos auxiliares y de UI que no necesitan cambios
     Private Async Function CargarCombosAsync() As Task
-        ' El código de CargarCombosAsync no cambia
-        cboTipoFuncionario.DataSource = Await _svc.ObtenerTiposFuncionarioAsync()
-        cboTipoFuncionario.DisplayMember = "Value" : cboTipoFuncionario.ValueMember = "Key"
-        cboCargo.DataSource = Await _svc.ObtenerCargosAsync()
-        cboCargo.DisplayMember = "Value" : cboCargo.ValueMember = "Key"
-        cboEscalafon.DataSource = Await _svc.ObtenerEscalafonesAsync()
-        cboEscalafon.DisplayMember = "Value" : cboEscalafon.ValueMember = "Key"
-        cboFuncion.DataSource = Await _svc.ObtenerFuncionesAsync()
-        cboFuncion.DisplayMember = "Value" : cboFuncion.ValueMember = "Key"
-        cboEstadoCivil.DataSource = Await _svc.ObtenerEstadosCivilesAsync()
-        cboEstadoCivil.DisplayMember = "Value" : cboEstadoCivil.ValueMember = "Key"
-        cboGenero.DataSource = Await _svc.ObtenerGenerosAsync()
-        cboGenero.DisplayMember = "Value" : cboGenero.ValueMember = "Key"
-        cboNivelEstudio.DataSource = Await _svc.ObtenerNivelesEstudioAsync()
-        cboNivelEstudio.DisplayMember = "Value" : cboNivelEstudio.ValueMember = "Key"
-        cboEstado.DataSource = Await _svc.ObtenerEstadosAsync()
-        cboEstado.DisplayMember = "Value" : cboEstado.ValueMember = "Key"
-        cboSeccion.DataSource = Await _svc.ObtenerSeccionesAsync()
-        cboSeccion.DisplayMember = "Value" : cboSeccion.ValueMember = "Key"
-        cboPuestoTrabajo.DataSource = Await _svc.ObtenerPuestosTrabajoAsync()
-        cboPuestoTrabajo.DisplayMember = "Value" : cboPuestoTrabajo.ValueMember = "Key"
-        cboTurno.DataSource = Await _svc.ObtenerTurnosAsync()
-        cboTurno.DisplayMember = "Value" : cboTurno.ValueMember = "Key"
-        cboSemana.DataSource = Await _svc.ObtenerSemanasAsync()
-        cboSemana.DisplayMember = "Value" : cboSemana.ValueMember = "Key"
-        cboHorario.DataSource = Await _svc.ObtenerHorariosAsync()
-        cboHorario.DisplayMember = "Value" : cboHorario.ValueMember = "Key"
+        cboTipoFuncionario.DataSource = Await _svc.ObtenerTiposFuncionarioAsync() : cboTipoFuncionario.DisplayMember = "Value" : cboTipoFuncionario.ValueMember = "Key"
+        cboCargo.DataSource = Await _svc.ObtenerCargosAsync() : cboCargo.DisplayMember = "Value" : cboCargo.ValueMember = "Key"
+        cboEscalafon.DataSource = Await _svc.ObtenerEscalafonesAsync() : cboEscalafon.DisplayMember = "Value" : cboEscalafon.ValueMember = "Key"
+        cboFuncion.DataSource = Await _svc.ObtenerFuncionesAsync() : cboFuncion.DisplayMember = "Value" : cboFuncion.ValueMember = "Key"
+        cboEstadoCivil.DataSource = Await _svc.ObtenerEstadosCivilesAsync() : cboEstadoCivil.DisplayMember = "Value" : cboEstadoCivil.ValueMember = "Key"
+        cboGenero.DataSource = Await _svc.ObtenerGenerosAsync() : cboGenero.DisplayMember = "Value" : cboGenero.ValueMember = "Key"
+        cboNivelEstudio.DataSource = Await _svc.ObtenerNivelesEstudioAsync() : cboNivelEstudio.DisplayMember = "Value" : cboNivelEstudio.ValueMember = "Key"
+        cboEstado.DataSource = Await _svc.ObtenerEstadosAsync() : cboEstado.DisplayMember = "Value" : cboEstado.ValueMember = "Key"
+        cboSeccion.DataSource = Await _svc.ObtenerSeccionesAsync() : cboSeccion.DisplayMember = "Value" : cboSeccion.ValueMember = "Key"
+        cboPuestoTrabajo.DataSource = Await _svc.ObtenerPuestosTrabajoAsync() : cboPuestoTrabajo.DisplayMember = "Value" : cboPuestoTrabajo.ValueMember = "Key"
+        cboTurno.DataSource = Await _svc.ObtenerTurnosAsync() : cboTurno.DisplayMember = "Value" : cboTurno.ValueMember = "Key"
+        cboSemana.DataSource = Await _svc.ObtenerSemanasAsync() : cboSemana.DisplayMember = "Value" : cboSemana.ValueMember = "Key"
+        cboHorario.DataSource = Await _svc.ObtenerHorariosAsync() : cboHorario.DisplayMember = "Value" : cboHorario.ValueMember = "Key"
         cboCargo.SelectedIndex = -1 : cboEscalafon.SelectedIndex = -1 : cboFuncion.SelectedIndex = -1
         cboEstadoCivil.SelectedIndex = -1 : cboGenero.SelectedIndex = -1 : cboNivelEstudio.SelectedIndex = -1
         cboEstado.SelectedIndex = -1 : cboSeccion.SelectedIndex = -1 : cboPuestoTrabajo.SelectedIndex = -1
@@ -602,19 +455,11 @@ Public Class frmFuncionarioCrear
     End Sub
 
     Private Function MapEstadosActivos(source As IEnumerable(Of EstadoTransitorio)) As BindingList(Of EstadoRow)
-        Dim list As New BindingList(Of EstadoRow)
-        For Each et In source
-            list.Add(BuildEstadoRow(et, "Estado"))
-        Next
-        Return list
+        Return New BindingList(Of EstadoRow)(source.Select(Function(et) BuildEstadoRow(et, "Estado")).ToList())
     End Function
 
     Private Function MapEstadosHistorial(source As IEnumerable(Of EstadoTransitorio)) As BindingList(Of EstadoRow)
-        Dim list As New BindingList(Of EstadoRow)
-        For Each et In source
-            list.Add(BuildEstadoRow(et, "Historial"))
-        Next
-        Return list
+        Return New BindingList(Of EstadoRow)(source.Select(Function(et) BuildEstadoRow(et, "Historial")).ToList())
     End Function
 
     Private Async Sub btnAñadirDotacion_Click(sender As Object, e As EventArgs) Handles btnAñadirDotacion.Click
@@ -656,11 +501,8 @@ Public Class frmFuncionarioCrear
             Try
                 _dotaciones.Remove(dotacionSeleccionada)
                 If dotacionSeleccionada.Id > 0 Then
-                    Dim svcDotacion As New GenericService(Of FuncionarioDotacion)(_uow)
-                    Await svcDotacion.DeleteAsync(dotacionSeleccionada.Id)
-                End If
-                If _funcionario.FuncionarioDotacion.Contains(dotacionSeleccionada) Then
-                    _funcionario.FuncionarioDotacion.Remove(dotacionSeleccionada)
+                    _uow.Repository(Of FuncionarioDotacion).Remove(dotacionSeleccionada)
+                    Await _uow.CommitAsync()
                 End If
             Catch ex As Exception
                 MessageBox.Show("Ocurrió un error al quitar la dotación: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
