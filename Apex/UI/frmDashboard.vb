@@ -288,6 +288,12 @@ Public Class frmDashboard
         End Try
     End Function
 
+    Private Sub frmDashboard_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Using uow As New UnitOfWork()
+            TiposEstadoCatalog.Init(uow) ' ← UNA sola vez por proceso
+        End Using
+    End Sub
+
 #End Region
 
 End Class

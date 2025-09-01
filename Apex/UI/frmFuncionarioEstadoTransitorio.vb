@@ -31,6 +31,7 @@ Public Class frmFuncionarioEstadoTransitorio
         _unitOfWork = uow
         _readOnly = readOnlyValue
         _tiposEstado = _unitOfWork.Repository(Of TipoEstadoTransitorio)().GetAll().ToList()
+        TiposEstadoCatalog.Init(_unitOfWork)
     End Sub
 
     Public Property ReadOnlyProperty As Boolean
@@ -111,49 +112,64 @@ Public Class frmFuncionarioEstadoTransitorio
         Dim observaciones As String = ""
 
         Select Case Estado.TipoEstadoTransitorioId
-            Case 1 ' Designación
-                DesignacionDetalle = Estado.DesignacionDetalle
-                dtpFechaDesde.Value = DesignacionDetalle.FechaDesde
-                fechaHasta = DesignacionDetalle.FechaHasta
-                observaciones = DesignacionDetalle.Observaciones
-                txtResolucion.Text = DesignacionDetalle.DocResolucion
-            Case 2 ' Enfermedad
-                EnfermedadDetalle = Estado.EnfermedadDetalle
-                dtpFechaDesde.Value = EnfermedadDetalle.FechaDesde
-                fechaHasta = EnfermedadDetalle.FechaHasta
-                observaciones = EnfermedadDetalle.Observaciones
-                txtDiagnostico.Text = EnfermedadDetalle.Diagnostico
-            Case 3 ' Sanción
-                SancionDetalle = Estado.SancionDetalle
-                dtpFechaDesde.Value = SancionDetalle.FechaDesde
-                fechaHasta = SancionDetalle.FechaHasta
-                observaciones = SancionDetalle.Observaciones
-                txtResolucion.Text = SancionDetalle.Resolucion
-            Case 4 ' Orden Cinco
-                OrdenCincoDetalle = Estado.OrdenCincoDetalle
-                dtpFechaDesde.Value = OrdenCincoDetalle.FechaDesde
-                fechaHasta = OrdenCincoDetalle.FechaHasta
-                observaciones = OrdenCincoDetalle.Observaciones
-            Case 5 ' Retén
-                RetenDetalle = Estado.RetenDetalle
-                dtpFechaDesde.Value = RetenDetalle.FechaReten
-                observaciones = RetenDetalle.Observaciones
-                txtTurnoReten.Text = RetenDetalle.Turno
-            Case 6 ' Sumario
-                SumarioDetalle = Estado.SumarioDetalle
-                dtpFechaDesde.Value = SumarioDetalle.FechaDesde
-                fechaHasta = SumarioDetalle.FechaHasta
-                observaciones = SumarioDetalle.Observaciones
-                txtResolucion.Text = SumarioDetalle.Expediente
-            Case 7 ' Traslado
-                TrasladoDetalle = Estado.TrasladoDetalle
-                dtpFechaDesde.Value = TrasladoDetalle.FechaDesde
-                fechaHasta = TrasladoDetalle.FechaHasta
-                observaciones = TrasladoDetalle.Observaciones
+            Case TiposEstadoCatalog.Designacion
+                Dim d = Estado.DesignacionDetalle
+                If d Is Nothing Then Exit Select
+                dtpFechaDesde.Value = d.FechaDesde
+                fechaHasta = d.FechaHasta
+                observaciones = d.Observaciones
+                txtResolucion.Text = d.DocResolucion
+
+            Case TiposEstadoCatalog.Enfermedad
+                Dim d = Estado.EnfermedadDetalle
+                If d Is Nothing Then Exit Select
+                dtpFechaDesde.Value = d.FechaDesde
+                fechaHasta = d.FechaHasta
+                observaciones = d.Observaciones
+                txtDiagnostico.Text = d.Diagnostico
+
+            Case TiposEstadoCatalog.Sancion
+                Dim d = Estado.SancionDetalle
+                If d Is Nothing Then Exit Select
+                dtpFechaDesde.Value = d.FechaDesde
+                fechaHasta = d.FechaHasta
+                observaciones = d.Observaciones
+                txtResolucion.Text = d.Resolucion
+
+            Case TiposEstadoCatalog.OrdenCinco
+                Dim d = Estado.OrdenCincoDetalle
+                If d Is Nothing Then Exit Select
+                dtpFechaDesde.Value = d.FechaDesde
+                fechaHasta = d.FechaHasta
+                observaciones = d.Observaciones
+
+            Case TiposEstadoCatalog.Reten
+                Dim d = Estado.RetenDetalle
+                If d Is Nothing Then Exit Select
+                dtpFechaDesde.Value = d.FechaReten
+                observaciones = d.Observaciones
+                txtTurnoReten.Text = d.Turno
+
+            Case TiposEstadoCatalog.Sumario
+                Dim d = Estado.SumarioDetalle
+                If d Is Nothing Then Exit Select
+                dtpFechaDesde.Value = d.FechaDesde
+                fechaHasta = d.FechaHasta
+                observaciones = d.Observaciones
+                txtResolucion.Text = d.Expediente
+
+            Case TiposEstadoCatalog.Traslado
+                Dim d = Estado.TrasladoDetalle
+                If d Is Nothing Then Exit Select
+                dtpFechaDesde.Value = d.FechaDesde
+                fechaHasta = d.FechaHasta
+                observaciones = d.Observaciones
         End Select
 
         txtObservaciones.Text = observaciones
-        If Estado.TipoEstadoTransitorioId <> 5 Then
+
+        ' Para Retén no se maneja FechaHasta
+        If Estado.TipoEstadoTransitorioId <> TiposEstadoCatalog.Reten Then
             If fechaHasta.HasValue Then
                 dtpFechaHasta.Value = fechaHasta.Value
                 dtpFechaHasta.Enabled = True
@@ -165,36 +181,55 @@ Public Class frmFuncionarioEstadoTransitorio
         End If
     End Sub
 
+
     Private Sub TipoEstado_Changed(sender As Object, e As EventArgs)
-        lblResolucion.Visible = False : txtResolucion.Visible = False
-        lblDiagnostico.Visible = False : txtDiagnostico.Visible = False
-        lblTurnoReten.Visible = False : txtTurnoReten.Visible = False
+        ' Reset UI
+        ShowExtra(False, False, False)
+        lblResolucion.Text = "Resolución:"
         lblFechaDesde.Text = "Fecha Desde:"
-        lblFechaHasta.Visible = True
-        dtpFechaHasta.Visible = True
-        chkFechaHasta.Visible = True
+        ToggleHastaSection(True)
 
-        If cboTipoEstado.SelectedIndex = -1 Then Return
+        If cboTipoEstado.SelectedIndex = -1 OrElse cboTipoEstado.SelectedValue Is Nothing Then Exit Sub
 
-        Dim tipoId = CInt(cboTipoEstado.SelectedValue)
+        Dim tipoId As Integer
+        If Not Integer.TryParse(cboTipoEstado.SelectedValue.ToString(), tipoId) Then Exit Sub
+
         Select Case tipoId
-            Case 1, 3, 6 ' Designación, Sanción, Sumario
-                lblResolucion.Visible = True
-                txtResolucion.Visible = True
-            Case 2 ' Enfermedad
-                lblDiagnostico.Visible = True
-                txtDiagnostico.Visible = True
-            Case 4 ' Orden Cinco
-                ' No tiene campos adicionales
-            Case 5 ' Retén
-                lblTurnoReten.Visible = True
-                txtTurnoReten.Visible = True
+            Case TiposEstadoCatalog.Designacion, TiposEstadoCatalog.Sancion, TiposEstadoCatalog.Sumario
+                ShowExtra(True, False, False)
+                ' Ajuste de etiqueta según el tipo
+                If tipoId = TiposEstadoCatalog.Designacion Then lblResolucion.Text = "Doc. Resolución:"
+                If tipoId = TiposEstadoCatalog.Sumario Then lblResolucion.Text = "Expediente:"
+
+            Case TiposEstadoCatalog.Enfermedad
+                ShowExtra(False, True, False)
+
+            Case TiposEstadoCatalog.Reten
+                ShowExtra(False, False, True)
                 lblFechaDesde.Text = "Fecha Retén:"
-                lblFechaHasta.Visible = False
-                dtpFechaHasta.Visible = False
-                chkFechaHasta.Visible = False
+                ToggleHastaSection(False)
+
+            Case TiposEstadoCatalog.OrdenCinco, TiposEstadoCatalog.Traslado
+                ' No tienen campos adicionales visibles
+
+            Case Else
+                ' Nada
         End Select
     End Sub
+
+    ' Helpers
+    Private Sub ShowExtra(showResol As Boolean, showDiag As Boolean, showReten As Boolean)
+        lblResolucion.Visible = showResol : txtResolucion.Visible = showResol
+        lblDiagnostico.Visible = showDiag : txtDiagnostico.Visible = showDiag
+        lblTurnoReten.Visible = showReten : txtTurnoReten.Visible = showReten
+    End Sub
+
+    Private Sub ToggleHastaSection(visible As Boolean)
+        lblFechaHasta.Visible = visible
+        dtpFechaHasta.Visible = visible
+        chkFechaHasta.Visible = visible
+    End Sub
+
 
     Private Sub CargarCombos()
         cboTipoEstado.DataSource = _tiposEstado
@@ -212,14 +247,20 @@ Public Class frmFuncionarioEstadoTransitorio
             Return
         End If
 
-        If cboTipoEstado.SelectedIndex = -1 Then
+        If cboTipoEstado.SelectedIndex = -1 OrElse cboTipoEstado.SelectedValue Is Nothing Then
             MessageBox.Show("Debe seleccionar un tipo de estado.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             Return
         End If
 
-        Dim tipoId = CInt(cboTipoEstado.SelectedValue)
+        Dim tipoId As Integer
+        If Not Integer.TryParse(cboTipoEstado.SelectedValue.ToString(), tipoId) Then
+            MessageBox.Show("Tipo de estado inválido.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return
+        End If
 
-        If tipoId <> 5 AndAlso Not chkFechaHasta.Checked AndAlso dtpFechaHasta.Value.Date < dtpFechaDesde.Value.Date Then
+        ' Validación de fechas (no aplica para Retén)
+        Dim fechaHastaSel As Date? = If(chkFechaHasta.Checked, CType(Nothing, Date?), dtpFechaHasta.Value.Date)
+        If tipoId <> TiposEstadoCatalog.Reten AndAlso fechaHastaSel.HasValue AndAlso fechaHastaSel.Value < dtpFechaDesde.Value.Date Then
             MessageBox.Show("La fecha de fin no puede ser anterior a la fecha de inicio.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             Return
         End If
@@ -227,52 +268,59 @@ Public Class frmFuncionarioEstadoTransitorio
         Estado.TipoEstadoTransitorioId = tipoId
 
         Select Case tipoId
-            Case 1
-                Dim detalle = If(Estado.Id > 0, Estado.DesignacionDetalle, New DesignacionDetalle())
-                detalle.FechaDesde = dtpFechaDesde.Value.Date
-                detalle.FechaHasta = If(chkFechaHasta.Checked, CType(Nothing, Date?), dtpFechaHasta.Value.Date)
-                detalle.Observaciones = txtObservaciones.Text.Trim()
-                detalle.DocResolucion = txtResolucion.Text.Trim()
-                Estado.DesignacionDetalle = detalle
-            Case 2
-                Dim detalle = If(Estado.Id > 0, Estado.EnfermedadDetalle, New EnfermedadDetalle())
-                detalle.FechaDesde = dtpFechaDesde.Value.Date
-                detalle.FechaHasta = If(chkFechaHasta.Checked, CType(Nothing, Date?), dtpFechaHasta.Value.Date)
-                detalle.Observaciones = txtObservaciones.Text.Trim()
-                detalle.Diagnostico = txtDiagnostico.Text.Trim()
-                Estado.EnfermedadDetalle = detalle
-            Case 3
-                Dim detalle = If(Estado.Id > 0, Estado.SancionDetalle, New SancionDetalle())
-                detalle.FechaDesde = dtpFechaDesde.Value.Date
-                detalle.FechaHasta = If(chkFechaHasta.Checked, CType(Nothing, Date?), dtpFechaHasta.Value.Date)
-                detalle.Observaciones = txtObservaciones.Text.Trim()
-                detalle.Resolucion = txtResolucion.Text.Trim()
-                Estado.SancionDetalle = detalle
-            Case 4
-                Dim detalle = If(Estado.Id > 0, Estado.OrdenCincoDetalle, New OrdenCincoDetalle())
-                detalle.FechaDesde = dtpFechaDesde.Value.Date
-                detalle.FechaHasta = If(chkFechaHasta.Checked, CType(Nothing, Date?), dtpFechaHasta.Value.Date)
-                detalle.Observaciones = txtObservaciones.Text.Trim()
-                Estado.OrdenCincoDetalle = detalle
-            Case 5
-                Dim detalle = If(Estado.Id > 0, Estado.RetenDetalle, New RetenDetalle())
-                detalle.FechaReten = dtpFechaDesde.Value.Date
-                detalle.Observaciones = txtObservaciones.Text.Trim()
-                detalle.Turno = txtTurnoReten.Text.Trim()
-                Estado.RetenDetalle = detalle
-            Case 6
-                Dim detalle = If(Estado.Id > 0, Estado.SumarioDetalle, New SumarioDetalle())
-                detalle.FechaDesde = dtpFechaDesde.Value.Date
-                detalle.FechaHasta = If(chkFechaHasta.Checked, CType(Nothing, Date?), dtpFechaHasta.Value.Date)
-                detalle.Observaciones = txtObservaciones.Text.Trim()
-                detalle.Expediente = txtResolucion.Text.Trim()
-                Estado.SumarioDetalle = detalle
-            Case 7
-                Dim detalle = If(Estado.Id > 0, Estado.TrasladoDetalle, New TrasladoDetalle())
-                detalle.FechaDesde = dtpFechaDesde.Value.Date
-                detalle.FechaHasta = If(chkFechaHasta.Checked, CType(Nothing, Date?), dtpFechaHasta.Value.Date)
-                detalle.Observaciones = txtObservaciones.Text.Trim()
-                Estado.TrasladoDetalle = detalle
+            Case TiposEstadoCatalog.Designacion
+                Dim d = If(Estado.DesignacionDetalle, New DesignacionDetalle())
+                d.FechaDesde = dtpFechaDesde.Value.Date
+                d.FechaHasta = fechaHastaSel
+                d.Observaciones = txtObservaciones.Text.Trim()
+                d.DocResolucion = txtResolucion.Text.Trim()
+                Estado.DesignacionDetalle = d
+            ' d.EstadoTransitorio = Estado ' <- solo si tu mapeo 1-1 lo requiere
+
+            Case TiposEstadoCatalog.Enfermedad
+                Dim d = If(Estado.EnfermedadDetalle, New EnfermedadDetalle())
+                d.FechaDesde = dtpFechaDesde.Value.Date
+                d.FechaHasta = fechaHastaSel
+                d.Observaciones = txtObservaciones.Text.Trim()
+                d.Diagnostico = txtDiagnostico.Text.Trim()
+                Estado.EnfermedadDetalle = d
+
+            Case TiposEstadoCatalog.Sancion
+                Dim d = If(Estado.SancionDetalle, New SancionDetalle())
+                d.FechaDesde = dtpFechaDesde.Value.Date
+                d.FechaHasta = fechaHastaSel
+                d.Observaciones = txtObservaciones.Text.Trim()
+                d.Resolucion = txtResolucion.Text.Trim()
+                Estado.SancionDetalle = d
+
+            Case TiposEstadoCatalog.OrdenCinco
+                Dim d = If(Estado.OrdenCincoDetalle, New OrdenCincoDetalle())
+                d.FechaDesde = dtpFechaDesde.Value.Date
+                d.FechaHasta = fechaHastaSel
+                d.Observaciones = txtObservaciones.Text.Trim()
+                Estado.OrdenCincoDetalle = d
+
+            Case TiposEstadoCatalog.Reten
+                Dim d = If(Estado.RetenDetalle, New RetenDetalle())
+                d.FechaReten = dtpFechaDesde.Value.Date
+                d.Observaciones = txtObservaciones.Text.Trim()
+                d.Turno = txtTurnoReten.Text.Trim()
+                Estado.RetenDetalle = d
+
+            Case TiposEstadoCatalog.Sumario
+                Dim d = If(Estado.SumarioDetalle, New SumarioDetalle())
+                d.FechaDesde = dtpFechaDesde.Value.Date
+                d.FechaHasta = fechaHastaSel
+                d.Observaciones = txtObservaciones.Text.Trim()
+                d.Expediente = txtResolucion.Text.Trim()
+                Estado.SumarioDetalle = d
+
+            Case TiposEstadoCatalog.Traslado
+                Dim d = If(Estado.TrasladoDetalle, New TrasladoDetalle())
+                d.FechaDesde = dtpFechaDesde.Value.Date
+                d.FechaHasta = fechaHastaSel
+                d.Observaciones = txtObservaciones.Text.Trim()
+                Estado.TrasladoDetalle = d
         End Select
 
         If Estado.Id = 0 Then
@@ -285,45 +333,167 @@ Public Class frmFuncionarioEstadoTransitorio
         Close()
     End Sub
 
+
     Private Sub btnCancelar_Click(sender As Object, e As EventArgs) Handles btnCancelar.Click
         DialogResult = DialogResult.Cancel
         Close()
     End Sub
 
 #Region "Lógica de Archivos Adjuntos"
+    ' Clase liviana para la grilla
+    Private Class AdjuntoRow
+        Public Property Id As Integer
+        Public Property NombreArchivo As String
+        Public Property FechaCreacion As Date
+        Public Property Origen As String
+    End Class
+
+    Private Sub ConfigurarGrillaAdjuntos()
+        With dgvAdjuntos
+            .AutoGenerateColumns = False
+            .Columns.Clear()
+
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .DataPropertyName = NameOf(AdjuntoRow.Id),
+            .Name = "Id",
+            .Visible = False
+        })
+
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .DataPropertyName = NameOf(AdjuntoRow.NombreArchivo),
+            .HeaderText = "Nombre del Archivo",
+            .Name = "NombreArchivo",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+        })
+
+            Dim colFecha As New DataGridViewTextBoxColumn With {
+            .DataPropertyName = NameOf(AdjuntoRow.FechaCreacion),
+            .HeaderText = "Fecha de Carga",
+            .Name = "FechaCreacion",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+        }
+            colFecha.DefaultCellStyle.Format = "dd/MM/yyyy HH:mm"
+            .Columns.Add(colFecha)
+
+            ' (Opcional, útil para depurar) columna Origen
+            '.Columns.Add(New DataGridViewTextBoxColumn With {
+            '    .DataPropertyName = NameOf(AdjuntoRow.Origen),
+            '    .HeaderText = "Origen",
+            '    .Name = "Origen",
+            '    .Width = 80
+            '})
+        End With
+    End Sub
 
     Private Sub CargarAdjuntos(estadoId As Integer)
-        Dim adjuntosMostrados As New List(Of Object)
+        ' Configurar columnas una sola vez
+        If dgvAdjuntos.Columns.Count = 0 Then ConfigurarGrillaAdjuntos()
 
+        ' Guardar selección actual (si la hay) para restaurarla luego
+        Dim idSeleccionado As Integer? = Nothing
+        If dgvAdjuntos.CurrentRow IsNot Nothing AndAlso dgvAdjuntos.CurrentRow.DataBoundItem IsNot Nothing Then
+            Dim actual = TryCast(dgvAdjuntos.CurrentRow.DataBoundItem, AdjuntoRow)
+            If actual IsNot Nothing Then idSeleccionado = actual.Id
+        End If
+
+        Dim adjuntos As New List(Of AdjuntoRow)
+
+        ' Desde BD
         If estadoId > 0 Then
             Dim repo = _unitOfWork.Repository(Of EstadoTransitorioAdjunto)()
-            Dim adjuntosDB = repo.GetAll().Where(Function(a) a.EstadoTransitorioId = estadoId) _
-                                    .Select(Function(a) New With {a.Id, a.NombreArchivo, a.FechaCreacion}) _
-                                    .ToList()
-            adjuntosMostrados.AddRange(adjuntosDB)
+            ' Proyecta solo lo necesario (Id, Nombre, Fecha) – evita traer BLOB al grid
+            Dim adjuntosDB = repo.GetAll().
+            Where(Function(a) a.EstadoTransitorioId = estadoId).
+            Select(Function(a) New AdjuntoRow With {
+                .Id = a.Id,
+                .NombreArchivo = a.NombreArchivo,
+                .FechaCreacion = a.FechaCreacion,
+                .Origen = "BD"
+            }).ToList()
+            adjuntos.AddRange(adjuntosDB)
         End If
 
-        If Estado IsNot Nothing AndAlso Estado.AdjuntosNuevos.Any() Then
-            Dim adjuntosMemoria = Estado.AdjuntosNuevos.Select(Function(a) New With {a.Id, a.NombreArchivo, a.FechaCreacion}).ToList()
-            adjuntosMostrados.AddRange(adjuntosMemoria)
+        ' Desde memoria (Adjuntos nuevos aún no persistidos)
+        If Estado IsNot Nothing AndAlso Estado.AdjuntosNuevos IsNot Nothing AndAlso Estado.AdjuntosNuevos.Count > 0 Then
+            Dim adjuntosMemoria = Estado.AdjuntosNuevos.Select(Function(a) New AdjuntoRow With {
+            .Id = a.Id, ' negativo (tu convención), perfecto
+            .NombreArchivo = a.NombreArchivo,
+            .FechaCreacion = a.FechaCreacion,
+            .Origen = "Memoria"
+        }).ToList()
+            adjuntos.AddRange(adjuntosMemoria)
         End If
 
-        dgvAdjuntos.DataSource = Nothing
-        dgvAdjuntos.DataSource = adjuntosMostrados
+        ' Orden estable y útil: más recientes primero, luego por nombre
+        Dim listaOrdenada = adjuntos.
+        OrderByDescending(Function(x) x.FechaCreacion).
+        ThenBy(Function(x) x.NombreArchivo).
+        ToList()
 
-        If dgvAdjuntos.Rows.Count > 0 Then
-            dgvAdjuntos.Columns("Id").Visible = False
-            dgvAdjuntos.Columns("NombreArchivo").HeaderText = "Nombre del Archivo"
-            dgvAdjuntos.Columns("NombreArchivo").AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-            dgvAdjuntos.Columns("FechaCreacion").HeaderText = "Fecha de Carga"
-            dgvAdjuntos.Enabled = True
-            pnlPreview.Enabled = True
-        Else
-            dgvAdjuntos.Enabled = False
-            pnlPreview.Enabled = False
+        ' Enlazar (BindingSource para refrescos y orden)
+        Dim bs = TryCast(dgvAdjuntos.DataSource, BindingSource)
+        If bs Is Nothing Then
+            bs = New BindingSource()
+            dgvAdjuntos.DataSource = bs
+        End If
+        bs.DataSource = listaOrdenada
+
+        ' Habilitar/Deshabilitar UI
+        Dim hay = listaOrdenada.Count > 0
+        dgvAdjuntos.Enabled = hay
+        pnlPreview.Enabled = hay
+        If Not hay Then
             MostrarPanelMensaje("No hay archivos adjuntos.")
         End If
+
+        ' Restaurar selección si es posible
+        If hay AndAlso idSeleccionado.HasValue Then
+            For Each row As DataGridViewRow In dgvAdjuntos.Rows
+                Dim item = TryCast(row.DataBoundItem, AdjuntoRow)
+                If item IsNot Nothing AndAlso item.Id = idSeleccionado.Value Then
+                    row.Selected = True
+                    dgvAdjuntos.CurrentCell = row.Cells("NombreArchivo")
+                    Exit For
+                End If
+            Next
+        ElseIf hay Then
+            dgvAdjuntos.Rows(0).Selected = True
+            dgvAdjuntos.CurrentCell = dgvAdjuntos.Rows(0).Cells("NombreArchivo")
+        End If
     End Sub
+
+    'Private Sub CargarAdjuntos(estadoId As Integer)
+    '    Dim adjuntosMostrados As New List(Of Object)
+
+    '    If estadoId > 0 Then
+    '        Dim repo = _unitOfWork.Repository(Of EstadoTransitorioAdjunto)()
+    '        Dim adjuntosDB = repo.GetAll().Where(Function(a) a.EstadoTransitorioId = estadoId) _
+    '                                .Select(Function(a) New With {a.Id, a.NombreArchivo, a.FechaCreacion}) _
+    '                                .ToList()
+    '        adjuntosMostrados.AddRange(adjuntosDB)
+    '    End If
+
+    '    If Estado IsNot Nothing AndAlso Estado.AdjuntosNuevos.Any() Then
+    '        Dim adjuntosMemoria = Estado.AdjuntosNuevos.Select(Function(a) New With {a.Id, a.NombreArchivo, a.FechaCreacion}).ToList()
+    '        adjuntosMostrados.AddRange(adjuntosMemoria)
+    '    End If
+
+    '    dgvAdjuntos.DataSource = Nothing
+    '    dgvAdjuntos.DataSource = adjuntosMostrados
+
+    '    If dgvAdjuntos.Rows.Count > 0 Then
+    '        dgvAdjuntos.Columns("Id").Visible = False
+    '        dgvAdjuntos.Columns("NombreArchivo").HeaderText = "Nombre del Archivo"
+    '        dgvAdjuntos.Columns("NombreArchivo").AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+    '        dgvAdjuntos.Columns("FechaCreacion").HeaderText = "Fecha de Carga"
+    '        dgvAdjuntos.Enabled = True
+    '        pnlPreview.Enabled = True
+    '    Else
+    '        dgvAdjuntos.Enabled = False
+    '        pnlPreview.Enabled = False
+    '        MostrarPanelMensaje("No hay archivos adjuntos.")
+    '    End If
+    'End Sub
 
     Private Sub btnAdjuntar_Click(sender As Object, e As EventArgs) Handles btnAdjuntar.Click
         Using openDialog As New OpenFileDialog()

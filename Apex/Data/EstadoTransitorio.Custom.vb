@@ -10,27 +10,29 @@ Partial Public Class EstadoTransitorio
     ''' <param name="hasta">Parámetro de salida para la fecha de fin.</param>
     Public Sub GetFechas(ByRef desde As Date?, ByRef hasta As Date?)
         Select Case Me.TipoEstadoTransitorioId
-            Case 1 ' Designación
+            Case TiposEstadoCatalog.Designacion
                 desde = Me.DesignacionDetalle?.FechaDesde
                 hasta = Me.DesignacionDetalle?.FechaHasta
-            Case 2 ' Enfermedad
+            Case TiposEstadoCatalog.Enfermedad
                 desde = Me.EnfermedadDetalle?.FechaDesde
                 hasta = Me.EnfermedadDetalle?.FechaHasta
-            Case 3 ' Sanción
+            Case TiposEstadoCatalog.Sancion
                 desde = Me.SancionDetalle?.FechaDesde
                 hasta = Me.SancionDetalle?.FechaHasta
-            Case 4 ' Orden Cinco
+            Case TiposEstadoCatalog.OrdenCinco
                 desde = Me.OrdenCincoDetalle?.FechaDesde
                 hasta = Me.OrdenCincoDetalle?.FechaHasta
-            Case 5 ' Retén (es un solo día)
+            Case TiposEstadoCatalog.Reten      ' un solo día
                 desde = Me.RetenDetalle?.FechaReten
                 hasta = Me.RetenDetalle?.FechaReten
-            Case 6 ' Sumario
+            Case TiposEstadoCatalog.Sumario
                 desde = Me.SumarioDetalle?.FechaDesde
                 hasta = Me.SumarioDetalle?.FechaHasta
+            Case TiposEstadoCatalog.Traslado
+                desde = Me.TrasladoDetalle?.FechaDesde
+                hasta = Me.TrasladoDetalle?.FechaHasta
             Case Else
-                desde = Nothing
-                hasta = Nothing
+                desde = Nothing : hasta = Nothing
         End Select
     End Sub
 
@@ -40,20 +42,15 @@ Partial Public Class EstadoTransitorio
     ''' <returns>Un objeto Color.</returns>
     Public Function GetColor() As Color
         Select Case Me.TipoEstadoTransitorioId
-            Case 1 ' Designación
-                Return Color.LightSkyBlue
-            Case 2 ' Enfermedad
-                Return Color.LightCoral
-            Case 3 ' Sanción
-                Return Color.Khaki
-            Case 4 ' Orden Cinco
-                Return Color.Plum
-            Case 5 ' Retén
-                Return Color.LightGray
-            Case 6 ' Sumario
-                Return Color.LightSalmon
-            Case Else
-                Return Color.White
+            Case TiposEstadoCatalog.Designacion : Return Color.LightSkyBlue
+            Case TiposEstadoCatalog.Enfermedad : Return Color.LightCoral
+            Case TiposEstadoCatalog.Sancion : Return Color.Khaki
+            Case TiposEstadoCatalog.OrdenCinco : Return Color.Plum
+            Case TiposEstadoCatalog.Reten : Return Color.LightGray
+            Case TiposEstadoCatalog.Sumario : Return Color.LightSalmon
+            Case TiposEstadoCatalog.Traslado : Return Color.LightGreen
+            Case Else : Return Color.White
         End Select
     End Function
+
 End Class
