@@ -287,6 +287,8 @@
           <Property Name="FuncionarioId" Type="int" Nullable="false" />
           <Property Name="Fecha" Type="date" Nullable="false" />
           <Property Name="Area" Type="nvarchar(max)" />
+          <Property Name="Anio" Type="int" StoreGeneratedPattern="Computed" />
+          <Property Name="Mes" Type="int" StoreGeneratedPattern="Computed" />
         </EntityType>
         <EntityType Name="HistoricoLicencia">
           <Key>
@@ -2420,6 +2422,8 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <Property Name="Fecha" Type="DateTime" Nullable="false" Precision="0" />
           <Property Name="Area" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="Funcionario" Relationship="Self.FK_HistCust_Func" FromRole="HistoricoCustodia" ToRole="Funcionario" />
+          <Property Name="Anio" Type="Int32" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="Mes" Type="Int32" annotation:StoreGeneratedPattern="Computed" />
         </EntityType>
         <EntityType Name="HistoricoLicencia">
           <Key>
@@ -4449,6 +4453,8 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <EntitySetMapping Name="HistoricoCustodia">
             <EntityTypeMapping TypeName="ApexModel.HistoricoCustodia">
               <MappingFragment StoreEntitySet="HistoricoCustodia">
+                <ScalarProperty Name="Mes" ColumnName="Mes" />
+                <ScalarProperty Name="Anio" ColumnName="Anio" />
                 <ScalarProperty Name="FuncionarioId" ColumnName="FuncionarioId" />
                 <ScalarProperty Name="Fecha" ColumnName="Fecha" />
                 <ScalarProperty Name="Area" ColumnName="Area" />

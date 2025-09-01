@@ -14,6 +14,8 @@ Partial Public Class HistoricoCustodia
     Public Property FuncionarioId As Integer
     Public Property Fecha As Date
     Public Property Area As String
+    Public Property Anio As Nullable(Of Integer)
+    Public Property Mes As Nullable(Of Integer)
 
     Public Overridable Property Funcionario As Funcionario
 
