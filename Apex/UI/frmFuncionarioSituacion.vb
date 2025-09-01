@@ -88,6 +88,7 @@ Public Class frmFuncionarioSituacion
                 Include(Function(et) et.OrdenCincoDetalle).
                 Include(Function(et) et.RetenDetalle).
                 Include(Function(et) et.SumarioDetalle).
+                Include(Function(et) et.TrasladoDetalle).
                 Where(Function(et) et.FuncionarioId = _funcionarioId).
                 AsNoTracking().
                 ToListAsync()

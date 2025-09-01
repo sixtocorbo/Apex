@@ -332,6 +332,7 @@ Public Class frmFuncionarioCrear
                              .Include(Function(et) et.DesarmadoDetalle) _
                              .Include(Function(et) et.SeparacionDelCargoDetalle) _
                              .Include(Function(et) et.InicioDeProcesamientoDetalle) _
+                             .Include(Function(et) et.TrasladoDetalle) _
                              .OrderByDescending(Function(et) et.Id).ToListAsync()
 
             _estadoRows = MapEstadosHistorial(historial)

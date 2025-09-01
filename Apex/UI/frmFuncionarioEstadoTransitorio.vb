@@ -16,6 +16,7 @@ Public Class frmFuncionarioEstadoTransitorio
     Public OrdenCincoDetalle As OrdenCincoDetalle
     Public EnfermedadDetalle As EnfermedadDetalle
     Public RetenDetalle As RetenDetalle
+    Public TrasladoDetalle As TrasladoDetalle
 
     Public Sub New(estado As EstadoTransitorio, tiposEstado As List(Of TipoEstadoTransitorio), uow As IUnitOfWork)
         InitializeComponent()
@@ -144,6 +145,11 @@ Public Class frmFuncionarioEstadoTransitorio
                 fechaHasta = SumarioDetalle.FechaHasta
                 observaciones = SumarioDetalle.Observaciones
                 txtResolucion.Text = SumarioDetalle.Expediente
+            Case 7 ' Traslado
+                TrasladoDetalle = Estado.TrasladoDetalle
+                dtpFechaDesde.Value = TrasladoDetalle.FechaDesde
+                fechaHasta = TrasladoDetalle.FechaHasta
+                observaciones = TrasladoDetalle.Observaciones
         End Select
 
         txtObservaciones.Text = observaciones
@@ -261,6 +267,12 @@ Public Class frmFuncionarioEstadoTransitorio
                 detalle.Observaciones = txtObservaciones.Text.Trim()
                 detalle.Expediente = txtResolucion.Text.Trim()
                 Estado.SumarioDetalle = detalle
+            Case 7
+                Dim detalle = If(Estado.Id > 0, Estado.TrasladoDetalle, New TrasladoDetalle())
+                detalle.FechaDesde = dtpFechaDesde.Value.Date
+                detalle.FechaHasta = If(chkFechaHasta.Checked, CType(Nothing, Date?), dtpFechaHasta.Value.Date)
+                detalle.Observaciones = txtObservaciones.Text.Trim()
+                Estado.TrasladoDetalle = detalle
         End Select
 
         If Estado.Id = 0 Then
