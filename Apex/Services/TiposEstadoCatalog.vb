@@ -45,17 +45,18 @@ Public NotInheritable Class TiposEstadoCatalog
             End If
         Next
 
-        ' ---- Aliases / sinónimos frecuentes ----
+        ' ---- Aliases / sinónimos frecuentes (CORREGIDOS Y AMPLIADOS) ----
         AddAlias(dict, "Orden 5", "Orden Cinco")
         AddAlias(dict, "Orden V", "Orden Cinco")
         AddAlias(dict, "Baja", "Baja de Funcionario")
         AddAlias(dict, "Reactivacion", "Reactivación de Funcionario")
-        AddAlias(dict, "Reactivación", "Reactivación de Funcionario")
         AddAlias(dict, "Inicio de Proceso", "Inicio de Procesamiento")
         AddAlias(dict, "Procesamiento", "Inicio de Procesamiento")
         AddAlias(dict, "Separacion Cargo", "Separación del Cargo")
-        AddAlias(dict, "Separación Cargo", "Separación del Cargo")
         AddAlias(dict, "Reten", "Retén")
+        AddAlias(dict, "Licencia Medica", "Licencia")
+        AddAlias(dict, "Licencia por enfermedad", "Licencia")
+
 
         _byName = dict
     End Sub
@@ -112,7 +113,7 @@ Public NotInheritable Class TiposEstadoCatalog
         End Get
     End Property
 
-    ' ---- Propiedades fuertes (sin magic numbers) ----
+    ' ---- Propiedades fuertes (sin magic numbers) - COMPLETAS ----
     Public Shared ReadOnly Property Designacion As Integer
         Get
             Return IdDe("Designación")
@@ -188,6 +189,13 @@ Public NotInheritable Class TiposEstadoCatalog
     Public Shared ReadOnly Property Desarmado As Integer
         Get
             Return IdDe("Desarmado")
+        End Get
+    End Property
+
+    ' NUEVA PROPIEDAD AÑADIDA
+    Public Shared ReadOnly Property Licencia As Integer
+        Get
+            Return IdDe("Licencia")
         End Get
     End Property
 End Class
