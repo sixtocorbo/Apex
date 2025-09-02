@@ -17,6 +17,8 @@ Partial Public Class Cargo
     Public Property UpdatedAt As Nullable(Of Date)
     Public Property Grado As Nullable(Of Integer)
 
+    Public Overridable Property CambioDeCargoDetalle As ICollection(Of CambioDeCargoDetalle) = New HashSet(Of CambioDeCargoDetalle)
+    Public Overridable Property CambioDeCargoDetalle1 As ICollection(Of CambioDeCargoDetalle) = New HashSet(Of CambioDeCargoDetalle)
     Public Overridable Property Funcionario As ICollection(Of Funcionario) = New HashSet(Of Funcionario)
 
 End Class

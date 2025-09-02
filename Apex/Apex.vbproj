@@ -195,6 +195,12 @@
     <Compile Include="Data\AuditoriaCambios.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
+    <Compile Include="Data\BajaDeFuncionarioDetalle.vb">
+      <DependentUpon>Model1.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\CambioDeCargoDetalle.vb">
+      <DependentUpon>Model1.tt</DependentUpon>
+    </Compile>
     <Compile Include="Data\Cargo.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
@@ -279,6 +285,9 @@
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\IGenericService.vb" />
+    <Compile Include="Data\InicioDeProcesamientoDetalle.vb">
+      <DependentUpon>Model1.tt</DependentUpon>
+    </Compile>
     <Compile Include="Data\IUnitOfWork.vb" />
     <Compile Include="Data\MapPoliciaFunc.vb">
       <DependentUpon>Model1.tt</DependentUpon>
@@ -329,6 +338,9 @@
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\PuestoTrabajo.vb">
+      <DependentUpon>Model1.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\ReactivacionDeFuncionarioDetalle.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\RegimenAlternancia.vb">
