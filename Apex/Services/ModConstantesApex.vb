@@ -8,4 +8,5 @@ Public Class ModConstantesApex
     Public Const CATEGORIA_SANCION_GRAVE As String = "Sanción Grave" ' <-- CORREGIDO
     Public Const CATEGORIA_SANCION_LEVE As String = "Sanción Leve"   ' <-- CORREGIDO
     Public Const CATEGORIA_ESTADO_SANCION As String = "Sanción"     ' <-- CORREGIDO
+
 End Class

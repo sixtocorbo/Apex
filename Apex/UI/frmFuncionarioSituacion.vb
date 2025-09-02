@@ -36,7 +36,6 @@ Public Class frmFuncionarioSituacion
 
         ' Suscripciones a eventos
         AddHandler dgvNovedades.CellDoubleClick, AddressOf dgvNovedades_CellDoubleClick
-        AddHandler dgvEstados.CellFormatting, AddressOf dgvEstados_CellFormatting
         AddHandler dgvNovedades.DataBindingComplete, AddressOf DgvNovedades_DataBindingComplete
         AddHandler dgvEstados.DataBindingComplete, AddressOf DgvEstados_DataBindingComplete
         AddHandler NotificadorEventos.FuncionarioActualizado, _funcionarioActualizadoHandler
@@ -122,9 +121,6 @@ Public Class frmFuncionarioSituacion
         _selectedTimelineButton = Nothing
         dgvNovedades.DataSource = Nothing
 
-        ' ============================================================================
-        ' CORRECCIÓN: Se ordena el timeline de forma descendente.
-        ' ============================================================================
         Dim fechasNovedades = _todasLasNovedades _
             .Where(Function(n) n.Fecha.Date >= fechaInicio AndAlso n.Fecha.Date <= fechaFin) _
             .Select(Function(n) n.Fecha.Date).Distinct().OrderByDescending(Function(d) d).ToList()
@@ -181,7 +177,7 @@ Public Class frmFuncionarioSituacion
     Private Sub ActualizarVistaDeNovedades(selectedDate As Date)
         Dim novedadesDelDia = _todasLasNovedades.
             Where(Function(n) n.Fecha.Date = selectedDate.Date).
-            OrderByDescending(Function(n) n.Id). ' Opcional: ordenar novedades del mismo día
+            OrderByDescending(Function(n) n.Id).
             Select(Function(n) New With {.Id = n.Id, n.Fecha, .Texto = n.Texto}).ToList()
 
         dgvNovedades.DataSource = novedadesDelDia
@@ -210,23 +206,25 @@ Public Class frmFuncionarioSituacion
 
             Dim eventosUnificados As New List(Of Object)
 
+            ' ============================================================================
+            ' CORRECCIÓN: Se agrega el TipoId al objeto anónimo para usarlo al colorear.
+            ' ============================================================================
             eventosUnificados.AddRange(estadosEnPeriodo.Select(Function(s) New With {
                 .Tipo = s.TipoEstadoNombre,
                 .Desde = s.FechaDesde,
                 .Hasta = s.FechaHasta,
-                .IsEstado = True
+                .IsEstado = True,
+                .TipoId = s.TipoEstadoTransitorioId
             }))
 
             eventosUnificados.AddRange(licenciasEnPeriodo.Select(Function(l) New With {
                 .Tipo = $"LICENCIA: {l.TipoLicencia.Nombre}",
                 .Desde = CType(l.inicio, Date?),
                 .Hasta = CType(l.finaliza, Date?),
-                .IsEstado = False
+                .IsEstado = False,
+                .TipoId = 0 ' Un valor por defecto para las licencias
             }))
 
-            ' ============================================================================
-            ' CORRECCIÓN: Se ordena la grilla de forma descendente por fecha de inicio.
-            ' ============================================================================
             dgvEstados.DataSource = eventosUnificados.OrderByDescending(Function(x) x.Desde).ToList()
 
         Catch ex As Exception
@@ -240,7 +238,7 @@ Public Class frmFuncionarioSituacion
 #End Region
 
 #Region " Configuración y Eventos de Grillas "
-
+    ' ... (Esta región no necesita cambios)
     Private Sub ConfigurarGrillaNovedades()
         If dgvNovedades.Columns.Count > 0 Then Return
         dgvNovedades.AutoGenerateColumns = False
@@ -297,21 +295,6 @@ Public Class frmFuncionarioSituacion
         End Try
     End Sub
 
-    Private Sub dgvEstados_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
-        If e.RowIndex < 0 OrElse dgvEstados.Rows(e.RowIndex).DataBoundItem Is Nothing Then Return
-
-        Dim rowData = dgvEstados.Rows(e.RowIndex).DataBoundItem
-        Dim isEstado = CBool(rowData.GetType().GetProperty("IsEstado")?.GetValue(rowData, Nothing))
-
-        If isEstado Then
-            e.CellStyle.BackColor = ColorTranslator.FromHtml("#fff1cc") ' Color para Estados
-        Else
-            e.CellStyle.BackColor = ColorTranslator.FromHtml("#d4e6f1") ' Color para Licencias
-        End If
-        e.CellStyle.ForeColor = Color.Black
-    End Sub
-
-
     Private Sub DgvNovedades_DataBindingComplete(sender As Object, e As DataGridViewBindingCompleteEventArgs)
         Dim dgv = CType(sender, DataGridView)
         ConfigurarGrillaNovedades()
@@ -321,8 +304,8 @@ Public Class frmFuncionarioSituacion
     Private Sub DgvEstados_DataBindingComplete(sender As Object, e As DataGridViewBindingCompleteEventArgs)
         Dim dgv = CType(sender, DataGridView)
         ConfigurarGrillaEstados()
-        If dgv.Columns.Contains("Entity") Then dgv.Columns("Entity").Visible = False
         If dgv.Columns.Contains("IsEstado") Then dgv.Columns("IsEstado").Visible = False
+        If dgv.Columns.Contains("TipoId") Then dgv.Columns("TipoId").Visible = False
     End Sub
 
     Private Sub Cerrando(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
