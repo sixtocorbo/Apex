@@ -124,9 +124,6 @@ Public Class frmFuncionarioCrear
             Case TiposEstadoCatalog.Sumario
                 _uow.Context.Entry(et).Reference(Function(x) x.SumarioDetalle).Load()
 
-            Case TiposEstadoCatalog.CambioDeCargo
-                _uow.Context.Entry(et).Reference(Function(x) x.CambioDeCargoDetalle).Load()
-
             Case TiposEstadoCatalog.Traslado
                 _uow.Context.Entry(et).Reference(Function(x) x.TrasladoDetalle).Load()
 
@@ -194,10 +191,6 @@ Public Class frmFuncionarioCrear
 
             Case TiposEstadoCatalog.Traslado
                 Dim d = e.TrasladoDetalle
-                If d IsNot Nothing Then obs = d.Observaciones
-
-            Case TiposEstadoCatalog.CambioDeCargo
-                Dim d = e.CambioDeCargoDetalle
                 If d IsNot Nothing Then obs = d.Observaciones
 
             Case TiposEstadoCatalog.SeparacionDelCargo
@@ -408,7 +401,6 @@ Public Class frmFuncionarioCrear
                              .Include(Function(et) et.RetenDetalle) _
                              .Include(Function(et) et.DesarmadoDetalle) _
                              .Include(Function(et) et.SeparacionDelCargoDetalle) _
-                             .Include(Function(et) et.InicioDeProcesamientoDetalle) _
                              .Include(Function(et) et.TrasladoDetalle) _
                              .OrderByDescending(Function(et) et.Id).ToListAsync()
 
@@ -640,11 +632,6 @@ Public Class frmFuncionarioCrear
         If estado.RetenDetalle IsNot Nothing Then _uow.Context.Entry(estado.RetenDetalle).State = EntityState.Deleted
         If estado.SumarioDetalle IsNot Nothing Then _uow.Context.Entry(estado.SumarioDetalle).State = EntityState.Deleted
         If estado.TrasladoDetalle IsNot Nothing Then _uow.Context.Entry(estado.TrasladoDetalle).State = EntityState.Deleted
-        If estado.BajaDeFuncionarioDetalle IsNot Nothing Then _uow.Context.Entry(estado.BajaDeFuncionarioDetalle).State = EntityState.Deleted
-        If estado.CambioDeCargoDetalle IsNot Nothing Then _uow.Context.Entry(estado.CambioDeCargoDetalle).State = EntityState.Deleted
-        If estado.ReactivacionDeFuncionarioDetalle IsNot Nothing Then _uow.Context.Entry(estado.ReactivacionDeFuncionarioDetalle).State = EntityState.Deleted
-        If estado.SeparacionDelCargoDetalle IsNot Nothing Then _uow.Context.Entry(estado.SeparacionDelCargoDetalle).State = EntityState.Deleted
-        If estado.InicioDeProcesamientoDetalle IsNot Nothing Then _uow.Context.Entry(estado.InicioDeProcesamientoDetalle).State = EntityState.Deleted
         If estado.DesarmadoDetalle IsNot Nothing Then _uow.Context.Entry(estado.DesarmadoDetalle).State = EntityState.Deleted
 
         ' Ahora sí: eliminá el estado

@@ -17,17 +17,13 @@ Partial Public Class EstadoTransitorio
     Public Property CreatedAt As Date
     Public Property UpdatedAt As Nullable(Of Date)
 
-    Public Overridable Property BajaDeFuncionarioDetalle As BajaDeFuncionarioDetalle
-    Public Overridable Property CambioDeCargoDetalle As CambioDeCargoDetalle
     Public Overridable Property DesarmadoDetalle As DesarmadoDetalle
     Public Overridable Property DesignacionDetalle As DesignacionDetalle
     Public Overridable Property EnfermedadDetalle As EnfermedadDetalle
     Public Overridable Property Funcionario As Funcionario
     Public Overridable Property TipoEstadoTransitorio As TipoEstadoTransitorio
     Public Overridable Property EstadoTransitorioAdjunto As ICollection(Of EstadoTransitorioAdjunto) = New HashSet(Of EstadoTransitorioAdjunto)
-    Public Overridable Property InicioDeProcesamientoDetalle As InicioDeProcesamientoDetalle
     Public Overridable Property OrdenCincoDetalle As OrdenCincoDetalle
-    Public Overridable Property ReactivacionDeFuncionarioDetalle As ReactivacionDeFuncionarioDetalle
     Public Overridable Property RetenDetalle As RetenDetalle
     Public Overridable Property SancionDetalle As SancionDetalle
     Public Overridable Property SeparacionDelCargoDetalle As SeparacionDelCargoDetalle
