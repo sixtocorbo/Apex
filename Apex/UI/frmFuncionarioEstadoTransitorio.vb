@@ -164,6 +164,8 @@ Public Class frmFuncionarioEstadoTransitorio
                 dtpFechaDesde.Value = d.FechaDesde
                 fechaHasta = d.FechaHasta
                 observaciones = d.Observaciones
+
+
         End Select
 
         txtObservaciones.Text = observaciones

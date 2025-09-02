@@ -84,31 +84,15 @@ Public NotInheritable Class TiposEstadoCatalog
         End Get
     End Property
 
-    Public Shared ReadOnly Property BajaDeFuncionario As Integer
-        Get
-            Return IdDe("Baja de Funcionario")
-        End Get
-    End Property
     Public Shared ReadOnly Property CambioDeCargo As Integer
-        Get
-            Return IdDe("Cambio de Cargo")
-        End Get
-    End Property
-    Public Shared ReadOnly Property ReactivacionDeFuncionario As Integer
-        Get
-            Return IdDe("Reactivación de Funcionario")
-        End Get
-    End Property
+
+
     Public Shared ReadOnly Property SeparacionDelCargo As Integer
         Get
             Return IdDe("Separación del Cargo")
         End Get
     End Property
-    Public Shared ReadOnly Property InicioDeProcesamiento As Integer
-        Get
-            Return IdDe("Inicio de Procesamiento")
-        End Get
-    End Property
+
     Public Shared ReadOnly Property Desarmado As Integer
         Get
             Return IdDe("Desarmado")

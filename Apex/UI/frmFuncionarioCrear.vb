@@ -124,23 +124,14 @@ Public Class frmFuncionarioCrear
             Case TiposEstadoCatalog.Sumario
                 _uow.Context.Entry(et).Reference(Function(x) x.SumarioDetalle).Load()
 
-            Case TiposEstadoCatalog.BajaDeFuncionario
-                _uow.Context.Entry(et).Reference(Function(x) x.BajaDeFuncionarioDetalle).Load()
-
             Case TiposEstadoCatalog.CambioDeCargo
                 _uow.Context.Entry(et).Reference(Function(x) x.CambioDeCargoDetalle).Load()
 
             Case TiposEstadoCatalog.Traslado
                 _uow.Context.Entry(et).Reference(Function(x) x.TrasladoDetalle).Load()
 
-            Case TiposEstadoCatalog.ReactivacionDeFuncionario
-                _uow.Context.Entry(et).Reference(Function(x) x.ReactivacionDeFuncionarioDetalle).Load()
-
             Case TiposEstadoCatalog.SeparacionDelCargo
                 _uow.Context.Entry(et).Reference(Function(x) x.SeparacionDelCargoDetalle).Load()
-
-            Case TiposEstadoCatalog.InicioDeProcesamiento
-                _uow.Context.Entry(et).Reference(Function(x) x.InicioDeProcesamientoDetalle).Load()
 
             Case TiposEstadoCatalog.Desarmado
                 _uow.Context.Entry(et).Reference(Function(x) x.DesarmadoDetalle).Load()
@@ -205,24 +196,12 @@ Public Class frmFuncionarioCrear
                 Dim d = e.TrasladoDetalle
                 If d IsNot Nothing Then obs = d.Observaciones
 
-            Case TiposEstadoCatalog.BajaDeFuncionario
-                Dim d = e.BajaDeFuncionarioDetalle
-                If d IsNot Nothing Then obs = d.Observaciones
-
             Case TiposEstadoCatalog.CambioDeCargo
                 Dim d = e.CambioDeCargoDetalle
                 If d IsNot Nothing Then obs = d.Observaciones
 
-            Case TiposEstadoCatalog.ReactivacionDeFuncionario
-                Dim d = e.ReactivacionDeFuncionarioDetalle
-                If d IsNot Nothing Then obs = d.Observaciones
-
             Case TiposEstadoCatalog.SeparacionDelCargo
                 Dim d = e.SeparacionDelCargoDetalle
-                If d IsNot Nothing Then obs = d.Observaciones
-
-            Case TiposEstadoCatalog.InicioDeProcesamiento
-                Dim d = e.InicioDeProcesamientoDetalle
                 If d IsNot Nothing Then obs = d.Observaciones
 
             Case TiposEstadoCatalog.Desarmado

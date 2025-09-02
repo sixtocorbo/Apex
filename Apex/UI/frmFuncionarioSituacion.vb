@@ -232,32 +232,44 @@ Public Class frmFuncionarioSituacion
 #Region " Lógica de la Grilla de Estados "
 
     Private Sub PoblarGrillaEstados(fechaInicio As Date, fechaFin As Date)
+        ' 1. Crear una lista unificada para ambos tipos de eventos.
+        Dim eventosUnificados As New List(Of Object)
+
+        ' 2. Agregar los estados transitorios a la lista.
+        eventosUnificados.AddRange(_todosLosEstados.Select(Function(s)
+                                                               Dim desde As Date? = Nothing, hasta As Date? = Nothing
+                                                               s.GetFechas(desde, hasta)
+                                                               If hasta.HasValue AndAlso hasta.Value = Date.MinValue Then hasta = Nothing
+                                                               Return New With {
+                                                              .Tipo = s.TipoEstadoTransitorio.Nombre,
+                                                              .Desde = desde,
+                                                              .Hasta = hasta,
+                                                              .Entity = CType(s, Object) ' Guardamos la entidad original
+                                                          }
+                                                           End Function))
+
+        ' 3. Agregar las licencias a la lista.
+        eventosUnificados.AddRange(_todasLasLicencias.Select(Function(l) New With {
+        .Tipo = $"LICENCIA: {l.TipoLicencia.Nombre}",
+        .Desde = CType(l.inicio, Date?),
+        .Hasta = CType(l.finaliza, Date?),
+        .Entity = CType(l, Object) ' Guardamos la entidad original
+    }))
+
+        ' 4. Filtrar la lista unificada por el rango de fechas.
         Dim overlaps As Func(Of Date?, Date?, Boolean) =
-            Function(desde As Date?, hasta As Date?) As Boolean
-                If Not desde.HasValue Then Return False
-                Dim finEfectivo As Date = If(hasta.HasValue, hasta.Value, Date.MaxValue)
-                Return (desde.Value.Date <= fechaFin) AndAlso (finEfectivo.Date >= fechaInicio)
-            End Function
+        Function(desde As Date?, hasta As Date?) As Boolean
+            If Not desde.HasValue Then Return False
+            Dim finEfectivo As Date = If(hasta.HasValue, hasta.Value, Date.MaxValue)
+            Return (desde.Value.Date <= fechaFin) AndAlso (finEfectivo.Date >= fechaInicio)
+        End Function
 
-        Dim estadosEnPeriodo = _todosLosEstados.Where(Function(s)
-                                                          Dim desde As Date? = Nothing, hasta As Date? = Nothing
-                                                          s.GetFechas(desde, hasta)
-                                                          Return overlaps(desde, hasta)
-                                                      End Function)
+        Dim eventosEnPeriodo = eventosUnificados.Where(Function(e) overlaps(e.Desde, e.Hasta)) _
+                                            .OrderBy(Function(x) x.Desde) _
+                                            .ToList()
 
-        Dim dataSource = estadosEnPeriodo.Select(Function(s)
-                                                     Dim desde As Date? = Nothing, hasta As Date? = Nothing
-                                                     s.GetFechas(desde, hasta)
-                                                     If hasta.HasValue AndAlso hasta.Value = Date.MinValue Then hasta = Nothing
-                                                     Return New With {
-                                                       .Tipo = s.TipoEstadoTransitorio.Nombre,
-                                                       .Desde = desde,
-                                                       .Hasta = hasta,
-                                                       .Entity = s
-                                                     }
-                                                 End Function).OrderBy(Function(x) x.Desde).ToList()
-
-        dgvEstados.DataSource = dataSource
+        ' 5. Asignar el resultado a la grilla.
+        dgvEstados.DataSource = eventosEnPeriodo
     End Sub
 
 #End Region
@@ -329,10 +341,20 @@ Public Class frmFuncionarioSituacion
         Dim rowData = dgv.Rows(e.RowIndex).DataBoundItem
         If rowData Is Nothing Then Return
 
-        ' Acceso seguro a la propiedad 'Entity' del objeto anónimo
-        Dim estado As EstadoTransitorio = TryCast(rowData.GetType().GetProperty("Entity")?.GetValue(rowData, Nothing), EstadoTransitorio)
-        If estado IsNot Nothing Then
-            e.CellStyle.BackColor = estado.GetColor()
+        ' Acceso seguro a la propiedad 'Entity'
+        Dim entity = rowData.GetType().GetProperty("Entity")?.GetValue(rowData, Nothing)
+
+        If entity IsNot Nothing Then
+            If TypeOf entity Is EstadoTransitorio Then
+                ' Aplicar color para Estados Transitorios
+                Dim estado = CType(entity, EstadoTransitorio)
+                e.CellStyle.BackColor = estado.GetColor()
+                e.CellStyle.ForeColor = Color.Black ' O el color que prefieras para el texto
+            ElseIf TypeOf entity Is HistoricoLicencia Then
+                ' Aplicar un color distintivo para las Licencias
+                e.CellStyle.BackColor = Color.LightBlue
+                e.CellStyle.ForeColor = Color.Black
+            End If
         End If
     End Sub
 
