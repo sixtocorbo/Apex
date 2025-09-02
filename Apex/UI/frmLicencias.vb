@@ -1,33 +1,42 @@
 ﻿' Apex/UI/frmGestionLicencias.vb
+Option Strict On
+Option Explicit On
+
+Imports System.Threading.Tasks
+Imports System.Windows.Forms
+
 Public Class frmLicencias
 
-    Private _licenciaSvc As New LicenciaService()
+    Private ReadOnly _licenciaSvc As New LicenciaService()
 
-    ' --- INICIO DE LA MODIFICACIÓN #1: Conectar al Notificador de Eventos ---
+    ' --- Suscripción al notificador ---
     Private Async Sub frmGestionLicencias_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
         ConfigurarGrillaLicencias()
         txtBusquedaLicencia.Focus()
-        ' Nos suscribimos al evento para enterarnos de cambios hechos en otros formularios.
+
         AddHandler NotificadorEventos.DatosActualizados, AddressOf OnDatosActualizados
-        ' Forzamos una búsqueda inicial si hay texto en el cuadro de búsqueda.
+
         If Not String.IsNullOrWhiteSpace(txtBusquedaLicencia.Text) Then
             Await CargarDatosLicenciasAsync()
         End If
     End Sub
 
-    ' Es una buena práctica desuscribirse para evitar fugas de memoria.
     Private Sub frmGestionLicencias_FormClosed(sender As Object, e As FormClosedEventArgs) Handles Me.FormClosed
         RemoveHandler NotificadorEventos.DatosActualizados, AddressOf OnDatosActualizados
     End Sub
 
-    ' Este método se disparará automáticamente cuando se guarde una licencia.
     Private Async Sub OnDatosActualizados(sender As Object, e As EventArgs)
-        If Me.IsHandleCreated AndAlso Me.Visible Then
-            Await CargarDatosLicenciasAsync()
+        ' Asegura refresco en el hilo de UI
+        If Me.IsHandleCreated AndAlso Not Me.IsDisposed Then
+            If Me.InvokeRequired Then
+                Me.BeginInvoke(New Action(Async Sub() Await CargarDatosLicenciasAsync()))
+            Else
+                Await CargarDatosLicenciasAsync()
+            End If
         End If
     End Sub
-    ' --- FIN DE LA MODIFICACIÓN #1 ---
+    ' --- fin notificador ---
 
 #Region "Configuración y Carga de Datos"
 
@@ -38,36 +47,74 @@ Public Class frmLicencias
             .RowHeadersVisible = False
             .SelectionMode = DataGridViewSelectionMode.FullRowSelect
             .MultiSelect = False
+            .ReadOnly = True
+            .AllowUserToAddRows = False
+            .AllowUserToDeleteRows = False
 
-            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Id", .DataPropertyName = "Id", .Visible = False})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "NombreFuncionario", .DataPropertyName = "NombreFuncionario", .HeaderText = "Funcionario", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "TipoLicencia", .DataPropertyName = "TipoLicencia", .HeaderText = "Tipo", .Width = 180})
+            ' Id (oculto)
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+                .Name = "LicenciaId",
+                .DataPropertyName = "LicenciaId",
+                .Visible = False
+            })
 
-            Dim colInicio As New DataGridViewTextBoxColumn With {.Name = "FechaInicio", .DataPropertyName = "FechaInicio", .HeaderText = "Desde", .Width = 100}
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+                .Name = "NombreFuncionario",
+                .DataPropertyName = "NombreFuncionario",
+                .HeaderText = "Funcionario",
+                .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+            })
+
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+                .Name = "TipoLicencia",
+                .DataPropertyName = "TipoLicencia",
+                .HeaderText = "Tipo",
+                .Width = 180
+            })
+
+            Dim colInicio As New DataGridViewTextBoxColumn With {
+                .Name = "FechaInicio",
+                .DataPropertyName = "FechaInicio",
+                .HeaderText = "Desde",
+                .Width = 100
+            }
             colInicio.DefaultCellStyle.Format = "dd/MM/yyyy"
             .Columns.Add(colInicio)
 
-            Dim colFin As New DataGridViewTextBoxColumn With {.Name = "FechaFin", .DataPropertyName = "FechaFin", .HeaderText = "Hasta", .Width = 100}
+            Dim colFin As New DataGridViewTextBoxColumn With {
+                .Name = "FechaFin",
+                .DataPropertyName = "FechaFin",
+                .HeaderText = "Hasta",
+                .Width = 100
+            }
             colFin.DefaultCellStyle.Format = "dd/MM/yyyy"
             .Columns.Add(colFin)
 
-            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Estado", .DataPropertyName = "Estado", .HeaderText = "Estado", .Width = 120})
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+                .Name = "EstadoLicencia",
+                .DataPropertyName = "EstadoLicencia",
+                .HeaderText = "Estado",
+                .Width = 120
+            })
         End With
     End Sub
 
     Private Async Function CargarDatosLicenciasAsync() As Task
         Dim filtro = txtBusquedaLicencia.Text.Trim()
-        ' Ahora solo no cargamos nada si el filtro está vacío.
+
         If String.IsNullOrWhiteSpace(filtro) Then
-            dgvLicencias.DataSource = New List(Of vw_LicenciasCompletas)() ' Asignar lista vacía
+            ' >>> Tipo correcto del DataSource vacío
+            dgvLicencias.DataSource = New List(Of LicenciaConFuncionarioExtendidoDto)()
             Return
         End If
+
         LoadingHelper.MostrarCargando(Me)
         Try
             dgvLicencias.DataSource = Nothing
-            dgvLicencias.DataSource = Await _licenciaSvc.GetAllConDetallesAsync(filtroNombre:=filtro)
+            Dim datos = Await _licenciaSvc.GetAllConDetallesAsync(filtroNombre:=filtro)
+            dgvLicencias.DataSource = datos
         Catch ex As Exception
-            MessageBox.Show("Error al cargar licencias: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            MessageBox.Show("Error al cargar licencias: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.[Error])
         Finally
             LoadingHelper.OcultarCargando(Me)
         End Try
@@ -84,47 +131,68 @@ Public Class frmLicencias
         End If
     End Sub
 
+    ' (Opcional) búsqueda en vivo:
+    'Private Async Sub txtBusquedaLicencia_TextChanged(sender As Object, e As EventArgs) Handles txtBusquedaLicencia.TextChanged
+    '    Await CargarDatosLicenciasAsync()
+    'End Sub
+
 #End Region
 
 #Region "Acciones para Licencias"
 
     Private Sub btnNuevaLicencia_Click(sender As Object, e As EventArgs) Handles btnNuevaLicencia.Click
-        ' --- INICIO DE LA CORRECCIÓN ---
-        ' Abrimos el formulario como un diálogo modal.
-        ' La ejecución se detendrá aquí hasta que el formulario frmLicenciaCrear se cierre.
+        ' Abrir en el panel del Dashboard (tu patrón actual)
         Dim frm As New frmLicenciaCrear()
-        Dim parentDashboard As frmDashboard = CType(Me.ParentForm, frmDashboard)
-        parentDashboard.AbrirFormEnPanel(frm)
+        Dim parentDashboard As frmDashboard = TryCast(Me.ParentForm, frmDashboard)
+        If parentDashboard IsNot Nothing Then
+            parentDashboard.AbrirFormEnPanel(frm)
+        Else
+            ' Fallback modal si no está en dashboard
+            Using frm
+                frm.ShowDialog(Me)
+            End Using
+        End If
     End Sub
 
     Private Sub btnEditarLicencia_Click(sender As Object, e As EventArgs) Handles btnEditarLicencia.Click
+        EditarSeleccionada()
+    End Sub
+
+    Private Sub dgvLicencias_CellDoubleClick(sender As Object, e As DataGridViewCellEventArgs) Handles dgvLicencias.CellDoubleClick
+        If e.RowIndex >= 0 Then
+            EditarSeleccionada()
+        End If
+    End Sub
+
+    Private Sub EditarSeleccionada()
         If dgvLicencias.CurrentRow Is Nothing Then Return
-        Dim licenciaSeleccionada = CType(dgvLicencias.CurrentRow.DataBoundItem, vw_LicenciasCompletas)
-        If licenciaSeleccionada Is Nothing Then Return
+        Dim dto = TryCast(dgvLicencias.CurrentRow.DataBoundItem, LicenciaConFuncionarioExtendidoDto)
+        If dto Is Nothing OrElse Not dto.LicenciaId.HasValue Then
+            MessageBox.Show("No se pudo determinar la licencia a editar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return
+        End If
 
-        Dim idSeleccionado = licenciaSeleccionada.Id
-        Dim estadoActual = licenciaSeleccionada.Estado
-
-        ' --- INICIO DE LA CORRECCIÓN (consistencia) ---
-        ' El modo de edición ya usaba ShowDialog, lo cual es correcto. Lo mantenemos.
-        Using frm As New frmLicenciaCrear(idSeleccionado, estadoActual)
+        Using frm As New frmLicenciaCrear(dto.LicenciaId.Value, dto.EstadoLicencia)
             frm.ShowDialog(Me)
         End Using
-        ' --- FIN DE LA CORRECCIÓN ---
     End Sub
 
     Private Async Sub btnEliminarLicencia_Click(sender As Object, e As EventArgs) Handles btnEliminarLicencia.Click
         If dgvLicencias.CurrentRow Is Nothing Then Return
-        Dim idSeleccionado = CInt(dgvLicencias.CurrentRow.Cells("Id").Value)
-        Dim nombre = dgvLicencias.CurrentRow.Cells("NombreFuncionario").Value.ToString()
 
-        If MessageBox.Show($"¿Está seguro de que desea eliminar la licencia para '{nombre}'?", "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
+        Dim dto = TryCast(dgvLicencias.CurrentRow.DataBoundItem, LicenciaConFuncionarioExtendidoDto)
+        If dto Is Nothing OrElse Not dto.LicenciaId.HasValue Then
+            MessageBox.Show("No se pudo determinar la licencia a eliminar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return
+        End If
+
+        Dim nombre = If(dto.NombreFuncionario, "(sin nombre)")
+        If MessageBox.Show($"¿Eliminar la licencia de '{nombre}'?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
             Try
-                Await _licenciaSvc.DeleteAsync(idSeleccionado)
-                ' Notificamos la eliminación para que todos los formularios se actualicen.
+                Await _licenciaSvc.DeleteAsync(dto.LicenciaId.Value)
                 NotificadorEventos.NotificarActualizacion()
             Catch ex As Exception
-                MessageBox.Show("Error al eliminar la licencia: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                MessageBox.Show("Error al eliminar la licencia: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.[Error])
             End Try
         End If
     End Sub
