@@ -1,9 +1,11 @@
 ﻿Option Strict On
 Option Explicit On
 
-Imports System.IO
-Imports System.Data.Entity
 Imports System.ComponentModel
+Imports System.Data.Entity
+Imports System.IO
+Imports System.Linq
+Imports System.Linq.Expressions
 Imports System.Text
 
 Public Class frmFuncionarioCrear
@@ -97,153 +99,336 @@ Public Class frmFuncionarioCrear
             pbFoto.Image = My.Resources.Police
         End If
     End Sub
+    Private Sub CargarDatosEnControles()
+        If _funcionario Is Nothing Then Return
+
+        ' Texto
+        txtCI.Text = If(_funcionario.CI, String.Empty).Trim()
+        txtNombre.Text = If(_funcionario.Nombre, String.Empty).Trim()
+        txtDomicilio.Text = If(_funcionario.Domicilio, String.Empty).Trim()
+        txtEmail.Text = If(_funcionario.Email, String.Empty).Trim()
+        txtTelefono.Text = If(_funcionario.Telefono, String.Empty).Trim()
+        txtCiudad.Text = If(_funcionario.Ciudad, String.Empty).Trim()
+        txtSeccional.Text = If(_funcionario.Seccional, String.Empty).Trim()
+        txtCredencial.Text = If(_funcionario.Credencial, String.Empty).Trim()
+
+        ' Checkboxes
+        chkActivo.Checked = _funcionario.Activo
+        chkEstudia.Checked = _funcionario.Estudia
+
+        ' Fechas (defensivo con rango del DateTimePicker)
+        dtpFechaIngreso.Value = SafePickerDate(dtpFechaIngreso, _funcionario.FechaIngreso)
+        dtpFechaNacimiento.Value = SafePickerDate(dtpFechaNacimiento, _funcionario.FechaNacimiento)
+
+        ' Combos (usa helpers que dejan -1 si el valor no existe en el origen de datos)
+        SetSelectedOrNone(cboTipoFuncionario, _funcionario.TipoFuncionarioId)               ' no-nullable
+        SetSelectedOrNone(cboCargo, _funcionario.CargoId)                                   ' nullable
+        SetSelectedOrNone(cboEscalafon, _funcionario.EscalafonId)
+        SetSelectedOrNone(cboFuncion, _funcionario.FuncionId)
+        SetSelectedOrNone(cboEstadoCivil, _funcionario.EstadoCivilId)
+        SetSelectedOrNone(cboGenero, _funcionario.GeneroId)
+        SetSelectedOrNone(cboNivelEstudio, _funcionario.NivelEstudioId)
+        SetSelectedOrNone(cboEstado, _funcionario.EstadoId)
+        SetSelectedOrNone(cboSeccion, _funcionario.SeccionId)
+        SetSelectedOrNone(cboPuestoTrabajo, _funcionario.PuestoTrabajoId)
+        SetSelectedOrNone(cboTurno, _funcionario.TurnoId)
+        SetSelectedOrNone(cboSemana, _funcionario.SemanaId)
+        SetSelectedOrNone(cboHorario, _funcionario.HorarioId)
+
+        ' Foto
+        If _funcionario.Foto IsNot Nothing AndAlso _funcionario.Foto.Length > 0 Then
+            Using ms As New MemoryStream(_funcionario.Foto)
+                If pbFoto.Image IsNot Nothing Then pbFoto.Image.Dispose()
+                pbFoto.Image = New Bitmap(ms)
+            End Using
+        Else
+            pbFoto.Image = My.Resources.Police
+        End If
+    End Sub
+
+    ' ---------- Helpers ----------
+
+    ' Asegura que el DateTime esté dentro del rango del control; si no hay valor, usa Today o MinDate como fallback.
+    Private Function SafePickerDate(picker As DateTimePicker, value As Date?) As Date
+        Dim d As Date = If(value.HasValue, value.Value, Date.Today)
+        If d < picker.MinDate Then d = picker.MinDate
+        If d > picker.MaxDate Then d = picker.MaxDate
+        Return d
+    End Function
+
+    ' Sobrecarga para IDs no anulables (ej. TipoFuncionarioId)
+    Private Sub SetSelectedOrNone(cbo As ComboBox, value As Integer)
+        If cbo Is Nothing Then Return
+        Try
+            cbo.SelectedValue = value
+            Dim ok As Boolean = (cbo.SelectedValue IsNot Nothing AndAlso Convert.ToInt32(cbo.SelectedValue) = value)
+            If Not ok Then cbo.SelectedIndex = -1
+        Catch
+            cbo.SelectedIndex = -1
+        End Try
+    End Sub
+
+    ' Sobrecarga para IDs anulables (la mayoría de los combos)
+    Private Sub SetSelectedOrNone(cbo As ComboBox, value As Integer?)
+        If cbo Is Nothing Then Return
+        If Not value.HasValue Then
+            cbo.SelectedIndex = -1
+            Return
+        End If
+        Try
+            cbo.SelectedValue = value.Value
+            Dim ok As Boolean = (cbo.SelectedValue IsNot Nothing AndAlso Convert.ToInt32(cbo.SelectedValue) = value.Value)
+            If Not ok Then cbo.SelectedIndex = -1
+        Catch
+            cbo.SelectedIndex = -1
+        End Try
+    End Sub
 
 #End Region
 
 #Region " Lógica de Carga y Mapeo de Datos "
 
-    ' Archivo: Apex/UI/frmFuncionarioCrear.vb
-
     Private Sub LoadEstadoTransitorioDetails(et As EstadoTransitorio)
+        If et Is Nothing Then Exit Sub
+
+        ' Asegurar que el entity esté adjunto (por si vino con AsNoTracking)
+        Dim entry = _uow.Context.Entry(et)
+        If entry.State = EntityState.Detached Then
+            _uow.Context.Set(Of EstadoTransitorio)().Attach(et)
+            entry = _uow.Context.Entry(et)
+        End If
+
         Select Case et.TipoEstadoTransitorioId
             Case TiposEstadoCatalog.Designacion
-                _uow.Context.Entry(et).Reference(Function(x) x.DesignacionDetalle).Load()
+                LoadRef(et, Function(x) x.DesignacionDetalle)
 
             Case TiposEstadoCatalog.Enfermedad
-                _uow.Context.Entry(et).Reference(Function(x) x.EnfermedadDetalle).Load()
+                LoadRef(et, Function(x) x.EnfermedadDetalle)
 
             Case TiposEstadoCatalog.Sancion
-                _uow.Context.Entry(et).Reference(Function(x) x.SancionDetalle).Load()
+                LoadRef(et, Function(x) x.SancionDetalle)
 
             Case TiposEstadoCatalog.OrdenCinco
-                _uow.Context.Entry(et).Reference(Function(x) x.OrdenCincoDetalle).Load()
+                LoadRef(et, Function(x) x.OrdenCincoDetalle)
 
             Case TiposEstadoCatalog.Reten
-                _uow.Context.Entry(et).Reference(Function(x) x.RetenDetalle).Load()
+                LoadRef(et, Function(x) x.RetenDetalle)
 
             Case TiposEstadoCatalog.Sumario
-                _uow.Context.Entry(et).Reference(Function(x) x.SumarioDetalle).Load()
+                LoadRef(et, Function(x) x.SumarioDetalle)
 
             Case TiposEstadoCatalog.Traslado
-                _uow.Context.Entry(et).Reference(Function(x) x.TrasladoDetalle).Load()
+                LoadRef(et, Function(x) x.TrasladoDetalle)
+
+            Case TiposEstadoCatalog.BajaDeFuncionario
+                LoadRef(et, Function(x) x.BajaDeFuncionarioDetalle)
+
+            Case TiposEstadoCatalog.CambioDeCargo
+                LoadRef(et, Function(x) x.CambioDeCargoDetalle)
+                ' Cargar navs Cargo / Cargo1 para tener nombres
+                Dim d = et.CambioDeCargoDetalle
+                If d IsNot Nothing Then
+                    Dim de = _uow.Context.Entry(d)
+                    Dim rCargo = de.Reference(Function(x) x.Cargo)
+                    If Not rCargo.IsLoaded Then rCargo.Load()
+                    Dim rCargo1 = de.Reference(Function(x) x.Cargo1)
+                    If Not rCargo1.IsLoaded Then rCargo1.Load()
+                End If
+
+            Case TiposEstadoCatalog.ReactivacionDeFuncionario
+                LoadRef(et, Function(x) x.ReactivacionDeFuncionarioDetalle)
 
             Case TiposEstadoCatalog.SeparacionDelCargo
-                _uow.Context.Entry(et).Reference(Function(x) x.SeparacionDelCargoDetalle).Load()
+                LoadRef(et, Function(x) x.SeparacionDelCargoDetalle)
+
+            Case TiposEstadoCatalog.InicioDeProcesamiento
+                LoadRef(et, Function(x) x.InicioDeProcesamientoDetalle)
 
             Case TiposEstadoCatalog.Desarmado
-                _uow.Context.Entry(et).Reference(Function(x) x.DesarmadoDetalle).Load()
+                LoadRef(et, Function(x) x.DesarmadoDetalle)
+
+            Case Else
+                ' Logger.Warn($"TipoEstadoTransitorioId desconocido: {et.TipoEstadoTransitorioId}")
         End Select
     End Sub
 
-
+    Private Sub LoadRef(Of TProp As Class)(
+        et As EstadoTransitorio,
+        selector As Expression(Of Func(Of EstadoTransitorio, TProp))
+    )
+        Dim r = _uow.Context.Entry(et).Reference(selector)
+        If Not r.IsLoaded Then r.Load()
+    End Sub
 
     Private Function BuildEstadoRow(e As EstadoTransitorio, origen As String) As EstadoRow
-        ' Nombre del tipo
-        Dim tipoNombre = _tiposEstadoTransitorio _
-        .FirstOrDefault(Function(t) t.Id = e.TipoEstadoTransitorioId)?.Nombre
+        If e Is Nothing Then Return Nothing
 
-        ' Fechas (centralizado, sin duplicar lógica)
+        ' Nombre del tipo (defensivo)
+        Dim tipoNombre As String = String.Empty
+        Dim tipo = _tiposEstadoTransitorio?.FirstOrDefault(Function(t) t.Id = e.TipoEstadoTransitorioId)
+        If tipo IsNot Nothing Then tipoNombre = tipo.Nombre
+
+        ' Fechas centralizadas
         Dim fd As Date? = Nothing, fh As Date? = Nothing
         e.GetFechas(fd, fh)
 
         Dim obs As String = String.Empty
-        Dim det As String = String.Empty
+        Dim parts As New List(Of String)()
+
+        Dim addPart As Action(Of String, String) =
+            Sub(label As String, value As String)
+                If Not String.IsNullOrWhiteSpace(value) Then
+                    parts.Add($"{label}: {value.Trim()}")
+                End If
+            End Sub
+
+        Dim addDate As Action(Of String, Date?) =
+            Sub(label As String, d As Date?)
+                If d.HasValue Then parts.Add($"{label}: {d.Value:dd/MM/yyyy}")
+            End Sub
 
         Select Case e.TipoEstadoTransitorioId
             Case TiposEstadoCatalog.Designacion
                 Dim d = e.DesignacionDetalle
                 If d IsNot Nothing Then
                     obs = d.Observaciones
-                    If Not String.IsNullOrWhiteSpace(d.DocResolucion) Then det = $"Resolución: {d.DocResolucion}"
+                    addPart("Resolución", d.DocResolucion)
+                    addDate("Fecha res.", d.FechaResolucion)
                 End If
 
             Case TiposEstadoCatalog.Enfermedad
                 Dim d = e.EnfermedadDetalle
                 If d IsNot Nothing Then
                     obs = d.Observaciones
-                    If Not String.IsNullOrWhiteSpace(d.Diagnostico) Then det = $"Diagnóstico: {d.Diagnostico}"
+                    addPart("Diagnóstico", d.Diagnostico)
                 End If
 
             Case TiposEstadoCatalog.Sancion
                 Dim d = e.SancionDetalle
                 If d IsNot Nothing Then
                     obs = d.Observaciones
-                    If Not String.IsNullOrWhiteSpace(d.Resolucion) Then det = $"Resolución: {d.Resolucion}"
+                    addPart("Resolución", d.Resolucion)
+                    addPart("Tipo", d.TipoSancion)
                 End If
 
             Case TiposEstadoCatalog.OrdenCinco
                 Dim d = e.OrdenCincoDetalle
-                If d IsNot Nothing Then obs = d.Observaciones
+                If d IsNot Nothing Then
+                    obs = d.Observaciones
+                End If
 
             Case TiposEstadoCatalog.Reten
                 Dim d = e.RetenDetalle
                 If d IsNot Nothing Then
                     obs = d.Observaciones
-                    If Not String.IsNullOrWhiteSpace(d.Turno) Then det = $"Turno: {d.Turno}"
+                    addDate("Fecha retén", d.FechaReten)
+                    addPart("Turno", d.Turno)
+                    addPart("Asignado por", d.AsignadoPor)
                 End If
 
             Case TiposEstadoCatalog.Sumario
                 Dim d = e.SumarioDetalle
                 If d IsNot Nothing Then
                     obs = d.Observaciones
-                    If Not String.IsNullOrWhiteSpace(d.Expediente) Then det = $"Expediente: {d.Expediente}"
+                    addPart("Expediente", d.Expediente)
                 End If
 
             Case TiposEstadoCatalog.Traslado
                 Dim d = e.TrasladoDetalle
-                If d IsNot Nothing Then obs = d.Observaciones
+                If d IsNot Nothing Then
+                    obs = d.Observaciones
+                End If
+
+            Case TiposEstadoCatalog.BajaDeFuncionario
+                Dim d = e.BajaDeFuncionarioDetalle
+                If d IsNot Nothing Then
+                    obs = d.Observaciones
+                End If
+
+            Case TiposEstadoCatalog.CambioDeCargo
+                Dim d = e.CambioDeCargoDetalle
+                If d IsNot Nothing Then
+                    obs = d.Observaciones
+                    Dim cargoAnt As String = GetCargoNombre(d, True)
+                    Dim cargoNvo As String = GetCargoNombre(d, False)
+                    addPart("Cargo anterior", cargoAnt)
+                    addPart("Cargo nuevo", cargoNvo)
+                    addPart("Resolución", d.Resolucion)
+                End If
+
+            Case TiposEstadoCatalog.ReactivacionDeFuncionario
+                Dim d = e.ReactivacionDeFuncionarioDetalle
+                If d IsNot Nothing Then
+                    obs = d.Observaciones
+                    addPart("Resolución", d.Resolucion)
+                End If
 
             Case TiposEstadoCatalog.SeparacionDelCargo
                 Dim d = e.SeparacionDelCargoDetalle
-                If d IsNot Nothing Then obs = d.Observaciones
+                If d IsNot Nothing Then
+                    obs = d.Observaciones
+                End If
+
+            Case TiposEstadoCatalog.InicioDeProcesamiento
+                Dim d = e.InicioDeProcesamientoDetalle
+                If d IsNot Nothing Then
+                    obs = d.Observaciones
+                    addPart("Expediente", d.Expediente)
+                End If
 
             Case TiposEstadoCatalog.Desarmado
                 Dim d = e.DesarmadoDetalle
-                If d IsNot Nothing Then obs = d.Observaciones
+                If d IsNot Nothing Then
+                    obs = d.Observaciones
+                End If
+
+            Case Else
+                ' Tipo desconocido: no rompe
         End Select
 
-        Dim obsFinal = If(String.IsNullOrWhiteSpace(det), obs, $"{det} | {obs}")
+        Dim det As String = String.Join(" | ", parts)
+        Dim obsFinal As String =
+            If(String.IsNullOrWhiteSpace(det), (If(obs, String.Empty)).Trim(),
+               If(String.IsNullOrWhiteSpace(obs), det, $"{det} | {obs.Trim()}"))
 
         Return New EstadoRow With {
-        .Id = e.Id,
-        .Origen = origen,
-        .TipoEstado = If(tipoNombre, String.Empty),
-        .FechaDesde = fd,
-        .FechaHasta = fh,
-        .Observaciones = obsFinal,
-        .EntityRef = e
-    }
+            .Id = e.Id,
+            .Origen = origen,
+            .TipoEstado = If(tipoNombre, String.Empty),
+            .FechaDesde = fd,
+            .FechaHasta = fh,
+            .Observaciones = obsFinal,
+            .EntityRef = e
+        }
     End Function
 
+    Private Function GetCargoNombre(d As CambioDeCargoDetalle, anterior As Boolean) As String
+        Dim targetId As Integer? = If(anterior, d.CargoAnteriorId, CType(d.CargoNuevoId, Integer?))
+        If Not targetId.HasValue Then Return Nothing
 
-    Private Sub CargarDatosEnControles()
-        txtCI.Text = _funcionario.CI
-        txtNombre.Text = _funcionario.Nombre
-        dtpFechaIngreso.Value = _funcionario.FechaIngreso
-        cboTipoFuncionario.SelectedValue = CInt(_funcionario.TipoFuncionarioId)
-        cboCargo.SelectedValue = If(_funcionario.CargoId.HasValue, CInt(_funcionario.CargoId), -1)
-        chkActivo.Checked = _funcionario.Activo
-        cboEscalafon.SelectedValue = If(_funcionario.EscalafonId.HasValue, CInt(_funcionario.EscalafonId), -1)
-        cboFuncion.SelectedValue = If(_funcionario.FuncionId.HasValue, CInt(_funcionario.FuncionId), -1)
-        cboEstado.SelectedValue = If(_funcionario.EstadoId.HasValue, CInt(_funcionario.EstadoId), -1)
-        cboSeccion.SelectedValue = If(_funcionario.SeccionId.HasValue, CInt(_funcionario.SeccionId), -1)
-        cboPuestoTrabajo.SelectedValue = If(_funcionario.PuestoTrabajoId.HasValue, CInt(_funcionario.PuestoTrabajoId), -1)
-        cboTurno.SelectedValue = If(_funcionario.TurnoId.HasValue, CInt(_funcionario.TurnoId), -1)
-        cboSemana.SelectedValue = If(_funcionario.SemanaId.HasValue, CInt(_funcionario.SemanaId), -1)
-        cboHorario.SelectedValue = If(_funcionario.HorarioId.HasValue, CInt(_funcionario.HorarioId), -1)
-        If _funcionario.Foto IsNot Nothing AndAlso _funcionario.Foto.Length > 0 Then pbFoto.Image = New Bitmap(New MemoryStream(_funcionario.Foto)) Else pbFoto.Image = My.Resources.Police
-        dtpFechaNacimiento.Value = If(_funcionario.FechaNacimiento.HasValue, _funcionario.FechaNacimiento.Value, dtpFechaNacimiento.MinDate)
-        txtDomicilio.Text = _funcionario.Domicilio
-        txtEmail.Text = _funcionario.Email
-        txtTelefono.Text = _funcionario.Telefono
-        cboEstadoCivil.SelectedValue = If(_funcionario.EstadoCivilId.HasValue, CInt(_funcionario.EstadoCivilId), -1)
-        cboGenero.SelectedValue = If(_funcionario.GeneroId.HasValue, CInt(_funcionario.GeneroId), -1)
-        cboNivelEstudio.SelectedValue = If(_funcionario.NivelEstudioId.HasValue, CInt(_funcionario.NivelEstudioId), -1)
-        txtCiudad.Text = _funcionario.Ciudad
-        txtSeccional.Text = _funcionario.Seccional
-        txtCredencial.Text = _funcionario.Credencial
-        chkEstudia.Checked = _funcionario.Estudia
-    End Sub
+        ' 1) Si las navs están cargadas, usar la que coincida con el FK
+        If d.Cargo IsNot Nothing AndAlso d.Cargo.Id = targetId.Value Then
+            Return d.Cargo.Nombre
+        End If
+        If d.Cargo1 IsNot Nothing AndAlso d.Cargo1.Id = targetId.Value Then
+            Return d.Cargo1.Nombre
+        End If
+
+        ' 2) Fallback: consultar solo ese Id
+        Try
+            Dim nombre As String = _uow.Repository(Of Cargo)().
+                                   GetAll().
+                                   Where(Function(x) x.Id = targetId.Value).
+                                   Select(Function(x) x.Nombre).
+                                   FirstOrDefault()
+            If Not String.IsNullOrWhiteSpace(nombre) Then Return nombre
+        Catch
+            ' silencioso
+        End Try
+
+        ' 3) Último recurso
+        Return "#" & targetId.Value.ToString()
+    End Function
 
 #End Region
 
@@ -321,7 +506,6 @@ Public Class frmFuncionarioCrear
 
     Private Sub SincronizarEstados()
         ' Borrados: ya están marcados como Deleted en el click
-
         For Each row In _estadoRows
             Dim estado = row.EntityRef
             If estado.Id <= 0 Then
@@ -332,7 +516,6 @@ Public Class frmFuncionarioCrear
             End If
         Next
     End Sub
-
 
 #End Region
 
@@ -377,32 +560,43 @@ Public Class frmFuncionarioCrear
         If _estaCargandoHistorial Then Return
         _estaCargandoHistorial = True
         Try
-            If chkVerHistorial.Checked Then Await CargarHistorialCompleto() Else _estadoRows = MapEstadosActivos(_funcionario.EstadoTransitorio.Where(AddressOf IsEstadoActivo)) : bsEstados.DataSource = _estadoRows : bsEstados.ResetBindings(False)
+            If chkVerHistorial.Checked Then
+                Await CargarHistorialCompleto()
+            Else
+                _estadoRows = MapEstadosActivos(_funcionario.EstadoTransitorio.Where(AddressOf IsEstadoActivo))
+                bsEstados.DataSource = _estadoRows
+                bsEstados.ResetBindings(False)
+            End If
         Finally
             _estaCargandoHistorial = False
             DgvEstadosTransitorios_SelectionChanged(Nothing, EventArgs.Empty)
         End Try
     End Sub
 
-    ' Archivo: Apex/UI/frmFuncionarioCrear.vb
-
     Private Async Function CargarHistorialCompleto() As Task
         LoadingHelper.MostrarCargando(Me)
         Try
-            Dim query = _uow.Context.Set(Of EstadoTransitorio)().Where(Function(et) et.FuncionarioId = _idFuncionario)
+            Dim query = _uow.Context.Set(Of EstadoTransitorio)().
+                        Where(Function(et) et.FuncionarioId = _idFuncionario)
 
-            ' CONSULTA CORREGIDA: Se añaden los .Include() que faltaban
-            Dim historial = Await query.Include(Function(et) et.TipoEstadoTransitorio) _
-                             .Include(Function(et) et.DesignacionDetalle) _
-                             .Include(Function(et) et.SancionDetalle) _
-                             .Include(Function(et) et.SumarioDetalle) _
-                             .Include(Function(et) et.OrdenCincoDetalle) _
-                             .Include(Function(et) et.EnfermedadDetalle) _
-                             .Include(Function(et) et.RetenDetalle) _
-                             .Include(Function(et) et.DesarmadoDetalle) _
-                             .Include(Function(et) et.SeparacionDelCargoDetalle) _
-                             .Include(Function(et) et.TrasladoDetalle) _
-                             .OrderByDescending(Function(et) et.Id).ToListAsync()
+            ' Includes completos (evita N+1 al construir filas)
+            Dim historial = Await query.
+                Include(Function(et) et.TipoEstadoTransitorio).
+                Include(Function(et) et.DesignacionDetalle).
+                Include(Function(et) et.SancionDetalle).
+                Include(Function(et) et.SumarioDetalle).
+                Include(Function(et) et.OrdenCincoDetalle).
+                Include(Function(et) et.EnfermedadDetalle).
+                Include(Function(et) et.RetenDetalle).
+                Include(Function(et) et.DesarmadoDetalle).
+                Include(Function(et) et.SeparacionDelCargoDetalle).
+                Include(Function(et) et.TrasladoDetalle).
+                Include(Function(et) et.InicioDeProcesamientoDetalle).
+                Include(Function(et) et.CambioDeCargoDetalle).
+                Include(Function(et) et.CambioDeCargoDetalle.Cargo).
+                Include(Function(et) et.CambioDeCargoDetalle.Cargo1).
+                OrderByDescending(Function(et) et.Id).
+                ToListAsync()
 
             _estadoRows = MapEstadosHistorial(historial)
             bsEstados.DataSource = _estadoRows
@@ -419,9 +613,16 @@ Public Class frmFuncionarioCrear
     End Sub
 
     Private Sub btnAñadirEstado_Click(sender As Object, e As EventArgs) Handles btnAñadirEstado.Click
-        Dim nuevoEstado = New EstadoTransitorio()
+        ' Vincular el funcionario evita NullReference en el form de estado (Case 30)
+        Dim nuevoEstado = New EstadoTransitorio() With {
+            .Funcionario = _funcionario
+        }
+
         Using frm As New frmFuncionarioEstadoTransitorio(nuevoEstado, _tiposEstadoTransitorio, _uow)
-            If frm.ShowDialog(Me) = DialogResult.OK Then _estadoRows.Add(BuildEstadoRow(frm.Estado, "Nuevo")) : bsEstados.ResetBindings(False)
+            If frm.ShowDialog(Me) = DialogResult.OK Then
+                _estadoRows.Add(BuildEstadoRow(frm.Estado, "Nuevo"))
+                bsEstados.ResetBindings(False)
+            End If
         End Using
     End Sub
 
@@ -429,7 +630,10 @@ Public Class frmFuncionarioCrear
         Dim row = TryCast(dgvEstadosTransitorios.CurrentRow?.DataBoundItem, EstadoRow)
         If row?.EntityRef Is Nothing Then Return
         Using frm As New frmFuncionarioEstadoTransitorio(row.EntityRef, _tiposEstadoTransitorio, _uow)
-            If frm.ShowDialog(Me) = DialogResult.OK Then UpdateRowFromEntity(row, frm.Estado) : bsEstados.ResetBindings(False)
+            If frm.ShowDialog(Me) = DialogResult.OK Then
+                UpdateRowFromEntity(row, frm.Estado)
+                bsEstados.ResetBindings(False)
+            End If
         End Using
     End Sub
 
@@ -438,28 +642,25 @@ Public Class frmFuncionarioCrear
         If row?.EntityRef Is Nothing Then Return
 
         If MessageBox.Show("¿Está seguro de que desea quitar este estado transitorio?", "Confirmar Eliminación",
-                       MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then Return
+                           MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then Return
 
         Dim entidad = row.EntityRef
 
         If entidad.Id > 0 Then
-            ' Importante: NO rompas la relación de navegación.
-            ' NO hagas: _funcionario.EstadoTransitorio.Remove(entidad)
-
+            ' Importante: NO romper la relación de navegación.
             ' Marcá la entidad (y su detalle) como Deleted ya, así EF no intenta nullear FKs
             MarcarParaEliminar(entidad)
         Else
-            ' Era nuevo/no persistido: simplemente sacalo del contexto
+            ' Era nuevo/no persistido: simplemente sacarlo del contexto
             If _uow.Context.Entry(entidad).State <> EntityState.Detached Then
                 _uow.Context.Entry(entidad).State = EntityState.Detached
             End If
         End If
 
-        ' Actualizá solo la UI
+        ' Actualizar solo UI
         _estadoRows.Remove(row)
         bsEstados.ResetBindings(False)
     End Sub
-
 
     Private Sub dgvDotacion_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
         Dim dgv = CType(sender, DataGridView)
@@ -618,24 +819,56 @@ Public Class frmFuncionarioCrear
         End If
     End Sub
 #End Region
+
     Private Sub MarcarParaEliminar(estado As EstadoTransitorio)
-        ' Attach si viniera detached
-        If _uow.Context.Entry(estado).State = EntityState.Detached Then
-            _uow.Context.Set(Of EstadoTransitorio)().Attach(estado)
+        Dim ctx = _uow.Context
+
+        ' Adjuntar si viniera detached
+        If ctx.Entry(estado).State = EntityState.Detached Then
+            ctx.Set(Of EstadoTransitorio)().Attach(estado)
         End If
 
-        ' Si NO tenés ON DELETE CASCADE en BD, eliminá explícitamente el detalle correspondiente
-        If estado.DesignacionDetalle IsNot Nothing Then _uow.Context.Entry(estado.DesignacionDetalle).State = EntityState.Deleted
-        If estado.EnfermedadDetalle IsNot Nothing Then _uow.Context.Entry(estado.EnfermedadDetalle).State = EntityState.Deleted
-        If estado.SancionDetalle IsNot Nothing Then _uow.Context.Entry(estado.SancionDetalle).State = EntityState.Deleted
-        If estado.OrdenCincoDetalle IsNot Nothing Then _uow.Context.Entry(estado.OrdenCincoDetalle).State = EntityState.Deleted
-        If estado.RetenDetalle IsNot Nothing Then _uow.Context.Entry(estado.RetenDetalle).State = EntityState.Deleted
-        If estado.SumarioDetalle IsNot Nothing Then _uow.Context.Entry(estado.SumarioDetalle).State = EntityState.Deleted
-        If estado.TrasladoDetalle IsNot Nothing Then _uow.Context.Entry(estado.TrasladoDetalle).State = EntityState.Deleted
-        If estado.DesarmadoDetalle IsNot Nothing Then _uow.Context.Entry(estado.DesarmadoDetalle).State = EntityState.Deleted
+        ' Cargar dependientes mínimos (evita que EF intente nullear FKs no anulables)
+        ctx.Entry(estado).Collection(Function(e) e.EstadoTransitorioAdjunto).Load()
 
-        ' Ahora sí: eliminá el estado
-        _uow.Context.Entry(estado).State = EntityState.Deleted
+        ctx.Entry(estado).Reference(Function(e) e.DesignacionDetalle).Load()
+        ctx.Entry(estado).Reference(Function(e) e.EnfermedadDetalle).Load()
+        ctx.Entry(estado).Reference(Function(e) e.SancionDetalle).Load()
+        ctx.Entry(estado).Reference(Function(e) e.OrdenCincoDetalle).Load()
+        ctx.Entry(estado).Reference(Function(e) e.RetenDetalle).Load()
+        ctx.Entry(estado).Reference(Function(e) e.SumarioDetalle).Load()
+        ctx.Entry(estado).Reference(Function(e) e.TrasladoDetalle).Load()
+        ctx.Entry(estado).Reference(Function(e) e.BajaDeFuncionarioDetalle).Load()
+        ctx.Entry(estado).Reference(Function(e) e.CambioDeCargoDetalle).Load()
+        ctx.Entry(estado).Reference(Function(e) e.ReactivacionDeFuncionarioDetalle).Load()
+        ctx.Entry(estado).Reference(Function(e) e.SeparacionDelCargoDetalle).Load()
+        ctx.Entry(estado).Reference(Function(e) e.InicioDeProcesamientoDetalle).Load()
+        ctx.Entry(estado).Reference(Function(e) e.DesarmadoDetalle).Load()
+
+        ' 1) Borrar ADJUNTOS (1-N)
+        If estado.EstadoTransitorioAdjunto IsNot Nothing AndAlso estado.EstadoTransitorioAdjunto.Any() Then
+            For Each a In estado.EstadoTransitorioAdjunto.ToList()
+                ctx.Entry(a).State = EntityState.Deleted
+            Next
+        End If
+
+        ' 2) Borrar DETALLES (1-1) existentes
+        If estado.DesignacionDetalle IsNot Nothing Then ctx.Entry(estado.DesignacionDetalle).State = EntityState.Deleted
+        If estado.EnfermedadDetalle IsNot Nothing Then ctx.Entry(estado.EnfermedadDetalle).State = EntityState.Deleted
+        If estado.SancionDetalle IsNot Nothing Then ctx.Entry(estado.SancionDetalle).State = EntityState.Deleted
+        If estado.OrdenCincoDetalle IsNot Nothing Then ctx.Entry(estado.OrdenCincoDetalle).State = EntityState.Deleted
+        If estado.RetenDetalle IsNot Nothing Then ctx.Entry(estado.RetenDetalle).State = EntityState.Deleted
+        If estado.SumarioDetalle IsNot Nothing Then ctx.Entry(estado.SumarioDetalle).State = EntityState.Deleted
+        If estado.TrasladoDetalle IsNot Nothing Then ctx.Entry(estado.TrasladoDetalle).State = EntityState.Deleted
+        If estado.BajaDeFuncionarioDetalle IsNot Nothing Then ctx.Entry(estado.BajaDeFuncionarioDetalle).State = EntityState.Deleted
+        If estado.CambioDeCargoDetalle IsNot Nothing Then ctx.Entry(estado.CambioDeCargoDetalle).State = EntityState.Deleted
+        If estado.ReactivacionDeFuncionarioDetalle IsNot Nothing Then ctx.Entry(estado.ReactivacionDeFuncionarioDetalle).State = EntityState.Deleted
+        If estado.SeparacionDelCargoDetalle IsNot Nothing Then ctx.Entry(estado.SeparacionDelCargoDetalle).State = EntityState.Deleted
+        If estado.InicioDeProcesamientoDetalle IsNot Nothing Then ctx.Entry(estado.InicioDeProcesamientoDetalle).State = EntityState.Deleted
+        If estado.DesarmadoDetalle IsNot Nothing Then ctx.Entry(estado.DesarmadoDetalle).State = EntityState.Deleted
+
+        ' 3) Borrar el principal
+        ctx.Entry(estado).State = EntityState.Deleted
     End Sub
 
 End Class

@@ -383,7 +383,6 @@
     <Compile Include="Data\sysdiagrams.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
-    <Compile Include="Data\TipoEstado.vb" />
     <Compile Include="Data\TipoEstadoTransitorio.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>

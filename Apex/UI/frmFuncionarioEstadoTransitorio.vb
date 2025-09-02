@@ -1,15 +1,17 @@
 ﻿Imports System.IO
 Imports System.Linq
+Imports System.Data.Entity
 
 Public Class frmFuncionarioEstadoTransitorio
 
     Public Estado As EstadoTransitorio
     Private _tiposEstado As List(Of TipoEstadoTransitorio)
     Private _unitOfWork As IUnitOfWork
-    Private _tempFiles As New List(Of String) ' Lista para rastrear archivos PDF temporales
+    Private _tempFiles As New List(Of String)
     Private _readOnly As Boolean = False
+    Private _listaCargos As List(Of Cargo)
 
-    ' Propiedades para los detalles
+    ' Propiedades para todos los detalles
     Public DesignacionDetalle As DesignacionDetalle
     Public SancionDetalle As SancionDetalle
     Public SumarioDetalle As SumarioDetalle
@@ -17,6 +19,12 @@ Public Class frmFuncionarioEstadoTransitorio
     Public EnfermedadDetalle As EnfermedadDetalle
     Public RetenDetalle As RetenDetalle
     Public TrasladoDetalle As TrasladoDetalle
+    Public BajaDeFuncionarioDetalle As BajaDeFuncionarioDetalle
+    Public CambioDeCargoDetalle As CambioDeCargoDetalle
+    Public ReactivacionDeFuncionarioDetalle As ReactivacionDeFuncionarioDetalle
+    Public SeparacionDelCargoDetalle As SeparacionDelCargoDetalle
+    Public InicioDeProcesamientoDetalle As InicioDeProcesamientoDetalle
+    Public DesarmadoDetalle As DesarmadoDetalle
 
     Public Sub New(estado As EstadoTransitorio, tiposEstado As List(Of TipoEstadoTransitorio), uow As IUnitOfWork)
         InitializeComponent()
@@ -31,7 +39,6 @@ Public Class frmFuncionarioEstadoTransitorio
         _unitOfWork = uow
         _readOnly = readOnlyValue
         _tiposEstado = _unitOfWork.Repository(Of TipoEstadoTransitorio)().GetAll().ToList()
-        TiposEstadoCatalog.Init(_unitOfWork)
     End Sub
 
     Public Property ReadOnlyProperty As Boolean
@@ -47,38 +54,33 @@ Public Class frmFuncionarioEstadoTransitorio
         AppTheme.Aplicar(Me)
         CargarCombos()
 
+        ' Si estamos editando y no viene cargado el Funcionario, intentamos cargarlo.
+        If Estado IsNot Nothing AndAlso Estado.Id > 0 AndAlso Estado.Funcionario Is Nothing Then
+            Try
+                _unitOfWork.Context.Entry(Estado).Reference(Function(x) x.Funcionario).Load()
+            Catch
+                ' ignorar si falla
+            End Try
+        End If
+
         If Estado IsNot Nothing AndAlso Estado.Id > 0 Then
             ' MODO EDICIÓN O LECTURA
             cboTipoEstado.SelectedValue = Estado.TipoEstadoTransitorioId
             cboTipoEstado.Enabled = False
             CargarDatosDeDetalle()
             CargarAdjuntos(Estado.Id)
-
-            GroupBox1.Enabled = True
-            If dgvAdjuntos.Rows.Count = 0 Then
-                MostrarPanelMensaje("Haga clic en 'Adjuntar' para agregar un archivo.")
-                pnlPreview.Enabled = False
-                dgvAdjuntos.Enabled = False
-            Else
-                dgvAdjuntos.Enabled = True
-                pnlPreview.Enabled = True
-            End If
+            pnlPreview.Enabled = dgvAdjuntos.Rows.Count > 0
+            dgvAdjuntos.Enabled = dgvAdjuntos.Rows.Count > 0
         Else
             ' MODO CREACIÓN
-            Estado = New EstadoTransitorio()
+            If Estado Is Nothing Then Estado = New EstadoTransitorio()
             chkFechaHasta.Checked = True
             cboTipoEstado.SelectedIndex = -1
-
-            ' Habilitamos la sección de adjuntos desde el inicio
-            GroupBox1.Enabled = True
-            dgvAdjuntos.Enabled = True ' La grilla estará vacía pero funcional
-            pnlPreview.Enabled = False ' La previsualización no tiene sentido aún
+            pnlPreview.Enabled = False
             MostrarPanelMensaje("Haga clic en 'Adjuntar' para agregar un archivo.")
         End If
 
-        If _readOnly Then
-            SetReadOnlyMode()
-        End If
+        If _readOnly Then SetReadOnlyMode()
 
         AddHandler cboTipoEstado.SelectedIndexChanged, AddressOf TipoEstado_Changed
         AddHandler dgvAdjuntos.SelectionChanged, AddressOf dgvAdjuntos_SelectionChanged
@@ -94,16 +96,13 @@ Public Class frmFuncionarioEstadoTransitorio
         txtResolucion.ReadOnly = True
         txtDiagnostico.ReadOnly = True
         txtTurnoReten.ReadOnly = True
-
-        ' Corrección: Cambiamos Visible a Enabled
+        cboCargoAnterior.Enabled = False
+        cboCargoNuevo.Enabled = False
         btnAdjuntar.Enabled = False
         btnEliminarAdjunto.Enabled = False
-        btnVerAdjunto.Enabled = dgvAdjuntos.Rows.Count > 0 ' Solo habilitado si hay algo que ver
-
+        btnVerAdjunto.Enabled = dgvAdjuntos.Rows.Count > 0
         btnGuardar.Text = "Cerrar"
         btnCancelar.Visible = False
-
-        ' Centrar el botón Cerrar
         btnGuardar.Location = New Point((Me.ClientSize.Width - btnGuardar.Width) / 2, btnGuardar.Location.Y)
     End Sub
 
@@ -112,7 +111,7 @@ Public Class frmFuncionarioEstadoTransitorio
         Dim observaciones As String = ""
 
         Select Case Estado.TipoEstadoTransitorioId
-            Case TiposEstadoCatalog.Designacion
+            Case 1 ' Designacion
                 Dim d = Estado.DesignacionDetalle
                 If d Is Nothing Then Exit Select
                 dtpFechaDesde.Value = d.FechaDesde
@@ -120,7 +119,7 @@ Public Class frmFuncionarioEstadoTransitorio
                 observaciones = d.Observaciones
                 txtResolucion.Text = d.DocResolucion
 
-            Case TiposEstadoCatalog.Enfermedad
+            Case 2 ' Enfermedad
                 Dim d = Estado.EnfermedadDetalle
                 If d Is Nothing Then Exit Select
                 dtpFechaDesde.Value = d.FechaDesde
@@ -128,7 +127,7 @@ Public Class frmFuncionarioEstadoTransitorio
                 observaciones = d.Observaciones
                 txtDiagnostico.Text = d.Diagnostico
 
-            Case TiposEstadoCatalog.Sancion
+            Case 3 ' Sancion
                 Dim d = Estado.SancionDetalle
                 If d Is Nothing Then Exit Select
                 dtpFechaDesde.Value = d.FechaDesde
@@ -136,21 +135,21 @@ Public Class frmFuncionarioEstadoTransitorio
                 observaciones = d.Observaciones
                 txtResolucion.Text = d.Resolucion
 
-            Case TiposEstadoCatalog.OrdenCinco
+            Case 4 ' OrdenCinco
                 Dim d = Estado.OrdenCincoDetalle
                 If d Is Nothing Then Exit Select
                 dtpFechaDesde.Value = d.FechaDesde
                 fechaHasta = d.FechaHasta
                 observaciones = d.Observaciones
 
-            Case TiposEstadoCatalog.Reten
+            Case 5 ' Reten
                 Dim d = Estado.RetenDetalle
                 If d Is Nothing Then Exit Select
                 dtpFechaDesde.Value = d.FechaReten
                 observaciones = d.Observaciones
                 txtTurnoReten.Text = d.Turno
 
-            Case TiposEstadoCatalog.Sumario
+            Case 6 ' Sumario
                 Dim d = Estado.SumarioDetalle
                 If d Is Nothing Then Exit Select
                 dtpFechaDesde.Value = d.FechaDesde
@@ -158,20 +157,63 @@ Public Class frmFuncionarioEstadoTransitorio
                 observaciones = d.Observaciones
                 txtResolucion.Text = d.Expediente
 
-            Case TiposEstadoCatalog.Traslado
+            Case 21 ' Traslado
                 Dim d = Estado.TrasladoDetalle
                 If d Is Nothing Then Exit Select
                 dtpFechaDesde.Value = d.FechaDesde
                 fechaHasta = d.FechaHasta
                 observaciones = d.Observaciones
 
+            Case 29 ' Baja de Funcionario
+                Dim d = Estado.BajaDeFuncionarioDetalle
+                If d Is Nothing Then Exit Select
+                dtpFechaDesde.Value = d.FechaDesde
+                fechaHasta = d.FechaHasta
+                observaciones = d.Observaciones
 
+            Case 30 ' Cambio de Cargo
+                Dim d = Estado.CambioDeCargoDetalle
+                If d Is Nothing Then Exit Select
+                dtpFechaDesde.Value = d.FechaDesde
+                fechaHasta = d.FechaHasta
+                observaciones = d.Observaciones
+                txtResolucion.Text = d.Resolucion
+                cboCargoAnterior.SelectedValue = d.CargoAnteriorId
+                cboCargoNuevo.SelectedValue = d.CargoNuevoId
+
+            Case 31 ' Reactivación de Funcionario
+                Dim d = Estado.ReactivacionDeFuncionarioDetalle
+                If d Is Nothing Then Exit Select
+                dtpFechaDesde.Value = d.FechaDesde
+                observaciones = d.Observaciones
+                txtResolucion.Text = d.Resolucion
+
+            Case 32 ' Separación del Cargo
+                Dim d = Estado.SeparacionDelCargoDetalle
+                If d Is Nothing Then Exit Select
+                dtpFechaDesde.Value = d.FechaDesde
+                fechaHasta = d.FechaHasta
+                observaciones = d.Observaciones
+
+            Case 33 ' Inicio de Procesamiento
+                Dim d = Estado.InicioDeProcesamientoDetalle
+                If d Is Nothing Then Exit Select
+                dtpFechaDesde.Value = d.FechaDesde
+                fechaHasta = d.FechaHasta
+                observaciones = d.Observaciones
+                txtResolucion.Text = d.Expediente
+
+            Case 34 ' Desarmado
+                Dim d = Estado.DesarmadoDetalle
+                If d Is Nothing Then Exit Select
+                dtpFechaDesde.Value = d.FechaDesde
+                fechaHasta = d.FechaHasta
+                observaciones = d.Observaciones
         End Select
 
         txtObservaciones.Text = observaciones
 
-        ' Para Retén no se maneja FechaHasta
-        If Estado.TipoEstadoTransitorioId <> TiposEstadoCatalog.Reten Then
+        If Estado.TipoEstadoTransitorioId <> 5 AndAlso Estado.TipoEstadoTransitorioId <> 31 Then
             If fechaHasta.HasValue Then
                 dtpFechaHasta.Value = fechaHasta.Value
                 dtpFechaHasta.Enabled = True
@@ -183,10 +225,9 @@ Public Class frmFuncionarioEstadoTransitorio
         End If
     End Sub
 
-
     Private Sub TipoEstado_Changed(sender As Object, e As EventArgs)
         ' Reset UI
-        ShowExtra(False, False, False)
+        ShowExtra(False, False, False, False)
         lblResolucion.Text = "Resolución:"
         lblFechaDesde.Text = "Fecha Desde:"
         ToggleHastaSection(True)
@@ -197,33 +238,42 @@ Public Class frmFuncionarioEstadoTransitorio
         If Not Integer.TryParse(cboTipoEstado.SelectedValue.ToString(), tipoId) Then Exit Sub
 
         Select Case tipoId
-            Case TiposEstadoCatalog.Designacion, TiposEstadoCatalog.Sancion, TiposEstadoCatalog.Sumario
-                ShowExtra(True, False, False)
-                ' Ajuste de etiqueta según el tipo
-                If tipoId = TiposEstadoCatalog.Designacion Then lblResolucion.Text = "Doc. Resolución:"
-                If tipoId = TiposEstadoCatalog.Sumario Then lblResolucion.Text = "Expediente:"
+            Case 1, 3, 6, 31, 33
+                ShowExtra(True, False, False, False)
+                If tipoId = 1 Then lblResolucion.Text = "Doc. Resolución:"
+                If tipoId = 6 Or tipoId = 33 Then lblResolucion.Text = "Expediente:"
 
-            Case TiposEstadoCatalog.Enfermedad
-                ShowExtra(False, True, False)
+            Case 30 ' Cambio de Cargo
+                ShowExtra(True, False, False, True)
+                lblResolucion.Text = "Resolución:"
+                SetCargoAnteriorDesdeFuncionario()
 
-            Case TiposEstadoCatalog.Reten
-                ShowExtra(False, False, True)
+            Case 2 ' Enfermedad
+                ShowExtra(False, True, False, False)
+
+            Case 5 ' Reten
+                ShowExtra(False, False, True, False)
                 lblFechaDesde.Text = "Fecha Retén:"
                 ToggleHastaSection(False)
 
-            Case TiposEstadoCatalog.OrdenCinco, TiposEstadoCatalog.Traslado
-                ' No tienen campos adicionales visibles
-
+            Case 4, 21, 29, 32, 34
+                ShowExtra(False, False, False, False)
             Case Else
-                ' Nada
+                ShowExtra(False, False, False, False)
         End Select
     End Sub
 
-    ' Helpers
-    Private Sub ShowExtra(showResol As Boolean, showDiag As Boolean, showReten As Boolean)
-        lblResolucion.Visible = showResol : txtResolucion.Visible = showResol
-        lblDiagnostico.Visible = showDiag : txtDiagnostico.Visible = showDiag
-        lblTurnoReten.Visible = showReten : txtTurnoReten.Visible = showReten
+    Private Sub ShowExtra(showResol As Boolean, showDiag As Boolean, showReten As Boolean, showCargos As Boolean)
+        lblResolucion.Visible = showResol
+        txtResolucion.Visible = showResol
+        lblDiagnostico.Visible = showDiag
+        txtDiagnostico.Visible = showDiag
+        lblTurnoReten.Visible = showReten
+        txtTurnoReten.Visible = showReten
+        lblCargoAnterior.Visible = showCargos
+        cboCargoAnterior.Visible = showCargos
+        lblCargoNuevo.Visible = showCargos
+        cboCargoNuevo.Visible = showCargos
     End Sub
 
     Private Sub ToggleHastaSection(visible As Boolean)
@@ -232,11 +282,20 @@ Public Class frmFuncionarioEstadoTransitorio
         chkFechaHasta.Visible = visible
     End Sub
 
-
     Private Sub CargarCombos()
         cboTipoEstado.DataSource = _tiposEstado
         cboTipoEstado.DisplayMember = "Nombre"
         cboTipoEstado.ValueMember = "Id"
+
+        _listaCargos = _unitOfWork.Repository(Of Cargo)().GetAll().OrderBy(Function(c) c.Nombre).ToList()
+        cboCargoAnterior.DataSource = New List(Of Cargo)(_listaCargos)
+        cboCargoAnterior.DisplayMember = "Nombre"
+        cboCargoAnterior.ValueMember = "Id"
+        cboCargoNuevo.DataSource = New List(Of Cargo)(_listaCargos)
+        cboCargoNuevo.DisplayMember = "Nombre"
+        cboCargoNuevo.ValueMember = "Id"
+        cboCargoAnterior.SelectedIndex = -1
+        cboCargoNuevo.SelectedIndex = -1
     End Sub
 
     Private Sub chkFechaHasta_CheckedChanged(sender As Object, e As EventArgs) Handles chkFechaHasta.CheckedChanged
@@ -254,15 +313,10 @@ Public Class frmFuncionarioEstadoTransitorio
             Return
         End If
 
-        Dim tipoId As Integer
-        If Not Integer.TryParse(cboTipoEstado.SelectedValue.ToString(), tipoId) Then
-            MessageBox.Show("Tipo de estado inválido.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-            Return
-        End If
+        Dim tipoId As Integer = CInt(cboTipoEstado.SelectedValue)
+        Dim fechaHastaSel As Date? = If(chkFechaHasta.Checked Or Not chkFechaHasta.Visible, CType(Nothing, Date?), dtpFechaHasta.Value.Date)
 
-        ' Validación de fechas (no aplica para Retén)
-        Dim fechaHastaSel As Date? = If(chkFechaHasta.Checked, CType(Nothing, Date?), dtpFechaHasta.Value.Date)
-        If tipoId <> TiposEstadoCatalog.Reten AndAlso fechaHastaSel.HasValue AndAlso fechaHastaSel.Value < dtpFechaDesde.Value.Date Then
+        If tipoId <> 5 AndAlso tipoId <> 31 AndAlso fechaHastaSel.HasValue AndAlso fechaHastaSel.Value < dtpFechaDesde.Value.Date Then
             MessageBox.Show("La fecha de fin no puede ser anterior a la fecha de inicio.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             Return
         End If
@@ -270,16 +324,15 @@ Public Class frmFuncionarioEstadoTransitorio
         Estado.TipoEstadoTransitorioId = tipoId
 
         Select Case tipoId
-            Case TiposEstadoCatalog.Designacion
+            Case 1 ' Designacion
                 Dim d = If(Estado.DesignacionDetalle, New DesignacionDetalle())
                 d.FechaDesde = dtpFechaDesde.Value.Date
                 d.FechaHasta = fechaHastaSel
                 d.Observaciones = txtObservaciones.Text.Trim()
                 d.DocResolucion = txtResolucion.Text.Trim()
                 Estado.DesignacionDetalle = d
-            ' d.EstadoTransitorio = Estado ' <- solo si tu mapeo 1-1 lo requiere
 
-            Case TiposEstadoCatalog.Enfermedad
+            Case 2 ' Enfermedad
                 Dim d = If(Estado.EnfermedadDetalle, New EnfermedadDetalle())
                 d.FechaDesde = dtpFechaDesde.Value.Date
                 d.FechaHasta = fechaHastaSel
@@ -287,7 +340,7 @@ Public Class frmFuncionarioEstadoTransitorio
                 d.Diagnostico = txtDiagnostico.Text.Trim()
                 Estado.EnfermedadDetalle = d
 
-            Case TiposEstadoCatalog.Sancion
+            Case 3 ' Sancion
                 Dim d = If(Estado.SancionDetalle, New SancionDetalle())
                 d.FechaDesde = dtpFechaDesde.Value.Date
                 d.FechaHasta = fechaHastaSel
@@ -295,21 +348,21 @@ Public Class frmFuncionarioEstadoTransitorio
                 d.Resolucion = txtResolucion.Text.Trim()
                 Estado.SancionDetalle = d
 
-            Case TiposEstadoCatalog.OrdenCinco
+            Case 4 ' OrdenCinco
                 Dim d = If(Estado.OrdenCincoDetalle, New OrdenCincoDetalle())
                 d.FechaDesde = dtpFechaDesde.Value.Date
                 d.FechaHasta = fechaHastaSel
                 d.Observaciones = txtObservaciones.Text.Trim()
                 Estado.OrdenCincoDetalle = d
 
-            Case TiposEstadoCatalog.Reten
+            Case 5 ' Reten
                 Dim d = If(Estado.RetenDetalle, New RetenDetalle())
                 d.FechaReten = dtpFechaDesde.Value.Date
                 d.Observaciones = txtObservaciones.Text.Trim()
                 d.Turno = txtTurnoReten.Text.Trim()
                 Estado.RetenDetalle = d
 
-            Case TiposEstadoCatalog.Sumario
+            Case 6 ' Sumario
                 Dim d = If(Estado.SumarioDetalle, New SumarioDetalle())
                 d.FechaDesde = dtpFechaDesde.Value.Date
                 d.FechaHasta = fechaHastaSel
@@ -317,12 +370,111 @@ Public Class frmFuncionarioEstadoTransitorio
                 d.Expediente = txtResolucion.Text.Trim()
                 Estado.SumarioDetalle = d
 
-            Case TiposEstadoCatalog.Traslado
+            Case 21 ' Traslado
                 Dim d = If(Estado.TrasladoDetalle, New TrasladoDetalle())
                 d.FechaDesde = dtpFechaDesde.Value.Date
                 d.FechaHasta = fechaHastaSel
                 d.Observaciones = txtObservaciones.Text.Trim()
                 Estado.TrasladoDetalle = d
+
+            Case 29 ' Baja de Funcionario
+                Dim d = If(Estado.BajaDeFuncionarioDetalle, New BajaDeFuncionarioDetalle())
+                d.FechaDesde = dtpFechaDesde.Value.Date
+                d.FechaHasta = fechaHastaSel
+                d.Observaciones = txtObservaciones.Text.Trim()
+                Estado.BajaDeFuncionarioDetalle = d
+
+            Case 30 ' Cambio de Cargo
+                If cboCargoNuevo.SelectedIndex = -1 Then
+                    MessageBox.Show("Debe seleccionar el nuevo cargo.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                    Return
+                End If
+
+                ' Asegurar funcionario cargado si estamos editando
+                If Estado.Funcionario Is Nothing AndAlso Estado.Id > 0 Then
+                    Try
+                        _unitOfWork.Context.Entry(Estado).Reference(Function(x) x.Funcionario).Load()
+                    Catch
+                        ' ignorar
+                    End Try
+                End If
+
+                Dim cargoActualId As Integer? = Estado.Funcionario?.CargoId
+                If Not cargoActualId.HasValue Then
+                    MessageBox.Show("El funcionario no tiene un cargo actual asignado.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                    Return
+                End If
+
+                Dim cargoNuevoId = CType(cboCargoNuevo.SelectedValue, Integer)
+
+                If cargoNuevoId = cargoActualId.Value Then
+                    MessageBox.Show("El nuevo cargo no puede ser igual al cargo actual.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                    Return
+                End If
+
+                Dim cargoNuevo = _listaCargos.FirstOrDefault(Function(c) c.Id = cargoNuevoId)
+                Dim cargoActual = _listaCargos.FirstOrDefault(Function(c) c.Id = cargoActualId.Value)
+
+                Dim gradoNuevo = cargoNuevo?.Grado.GetValueOrDefault(0)
+                Dim gradoActual = cargoActual?.Grado.GetValueOrDefault(0)
+
+                Dim mensajeConfirmacion As String
+                Dim tituloConfirmacion As String = "Confirmar Cambio de Cargo"
+                Dim icono As MessageBoxIcon = MessageBoxIcon.Question
+
+                If gradoNuevo > gradoActual Then
+                    mensajeConfirmacion = $"¿Está seguro de que desea aplicar el ASCENSO al funcionario al cargo '{cargoNuevo.Nombre}'?"
+                ElseIf gradoNuevo < gradoActual Then
+                    mensajeConfirmacion = $"¡ATENCIÓN! El nuevo cargo '{cargoNuevo.Nombre}' representa un DESCENSO." & vbCrLf & "¿Desea continuar y aplicar el cambio de todas formas?"
+                    icono = MessageBoxIcon.Warning
+                Else
+                    mensajeConfirmacion = $"El nuevo cargo '{cargoNuevo.Nombre}' tiene el mismo grado que el actual (movimiento lateral)." & vbCrLf & "¿Desea confirmar el cambio?"
+                End If
+
+                If MessageBox.Show(mensajeConfirmacion, tituloConfirmacion, MessageBoxButtons.YesNo, icono) = DialogResult.No Then
+                    Return
+                End If
+
+                Dim d = If(Estado.CambioDeCargoDetalle, New CambioDeCargoDetalle())
+                d.FechaDesde = dtpFechaDesde.Value.Date
+                d.FechaHasta = fechaHastaSel
+                d.Observaciones = txtObservaciones.Text.Trim()
+                d.Resolucion = txtResolucion.Text.Trim()
+                d.CargoAnteriorId = cargoActualId.Value
+                d.CargoNuevoId = cargoNuevoId
+                Estado.CambioDeCargoDetalle = d
+
+                ' Actualizar cargo del funcionario
+                Estado.Funcionario.CargoId = cargoNuevoId
+
+            Case 31 ' Reactivación de Funcionario
+                Dim d = If(Estado.ReactivacionDeFuncionarioDetalle, New ReactivacionDeFuncionarioDetalle())
+                d.FechaDesde = dtpFechaDesde.Value.Date
+                d.Observaciones = txtObservaciones.Text.Trim()
+                d.Resolucion = txtResolucion.Text.Trim()
+                Estado.ReactivacionDeFuncionarioDetalle = d
+
+            Case 32 ' Separación del Cargo
+                Dim d = If(Estado.SeparacionDelCargoDetalle, New SeparacionDelCargoDetalle())
+                d.FechaDesde = dtpFechaDesde.Value.Date
+                d.FechaHasta = fechaHastaSel
+                d.Observaciones = txtObservaciones.Text.Trim()
+                Estado.SeparacionDelCargoDetalle = d
+
+            Case 33 ' Inicio de Procesamiento
+                Dim d = If(Estado.InicioDeProcesamientoDetalle, New InicioDeProcesamientoDetalle())
+                d.FechaDesde = dtpFechaDesde.Value.Date
+                d.FechaHasta = fechaHastaSel
+                d.Observaciones = txtObservaciones.Text.Trim()
+                d.Expediente = txtResolucion.Text.Trim()
+                Estado.InicioDeProcesamientoDetalle = d
+
+            Case 34 ' Desarmado
+                Dim d = If(Estado.DesarmadoDetalle, New DesarmadoDetalle())
+                d.FechaDesde = dtpFechaDesde.Value.Date
+                d.FechaHasta = fechaHastaSel
+                d.Observaciones = txtObservaciones.Text.Trim()
+                Estado.DesarmadoDetalle = d
         End Select
 
         If Estado.Id = 0 Then
@@ -335,14 +487,12 @@ Public Class frmFuncionarioEstadoTransitorio
         Close()
     End Sub
 
-
     Private Sub btnCancelar_Click(sender As Object, e As EventArgs) Handles btnCancelar.Click
         DialogResult = DialogResult.Cancel
         Close()
     End Sub
 
 #Region "Lógica de Archivos Adjuntos"
-    ' Clase liviana para la grilla
     Private Class AdjuntoRow
         Public Property Id As Integer
         Public Property NombreArchivo As String
@@ -354,44 +504,16 @@ Public Class frmFuncionarioEstadoTransitorio
         With dgvAdjuntos
             .AutoGenerateColumns = False
             .Columns.Clear()
-
-            .Columns.Add(New DataGridViewTextBoxColumn With {
-            .DataPropertyName = NameOf(AdjuntoRow.Id),
-            .Name = "Id",
-            .Visible = False
-        })
-
-            .Columns.Add(New DataGridViewTextBoxColumn With {
-            .DataPropertyName = NameOf(AdjuntoRow.NombreArchivo),
-            .HeaderText = "Nombre del Archivo",
-            .Name = "NombreArchivo",
-            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-        })
-
-            Dim colFecha As New DataGridViewTextBoxColumn With {
-            .DataPropertyName = NameOf(AdjuntoRow.FechaCreacion),
-            .HeaderText = "Fecha de Carga",
-            .Name = "FechaCreacion",
-            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-        }
+            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = NameOf(AdjuntoRow.Id), .Name = "Id", .Visible = False})
+            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = NameOf(AdjuntoRow.NombreArchivo), .HeaderText = "Nombre del Archivo", .Name = "NombreArchivo", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
+            Dim colFecha As New DataGridViewTextBoxColumn With {.DataPropertyName = NameOf(AdjuntoRow.FechaCreacion), .HeaderText = "Fecha de Carga", .Name = "FechaCreacion", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells}
             colFecha.DefaultCellStyle.Format = "dd/MM/yyyy HH:mm"
             .Columns.Add(colFecha)
-
-            ' (Opcional, útil para depurar) columna Origen
-            '.Columns.Add(New DataGridViewTextBoxColumn With {
-            '    .DataPropertyName = NameOf(AdjuntoRow.Origen),
-            '    .HeaderText = "Origen",
-            '    .Name = "Origen",
-            '    .Width = 80
-            '})
         End With
     End Sub
 
     Private Sub CargarAdjuntos(estadoId As Integer)
-        ' Configurar columnas una sola vez
         If dgvAdjuntos.Columns.Count = 0 Then ConfigurarGrillaAdjuntos()
-
-        ' Guardar selección actual (si la hay) para restaurarla luego
         Dim idSeleccionado As Integer? = Nothing
         If dgvAdjuntos.CurrentRow IsNot Nothing AndAlso dgvAdjuntos.CurrentRow.DataBoundItem IsNot Nothing Then
             Dim actual = TryCast(dgvAdjuntos.CurrentRow.DataBoundItem, AdjuntoRow)
@@ -399,56 +521,25 @@ Public Class frmFuncionarioEstadoTransitorio
         End If
 
         Dim adjuntos As New List(Of AdjuntoRow)
-
-        ' Desde BD
         If estadoId > 0 Then
             Dim repo = _unitOfWork.Repository(Of EstadoTransitorioAdjunto)()
-            ' Proyecta solo lo necesario (Id, Nombre, Fecha) – evita traer BLOB al grid
-            Dim adjuntosDB = repo.GetAll().
-            Where(Function(a) a.EstadoTransitorioId = estadoId).
-            Select(Function(a) New AdjuntoRow With {
-                .Id = a.Id,
-                .NombreArchivo = a.NombreArchivo,
-                .FechaCreacion = a.FechaCreacion,
-                .Origen = "BD"
-            }).ToList()
+            Dim adjuntosDB = repo.GetAll().Where(Function(a) a.EstadoTransitorioId = estadoId).Select(Function(a) New AdjuntoRow With {.Id = a.Id, .NombreArchivo = a.NombreArchivo, .FechaCreacion = a.FechaCreacion, .Origen = "BD"}).ToList()
             adjuntos.AddRange(adjuntosDB)
         End If
-
-        ' Desde memoria (Adjuntos nuevos aún no persistidos)
-        If Estado IsNot Nothing AndAlso Estado.AdjuntosNuevos IsNot Nothing AndAlso Estado.AdjuntosNuevos.Count > 0 Then
-            Dim adjuntosMemoria = Estado.AdjuntosNuevos.Select(Function(a) New AdjuntoRow With {
-            .Id = a.Id, ' negativo (tu convención), perfecto
-            .NombreArchivo = a.NombreArchivo,
-            .FechaCreacion = a.FechaCreacion,
-            .Origen = "Memoria"
-        }).ToList()
+        If Estado?.AdjuntosNuevos?.Any() Then
+            Dim adjuntosMemoria = Estado.AdjuntosNuevos.Select(Function(a) New AdjuntoRow With {.Id = a.Id, .NombreArchivo = a.NombreArchivo, .FechaCreacion = a.FechaCreacion, .Origen = "Memoria"}).ToList()
             adjuntos.AddRange(adjuntosMemoria)
         End If
 
-        ' Orden estable y útil: más recientes primero, luego por nombre
-        Dim listaOrdenada = adjuntos.
-        OrderByDescending(Function(x) x.FechaCreacion).
-        ThenBy(Function(x) x.NombreArchivo).
-        ToList()
+        Dim listaOrdenada = adjuntos.OrderByDescending(Function(x) x.FechaCreacion).ThenBy(Function(x) x.NombreArchivo).ToList()
+        Dim bs = If(TryCast(dgvAdjuntos.DataSource, BindingSource), New BindingSource With {.DataSource = listaOrdenada})
+        If dgvAdjuntos.DataSource Is Nothing Then dgvAdjuntos.DataSource = bs Else bs.DataSource = listaOrdenada
 
-        ' Enlazar (BindingSource para refrescos y orden)
-        Dim bs = TryCast(dgvAdjuntos.DataSource, BindingSource)
-        If bs Is Nothing Then
-            bs = New BindingSource()
-            dgvAdjuntos.DataSource = bs
-        End If
-        bs.DataSource = listaOrdenada
-
-        ' Habilitar/Deshabilitar UI
-        Dim hay = listaOrdenada.Count > 0
+        Dim hay As Boolean = listaOrdenada.Any()
         dgvAdjuntos.Enabled = hay
         pnlPreview.Enabled = hay
-        If Not hay Then
-            MostrarPanelMensaje("No hay archivos adjuntos.")
-        End If
+        If Not hay Then MostrarPanelMensaje("No hay archivos adjuntos.")
 
-        ' Restaurar selección si es posible
         If hay AndAlso idSeleccionado.HasValue Then
             For Each row As DataGridViewRow In dgvAdjuntos.Rows
                 Dim item = TryCast(row.DataBoundItem, AdjuntoRow)
@@ -460,58 +551,22 @@ Public Class frmFuncionarioEstadoTransitorio
             Next
         ElseIf hay Then
             dgvAdjuntos.Rows(0).Selected = True
-            dgvAdjuntos.CurrentCell = dgvAdjuntos.Rows(0).Cells("NombreArchivo")
         End If
     End Sub
-
-    'Private Sub CargarAdjuntos(estadoId As Integer)
-    '    Dim adjuntosMostrados As New List(Of Object)
-
-    '    If estadoId > 0 Then
-    '        Dim repo = _unitOfWork.Repository(Of EstadoTransitorioAdjunto)()
-    '        Dim adjuntosDB = repo.GetAll().Where(Function(a) a.EstadoTransitorioId = estadoId) _
-    '                                .Select(Function(a) New With {a.Id, a.NombreArchivo, a.FechaCreacion}) _
-    '                                .ToList()
-    '        adjuntosMostrados.AddRange(adjuntosDB)
-    '    End If
-
-    '    If Estado IsNot Nothing AndAlso Estado.AdjuntosNuevos.Any() Then
-    '        Dim adjuntosMemoria = Estado.AdjuntosNuevos.Select(Function(a) New With {a.Id, a.NombreArchivo, a.FechaCreacion}).ToList()
-    '        adjuntosMostrados.AddRange(adjuntosMemoria)
-    '    End If
-
-    '    dgvAdjuntos.DataSource = Nothing
-    '    dgvAdjuntos.DataSource = adjuntosMostrados
-
-    '    If dgvAdjuntos.Rows.Count > 0 Then
-    '        dgvAdjuntos.Columns("Id").Visible = False
-    '        dgvAdjuntos.Columns("NombreArchivo").HeaderText = "Nombre del Archivo"
-    '        dgvAdjuntos.Columns("NombreArchivo").AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-    '        dgvAdjuntos.Columns("FechaCreacion").HeaderText = "Fecha de Carga"
-    '        dgvAdjuntos.Enabled = True
-    '        pnlPreview.Enabled = True
-    '    Else
-    '        dgvAdjuntos.Enabled = False
-    '        pnlPreview.Enabled = False
-    '        MostrarPanelMensaje("No hay archivos adjuntos.")
-    '    End If
-    'End Sub
 
     Private Sub btnAdjuntar_Click(sender As Object, e As EventArgs) Handles btnAdjuntar.Click
         Using openDialog As New OpenFileDialog()
             openDialog.Title = "Seleccione un archivo (PDF o Imagen)"
             openDialog.Filter = "Archivos Soportados (*.pdf;*.jpg;*.jpeg;*.png)|*.pdf;*.jpg;*.jpeg;*.png|Todos los archivos (*.*)|*.*"
-
             If openDialog.ShowDialog() = DialogResult.OK Then
                 Try
                     Dim contenidoBytes = File.ReadAllBytes(openDialog.FileName)
-                    Dim nuevoAdjunto As New EstadoTransitorioAdjunto With {
+                    Dim nuevoAdjunto = New EstadoTransitorioAdjunto With {
                         .NombreArchivo = Path.GetFileName(openDialog.FileName),
                         .TipoMIME = GetMimeType(openDialog.FileName),
                         .Contenido = contenidoBytes,
                         .FechaCreacion = DateTime.Now
                     }
-
                     If Estado.Id = 0 Then
                         nuevoAdjunto.Id = -(Estado.AdjuntosNuevos.Count + 1)
                         Estado.AdjuntosNuevos.Add(nuevoAdjunto)
@@ -532,18 +587,11 @@ Public Class frmFuncionarioEstadoTransitorio
 
     Private Sub btnVerAdjunto_Click(sender As Object, e As EventArgs) Handles btnVerAdjunto.Click
         If dgvAdjuntos.CurrentRow Is Nothing Then Return
-
         Try
             Dim adjuntoId = CInt(dgvAdjuntos.CurrentRow.Cells("Id").Value)
-            Dim adjunto As EstadoTransitorioAdjunto
-
-            If adjuntoId < 0 Then
-                adjunto = Estado.AdjuntosNuevos.FirstOrDefault(Function(a) a.Id = adjuntoId)
-            Else
-                Dim repo = _unitOfWork.Repository(Of EstadoTransitorioAdjunto)()
-                adjunto = repo.GetById(adjuntoId)
-            End If
-
+            Dim adjunto = If(adjuntoId < 0,
+                Estado.AdjuntosNuevos.FirstOrDefault(Function(a) a.Id = adjuntoId),
+                _unitOfWork.Repository(Of EstadoTransitorioAdjunto)().GetById(adjuntoId))
             If adjunto IsNot Nothing Then
                 Dim tempPath = Path.Combine(Path.GetTempPath(), adjunto.NombreArchivo)
                 File.WriteAllBytes(tempPath, adjunto.Contenido)
@@ -556,23 +604,17 @@ Public Class frmFuncionarioEstadoTransitorio
 
     Private Sub btnEliminarAdjunto_Click(sender As Object, e As EventArgs) Handles btnEliminarAdjunto.Click
         If dgvAdjuntos.CurrentRow Is Nothing Then Return
-
         If MessageBox.Show("¿Está seguro de que desea eliminar este archivo adjunto?", "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) = DialogResult.Yes Then
             Try
                 Dim adjuntoId = CInt(dgvAdjuntos.CurrentRow.Cells("Id").Value)
-
                 If adjuntoId < 0 Then
                     Dim adjuntoAEliminar = Estado.AdjuntosNuevos.FirstOrDefault(Function(a) a.Id = adjuntoId)
-                    If adjuntoAEliminar IsNot Nothing Then
-                        Estado.AdjuntosNuevos.Remove(adjuntoAEliminar)
-                    End If
-                    CargarAdjuntos(Estado.Id)
+                    If adjuntoAEliminar IsNot Nothing Then Estado.AdjuntosNuevos.Remove(adjuntoAEliminar)
                 Else
-                    Dim repo = _unitOfWork.Repository(Of EstadoTransitorioAdjunto)()
-                    repo.RemoveById(adjuntoId)
+                    _unitOfWork.Repository(Of EstadoTransitorioAdjunto)().RemoveById(adjuntoId)
                     _unitOfWork.Commit()
-                    CargarAdjuntos(Estado.Id)
                 End If
+                CargarAdjuntos(Estado.Id)
             Catch ex As Exception
                 MessageBox.Show($"No se pudo eliminar el archivo: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
@@ -584,29 +626,17 @@ Public Class frmFuncionarioEstadoTransitorio
             MostrarPanelMensaje("Seleccione un archivo para previsualizar")
             Return
         End If
-
         Try
             Dim adjuntoId = CInt(dgvAdjuntos.CurrentRow.Cells("Id").Value)
-            Dim adjunto As EstadoTransitorioAdjunto
-
-            If adjuntoId < 0 Then
-                adjunto = Estado.AdjuntosNuevos.FirstOrDefault(Function(a) a.Id = adjuntoId)
-            Else
-                Dim repo = _unitOfWork.Repository(Of EstadoTransitorioAdjunto)()
-                adjunto = repo.GetById(adjuntoId)
-            End If
-
+            Dim adjunto = If(adjuntoId < 0,
+                Estado.AdjuntosNuevos.FirstOrDefault(Function(a) a.Id = adjuntoId),
+                _unitOfWork.Repository(Of EstadoTransitorioAdjunto)().GetById(adjuntoId))
             If adjunto Is Nothing Then Return
-
             Select Case adjunto.TipoMIME.ToLower()
-                Case "image/jpeg", "image/png"
-                    MostrarImagenPreview(adjunto.Contenido)
-                Case "application/pdf"
-                    MostrarPdfPreview(adjunto.Contenido)
-                Case Else
-                    MostrarPanelMensaje("Vista previa no disponible para este tipo de archivo.")
+                Case "image/jpeg", "image/png" : MostrarImagenPreview(adjunto.Contenido)
+                Case "application/pdf" : MostrarPdfPreview(adjunto.Contenido)
+                Case Else : MostrarPanelMensaje("Vista previa no disponible.")
             End Select
-
         Catch ex As Exception
             MostrarPanelMensaje($"Error al cargar la vista previa: {ex.Message}")
         End Try
@@ -631,7 +661,7 @@ Public Class frmFuncionarioEstadoTransitorio
             _tempFiles.Add(tempPdfPath)
             wbPreview.Navigate(tempPdfPath)
         Catch ex As Exception
-            MessageBox.Show($"No se pudo mostrar el PDF: {ex.Message}", "Error de Visualización", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            MessageBox.Show($"No se pudo mostrar el PDF: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
     End Sub
 
@@ -653,11 +683,8 @@ Public Class frmFuncionarioEstadoTransitorio
     End Function
 
     Private Sub frmFuncionarioEstadoTransitorio_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
-        If pbPreview.Image IsNot Nothing Then
-            pbPreview.Image.Dispose()
-            pbPreview.Image = Nothing
-        End If
-
+        pbPreview.Image?.Dispose()
+        pbPreview.Image = Nothing
         Try
             If wbPreview IsNot Nothing AndAlso Not wbPreview.IsDisposed Then
                 wbPreview.Navigate("about:blank")
@@ -668,26 +695,51 @@ Public Class frmFuncionarioEstadoTransitorio
         Catch ex As Exception
             Console.WriteLine($"Error al disponer el WebBrowser: {ex.Message}")
         End Try
-
         GC.Collect()
         GC.WaitForPendingFinalizers()
-
         For Each filePath In _tempFiles
             Try
-                If File.Exists(filePath) Then
-                    File.Delete(filePath)
-                End If
+                If File.Exists(filePath) Then File.Delete(filePath)
             Catch ex As Exception
                 Console.WriteLine($"No se pudo eliminar el archivo temporal: {filePath}. Error: {ex.Message}")
             End Try
         Next
     End Sub
-
 #End Region
+
     Private Sub Cerrando(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
-        ' Si la tecla presionada es Escape, se cierra el formulario.
-        If e.KeyCode = Keys.Escape Then
-            btnCancelar.PerformClick()
-        End If
+        If e.KeyCode = Keys.Escape Then btnCancelar.PerformClick()
     End Sub
+
+    ' ===== Helper seguro para "Cambio de Cargo" =====
+    Private Sub SetCargoAnteriorDesdeFuncionario()
+        ' Si el estado ya existe y la navegación no vino cargada, intentar cargarla
+        If Estado IsNot Nothing AndAlso Estado.Id > 0 AndAlso Estado.Funcionario Is Nothing Then
+            Try
+                _unitOfWork.Context.Entry(Estado).Reference(Function(e) e.Funcionario).Load()
+            Catch
+                ' ignorar si no carga
+            End Try
+        End If
+
+        Dim cargoAnteriorId As Integer? = Nothing
+
+        ' Si estamos editando y ya existe un detalle de cambio, usamos ese cargo anterior
+        If Estado?.CambioDeCargoDetalle IsNot Nothing AndAlso Estado.CambioDeCargoDetalle.CargoAnteriorId > 0 Then
+            cargoAnteriorId = Estado.CambioDeCargoDetalle.CargoAnteriorId
+        ElseIf Estado IsNot Nothing AndAlso Estado.Funcionario IsNot Nothing Then
+            cargoAnteriorId = Estado.Funcionario.CargoId
+        End If
+
+        ' Preparar combo seguro
+        cboCargoAnterior.SelectedIndex = -1
+
+        If cargoAnteriorId.HasValue AndAlso _listaCargos IsNot Nothing AndAlso
+           _listaCargos.Any(Function(c) c.Id = cargoAnteriorId.Value) Then
+            cboCargoAnterior.SelectedValue = cargoAnteriorId.Value
+        End If
+
+        cboCargoAnterior.Enabled = False
+    End Sub
+
 End Class

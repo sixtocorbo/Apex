@@ -1,22 +1,71 @@
 ﻿' Services/TiposEstadoCatalog.vb
 Option Strict On
 Option Explicit On
+
 Imports System.Text
 Imports System.Globalization
+Imports System.Linq
 
 Public NotInheritable Class TiposEstadoCatalog
     Private Sub New()
     End Sub
 
+    Private Shared ReadOnly _syncRoot As New Object()
     Private Shared _byName As Dictionary(Of String, Integer)
     Private Shared _initialized As Boolean
 
     ' Llamalo una sola vez al arrancar (p. ej. en frmMain/frmDashboard).
     Public Shared Sub Init(uow As IUnitOfWork)
-        If _initialized Then Exit Sub
+        If uow Is Nothing Then Throw New ArgumentNullException(NameOf(uow))
+        SyncLock _syncRoot
+            If _initialized Then Exit Sub
+            LoadFromDb(uow)
+            _initialized = True
+        End SyncLock
+    End Sub
+
+    ' Si agregás tipos nuevos en DB en tiempo de ejecución, podés refrescar.
+    Public Shared Sub Refresh(uow As IUnitOfWork)
+        If uow Is Nothing Then Throw New ArgumentNullException(NameOf(uow))
+        SyncLock _syncRoot
+            LoadFromDb(uow)
+            _initialized = True
+        End SyncLock
+    End Sub
+
+    Private Shared Sub LoadFromDb(uow As IUnitOfWork)
         Dim all = uow.Repository(Of TipoEstadoTransitorio)().GetAll().ToList()
-        _byName = all.ToDictionary(Function(t) Normalize(t.Nombre), Function(t) t.Id)
-        _initialized = True
+
+        Dim dict As New Dictionary(Of String, Integer)()
+        For Each t In all
+            If t Is Nothing OrElse String.IsNullOrWhiteSpace(t.Nombre) Then Continue For
+            Dim key = Normalize(t.Nombre)
+            If Not dict.ContainsKey(key) Then
+                dict.Add(key, t.Id)
+            End If
+        Next
+
+        ' ---- Aliases / sinónimos frecuentes ----
+        AddAlias(dict, "Orden 5", "Orden Cinco")
+        AddAlias(dict, "Orden V", "Orden Cinco")
+        AddAlias(dict, "Baja", "Baja de Funcionario")
+        AddAlias(dict, "Reactivacion", "Reactivación de Funcionario")
+        AddAlias(dict, "Reactivación", "Reactivación de Funcionario")
+        AddAlias(dict, "Inicio de Proceso", "Inicio de Procesamiento")
+        AddAlias(dict, "Procesamiento", "Inicio de Procesamiento")
+        AddAlias(dict, "Separacion Cargo", "Separación del Cargo")
+        AddAlias(dict, "Separación Cargo", "Separación del Cargo")
+        AddAlias(dict, "Reten", "Retén")
+
+        _byName = dict
+    End Sub
+
+    Private Shared Sub AddAlias(dict As Dictionary(Of String, Integer), aliasName As String, targetName As String)
+        Dim aliasKey = Normalize(aliasName)
+        Dim targetKey = Normalize(targetName)
+        If dict.ContainsKey(targetKey) AndAlso Not dict.ContainsKey(aliasKey) Then
+            dict(aliasKey) = dict(targetKey)
+        End If
     End Sub
 
     Private Shared Function Normalize(s As String) As String
@@ -31,15 +80,37 @@ Public NotInheritable Class TiposEstadoCatalog
         Return sb.ToString().Normalize(NormalizationForm.FormC)
     End Function
 
-    Private Shared Function IdDe(nombre As String) As Integer
-        If Not _initialized Then
+    Private Shared Function EnsureInit() As Boolean
+        If Not _initialized OrElse _byName Is Nothing Then
             Throw New InvalidOperationException("TiposEstadoCatalog no inicializado. Llamá a Init(uow) al arrancar.")
         End If
+        Return True
+    End Function
+
+    Private Shared Function IdDe(nombre As String) As Integer
+        EnsureInit()
         Dim key = Normalize(nombre)
         Dim id As Integer
         If _byName.TryGetValue(key, id) Then Return id
         Throw New KeyNotFoundException($"No se encontró TipoEstadoTransitorio '{nombre}'.")
     End Function
+
+    ' API pública extra por si la necesitás
+    Public Shared Function TryGetId(nombre As String, ByRef id As Integer) As Boolean
+        EnsureInit()
+        Return _byName.TryGetValue(Normalize(nombre), id)
+    End Function
+
+    Public Shared Function GetId(nombre As String) As Integer
+        Return IdDe(nombre)
+    End Function
+
+    Public Shared ReadOnly Property All As IReadOnlyDictionary(Of String, Integer)
+        Get
+            EnsureInit()
+            Return _byName
+        End Get
+    End Property
 
     ' ---- Propiedades fuertes (sin magic numbers) ----
     Public Shared ReadOnly Property Designacion As Integer
@@ -84,12 +155,33 @@ Public NotInheritable Class TiposEstadoCatalog
         End Get
     End Property
 
-    Public Shared ReadOnly Property CambioDeCargo As Integer
+    Public Shared ReadOnly Property BajaDeFuncionario As Integer
+        Get
+            Return IdDe("Baja de Funcionario")
+        End Get
+    End Property
 
+    Public Shared ReadOnly Property CambioDeCargo As Integer
+        Get
+            Return IdDe("Cambio de Cargo")
+        End Get
+    End Property
+
+    Public Shared ReadOnly Property ReactivacionDeFuncionario As Integer
+        Get
+            Return IdDe("Reactivación de Funcionario")
+        End Get
+    End Property
 
     Public Shared ReadOnly Property SeparacionDelCargo As Integer
         Get
             Return IdDe("Separación del Cargo")
+        End Get
+    End Property
+
+    Public Shared ReadOnly Property InicioDeProcesamiento As Integer
+        Get
+            Return IdDe("Inicio de Procesamiento")
         End Get
     End Property
 
@@ -98,5 +190,4 @@ Public NotInheritable Class TiposEstadoCatalog
             Return IdDe("Desarmado")
         End Get
     End Property
-
 End Class

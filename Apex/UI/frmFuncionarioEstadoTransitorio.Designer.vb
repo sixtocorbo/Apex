@@ -18,7 +18,7 @@ Partial Class frmFuncionarioEstadoTransitorio
     Private components As System.ComponentModel.IContainer
 
     'NOTE: The following procedure is required by the Windows Form Designer
-    'It can be modified using the Windows Form Designer.
+    'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
@@ -50,6 +50,10 @@ Partial Class frmFuncionarioEstadoTransitorio
         Me.lblPreviewNotAvailable = New System.Windows.Forms.Label()
         Me.wbPreview = New System.Windows.Forms.WebBrowser()
         Me.pbPreview = New System.Windows.Forms.PictureBox()
+        Me.lblCargoAnterior = New System.Windows.Forms.Label()
+        Me.cboCargoAnterior = New System.Windows.Forms.ComboBox()
+        Me.lblCargoNuevo = New System.Windows.Forms.Label()
+        Me.cboCargoNuevo = New System.Windows.Forms.ComboBox()
         Me.GroupBox1.SuspendLayout()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
@@ -363,11 +367,51 @@ Partial Class frmFuncionarioEstadoTransitorio
         Me.pbPreview.TabStop = False
         Me.pbPreview.Visible = False
         '
+        'lblCargoAnterior
+        '
+        Me.lblCargoAnterior.AutoSize = True
+        Me.lblCargoAnterior.Location = New System.Drawing.Point(606, 145)
+        Me.lblCargoAnterior.Name = "lblCargoAnterior"
+        Me.lblCargoAnterior.Size = New System.Drawing.Size(71, 20)
+        Me.lblCargoAnterior.TabIndex = 18
+        Me.lblCargoAnterior.Text = "C. Ant .:"
+        '
+        'cboCargoAnterior
+        '
+        Me.cboCargoAnterior.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboCargoAnterior.FormattingEnabled = True
+        Me.cboCargoAnterior.Location = New System.Drawing.Point(710, 140)
+        Me.cboCargoAnterior.Name = "cboCargoAnterior"
+        Me.cboCargoAnterior.Size = New System.Drawing.Size(446, 28)
+        Me.cboCargoAnterior.TabIndex = 19
+        '
+        'lblCargoNuevo
+        '
+        Me.lblCargoNuevo.AutoSize = True
+        Me.lblCargoNuevo.Location = New System.Drawing.Point(606, 185)
+        Me.lblCargoNuevo.Name = "lblCargoNuevo"
+        Me.lblCargoNuevo.Size = New System.Drawing.Size(85, 20)
+        Me.lblCargoNuevo.TabIndex = 20
+        Me.lblCargoNuevo.Text = "C. Nuevo .:"
+        '
+        'cboCargoNuevo
+        '
+        Me.cboCargoNuevo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboCargoNuevo.FormattingEnabled = True
+        Me.cboCargoNuevo.Location = New System.Drawing.Point(710, 180)
+        Me.cboCargoNuevo.Name = "cboCargoNuevo"
+        Me.cboCargoNuevo.Size = New System.Drawing.Size(446, 28)
+        Me.cboCargoNuevo.TabIndex = 21
+        '
         'frmFuncionarioEstadoTransitorio
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1176, 709)
+        Me.Controls.Add(Me.cboCargoNuevo)
+        Me.Controls.Add(Me.lblCargoNuevo)
+        Me.Controls.Add(Me.cboCargoAnterior)
+        Me.Controls.Add(Me.lblCargoAnterior)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.lblTurnoReten)
         Me.Controls.Add(Me.txtTurnoReten)
@@ -434,4 +478,8 @@ Partial Class frmFuncionarioEstadoTransitorio
     Friend WithEvents lblPreviewNotAvailable As Label
     Friend WithEvents pnlAdjuntosAcciones As FlowLayoutPanel
     Friend WithEvents pnlPreview As Panel
+    Friend WithEvents lblCargoAnterior As Label
+    Friend WithEvents cboCargoAnterior As ComboBox
+    Friend WithEvents lblCargoNuevo As Label
+    Friend WithEvents cboCargoNuevo As ComboBox
 End Class
