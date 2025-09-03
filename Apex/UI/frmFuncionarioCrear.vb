@@ -542,12 +542,24 @@ Public Class frmFuncionarioCrear
     End Sub
 
     Private Function IsEstadoActivo(et As EstadoTransitorio) As Boolean
-        Dim fechaActual = Date.Today, fechaDesde As Date? = Nothing, fechaHasta As Date? = Nothing
+        Dim hoy = Date.Today
+        Dim fechaDesde As Date? = Nothing, fechaHasta As Date? = Nothing
         et.GetFechas(fechaDesde, fechaHasta)
-        If et.TipoEstadoTransitorioId = 5 Then Return If(fechaDesde.HasValue, fechaDesde.Value.Date = fechaActual, False)
+
+        ' Normalizar sentinelas (p.ej. 0001/1900) a "sin fin"
+        If fechaHasta.HasValue AndAlso fechaHasta.Value.Year < 1902 Then
+            fechaHasta = Nothing
+        End If
+
+        ' Retén: solo el día exacto (fecha puntual)
+        If et.TipoEstadoTransitorioId = TiposEstadoCatalog.Reten Then
+            Return fechaDesde.HasValue AndAlso fechaDesde.Value.Date = hoy
+        End If
+
         If Not fechaDesde.HasValue Then Return False
-        Return fechaDesde.Value.Date <= fechaActual AndAlso (Not fechaHasta.HasValue OrElse fechaHasta.Value.Date >= fechaActual)
+        Return fechaDesde.Value.Date <= hoy AndAlso (Not fechaHasta.HasValue OrElse fechaHasta.Value.Date >= hoy)
     End Function
+
 
     Private Sub UpdateRowFromEntity(row As EstadoRow, e As EstadoTransitorio)
         Dim updated = BuildEstadoRow(e, row.Origen)

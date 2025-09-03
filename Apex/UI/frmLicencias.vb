@@ -17,9 +17,8 @@ Public Class frmLicencias
 
         AddHandler NotificadorEventos.DatosActualizados, AddressOf OnDatosActualizados
 
-        If Not String.IsNullOrWhiteSpace(txtBusquedaLicencia.Text) Then
-            Await CargarDatosLicenciasAsync()
-        End If
+        ' Por defecto: mostrar licencias cursando hoy
+        chkSoloVigentes.Checked = True ' disparará el CheckedChanged y cargará
     End Sub
 
     Private Sub frmGestionLicencias_FormClosed(sender As Object, e As FormClosedEventArgs) Handles Me.FormClosed
@@ -101,17 +100,21 @@ Public Class frmLicencias
 
     Private Async Function CargarDatosLicenciasAsync() As Task
         Dim filtro = txtBusquedaLicencia.Text.Trim()
-
-        If String.IsNullOrWhiteSpace(filtro) Then
-            ' >>> Tipo correcto del DataSource vacío
-            dgvLicencias.DataSource = New List(Of LicenciaConFuncionarioExtendidoDto)()
-            Return
-        End If
+        Dim soloVigentes = (chkSoloVigentes IsNot Nothing AndAlso chkSoloVigentes.Checked)
 
         LoadingHelper.MostrarCargando(Me)
         Try
             dgvLicencias.DataSource = Nothing
-            Dim datos = Await _licenciaSvc.GetAllConDetallesAsync(filtroNombre:=filtro)
+            Dim datos As List(Of LicenciaConFuncionarioExtendidoDto)
+
+            If soloVigentes Then
+                ' Mostrar sólo las licencias cursando hoy (con o sin filtro de nombre/CI)
+                datos = Await _licenciaSvc.GetVigentesHoyAsync(filtroNombre:=filtro)
+            Else
+                ' Sin restricción de vigencia: usa tu consulta general (con o sin filtro)
+                datos = Await _licenciaSvc.GetAllConDetallesAsync(filtroNombre:=filtro)
+            End If
+
             dgvLicencias.DataSource = datos
         Catch ex As Exception
             MessageBox.Show("Error al cargar licencias: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.[Error])
@@ -131,10 +134,10 @@ Public Class frmLicencias
         End If
     End Sub
 
-    ' (Opcional) búsqueda en vivo:
-    'Private Async Sub txtBusquedaLicencia_TextChanged(sender As Object, e As EventArgs) Handles txtBusquedaLicencia.TextChanged
-    '    Await CargarDatosLicenciasAsync()
-    'End Sub
+    Private Async Sub chkSoloVigentes_CheckedChanged(sender As Object, e As EventArgs) Handles chkSoloVigentes.CheckedChanged
+        ' Al cambiar el check, recargar según corresponda
+        Await CargarDatosLicenciasAsync()
+    End Sub
 
 #End Region
 

@@ -1,4 +1,5 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
+﻿' Apex/UI/frmGestionLicencias.Designer.vb
+<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class frmLicencias
     Inherits System.Windows.Forms.Form
 
@@ -23,6 +24,7 @@ Partial Class frmLicencias
         Me.btnEditarLicencia = New System.Windows.Forms.Button()
         Me.btnNuevaLicencia = New System.Windows.Forms.Button()
         Me.PanelBusquedaLicencias = New System.Windows.Forms.Panel()
+        Me.chkSoloVigentes = New System.Windows.Forms.CheckBox()
         Me.txtBusquedaLicencia = New System.Windows.Forms.TextBox()
         Me.Label1 = New System.Windows.Forms.Label()
         CType(Me.dgvLicencias, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -94,6 +96,7 @@ Partial Class frmLicencias
         '
         'PanelBusquedaLicencias
         '
+        Me.PanelBusquedaLicencias.Controls.Add(Me.chkSoloVigentes)
         Me.PanelBusquedaLicencias.Controls.Add(Me.txtBusquedaLicencia)
         Me.PanelBusquedaLicencias.Controls.Add(Me.Label1)
         Me.PanelBusquedaLicencias.Dock = System.Windows.Forms.DockStyle.Top
@@ -102,6 +105,17 @@ Partial Class frmLicencias
         Me.PanelBusquedaLicencias.Name = "PanelBusquedaLicencias"
         Me.PanelBusquedaLicencias.Size = New System.Drawing.Size(900, 62)
         Me.PanelBusquedaLicencias.TabIndex = 5
+        '
+        'chkSoloVigentes
+        '
+        Me.chkSoloVigentes.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.chkSoloVigentes.AutoSize = True
+        Me.chkSoloVigentes.Location = New System.Drawing.Point(720, 17)
+        Me.chkSoloVigentes.Name = "chkSoloVigentes"
+        Me.chkSoloVigentes.Size = New System.Drawing.Size(151, 24)
+        Me.chkSoloVigentes.TabIndex = 2
+        Me.chkSoloVigentes.Text = "Sólo vigentes hoy"
+        Me.chkSoloVigentes.UseVisualStyleBackColor = True
         '
         'txtBusquedaLicencia
         '
@@ -148,4 +162,5 @@ Partial Class frmLicencias
     Friend WithEvents PanelBusquedaLicencias As Panel
     Friend WithEvents txtBusquedaLicencia As TextBox
     Friend WithEvents Label1 As Label
+    Friend WithEvents chkSoloVigentes As CheckBox
 End Class

@@ -340,6 +340,22 @@ Public Class LicenciaService
             Return prediccion.OrderBy(Function(p) p.Mes).ToList()
         End Using
     End Function
+    ' En Apex/Services/LicenciaService.vb
+    Public Async Function GetVigentesHoyAsync(
+    Optional filtroNombre As String = "",
+    Optional tiposLicenciaIds As List(Of Integer) = Nothing,
+    Optional soloActivos As Boolean? = True
+) As Task(Of List(Of LicenciaConFuncionarioExtendidoDto))
+
+        Dim hoy = Date.Today
+        Return Await GetAllConDetallesAsync(
+        filtroNombre:=filtroNombre,
+        fechaDesde:=hoy,
+        fechaHasta:=hoy,
+        tiposLicenciaIds:=tiposLicenciaIds,
+        soloActivos:=soloActivos
+    )
+    End Function
 
 End Class
 

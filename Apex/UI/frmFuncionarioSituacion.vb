@@ -306,6 +306,8 @@ Public Class frmFuncionarioSituacion
         ConfigurarGrillaEstados()
         If dgv.Columns.Contains("IsEstado") Then dgv.Columns("IsEstado").Visible = False
         If dgv.Columns.Contains("TipoId") Then dgv.Columns("TipoId").Visible = False
+        ' << NUEVO: aplicar colores por severidad >>
+        AplicarColoresEstados(dgv)
     End Sub
 
     Private Sub Cerrando(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
@@ -313,5 +315,98 @@ Public Class frmFuncionarioSituacion
     End Sub
 
 #End Region
+    '=============================================================================
+    ' ===================== Severidad y Colores =====================
+    Private Enum Severidad
+        Info = 0
+        Baja = 1
+        Media = 2
+        Alta = 3
+        Critica = 4
+    End Enum
+
+    Private Sub AplicarColoresEstados(dgv As DataGridView)
+        For Each row As DataGridViewRow In dgv.Rows
+            Dim data As Object = row.DataBoundItem
+            If data Is Nothing Then Continue For
+
+            Dim tipoTxt As String = GetPropValue(Of String)(data, "Tipo", "")
+            Dim tipoId As Integer = GetPropValue(Of Integer)(data, "TipoId", 0)
+            Dim isEstado As Boolean = GetPropValue(Of Boolean)(data, "IsEstado", False)
+
+            Dim sev As Severidad = ClasificarSeveridad(tipoTxt, tipoId, isEstado)
+            PintarFilaPorSeveridad(row, sev)
+        Next
+    End Sub
+
+    Private Function ClasificarSeveridad(tipoTexto As String, tipoId As Integer, isEstado As Boolean) As Severidad
+        Dim t As String = If(tipoTexto, String.Empty).ToUpperInvariant()
+
+        ' --- Reglas por texto (robusto a cambios de IDs / nombres) ---
+        If t.StartsWith("LICENCIA") Then Return Severidad.Info
+        If t.Contains("INICIO DE PROCESAMIENTO") Then Return Severidad.Critica
+        If t.Contains("SEPARACION") OrElse t.Contains("SEPARACIÓN") Then Return Severidad.Critica
+        If t.Contains("BAJA") Then Return Severidad.Critica
+        If t.Contains("SUMARIO") Then Return Severidad.Alta
+        If t.Contains("SANCI") Then Return Severidad.Alta
+        If t.Contains("ENFERMEDAD") Then Return Severidad.Media
+        If t.Contains("ORDEN CINCO") OrElse t.Contains("ORDEN 5") Then Return Severidad.Media
+        If t.Contains("TRASLADO") Then Return Severidad.Media
+        If t.Contains("RETEN") OrElse t.Contains("RETÉN") Then Return Severidad.Baja
+        If t.Contains("DESIGNACION") OrElse t.Contains("DESIGNACIÓN") Then Return Severidad.Baja
+        If t.Contains("REACTIVACION") OrElse t.Contains("REACTIVACIÓN") Then Return Severidad.Baja
+        If t.Contains("CAMBIO DE CARGO") Then Return Severidad.Baja
+
+        ' --- (Opcional) Reglas por ID si querés afinar: ej. 5 = Retén en tu código ---
+        'Select Case tipoId
+        '    Case 5 : Return Severidad.Baja ' Retén
+        'End Select
+
+        Return Severidad.Baja
+    End Function
+
+    Private Sub PintarFilaPorSeveridad(row As DataGridViewRow, sev As Severidad)
+        Dim strong As Color
+        Dim text As Color = Color.White
+
+        Select Case sev
+            Case Severidad.Critica
+                strong = Color.FromArgb(229, 57, 53)     ' rojo 600
+            Case Severidad.Alta
+                strong = Color.FromArgb(245, 124, 0)     ' naranja 700
+            Case Severidad.Media
+                strong = Color.FromArgb(255, 179, 0)     ' ámbar 600
+            Case Severidad.Baja
+                strong = Color.FromArgb(56, 142, 60)     ' verde 600
+            Case Else ' Info
+                strong = Color.FromArgb(30, 136, 229)    ' azul 600
+        End Select
+
+        ' MISMO color fuerte tanto seleccionado como no seleccionado
+        row.DefaultCellStyle.BackColor = strong
+        row.DefaultCellStyle.ForeColor = text
+        row.DefaultCellStyle.SelectionBackColor = strong
+        row.DefaultCellStyle.SelectionForeColor = text
+    End Sub
+
+
+    ' ==== Helpers seguros con Option Strict On ====
+    Private Function GetPropValue(Of T)(obj As Object, propName As String, defaultValue As T) As T
+        If obj Is Nothing Then Return defaultValue
+        Dim p = obj.GetType().GetProperty(propName, Reflection.BindingFlags.Instance Or Reflection.BindingFlags.Public Or Reflection.BindingFlags.IgnoreCase)
+        If p Is Nothing Then Return defaultValue
+        Dim val = p.GetValue(obj, Nothing)
+        If val Is Nothing Then Return defaultValue
+        Try
+            Return CType(val, T)
+        Catch
+            Try
+                Return DirectCast(Convert.ChangeType(val, GetType(T), Globalization.CultureInfo.InvariantCulture), T)
+            Catch
+                Return defaultValue
+            End Try
+        End Try
+    End Function
+    ' =================== Fin Severidad y Colores ===================
 
 End Class
