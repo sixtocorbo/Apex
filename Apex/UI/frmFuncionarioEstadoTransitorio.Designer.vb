@@ -54,6 +54,9 @@ Partial Class frmFuncionarioEstadoTransitorio
         Me.cboCargoAnterior = New System.Windows.Forms.ComboBox()
         Me.lblCargoNuevo = New System.Windows.Forms.Label()
         Me.cboCargoNuevo = New System.Windows.Forms.ComboBox()
+        Me.lblFechaResolucion = New System.Windows.Forms.Label()
+        Me.dtpFechaResolucion = New System.Windows.Forms.DateTimePicker()
+        Me.chkSinFechaResolucion = New System.Windows.Forms.CheckBox()
         Me.GroupBox1.SuspendLayout()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
@@ -176,7 +179,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         'lblResolucion
         '
         Me.lblResolucion.AutoSize = True
-        Me.lblResolucion.Location = New System.Drawing.Point(606, 23)
+        Me.lblResolucion.Location = New System.Drawing.Point(579, 23)
         Me.lblResolucion.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblResolucion.Name = "lblResolucion"
         Me.lblResolucion.Size = New System.Drawing.Size(92, 20)
@@ -185,16 +188,16 @@ Partial Class frmFuncionarioEstadoTransitorio
         '
         'txtResolucion
         '
-        Me.txtResolucion.Location = New System.Drawing.Point(710, 18)
+        Me.txtResolucion.Location = New System.Drawing.Point(727, 18)
         Me.txtResolucion.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtResolucion.Name = "txtResolucion"
-        Me.txtResolucion.Size = New System.Drawing.Size(446, 26)
+        Me.txtResolucion.Size = New System.Drawing.Size(427, 26)
         Me.txtResolucion.TabIndex = 11
         '
         'lblDiagnostico
         '
         Me.lblDiagnostico.AutoSize = True
-        Me.lblDiagnostico.Location = New System.Drawing.Point(606, 65)
+        Me.lblDiagnostico.Location = New System.Drawing.Point(579, 105)
         Me.lblDiagnostico.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblDiagnostico.Name = "lblDiagnostico"
         Me.lblDiagnostico.Size = New System.Drawing.Size(97, 20)
@@ -203,16 +206,16 @@ Partial Class frmFuncionarioEstadoTransitorio
         '
         'txtDiagnostico
         '
-        Me.txtDiagnostico.Location = New System.Drawing.Point(710, 60)
+        Me.txtDiagnostico.Location = New System.Drawing.Point(727, 100)
         Me.txtDiagnostico.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtDiagnostico.Name = "txtDiagnostico"
-        Me.txtDiagnostico.Size = New System.Drawing.Size(446, 26)
+        Me.txtDiagnostico.Size = New System.Drawing.Size(427, 26)
         Me.txtDiagnostico.TabIndex = 13
         '
         'lblTurnoReten
         '
         Me.lblTurnoReten.AutoSize = True
-        Me.lblTurnoReten.Location = New System.Drawing.Point(606, 105)
+        Me.lblTurnoReten.Location = New System.Drawing.Point(579, 145)
         Me.lblTurnoReten.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblTurnoReten.Name = "lblTurnoReten"
         Me.lblTurnoReten.Size = New System.Drawing.Size(54, 20)
@@ -221,10 +224,10 @@ Partial Class frmFuncionarioEstadoTransitorio
         '
         'txtTurnoReten
         '
-        Me.txtTurnoReten.Location = New System.Drawing.Point(710, 100)
+        Me.txtTurnoReten.Location = New System.Drawing.Point(727, 140)
         Me.txtTurnoReten.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtTurnoReten.Name = "txtTurnoReten"
-        Me.txtTurnoReten.Size = New System.Drawing.Size(446, 26)
+        Me.txtTurnoReten.Size = New System.Drawing.Size(427, 26)
         Me.txtTurnoReten.TabIndex = 15
         '
         'GroupBox1
@@ -370,44 +373,76 @@ Partial Class frmFuncionarioEstadoTransitorio
         'lblCargoAnterior
         '
         Me.lblCargoAnterior.AutoSize = True
-        Me.lblCargoAnterior.Location = New System.Drawing.Point(606, 145)
+        Me.lblCargoAnterior.Location = New System.Drawing.Point(579, 145)
         Me.lblCargoAnterior.Name = "lblCargoAnterior"
-        Me.lblCargoAnterior.Size = New System.Drawing.Size(71, 20)
+        Me.lblCargoAnterior.Size = New System.Drawing.Size(125, 20)
         Me.lblCargoAnterior.TabIndex = 18
-        Me.lblCargoAnterior.Text = "C. Ant .:"
+        Me.lblCargoAnterior.Text = "Cargo Anterior:"
         '
         'cboCargoAnterior
         '
         Me.cboCargoAnterior.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboCargoAnterior.FormattingEnabled = True
-        Me.cboCargoAnterior.Location = New System.Drawing.Point(710, 140)
+        Me.cboCargoAnterior.Location = New System.Drawing.Point(727, 140)
         Me.cboCargoAnterior.Name = "cboCargoAnterior"
-        Me.cboCargoAnterior.Size = New System.Drawing.Size(446, 28)
+        Me.cboCargoAnterior.Size = New System.Drawing.Size(427, 28)
         Me.cboCargoAnterior.TabIndex = 19
         '
         'lblCargoNuevo
         '
         Me.lblCargoNuevo.AutoSize = True
-        Me.lblCargoNuevo.Location = New System.Drawing.Point(606, 185)
+        Me.lblCargoNuevo.Location = New System.Drawing.Point(579, 185)
         Me.lblCargoNuevo.Name = "lblCargoNuevo"
-        Me.lblCargoNuevo.Size = New System.Drawing.Size(85, 20)
+        Me.lblCargoNuevo.Size = New System.Drawing.Size(107, 20)
         Me.lblCargoNuevo.TabIndex = 20
-        Me.lblCargoNuevo.Text = "C. Nuevo .:"
+        Me.lblCargoNuevo.Text = "Cargo Nuevo:"
         '
         'cboCargoNuevo
         '
         Me.cboCargoNuevo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboCargoNuevo.FormattingEnabled = True
-        Me.cboCargoNuevo.Location = New System.Drawing.Point(710, 180)
+        Me.cboCargoNuevo.Location = New System.Drawing.Point(727, 180)
         Me.cboCargoNuevo.Name = "cboCargoNuevo"
-        Me.cboCargoNuevo.Size = New System.Drawing.Size(446, 28)
+        Me.cboCargoNuevo.Size = New System.Drawing.Size(427, 28)
         Me.cboCargoNuevo.TabIndex = 21
+        '
+        'lblFechaResolucion
+        '
+        Me.lblFechaResolucion.AutoSize = True
+        Me.lblFechaResolucion.Location = New System.Drawing.Point(579, 65)
+        Me.lblFechaResolucion.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.lblFechaResolucion.Name = "lblFechaResolucion"
+        Me.lblFechaResolucion.Size = New System.Drawing.Size(141, 20)
+        Me.lblFechaResolucion.TabIndex = 22
+        Me.lblFechaResolucion.Text = "Fecha Resolución:"
+        '
+        'dtpFechaResolucion
+        '
+        Me.dtpFechaResolucion.Location = New System.Drawing.Point(727, 60)
+        Me.dtpFechaResolucion.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.dtpFechaResolucion.Name = "dtpFechaResolucion"
+        Me.dtpFechaResolucion.Size = New System.Drawing.Size(298, 26)
+        Me.dtpFechaResolucion.TabIndex = 23
+        '
+        'chkSinFechaResolucion
+        '
+        Me.chkSinFechaResolucion.AutoSize = True
+        Me.chkSinFechaResolucion.Location = New System.Drawing.Point(1037, 63)
+        Me.chkSinFechaResolucion.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.chkSinFechaResolucion.Name = "chkSinFechaResolucion"
+        Me.chkSinFechaResolucion.Size = New System.Drawing.Size(110, 24)
+        Me.chkSinFechaResolucion.TabIndex = 24
+        Me.chkSinFechaResolucion.Text = "Sin Fecha"
+        Me.chkSinFechaResolucion.UseVisualStyleBackColor = True
         '
         'frmFuncionarioEstadoTransitorio
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1176, 709)
+        Me.Controls.Add(Me.chkSinFechaResolucion)
+        Me.Controls.Add(Me.dtpFechaResolucion)
+        Me.Controls.Add(Me.lblFechaResolucion)
         Me.Controls.Add(Me.cboCargoNuevo)
         Me.Controls.Add(Me.lblCargoNuevo)
         Me.Controls.Add(Me.cboCargoAnterior)
@@ -482,4 +517,8 @@ Partial Class frmFuncionarioEstadoTransitorio
     Friend WithEvents cboCargoAnterior As ComboBox
     Friend WithEvents lblCargoNuevo As Label
     Friend WithEvents cboCargoNuevo As ComboBox
+    ' Controles nuevos
+    Friend WithEvents lblFechaResolucion As Label
+    Friend WithEvents dtpFechaResolucion As DateTimePicker
+    Friend WithEvents chkSinFechaResolucion As CheckBox
 End Class

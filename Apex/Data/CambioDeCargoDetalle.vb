@@ -18,6 +18,7 @@ Partial Public Class CambioDeCargoDetalle
     Public Property FechaHasta As Nullable(Of Date)
     Public Property Observaciones As String
     Public Property Resolucion As String
+    Public Property FechaResolucion As Nullable(Of Date)
 
     Public Overridable Property Cargo As Cargo
     Public Overridable Property Cargo1 As Cargo

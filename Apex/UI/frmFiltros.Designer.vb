@@ -220,10 +220,10 @@ Partial Class frmFiltros
         '
         'btnCargar
         '
-        Me.btnCargar.Anchor = System.Windows.Forms.AnchorStyles.Top
+        Me.btnCargar.Dock = System.Windows.Forms.DockStyle.Fill
         Me.btnCargar.Location = New System.Drawing.Point(69, 101)
         Me.btnCargar.Name = "btnCargar"
-        Me.btnCargar.Size = New System.Drawing.Size(185, 35)
+        Me.btnCargar.Size = New System.Drawing.Size(185, 46)
         Me.btnCargar.TabIndex = 6
         Me.btnCargar.Text = "Cargar"
         Me.btnCargar.UseVisualStyleBackColor = True

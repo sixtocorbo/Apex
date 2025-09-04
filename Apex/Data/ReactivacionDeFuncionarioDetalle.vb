@@ -15,6 +15,7 @@ Partial Public Class ReactivacionDeFuncionarioDetalle
     Public Property FechaDesde As Date
     Public Property Observaciones As String
     Public Property Resolucion As String
+    Public Property FechaResolucion As Nullable(Of Date)
 
     Public Overridable Property EstadoTransitorio As EstadoTransitorio
 

@@ -16,6 +16,7 @@ Partial Public Class InicioDeProcesamientoDetalle
     Public Property FechaHasta As Nullable(Of Date)
     Public Property Expediente As String
     Public Property Observaciones As String
+    Public Property FechaResolucion As Nullable(Of Date)
 
     Public Overridable Property EstadoTransitorio As EstadoTransitorio
 

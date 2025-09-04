@@ -75,6 +75,8 @@ Public Class frmFuncionarioEstadoTransitorio
             ' MODO CREACIÓN
             If Estado Is Nothing Then Estado = New EstadoTransitorio()
             chkFechaHasta.Checked = True
+            ' >>> NOVEDAD: Marcar checkbox de fecha de resolución por defecto
+            chkSinFechaResolucion.Checked = True
             cboTipoEstado.SelectedIndex = -1
             pnlPreview.Enabled = False
             MostrarPanelMensaje("Haga clic en 'Adjuntar' para agregar un archivo.")
@@ -92,6 +94,9 @@ Public Class frmFuncionarioEstadoTransitorio
         dtpFechaDesde.Enabled = False
         dtpFechaHasta.Enabled = False
         chkFechaHasta.Enabled = False
+        ' >>> NOVEDAD: Deshabilitar controles de fecha de resolución
+        dtpFechaResolucion.Enabled = False
+        chkSinFechaResolucion.Enabled = False
         txtObservaciones.ReadOnly = True
         txtResolucion.ReadOnly = True
         txtDiagnostico.ReadOnly = True
@@ -109,6 +114,8 @@ Public Class frmFuncionarioEstadoTransitorio
     Private Sub CargarDatosDeDetalle()
         Dim fechaHasta As Date? = Nothing
         Dim observaciones As String = ""
+        ' >>> NOVEDAD: Variable para la nueva fecha
+        Dim fechaResolucion As Date? = Nothing
 
         Select Case Estado.TipoEstadoTransitorioId
             Case 1 ' Designacion
@@ -118,6 +125,8 @@ Public Class frmFuncionarioEstadoTransitorio
                 fechaHasta = d.FechaHasta
                 observaciones = d.Observaciones
                 txtResolucion.Text = d.DocResolucion
+                ' >>> NOVEDAD: Cargar fecha de resolución (suponiendo que la propiedad existirá)
+                ' fechaResolucion = d.FechaResolucion
 
             Case 2 ' Enfermedad
                 Dim d = Estado.EnfermedadDetalle
@@ -134,6 +143,8 @@ Public Class frmFuncionarioEstadoTransitorio
                 fechaHasta = d.FechaHasta
                 observaciones = d.Observaciones
                 txtResolucion.Text = d.Resolucion
+                ' >>> NOVEDAD: Cargar fecha de resolución (suponiendo que la propiedad existirá)
+                ' fechaResolucion = d.FechaResolucion
 
             Case 4 ' OrdenCinco
                 Dim d = Estado.OrdenCincoDetalle
@@ -156,6 +167,8 @@ Public Class frmFuncionarioEstadoTransitorio
                 fechaHasta = d.FechaHasta
                 observaciones = d.Observaciones
                 txtResolucion.Text = d.Expediente
+                ' >>> NOVEDAD: Cargar fecha de resolución (suponiendo que la propiedad existirá)
+                ' fechaResolucion = d.FechaResolucion
 
             Case 21 ' Traslado
                 Dim d = Estado.TrasladoDetalle
@@ -180,6 +193,8 @@ Public Class frmFuncionarioEstadoTransitorio
                 txtResolucion.Text = d.Resolucion
                 cboCargoAnterior.SelectedValue = d.CargoAnteriorId
                 cboCargoNuevo.SelectedValue = d.CargoNuevoId
+                ' >>> NOVEDAD: Cargar fecha de resolución (suponiendo que la propiedad existirá)
+                ' fechaResolucion = d.FechaResolucion
 
             Case 31 ' Reactivación de Funcionario
                 Dim d = Estado.ReactivacionDeFuncionarioDetalle
@@ -187,6 +202,8 @@ Public Class frmFuncionarioEstadoTransitorio
                 dtpFechaDesde.Value = d.FechaDesde
                 observaciones = d.Observaciones
                 txtResolucion.Text = d.Resolucion
+                ' >>> NOVEDAD: Cargar fecha de resolución (suponiendo que la propiedad existirá)
+                ' fechaResolucion = d.FechaResolucion
 
             Case 32 ' Separación del Cargo
                 Dim d = Estado.SeparacionDelCargoDetalle
@@ -202,6 +219,8 @@ Public Class frmFuncionarioEstadoTransitorio
                 fechaHasta = d.FechaHasta
                 observaciones = d.Observaciones
                 txtResolucion.Text = d.Expediente
+                ' >>> NOVEDAD: Cargar fecha de resolución (suponiendo que la propiedad existirá)
+                ' fechaResolucion = d.FechaResolucion
 
             Case 34 ' Desarmado
                 Dim d = Estado.DesarmadoDetalle
@@ -213,6 +232,7 @@ Public Class frmFuncionarioEstadoTransitorio
 
         txtObservaciones.Text = observaciones
 
+        ' --- Lógica para Fecha Hasta ---
         If Estado.TipoEstadoTransitorioId <> 5 AndAlso Estado.TipoEstadoTransitorioId <> 31 Then
             If fechaHasta.HasValue Then
                 dtpFechaHasta.Value = fechaHasta.Value
@@ -222,6 +242,16 @@ Public Class frmFuncionarioEstadoTransitorio
                 dtpFechaHasta.Enabled = False
                 chkFechaHasta.Checked = True
             End If
+        End If
+
+        ' --- >>> NOVEDAD: Lógica para la nueva Fecha de Resolución ---
+        If fechaResolucion.HasValue Then
+            dtpFechaResolucion.Value = fechaResolucion.Value
+            dtpFechaResolucion.Enabled = True
+            chkSinFechaResolucion.Checked = False
+        Else
+            dtpFechaResolucion.Enabled = False
+            chkSinFechaResolucion.Checked = True
         End If
     End Sub
 
@@ -263,9 +293,15 @@ Public Class frmFuncionarioEstadoTransitorio
         End Select
     End Sub
 
+    ' >>> MODIFICADO: Se añade el manejo de visibilidad para los controles de Fecha Resolución
     Private Sub ShowExtra(showResol As Boolean, showDiag As Boolean, showReten As Boolean, showCargos As Boolean)
         lblResolucion.Visible = showResol
         txtResolucion.Visible = showResol
+        ' --- Nuevos controles ---
+        lblFechaResolucion.Visible = showResol
+        dtpFechaResolucion.Visible = showResol
+        chkSinFechaResolucion.Visible = showResol
+        ' --- Fin nuevos controles ---
         lblDiagnostico.Visible = showDiag
         txtDiagnostico.Visible = showDiag
         lblTurnoReten.Visible = showReten
@@ -302,6 +338,11 @@ Public Class frmFuncionarioEstadoTransitorio
         dtpFechaHasta.Enabled = Not chkFechaHasta.Checked
     End Sub
 
+    ' >>> NOVEDAD: Evento para el nuevo CheckBox
+    Private Sub chkSinFechaResolucion_CheckedChanged(sender As Object, e As EventArgs) Handles chkSinFechaResolucion.CheckedChanged
+        dtpFechaResolucion.Enabled = Not chkSinFechaResolucion.Checked
+    End Sub
+
     Private Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
         If _readOnly Then
             Close()
@@ -315,6 +356,8 @@ Public Class frmFuncionarioEstadoTransitorio
 
         Dim tipoId As Integer = CInt(cboTipoEstado.SelectedValue)
         Dim fechaHastaSel As Date? = If(chkFechaHasta.Checked Or Not chkFechaHasta.Visible, CType(Nothing, Date?), dtpFechaHasta.Value.Date)
+        ' >>> NOVEDAD: Capturar el valor de la nueva fecha de resolución
+        Dim fechaResolucionSel As Date? = If(chkSinFechaResolucion.Checked Or Not chkSinFechaResolucion.Visible, CType(Nothing, Date?), dtpFechaResolucion.Value.Date)
 
         If tipoId <> 5 AndAlso tipoId <> 31 AndAlso fechaHastaSel.HasValue AndAlso fechaHastaSel.Value < dtpFechaDesde.Value.Date Then
             MessageBox.Show("La fecha de fin no puede ser anterior a la fecha de inicio.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
@@ -330,6 +373,8 @@ Public Class frmFuncionarioEstadoTransitorio
                 d.FechaHasta = fechaHastaSel
                 d.Observaciones = txtObservaciones.Text.Trim()
                 d.DocResolucion = txtResolucion.Text.Trim()
+                ' >>> NOVEDAD: Guardar fecha de resolución
+                ' d.FechaResolucion = fechaResolucionSel
                 Estado.DesignacionDetalle = d
 
             Case 2 ' Enfermedad
@@ -346,6 +391,8 @@ Public Class frmFuncionarioEstadoTransitorio
                 d.FechaHasta = fechaHastaSel
                 d.Observaciones = txtObservaciones.Text.Trim()
                 d.Resolucion = txtResolucion.Text.Trim()
+                ' >>> NOVEDAD: Guardar fecha de resolución
+                ' d.FechaResolucion = fechaResolucionSel
                 Estado.SancionDetalle = d
 
             Case 4 ' OrdenCinco
@@ -368,6 +415,8 @@ Public Class frmFuncionarioEstadoTransitorio
                 d.FechaHasta = fechaHastaSel
                 d.Observaciones = txtObservaciones.Text.Trim()
                 d.Expediente = txtResolucion.Text.Trim()
+                ' >>> NOVEDAD: Guardar fecha de resolución
+                ' d.FechaResolucion = fechaResolucionSel
                 Estado.SumarioDetalle = d
 
             Case 21 ' Traslado
@@ -390,13 +439,9 @@ Public Class frmFuncionarioEstadoTransitorio
                     Return
                 End If
 
-                ' Asegurar funcionario cargado si estamos editando
                 If Estado.Funcionario Is Nothing AndAlso Estado.Id > 0 Then
-                    Try
-                        _unitOfWork.Context.Entry(Estado).Reference(Function(x) x.Funcionario).Load()
-                    Catch
-                        ' ignorar
-                    End Try
+                    Try : _unitOfWork.Context.Entry(Estado).Reference(Function(x) x.Funcionario).Load()
+                    Catch : End Try
                 End If
 
                 Dim cargoActualId As Integer? = Estado.Funcionario?.CargoId
@@ -442,9 +487,9 @@ Public Class frmFuncionarioEstadoTransitorio
                 d.Resolucion = txtResolucion.Text.Trim()
                 d.CargoAnteriorId = cargoActualId.Value
                 d.CargoNuevoId = cargoNuevoId
+                ' >>> NOVEDAD: Guardar fecha de resolución
+                ' d.FechaResolucion = fechaResolucionSel
                 Estado.CambioDeCargoDetalle = d
-
-                ' Actualizar cargo del funcionario
                 Estado.Funcionario.CargoId = cargoNuevoId
 
             Case 31 ' Reactivación de Funcionario
@@ -452,6 +497,8 @@ Public Class frmFuncionarioEstadoTransitorio
                 d.FechaDesde = dtpFechaDesde.Value.Date
                 d.Observaciones = txtObservaciones.Text.Trim()
                 d.Resolucion = txtResolucion.Text.Trim()
+                ' >>> NOVEDAD: Guardar fecha de resolución
+                ' d.FechaResolucion = fechaResolucionSel
                 Estado.ReactivacionDeFuncionarioDetalle = d
 
             Case 32 ' Separación del Cargo
@@ -467,6 +514,8 @@ Public Class frmFuncionarioEstadoTransitorio
                 d.FechaHasta = fechaHastaSel
                 d.Observaciones = txtObservaciones.Text.Trim()
                 d.Expediente = txtResolucion.Text.Trim()
+                ' >>> NOVEDAD: Guardar fecha de resolución
+                ' d.FechaResolucion = fechaResolucionSel
                 Estado.InicioDeProcesamientoDetalle = d
 
             Case 34 ' Desarmado
@@ -711,27 +760,20 @@ Public Class frmFuncionarioEstadoTransitorio
         If e.KeyCode = Keys.Escape Then btnCancelar.PerformClick()
     End Sub
 
-    ' ===== Helper seguro para "Cambio de Cargo" =====
     Private Sub SetCargoAnteriorDesdeFuncionario()
-        ' Si el estado ya existe y la navegación no vino cargada, intentar cargarla
         If Estado IsNot Nothing AndAlso Estado.Id > 0 AndAlso Estado.Funcionario Is Nothing Then
-            Try
-                _unitOfWork.Context.Entry(Estado).Reference(Function(e) e.Funcionario).Load()
-            Catch
-                ' ignorar si no carga
-            End Try
+            Try : _unitOfWork.Context.Entry(Estado).Reference(Function(e) e.Funcionario).Load()
+            Catch : End Try
         End If
 
         Dim cargoAnteriorId As Integer? = Nothing
 
-        ' Si estamos editando y ya existe un detalle de cambio, usamos ese cargo anterior
         If Estado?.CambioDeCargoDetalle IsNot Nothing AndAlso Estado.CambioDeCargoDetalle.CargoAnteriorId > 0 Then
             cargoAnteriorId = Estado.CambioDeCargoDetalle.CargoAnteriorId
         ElseIf Estado IsNot Nothing AndAlso Estado.Funcionario IsNot Nothing Then
             cargoAnteriorId = Estado.Funcionario.CargoId
         End If
 
-        ' Preparar combo seguro
         cboCargoAnterior.SelectedIndex = -1
 
         If cargoAnteriorId.HasValue AndAlso _listaCargos IsNot Nothing AndAlso

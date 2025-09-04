@@ -46,6 +46,8 @@ Public NotInheritable Class TiposEstadoCatalog
         Next
 
         ' ---- Aliases / sinónimos frecuentes (CORREGIDOS Y AMPLIADOS) ----
+        ' **CORRECCIÓN**: Las licencias médicas son un tipo de estado transitorio de "Enfermedad".
+        ' Se corrige el alias para que apunte al tipo correcto en lugar de a "Licencia".
         AddAlias(dict, "Orden 5", "Orden Cinco")
         AddAlias(dict, "Orden V", "Orden Cinco")
         AddAlias(dict, "Baja", "Baja de Funcionario")
@@ -54,8 +56,8 @@ Public NotInheritable Class TiposEstadoCatalog
         AddAlias(dict, "Procesamiento", "Inicio de Procesamiento")
         AddAlias(dict, "Separacion Cargo", "Separación del Cargo")
         AddAlias(dict, "Reten", "Retén")
-        AddAlias(dict, "Licencia Medica", "Licencia")
-        AddAlias(dict, "Licencia por enfermedad", "Licencia")
+        AddAlias(dict, "Licencia Medica", "Enfermedad")
+        AddAlias(dict, "Licencia por enfermedad", "Enfermedad")
 
 
         _byName = dict
@@ -192,10 +194,11 @@ Public NotInheritable Class TiposEstadoCatalog
         End Get
     End Property
 
-    ' NUEVA PROPIEDAD AÑADIDA
-    Public Shared ReadOnly Property Licencia As Integer
-        Get
-            Return IdDe("Licencia")
-        End Get
-    End Property
+    ' **PROPIEDAD ELIMINADA**: La "Licencia" no es un TipoEstadoTransitorio.
+    ' Las licencias por enfermedad se gestionan a través del estado "Enfermedad".
+    ' Public Shared ReadOnly Property Licencia As Integer
+    '     Get
+    '         Return IdDe("Licencia")
+    '     End Get
+    ' End Property
 End Class
