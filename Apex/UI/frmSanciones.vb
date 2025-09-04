@@ -1,15 +1,49 @@
-﻿' Apex/UI/frmGestionSanciones.vb
+﻿' Apex/UI/frmSanciones.vb
+Imports System.Data.Entity
+
 Public Class frmSanciones
 
     Private _sancionSvc As New SancionService()
+    Private _tipoLicenciaSvc As New GenericService(Of TipoLicencia)(New UnitOfWork())
+    Private WithEvents SearchTimer As New System.Windows.Forms.Timer()
 
-    Private Sub frmGestionSanciones_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Private Async Sub frmGestionSanciones_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
         ConfigurarGrillaSanciones()
+
+        Await CargarCombosAsync()
+
+        ' Configura el temporizador para la búsqueda automática
+        SearchTimer.Interval = 500 ' 500 ms de espera
+        AddHandler txtBusquedaSancion.TextChanged, AddressOf IniciarTemporizador
+        AddHandler cmbTipoLicencia.SelectedIndexChanged, AddressOf IniciarTemporizador
+        AddHandler SearchTimer.Tick, AddressOf Temporizador_Tick
+
         txtBusquedaSancion.Focus()
     End Sub
 
 #Region "Configuración y Carga de Datos"
+
+    Private Async Function CargarCombosAsync() As Task
+        Const CATEGORIA_SANCION_ID As Integer = 3
+
+        ' --- CORRECCIÓN CLAVE: Se ajusta la forma de llamar al servicio ---
+        ' 1. Obtenemos el IQueryable (la base de la consulta)
+        Dim query = _tipoLicenciaSvc.GetAll()
+
+        ' 2. Construimos la consulta y la ejecutamos con ToListAsync
+        Dim tiposLicencia = Await query.Where(Function(tl) tl.CategoriaAusenciaId = CATEGORIA_SANCION_ID) _
+                                     .ToListAsync()
+        ' --- FIN DE LA CORRECCIÓN ---
+
+        ' Añade un item para "Todos" al principio
+        Dim listaConTodos = tiposLicencia.OrderBy(Function(x) x.Nombre).ToList()
+        listaConTodos.Insert(0, New TipoLicencia With {.Id = 0, .Nombre = "[TODOS]"})
+
+        cmbTipoLicencia.DataSource = listaConTodos
+        cmbTipoLicencia.DisplayMember = "Nombre"
+        cmbTipoLicencia.ValueMember = "Id"
+    End Function
 
     Private Sub ConfigurarGrillaSanciones()
         With dgvSanciones
@@ -37,14 +71,21 @@ Public Class frmSanciones
 
     Private Async Function CargarDatosSancionesAsync() As Task
         Dim filtro = txtBusquedaSancion.Text.Trim()
-        If String.IsNullOrWhiteSpace(filtro) Then
+        Dim tipoLicenciaId As Integer? = Nothing
+
+        If cmbTipoLicencia.SelectedValue IsNot Nothing AndAlso CInt(cmbTipoLicencia.SelectedValue) > 0 Then
+            tipoLicenciaId = CInt(cmbTipoLicencia.SelectedValue)
+        End If
+
+        If String.IsNullOrWhiteSpace(filtro) AndAlso Not tipoLicenciaId.HasValue Then
             dgvSanciones.DataSource = Nothing
             Return
         End If
+
         LoadingHelper.MostrarCargando(Me)
         Try
             dgvSanciones.DataSource = Nothing
-            dgvSanciones.DataSource = Await _sancionSvc.GetAllConDetallesAsync(filtro)
+            dgvSanciones.DataSource = Await _sancionSvc.GetAllConDetallesAsync(filtro, Nothing, Nothing, tipoLicenciaId)
         Catch ex As Exception
             MessageBox.Show("Error al cargar sanciones: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         Finally
@@ -56,9 +97,20 @@ Public Class frmSanciones
 
 #Region "Manejo de Búsqueda"
 
+    Private Sub IniciarTemporizador(sender As Object, e As EventArgs)
+        SearchTimer.Stop()
+        SearchTimer.Start()
+    End Sub
+
+    Private Async Sub Temporizador_Tick(sender As Object, e As EventArgs)
+        SearchTimer.Stop()
+        Await CargarDatosSancionesAsync()
+    End Sub
+
     Private Async Sub txtBusquedaSancion_KeyDown(sender As Object, e As KeyEventArgs) Handles txtBusquedaSancion.KeyDown
         If e.KeyCode = Keys.Enter Then
             e.SuppressKeyPress = True
+            SearchTimer.Stop()
             Await CargarDatosSancionesAsync()
         End If
     End Sub

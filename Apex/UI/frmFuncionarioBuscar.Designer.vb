@@ -24,7 +24,6 @@ Partial Class frmFuncionarioBuscar
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.panelFiltros = New System.Windows.Forms.Panel()
-        Me.btnBuscar = New System.Windows.Forms.Button()
         Me.txtBusqueda = New System.Windows.Forms.TextBox()
         Me.lblBuscar = New System.Windows.Forms.Label()
         Me.splitContenedor = New System.Windows.Forms.SplitContainer()
@@ -63,7 +62,6 @@ Partial Class frmFuncionarioBuscar
         'panelFiltros
         '
         Me.panelFiltros.BackColor = System.Drawing.Color.WhiteSmoke
-        Me.panelFiltros.Controls.Add(Me.btnBuscar)
         Me.panelFiltros.Controls.Add(Me.txtBusqueda)
         Me.panelFiltros.Controls.Add(Me.lblBuscar)
         Me.panelFiltros.Dock = System.Windows.Forms.DockStyle.Top
@@ -72,16 +70,6 @@ Partial Class frmFuncionarioBuscar
         Me.panelFiltros.Name = "panelFiltros"
         Me.panelFiltros.Size = New System.Drawing.Size(1686, 92)
         Me.panelFiltros.TabIndex = 0
-        '
-        'btnBuscar
-        '
-        Me.btnBuscar.Location = New System.Drawing.Point(465, 28)
-        Me.btnBuscar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnBuscar.Name = "btnBuscar"
-        Me.btnBuscar.Size = New System.Drawing.Size(127, 39)
-        Me.btnBuscar.TabIndex = 2
-        Me.btnBuscar.Text = "Buscar"
-        Me.btnBuscar.UseVisualStyleBackColor = True
         '
         'txtBusqueda
         '
@@ -433,7 +421,6 @@ Partial Class frmFuncionarioBuscar
     Friend WithEvents panelFiltros As System.Windows.Forms.Panel
     Friend WithEvents lblBuscar As System.Windows.Forms.Label
     Friend WithEvents txtBusqueda As System.Windows.Forms.TextBox
-    Friend WithEvents btnBuscar As System.Windows.Forms.Button
     Friend WithEvents splitContenedor As System.Windows.Forms.SplitContainer
     Friend WithEvents dgvResultados As System.Windows.Forms.DataGridView
     Friend WithEvents panelDetalle As System.Windows.Forms.Panel

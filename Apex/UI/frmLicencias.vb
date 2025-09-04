@@ -10,7 +10,7 @@ Public Class frmLicencias
     Private ReadOnly _licenciaSvc As New LicenciaService()
 
     ' --- Suscripción al notificador ---
-    Private Async Sub frmGestionLicencias_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Private Sub frmGestionLicencias_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
         ConfigurarGrillaLicencias()
         txtBusquedaLicencia.Focus()

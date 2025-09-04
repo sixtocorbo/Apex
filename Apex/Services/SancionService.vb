@@ -1,4 +1,5 @@
-﻿Imports System.Data.Entity
+﻿' Apex/Services/SancionService.vb
+Imports System.Data.Entity
 Imports System.Data.SqlClient
 
 Public Class SancionService
@@ -18,10 +19,13 @@ Public Class SancionService
         End Get
     End Property
 
+    ' --- MODIFICACIÓN INICIO ---
+    ' Se añade el parámetro opcional tipoLicenciaId
     Public Async Function GetAllConDetallesAsync(
         Optional filtroNombre As String = "",
         Optional fechaDesde As Date? = Nothing,
-        Optional fechaHasta As Date? = Nothing
+        Optional fechaHasta As Date? = Nothing,
+        Optional tipoLicenciaId As Integer? = Nothing
     ) As Task(Of List(Of vw_SancionesCompletas))
 
         Dim sqlBuilder As New System.Text.StringBuilder("SELECT * FROM vw_SancionesCompletas WHERE 1=1")
@@ -44,6 +48,14 @@ Public Class SancionService
             sqlBuilder.Append($" AND FuncionarioId IN (SELECT Id FROM dbo.Funcionario WHERE CONTAINS((Nombre, CI), @p{parameters.Count}))")
             parameters.Add(New SqlParameter($"@p{parameters.Count}", expresionFts))
         End If
+
+        ' Nuevo filtro por TipoLicenciaId
+        If tipoLicenciaId.HasValue AndAlso tipoLicenciaId.Value > 0 Then
+            ' **NOTA**: Asegúrate de que tu vista SQL (vw_SancionesCompletas) tenga la columna TipoLicenciaId
+            sqlBuilder.Append(" AND TipoLicenciaId = @p" & parameters.Count)
+            parameters.Add(New SqlParameter("@p" & parameters.Count, tipoLicenciaId.Value))
+        End If
+        ' --- MODIFICACIÓN FIN ---
 
         sqlBuilder.Append(" ORDER BY FechaDesde DESC")
 

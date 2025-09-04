@@ -2,6 +2,7 @@
 Partial Class frmSanciones
     Inherits System.Windows.Forms.Form
 
+    'Form overrides dispose to clean up the component list.
     <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
@@ -13,8 +14,12 @@ Partial Class frmSanciones
         End Try
     End Sub
 
+    'Required by the Windows Form Designer
     Private components As System.ComponentModel.IContainer
 
+    'NOTE: The following procedure is required by the Windows Form Designer
+    'It can be modified using the Windows Form Designer.  
+    'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.dgvSanciones = New System.Windows.Forms.DataGridView()
@@ -23,6 +28,8 @@ Partial Class frmSanciones
         Me.btnEditarSancion = New System.Windows.Forms.Button()
         Me.btnNuevaSancion = New System.Windows.Forms.Button()
         Me.PanelBusquedaSanciones = New System.Windows.Forms.Panel()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.cmbTipoLicencia = New System.Windows.Forms.ComboBox()
         Me.txtBusquedaSancion = New System.Windows.Forms.TextBox()
         Me.Label3 = New System.Windows.Forms.Label()
         CType(Me.dgvSanciones, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -92,6 +99,8 @@ Partial Class frmSanciones
         '
         'PanelBusquedaSanciones
         '
+        Me.PanelBusquedaSanciones.Controls.Add(Me.Label1)
+        Me.PanelBusquedaSanciones.Controls.Add(Me.cmbTipoLicencia)
         Me.PanelBusquedaSanciones.Controls.Add(Me.txtBusquedaSancion)
         Me.PanelBusquedaSanciones.Controls.Add(Me.Label3)
         Me.PanelBusquedaSanciones.Dock = System.Windows.Forms.DockStyle.Top
@@ -100,12 +109,30 @@ Partial Class frmSanciones
         Me.PanelBusquedaSanciones.Size = New System.Drawing.Size(900, 62)
         Me.PanelBusquedaSanciones.TabIndex = 3
         '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(430, 18)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(114, 20)
+        Me.Label1.TabIndex = 3
+        Me.Label1.Text = "Tipo Sanción:"
+        '
+        'cmbTipoLicencia
+        '
+        Me.cmbTipoLicencia.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cmbTipoLicencia.FormattingEnabled = True
+        Me.cmbTipoLicencia.Location = New System.Drawing.Point(550, 14)
+        Me.cmbTipoLicencia.Name = "cmbTipoLicencia"
+        Me.cmbTipoLicencia.Size = New System.Drawing.Size(280, 28)
+        Me.cmbTipoLicencia.TabIndex = 2
+        '
         'txtBusquedaSancion
         '
         Me.txtBusquedaSancion.Location = New System.Drawing.Point(131, 14)
         Me.txtBusquedaSancion.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.txtBusquedaSancion.Name = "txtBusquedaSancion"
-        Me.txtBusquedaSancion.Size = New System.Drawing.Size(380, 26)
+        Me.txtBusquedaSancion.Size = New System.Drawing.Size(280, 26)
         Me.txtBusquedaSancion.TabIndex = 1
         '
         'Label3
@@ -144,4 +171,6 @@ Partial Class frmSanciones
     Friend WithEvents PanelBusquedaSanciones As Panel
     Friend WithEvents txtBusquedaSancion As TextBox
     Friend WithEvents Label3 As Label
+    Friend WithEvents cmbTipoLicencia As ComboBox
+    Friend WithEvents Label1 As Label
 End Class

@@ -22,7 +22,12 @@ Public Class frmFuncionarioBuscar
     Private Const LIMITE_FILAS As Integer = 500
     Private _detallesEstadoActual As New List(Of String)
 
+    ' Temporizador para la búsqueda automática.
+    ' Se especifica el namespace completo para evitar la ambigüedad.
+    Private WithEvents SearchTimer As New System.Windows.Forms.Timer()
+
     Public ReadOnly Property FuncionarioSeleccionado As FuncionarioMin
+
         Get
             If dgvResultados.CurrentRow IsNot Nothing Then
                 Return CType(dgvResultados.CurrentRow.DataBoundItem, FuncionarioMin)
@@ -33,6 +38,7 @@ Public Class frmFuncionarioBuscar
 
     Public Sub New()
         InitializeComponent()
+
         _modo = ModoApertura.Navegacion
         FlowLayoutPanelAcciones.Visible = False
     End Sub
@@ -52,8 +58,24 @@ Public Class frmFuncionarioBuscar
         AddHandler btnVerSituacion.Click, AddressOf btnVerSituacion_Click
         AddHandler btnGenerarFicha.Click, AddressOf btnGenerarFicha_Click
         AddHandler NotificadorEventos.DatosActualizados, AddressOf OnDatosActualizados
+
+        ' Configurar el temporizador de búsqueda
+        SearchTimer.Interval = 500 ' 500ms de espera antes de buscar
+        AddHandler SearchTimer.Tick, AddressOf SearchTimer_Tick
+        AddHandler txtBusqueda.TextChanged, AddressOf txtBusqueda_TextChanged
     End Sub
 
+    Private Sub txtBusqueda_TextChanged(sender As Object, e As EventArgs)
+        ' Reiniciar el temporizador cada vez que el texto cambia
+        SearchTimer.Stop()
+        SearchTimer.Start()
+    End Sub
+
+    Private Async Sub SearchTimer_Tick(sender As Object, e As EventArgs)
+        ' Cuando el temporizador se cumple, detenerlo y ejecutar la búsqueda
+        SearchTimer.Stop()
+        Await BuscarAsync()
+    End Sub
 
     ''' <summary>
     ''' Este método se ejecutará automáticamente cuando otro formulario notifique un cambio.
@@ -81,6 +103,7 @@ Public Class frmFuncionarioBuscar
             .RowTemplate.MinimumHeight = 40
             .Columns.Clear()
 
+
             .Columns.Add(New DataGridViewTextBoxColumn With {
                 .Name = "Id",
                 .DataPropertyName = "Id",
@@ -102,7 +125,11 @@ Public Class frmFuncionarioBuscar
             })
         End With
 
-        AddHandler dgvResultados.SelectionChanged, AddressOf MostrarDetalle
+        ' --- CAMBIO REALIZADO AQUÍ ---
+        ' Cambiamos el evento para que la actualización con las teclas sea robusta.
+        AddHandler dgvResultados.CurrentCellChanged, AddressOf MostrarDetalle
+        ' --- FIN DEL CAMBIO ---
+
         AddHandler dgvResultados.CellDoubleClick, AddressOf OnDgvDoubleClick
         AddHandler dgvResultados.DataError, Sub(s, ev) ev.ThrowException = False
     End Sub
@@ -118,7 +145,6 @@ Public Class frmFuncionarioBuscar
         End If
 
         LoadingHelper.MostrarCargando(Me)
-        btnBuscar.Enabled = False
 
         Try
             Using uow As New UnitOfWork()
@@ -175,18 +201,16 @@ Public Class frmFuncionarioBuscar
 
         Finally
             LoadingHelper.OcultarCargando(Me)
-            btnBuscar.Enabled = True
         End Try
     End Function
 
-    Private Async Sub txtBusqueda_KeyDown(sender As Object, e As KeyEventArgs) _
+    ' --- MÉTODO CORREGIDO: Se quita "Async" ---
+    Private Sub txtBusqueda_KeyDown(sender As Object, e As KeyEventArgs) _
     Handles txtBusqueda.KeyDown
 
         If e.KeyCode = Keys.Enter Then
             e.Handled = True
             e.SuppressKeyPress = True
-            Await BuscarAsync()
-            Return
         End If
 
         If dgvResultados.Rows.Count = 0 Then Return
@@ -215,9 +239,6 @@ Public Class frmFuncionarioBuscar
     End Sub
 #End Region
 
-    Private Async Sub btnBuscar_Click(sender As Object, e As EventArgs) Handles btnBuscar.Click
-        Await BuscarAsync()
-    End Sub
 
 #Region "Detalle lateral (Foto on-demand)"
     Private Async Sub MostrarDetalle(sender As Object, e As EventArgs)
