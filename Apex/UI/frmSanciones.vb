@@ -1,9 +1,9 @@
-﻿' Apex/UI/frmSanciones.vb
-Imports System.Data.Entity
+﻿Imports System.Data.Entity
 
 Public Class frmSanciones
 
-    Private _sancionSvc As New SancionService()
+    ' --- CORRECCIÓN 1: Usar el servicio de licencias ---
+    Private _licenciaSvc As New LicenciaService()
     Private _tipoLicenciaSvc As New GenericService(Of TipoLicencia)(New UnitOfWork())
     Private WithEvents SearchTimer As New System.Windows.Forms.Timer()
 
@@ -12,6 +12,7 @@ Public Class frmSanciones
         ConfigurarGrillaSanciones()
 
         Await CargarCombosAsync()
+        Await CargarDatosSancionesAsync() ' <-- AÑADIDO: Carga los datos al abrir el formulario
 
         ' Configura el temporizador para la búsqueda automática
         SearchTimer.Interval = 500 ' 500 ms de espera
@@ -25,18 +26,8 @@ Public Class frmSanciones
 #Region "Configuración y Carga de Datos"
 
     Private Async Function CargarCombosAsync() As Task
-        Const CATEGORIA_SANCION_ID As Integer = 3
-
-        ' --- CORRECCIÓN CLAVE: Se ajusta la forma de llamar al servicio ---
-        ' 1. Obtenemos el IQueryable (la base de la consulta)
-        Dim query = _tipoLicenciaSvc.GetAll()
-
-        ' 2. Construimos la consulta y la ejecutamos con ToListAsync
-        Dim tiposLicencia = Await query.Where(Function(tl) tl.CategoriaAusenciaId = CATEGORIA_SANCION_ID) _
-                                     .ToListAsync()
-        ' --- FIN DE LA CORRECCIÓN ---
-
-        ' Añade un item para "Todos" al principio
+        Dim todosLosTipos As List(Of TipoLicencia) = Await _tipoLicenciaSvc.GetAllAsync()
+        Dim tiposLicencia = todosLosTipos.Where(Function(tl) tl.CategoriaAusenciaId = ModConstantesApex.CATEGORIA_ID_SANCION_GRAVE Or tl.CategoriaAusenciaId = ModConstantesApex.CATEGORIA_ID_SANCION_LEVE).ToList()
         Dim listaConTodos = tiposLicencia.OrderBy(Function(x) x.Nombre).ToList()
         listaConTodos.Insert(0, New TipoLicencia With {.Id = 0, .Nombre = "[TODOS]"})
 
@@ -56,16 +47,18 @@ Public Class frmSanciones
             .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Id", .DataPropertyName = "Id", .Visible = False})
             .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "NombreFuncionario", .DataPropertyName = "NombreFuncionario", .HeaderText = "Funcionario", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
 
-            Dim colDesde As New DataGridViewTextBoxColumn With {.Name = "FechaDesde", .DataPropertyName = "FechaDesde", .HeaderText = "Desde", .Width = 100}
+            ' --- CORRECCIÓN 2: Ajustar los DataPropertyName a la vista vw_LicenciasCompletas ---
+            Dim colDesde As New DataGridViewTextBoxColumn With {.Name = "FechaDesde", .DataPropertyName = "FechaInicio", .HeaderText = "Desde", .Width = 100}
             colDesde.DefaultCellStyle.Format = "dd/MM/yyyy"
             .Columns.Add(colDesde)
 
-            Dim colHasta As New DataGridViewTextBoxColumn With {.Name = "FechaHasta", .DataPropertyName = "FechaHasta", .HeaderText = "Hasta", .Width = 100}
+            Dim colHasta As New DataGridViewTextBoxColumn With {.Name = "FechaHasta", .DataPropertyName = "FechaFin", .HeaderText = "Hasta", .Width = 100}
             colHasta.DefaultCellStyle.Format = "dd/MM/yyyy"
             .Columns.Add(colHasta)
 
-            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Resolucion", .DataPropertyName = "Resolucion", .HeaderText = "Resolución", .Width = 120})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Observaciones", .DataPropertyName = "Observaciones", .HeaderText = "Observaciones", .Width = 200})
+            ' La columna 'Resolucion' no existe en HistoricoLicencia, la reemplazamos por 'Estado'
+            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Estado", .DataPropertyName = "Estado", .HeaderText = "Estado", .Width = 120})
+            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Observaciones", .DataPropertyName = "Comentario", .HeaderText = "Observaciones", .Width = 200})
         End With
     End Sub
 
@@ -77,15 +70,11 @@ Public Class frmSanciones
             tipoLicenciaId = CInt(cmbTipoLicencia.SelectedValue)
         End If
 
-        If String.IsNullOrWhiteSpace(filtro) AndAlso Not tipoLicenciaId.HasValue Then
-            dgvSanciones.DataSource = Nothing
-            Return
-        End If
-
         LoadingHelper.MostrarCargando(Me)
         Try
             dgvSanciones.DataSource = Nothing
-            dgvSanciones.DataSource = Await _sancionSvc.GetAllConDetallesAsync(filtro, Nothing, Nothing, tipoLicenciaId)
+            ' Llama al servicio de licencias para obtener las que son sanciones
+            dgvSanciones.DataSource = Await _licenciaSvc.GetSancionesAsync(filtro, tipoLicenciaId)
         Catch ex As Exception
             MessageBox.Show("Error al cargar sanciones: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         Finally
@@ -120,7 +109,10 @@ Public Class frmSanciones
 #Region "Acciones para Sanciones"
 
     Private Async Sub btnNuevaSancion_Click(sender As Object, e As EventArgs) Handles btnNuevaSancion.Click
-        Using frm As New frmSancionCrear()
+        ' Al crear una nueva sanción, se debe abrir un formulario para crear una LICENCIA
+        Using frm As New frmLicenciaCrear() ' Asumimos que existe un frmLicenciaCrear
+            ' Opcionalmente, se puede pasar un parámetro para filtrar solo tipos de sanción
+            ' frm.CategoriaFiltro = "Sanción" 
             If frm.ShowDialog(Me) = DialogResult.OK Then
                 Await CargarDatosSancionesAsync()
             End If
@@ -129,17 +121,22 @@ Public Class frmSanciones
 
     Private Async Sub btnEditarSancion_Click(sender As Object, e As EventArgs) Handles btnEditarSancion.Click
         If dgvSanciones.CurrentRow Is Nothing Then Return
-        Dim sancionSeleccionada = CType(dgvSanciones.CurrentRow.DataBoundItem, vw_SancionesCompletas)
-        If sancionSeleccionada Is Nothing Then Return
 
-        Dim idSeleccionado = sancionSeleccionada.Id
-        Using frm As New frmSancionCrear()
-            frm.SancionId = idSeleccionado
-            If frm.ShowDialog(Me) = DialogResult.OK Then
-                Await CargarDatosSancionesAsync()
-            End If
-        End Using
-    End Sub
+        ' --- CORRECCIÓN 1: Asegurarse de que el tipo de dato es el correcto ---
+        Dim sancionSeleccionada = TryCast(dgvSanciones.CurrentRow.DataBoundItem, vw_LicenciasCompletas)
+            If sancionSeleccionada Is Nothing Then Return
+
+            Dim idSeleccionado = sancionSeleccionada.Id
+            Dim estadoActual = sancionSeleccionada.Estado
+
+            ' --- CORRECCIÓN 2: Usar el constructor correcto para editar ---
+            ' Se le pasa el ID y el estado actual directamente al crearlo.
+            Using frm As New frmLicenciaCrear(idSeleccionado, estadoActual)
+                If frm.ShowDialog(Me) = DialogResult.OK Then
+                    Await CargarDatosSancionesAsync()
+                End If
+            End Using
+End Sub
 
     Private Async Sub btnEliminarSancion_Click(sender As Object, e As EventArgs) Handles btnEliminarSancion.Click
         If dgvSanciones.CurrentRow Is Nothing Then Return
@@ -147,7 +144,8 @@ Public Class frmSanciones
         Dim nombre = dgvSanciones.CurrentRow.Cells("NombreFuncionario").Value.ToString()
         If MessageBox.Show($"¿Está seguro de que desea eliminar la sanción para '{nombre}'?", "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
             Try
-                Await _sancionSvc.DeleteAsync(idSeleccionado)
+                ' --- CORRECCIÓN 3: Usar el servicio de licencias para eliminar ---
+                Await _licenciaSvc.DeleteAsync(idSeleccionado)
                 Await CargarDatosSancionesAsync()
             Catch ex As Exception
                 MessageBox.Show("Error al eliminar la sanción: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)

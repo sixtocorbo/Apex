@@ -16,6 +16,7 @@ Partial Public Class EnfermedadDetalle
     Public Property FechaHasta As Nullable(Of Date)
     Public Property Observaciones As String
     Public Property Diagnostico As String
+    Public Property FechaResolucion As Nullable(Of Date)
 
     Public Overridable Property EstadoTransitorio As EstadoTransitorio
 

@@ -356,7 +356,40 @@ Public Class LicenciaService
         soloActivos:=soloActivos
     )
     End Function
+    Public Async Function GetSancionesAsync(
+        Optional filtro As String = "",
+        Optional tipoLicenciaId As Integer? = Nothing) As Task(Of List(Of vw_LicenciasCompletas))
 
+        ' Usamos la vista correcta: vw_LicenciasCompletas
+        Dim query = _unitOfWork.Repository(Of vw_LicenciasCompletas)().GetAll()
+
+        ' Filtro por texto de búsqueda
+        If Not String.IsNullOrWhiteSpace(filtro) Then
+            query = query.Where(Function(s) s.NombreFuncionario.Contains(filtro) Or s.CI.Contains(filtro))
+        End If
+
+        If tipoLicenciaId.HasValue AndAlso tipoLicenciaId.Value > 0 Then
+            ' Filtra por un tipo de sanción específico
+            query = query.Where(Function(s) s.TipoLicenciaId = tipoLicenciaId.Value)
+        Else
+            ' Si no hay un tipo específico, trae TODAS las licencias que sean de categoría Sanción
+            Dim idsCategoriasSancion As New List(Of Integer) From {
+                ModConstantesApex.CATEGORIA_ID_SANCION_LEVE,
+                ModConstantesApex.CATEGORIA_ID_SANCION_GRAVE
+            }
+
+            ' Para esto, necesitamos unir con TipoLicencia para acceder a CategoriaAusenciaId
+            Dim licenciasQuery = _unitOfWork.Repository(Of TipoLicencia)().GetAll()
+            Dim idsLicenciasSancion = Await licenciasQuery _
+                .Where(Function(tl) idsCategoriasSancion.Contains(tl.CategoriaAusenciaId)) _
+                .Select(Function(tl) tl.Id) _
+                .ToListAsync()
+
+            query = query.Where(Function(s) idsLicenciasSancion.Contains(s.TipoLicenciaId))
+        End If
+
+        Return Await query.OrderByDescending(Function(s) s.FechaInicio).ToListAsync()
+    End Function
 End Class
 
 ' ---- DTO para el SqlQuery de GetAllConDetallesAsync ----

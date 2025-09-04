@@ -12,7 +12,7 @@ Public Class frmConfiguracion
     Private _gestionTiposEstadoTransitorioInstancia As frmEstadoTransitorioTipos
     Private _gestionCategoriasAusenciaInstancia As frmIncidenciasCategorias
 
-    Private Sub btnGestionarIncidencias_Click(sender As Object, e As EventArgs)
+    Private Sub btnGestionarIncidencias_Click(sender As Object, e As EventArgs) Handles btnGestionarIncidencias.Click
         If _gestionIncidenciasInstancia Is Nothing OrElse _gestionIncidenciasInstancia.IsDisposed Then
             _gestionIncidenciasInstancia = New frmIncidencias()
         End If
@@ -52,14 +52,6 @@ Public Class frmConfiguracion
         parentDashboard.AbrirFormEnPanel(_gestionTurnosInstancia)
     End Sub
 
-    Private Sub btnNomenclaturas_Click(sender As Object, e As EventArgs) Handles btnNomenclaturas.Click
-        If _gestionNomenclaturasInstancia Is Nothing OrElse _gestionNomenclaturasInstancia.IsDisposed Then
-            _gestionNomenclaturasInstancia = New frmNomenclaturas()
-        End If
-        Dim parentDashboard As frmDashboard = CType(Me.ParentForm, frmDashboard)
-        parentDashboard.AbrirFormEnPanel(_gestionNomenclaturasInstancia)
-    End Sub
-
     Private Sub btnTiposEstadoTransitorio_Click(sender As Object, e As EventArgs)
         If _gestionTiposEstadoTransitorioInstancia Is Nothing OrElse _gestionTiposEstadoTransitorioInstancia.IsDisposed Then
             _gestionTiposEstadoTransitorioInstancia = New frmEstadoTransitorioTipos()
@@ -79,4 +71,6 @@ Public Class frmConfiguracion
     Private Sub frmConfiguracion_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
     End Sub
+
+
 End Class
