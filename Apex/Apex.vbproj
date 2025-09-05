@@ -308,9 +308,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
-    <Compile Include="Data\Movimiento.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
-    </Compile>
     <Compile Include="Data\NivelEstudio.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>

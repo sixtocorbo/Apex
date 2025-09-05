@@ -17,7 +17,4 @@ Partial Public Class Estado
     Public Property CreatedAt As Date
     Public Property UpdatedAt As Nullable(Of Date)
 
-    Public Overridable Property Funcionario As ICollection(Of Funcionario) = New HashSet(Of Funcionario)
-    Public Overridable Property Movimiento As ICollection(Of Movimiento) = New HashSet(Of Movimiento)
-
 End Class

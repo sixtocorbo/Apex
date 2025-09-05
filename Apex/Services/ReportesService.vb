@@ -45,7 +45,6 @@ Public Class ReportesService
             Include(Function(f) f.Turno).
             Include(Function(f) f.Semana).
             Include(Function(f) f.Horario).
-            Include(Function(f) f.Estado).
             Include(Function(f) f.Escalafon).
             Include(Function(f) f.Funcion).
             Include(Function(f) f.EstadoCivil).

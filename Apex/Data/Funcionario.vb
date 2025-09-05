@@ -21,7 +21,6 @@ Partial Public Class Funcionario
     Public Property Activo As Boolean
     Public Property CreatedAt As Date
     Public Property UpdatedAt As Nullable(Of Date)
-    Public Property EstadoId As Nullable(Of Integer)
     Public Property SeccionId As Nullable(Of Integer)
     Public Property EstadoCivilId As Nullable(Of Integer)
     Public Property GeneroId As Nullable(Of Integer)
@@ -44,7 +43,6 @@ Partial Public Class Funcionario
 
     Public Overridable Property Cargo As Cargo
     Public Overridable Property Escalafon As Escalafon
-    Public Overridable Property Estado As Estado
     Public Overridable Property EstadoCivil As EstadoCivil
     Public Overridable Property EstadoTransitorio As ICollection(Of EstadoTransitorio) = New HashSet(Of EstadoTransitorio)
     Public Overridable Property Funcion As Funcion
@@ -68,7 +66,6 @@ Partial Public Class Funcionario
     Public Overridable Property HistoricoNocturnidad As ICollection(Of HistoricoNocturnidad) = New HashSet(Of HistoricoNocturnidad)
     Public Overridable Property HistoricoPresentismo As ICollection(Of HistoricoPresentismo) = New HashSet(Of HistoricoPresentismo)
     Public Overridable Property HistoricoViatico As ICollection(Of HistoricoViatico) = New HashSet(Of HistoricoViatico)
-    Public Overridable Property Movimiento As ICollection(Of Movimiento) = New HashSet(Of Movimiento)
     Public Overridable Property NotificacionPersonal As ICollection(Of NotificacionPersonal) = New HashSet(Of NotificacionPersonal)
     Public Overridable Property NovedadFuncionario As ICollection(Of NovedadFuncionario) = New HashSet(Of NovedadFuncionario)
     Public Overridable Property Usuario As ICollection(Of Usuario) = New HashSet(Of Usuario)
