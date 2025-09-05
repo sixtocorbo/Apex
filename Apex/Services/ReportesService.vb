@@ -1,4 +1,6 @@
-﻿' Apex/Services/ReportesService.vb
+﻿Option Strict On
+Option Explicit On
+
 Imports System.Data.Entity
 Imports System.Linq
 Imports System.Threading.Tasks
@@ -8,6 +10,10 @@ Public Class ReportesService
 
     Public Sub New()
         _unitOfWork = New UnitOfWork()
+    End Sub
+
+    Public Sub New(unitOfWork As IUnitOfWork)
+        _unitOfWork = unitOfWork
     End Sub
 
     ' Une sólo las partes no vacías con el separador indicado.
@@ -25,18 +31,13 @@ Public Class ReportesService
         Return $"{label}{value.Trim()}"
     End Function
 
-    ' Normaliza el texto de Estado: SI/SÍ -> Activo, NO -> Inactivo, otro -> tal cual
-    Private Shared Function EstadoDisplay(valor As String) As String
-        If String.IsNullOrWhiteSpace(valor) Then Return Nothing
-        Dim raw = valor.Trim()
-        Dim v = raw.ToUpperInvariant()
-        If v = "SI" OrElse v = "SÍ" Then Return "Activo"
-        If v = "NO" Then Return "Inactivo"
-        Return raw
+    ' --- ÚNICA fuente de verdad: Activo=True/False -> "Activo"/"Inactivo"
+    Private Shared Function EstadoDisplay(valor As Boolean) As String
+        Return If(valor, "Activo", "Inactivo")
     End Function
 
     Public Async Function GetDatosFichaFuncionalAsync(funcionarioId As Integer) As Task(Of FichaFuncionalDTO)
-        ' Consulta del funcionario con sus relaciones
+        ' Cargamos el funcionario con sus relaciones (solo lectura)
         Dim funcionario = Await _unitOfWork.Repository(Of Funcionario)().
             GetAll().
             Include(Function(f) f.Cargo).
@@ -58,7 +59,7 @@ Public Class ReportesService
         ' Estudia -> "Sí"/"No"
         Dim estudia As String = If(funcionario.Estudia, "Sí", "No")
 
-        ' --- Datos Laborales (con etiquetas + separadores sólo entre partes no vacías) ---
+        ' Datos Laborales (usa etiquetas solo si hay valor)
         Dim datosLaborales As String = JoinNonEmpty(" | ",
             Labeled("Grado: ", funcionario.Cargo?.Grado?.ToString()),
             Labeled("Escalafón: ", funcionario.Escalafon?.Nombre),
@@ -66,15 +67,16 @@ Public Class ReportesService
             Labeled("Puesto de trabajo: ", funcionario.PuestoTrabajo?.Nombre)
         )
 
-        ' --- Situación General (usa EstadoDisplay) ---
+        ' Situación general (Estado viene del booleano Activo)
         Dim situacionGeneral As String = JoinNonEmpty(" | ",
-           Labeled("Estado: ", EstadoDisplay(funcionario.Activo)),
+            Labeled("Estado: ", EstadoDisplay(funcionario.Activo)),
             Labeled("Turno: ", funcionario.Turno?.Nombre),
             Labeled("Semana: ", funcionario.Semana?.Nombre),
             Labeled("Horario: ", funcionario.Horario?.Nombre)
         )
-
-        ' Mapear DTO (Estado ya normalizado)
+        Dim fechaIng As Date? = funcionario.FechaIngreso
+        Dim fechaIngStr As String = If(fechaIng.HasValue, fechaIng.Value.ToShortDateString(), Nothing)
+        ' Mapeo DTO
         Dim dto As New FichaFuncionalDTO With {
             .NombreCompleto = funcionario.Nombre,
             .Cedula = funcionario.CI,
@@ -84,7 +86,7 @@ Public Class ReportesService
             .Correo = funcionario.Email,
             .EstadoCivil = funcionario.EstadoCivil?.Nombre,
             .NivelEstudios = funcionario.NivelEstudio?.Nombre,
-            .FechaIngreso = funcionario.FechaIngreso.ToShortDateString(),
+          .FechaIngreso = fechaIngStr,
             .Grado = funcionario.Cargo?.Grado?.ToString(),
             .Cargo = funcionario.Cargo?.Nombre,
             .Seccion = funcionario.Seccion?.Nombre,
@@ -92,7 +94,7 @@ Public Class ReportesService
             .Turno = funcionario.Turno?.Nombre,
             .Semana = funcionario.Semana?.Nombre,
             .Horario = funcionario.Horario?.Nombre,
-           .Estado = EstadoDisplay(funcionario.Activo),
+            .Estado = EstadoDisplay(funcionario.Activo), ' <- solo booleano
             .Escalafon = funcionario.Escalafon?.Nombre,
             .Funcion = funcionario.Funcion?.Nombre,
             .Foto = funcionario.Foto,
@@ -107,16 +109,18 @@ Public Class ReportesService
 
         Return dto
     End Function
-    ' Normaliza el texto de Estado: True -> Activo, False -> Inactivo
-    Private Shared Function EstadoDisplay(valor As Boolean) As String
-        Return If(valor, "Activo", "Inactivo")
-    End Function
-    Public Async Function GetDatosNotificacionAsync(notificacionId As Integer) As Task(Of vw_NotificacionesCompletas)
-        Dim notificacion = Await _unitOfWork.Repository(Of vw_NotificacionesCompletas)().
-            GetAll().
-            FirstOrDefaultAsync(Function(n) n.Id = notificacionId)
 
-        Return notificacion
+    Private Shared Function FmtDate(d As Date?) As String
+        Return If(d.HasValue, d.Value.ToShortDateString(), Nothing)
+        ' Si prefieres formato fijo:
+        ' Return If(d.HasValue, d.Value.ToString("yyyy-MM-dd"), Nothing)
+    End Function
+
+    ' Notificación para el RDLC
+    Public Async Function GetDatosNotificacionAsync(notificacionId As Integer) As Task(Of vw_NotificacionesCompletas)
+        Return Await _unitOfWork.Repository(Of vw_NotificacionesCompletas)().
+            GetAll().
+            FirstOrDefaultAsync(Function(n) n.Id = notificacionId) ' Cambiar a n.NotificacionId si tu vista lo llama así
     End Function
 End Class
 
@@ -138,7 +142,7 @@ Public Class FichaFuncionalDTO
     Public Property Turno As String
     Public Property Semana As String
     Public Property Horario As String
-    Public Property Estado As String
+    Public Property Estado As String            ' "Activo"/"Inactivo"
     Public Property Escalafon As String
     Public Property Funcion As String
     Public Property Foto As Byte()

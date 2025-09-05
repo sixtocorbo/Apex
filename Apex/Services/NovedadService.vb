@@ -7,16 +7,31 @@ Public Class NovedadService
     Inherits GenericService(Of Novedad)
 
     Private Shadows ReadOnly _unitOfWork As IUnitOfWork
+    Private ReadOnly _auditoriaService As AuditoriaService
 
     Public Sub New()
         MyBase.New(New UnitOfWork())
         _unitOfWork = MyBase._unitOfWork
+        _auditoriaService = New AuditoriaService(_unitOfWork)
     End Sub
 
     Public Sub New(unitOfWork As IUnitOfWork)
         MyBase.New(unitOfWork)
         _unitOfWork = unitOfWork
+        _auditoriaService = New AuditoriaService(_unitOfWork)
     End Sub
+    ' --- Helper interno para que la auditoría nunca “rompa” la operación principal ---
+    Private Async Function RegistrarAuditoriaSeguraAsync(accion As String,
+                                                         tipoEntidad As String,
+                                                         descripcion As String,
+                                                         Optional entidadId As Integer? = Nothing) As Task
+        Try
+            Await _auditoriaService.RegistrarActividadAsync(accion, tipoEntidad, descripcion, entidadId)
+        Catch
+            ' No re-lanzamos: la auditoría no debe impedir la operación principal.
+            ' Podés loguear a archivo/telemetría aquí si querés.
+        End Try
+    End Function
 
     ''' <summary>
     ''' Obtiene las novedades AGRUPADAS para la grilla principal usando la nueva vista.
@@ -111,6 +126,8 @@ Public Class NovedadService
 
         _unitOfWork.Repository(Of Novedad)().Add(nuevaNovedad)
         Await _unitOfWork.CommitAsync()
+
+
         Return nuevaNovedad
     End Function
 
@@ -119,28 +136,45 @@ Public Class NovedadService
     ''' Elimina una novedad y todas sus relaciones (funcionarios, fotos) de forma explícita y transaccional.
     ''' </summary>
     Public Async Function DeleteNovedadCompletaAsync(novedadId As Integer) As Task
-        ' Obtenemos la novedad incluyendo sus relaciones para poder eliminarlas.
+        ' Cargar la novedad con sus dependencias
         Dim novedadAEliminar = Await _unitOfWork.Context.Set(Of Novedad)().
-            Include(Function(n) n.NovedadFuncionario).
-            Include(Function(n) n.NovedadFoto).
-            SingleOrDefaultAsync(Function(n) n.Id = novedadId)
+        Include(Function(n) n.NovedadFuncionario).
+        Include(Function(n) n.NovedadFoto).
+        SingleOrDefaultAsync(Function(n) n.Id = novedadId)
 
-        If novedadAEliminar IsNot Nothing Then
-            ' 1. Obtener los repositorios para las tablas hijas.
-            Dim repoFuncionarios = _unitOfWork.Repository(Of NovedadFuncionario)()
-            Dim repoFotos = _unitOfWork.Repository(Of NovedadFoto)()
-
-            ' 2. Eliminar explícitamente todos los registros de las tablas hijas.
-            repoFuncionarios.RemoveRange(novedadAEliminar.NovedadFuncionario.ToList())
-            repoFotos.RemoveRange(novedadAEliminar.NovedadFoto.ToList())
-
-            ' 3. Ahora que no tiene dependencias, eliminamos la novedad principal.
-            _unitOfWork.Repository(Of Novedad)().Remove(novedadAEliminar)
-
-            ' 4. Guardamos todos los cambios (las 3 eliminaciones) en una sola operación.
-            Await _unitOfWork.CommitAsync()
+        If novedadAEliminar Is Nothing Then
+            Return
         End If
+
+        ' === Declaraciones locales ANTES de eliminar (para usar en la auditoría) ===
+        Dim cantFuncs As Integer = If(novedadAEliminar.NovedadFuncionario IsNot Nothing,
+                                  novedadAEliminar.NovedadFuncionario.Count, 0)
+        Dim cantFotos As Integer = If(novedadAEliminar.NovedadFoto IsNot Nothing,
+                                  novedadAEliminar.NovedadFoto.Count, 0)
+        Dim idEliminado As Integer = novedadAEliminar.Id
+
+        ' Eliminar explícitamente dependencias
+        Dim repoFuncionarios = _unitOfWork.Repository(Of NovedadFuncionario)()
+        Dim repoFotos = _unitOfWork.Repository(Of NovedadFoto)()
+
+        repoFuncionarios.RemoveRange(novedadAEliminar.NovedadFuncionario.ToList())
+        repoFotos.RemoveRange(novedadAEliminar.NovedadFoto.ToList())
+
+        ' Eliminar la novedad principal
+        _unitOfWork.Repository(Of Novedad)().Remove(novedadAEliminar)
+
+        ' Persistir todo
+        Await _unitOfWork.CommitAsync()
+
+        ' Auditoría (usa las variables locales declaradas arriba)
+        Await RegistrarAuditoriaSeguraAsync(
+        accion:="Eliminar",
+        tipoEntidad:="Novedad",
+        descripcion:=$"Se eliminó la novedad #{idEliminado} con {cantFuncs} funcionario(s) y {cantFotos} foto(s).",
+        entidadId:=idEliminado
+    )
     End Function
+
 
     ''' <summary>
     ''' Obtiene la información completa de una lista de novedades a partir de sus IDs.
@@ -189,6 +223,13 @@ Public Class NovedadService
 
         ' 4. Guardar todos los cambios en una única transacción.
         Await _unitOfWork.CommitAsync()
+        ' AUDITORÍA
+        Await RegistrarAuditoriaSeguraAsync(
+            accion:="Actualizar",
+            tipoEntidad:="Novedad",
+            descripcion:=$"Se actualizó la novedad #{novedadEnDb.Id}. Funcionarios: {nuevosFuncionarioIds?.Count}.",
+            entidadId:=novedadEnDb.Id
+        )
     End Function
 
     ''' <summary>
@@ -225,6 +266,13 @@ Public Class NovedadService
 
         _unitOfWork.Repository(Of NovedadFoto)().Add(nuevaFoto)
         Await _unitOfWork.CommitAsync()
+        ' AUDITORÍA
+        Await RegistrarAuditoriaSeguraAsync(
+            accion:="AgregarFoto",
+            tipoEntidad:="Novedad",
+            descripcion:=$"Se agregó la foto '{Path.GetFileName(rutaArchivo)}' a la novedad #{novedadId}.",
+            entidadId:=novedadId
+        )
     End Function
 
     ''' <summary>
@@ -233,11 +281,28 @@ Public Class NovedadService
     Public Async Function DeleteFotoAsync(fotoId As Integer) As Task
         Dim repo = _unitOfWork.Repository(Of NovedadFoto)()
         Dim foto = Await repo.GetByIdAsync(fotoId)
-        If foto IsNot Nothing Then
-            repo.Remove(foto)
-            Await _unitOfWork.CommitAsync()
+
+        If foto Is Nothing Then
+            Return
         End If
+
+        ' Si NovedadId es NOT NULL en la BD:
+        Dim novedadIdDeLaFoto As Integer = foto.NovedadId
+
+        ' Si fuera Nullable(Of Integer):
+        'Dim novedadIdDeLaFoto As Integer = If(foto.NovedadId.HasValue, foto.NovedadId.Value, 0)
+
+        repo.Remove(foto)
+        Await _unitOfWork.CommitAsync()
+
+        Await RegistrarAuditoriaSeguraAsync(
+        accion:="EliminarFoto",
+        tipoEntidad:="Novedad",
+        descripcion:=$"Se eliminó la foto #{fotoId} de la novedad #{novedadIdDeLaFoto}.",
+        entidadId:=novedadIdDeLaFoto
+    )
     End Function
+
 
     ''' <summary>
     ''' Agrega un funcionario a una novedad que ya existe.
@@ -252,6 +317,13 @@ Public Class NovedadService
                 .FuncionarioId = funcionarioId
             })
             Await _unitOfWork.CommitAsync()
+            ' AUDITORÍA
+            Await RegistrarAuditoriaSeguraAsync(
+                accion:="AgregarFuncionario",
+                tipoEntidad:="Novedad",
+                descripcion:=$"Se agregó el funcionario #{funcionarioId} a la novedad #{novedadId}.",
+                entidadId:=novedadId
+            )
         End If
     End Function
 
@@ -264,6 +336,13 @@ Public Class NovedadService
         If relacion IsNot Nothing Then
             repo.Remove(relacion)
             Await _unitOfWork.CommitAsync()
+            ' AUDITORÍA
+            Await RegistrarAuditoriaSeguraAsync(
+                accion:="QuitarFuncionario",
+                tipoEntidad:="Novedad",
+                descripcion:=$"Se quitó el funcionario #{funcionarioId} de la novedad #{novedadId}.",
+                entidadId:=novedadId
+            )
         End If
     End Function
 

@@ -19,4 +19,10 @@ Public Class ModConstantesApex
     Public Const CATEGORIA_NOMBRE_ESPECIAL As String = "Especial"
     Public Const CATEGORIA_NOMBRE_GENERAL As String = "General"
 
+    ' -------- Notificaciones ----------
+    Public Const ESTADO_NOTI_PENDIENTE As Byte = 1
+    ' Si ya tenés otros estados, podés agregarlos aquí:
+    Public Const ESTADO_NOTI_ENVIADA As Byte = 2
+    Public Const ESTADO_NOTI_ENTREGADA As Byte = 3
+
 End Class
