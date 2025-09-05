@@ -83,8 +83,6 @@ Partial Class frmFuncionarioCrear
         Me.cboEscalafon = New System.Windows.Forms.ComboBox()
         Me.lblFuncion = New System.Windows.Forms.Label()
         Me.cboFuncion = New System.Windows.Forms.ComboBox()
-        Me.lblEstado = New System.Windows.Forms.Label()
-        Me.cboEstado = New System.Windows.Forms.ComboBox()
         Me.lblSeccion = New System.Windows.Forms.Label()
         Me.cboSeccion = New System.Windows.Forms.ComboBox()
         Me.lblPuesto = New System.Windows.Forms.Label()
@@ -693,8 +691,6 @@ Partial Class frmFuncionarioCrear
         Me.TableLayoutPanelDatosGenerales.Controls.Add(Me.cboEscalafon, 1, 5)
         Me.TableLayoutPanelDatosGenerales.Controls.Add(Me.lblFuncion, 0, 6)
         Me.TableLayoutPanelDatosGenerales.Controls.Add(Me.cboFuncion, 1, 6)
-        Me.TableLayoutPanelDatosGenerales.Controls.Add(Me.lblEstado, 2, 0)
-        Me.TableLayoutPanelDatosGenerales.Controls.Add(Me.cboEstado, 3, 0)
         Me.TableLayoutPanelDatosGenerales.Controls.Add(Me.lblSeccion, 2, 1)
         Me.TableLayoutPanelDatosGenerales.Controls.Add(Me.cboSeccion, 3, 1)
         Me.TableLayoutPanelDatosGenerales.Controls.Add(Me.lblPuesto, 2, 2)
@@ -872,26 +868,6 @@ Partial Class frmFuncionarioCrear
         Me.cboFuncion.Name = "cboFuncion"
         Me.cboFuncion.Size = New System.Drawing.Size(295, 28)
         Me.cboFuncion.TabIndex = 13
-        '
-        'lblEstado
-        '
-        Me.lblEstado.Anchor = System.Windows.Forms.AnchorStyles.Right
-        Me.lblEstado.AutoSize = True
-        Me.lblEstado.Location = New System.Drawing.Point(460, 24)
-        Me.lblEstado.Name = "lblEstado"
-        Me.lblEstado.Size = New System.Drawing.Size(64, 20)
-        Me.lblEstado.TabIndex = 15
-        Me.lblEstado.Text = "Estado:"
-        '
-        'cboEstado
-        '
-        Me.cboEstado.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboEstado.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboEstado.FormattingEnabled = True
-        Me.cboEstado.Location = New System.Drawing.Point(530, 20)
-        Me.cboEstado.Name = "cboEstado"
-        Me.cboEstado.Size = New System.Drawing.Size(297, 28)
-        Me.cboEstado.TabIndex = 16
         '
         'lblSeccion
         '
@@ -1115,8 +1091,6 @@ Partial Class frmFuncionarioCrear
     Friend WithEvents chkActivo As CheckBox
     Friend WithEvents TabControlMain As TabControl
     Friend WithEvents chkVerHistorial As CheckBox
-    Friend WithEvents lblEstado As Label
-    Friend WithEvents cboEstado As ComboBox
     Friend WithEvents lblSeccion As Label
     Friend WithEvents cboSeccion As ComboBox
     Friend WithEvents lblPuesto As Label

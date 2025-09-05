@@ -68,7 +68,7 @@ Public Class ReportesService
 
         ' --- Situación General (usa EstadoDisplay) ---
         Dim situacionGeneral As String = JoinNonEmpty(" | ",
-            Labeled("Estado: ", EstadoDisplay(funcionario.Estado?.Nombre)),
+           Labeled("Estado: ", EstadoDisplay(funcionario.Activo)),
             Labeled("Turno: ", funcionario.Turno?.Nombre),
             Labeled("Semana: ", funcionario.Semana?.Nombre),
             Labeled("Horario: ", funcionario.Horario?.Nombre)
@@ -92,7 +92,7 @@ Public Class ReportesService
             .Turno = funcionario.Turno?.Nombre,
             .Semana = funcionario.Semana?.Nombre,
             .Horario = funcionario.Horario?.Nombre,
-            .Estado = EstadoDisplay(funcionario.Estado?.Nombre),
+           .Estado = EstadoDisplay(funcionario.Activo),
             .Escalafon = funcionario.Escalafon?.Nombre,
             .Funcion = funcionario.Funcion?.Nombre,
             .Foto = funcionario.Foto,
@@ -107,7 +107,10 @@ Public Class ReportesService
 
         Return dto
     End Function
-
+    ' Normaliza el texto de Estado: True -> Activo, False -> Inactivo
+    Private Shared Function EstadoDisplay(valor As Boolean) As String
+        Return If(valor, "Activo", "Inactivo")
+    End Function
     Public Async Function GetDatosNotificacionAsync(notificacionId As Integer) As Task(Of vw_NotificacionesCompletas)
         Dim notificacion = Await _unitOfWork.Repository(Of vw_NotificacionesCompletas)().
             GetAll().

@@ -128,7 +128,6 @@ Public Class frmFuncionarioCrear
         SetSelectedOrNone(cboEstadoCivil, _funcionario.EstadoCivilId)
         SetSelectedOrNone(cboGenero, _funcionario.GeneroId)
         SetSelectedOrNone(cboNivelEstudio, _funcionario.NivelEstudioId)
-        SetSelectedOrNone(cboEstado, _funcionario.EstadoId)
         SetSelectedOrNone(cboSeccion, _funcionario.SeccionId)
         SetSelectedOrNone(cboPuestoTrabajo, _funcionario.PuestoTrabajoId)
         SetSelectedOrNone(cboTurno, _funcionario.TurnoId)
@@ -491,7 +490,6 @@ Public Class frmFuncionarioCrear
         _funcionario.EstadoCivilId = If(cboEstadoCivil.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboEstadoCivil.SelectedValue))
         _funcionario.GeneroId = If(cboGenero.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboGenero.SelectedValue))
         _funcionario.NivelEstudioId = If(cboNivelEstudio.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboNivelEstudio.SelectedValue))
-        _funcionario.EstadoId = If(cboEstado.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboEstado.SelectedValue))
         _funcionario.SeccionId = If(cboSeccion.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboSeccion.SelectedValue))
         _funcionario.PuestoTrabajoId = If(cboPuestoTrabajo.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboPuestoTrabajo.SelectedValue))
         _funcionario.TurnoId = If(cboTurno.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboTurno.SelectedValue))
@@ -743,7 +741,6 @@ Public Class frmFuncionarioCrear
         cboEstadoCivil.DataSource = Await _svc.ObtenerEstadosCivilesAsync() : cboEstadoCivil.DisplayMember = "Value" : cboEstadoCivil.ValueMember = "Key"
         cboGenero.DataSource = Await _svc.ObtenerGenerosAsync() : cboGenero.DisplayMember = "Value" : cboGenero.ValueMember = "Key"
         cboNivelEstudio.DataSource = Await _svc.ObtenerNivelesEstudioAsync() : cboNivelEstudio.DisplayMember = "Value" : cboNivelEstudio.ValueMember = "Key"
-        cboEstado.DataSource = Await _svc.ObtenerEstadosAsync() : cboEstado.DisplayMember = "Value" : cboEstado.ValueMember = "Key"
         cboSeccion.DataSource = Await _svc.ObtenerSeccionesAsync() : cboSeccion.DisplayMember = "Value" : cboSeccion.ValueMember = "Key"
         cboPuestoTrabajo.DataSource = Await _svc.ObtenerPuestosTrabajoAsync() : cboPuestoTrabajo.DisplayMember = "Value" : cboPuestoTrabajo.ValueMember = "Key"
         cboTurno.DataSource = Await _svc.ObtenerTurnosAsync() : cboTurno.DisplayMember = "Value" : cboTurno.ValueMember = "Key"
@@ -751,7 +748,6 @@ Public Class frmFuncionarioCrear
         cboHorario.DataSource = Await _svc.ObtenerHorariosAsync() : cboHorario.DisplayMember = "Value" : cboHorario.ValueMember = "Key"
         cboCargo.SelectedIndex = -1 : cboEscalafon.SelectedIndex = -1 : cboFuncion.SelectedIndex = -1
         cboEstadoCivil.SelectedIndex = -1 : cboGenero.SelectedIndex = -1 : cboNivelEstudio.SelectedIndex = -1
-        cboEstado.SelectedIndex = -1 : cboSeccion.SelectedIndex = -1 : cboPuestoTrabajo.SelectedIndex = -1
         cboTurno.SelectedIndex = -1 : cboSemana.SelectedIndex = -1 : cboHorario.SelectedIndex = -1
     End Function
 

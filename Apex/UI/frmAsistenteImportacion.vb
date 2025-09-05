@@ -586,12 +586,8 @@ Public Class frmAsistenteImportacion
     Private Function CrearFuncionario(ci As String, nombre As String) As Funcionario
         Try
             Using ctx As New ApexEntities()
-                Dim nuevoFuncionario As New Funcionario With {
-                    .CI = ci, .Nombre = nombre, .FechaIngreso = New Date(1900, 1, 1),
-                    .TipoFuncionarioId = 1, .Activo = True, .CreatedAt = DateTime.Now,
-                    .CargoId = 1, .EstadoId = 1, .SeccionId = 1, .PuestoTrabajoId = 1,
-                    .TurnoId = 1, .SemanaId = 1, .HorarioId = 1
-                }
+                Dim nuevoFuncionario As New Funcionario With {.CI = ci, .Nombre = nombre, .FechaIngreso = New Date(1900, 1, 1), .TipoFuncionarioId = 1, .Activo = True, .CreatedAt = DateTime.Now, .CargoId = 1, .SeccionId = 1, .PuestoTrabajoId = 1, .TurnoId = 1, .SemanaId = 1, .HorarioId = 1
+}
                 ctx.Funcionario.Add(nuevoFuncionario)
                 ctx.SaveChanges()
                 Return nuevoFuncionario

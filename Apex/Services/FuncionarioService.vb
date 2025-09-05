@@ -79,7 +79,7 @@ Public Class FuncionarioService
                 .TipoDeFuncionario = If(f.TipoFuncionario IsNot Nothing, f.TipoFuncionario.Nombre, "N/A"),
                 .Escalafon = If(f.Escalafon IsNot Nothing, f.Escalafon.Nombre, "N/A"),
                 .Funcion = If(f.Funcion IsNot Nothing, f.Funcion.Nombre, "N/A"),
-                .EstadoActual = If(f.Estado IsNot Nothing, f.Estado.Nombre, "N/A"),
+                .EstadoActual = If(f.Activo, "Activo", "Inactivo"),
                 .Seccion = If(f.Seccion IsNot Nothing, f.Seccion.Nombre, "N/A"),
                 .PuestoDeTrabajo = If(f.PuestoTrabajo IsNot Nothing, f.PuestoTrabajo.Nombre, "N/A"),
                 .Turno = If(f.Turno IsNot Nothing, f.Turno.Nombre, "N/A"),
@@ -132,9 +132,6 @@ Public Class FuncionarioService
         End Using
     End Function
 
-
-
-
     ' --- Métodos para poblar los ComboBox (Catálogos) ---
     Public Async Function ObtenerCargosAsync() As Task(Of List(Of KeyValuePair(Of Integer, String)))
         Dim lista = Await _unitOfWork.Repository(Of Cargo)().GetAll().AsNoTracking().OrderBy(Function(c) c.Nombre).ToListAsync()
@@ -169,12 +166,6 @@ Public Class FuncionarioService
     Public Async Function ObtenerNivelesEstudioAsync() As Task(Of List(Of KeyValuePair(Of Integer, String)))
         Dim lista = Await _unitOfWork.Repository(Of NivelEstudio)().GetAll().AsNoTracking().OrderBy(Function(ne) ne.Nombre).ToListAsync()
         Return lista.Select(Function(ne) New KeyValuePair(Of Integer, String)(ne.Id, ne.Nombre)).ToList()
-    End Function
-
-    ' --- INICIO: Métodos añadidos para los combos faltantes ---
-    Public Async Function ObtenerEstadosAsync() As Task(Of List(Of KeyValuePair(Of Integer, String)))
-        Dim lista = Await _unitOfWork.Repository(Of Estado)().GetAll().AsNoTracking().OrderBy(Function(e) e.Nombre).ToListAsync()
-        Return lista.Select(Function(e) New KeyValuePair(Of Integer, String)(e.Id, e.Nombre)).ToList()
     End Function
 
     Public Async Function ObtenerSeccionesAsync() As Task(Of List(Of KeyValuePair(Of Integer, String)))
