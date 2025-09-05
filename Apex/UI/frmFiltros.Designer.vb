@@ -365,6 +365,7 @@ Partial Class frmFiltros
         '
         'txtBusquedaGlobal
         '
+        Me.txtBusquedaGlobal.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtBusquedaGlobal.Dock = System.Windows.Forms.DockStyle.Fill
         Me.txtBusquedaGlobal.Location = New System.Drawing.Point(10, 29)
         Me.txtBusquedaGlobal.Name = "txtBusquedaGlobal"

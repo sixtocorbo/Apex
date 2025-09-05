@@ -85,6 +85,7 @@ Partial Class frmTurnos
         '
         'txtBuscar
         '
+        Me.txtBuscar.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtBuscar.Dock = System.Windows.Forms.DockStyle.Top
         Me.txtBuscar.Location = New System.Drawing.Point(0, 20)
         Me.txtBuscar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
@@ -174,6 +175,7 @@ Partial Class frmTurnos
         '
         'txtNombre
         '
+        Me.txtNombre.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtNombre.Location = New System.Drawing.Point(128, 40)
         Me.txtNombre.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtNombre.Name = "txtNombre"

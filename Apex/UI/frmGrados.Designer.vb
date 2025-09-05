@@ -117,6 +117,7 @@ Partial Class frmGrados
         '
         'txtGrado
         '
+        Me.txtGrado.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtGrado.Location = New System.Drawing.Point(93, 108)
         Me.txtGrado.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtGrado.Name = "txtGrado"
@@ -135,6 +136,7 @@ Partial Class frmGrados
         '
         'txtNombre
         '
+        Me.txtNombre.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtNombre.Location = New System.Drawing.Point(93, 51)
         Me.txtNombre.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtNombre.Name = "txtNombre"

@@ -61,6 +61,7 @@ Partial Class frmFuncionarioDotacion
         '
         'txtTalla
         '
+        Me.txtTalla.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtTalla.Location = New System.Drawing.Point(124, 54)
         Me.txtTalla.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.txtTalla.Name = "txtTalla"
@@ -78,6 +79,7 @@ Partial Class frmFuncionarioDotacion
         '
         'txtObservaciones
         '
+        Me.txtObservaciones.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtObservaciones.Location = New System.Drawing.Point(124, 89)
         Me.txtObservaciones.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.txtObservaciones.Multiline = True

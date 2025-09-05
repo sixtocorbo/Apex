@@ -130,6 +130,7 @@ Partial Class frmNovedades
         '
         Me.txtBusqueda.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtBusqueda.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtBusqueda.Font = New System.Drawing.Font("Segoe UI", 9.0!)
         Me.txtBusqueda.Location = New System.Drawing.Point(78, 11)
         Me.txtBusqueda.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)

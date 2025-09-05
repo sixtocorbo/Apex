@@ -159,6 +159,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         '
         'txtObservaciones
         '
+        Me.txtObservaciones.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtObservaciones.Location = New System.Drawing.Point(166, 140)
         Me.txtObservaciones.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtObservaciones.Multiline = True
@@ -188,6 +189,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         '
         'txtResolucion
         '
+        Me.txtResolucion.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtResolucion.Location = New System.Drawing.Point(727, 18)
         Me.txtResolucion.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtResolucion.Name = "txtResolucion"
@@ -206,6 +208,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         '
         'txtDiagnostico
         '
+        Me.txtDiagnostico.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtDiagnostico.Location = New System.Drawing.Point(727, 100)
         Me.txtDiagnostico.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtDiagnostico.Name = "txtDiagnostico"
@@ -375,7 +378,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         Me.lblCargoAnterior.AutoSize = True
         Me.lblCargoAnterior.Location = New System.Drawing.Point(579, 145)
         Me.lblCargoAnterior.Name = "lblCargoAnterior"
-        Me.lblCargoAnterior.Size = New System.Drawing.Size(125, 20)
+        Me.lblCargoAnterior.Size = New System.Drawing.Size(116, 20)
         Me.lblCargoAnterior.TabIndex = 18
         Me.lblCargoAnterior.Text = "Cargo Anterior:"
         '
@@ -393,7 +396,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         Me.lblCargoNuevo.AutoSize = True
         Me.lblCargoNuevo.Location = New System.Drawing.Point(579, 185)
         Me.lblCargoNuevo.Name = "lblCargoNuevo"
-        Me.lblCargoNuevo.Size = New System.Drawing.Size(107, 20)
+        Me.lblCargoNuevo.Size = New System.Drawing.Size(105, 20)
         Me.lblCargoNuevo.TabIndex = 20
         Me.lblCargoNuevo.Text = "Cargo Nuevo:"
         '
@@ -430,7 +433,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         Me.chkSinFechaResolucion.Location = New System.Drawing.Point(1037, 63)
         Me.chkSinFechaResolucion.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.chkSinFechaResolucion.Name = "chkSinFechaResolucion"
-        Me.chkSinFechaResolucion.Size = New System.Drawing.Size(110, 24)
+        Me.chkSinFechaResolucion.Size = New System.Drawing.Size(107, 24)
         Me.chkSinFechaResolucion.TabIndex = 24
         Me.chkSinFechaResolucion.Text = "Sin Fecha"
         Me.chkSinFechaResolucion.UseVisualStyleBackColor = True

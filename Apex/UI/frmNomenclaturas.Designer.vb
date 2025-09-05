@@ -129,6 +129,7 @@ Partial Class frmNomenclaturas
         '
         Me.txtObservaciones.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtObservaciones.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtObservaciones.Location = New System.Drawing.Point(150, 277)
         Me.txtObservaciones.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtObservaciones.Multiline = True
@@ -148,6 +149,7 @@ Partial Class frmNomenclaturas
         '
         'txtUbicacion
         '
+        Me.txtUbicacion.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtUbicacion.Location = New System.Drawing.Point(150, 237)
         Me.txtUbicacion.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtUbicacion.Name = "txtUbicacion"
@@ -166,6 +168,7 @@ Partial Class frmNomenclaturas
         '
         'txtEjemplo
         '
+        Me.txtEjemplo.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtEjemplo.Location = New System.Drawing.Point(150, 197)
         Me.txtEjemplo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtEjemplo.Name = "txtEjemplo"
@@ -184,6 +187,7 @@ Partial Class frmNomenclaturas
         '
         'txtPatron
         '
+        Me.txtPatron.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtPatron.Location = New System.Drawing.Point(150, 157)
         Me.txtPatron.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtPatron.Name = "txtPatron"
@@ -202,6 +206,7 @@ Partial Class frmNomenclaturas
         '
         'txtArea
         '
+        Me.txtArea.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtArea.Location = New System.Drawing.Point(513, 115)
         Me.txtArea.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtArea.Name = "txtArea"
@@ -220,6 +225,7 @@ Partial Class frmNomenclaturas
         '
         'txtCodigo
         '
+        Me.txtCodigo.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtCodigo.Location = New System.Drawing.Point(150, 115)
         Me.txtCodigo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtCodigo.Name = "txtCodigo"
@@ -240,8 +246,9 @@ Partial Class frmNomenclaturas
         '
         Me.txtNombre.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtNombre.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtNombre.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtNombre.Location = New System.Drawing.Point(14, 49)
+        Me.txtNombre.Location = New System.Drawing.Point(9, 50)
         Me.txtNombre.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtNombre.Name = "txtNombre"
         Me.txtNombre.Size = New System.Drawing.Size(1128, 35)

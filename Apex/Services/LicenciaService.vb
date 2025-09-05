@@ -1,9 +1,9 @@
-﻿' Apex/Services/LicenciaService.vb
-Option Strict On
+﻿Option Strict On
 Option Explicit On
 
 Imports System.Data.Entity
 Imports System.Data.SqlClient
+Imports System.Text
 
 ' ---- Clases auxiliares ----
 Public Class LicenciaEstacional
@@ -148,11 +148,11 @@ Public Class LicenciaService
         sql.AppendLine("    f.FechaNacimiento,")
         sql.AppendLine("    f.Domicilio,")
         sql.AppendLine("    f.Email,")
+        sql.AppendLine("    CASE WHEN f.Activo = 1 THEN 'Activo' ELSE 'Inactivo' END AS EstadoActual,")
         sql.AppendLine("    COALESCE(c.Nombre,  'N/A') AS Cargo,")
         sql.AppendLine("    COALESCE(tf.Nombre, 'N/A') AS TipoDeFuncionario,")
         sql.AppendLine("    COALESCE(ecl.Nombre,'N/A') AS Escalafon,")
         sql.AppendLine("    COALESCE(fun.Nombre,'N/A') AS Funcion,")
-        sql.AppendLine("    COALESCE(est.Nombre,'N/A') AS EstadoActual,")
         sql.AppendLine("    COALESCE(sec.Nombre,'N/A') AS Seccion,")
         sql.AppendLine("    COALESCE(pt.Nombre, 'N/A') AS PuestoDeTrabajo,")
         sql.AppendLine("    COALESCE(tur.Nombre,'N/A') AS Turno,")
@@ -162,13 +162,12 @@ Public Class LicenciaService
         sql.AppendLine("    COALESCE(ec.Nombre, 'N/A') AS EstadoCivil,")
         sql.AppendLine("    COALESCE(ne.Nombre, 'N/A') AS NivelDeEstudio")
         sql.AppendLine("FROM dbo.HistoricoLicencia h")
-        sql.AppendLine("JOIN dbo.Funcionario f   ON f.Id = h.FuncionarioId")
+        sql.AppendLine("JOIN dbo.Funcionario f ON f.Id = h.FuncionarioId")
         sql.AppendLine("JOIN dbo.TipoLicencia tl ON tl.Id = h.TipoLicenciaId")
         sql.AppendLine("LEFT JOIN dbo.Cargo c              ON c.Id = f.CargoId")
         sql.AppendLine("LEFT JOIN dbo.TipoFuncionario tf   ON tf.Id = f.TipoFuncionarioId")
         sql.AppendLine("LEFT JOIN dbo.Escalafon ecl        ON ecl.Id = f.EscalafonId")
         sql.AppendLine("LEFT JOIN dbo.Funcion fun          ON fun.Id = f.FuncionId")
-        sql.AppendLine("LEFT JOIN dbo.Estado est           ON est.Id = f.EstadoId")
         sql.AppendLine("LEFT JOIN dbo.Seccion sec          ON sec.Id = f.SeccionId")
         sql.AppendLine("LEFT JOIN dbo.PuestoTrabajo pt     ON pt.Id = f.PuestoTrabajoId")
         sql.AppendLine("LEFT JOIN dbo.Turno tur            ON tur.Id = f.TurnoId")
@@ -193,7 +192,7 @@ Public Class LicenciaService
         ' --- FTS sobre Funcionario (Nombre, CI) ---
         If Not String.IsNullOrWhiteSpace(filtroNombre) Then
             Dim terminos = filtroNombre.Split({" "c}, StringSplitOptions.RemoveEmptyEntries).
-                                    Select(Function(w) $"""{w}*""")
+                Select(Function(w) $"""{w}*""")
             Dim expresionFts = String.Join(" AND ", terminos)
             Dim pname = "@p" & parameters.Count
             sql.AppendLine($"  AND CONTAINS((f.Nombre, f.CI), {pname})")
@@ -426,7 +425,6 @@ Public Class LicenciaConFuncionarioExtendidoDto
     Public Property FuncionId As Integer?
     Public Property Funcion As String
 
-    Public Property EstadoId As Integer?
     Public Property EstadoActual As String
 
     Public Property SeccionId As Integer?

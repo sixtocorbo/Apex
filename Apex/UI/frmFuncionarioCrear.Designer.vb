@@ -440,6 +440,7 @@ Partial Class frmFuncionarioCrear
         'txtDomicilio
         '
         Me.txtDomicilio.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtDomicilio.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtDomicilio.Location = New System.Drawing.Point(184, 56)
         Me.txtDomicilio.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtDomicilio.Name = "txtDomicilio"
@@ -480,6 +481,7 @@ Partial Class frmFuncionarioCrear
         'txtEmail
         '
         Me.txtEmail.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtEmail.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtEmail.Location = New System.Drawing.Point(184, 148)
         Me.txtEmail.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtEmail.Name = "txtEmail"
@@ -565,6 +567,7 @@ Partial Class frmFuncionarioCrear
         'txtCiudad
         '
         Me.txtCiudad.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtCiudad.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtCiudad.Location = New System.Drawing.Point(752, 10)
         Me.txtCiudad.Name = "txtCiudad"
         Me.txtCiudad.Size = New System.Drawing.Size(383, 26)
@@ -583,6 +586,7 @@ Partial Class frmFuncionarioCrear
         'txtSeccional
         '
         Me.txtSeccional.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtSeccional.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtSeccional.Location = New System.Drawing.Point(752, 56)
         Me.txtSeccional.Name = "txtSeccional"
         Me.txtSeccional.Size = New System.Drawing.Size(383, 26)
@@ -601,6 +605,7 @@ Partial Class frmFuncionarioCrear
         'txtCredencial
         '
         Me.txtCredencial.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtCredencial.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtCredencial.Location = New System.Drawing.Point(752, 102)
         Me.txtCredencial.Name = "txtCredencial"
         Me.txtCredencial.Size = New System.Drawing.Size(383, 26)
@@ -753,6 +758,7 @@ Partial Class frmFuncionarioCrear
         'txtNombre
         '
         Me.txtNombre.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtNombre.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.TableLayoutPanelDatosGenerales.SetColumnSpan(Me.txtNombre, 3)
         Me.txtNombre.Location = New System.Drawing.Point(90, 89)
         Me.txtNombre.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)

@@ -110,15 +110,16 @@ Partial Class frmLicencias
         '
         Me.chkSoloVigentes.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.chkSoloVigentes.AutoSize = True
-        Me.chkSoloVigentes.Location = New System.Drawing.Point(720, 17)
+        Me.chkSoloVigentes.Location = New System.Drawing.Point(712, 17)
         Me.chkSoloVigentes.Name = "chkSoloVigentes"
-        Me.chkSoloVigentes.Size = New System.Drawing.Size(151, 24)
+        Me.chkSoloVigentes.Size = New System.Drawing.Size(159, 24)
         Me.chkSoloVigentes.TabIndex = 2
         Me.chkSoloVigentes.Text = "Sólo vigentes hoy"
         Me.chkSoloVigentes.UseVisualStyleBackColor = True
         '
         'txtBusquedaLicencia
         '
+        Me.txtBusquedaLicencia.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtBusquedaLicencia.Location = New System.Drawing.Point(131, 14)
         Me.txtBusquedaLicencia.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.txtBusquedaLicencia.Name = "txtBusquedaLicencia"

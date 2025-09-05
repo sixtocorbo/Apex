@@ -52,7 +52,7 @@ Partial Class frmNotificaciones
         'btnImprimir
         '
         Me.btnImprimir.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnImprimir.Location = New System.Drawing.Point(495, 11)
+        Me.btnImprimir.Location = New System.Drawing.Point(403, 13)
         Me.btnImprimir.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.btnImprimir.Name = "btnImprimir"
         Me.btnImprimir.Size = New System.Drawing.Size(106, 36)
@@ -63,7 +63,7 @@ Partial Class frmNotificaciones
         'btnEliminar
         '
         Me.btnEliminar.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnEliminar.Location = New System.Drawing.Point(619, 11)
+        Me.btnEliminar.Location = New System.Drawing.Point(529, 13)
         Me.btnEliminar.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.btnEliminar.Name = "btnEliminar"
         Me.btnEliminar.Size = New System.Drawing.Size(106, 36)
@@ -74,7 +74,7 @@ Partial Class frmNotificaciones
         'btnEditar
         '
         Me.btnEditar.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnEditar.Location = New System.Drawing.Point(742, 11)
+        Me.btnEditar.Location = New System.Drawing.Point(655, 13)
         Me.btnEditar.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.btnEditar.Name = "btnEditar"
         Me.btnEditar.Size = New System.Drawing.Size(106, 36)
@@ -84,7 +84,8 @@ Partial Class frmNotificaciones
         '
         'btnNuevo
         '
-        Me.btnNuevo.Location = New System.Drawing.Point(14, 11)
+        Me.btnNuevo.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnNuevo.Location = New System.Drawing.Point(781, 13)
         Me.btnNuevo.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.btnNuevo.Name = "btnNuevo"
         Me.btnNuevo.Size = New System.Drawing.Size(106, 36)
@@ -105,10 +106,11 @@ Partial Class frmNotificaciones
         '
         'txtFiltro
         '
+        Me.txtFiltro.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtFiltro.Location = New System.Drawing.Point(79, 15)
         Me.txtFiltro.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.txtFiltro.Name = "txtFiltro"
-        Me.txtFiltro.Size = New System.Drawing.Size(337, 26)
+        Me.txtFiltro.Size = New System.Drawing.Size(502, 26)
         Me.txtFiltro.TabIndex = 1
         '
         'Label1

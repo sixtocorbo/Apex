@@ -92,6 +92,7 @@ Partial Class frmNovedadCrear
         '
         'txtTexto
         '
+        Me.txtTexto.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtTexto.Dock = System.Windows.Forms.DockStyle.Fill
         Me.txtTexto.Location = New System.Drawing.Point(10, 10)
         Me.txtTexto.Multiline = True

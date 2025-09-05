@@ -74,6 +74,7 @@ Partial Class frmEstadosTransitoriosGeneral
         '
         Me.txtFiltro.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtFiltro.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtFiltro.Location = New System.Drawing.Point(302, 18)
         Me.txtFiltro.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtFiltro.Name = "txtFiltro"

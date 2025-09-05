@@ -158,6 +158,7 @@ Partial Class frmSancionCrear
         'txtResolucion
         '
         Me.txtResolucion.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtResolucion.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.TableLayoutPanel1.SetColumnSpan(Me.txtResolucion, 2)
         Me.txtResolucion.Location = New System.Drawing.Point(141, 93)
         Me.txtResolucion.Name = "txtResolucion"
@@ -197,6 +198,7 @@ Partial Class frmSancionCrear
         '
         'txtObservaciones
         '
+        Me.txtObservaciones.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.TableLayoutPanel1.SetColumnSpan(Me.txtObservaciones, 2)
         Me.txtObservaciones.Dock = System.Windows.Forms.DockStyle.Fill
         Me.txtObservaciones.Location = New System.Drawing.Point(141, 153)

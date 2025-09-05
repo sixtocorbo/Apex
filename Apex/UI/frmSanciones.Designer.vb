@@ -114,7 +114,7 @@ Partial Class frmSanciones
         Me.Label1.AutoSize = True
         Me.Label1.Location = New System.Drawing.Point(430, 18)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(114, 20)
+        Me.Label1.Size = New System.Drawing.Size(105, 20)
         Me.Label1.TabIndex = 3
         Me.Label1.Text = "Tipo Sanción:"
         '
@@ -129,6 +129,7 @@ Partial Class frmSanciones
         '
         'txtBusquedaSancion
         '
+        Me.txtBusquedaSancion.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtBusquedaSancion.Location = New System.Drawing.Point(131, 14)
         Me.txtBusquedaSancion.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.txtBusquedaSancion.Name = "txtBusquedaSancion"

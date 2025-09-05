@@ -153,6 +153,7 @@ Partial Class frmNotificacionCrear
         '
         'txtMedio
         '
+        Me.txtMedio.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtMedio.Dock = System.Windows.Forms.DockStyle.Fill
         Me.txtMedio.Location = New System.Drawing.Point(142, 93)
         Me.txtMedio.Multiline = True
@@ -174,6 +175,7 @@ Partial Class frmNotificacionCrear
         'txtDocumento
         '
         Me.txtDocumento.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtDocumento.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtDocumento.Location = New System.Drawing.Point(142, 173)
         Me.txtDocumento.Name = "txtDocumento"
         Me.txtDocumento.Size = New System.Drawing.Size(319, 31)
@@ -192,6 +194,7 @@ Partial Class frmNotificacionCrear
         'txtExpMinisterial
         '
         Me.txtExpMinisterial.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtExpMinisterial.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtExpMinisterial.Location = New System.Drawing.Point(142, 203)
         Me.txtExpMinisterial.Name = "txtExpMinisterial"
         Me.txtExpMinisterial.Size = New System.Drawing.Size(319, 31)
@@ -210,6 +213,7 @@ Partial Class frmNotificacionCrear
         'txtExpINR
         '
         Me.txtExpINR.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtExpINR.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtExpINR.Location = New System.Drawing.Point(142, 233)
         Me.txtExpINR.Name = "txtExpINR"
         Me.txtExpINR.Size = New System.Drawing.Size(319, 31)
@@ -228,6 +232,7 @@ Partial Class frmNotificacionCrear
         'txtOficina
         '
         Me.txtOficina.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtOficina.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtOficina.Location = New System.Drawing.Point(142, 263)
         Me.txtOficina.Name = "txtOficina"
         Me.txtOficina.Size = New System.Drawing.Size(319, 31)

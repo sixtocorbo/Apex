@@ -59,6 +59,7 @@ Partial Class frmViaticosListas
         '
         Me.txtFiltroDinamico.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtFiltroDinamico.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtFiltroDinamico.Location = New System.Drawing.Point(121, 58)
         Me.txtFiltroDinamico.Name = "txtFiltroDinamico"
         Me.txtFiltroDinamico.Size = New System.Drawing.Size(417, 31)

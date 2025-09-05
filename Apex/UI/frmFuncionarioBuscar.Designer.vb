@@ -73,6 +73,7 @@ Partial Class frmFuncionarioBuscar
         '
         'txtBusqueda
         '
+        Me.txtBusqueda.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtBusqueda.Location = New System.Drawing.Point(99, 31)
         Me.txtBusqueda.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtBusqueda.Name = "txtBusqueda"
