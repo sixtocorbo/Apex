@@ -193,12 +193,4 @@ Public NotInheritable Class TiposEstadoCatalog
             Return IdDe("Desarmado")
         End Get
     End Property
-
-    ' **PROPIEDAD ELIMINADA**: La "Licencia" no es un TipoEstadoTransitorio.
-    ' Las licencias por enfermedad se gestionan a través del estado "Enfermedad".
-    ' Public Shared ReadOnly Property Licencia As Integer
-    '     Get
-    '         Return IdDe("Licencia")
-    '     End Get
-    ' End Property
 End Class
