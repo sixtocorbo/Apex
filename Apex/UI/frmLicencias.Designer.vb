@@ -108,9 +108,8 @@ Partial Class frmLicencias
         '
         'chkSoloVigentes
         '
-        Me.chkSoloVigentes.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.chkSoloVigentes.AutoSize = True
-        Me.chkSoloVigentes.Location = New System.Drawing.Point(712, 17)
+        Me.chkSoloVigentes.Location = New System.Drawing.Point(517, 16)
         Me.chkSoloVigentes.Name = "chkSoloVigentes"
         Me.chkSoloVigentes.Size = New System.Drawing.Size(159, 24)
         Me.chkSoloVigentes.TabIndex = 2

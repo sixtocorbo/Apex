@@ -82,8 +82,7 @@ Public Class frmNovedades
         lstFuncionarios.DataSource = Nothing
         flpFotos.Controls.Clear()
         _pictureBoxSeleccionado = Nothing
-        ' --- CORRECCIÓN ---
-        ' Es crucial resetear el ID seleccionado para permitir que la nueva selección se cargue.
+
         _idNovedadSeleccionada = Nothing
     End Sub
 
