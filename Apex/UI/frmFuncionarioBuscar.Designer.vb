@@ -16,13 +16,15 @@ Partial Class frmFuncionarioBuscar
     End Sub
 #End Region
 
+    ' --- CAMBIO: Se agrega el contenedor de componentes ---
     Private components As System.ComponentModel.IContainer
 
     '======================================================================
-    '                       ¡InitializeComponent!
+    '                         ¡InitializeComponent!
     '======================================================================
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container()
         Me.panelFiltros = New System.Windows.Forms.Panel()
         Me.txtBusqueda = New System.Windows.Forms.TextBox()
         Me.lblBuscar = New System.Windows.Forms.Label()
@@ -44,10 +46,13 @@ Partial Class frmFuncionarioBuscar
         Me.lblCargoHeader = New System.Windows.Forms.Label()
         Me.lblNombreCompleto = New System.Windows.Forms.Label()
         Me.lblCI = New System.Windows.Forms.Label()
-        Me.pbFotoDetalle = New System.Windows.Forms.PictureBox()
         Me.FlowLayoutPanelAcciones = New System.Windows.Forms.FlowLayoutPanel()
         Me.btnSeleccionar = New System.Windows.Forms.Button()
         Me.btnCancelar = New System.Windows.Forms.Button()
+        Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
+        Me.pbCopyNombre = New System.Windows.Forms.PictureBox()
+        Me.pbCopyCI = New System.Windows.Forms.PictureBox()
+        Me.pbFotoDetalle = New System.Windows.Forms.PictureBox()
         Me.panelFiltros.SuspendLayout()
         CType(Me.splitContenedor, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.splitContenedor.Panel1.SuspendLayout()
@@ -55,8 +60,10 @@ Partial Class frmFuncionarioBuscar
         Me.splitContenedor.SuspendLayout()
         CType(Me.dgvResultados, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.panelDetalle.SuspendLayout()
-        CType(Me.pbFotoDetalle, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.FlowLayoutPanelAcciones.SuspendLayout()
+        CType(Me.pbCopyNombre, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.pbCopyCI, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.pbFotoDetalle, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'panelFiltros
@@ -131,6 +138,8 @@ Partial Class frmFuncionarioBuscar
         'panelDetalle
         '
         Me.panelDetalle.BackColor = System.Drawing.Color.White
+        Me.panelDetalle.Controls.Add(Me.pbCopyNombre)
+        Me.panelDetalle.Controls.Add(Me.pbCopyCI)
         Me.panelDetalle.Controls.Add(Me.btnVerSituacion)
         Me.panelDetalle.Controls.Add(Me.btnGenerarFicha)
         Me.panelDetalle.Controls.Add(Me.lblEstadoActividad)
@@ -343,19 +352,6 @@ Partial Class frmFuncionarioBuscar
         Me.lblCI.Text = "CI: -"
         Me.lblCI.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
-        'pbFotoDetalle
-        '
-        Me.pbFotoDetalle.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.pbFotoDetalle.Location = New System.Drawing.Point(19, 20)
-        Me.pbFotoDetalle.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.pbFotoDetalle.Name = "pbFotoDetalle"
-        Me.pbFotoDetalle.Size = New System.Drawing.Size(1051, 540)
-        Me.pbFotoDetalle.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
-        Me.pbFotoDetalle.TabIndex = 0
-        Me.pbFotoDetalle.TabStop = False
-        '
         'FlowLayoutPanelAcciones
         '
         Me.FlowLayoutPanelAcciones.AutoSize = True
@@ -391,6 +387,47 @@ Partial Class frmFuncionarioBuscar
         Me.btnCancelar.Text = "Cancelar"
         Me.btnCancelar.UseVisualStyleBackColor = True
         '
+        'pbCopyNombre
+        '
+        Me.pbCopyNombre.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.pbCopyNombre.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.pbCopyNombre.Image = Global.Apex.My.Resources.Resources.copy_icon
+        Me.pbCopyNombre.Location = New System.Drawing.Point(1040, 620)
+        Me.pbCopyNombre.Name = "pbCopyNombre"
+        Me.pbCopyNombre.Size = New System.Drawing.Size(24, 24)
+        Me.pbCopyNombre.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
+        Me.pbCopyNombre.TabIndex = 19
+        Me.pbCopyNombre.TabStop = False
+        Me.ToolTip1.SetToolTip(Me.pbCopyNombre, "Copiar Nombre")
+        Me.pbCopyNombre.Visible = False
+        '
+        'pbCopyCI
+        '
+        Me.pbCopyCI.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.pbCopyCI.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.pbCopyCI.Image = Global.Apex.My.Resources.Resources.copy_icon
+        Me.pbCopyCI.Location = New System.Drawing.Point(1040, 584)
+        Me.pbCopyCI.Name = "pbCopyCI"
+        Me.pbCopyCI.Size = New System.Drawing.Size(24, 24)
+        Me.pbCopyCI.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
+        Me.pbCopyCI.TabIndex = 18
+        Me.pbCopyCI.TabStop = False
+        Me.ToolTip1.SetToolTip(Me.pbCopyCI, "Copiar CI")
+        Me.pbCopyCI.Visible = False
+        '
+        'pbFotoDetalle
+        '
+        Me.pbFotoDetalle.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.pbFotoDetalle.Location = New System.Drawing.Point(19, 20)
+        Me.pbFotoDetalle.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.pbFotoDetalle.Name = "pbFotoDetalle"
+        Me.pbFotoDetalle.Size = New System.Drawing.Size(1051, 540)
+        Me.pbFotoDetalle.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
+        Me.pbFotoDetalle.TabIndex = 0
+        Me.pbFotoDetalle.TabStop = False
+        '
         'frmFuncionarioBuscar
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -412,8 +449,10 @@ Partial Class frmFuncionarioBuscar
         CType(Me.dgvResultados, System.ComponentModel.ISupportInitialize).EndInit()
         Me.panelDetalle.ResumeLayout(False)
         Me.panelDetalle.PerformLayout()
-        CType(Me.pbFotoDetalle, System.ComponentModel.ISupportInitialize).EndInit()
         Me.FlowLayoutPanelAcciones.ResumeLayout(False)
+        CType(Me.pbCopyNombre, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.pbCopyCI, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.pbFotoDetalle, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -444,4 +483,9 @@ Partial Class frmFuncionarioBuscar
     Friend WithEvents lblEstadoActividad As Label
     Friend WithEvents btnGenerarFicha As Button
     Friend WithEvents btnVerSituacion As Button
+    ' --- INICIO DE DECLARACIÓN DE NUEVOS CONTROLES ---
+    Friend WithEvents pbCopyCI As PictureBox
+    Friend WithEvents pbCopyNombre As PictureBox
+    Friend WithEvents ToolTip1 As ToolTip
+    ' --- FIN DE DECLARACIÓN DE NUEVOS CONTROLES ---
 End Class

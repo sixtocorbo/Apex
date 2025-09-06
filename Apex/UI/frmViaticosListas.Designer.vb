@@ -80,7 +80,7 @@ Partial Class frmViaticosListas
         Me.btnGenerar.Name = "btnGenerar"
         Me.btnGenerar.Size = New System.Drawing.Size(204, 33)
         Me.btnGenerar.TabIndex = 2
-        Me.btnGenerar.Text = "Generar Reporte"
+        Me.btnGenerar.Text = "Generar lista"
         Me.btnGenerar.UseVisualStyleBackColor = True
         '
         'dtpPeriodo

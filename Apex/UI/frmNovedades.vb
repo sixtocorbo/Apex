@@ -11,13 +11,18 @@ Public Class frmNovedades
     Private _bsNovedades As New BindingSource()
     Private _pictureBoxSeleccionado As PictureBox = Nothing
     Private _idNovedadSeleccionada As Integer?
-
+    Private _funcionariosSeleccionadosFiltro As New Dictionary(Of Integer, String)
     Private Async Sub frmNovedades_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
         ConfigurarGrilla()
         dgvNovedades.DataSource = _bsNovedades
-        ' Carga las últimas novedades al abrir el formulario
-        Await BuscarAsync(String.Empty)
+
+        ' Configuración inicial de los filtros
+        dtpFechaDesde.Value = DateTime.Now.AddMonths(-1)
+        dtpFechaHasta.Value = DateTime.Now
+
+        ' Carga las novedades al abrir el formulario usando los filtros por defecto
+        Await BuscarAsync()
     End Sub
 
     Private Async Sub dgvNovedades_SelectionChanged(sender As Object, e As EventArgs) Handles dgvNovedades.SelectionChanged
@@ -41,24 +46,35 @@ Public Class frmNovedades
         End With
     End Sub
 
-    Private Async Function BuscarAsync(Optional textoBusqueda As String = Nothing) As Task
-        If textoBusqueda Is Nothing Then textoBusqueda = txtBusqueda.Text
+    Private Async Function BuscarAsync() As Task
+        ' 1. Recopilar todos los criterios de búsqueda de la UI
+        Dim textoBusqueda As String = txtBusqueda.Text.Trim()
+        Dim fechaDesde As DateTime? = Nothing
+        Dim fechaHasta As DateTime? = Nothing
+        If chkFiltrarPorFecha.Checked Then
+            fechaDesde = dtpFechaDesde.Value.Date
+            ' Establece la hora al último instante del día para incluir todos los registros de esa fecha.
+            fechaHasta = dtpFechaHasta.Value.Date.AddDays(1).AddTicks(-1)
+        End If
+        Dim idsFuncionarios As List(Of Integer) = _funcionariosSeleccionadosFiltro.Keys.ToList()
 
+        ' 2. Mostrar feedback al usuario
         LoadingHelper.MostrarCargando(Me)
         btnBuscar.Enabled = False
         _bsNovedades.DataSource = Nothing
-        LimpiarDetalles() ' Limpia los detalles al iniciar la búsqueda
+        LimpiarDetalles()
 
         Try
+            ' 3. Llamar al NUEVO método de servicio que acepta todos los filtros
             Using svc As New NovedadService()
-                _bsNovedades.DataSource = Await svc.BuscarNovedadesAgrupadasFTSAsync(textoBusqueda)
+                _bsNovedades.DataSource = Await svc.BuscarNovedadesAvanzadoAsync(textoBusqueda, fechaDesde, fechaHasta, idsFuncionarios)
             End Using
-
         Catch ex As Exception
             MessageBox.Show("Ocurrió un error al buscar las novedades: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         Finally
             LoadingHelper.OcultarCargando(Me)
             btnBuscar.Enabled = True
+            dgvNovedades.Focus()
         End Try
     End Function
 
@@ -91,27 +107,18 @@ Public Class frmNovedades
             LimpiarDetalles()
             Return
         End If
-
         Dim novedadSeleccionada = CType(dgvNovedades.CurrentRow.DataBoundItem, vw_NovedadesAgrupadas)
-
-        ' --- CORRECCIÓN ---
-        ' Evita la recarga innecesaria si el evento se dispara para una novedad que ya está mostrada.
-        ' Esto soluciona el problema de carga múltiple al asignar el DataSource.
         If _idNovedadSeleccionada.HasValue AndAlso _idNovedadSeleccionada.Value = novedadSeleccionada.Id Then
             Return
         End If
-
         _idNovedadSeleccionada = novedadSeleccionada.Id
-
         Using svc As New NovedadService()
             Dim novedadCompleta = Await svc.GetByIdAsync(novedadSeleccionada.Id)
             txtTextoNovedad.Text = If(novedadCompleta IsNot Nothing, novedadCompleta.Texto, "")
-
             Dim funcionarios = Await svc.GetFuncionariosPorNovedadAsync(novedadSeleccionada.Id)
             lstFuncionarios.DataSource = funcionarios
             lstFuncionarios.DisplayMember = "Nombre"
             lstFuncionarios.ValueMember = "Id"
-
             Await CargarFotos(novedadSeleccionada.Id)
         End Using
     End Function
@@ -122,7 +129,6 @@ Public Class frmNovedades
     Private Async Function CargarFotos(novedadId As Integer) As Task
         _pictureBoxSeleccionado = Nothing
         flpFotos.Controls.Clear()
-
         Using svc As New NovedadService()
             Dim fotos = Await svc.GetFotosPorNovedadAsync(novedadId)
             For Each foto In fotos

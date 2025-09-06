@@ -30,6 +30,7 @@ Partial Class frmConfiguracion
         Me.btnTiposEstadoTransitorio = New System.Windows.Forms.Button()
         Me.btnGestionarIncidencias = New System.Windows.Forms.Button()
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
+        Me.btnNomenclaturas = New System.Windows.Forms.Button()
         Me.FlowLayoutPanel1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -112,11 +113,22 @@ Partial Class frmConfiguracion
         Me.FlowLayoutPanel1.Controls.Add(Me.btnGestionarIncidencias)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnTiposEstadoTransitorio)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnCategoriasAusencia)
+        Me.FlowLayoutPanel1.Controls.Add(Me.btnNomenclaturas)
         Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.FlowLayoutPanel1.Location = New System.Drawing.Point(0, 0)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
         Me.FlowLayoutPanel1.Size = New System.Drawing.Size(717, 375)
         Me.FlowLayoutPanel1.TabIndex = 8
+        '
+        'btnNomenclaturas
+        '
+        Me.btnNomenclaturas.Location = New System.Drawing.Point(297, 140)
+        Me.btnNomenclaturas.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnNomenclaturas.Name = "btnNomenclaturas"
+        Me.btnNomenclaturas.Size = New System.Drawing.Size(285, 35)
+        Me.btnNomenclaturas.TabIndex = 8
+        Me.btnNomenclaturas.Text = "Nomenclaturas"
+        Me.btnNomenclaturas.UseVisualStyleBackColor = True
         '
         'frmConfiguracion
         '
@@ -141,4 +153,5 @@ Partial Class frmConfiguracion
     Friend WithEvents btnTiposEstadoTransitorio As Button
     Friend WithEvents btnGestionarIncidencias As Button
     Friend WithEvents FlowLayoutPanel1 As FlowLayoutPanel
+    Friend WithEvents btnNomenclaturas As Button
 End Class

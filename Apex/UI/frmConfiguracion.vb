@@ -12,6 +12,7 @@ Public Class frmConfiguracion
     Private _gestionTiposEstadoTransitorioInstancia As frmEstadoTransitorioTipos
     Private _gestionCategoriasAusenciaInstancia As frmIncidenciasCategorias
 
+
     Private Sub btnGestionarIncidencias_Click(sender As Object, e As EventArgs) Handles btnGestionarIncidencias.Click
         If _gestionIncidenciasInstancia Is Nothing OrElse _gestionIncidenciasInstancia.IsDisposed Then
             _gestionIncidenciasInstancia = New frmIncidencias()
@@ -52,7 +53,7 @@ Public Class frmConfiguracion
         parentDashboard.AbrirFormEnPanel(_gestionTurnosInstancia)
     End Sub
 
-    Private Sub btnTiposEstadoTransitorio_Click(sender As Object, e As EventArgs)
+    Private Sub btnTiposEstadoTransitorio_Click(sender As Object, e As EventArgs) Handles btnTiposEstadoTransitorio.Click
         If _gestionTiposEstadoTransitorioInstancia Is Nothing OrElse _gestionTiposEstadoTransitorioInstancia.IsDisposed Then
             _gestionTiposEstadoTransitorioInstancia = New frmEstadoTransitorioTipos()
         End If
@@ -60,7 +61,7 @@ Public Class frmConfiguracion
         parentDashboard.AbrirFormEnPanel(_gestionTiposEstadoTransitorioInstancia)
     End Sub
 
-    Private Sub btnCategoriasAusencia_Click(sender As Object, e As EventArgs)
+    Private Sub btnCategoriasAusencia_Click(sender As Object, e As EventArgs) Handles btnCategoriasAusencia.Click
         If _gestionCategoriasAusenciaInstancia Is Nothing OrElse _gestionCategoriasAusenciaInstancia.IsDisposed Then
             _gestionCategoriasAusenciaInstancia = New frmIncidenciasCategorias()
         End If
@@ -72,5 +73,11 @@ Public Class frmConfiguracion
         AppTheme.Aplicar(Me)
     End Sub
 
-
+    Private Sub btnNomenclaturas_Click(sender As Object, e As EventArgs) Handles btnNomenclaturas.Click
+        If _gestionNomenclaturasInstancia Is Nothing OrElse _gestionNomenclaturasInstancia.IsDisposed Then
+            _gestionNomenclaturasInstancia = New frmNomenclaturas()
+            Dim parentDashboard As frmDashboard = CType(Me.ParentForm, frmDashboard)
+            parentDashboard.AbrirFormEnPanel(_gestionNomenclaturasInstancia)
+        End If
+    End Sub
 End Class

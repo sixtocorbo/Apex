@@ -2,6 +2,7 @@
 Imports System.Data.Entity
 Imports System.Data.SqlClient ' <--- IMPORTANTE: Añadir esta línea
 Imports System.IO
+Imports System.Text
 
 Public Class NovedadService
     Inherits GenericService(Of Novedad)
@@ -59,66 +60,95 @@ Public Class NovedadService
         Return lista
     End Function
 
-    ' --- INICIO DEL NUEVO MÉTODO AÑADIDO ---
+    ' --- MÉTODO DE BÚSQUEDA AVANZADA (NUEVO Y CENTRALIZADO) ---
     ''' <summary>
-    ''' Busca novedades utilizando Full-Text Search sobre el texto de la novedad y los nombres de los funcionarios involucrados.
+    ''' Realiza una búsqueda avanzada de novedades combinando Full-Text Search, rango de fechas y filtro por funcionarios.
     ''' </summary>
-    Public Async Function BuscarNovedadesAgrupadasFTSAsync(textoBusqueda As String) As Task(Of List(Of vw_NovedadesAgrupadas))
-        If String.IsNullOrWhiteSpace(textoBusqueda) Then
-            ' Si no hay búsqueda, devuelve las últimas 200 novedades.
-            Dim listaSinFiltro = Await _unitOfWork.Repository(Of vw_NovedadesAgrupadas).GetAll().
-                                    OrderByDescending(Function(n) n.Fecha).ThenByDescending(Function(n) n.Id).
-                                    Take(200).
-                                    ToListAsync()
+    ''' <returns>Una lista de novedades agrupadas que coinciden con los criterios.</returns>
+    Public Async Function BuscarNovedadesAvanzadoAsync(
+        textoBusqueda As String,
+        fechaDesde As DateTime?,
+        fechaHasta As DateTime?,
+        idsFuncionarios As List(Of Integer)
+    ) As Task(Of List(Of vw_NovedadesAgrupadas))
 
+        ' --- Caso 1: Sin filtros, devolver las últimas 200 (comportamiento por defecto) ---
+        If String.IsNullOrWhiteSpace(textoBusqueda) AndAlso Not fechaDesde.HasValue AndAlso (idsFuncionarios Is Nothing OrElse Not idsFuncionarios.Any()) Then
+            Dim listaSinFiltro = Await _unitOfWork.Repository(Of vw_NovedadesAgrupadas).GetAll().
+                                     OrderByDescending(Function(n) n.Fecha).ThenByDescending(Function(n) n.Id).
+                                     Take(200).
+                                     ToListAsync()
             ' AUDITORÍA
             Await RegistrarAuditoriaSeguraAsync(
-                accion:="Buscar",
+                accion:="BuscarAvanzado",
                 tipoEntidad:="Novedad",
-                descripcion:=$"Búsqueda FTS sin filtro. Devueltas {listaSinFiltro.Count} novedades."
+                descripcion:=$"Búsqueda sin filtros. Se devuelven las últimas {listaSinFiltro.Count} novedades."
             )
-
             Return listaSinFiltro
         End If
 
-        ' Formatear el texto de búsqueda para CONTAINS. Ej: "arma" "incautada" -> ""arma*"" AND ""incautada*""
-        Dim terminos = textoBusqueda.Split({" "c}, StringSplitOptions.RemoveEmptyEntries) _
-                                    .Select(Function(w) $"""{w.Trim()}*""")
-        Dim expresionFts = String.Join(" AND ", terminos)
+        ' --- Caso 2: Búsqueda con filtros, construir consulta dinámica ---
+        Dim sqlBuilder As New StringBuilder()
+        Dim parameters As New List(Of SqlParameter)()
+        Dim whereClauses As New List(Of String)()
 
-        ' La consulta ahora une la vista con la tabla base para usar el índice correcto en la columna 'Texto'.
-        Dim sql = "
-            SELECT DISTINCT
-                v.Id, v.Fecha, v.Resumen, v.Funcionarios, v.Estado
-            FROM
-                dbo.vw_NovedadesAgrupadas AS v
-            INNER JOIN
-                dbo.Novedad AS n ON v.Id = n.Id
-            WHERE
-                -- Busca en la columna 'Texto' de la tabla Novedad
-                CONTAINS(n.Texto, @patron) OR
-                -- Busca en los funcionarios involucrados
-                EXISTS (
-                    SELECT 1
-                    FROM dbo.NovedadFuncionario AS nf
-                    JOIN dbo.Funcionario AS f ON nf.FuncionarioId = f.Id
-                    WHERE nf.NovedadId = v.Id AND CONTAINS(f.Nombre, @patron)
-                )
-            ORDER BY
-                v.Fecha DESC, v.Id DESC;"
+        sqlBuilder.AppendLine("SELECT DISTINCT v.Id, v.Fecha, v.Resumen, v.Funcionarios, v.Estado")
+        sqlBuilder.AppendLine("FROM dbo.vw_NovedadesAgrupadas AS v")
 
-        Dim pPatron = New SqlParameter("@patron", expresionFts)
-        Dim lista = Await _unitOfWork.Context.Database.SqlQuery(Of vw_NovedadesAgrupadas)(sql, pPatron).ToListAsync()
+        ' --- Filtro de Texto (FTS) ---
+        If Not String.IsNullOrWhiteSpace(textoBusqueda) Then
+            sqlBuilder.AppendLine("INNER JOIN dbo.Novedad AS n ON v.Id = n.Id") ' Necesario para buscar en n.Texto
+
+            Dim terminos = textoBusqueda.Split({" "c}, StringSplitOptions.RemoveEmptyEntries) _
+                                        .Select(Function(w) $"""{w.Trim()}*""")
+            Dim expresionFts = String.Join(" AND ", terminos)
+            parameters.Add(New SqlParameter("@patronFTS", expresionFts))
+
+            Dim ftsCondition = " (CONTAINS(n.Texto, @patronFTS) OR " &
+                               "  EXISTS (SELECT 1 FROM dbo.NovedadFuncionario nf JOIN dbo.Funcionario f ON nf.FuncionarioId = f.Id WHERE nf.NovedadId = v.Id AND CONTAINS(f.Nombre, @patronFTS)))"
+            whereClauses.Add(ftsCondition)
+        End If
+
+        ' --- Filtro de Fechas ---
+        If fechaDesde.HasValue Then
+            whereClauses.Add("v.Fecha >= @fechaDesde")
+            parameters.Add(New SqlParameter("@fechaDesde", fechaDesde.Value))
+        End If
+        If fechaHasta.HasValue Then
+
+            whereClauses.Add("v.Fecha <= @fechaHasta")
+            parameters.Add(New SqlParameter("@fechaHasta", fechaHasta.Value))
+        End If
+
+        ' --- Filtro de Funcionarios ---
+        If idsFuncionarios IsNot Nothing AndAlso idsFuncionarios.Any() Then
+            ' Se crea una subconsulta que asegura que la novedad contenga AL MENOS UNO de los funcionarios seleccionados.
+            Dim funcCondition = $"v.Id IN (SELECT nf.NovedadId FROM dbo.NovedadFuncionario nf WHERE nf.FuncionarioId IN ({String.Join(",", idsFuncionarios)}))"
+            whereClauses.Add(funcCondition)
+            ' Nota: Para listas muy grandes de funcionarios, un TVP (Table-Valued Parameter) sería más eficiente,
+            ' pero para una selección manual de UI, esto es perfectamente adecuado y simple.
+        End If
+
+        ' --- Ensamblar la consulta final ---
+        If whereClauses.Any() Then
+            sqlBuilder.AppendLine("WHERE " & String.Join(" AND ", whereClauses))
+        End If
+
+        sqlBuilder.AppendLine("ORDER BY v.Fecha DESC, v.Id DESC")
+
+        Dim lista = Await _unitOfWork.Context.Database.SqlQuery(Of vw_NovedadesAgrupadas)(sqlBuilder.ToString(), parameters.ToArray()).ToListAsync()
 
         ' AUDITORÍA
+        Dim descAuditoria = $"Búsqueda con filtros: Texto='{textoBusqueda}', FechaDesde='{fechaDesde}', FechaHasta='{fechaHasta}', Funcionarios='{idsFuncionarios?.Count}'. Resultados: {lista.Count}."
         Await RegistrarAuditoriaSeguraAsync(
-            accion:="BuscarFTS",
+            accion:="BuscarAvanzado",
             tipoEntidad:="Novedad",
-            descripcion:=$"Búsqueda FTS con patrón '{textoBusqueda}'. Resultados: {lista.Count}."
+            descripcion:=descAuditoria
         )
 
         Return lista
     End Function
+
 
     ''' <summary>
     ''' Crea una nueva novedad junto con sus funcionarios asociados en una única transacción.

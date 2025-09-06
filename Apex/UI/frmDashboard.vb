@@ -22,7 +22,6 @@ Public Class frmDashboard
     {GetType(frmSanciones), New String() {"txtBuscar", "txtBusqueda", "txtFiltro"}},
     {GetType(frmConceptoFuncional), New String() {"txtBuscar", "txtBusqueda", "txtNombre", "cmbConcepto"}},
     {GetType(frmNovedades), New String() {"txtBuscar", "txtBusqueda", "txtFiltro"}},
-    {GetType(frmNomenclaturas), New String() {"txtBuscar", "txtBusqueda", "txtCodigo", "txtNombre"}},
     {GetType(frmRenombrarPDF), New String() {"txtCarpeta", "txtRuta", "txtPrefijo", "btnSeleccionarCarpeta"}},
     {GetType(frmAsistenteImportacion), New String() {"txtArchivo", "btnSeleccionarArchivo"}},
     {GetType(frmViaticosListas), New String() {"txtBuscar", "txtBusqueda", "txtFiltro"}},
@@ -51,7 +50,6 @@ Public Class frmDashboard
         AddHandler btnConceptoFuncional.Click, AddressOf AbrirFormularioDesdeMenu_Click
         AddHandler btnFiltros.Click, AddressOf AbrirFormularioDesdeMenu_Click
         AddHandler btnNovedades.Click, AddressOf AbrirFormularioDesdeMenu_Click
-        AddHandler btnNomenclaturas.Click, AddressOf AbrirFormularioDesdeMenu_Click
         AddHandler btnRenombrarPDFs.Click, AddressOf AbrirFormularioDesdeMenu_Click
         AddHandler btnImportacion.Click, AddressOf AbrirFormularioDesdeMenu_Click
         AddHandler btnViaticos.Click, AddressOf AbrirFormularioDesdeMenu_Click
@@ -187,7 +185,6 @@ Public Class frmDashboard
             Case "btnConceptoFuncional" : Return GetType(frmConceptoFuncional)
             Case "btnFiltros" : Return GetType(frmFiltros)
             Case "btnNovedades" : Return GetType(frmNovedades)
-            Case "btnNomenclaturas" : Return GetType(frmNomenclaturas)
             Case "btnRenombrarPDFs" : Return GetType(frmRenombrarPDF)
             Case "btnImportacion" : Return GetType(frmAsistenteImportacion)
             Case "btnViaticos" : Return GetType(frmViaticosListas)

@@ -362,6 +362,7 @@ Partial Class frmNomenclaturas
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1167, 837)
         Me.Controls.Add(Me.TableLayoutPanel1)
+        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.MinimumSize = New System.Drawing.Size(850, 800)
         Me.Name = "frmNomenclaturas"

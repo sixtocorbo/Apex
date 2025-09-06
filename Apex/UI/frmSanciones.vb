@@ -124,19 +124,19 @@ Public Class frmSanciones
 
         ' --- CORRECCIÓN 1: Asegurarse de que el tipo de dato es el correcto ---
         Dim sancionSeleccionada = TryCast(dgvSanciones.CurrentRow.DataBoundItem, vw_LicenciasCompletas)
-            If sancionSeleccionada Is Nothing Then Return
+        If sancionSeleccionada Is Nothing Then Return
 
-            Dim idSeleccionado = sancionSeleccionada.Id
-            Dim estadoActual = sancionSeleccionada.Estado
+        Dim idSeleccionado = sancionSeleccionada.Id
+        Dim estadoActual = sancionSeleccionada.Estado
 
-            ' --- CORRECCIÓN 2: Usar el constructor correcto para editar ---
-            ' Se le pasa el ID y el estado actual directamente al crearlo.
-            Using frm As New frmLicenciaCrear(idSeleccionado, estadoActual)
-                If frm.ShowDialog(Me) = DialogResult.OK Then
-                    Await CargarDatosSancionesAsync()
-                End If
-            End Using
-End Sub
+        ' --- CORRECCIÓN 2: Usar el constructor correcto para editar ---
+        ' Se le pasa el ID y el estado actual directamente al crearlo.
+        Using frm As New frmLicenciaCrear(idSeleccionado, estadoActual)
+            If frm.ShowDialog(Me) = DialogResult.OK Then
+                Await CargarDatosSancionesAsync()
+            End If
+        End Using
+    End Sub
 
     Private Async Sub btnEliminarSancion_Click(sender As Object, e As EventArgs) Handles btnEliminarSancion.Click
         If dgvSanciones.CurrentRow Is Nothing Then Return

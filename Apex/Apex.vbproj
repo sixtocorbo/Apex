@@ -655,12 +655,6 @@
     <Compile Include="UI\frmNotificacionRPT.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\frmNovedadesDelDia.Designer.vb">
-      <DependentUpon>frmNovedadesDelDia.vb</DependentUpon>
-    </Compile>
-    <Compile Include="UI\frmNovedadesDelDia.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="UI\frmViaticosListas.Designer.vb">
       <DependentUpon>frmViaticosListas.vb</DependentUpon>
     </Compile>
@@ -834,9 +828,6 @@
     <EmbeddedResource Include="UI\frmTurnos.resx">
       <DependentUpon>frmTurnos.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\frmNovedadesDelDia.resx">
-      <DependentUpon>frmNovedadesDelDia.vb</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="UI\frmNovedadesListas.resx">
       <DependentUpon>frmNovedadesListas.vb</DependentUpon>
     </EmbeddedResource>
@@ -917,6 +908,7 @@
       <DependentUpon>Model1.edmx</DependentUpon>
       <LastGenOutput>Model1.vb</LastGenOutput>
     </Content>
+    <None Include="Resources\copy_icon.ico" />
     <Content Include="SqlServerTypes\Loader.cs" />
     <Content Include="SqlServerTypes\readme.htm" />
     <Content Include="SqlServerTypes\x64\msvcr120.dll">
