@@ -20,6 +20,7 @@ Public Class NovedadService
         _unitOfWork = unitOfWork
         _auditoriaService = New AuditoriaService(_unitOfWork)
     End Sub
+
     ' --- Helper interno para que la auditoría nunca “rompa” la operación principal ---
     Private Async Function RegistrarAuditoriaSeguraAsync(accion As String,
                                                          tipoEntidad As String,
@@ -44,7 +45,18 @@ Public Class NovedadService
         If fechaFin.HasValue Then
             query = query.Where(Function(n) n.Fecha <= fechaFin.Value)
         End If
-        Return Await query.OrderByDescending(Function(n) n.Fecha).ThenBy(Function(n) n.Id).ToListAsync()
+
+        Dim lista = Await query.OrderByDescending(Function(n) n.Fecha).ThenBy(Function(n) n.Id).ToListAsync()
+
+        ' AUDITORÍA
+        Dim rango As String = $"rango: {If(fechaInicio.HasValue, fechaInicio.Value.ToString("yyyy-MM-dd"), "sin inicio")} - {If(fechaFin.HasValue, fechaFin.Value.ToString("yyyy-MM-dd"), "sin fin")}"
+        Await RegistrarAuditoriaSeguraAsync(
+            accion:="Listar",
+            tipoEntidad:="Novedad",
+            descripcion:=$"Se listaron {lista.Count} novedades agrupadas ({rango})."
+        )
+
+        Return lista
     End Function
 
     ' --- INICIO DEL NUEVO MÉTODO AÑADIDO ---
@@ -54,10 +66,19 @@ Public Class NovedadService
     Public Async Function BuscarNovedadesAgrupadasFTSAsync(textoBusqueda As String) As Task(Of List(Of vw_NovedadesAgrupadas))
         If String.IsNullOrWhiteSpace(textoBusqueda) Then
             ' Si no hay búsqueda, devuelve las últimas 200 novedades.
-            Return Await _unitOfWork.Repository(Of vw_NovedadesAgrupadas).GetAll().
-                        OrderByDescending(Function(n) n.Fecha).ThenByDescending(Function(n) n.Id).
-                        Take(200).
-                        ToListAsync()
+            Dim listaSinFiltro = Await _unitOfWork.Repository(Of vw_NovedadesAgrupadas).GetAll().
+                                    OrderByDescending(Function(n) n.Fecha).ThenByDescending(Function(n) n.Id).
+                                    Take(200).
+                                    ToListAsync()
+
+            ' AUDITORÍA
+            Await RegistrarAuditoriaSeguraAsync(
+                accion:="Buscar",
+                tipoEntidad:="Novedad",
+                descripcion:=$"Búsqueda FTS sin filtro. Devueltas {listaSinFiltro.Count} novedades."
+            )
+
+            Return listaSinFiltro
         End If
 
         ' Formatear el texto de búsqueda para CONTAINS. Ej: "arma" "incautada" -> ""arma*"" AND ""incautada*""
@@ -87,10 +108,17 @@ Public Class NovedadService
                 v.Fecha DESC, v.Id DESC;"
 
         Dim pPatron = New SqlParameter("@patron", expresionFts)
-        Return Await _unitOfWork.Context.Database.SqlQuery(Of vw_NovedadesAgrupadas)(sql, pPatron).ToListAsync()
-    End Function
-    ' --- FIN DEL NUEVO MÉTODO AÑADIDO ---
+        Dim lista = Await _unitOfWork.Context.Database.SqlQuery(Of vw_NovedadesAgrupadas)(sql, pPatron).ToListAsync()
 
+        ' AUDITORÍA
+        Await RegistrarAuditoriaSeguraAsync(
+            accion:="BuscarFTS",
+            tipoEntidad:="Novedad",
+            descripcion:=$"Búsqueda FTS con patrón '{textoBusqueda}'. Resultados: {lista.Count}."
+        )
+
+        Return lista
+    End Function
 
     ''' <summary>
     ''' Crea una nueva novedad junto con sus funcionarios asociados en una única transacción.
@@ -101,6 +129,7 @@ Public Class NovedadService
         Dim repoGenerada = _unitOfWork.Repository(Of NovedadGenerada)()
         Dim novedadDelDia = Await repoGenerada.GetByPredicateAsync(Function(ng) ng.Fecha = fecha.Date)
 
+        Dim seCreoContenedor As Boolean = False
         If novedadDelDia Is Nothing Then
             ' Si no existe para esta fecha, la creamos.
             novedadDelDia = New NovedadGenerada With {
@@ -109,6 +138,15 @@ Public Class NovedadService
             }
             repoGenerada.Add(novedadDelDia)
             Await _unitOfWork.CommitAsync() ' Guardamos para obtener su ID.
+            seCreoContenedor = True
+
+            ' AUDITORÍA del contenedor
+            Await RegistrarAuditoriaSeguraAsync(
+                accion:="CrearContenedor",
+                tipoEntidad:="NovedadGenerada",
+                descripcion:=$"Se creó NovedadGenerada para la fecha {fecha:yyyy-MM-dd} con Id #{novedadDelDia.Id}.",
+                entidadId:=novedadDelDia.Id
+            )
         End If
 
         ' 2. Crear la Novedad específica, ahora con el ID del contenedor correcto.
@@ -127,6 +165,13 @@ Public Class NovedadService
         _unitOfWork.Repository(Of Novedad)().Add(nuevaNovedad)
         Await _unitOfWork.CommitAsync()
 
+        ' AUDITORÍA de la novedad creada
+        Await RegistrarAuditoriaSeguraAsync(
+            accion:="Crear",
+            tipoEntidad:="Novedad",
+            descripcion:=$"Se creó la novedad #{nuevaNovedad.Id} (fecha {fecha:yyyy-MM-dd}) con {funcionarioIds?.Count} funcionario(s). Contenedor creado: {seCreoContenedor}.",
+            entidadId:=nuevaNovedad.Id
+        )
 
         Return nuevaNovedad
     End Function
@@ -182,7 +227,16 @@ Public Class NovedadService
     Public Async Function GetNovedadesCompletasByIds(novedadIds As List(Of Integer)) As Task(Of List(Of vw_NovedadesCompletas))
         Using uow As New UnitOfWork()
             Dim repo = uow.Repository(Of vw_NovedadesCompletas)()
-            Return Await repo.GetAll().Where(Function(n) novedadIds.Contains(n.Id)).ToListAsync()
+            Dim lista = Await repo.GetAll().Where(Function(n) novedadIds.Contains(n.Id)).ToListAsync()
+
+            ' AUDITORÍA
+            Await RegistrarAuditoriaSeguraAsync(
+                accion:="ConsultarDetalle",
+                tipoEntidad:="Novedad",
+                descripcion:=$"Se consultaron detalles de {lista.Count} novedad(es). IDs: {String.Join(",", novedadIds)}."
+            )
+
+            Return lista
         End Using
     End Function
 
@@ -223,6 +277,7 @@ Public Class NovedadService
 
         ' 4. Guardar todos los cambios en una única transacción.
         Await _unitOfWork.CommitAsync()
+
         ' AUDITORÍA
         Await RegistrarAuditoriaSeguraAsync(
             accion:="Actualizar",
@@ -236,19 +291,39 @@ Public Class NovedadService
     ''' Obtiene la lista de funcionarios asociados a una novedad específica.
     ''' </summary>
     Public Async Function GetFuncionariosPorNovedadAsync(novedadId As Integer) As Task(Of List(Of Funcionario))
-        Return Await _unitOfWork.Repository(Of Funcionario)().GetAll().AsNoTracking().
+        Dim lista = Await _unitOfWork.Repository(Of Funcionario)().GetAll().AsNoTracking().
             Where(Function(f) f.NovedadFuncionario.Any(Function(nf) nf.NovedadId = novedadId)).
             OrderBy(Function(f) f.Nombre).
             ToListAsync()
+
+        ' AUDITORÍA
+        Await RegistrarAuditoriaSeguraAsync(
+            accion:="ConsultarFuncionariosDeNovedad",
+            tipoEntidad:="Novedad",
+            descripcion:=$"Se consultaron {lista.Count} funcionario(s) para la novedad #{novedadId}.",
+            entidadId:=novedadId
+        )
+
+        Return lista
     End Function
 
     ''' <summary>
     ''' Obtiene las fotos asociadas a una novedad específica.
     ''' </summary>
     Public Async Function GetFotosPorNovedadAsync(novedadId As Integer) As Task(Of List(Of NovedadFoto))
-        Return Await _unitOfWork.Repository(Of NovedadFoto)().GetAll().AsNoTracking().
+        Dim lista = Await _unitOfWork.Repository(Of NovedadFoto)().GetAll().AsNoTracking().
             Where(Function(nf) nf.NovedadId = novedadId).
             ToListAsync()
+
+        ' AUDITORÍA
+        Await RegistrarAuditoriaSeguraAsync(
+            accion:="ConsultarFotosDeNovedad",
+            tipoEntidad:="Novedad",
+            descripcion:=$"Se consultaron {lista.Count} foto(s) para la novedad #{novedadId}.",
+            entidadId:=novedadId
+        )
+
+        Return lista
     End Function
 
     ''' <summary>
@@ -266,6 +341,7 @@ Public Class NovedadService
 
         _unitOfWork.Repository(Of NovedadFoto)().Add(nuevaFoto)
         Await _unitOfWork.CommitAsync()
+
         ' AUDITORÍA
         Await RegistrarAuditoriaSeguraAsync(
             accion:="AgregarFoto",
@@ -289,9 +365,6 @@ Public Class NovedadService
         ' Si NovedadId es NOT NULL en la BD:
         Dim novedadIdDeLaFoto As Integer = foto.NovedadId
 
-        ' Si fuera Nullable(Of Integer):
-        'Dim novedadIdDeLaFoto As Integer = If(foto.NovedadId.HasValue, foto.NovedadId.Value, 0)
-
         repo.Remove(foto)
         Await _unitOfWork.CommitAsync()
 
@@ -302,7 +375,6 @@ Public Class NovedadService
         entidadId:=novedadIdDeLaFoto
     )
     End Function
-
 
     ''' <summary>
     ''' Agrega un funcionario a una novedad que ya existe.
@@ -317,6 +389,7 @@ Public Class NovedadService
                 .FuncionarioId = funcionarioId
             })
             Await _unitOfWork.CommitAsync()
+
             ' AUDITORÍA
             Await RegistrarAuditoriaSeguraAsync(
                 accion:="AgregarFuncionario",
@@ -336,6 +409,7 @@ Public Class NovedadService
         If relacion IsNot Nothing Then
             repo.Remove(relacion)
             Await _unitOfWork.CommitAsync()
+
             ' AUDITORÍA
             Await RegistrarAuditoriaSeguraAsync(
                 accion:="QuitarFuncionario",
