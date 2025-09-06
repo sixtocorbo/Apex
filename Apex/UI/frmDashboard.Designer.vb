@@ -24,8 +24,6 @@ Partial Class frmDashboard
     Private Sub InitializeComponent()
         Me.panelNavegacion = New System.Windows.Forms.Panel()
         Me.btnConfiguracion = New System.Windows.Forms.Button()
-        Me.btnAnalisisPersonal = New System.Windows.Forms.Button()
-        Me.btnAnalisis = New System.Windows.Forms.Button()
         Me.btnReportes = New System.Windows.Forms.Button()
         Me.btnViaticos = New System.Windows.Forms.Button()
         Me.btnImportacion = New System.Windows.Forms.Button()
@@ -51,8 +49,6 @@ Partial Class frmDashboard
         Me.panelNavegacion.AutoScroll = True
         Me.panelNavegacion.BackColor = System.Drawing.Color.FromArgb(CType(CType(51, Byte), Integer), CType(CType(51, Byte), Integer), CType(CType(76, Byte), Integer))
         Me.panelNavegacion.Controls.Add(Me.btnConfiguracion)
-        Me.panelNavegacion.Controls.Add(Me.btnAnalisisPersonal)
-        Me.panelNavegacion.Controls.Add(Me.btnAnalisis)
         Me.panelNavegacion.Controls.Add(Me.btnReportes)
         Me.panelNavegacion.Controls.Add(Me.btnViaticos)
         Me.panelNavegacion.Controls.Add(Me.btnImportacion)
@@ -80,7 +76,7 @@ Partial Class frmDashboard
         Me.btnConfiguracion.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnConfiguracion.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnConfiguracion.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnConfiguracion.Location = New System.Drawing.Point(0, 1410)
+        Me.btnConfiguracion.Location = New System.Drawing.Point(0, 1226)
         Me.btnConfiguracion.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnConfiguracion.Name = "btnConfiguracion"
         Me.btnConfiguracion.Padding = New System.Windows.Forms.Padding(18, 0, 0, 0)
@@ -89,40 +85,6 @@ Partial Class frmDashboard
         Me.btnConfiguracion.Text = "   ⚙️ Configuración"
         Me.btnConfiguracion.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.btnConfiguracion.UseVisualStyleBackColor = True
-        '
-        'btnAnalisisPersonal
-        '
-        Me.btnAnalisisPersonal.Dock = System.Windows.Forms.DockStyle.Top
-        Me.btnAnalisisPersonal.FlatAppearance.BorderSize = 0
-        Me.btnAnalisisPersonal.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.btnAnalisisPersonal.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnAnalisisPersonal.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnAnalisisPersonal.Location = New System.Drawing.Point(0, 1318)
-        Me.btnAnalisisPersonal.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnAnalisisPersonal.Name = "btnAnalisisPersonal"
-        Me.btnAnalisisPersonal.Padding = New System.Windows.Forms.Padding(18, 0, 0, 0)
-        Me.btnAnalisisPersonal.Size = New System.Drawing.Size(304, 92)
-        Me.btnAnalisisPersonal.TabIndex = 13
-        Me.btnAnalisisPersonal.Text = "   👥 Análisis de Personal"
-        Me.btnAnalisisPersonal.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
-        Me.btnAnalisisPersonal.UseVisualStyleBackColor = True
-        '
-        'btnAnalisis
-        '
-        Me.btnAnalisis.Dock = System.Windows.Forms.DockStyle.Top
-        Me.btnAnalisis.FlatAppearance.BorderSize = 0
-        Me.btnAnalisis.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.btnAnalisis.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnAnalisis.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnAnalisis.Location = New System.Drawing.Point(0, 1226)
-        Me.btnAnalisis.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnAnalisis.Name = "btnAnalisis"
-        Me.btnAnalisis.Padding = New System.Windows.Forms.Padding(18, 0, 0, 0)
-        Me.btnAnalisis.Size = New System.Drawing.Size(304, 92)
-        Me.btnAnalisis.TabIndex = 12
-        Me.btnAnalisis.Text = "   📊 Análisis de Licencias"
-        Me.btnAnalisis.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
-        Me.btnAnalisis.UseVisualStyleBackColor = True
         '
         'btnReportes
         '
@@ -403,8 +365,6 @@ Partial Class frmDashboard
     Friend WithEvents btnImportacion As Button
     Friend WithEvents lblSemanaActual As Label
     Friend WithEvents btnRenombrarPDFs As Button
-    Friend WithEvents btnAnalisis As Button
-    Friend WithEvents btnAnalisisPersonal As Button
     Friend WithEvents btnLicencias As Button
     Friend WithEvents btnNotificaciones As Button
     Friend WithEvents btnSanciones As Button

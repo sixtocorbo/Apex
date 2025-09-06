@@ -35,7 +35,7 @@ Partial Class frmReportes
         Me.btnAnalisisFuncionarios.Name = "btnAnalisisFuncionarios"
         Me.btnAnalisisFuncionarios.Size = New System.Drawing.Size(285, 35)
         Me.btnAnalisisFuncionarios.TabIndex = 2
-        Me.btnAnalisisFuncionarios.Text = "Análisis de funcionarios"
+        Me.btnAnalisisFuncionarios.Text = "👥 Análisis de Personal"
         Me.btnAnalisisFuncionarios.UseVisualStyleBackColor = True
         '
         'btnAnalisisEstacional
@@ -45,7 +45,7 @@ Partial Class frmReportes
         Me.btnAnalisisEstacional.Name = "btnAnalisisEstacional"
         Me.btnAnalisisEstacional.Size = New System.Drawing.Size(285, 35)
         Me.btnAnalisisEstacional.TabIndex = 0
-        Me.btnAnalisisEstacional.Text = "Analisis estacional"
+        Me.btnAnalisisEstacional.Text = "   📊 Análisis de Licencias"
         Me.btnAnalisisEstacional.UseVisualStyleBackColor = True
         '
         'FlowLayoutPanel1

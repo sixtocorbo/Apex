@@ -54,8 +54,6 @@ Public Class frmDashboard
         AddHandler btnImportacion.Click, AddressOf AbrirFormularioDesdeMenu_Click
         AddHandler btnViaticos.Click, AddressOf AbrirFormularioDesdeMenu_Click
         AddHandler btnReportes.Click, AddressOf AbrirFormularioDesdeMenu_Click
-        AddHandler btnAnalisis.Click, AddressOf AbrirFormularioDesdeMenu_Click
-        AddHandler btnAnalisisPersonal.Click, AddressOf AbrirFormularioDesdeMenu_Click
         AddHandler btnConfiguracion.Click, AddressOf AbrirFormularioDesdeMenu_Click
     End Sub
 
@@ -189,8 +187,6 @@ Public Class frmDashboard
             Case "btnImportacion" : Return GetType(frmAsistenteImportacion)
             Case "btnViaticos" : Return GetType(frmViaticosListas)
             Case "btnReportes" : Return GetType(frmReportes)
-            Case "btnAnalisis" : Return GetType(frmAnalisisEstacionalidad)
-            Case "btnAnalisisPersonal" : Return GetType(frmAnalisisFuncionarios)
             Case "btnConfiguracion" : Return GetType(frmConfiguracion)
             Case Else : Return Nothing
         End Select
