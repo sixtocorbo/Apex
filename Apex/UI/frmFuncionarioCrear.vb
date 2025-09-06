@@ -757,8 +757,7 @@ Public Class frmFuncionarioCrear
             Return
         End If
         Dim frm As New frmAuditoriaViewer(_funcionario.Id.ToString())
-        Dim parentDashboard As frmDashboard = CType(Me.ParentForm, frmDashboard)
-        parentDashboard.AbrirFormEnPanel(frm)
+        NavegacionHelper.AbrirFormEnDashboard(frm)
     End Sub
 
     Private Sub DgvEstadosTransitorios_CellDoubleClick(sender As Object, e As DataGridViewCellEventArgs)

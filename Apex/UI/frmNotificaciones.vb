@@ -140,8 +140,7 @@ Public Class frmNotificaciones
         Dim idSeleccionado = CInt(dgvNotificaciones.SelectedRows(0).Cells("Id").Value)
         Dim frm As New frmNotificacionRPT(idSeleccionado)
 
-        Dim parentDashboard As frmDashboard = CType(Me.ParentForm, frmDashboard)
-        parentDashboard.AbrirFormEnPanel(frm)
+        NavegacionHelper.AbrirFormEnDashboard(frm)
     End Sub
 
     Private Async Sub btnEliminar_Click(sender As Object, e As EventArgs) Handles btnEliminar.Click

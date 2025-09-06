@@ -146,15 +146,7 @@ Public Class frmLicencias
     Private Sub btnNuevaLicencia_Click(sender As Object, e As EventArgs) Handles btnNuevaLicencia.Click
         ' Abrir en el panel del Dashboard (tu patrón actual)
         Dim frm As New frmLicenciaCrear()
-        Dim parentDashboard As frmDashboard = TryCast(Me.ParentForm, frmDashboard)
-        If parentDashboard IsNot Nothing Then
-            parentDashboard.AbrirFormEnPanel(frm)
-        Else
-            ' Fallback modal si no está en dashboard
-            Using frm
-                frm.ShowDialog(Me)
-            End Using
-        End If
+        NavegacionHelper.AbrirFormEnDashboard(frm)
     End Sub
 
     Private Sub btnEditarLicencia_Click(sender As Object, e As EventArgs) Handles btnEditarLicencia.Click

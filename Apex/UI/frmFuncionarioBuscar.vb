@@ -333,9 +333,7 @@ Public Class frmFuncionarioBuscar
         If dgvResultados.CurrentRow Is Nothing Then Return
         Dim id = CInt(dgvResultados.CurrentRow.Cells("Id").Value)
         Dim frm As New frmFuncionarioSituacion(id)
-        Dim parentDashboard As frmDashboard = CType(Me.ParentForm, frmDashboard)
-
-        parentDashboard.AbrirFormEnPanel(frm)
+        NavegacionHelper.AbrirFormEnDashboard(frm)
     End Sub
 
     Private Class SituacionParaBoton
@@ -352,10 +350,7 @@ Public Class frmFuncionarioBuscar
         Else ' Modo Navegacion
             Dim id As Integer = CInt(dgvResultados.CurrentRow.Cells("Id").Value)
             Dim frm As New frmFuncionarioCrear(id)
-            Dim parentDashboard As frmDashboard = CType(Me.ParentForm, frmDashboard)
-            If parentDashboard IsNot Nothing Then
-                parentDashboard.AbrirFormEnPanel(frm)
-            End If
+            NavegacionHelper.AbrirFormEnDashboard(frm)
         End If
     End Sub
 
@@ -417,8 +412,7 @@ Public Class frmFuncionarioBuscar
     Private Sub btnGenerarFicha_Click(sender As Object, e As EventArgs)
         If FuncionarioSeleccionado IsNot Nothing Then
             Dim frm As New frmFichaPersonalRPT(FuncionarioSeleccionado.Id)
-            Dim parentDashboard As frmDashboard = CType(Me.ParentForm, frmDashboard)
-            parentDashboard.AbrirFormEnPanel(frm)
+            NavegacionHelper.AbrirFormEnDashboard(frm)
         Else
             MessageBox.Show("Por favor, seleccione un funcionario de la lista.", "Selección requerida", MessageBoxButtons.OK, MessageBoxIcon.Information)
         End If

@@ -81,13 +81,7 @@ Public Class frmConceptoFuncional
 
         ' Crear y mostrar el formulario del reporte, pasándole las listas
         Dim frm As New frmConceptoFuncionalRPT(_funcionarioSeleccionado, dtpFechaInicio.Value, dtpFechaFin.Value, salud, graves, leves)
-
-
-        ' Se obtiene una referencia al formulario Dashboard
-        Dim parentDashboard As frmDashboard = CType(Me.ParentForm, frmDashboard)
-
-        ' Se llama al método público del Dashboard para abrir el formulario en el panel
-        parentDashboard.AbrirFormEnPanel(frm)
+        NavegacionHelper.AbrirFormEnDashboard(frm)
     End Sub
 
     ''' <summary>
