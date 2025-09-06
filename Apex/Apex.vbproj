@@ -626,6 +626,12 @@
     <Compile Include="UI\frmNotificaciones.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="UI\frmReportes.Designer.vb">
+      <DependentUpon>frmReportes.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmReportes.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="UI\frmSanciones.Designer.vb">
       <DependentUpon>frmSanciones.vb</DependentUpon>
     </Compile>
@@ -696,12 +702,6 @@
       <DependentUpon>frmRenombrarPDF.vb</DependentUpon>
     </Compile>
     <Compile Include="UI\frmRenombrarPDF.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="UI\frmNovedadesListas.Designer.vb">
-      <DependentUpon>frmNovedadesListas.vb</DependentUpon>
-    </Compile>
-    <Compile Include="UI\frmNovedadesListas.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="UI\frmSancionCrear.Designer.vb">
@@ -817,6 +817,9 @@
     <EmbeddedResource Include="UI\frmNovedadesRPT.resx">
       <DependentUpon>frmNovedadesRPT.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmReportes.resx">
+      <DependentUpon>frmReportes.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\frmSanciones.resx">
       <DependentUpon>frmSanciones.vb</DependentUpon>
     </EmbeddedResource>
@@ -828,9 +831,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmTurnos.resx">
       <DependentUpon>frmTurnos.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UI\frmNovedadesListas.resx">
-      <DependentUpon>frmNovedadesListas.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmViaticosListas.resx">
       <DependentUpon>frmViaticosListas.vb</DependentUpon>

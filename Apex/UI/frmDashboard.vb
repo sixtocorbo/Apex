@@ -188,7 +188,7 @@ Public Class frmDashboard
             Case "btnRenombrarPDFs" : Return GetType(frmRenombrarPDF)
             Case "btnImportacion" : Return GetType(frmAsistenteImportacion)
             Case "btnViaticos" : Return GetType(frmViaticosListas)
-            Case "btnReportes" : Return GetType(frmNovedadesListas)
+            Case "btnReportes" : Return GetType(frmReportes)
             Case "btnAnalisis" : Return GetType(frmAnalisisEstacionalidad)
             Case "btnAnalisisPersonal" : Return GetType(frmAnalisisFuncionarios)
             Case "btnConfiguracion" : Return GetType(frmConfiguracion)
