@@ -31,6 +31,8 @@ Partial Class frmFuncionarioBuscar
         Me.splitContenedor = New System.Windows.Forms.SplitContainer()
         Me.dgvResultados = New System.Windows.Forms.DataGridView()
         Me.panelDetalle = New System.Windows.Forms.Panel()
+        Me.pbCopyNombre = New System.Windows.Forms.PictureBox()
+        Me.pbCopyCI = New System.Windows.Forms.PictureBox()
         Me.btnVerSituacion = New System.Windows.Forms.Button()
         Me.btnGenerarFicha = New System.Windows.Forms.Button()
         Me.lblEstadoActividad = New System.Windows.Forms.Label()
@@ -46,13 +48,8 @@ Partial Class frmFuncionarioBuscar
         Me.lblCargoHeader = New System.Windows.Forms.Label()
         Me.lblNombreCompleto = New System.Windows.Forms.Label()
         Me.lblCI = New System.Windows.Forms.Label()
-        Me.FlowLayoutPanelAcciones = New System.Windows.Forms.FlowLayoutPanel()
-        Me.btnSeleccionar = New System.Windows.Forms.Button()
-        Me.btnCancelar = New System.Windows.Forms.Button()
-        Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
-        Me.pbCopyNombre = New System.Windows.Forms.PictureBox()
-        Me.pbCopyCI = New System.Windows.Forms.PictureBox()
         Me.pbFotoDetalle = New System.Windows.Forms.PictureBox()
+        Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.panelFiltros.SuspendLayout()
         CType(Me.splitContenedor, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.splitContenedor.Panel1.SuspendLayout()
@@ -60,7 +57,6 @@ Partial Class frmFuncionarioBuscar
         Me.splitContenedor.SuspendLayout()
         CType(Me.dgvResultados, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.panelDetalle.SuspendLayout()
-        Me.FlowLayoutPanelAcciones.SuspendLayout()
         CType(Me.pbCopyNombre, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.pbCopyCI, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.pbFotoDetalle, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -163,6 +159,34 @@ Partial Class frmFuncionarioBuscar
         Me.panelDetalle.Padding = New System.Windows.Forms.Padding(15)
         Me.panelDetalle.Size = New System.Drawing.Size(1090, 958)
         Me.panelDetalle.TabIndex = 0
+        '
+        'pbCopyNombre
+        '
+        Me.pbCopyNombre.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.pbCopyNombre.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.pbCopyNombre.Image = Global.Apex.My.Resources.Resources.copy_icon
+        Me.pbCopyNombre.Location = New System.Drawing.Point(1040, 620)
+        Me.pbCopyNombre.Name = "pbCopyNombre"
+        Me.pbCopyNombre.Size = New System.Drawing.Size(24, 24)
+        Me.pbCopyNombre.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
+        Me.pbCopyNombre.TabIndex = 19
+        Me.pbCopyNombre.TabStop = False
+        Me.ToolTip1.SetToolTip(Me.pbCopyNombre, "Copiar Nombre")
+        Me.pbCopyNombre.Visible = False
+        '
+        'pbCopyCI
+        '
+        Me.pbCopyCI.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.pbCopyCI.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.pbCopyCI.Image = Global.Apex.My.Resources.Resources.copy_icon
+        Me.pbCopyCI.Location = New System.Drawing.Point(1040, 584)
+        Me.pbCopyCI.Name = "pbCopyCI"
+        Me.pbCopyCI.Size = New System.Drawing.Size(24, 24)
+        Me.pbCopyCI.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
+        Me.pbCopyCI.TabIndex = 18
+        Me.pbCopyCI.TabStop = False
+        Me.ToolTip1.SetToolTip(Me.pbCopyCI, "Copiar CI")
+        Me.pbCopyCI.Visible = False
         '
         'btnVerSituacion
         '
@@ -352,69 +376,6 @@ Partial Class frmFuncionarioBuscar
         Me.lblCI.Text = "CI: -"
         Me.lblCI.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
-        'FlowLayoutPanelAcciones
-        '
-        Me.FlowLayoutPanelAcciones.AutoSize = True
-        Me.FlowLayoutPanelAcciones.Controls.Add(Me.btnSeleccionar)
-        Me.FlowLayoutPanelAcciones.Controls.Add(Me.btnCancelar)
-        Me.FlowLayoutPanelAcciones.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.FlowLayoutPanelAcciones.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
-        Me.FlowLayoutPanelAcciones.Location = New System.Drawing.Point(0, 1001)
-        Me.FlowLayoutPanelAcciones.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
-        Me.FlowLayoutPanelAcciones.Name = "FlowLayoutPanelAcciones"
-        Me.FlowLayoutPanelAcciones.Padding = New System.Windows.Forms.Padding(6)
-        Me.FlowLayoutPanelAcciones.Size = New System.Drawing.Size(1686, 49)
-        Me.FlowLayoutPanelAcciones.TabIndex = 2
-        '
-        'btnSeleccionar
-        '
-        Me.btnSeleccionar.Location = New System.Drawing.Point(1559, 10)
-        Me.btnSeleccionar.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
-        Me.btnSeleccionar.Name = "btnSeleccionar"
-        Me.btnSeleccionar.Size = New System.Drawing.Size(112, 29)
-        Me.btnSeleccionar.TabIndex = 0
-        Me.btnSeleccionar.Text = "Seleccionar"
-        Me.btnSeleccionar.UseVisualStyleBackColor = True
-        '
-        'btnCancelar
-        '
-        Me.btnCancelar.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancelar.Location = New System.Drawing.Point(1441, 10)
-        Me.btnCancelar.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
-        Me.btnCancelar.Name = "btnCancelar"
-        Me.btnCancelar.Size = New System.Drawing.Size(112, 29)
-        Me.btnCancelar.TabIndex = 1
-        Me.btnCancelar.Text = "Cancelar"
-        Me.btnCancelar.UseVisualStyleBackColor = True
-        '
-        'pbCopyNombre
-        '
-        Me.pbCopyNombre.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.pbCopyNombre.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.pbCopyNombre.Image = Global.Apex.My.Resources.Resources.copy_icon
-        Me.pbCopyNombre.Location = New System.Drawing.Point(1040, 620)
-        Me.pbCopyNombre.Name = "pbCopyNombre"
-        Me.pbCopyNombre.Size = New System.Drawing.Size(24, 24)
-        Me.pbCopyNombre.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
-        Me.pbCopyNombre.TabIndex = 19
-        Me.pbCopyNombre.TabStop = False
-        Me.ToolTip1.SetToolTip(Me.pbCopyNombre, "Copiar Nombre")
-        Me.pbCopyNombre.Visible = False
-        '
-        'pbCopyCI
-        '
-        Me.pbCopyCI.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.pbCopyCI.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.pbCopyCI.Image = Global.Apex.My.Resources.Resources.copy_icon
-        Me.pbCopyCI.Location = New System.Drawing.Point(1040, 584)
-        Me.pbCopyCI.Name = "pbCopyCI"
-        Me.pbCopyCI.Size = New System.Drawing.Size(24, 24)
-        Me.pbCopyCI.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
-        Me.pbCopyCI.TabIndex = 18
-        Me.pbCopyCI.TabStop = False
-        Me.ToolTip1.SetToolTip(Me.pbCopyCI, "Copiar CI")
-        Me.pbCopyCI.Visible = False
-        '
         'pbFotoDetalle
         '
         Me.pbFotoDetalle.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
@@ -433,7 +394,6 @@ Partial Class frmFuncionarioBuscar
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1686, 1050)
-        Me.Controls.Add(Me.FlowLayoutPanelAcciones)
         Me.Controls.Add(Me.splitContenedor)
         Me.Controls.Add(Me.panelFiltros)
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
@@ -449,12 +409,10 @@ Partial Class frmFuncionarioBuscar
         CType(Me.dgvResultados, System.ComponentModel.ISupportInitialize).EndInit()
         Me.panelDetalle.ResumeLayout(False)
         Me.panelDetalle.PerformLayout()
-        Me.FlowLayoutPanelAcciones.ResumeLayout(False)
         CType(Me.pbCopyNombre, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.pbCopyCI, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.pbFotoDetalle, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
-        Me.PerformLayout()
 
     End Sub
 
@@ -475,9 +433,6 @@ Partial Class frmFuncionarioBuscar
     Friend WithEvents lblFechaIngreso As System.Windows.Forms.Label
     Friend WithEvents lblPresencia As System.Windows.Forms.Label
     Friend WithEvents lblPresenciaHeader As System.Windows.Forms.Label
-    Friend WithEvents FlowLayoutPanelAcciones As FlowLayoutPanel
-    Friend WithEvents btnSeleccionar As Button
-    Friend WithEvents btnCancelar As Button
     Friend WithEvents lblHorarioCompleto As Label
     Friend WithEvents lblHorarioCompletoHeader As Label
     Friend WithEvents lblEstadoActividad As Label
