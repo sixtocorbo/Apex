@@ -27,6 +27,7 @@ Partial Class frmEstadoTransitorioTipos
         Me.btnNuevo = New System.Windows.Forms.Button()
         Me.btnEliminar = New System.Windows.Forms.Button()
         Me.btnGuardar = New System.Windows.Forms.Button()
+        Me.btnVolver = New System.Windows.Forms.Button()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -50,6 +51,7 @@ Partial Class frmEstadoTransitorioTipos
         '
         'SplitContainer1.Panel2
         '
+        Me.SplitContainer1.Panel2.Controls.Add(Me.btnVolver)
         Me.SplitContainer1.Panel2.Controls.Add(Me.GroupBox1)
         Me.SplitContainer1.Panel2.Controls.Add(Me.btnNuevo)
         Me.SplitContainer1.Panel2.Controls.Add(Me.btnEliminar)
@@ -160,6 +162,16 @@ Partial Class frmEstadoTransitorioTipos
         Me.btnGuardar.Text = "Guardar"
         Me.btnGuardar.UseVisualStyleBackColor = True
         '
+        'btnVolver
+        '
+        Me.btnVolver.Location = New System.Drawing.Point(430, 237)
+        Me.btnVolver.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnVolver.Name = "btnVolver"
+        Me.btnVolver.Size = New System.Drawing.Size(180, 46)
+        Me.btnVolver.TabIndex = 5
+        Me.btnVolver.Text = "Volver"
+        Me.btnVolver.UseVisualStyleBackColor = True
+        '
         'frmEstadoTransitorioTipos
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -193,4 +205,5 @@ Partial Class frmEstadoTransitorioTipos
     Friend WithEvents btnNuevo As Button
     Friend WithEvents btnEliminar As Button
     Friend WithEvents btnGuardar As Button
+    Friend WithEvents btnVolver As Button
 End Class

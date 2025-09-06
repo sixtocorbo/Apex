@@ -441,6 +441,7 @@
     <Compile Include="Data\vw_SancionesCompletas.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\NavegacionHelper.vb" />
     <Compile Include="Services\AppTheme.vb" />
     <Compile Include="Services\AreaTrabajoService.vb" />
     <Compile Include="Services\AuditoriaService.vb" />

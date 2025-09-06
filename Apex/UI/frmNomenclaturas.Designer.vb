@@ -48,6 +48,7 @@ Partial Class frmNomenclaturas
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
         Me.Panel1 = New System.Windows.Forms.Panel()
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
+        Me.btnVolver = New System.Windows.Forms.Button()
         CType(Me.dgvNomenclaturas, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox1.SuspendLayout()
         Me.TableLayoutPanel1.SuspendLayout()
@@ -351,10 +352,21 @@ Partial Class frmNomenclaturas
         Me.FlowLayoutPanel1.Controls.Add(Me.btnNuevo)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnEliminar)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnGuardar)
-        Me.FlowLayoutPanel1.Location = New System.Drawing.Point(289, 773)
+        Me.FlowLayoutPanel1.Controls.Add(Me.btnVolver)
+        Me.FlowLayoutPanel1.Location = New System.Drawing.Point(191, 773)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
-        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(588, 61)
+        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(784, 61)
         Me.FlowLayoutPanel1.TabIndex = 3
+        '
+        'btnVolver
+        '
+        Me.btnVolver.Location = New System.Drawing.Point(592, 5)
+        Me.btnVolver.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnVolver.Name = "btnVolver"
+        Me.btnVolver.Size = New System.Drawing.Size(188, 51)
+        Me.btnVolver.TabIndex = 12
+        Me.btnVolver.Text = "Volver"
+        Me.btnVolver.UseVisualStyleBackColor = True
         '
         'frmNomenclaturas
         '
@@ -408,4 +420,5 @@ Partial Class frmNomenclaturas
     Friend WithEvents btnNuevo As Button
     Friend WithEvents Label8 As Label
     Friend WithEvents txtBuscar As TextBox
+    Friend WithEvents btnVolver As Button
 End Class

@@ -358,6 +358,7 @@ Partial Class frmNovedades
         Me.lstFuncionarios = New System.Windows.Forms.ListBox()
         Me.TabPageFotos = New System.Windows.Forms.TabPage()
         Me.flpFotos = New System.Windows.Forms.FlowLayoutPanel()
+        Me.btnImprimir = New System.Windows.Forms.Button()
         Me.PanelPrincipal.SuspendLayout()
         CType(Me.SplitContenedor, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContenedor.Panel1.SuspendLayout()
@@ -379,7 +380,7 @@ Partial Class frmNovedades
         Me.PanelPrincipal.Location = New System.Drawing.Point(0, 0)
         Me.PanelPrincipal.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.PanelPrincipal.Name = "PanelPrincipal"
-        Me.PanelPrincipal.Padding = New System.Windows.Forms.Padding(12, 12, 12, 12)
+        Me.PanelPrincipal.Padding = New System.Windows.Forms.Padding(12)
         Me.PanelPrincipal.Size = New System.Drawing.Size(1868, 1050)
         Me.PanelPrincipal.TabIndex = 0
         '
@@ -422,6 +423,7 @@ Partial Class frmNovedades
         '
         'PanelEncabezadoLista
         '
+        Me.PanelEncabezadoLista.Controls.Add(Me.btnImprimir)
         Me.PanelEncabezadoLista.Controls.Add(Me.GroupBoxFiltros)
         Me.PanelEncabezadoLista.Controls.Add(Me.btnBuscar)
         Me.PanelEncabezadoLista.Controls.Add(Me.txtBusqueda)
@@ -670,7 +672,7 @@ Partial Class frmNovedades
         Me.TabPageFuncionarios.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.TabPageFuncionarios.Name = "TabPageFuncionarios"
         Me.TabPageFuncionarios.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.TabPageFuncionarios.Size = New System.Drawing.Size(870, 1021)
+        Me.TabPageFuncionarios.Size = New System.Drawing.Size(932, 993)
         Me.TabPageFuncionarios.TabIndex = 1
         Me.TabPageFuncionarios.Text = "Funcionarios"
         Me.TabPageFuncionarios.UseVisualStyleBackColor = True
@@ -683,7 +685,7 @@ Partial Class frmNovedades
         Me.lstFuncionarios.Location = New System.Drawing.Point(4, 5)
         Me.lstFuncionarios.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.lstFuncionarios.Name = "lstFuncionarios"
-        Me.lstFuncionarios.Size = New System.Drawing.Size(862, 1011)
+        Me.lstFuncionarios.Size = New System.Drawing.Size(924, 983)
         Me.lstFuncionarios.TabIndex = 1
         '
         'TabPageFotos
@@ -693,7 +695,7 @@ Partial Class frmNovedades
         Me.TabPageFotos.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.TabPageFotos.Name = "TabPageFotos"
         Me.TabPageFotos.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.TabPageFotos.Size = New System.Drawing.Size(870, 1021)
+        Me.TabPageFotos.Size = New System.Drawing.Size(932, 993)
         Me.TabPageFotos.TabIndex = 2
         Me.TabPageFotos.Text = "Fotos"
         Me.TabPageFotos.UseVisualStyleBackColor = True
@@ -705,8 +707,19 @@ Partial Class frmNovedades
         Me.flpFotos.Location = New System.Drawing.Point(4, 5)
         Me.flpFotos.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.flpFotos.Name = "flpFotos"
-        Me.flpFotos.Size = New System.Drawing.Size(862, 1011)
+        Me.flpFotos.Size = New System.Drawing.Size(924, 983)
         Me.flpFotos.TabIndex = 0
+        '
+        'btnImprimir
+        '
+        Me.btnImprimir.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.btnImprimir.Location = New System.Drawing.Point(473, 294)
+        Me.btnImprimir.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnImprimir.Name = "btnImprimir"
+        Me.btnImprimir.Size = New System.Drawing.Size(135, 35)
+        Me.btnImprimir.TabIndex = 9
+        Me.btnImprimir.Text = "Imprimir"
+        Me.btnImprimir.UseVisualStyleBackColor = True
         '
         'frmNovedades
         '
@@ -766,4 +779,5 @@ Partial Class frmNovedades
     Friend WithEvents Label2 As Label
     Friend WithEvents dtpFechaDesde As DateTimePicker
     Friend WithEvents Label1 As Label
+    Friend WithEvents btnImprimir As Button
 End Class

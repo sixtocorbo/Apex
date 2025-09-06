@@ -101,7 +101,14 @@ Public Class frmNovedades
 
         _idNovedadSeleccionada = Nothing
     End Sub
-
+    Private Sub ActualizarListaFuncionarios()
+        lstFuncionariosFiltro.DataSource = Nothing
+        If _funcionariosSeleccionadosFiltro.Any() Then
+            lstFuncionariosFiltro.DataSource = New BindingSource(_funcionariosSeleccionadosFiltro, Nothing)
+            lstFuncionariosFiltro.DisplayMember = "Value"
+            lstFuncionariosFiltro.ValueMember = "Key"
+        End If
+    End Sub
     Private Async Function ActualizarDetalleDesdeSeleccion() As Task
         If dgvNovedades.CurrentRow Is Nothing OrElse dgvNovedades.CurrentRow.DataBoundItem Is Nothing Then
             LimpiarDetalles()
@@ -213,6 +220,91 @@ Public Class frmNovedades
                 LoadingHelper.OcultarCargando(Me)
             End Try
         End If
+    End Sub
+
+    Private Sub btnAgregarFuncionario_Click(sender As Object, e As EventArgs) Handles btnAgregarFuncionario.Click
+        Using frm As New frmFuncionarioBuscar(frmFuncionarioBuscar.ModoApertura.Seleccion)
+            If frm.ShowDialog(Me) = DialogResult.OK Then
+                ' --- CORRECCIÓN AQUÍ ---
+                ' Se accede al ID a través del FuncionarioSeleccionado
+                Dim funcId = frm.FuncionarioSeleccionado.Id
+                ' --- FIN DE LA CORRECCIÓN ---
+                If funcId > 0 AndAlso Not _funcionariosSeleccionadosFiltro.ContainsKey(funcId) Then
+                    Dim uow As New UnitOfWork()
+                    Dim repo = uow.Repository(Of Funcionario)()
+                    Dim funcionario = repo.GetById(funcId)
+                    If funcionario IsNot Nothing Then
+                        _funcionariosSeleccionadosFiltro.Add(funcionario.Id, funcionario.Nombre)
+                        ActualizarListaFuncionarios()
+                    End If
+                End If
+            End If
+        End Using
+    End Sub
+
+    Private Sub btnLimpiarFuncionarios_Click(sender As Object, e As EventArgs) Handles btnLimpiarFuncionarios.Click
+        _funcionariosSeleccionadosFiltro.Clear()
+        ActualizarListaFuncionarios()
+    End Sub
+
+    Private Sub btnQuitarFuncionario_Click(sender As Object, e As EventArgs) Handles btnQuitarFuncionario.Click
+        If lstFuncionariosFiltro.SelectedItem IsNot Nothing Then
+            Dim selectedFuncId = CType(lstFuncionariosFiltro.SelectedValue, Integer)
+            _funcionariosSeleccionadosFiltro.Remove(selectedFuncId)
+            ActualizarListaFuncionarios()
+        End If
+    End Sub
+
+    Private Async Sub btnImprimir_Click(sender As Object, e As EventArgs) Handles btnImprimir.Click
+        ' 1. Verificamos si hay datos en la grilla para imprimir
+        If _bsNovedades.DataSource Is Nothing OrElse _bsNovedades.Count = 0 Then
+            MessageBox.Show("Primero debe generar un reporte para poder imprimirlo.", "Sin datos", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return
+        End If
+
+        LoadingHelper.MostrarCargando(Me)
+        Try
+            ' 2. Obtenemos la lista de datos DESDE el BindingSource
+            Dim novedadesEnGrilla = CType(_bsNovedades.DataSource, List(Of vw_NovedadesAgrupadas))
+
+            If novedadesEnGrilla Is Nothing OrElse Not novedadesEnGrilla.Any() Then
+                MessageBox.Show("No hay datos para imprimir.", "Sin datos", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                Return
+            End If
+
+            Dim novedadIds = novedadesEnGrilla.Select(Function(n) n.Id).ToList()
+
+            ' 3. Buscamos los datos completos de las novedades desde el servicio
+            Dim novedadService As New NovedadService()
+            Dim datosCompletosParaReporte = Await novedadService.GetNovedadesCompletasByIds(novedadIds)
+
+            ' 4. Mapeamos los datos para el reporte
+            Dim datosMapeados = datosCompletosParaReporte.
+            GroupBy(Function(n) n.Id).
+            Select(Function(g) New With {
+                .Id = g.Key,
+                .Fecha = g.First().Fecha,
+                .Texto = g.First().Texto,
+                .Funcionarios = g.Select(Function(n) New With {
+                    .NombreFuncionario = n.NombreFuncionario
+                }).ToList()
+            }).
+            OrderByDescending(Function(n) n.Fecha).
+            ToList()
+
+            ' 5. Abrimos el formulario visor y le pasamos los datos
+            Dim frmVisor As New frmNovedadesRPT(datosMapeados)
+
+            ' Usamos nuestro nuevo método de ayuda para manejar toda la lógica.
+            NavegacionHelper.AbrirFormEnDashboard(frmVisor)
+
+        Catch ex As InvalidCastException
+            MessageBox.Show("Ocurrió un error de datos internos al preparar la impresión.", "Error de Datos", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        Catch ex As Exception
+            MessageBox.Show($"Ocurrió un error al preparar la impresión: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        Finally
+            LoadingHelper.OcultarCargando(Me)
+        End Try
     End Sub
 #End Region
 
