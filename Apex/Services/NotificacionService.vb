@@ -278,7 +278,6 @@ Public Class NotificacionService
     ' ----------------- Combos -----------------
     Public Async Function ObtenerFuncionariosParaComboAsync() As Task(Of List(Of KeyValuePair(Of Integer, String)))
         Dim lista = Await _unitOfWork.Repository(Of Funcionario)().GetAll().AsNoTracking().
-            Where(Function(f) f.Activo).
             OrderBy(Function(f) f.Nombre).
             Select(Function(f) New With {.Id = f.Id, .Nombre = f.Nombre}).
             ToListAsync()

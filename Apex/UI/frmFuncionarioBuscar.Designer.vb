@@ -50,6 +50,7 @@ Partial Class frmFuncionarioBuscar
         Me.lblCI = New System.Windows.Forms.Label()
         Me.pbFotoDetalle = New System.Windows.Forms.PictureBox()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
+        Me.lblAlertaNotificaciones = New System.Windows.Forms.Label()
         Me.panelFiltros.SuspendLayout()
         CType(Me.splitContenedor, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.splitContenedor.Panel1.SuspendLayout()
@@ -134,6 +135,7 @@ Partial Class frmFuncionarioBuscar
         'panelDetalle
         '
         Me.panelDetalle.BackColor = System.Drawing.Color.White
+        Me.panelDetalle.Controls.Add(Me.lblAlertaNotificaciones)
         Me.panelDetalle.Controls.Add(Me.pbCopyNombre)
         Me.panelDetalle.Controls.Add(Me.pbCopyCI)
         Me.panelDetalle.Controls.Add(Me.btnVerSituacion)
@@ -192,7 +194,7 @@ Partial Class frmFuncionarioBuscar
         '
         Me.btnVerSituacion.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnVerSituacion.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.btnVerSituacion.Location = New System.Drawing.Point(34, 853)
+        Me.btnVerSituacion.Location = New System.Drawing.Point(28, 853)
         Me.btnVerSituacion.Name = "btnVerSituacion"
         Me.btnVerSituacion.Size = New System.Drawing.Size(250, 38)
         Me.btnVerSituacion.TabIndex = 17
@@ -217,7 +219,7 @@ Partial Class frmFuncionarioBuscar
         Me.lblEstadoActividad.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblEstadoActividad.AutoSize = True
         Me.lblEstadoActividad.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.lblEstadoActividad.Location = New System.Drawing.Point(30, 904)
+        Me.lblEstadoActividad.Location = New System.Drawing.Point(28, 895)
         Me.lblEstadoActividad.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblEstadoActividad.Name = "lblEstadoActividad"
         Me.lblEstadoActividad.Size = New System.Drawing.Size(94, 28)
@@ -242,7 +244,7 @@ Partial Class frmFuncionarioBuscar
         Me.lblHorarioCompletoHeader.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblHorarioCompletoHeader.AutoSize = True
         Me.lblHorarioCompletoHeader.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.lblHorarioCompletoHeader.Location = New System.Drawing.Point(30, 783)
+        Me.lblHorarioCompletoHeader.Location = New System.Drawing.Point(28, 783)
         Me.lblHorarioCompletoHeader.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblHorarioCompletoHeader.Name = "lblHorarioCompletoHeader"
         Me.lblHorarioCompletoHeader.Size = New System.Drawing.Size(85, 28)
@@ -267,7 +269,7 @@ Partial Class frmFuncionarioBuscar
         Me.lblPresenciaHeader.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblPresenciaHeader.AutoSize = True
         Me.lblPresenciaHeader.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.lblPresenciaHeader.Location = New System.Drawing.Point(30, 821)
+        Me.lblPresenciaHeader.Location = New System.Drawing.Point(28, 821)
         Me.lblPresenciaHeader.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblPresenciaHeader.Name = "lblPresenciaHeader"
         Me.lblPresenciaHeader.Size = New System.Drawing.Size(103, 28)
@@ -292,7 +294,7 @@ Partial Class frmFuncionarioBuscar
         Me.lblFechaIngresoHeader.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblFechaIngresoHeader.AutoSize = True
         Me.lblFechaIngresoHeader.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.lblFechaIngresoHeader.Location = New System.Drawing.Point(30, 744)
+        Me.lblFechaIngresoHeader.Location = New System.Drawing.Point(28, 744)
         Me.lblFechaIngresoHeader.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblFechaIngresoHeader.Name = "lblFechaIngresoHeader"
         Me.lblFechaIngresoHeader.Size = New System.Drawing.Size(144, 28)
@@ -317,7 +319,7 @@ Partial Class frmFuncionarioBuscar
         Me.lblTipoHeader.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblTipoHeader.AutoSize = True
         Me.lblTipoHeader.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.lblTipoHeader.Location = New System.Drawing.Point(30, 705)
+        Me.lblTipoHeader.Location = New System.Drawing.Point(28, 705)
         Me.lblTipoHeader.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblTipoHeader.Name = "lblTipoHeader"
         Me.lblTipoHeader.Size = New System.Drawing.Size(57, 28)
@@ -342,7 +344,7 @@ Partial Class frmFuncionarioBuscar
         Me.lblCargoHeader.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblCargoHeader.AutoSize = True
         Me.lblCargoHeader.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.lblCargoHeader.Location = New System.Drawing.Point(30, 667)
+        Me.lblCargoHeader.Location = New System.Drawing.Point(28, 667)
         Me.lblCargoHeader.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblCargoHeader.Name = "lblCargoHeader"
         Me.lblCargoHeader.Size = New System.Drawing.Size(70, 28)
@@ -388,6 +390,19 @@ Partial Class frmFuncionarioBuscar
         Me.pbFotoDetalle.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
         Me.pbFotoDetalle.TabIndex = 0
         Me.pbFotoDetalle.TabStop = False
+        '
+        'lblAlertaNotificaciones
+        '
+        Me.lblAlertaNotificaciones.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.lblAlertaNotificaciones.AutoSize = True
+        Me.lblAlertaNotificaciones.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.lblAlertaNotificaciones.Location = New System.Drawing.Point(28, 927)
+        Me.lblAlertaNotificaciones.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.lblAlertaNotificaciones.Name = "lblAlertaNotificaciones"
+        Me.lblAlertaNotificaciones.Size = New System.Drawing.Size(149, 28)
+        Me.lblAlertaNotificaciones.TabIndex = 20
+        Me.lblAlertaNotificaciones.Text = "Notificaciones"
+        Me.lblAlertaNotificaciones.Visible = False
         '
         'frmFuncionarioBuscar
         '
@@ -442,5 +457,6 @@ Partial Class frmFuncionarioBuscar
     Friend WithEvents pbCopyCI As PictureBox
     Friend WithEvents pbCopyNombre As PictureBox
     Friend WithEvents ToolTip1 As ToolTip
+    Friend WithEvents lblAlertaNotificaciones As Label
     ' --- FIN DE DECLARACIÓN DE NUEVOS CONTROLES ---
 End Class

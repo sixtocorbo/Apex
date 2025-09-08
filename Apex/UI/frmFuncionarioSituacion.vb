@@ -407,6 +407,5 @@ Public Class frmFuncionarioSituacion
             End Try
         End Try
     End Function
-    ' =================== Fin Severidad y Colores ===================
 
 End Class

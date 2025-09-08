@@ -233,12 +233,31 @@ Public Class frmFuncionarioBuscar
 
 
 #Region "Detalle lateral (Foto on-demand)"
+    Private Async Function VerificarNotificacionesPendientesAsync(funcionarioId As Integer) As Task
+        Try
+            Using uow As New UnitOfWork()
+                ' Asumimos que el estado "Pendiente" es el que tiene Orden = 1, como en NotificacionService
+                Dim estadoPendienteId As Byte = 1
+                Dim tienePendientes = Await uow.Repository(Of NotificacionPersonal)().GetAll().
+                    AnyAsync(Function(n) n.FuncionarioId = funcionarioId AndAlso n.EstadoId = estadoPendienteId)
+
+                lblAlertaNotificaciones.Visible = tienePendientes
+            End Using
+        Catch ex As Exception
+            ' Opcional: registrar el error
+            lblAlertaNotificaciones.Visible = False
+        End Try
+    End Function
     Private Async Sub MostrarDetalle(sender As Object, e As EventArgs)
         If dgvResultados.CurrentRow Is Nothing OrElse dgvResultados.CurrentRow.DataBoundItem Is Nothing Then
             LimpiarDetalle()
             Return
         End If
         Dim id = CInt(dgvResultados.CurrentRow.Cells("Id").Value)
+
+        ' --- INICIO DE CAMBIOS ---
+        Await VerificarNotificacionesPendientesAsync(id)
+        ' --- FIN DE CAMBIOS ---
 
         Using uow As New UnitOfWork()
             Dim f = Await uow.Repository(Of Funcionario)() _
@@ -272,7 +291,7 @@ Public Class frmFuncionarioBuscar
                 lblEstadoActividad.ForeColor = Color.DarkGreen
             Else
                 lblEstadoActividad.Text = "Estado: Inactivo"
-                lblEstadoActividad.ForeColor = Color.Maroon
+                lblEstadoActividad.ForeColor = Color.Red
             End If
 
             Dim situaciones = Await uow.Context.Database.SqlQuery(Of SituacionParaBoton)(
@@ -329,6 +348,7 @@ Public Class frmFuncionarioBuscar
         End Using
     End Sub
 
+
     Private Sub btnVerSituacion_Click(sender As Object, e As EventArgs)
         If dgvResultados.CurrentRow Is Nothing Then Return
         Dim id = CInt(dgvResultados.CurrentRow.Cells("Id").Value)
@@ -381,12 +401,9 @@ Public Class frmFuncionarioBuscar
         _detallesEstadoActual.Clear()
         btnGenerarFicha.Visible = False
         btnVerSituacion.Visible = False
-
-        ' --- INICIO DE CAMBIOS ---
-        ' Ocultamos los íconos de copiar
+        lblAlertaNotificaciones.Visible = False
         pbCopyCI.Visible = False
         pbCopyNombre.Visible = False
-        ' --- FIN DE CAMBIOS ---
     End Sub
 
     Private Sub lblEstadoTransitorio_DoubleClick(sender As Object, e As EventArgs)
