@@ -134,28 +134,30 @@ Public Class ReportesService
 
             If notificacion Is Nothing Then Return Nothing
 
-            ' 2. Las designaciones se guardan en EstadoTransitorio, necesitamos encontrar el que corresponde.
-            '    Asumimos que el campo "Documento" de la notificación guarda el ID del EstadoTransitorio.
+            ' 2. Asumimos que el campo "Documento" de la notificación guarda el ID del EstadoTransitorio.
             Dim estadoTransitorioId As Integer = 0
             If Integer.TryParse(notificacion.Documento, estadoTransitorioId) AndAlso estadoTransitorioId > 0 Then
 
-                ' 3. Buscamos el detalle de la designación
-                Dim designacionDetalle = Await uow.Repository(Of DesignacionDetalle)().
+                ' 3. Buscamos el detalle de la designación (CON LA CORRECCIÓN DE GETALL())
+                Dim designacionDetalle = Await uow.Repository(Of DesignacionDetalle)().GetAll().
                     FirstOrDefaultAsync(Function(d) d.EstadoTransitorioId = estadoTransitorioId)
 
                 If designacionDetalle IsNot Nothing Then
-                    ' 4. Creamos el objeto DTO con todos los datos
+                    ' --- INICIO DE LA CORRECCIÓN ---
+                    ' 4. Creamos el objeto DTO con los campos correctos de tu entidad
                     Dim dto As New DesignacionReporteDTO With {
                         .NombreFuncionario = notificacion.Funcionario.Nombre,
                         .CedulaFuncionario = notificacion.Funcionario.CI,
                         .FechaProgramada = notificacion.FechaProgramada,
-                        .Destino = designacionDetalle.Destino,
-                        .Tarea = designacionDetalle.Tarea,
-                        .TomaDePosesion = designacionDetalle.TomaDePosesion,
+                        .FechaDesde = designacionDetalle.FechaDesde,
+                        .FechaHasta = designacionDetalle.FechaHasta,
                         .Observaciones = designacionDetalle.Observaciones,
-                        .Expediente = notificacion.ExpMinisterial ' o el campo que corresponda
+                        .DocResolucion = designacionDetalle.DocResolucion,
+                        .FechaResolucion = designacionDetalle.FechaResolucion,
+                        .Expediente = notificacion.ExpMinisterial ' O el campo que corresponda
                     }
                     Return dto
+                    ' --- FIN DE LA CORRECCIÓN ---
                 End If
             End If
 

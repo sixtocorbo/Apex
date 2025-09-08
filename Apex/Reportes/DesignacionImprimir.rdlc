@@ -7,7 +7,7 @@
 				<DataProvider>SQL</DataProvider>
 				<ConnectString />
 			</ConnectionProperties>
-			<rd:DataSourceID>f1b3f6f3-3a3b-45e2-8e7c-2b2a6c1a8d0a</rd:DataSourceID>
+			<rd:DataSourceID>a9e1b3c9-4b48-4b7b-972a-2a42a1b9a123</rd:DataSourceID>
 		</DataSource>
 	</DataSources>
 	<DataSets>
@@ -29,21 +29,25 @@
 					<DataField>FechaProgramada</DataField>
 					<rd:TypeName>System.DateTime</rd:TypeName>
 				</Field>
-				<Field Name="Destino">
-					<DataField>Destino</DataField>
-					<rd:TypeName>System.String</rd:TypeName>
+				<Field Name="FechaDesde">
+					<DataField>FechaDesde</DataField>
+					<rd:TypeName>System.DateTime</rd:TypeName>
 				</Field>
-				<Field Name="Tarea">
-					<DataField>Tarea</DataField>
-					<rd:TypeName>System.String</rd:TypeName>
-				</Field>
-				<Field Name="TomaDePosesion">
-					<DataField>TomaDePosesion</DataField>
+				<Field Name="FechaHasta">
+					<DataField>FechaHasta</DataField>
 					<rd:TypeName>System.DateTime</rd:TypeName>
 				</Field>
 				<Field Name="Observaciones">
 					<DataField>Observaciones</DataField>
 					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="DocResolucion">
+					<DataField>DocResolucion</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="FechaResolucion">
+					<DataField>FechaResolucion</DataField>
+					<rd:TypeName>System.DateTime</rd:TypeName>
 				</Field>
 				<Field Name="Expediente">
 					<DataField>Expediente</DataField>
@@ -154,75 +158,7 @@
 					<Paragraph>
 						<TextRuns>
 							<TextRun>
-								<Value>Por la presente se notifica a usted que, según consta en el expediente </Value>
-								<Style>
-									<FontFamily>Segoe UI</FontFamily>
-									<FontSize>11pt</FontSize>
-									<LineHeight>18pt</LineHeight>
-								</Style>
-							</TextRun>
-							<TextRun>
-								<Value>=Fields!Expediente.Value</Value>
-								<Style>
-									<FontFamily>Segoe UI</FontFamily>
-									<FontSize>11pt</FontSize>
-									<FontWeight>Bold</FontWeight>
-									<LineHeight>18pt</LineHeight>
-								</Style>
-							</TextRun>
-							<TextRun>
-								<Value>, ha sido designado para prestar servicios en </Value>
-								<Style>
-									<FontFamily>Segoe UI</FontFamily>
-									<FontSize>11pt</FontSize>
-									<LineHeight>18pt</LineHeight>
-								</Style>
-							</TextRun>
-							<TextRun>
-								<Value>=Fields!Destino.Value</Value>
-								<Style>
-									<FontFamily>Segoe UI</FontFamily>
-									<FontSize>11pt</FontSize>
-									<FontWeight>Bold</FontWeight>
-									<LineHeight>18pt</LineHeight>
-								</Style>
-							</TextRun>
-							<TextRun>
-								<Value>, donde cumplirá la tarea de </Value>
-								<Style>
-									<FontFamily>Segoe UI</FontFamily>
-									<FontSize>11pt</FontSize>
-									<LineHeight>18pt</LineHeight>
-								</Style>
-							</TextRun>
-							<TextRun>
-								<Value>=Fields!Tarea.Value</Value>
-								<Style>
-									<FontFamily>Segoe UI</FontFamily>
-									<FontSize>11pt</FontSize>
-									<FontWeight>Bold</FontWeight>
-									<LineHeight>18pt</LineHeight>
-								</Style>
-							</TextRun>
-							<TextRun>
-								<Value>. Deberá tomar posesión de su cargo a partir del día </Value>
-								<Style>
-									<FontFamily>Segoe UI</FontFamily>
-									<FontSize>11pt</FontSize>
-									<LineHeight>18pt</LineHeight>
-								</Style>
-							</TextRun>
-							<TextRun>
-								<Value>=Format(Fields!TomaDePosesion.Value, "dd/MM/yyyy")</Value>
-								<Style>
-									<FontFamily>Segoe UI</FontFamily>
-									<FontSize>11pt</FontSize>
-									<FontWeight>Bold</FontWeight>
-									<LineHeight>18pt</LineHeight>
-								</Style>
-							</TextRun>
-							<TextRun>
-								<Value>.</Value>
+								<Value>="Por la presente se le notifica que, según Resolución " &amp; Fields!DocResolucion.Value &amp; " de fecha " &amp; Format(Fields!FechaResolucion.Value, "dd/MM/yyyy") &amp; ", y constando en el expediente " &amp; Fields!Expediente.Value &amp; ", ha sido designado para cumplir funciones a partir del día " &amp; Format(Fields!FechaDesde.Value, "dd/MM/yyyy") &amp; "."</Value>
 								<Style>
 									<FontFamily>Segoe UI</FontFamily>
 									<FontSize>11pt</FontSize>
@@ -235,15 +171,20 @@
 					<Paragraph>
 						<TextRuns>
 							<TextRun>
-								<Value>Observaciones adicionales: </Value>
+								<Value />
 								<Style>
 									<FontFamily>Segoe UI</FontFamily>
 									<FontSize>11pt</FontSize>
 									<LineHeight>18pt</LineHeight>
 								</Style>
 							</TextRun>
+						</TextRuns>
+						<Style />
+					</Paragraph>
+					<Paragraph>
+						<TextRuns>
 							<TextRun>
-								<Value>=Fields!Observaciones.Value</Value>
+								<Value>="Observaciones: " &amp; Fields!Observaciones.Value</Value>
 								<Style>
 									<FontFamily>Segoe UI</FontFamily>
 									<FontSize>11pt</FontSize>
@@ -329,5 +270,5 @@
 		<Style />
 	</Page>
 	<rd:ReportUnitType>Inch</rd:ReportUnitType>
-	<rd:ReportID>18e15244-1246-4a51-9f9b-118f6027b1a2</rd:ReportID>
+	<rd:ReportID>c7b8d9e0-f1a2-4b3c-8d4e-5f6a7b8c9d0e</rd:ReportID>
 </Report>
