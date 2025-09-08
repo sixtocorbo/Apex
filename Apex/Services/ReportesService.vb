@@ -122,6 +122,47 @@ Public Class ReportesService
             GetAll().
             FirstOrDefaultAsync(Function(n) n.Id = notificacionId) ' Cambiar a n.NotificacionId si tu vista lo llama así
     End Function
+    ''' <summary>
+    ''' Obtiene los datos combinados de una notificación y su detalle de designación para un reporte.
+    ''' </summary>
+    Public Async Function GetDatosDesignacionAsync(notificacionId As Integer) As Task(Of DesignacionReporteDTO)
+        Using uow As New UnitOfWork()
+            ' 1. Buscamos la notificación
+            Dim notificacion = Await uow.Repository(Of NotificacionPersonal)().GetAll().
+                Include(Function(n) n.Funcionario).
+                FirstOrDefaultAsync(Function(n) n.Id = notificacionId)
+
+            If notificacion Is Nothing Then Return Nothing
+
+            ' 2. Las designaciones se guardan en EstadoTransitorio, necesitamos encontrar el que corresponde.
+            '    Asumimos que el campo "Documento" de la notificación guarda el ID del EstadoTransitorio.
+            Dim estadoTransitorioId As Integer = 0
+            If Integer.TryParse(notificacion.Documento, estadoTransitorioId) AndAlso estadoTransitorioId > 0 Then
+
+                ' 3. Buscamos el detalle de la designación
+                Dim designacionDetalle = Await uow.Repository(Of DesignacionDetalle)().
+                    FirstOrDefaultAsync(Function(d) d.EstadoTransitorioId = estadoTransitorioId)
+
+                If designacionDetalle IsNot Nothing Then
+                    ' 4. Creamos el objeto DTO con todos los datos
+                    Dim dto As New DesignacionReporteDTO With {
+                        .NombreFuncionario = notificacion.Funcionario.Nombre,
+                        .CedulaFuncionario = notificacion.Funcionario.CI,
+                        .FechaProgramada = notificacion.FechaProgramada,
+                        .Destino = designacionDetalle.Destino,
+                        .Tarea = designacionDetalle.Tarea,
+                        .TomaDePosesion = designacionDetalle.TomaDePosesion,
+                        .Observaciones = designacionDetalle.Observaciones,
+                        .Expediente = notificacion.ExpMinisterial ' o el campo que corresponda
+                    }
+                    Return dto
+                End If
+            End If
+
+            ' Si no se encuentra el detalle, devolvemos Nothing
+            Return Nothing
+        End Using
+    End Function
 End Class
 
 ' --- DTOs para la Ficha Funcional (versión simplificada) ---

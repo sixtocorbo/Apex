@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2008/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+	<AutoRefresh>0</AutoRefresh>
+	<DataSources>
+		<DataSource Name="DummyDataSource">
+			<ConnectionProperties>
+				<DataProvider>SQL</DataProvider>
+				<ConnectString />
+			</ConnectionProperties>
+			<rd:DataSourceID>f1b3f6f3-3a3b-45e2-8e7c-2b2a6c1a8d0a</rd:DataSourceID>
+		</DataSource>
+	</DataSources>
+	<DataSets>
+		<DataSet Name="DataSetDesignaciones">
+			<Query>
+				<DataSourceName>DummyDataSource</DataSourceName>
+				<CommandText>/* Local Query */</CommandText>
+			</Query>
+			<Fields>
+				<Field Name="NombreFuncionario">
+					<DataField>NombreFuncionario</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="CedulaFuncionario">
+					<DataField>CedulaFuncionario</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="FechaProgramada">
+					<DataField>FechaProgramada</DataField>
+					<rd:TypeName>System.DateTime</rd:TypeName>
+				</Field>
+				<Field Name="Destino">
+					<DataField>Destino</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="Tarea">
+					<DataField>Tarea</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="TomaDePosesion">
+					<DataField>TomaDePosesion</DataField>
+					<rd:TypeName>System.DateTime</rd:TypeName>
+				</Field>
+				<Field Name="Observaciones">
+					<DataField>Observaciones</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="Expediente">
+					<DataField>Expediente</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+			</Fields>
+		</DataSet>
+	</DataSets>
+	<Body>
+		<ReportItems>
+			<Textbox Name="ReportTitle">
+				<CanGrow>true</CanGrow>
+				<KeepTogether>true</KeepTogether>
+				<Paragraphs>
+					<Paragraph>
+						<TextRuns>
+							<TextRun>
+								<Value>MEMORÁNDUM DE DESIGNACIÓN</Value>
+								<Style>
+									<FontFamily>Segoe UI</FontFamily>
+									<FontSize>20pt</FontSize>
+									<FontWeight>Bold</FontWeight>
+								</Style>
+							</TextRun>
+						</TextRuns>
+						<Style>
+							<TextAlign>Center</TextAlign>
+						</Style>
+					</Paragraph>
+				</Paragraphs>
+				<rd:DefaultName>ReportTitle</rd:DefaultName>
+				<Height>0.5in</Height>
+				<Width>7.5in</Width>
+				<Style>
+					<Border>
+						<Style>None</Style>
+					</Border>
+					<PaddingLeft>2pt</PaddingLeft>
+					<PaddingRight>2pt</PaddingRight>
+					<PaddingTop>2pt</PaddingTop>
+					<PaddingBottom>2pt</PaddingBottom>
+				</Style>
+			</Textbox>
+			<Textbox Name="TextboxPara">
+				<CanGrow>true</CanGrow>
+				<KeepTogether>true</KeepTogether>
+				<Paragraphs>
+					<Paragraph>
+						<TextRuns>
+							<TextRun>
+								<Value>="PARA: " &amp; First(Fields!NombreFuncionario.Value, "DataSetDesignaciones") &amp; " (C.I. " &amp; First(Fields!CedulaFuncionario.Value, "DataSetDesignaciones") &amp; ")"</Value>
+								<Style>
+									<FontFamily>Segoe UI</FontFamily>
+									<FontSize>11pt</FontSize>
+								</Style>
+							</TextRun>
+						</TextRuns>
+					</Paragraph>
+				</Paragraphs>
+				<Top>0.7in</Top>
+				<Height>0.25in</Height>
+				<Width>7.5in</Width>
+				<ZIndex>1</ZIndex>
+				<Style>
+					<Border>
+						<Style>None</Style>
+					</Border>
+					<PaddingLeft>2pt</PaddingLeft>
+					<PaddingRight>2pt</PaddingRight>
+					<PaddingTop>2pt</PaddingTop>
+					<PaddingBottom>2pt</PaddingBottom>
+				</Style>
+			</Textbox>
+			<Textbox Name="TextboxFecha">
+				<CanGrow>true</CanGrow>
+				<KeepTogether>true</KeepTogether>
+				<Paragraphs>
+					<Paragraph>
+						<TextRuns>
+							<TextRun>
+								<Value>="FECHA: " &amp; Format(First(Fields!FechaProgramada.Value, "DataSetDesignaciones"), "dd 'de' MMMM 'de' yyyy")</Value>
+								<Style>
+									<FontFamily>Segoe UI</FontFamily>
+									<FontSize>11pt</FontSize>
+								</Style>
+							</TextRun>
+						</TextRuns>
+					</Paragraph>
+				</Paragraphs>
+				<Top>1.0in</Top>
+				<Height>0.25in</Height>
+				<Width>7.5in</Width>
+				<ZIndex>2</ZIndex>
+				<Style>
+					<Border>
+						<Style>None</Style>
+					</Border>
+					<PaddingLeft>2pt</PaddingLeft>
+					<PaddingRight>2pt</PaddingRight>
+					<PaddingTop>2pt</PaddingTop>
+					<PaddingBottom>2pt</PaddingBottom>
+				</Style>
+			</Textbox>
+			<Textbox Name="TextboxCuerpo">
+				<CanGrow>true</CanGrow>
+				<KeepTogether>true</KeepTogether>
+				<Paragraphs>
+					<Paragraph>
+						<TextRuns>
+							<TextRun>
+								<Value>Por la presente se notifica a usted que, según consta en el expediente </Value>
+								<Style>
+									<FontFamily>Segoe UI</FontFamily>
+									<FontSize>11pt</FontSize>
+									<LineHeight>18pt</LineHeight>
+								</Style>
+							</TextRun>
+							<TextRun>
+								<Value>=Fields!Expediente.Value</Value>
+								<Style>
+									<FontFamily>Segoe UI</FontFamily>
+									<FontSize>11pt</FontSize>
+									<FontWeight>Bold</FontWeight>
+									<LineHeight>18pt</LineHeight>
+								</Style>
+							</TextRun>
+							<TextRun>
+								<Value>, ha sido designado para prestar servicios en </Value>
+								<Style>
+									<FontFamily>Segoe UI</FontFamily>
+									<FontSize>11pt</FontSize>
+									<LineHeight>18pt</LineHeight>
+								</Style>
+							</TextRun>
+							<TextRun>
+								<Value>=Fields!Destino.Value</Value>
+								<Style>
+									<FontFamily>Segoe UI</FontFamily>
+									<FontSize>11pt</FontSize>
+									<FontWeight>Bold</FontWeight>
+									<LineHeight>18pt</LineHeight>
+								</Style>
+							</TextRun>
+							<TextRun>
+								<Value>, donde cumplirá la tarea de </Value>
+								<Style>
+									<FontFamily>Segoe UI</FontFamily>
+									<FontSize>11pt</FontSize>
+									<LineHeight>18pt</LineHeight>
+								</Style>
+							</TextRun>
+							<TextRun>
+								<Value>=Fields!Tarea.Value</Value>
+								<Style>
+									<FontFamily>Segoe UI</FontFamily>
+									<FontSize>11pt</FontSize>
+									<FontWeight>Bold</FontWeight>
+									<LineHeight>18pt</LineHeight>
+								</Style>
+							</TextRun>
+							<TextRun>
+								<Value>. Deberá tomar posesión de su cargo a partir del día </Value>
+								<Style>
+									<FontFamily>Segoe UI</FontFamily>
+									<FontSize>11pt</FontSize>
+									<LineHeight>18pt</LineHeight>
+								</Style>
+							</TextRun>
+							<TextRun>
+								<Value>=Format(Fields!TomaDePosesion.Value, "dd/MM/yyyy")</Value>
+								<Style>
+									<FontFamily>Segoe UI</FontFamily>
+									<FontSize>11pt</FontSize>
+									<FontWeight>Bold</FontWeight>
+									<LineHeight>18pt</LineHeight>
+								</Style>
+							</TextRun>
+							<TextRun>
+								<Value>.</Value>
+								<Style>
+									<FontFamily>Segoe UI</FontFamily>
+									<FontSize>11pt</FontSize>
+									<LineHeight>18pt</LineHeight>
+								</Style>
+							</TextRun>
+						</TextRuns>
+						<Style />
+					</Paragraph>
+					<Paragraph>
+						<TextRuns>
+							<TextRun>
+								<Value>Observaciones adicionales: </Value>
+								<Style>
+									<FontFamily>Segoe UI</FontFamily>
+									<FontSize>11pt</FontSize>
+									<LineHeight>18pt</LineHeight>
+								</Style>
+							</TextRun>
+							<TextRun>
+								<Value>=Fields!Observaciones.Value</Value>
+								<Style>
+									<FontFamily>Segoe UI</FontFamily>
+									<FontSize>11pt</FontSize>
+									<LineHeight>18pt</LineHeight>
+								</Style>
+							</TextRun>
+						</TextRuns>
+					</Paragraph>
+				</Paragraphs>
+				<Top>1.5in</Top>
+				<Height>2in</Height>
+				<Width>7.5in</Width>
+				<ZIndex>3</ZIndex>
+				<Style>
+					<Border>
+						<Style>None</Style>
+					</Border>
+					<PaddingLeft>2pt</PaddingLeft>
+					<PaddingRight>2pt</PaddingRight>
+					<PaddingTop>2pt</PaddingTop>
+					<PaddingBottom>2pt</PaddingBottom>
+				</Style>
+			</Textbox>
+			<Line Name="LineFirma">
+				<Top>4.0in</Top>
+				<Left>4.0in</Left>
+				<Height>0in</Height>
+				<Width>3.0in</Width>
+				<ZIndex>4</ZIndex>
+				<Style>
+					<Border>
+						<Style>Solid</Style>
+						<Width>0.5pt</Width>
+					</Border>
+				</Style>
+			</Line>
+			<Textbox Name="TextboxFirma">
+				<CanGrow>true</CanGrow>
+				<KeepTogether>true</KeepTogether>
+				<Paragraphs>
+					<Paragraph>
+						<TextRuns>
+							<TextRun>
+								<Value>Firma y Aclaración</Value>
+								<Style>
+									<FontFamily>Segoe UI</FontFamily>
+									<FontSize>10pt</FontSize>
+								</Style>
+							</TextRun>
+						</TextRuns>
+						<Style>
+							<TextAlign>Center</TextAlign>
+						</Style>
+					</Paragraph>
+				</Paragraphs>
+				<Top>4.05in</Top>
+				<Left>4.0in</Left>
+				<Height>0.25in</Height>
+				<Width>3.0in</Width>
+				<ZIndex>5</ZIndex>
+				<Style>
+					<Border>
+						<Style>None</Style>
+					</Border>
+					<PaddingLeft>2pt</PaddingLeft>
+					<PaddingRight>2pt</PaddingRight>
+					<PaddingTop>2pt</PaddingTop>
+					<PaddingBottom>2pt</PaddingBottom>
+				</Style>
+			</Textbox>
+		</ReportItems>
+		<Height>5.0in</Height>
+		<Style />
+	</Body>
+	<Width>7.5in</Width>
+	<Page>
+		<PageHeight>11.69in</PageHeight>
+		<PageWidth>8.27in</PageWidth>
+		<LeftMargin>0.5in</LeftMargin>
+		<RightMargin>0.5in</RightMargin>
+		<TopMargin>0.5in</TopMargin>
+		<BottomMargin>0.5in</BottomMargin>
+		<Style />
+	</Page>
+	<rd:ReportUnitType>Inch</rd:ReportUnitType>
+	<rd:ReportID>18e15244-1246-4a51-9f9b-118f6027b1a2</rd:ReportID>
+</Report>

@@ -452,6 +452,7 @@
     </Compile>
     <Compile Include="Services\ConceptoFuncionalService.vb" />
     <Compile Include="Services\ConsultasGenericas.vb" />
+    <Compile Include="Services\DesignacionReporteDTO.vb" />
     <Compile Include="Services\LicenciaService.vb" />
     <Compile Include="Services\LoadingHelper.vb" />
     <Compile Include="Services\ModConstantesApex.vb" />
@@ -487,6 +488,12 @@
       <DependentUpon>frmAuditoriaViewer.vb</DependentUpon>
     </Compile>
     <Compile Include="UI\frmAuditoriaViewer.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\frmDesignacionRPT.Designer.vb">
+      <DependentUpon>frmDesignacionRPT.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmDesignacionRPT.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="UI\frmNotificacionCambiarEstado.Designer.vb">
@@ -726,6 +733,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Reportes\ConceptoFuncional.rdlc" />
     <EmbeddedResource Include="Reportes\FichaFuncional.rdlc" />
+    <EmbeddedResource Include="Reportes\DesignacionImprimir.rdlc" />
     <EmbeddedResource Include="Reportes\NotificacionImprimir.rdlc" />
     <EmbeddedResource Include="Reportes\ReporteNovedades_Funcionarios.rdlc">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

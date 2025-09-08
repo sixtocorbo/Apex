@@ -233,6 +233,10 @@ Public Class frmFuncionarioBuscar
 
 
 #Region "Detalle lateral (Foto on-demand)"
+
+    ''' <summary>
+    ''' Verifica si el funcionario seleccionado tiene notificaciones en estado "Pendiente".
+    ''' </summary>
     Private Async Function VerificarNotificacionesPendientesAsync(funcionarioId As Integer) As Task
         Try
             Using uow As New UnitOfWork()
@@ -241,13 +245,18 @@ Public Class frmFuncionarioBuscar
                 Dim tienePendientes = Await uow.Repository(Of NotificacionPersonal)().GetAll().
                     AnyAsync(Function(n) n.FuncionarioId = funcionarioId AndAlso n.EstadoId = estadoPendienteId)
 
+                ' Hace visible la alerta si corresponde
                 lblAlertaNotificaciones.Visible = tienePendientes
             End Using
         Catch ex As Exception
-            ' Opcional: registrar el error
+            ' En caso de error, se asegura que la alerta no se muestre
             lblAlertaNotificaciones.Visible = False
         End Try
     End Function
+
+    ''' <summary>
+    ''' Carga y muestra los detalles del funcionario seleccionado en la grilla.
+    ''' </summary>
     Private Async Sub MostrarDetalle(sender As Object, e As EventArgs)
         If dgvResultados.CurrentRow Is Nothing OrElse dgvResultados.CurrentRow.DataBoundItem Is Nothing Then
             LimpiarDetalle()
@@ -256,6 +265,7 @@ Public Class frmFuncionarioBuscar
         Dim id = CInt(dgvResultados.CurrentRow.Cells("Id").Value)
 
         ' --- INICIO DE CAMBIOS ---
+        ' Llama al método para verificar y mostrar la alerta de notificaciones
         Await VerificarNotificacionesPendientesAsync(id)
         ' --- FIN DE CAMBIOS ---
 
@@ -270,9 +280,11 @@ Public Class frmFuncionarioBuscar
              .AsNoTracking() _
              .FirstOrDefaultAsync(Function(x) x.Id = id)
 
+            ' Doble chequeo para evitar problemas de concurrencia si el usuario cambia de fila rápidamente
             If dgvResultados.CurrentRow Is Nothing OrElse CInt(dgvResultados.CurrentRow.Cells("Id").Value) <> id Then Return
             If f Is Nothing Then Return
 
+            ' Carga de datos en los controles
             lblCI.Text = f.CI
             lblNombreCompleto.Text = f.Nombre
             lblCargo.Text = If(f.Cargo Is Nothing, "-", f.Cargo.Nombre)
@@ -280,20 +292,20 @@ Public Class frmFuncionarioBuscar
             lblFechaIngreso.Text = f.FechaIngreso.ToShortDateString()
             lblHorarioCompleto.Text = $"{If(f.Semana IsNot Nothing, f.Semana.Nombre, "-")} / {If(f.Turno IsNot Nothing, f.Turno.Nombre, "-")} / {If(f.Horario IsNot Nothing, f.Horario.Nombre, "-")}"
 
-            ' --- INICIO DE CAMBIOS ---
-            ' Hacemos visibles los íconos de copiar
+            ' Muestra los íconos para copiar
             pbCopyCI.Visible = True
             pbCopyNombre.Visible = True
-            ' --- FIN DE CAMBIOS ---
 
+            ' Configura el estado (Activo/Inactivo)
             If f.Activo Then
                 lblEstadoActividad.Text = "Estado: Activo"
                 lblEstadoActividad.ForeColor = Color.DarkGreen
             Else
                 lblEstadoActividad.Text = "Estado: Inactivo"
-                lblEstadoActividad.ForeColor = Color.Red
+                lblEstadoActividad.ForeColor = Color.Maroon
             End If
 
+            ' Busca y muestra la situación actual del funcionario
             Dim situaciones = Await uow.Context.Database.SqlQuery(Of SituacionParaBoton)(
             "SELECT Prioridad, Tipo, ColorIndicador FROM dbo.vw_FuncionarioSituacionActual WHERE FuncionarioId = @p0 ORDER BY Prioridad",
             id
@@ -303,18 +315,15 @@ Public Class frmFuncionarioBuscar
                 btnVerSituacion.Visible = True
                 Dim primeraSituacion = situaciones.First()
 
-                ' --- INICIO DE LA MODIFICACIÓN ---
-                ' Si estamos en modo de selección, deshabilitamos el botón para evitar errores.
+                ' Habilita o deshabilita botones según el modo de apertura del formulario
                 If _modo = ModoApertura.Seleccion Then
                     btnVerSituacion.Enabled = False
                     btnGenerarFicha.Enabled = False
-                    ' Opcionalmente, puedes añadir un ToolTip para informar al usuario:
                     ToolTip1.SetToolTip(btnVerSituacion, "No disponible en modo de selección")
                 Else
                     btnVerSituacion.Enabled = True
                     btnGenerarFicha.Enabled = True
                 End If
-                ' --- FIN DE LA MODIFICACIÓN ---
 
                 If situaciones.Count > 1 Then
                     btnVerSituacion.Text = "Situación Múltiple"
@@ -322,6 +331,7 @@ Public Class frmFuncionarioBuscar
                     btnVerSituacion.Text = primeraSituacion.Tipo
                 End If
 
+                ' Asigna colores al botón de situación
                 Try
                     btnVerSituacion.BackColor = Color.FromName(primeraSituacion.ColorIndicador)
                     btnVerSituacion.ForeColor = Color.White
@@ -333,11 +343,13 @@ Public Class frmFuncionarioBuscar
                 btnVerSituacion.Visible = False
             End If
 
+            ' Obtiene y muestra la presencia del día
             lblPresencia.Text = Await ObtenerPresenciaAsync(id, Date.Today)
             If Not f.Activo AndAlso (situaciones Is Nothing OrElse Not situaciones.Any()) Then
                 lblPresencia.Text = Await ObtenerPresenciaAsync(id, Date.Today)
             End If
 
+            ' Carga la foto del funcionario
             If f.Foto Is Nothing OrElse f.Foto.Length = 0 Then
                 pbFotoDetalle.Image = My.Resources.Police
             Else
@@ -347,6 +359,7 @@ Public Class frmFuncionarioBuscar
             End If
         End Using
     End Sub
+
 
 
     Private Sub btnVerSituacion_Click(sender As Object, e As EventArgs)
