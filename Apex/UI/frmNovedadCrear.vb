@@ -220,6 +220,11 @@ Public Class frmNovedadCrear
                     Next
                 End If
                 MessageBox.Show("Novedad creada con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                ' *** USAMOS EL NOTIFICADOR DE EVENTOS ***
+                ' Notificamos por cada funcionario que sus datos relacionados han cambiado.
+                For Each id In funcionarioIds
+                    NotificadorEventos.NotificarCambiosEnFuncionario(id)
+                Next
 
             Else ' Modo Editar
                 ' --- MODIFICACIÓN CLAVE: Lógica de guardado en edición ---
@@ -245,6 +250,11 @@ Public Class frmNovedadCrear
 
                 MessageBox.Show("Novedad actualizada con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
             End If
+
+            ' También notificamos al finalizar la edición
+            For Each id In funcionarioIds
+                NotificadorEventos.NotificarCambiosEnFuncionario(id)
+            Next
 
             DialogResult = DialogResult.OK
             Close()

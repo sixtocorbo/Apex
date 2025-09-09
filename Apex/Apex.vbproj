@@ -442,21 +442,21 @@
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="Helpers\NavegacionHelper.vb" />
-    <Compile Include="Services\AppTheme.vb" />
+    <Compile Include="Helpers\AppTheme.vb" />
     <Compile Include="Services\AreaTrabajoService.vb" />
     <Compile Include="Services\AuditoriaService.vb" />
     <Compile Include="Services\CargoService.vb" />
     <Compile Include="Services\CategoriaAusenciaService.vb" />
-    <Compile Include="Services\ChipControl.vb">
+    <Compile Include="UI\ChipControl.vb">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Services\ConceptoFuncionalService.vb" />
-    <Compile Include="Services\ConsultasGenericas.vb" />
+    <Compile Include="Helpers\ConsultasGenericas.vb" />
     <Compile Include="Services\DesignacionReporteDTO.vb" />
     <Compile Include="Services\LicenciaService.vb" />
-    <Compile Include="Services\LoadingHelper.vb" />
-    <Compile Include="Services\ModConstantesApex.vb" />
-    <Compile Include="Services\ModuloExtensions.vb" />
+    <Compile Include="Helpers\LoadingHelper.vb" />
+    <Compile Include="Helpers\ModConstantesApex.vb" />
+    <Compile Include="Helpers\ModuloExtensions.vb" />
     <Compile Include="Services\NotificacionService.vb" />
     <Compile Include="Services\NovedadService.vb" />
     <Compile Include="Services\ReportesService.vb" />

@@ -12,6 +12,21 @@ Public Class frmNovedades
     Private _pictureBoxSeleccionado As PictureBox = Nothing
     Private _idNovedadSeleccionada As Integer?
     Private _funcionariosSeleccionadosFiltro As New Dictionary(Of Integer, String)
+
+    ' --- 1. MODIFICAR EL CONSTRUCTOR Y AGREGAR UN MANEJADOR PARA EL EVENTO "DISPOSED" ---
+    Public Sub New()
+        ' Esta llamada es requerida por el diseñador.
+        InitializeComponent()
+
+        ' Nos suscribimos al evento del notificador cuando se crea el formulario.
+        AddHandler NotificadorEventos.FuncionarioActualizado, AddressOf HandleFuncionarioActualizado
+    End Sub
+
+    Private Sub frmNovedades_Disposed(sender As Object, e As EventArgs) Handles Me.Disposed
+        ' Es MUY IMPORTANTE desuscribirse del evento para evitar fugas de memoria.
+        RemoveHandler NotificadorEventos.FuncionarioActualizado, AddressOf HandleFuncionarioActualizado
+    End Sub
+
     Private Async Sub frmNovedades_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
         ConfigurarGrilla()
@@ -177,12 +192,40 @@ Public Class frmNovedades
 
 #Region "Gestión de Novedades (CRUD)"
 
-    Private Async Sub btnNuevaNovedad_Click(sender As Object, e As EventArgs) Handles btnNuevaNovedad.Click
-        Using frm As New frmNovedadCrear()
-            If frm.ShowDialog(Me) = DialogResult.OK Then
-                Await BuscarAsync()
+    Private Sub btnNuevaNovedad_Click(sender As Object, e As EventArgs) Handles btnNuevaNovedad.Click
+        Dim dashboard = Me.ParentForm
+        If dashboard IsNot Nothing AndAlso TypeOf dashboard Is frmDashboard Then
+            Dim formCrear As New frmNovedadCrear()
+            CType(dashboard, frmDashboard).AbrirFormEnPanel(formCrear)
+        Else
+            Dim formCrear As New frmNovedadCrear()
+            formCrear.Show()
+        End If
+    End Sub
+    ' --- 3. AÑADIR EL NUEVO MÉTODO MANEJADOR ---
+    ''' <summary>
+    ''' Se ejecuta cuando NotificadorEventos informa un cambio en un funcionario.
+    ''' </summary>
+    Private Async Sub HandleFuncionarioActualizado(sender As Object, e As FuncionarioEventArgs)
+        ' Para evitar que el filtro se llene con IDs de otras gestiones,
+        ' lo limpiamos la primera vez que llega una notificación de este "lote".
+        ' Una forma sencilla es verificar si el ID ya está en la lista. Si no hay ninguno, es un lote nuevo.
+        If Not _funcionariosSeleccionadosFiltro.ContainsKey(e.FuncionarioId) Then
+            ' Opcional: Si quieres que cada nueva gestión reemplace el filtro anterior, descomenta la siguiente línea:
+            ' _funcionariosSeleccionadosFiltro.Clear()
+        End If
+
+        ' Agregamos el funcionario de la notificación al filtro.
+        Using uow As New UnitOfWork()
+            Dim funcionario = Await uow.Repository(Of Funcionario).GetByIdAsync(e.FuncionarioId)
+            If funcionario IsNot Nothing AndAlso Not _funcionariosSeleccionadosFiltro.ContainsKey(e.FuncionarioId) Then
+                _funcionariosSeleccionadosFiltro.Add(funcionario.Id, funcionario.Nombre)
             End If
         End Using
+
+        ' Actualizamos la UI y disparamos la búsqueda.
+        ActualizarListaFuncionarios()
+        Await BuscarAsync()
     End Sub
 
     Private Async Sub btnEditarNovedad_Click(sender As Object, e As EventArgs) Handles btnEditarNovedad.Click

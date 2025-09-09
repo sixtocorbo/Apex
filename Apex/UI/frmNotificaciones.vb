@@ -147,12 +147,22 @@ Public Class frmNotificaciones
 
 #Region "Acciones (CRUD)"
 
-    Private Async Sub btnNuevo_Click(sender As Object, e As EventArgs) Handles btnNuevo.Click
-        Using frm As New frmNotificacionCrear()
-            If frm.ShowDialog() = DialogResult.OK Then
-                Await IniciarBusquedaAsync()
-            End If
-        End Using
+    Private Sub btnNuevo_Click(sender As Object, e As EventArgs) Handles btnNuevo.Click
+        ' Buscamos el formulario principal (Dashboard) que contiene a este.
+        Dim dashboard = Me.ParentForm
+
+        ' Verificamos que el formulario padre sea el Dashboard.
+        If dashboard IsNot Nothing AndAlso TypeOf dashboard Is frmDashboard Then
+            ' Creamos el formulario para la nueva notificación.
+            Dim formCrear As New frmNotificacionCrear()
+
+            ' Usamos el método público del Dashboard para abrir el formulario en el panel.
+            CType(dashboard, frmDashboard).AbrirFormEnPanel(formCrear)
+        Else
+            ' Comportamiento anterior por si no se encuentra el Dashboard.
+            Dim formCrear As New frmNotificacionCrear()
+            formCrear.Show()
+        End If
     End Sub
 
     Private Async Sub btnEditar_Click(sender As Object, e As EventArgs) Handles btnEditar.Click

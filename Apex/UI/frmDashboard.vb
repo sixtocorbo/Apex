@@ -172,20 +172,42 @@ Public Class frmDashboard
             Me.BeginInvoke(Sub() _navBusy = False)
         End Try
     End Sub
-
     ''' <summary>
-    ''' Busca una instancia de formulario en el diccionario. Si no existe, la crea y la guarda.
+    ''' Busca una instancia de formulario en el diccionario.
+    ''' Si no existe o si fue desechada (disposed), la crea y la guarda.
     ''' </summary>
     Private Function ObtenerOcrearInstancia(formType As Type) As Form
         Dim formName As String = formType.Name
+
+        ' Revisa si el formulario existe en el diccionario.
         If _formularios.ContainsKey(formName) Then
-            Return _formularios(formName)
-        Else
-            Dim newForm = CType(Activator.CreateInstance(formType), Form)
-            _formularios.Add(formName, newForm)
-            Return newForm
+            Dim FrmExistente = _formularios(formName)
+
+            ' Si la instancia existente NO es nula Y NO ha sido desechada, la reutilizamos.
+            If FrmExistente IsNot Nothing AndAlso Not FrmExistente.IsDisposed Then
+                Return FrmExistente
+            End If
         End If
+
+        ' Si no existe una instancia válida, creamos una nueva.
+        ' La nueva instancia reemplazará cualquier referencia a un formulario desechado.
+        Dim newForm = CType(Activator.CreateInstance(formType), Form)
+        _formularios(formName) = newForm ' Usar el indexador funciona para agregar y para actualizar.
+        Return newForm
     End Function
+    '''' <summary>
+    '''' Busca una instancia de formulario en el diccionario. Si no existe, la crea y la guarda.
+    '''' </summary>
+    'Private Function ObtenerOcrearInstancia(formType As Type) As Form
+    '    Dim formName As String = formType.Name
+    '    If _formularios.ContainsKey(formName) Then
+    '        Return _formularios(formName)
+    '    Else
+    '        Dim newForm = CType(Activator.CreateInstance(formType), Form)
+    '        _formularios.Add(formName, newForm)
+    '        Return newForm
+    '    End If
+    'End Function
 
     ''' <summary>
     ''' Devuelve el tipo de formulario correspondiente al nombre de un botón del menú.
