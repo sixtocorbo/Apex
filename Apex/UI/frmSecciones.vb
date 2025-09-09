@@ -134,8 +134,9 @@ Public Class frmSecciones
     End Sub
 
     Private Sub btnVolver_Click(sender As Object, e As EventArgs) Handles btnVolver.Click
-        ' Simplemente creamos una nueva instancia del menú de configuración
-        ' y le pedimos a nuestro ayudante que la muestre.
-        NavegacionHelper.AbrirFormEnDashboard(New frmConfiguracion())
+        ' CAMBIO CLAVE:
+        ' Ya no crea una nueva instancia. Llama al helper para que
+        ' busque y muestre el frmConfiguracion que ya está abierto.
+        NavegacionHelper.AbrirFormUnicoEnDashboard(Of frmConfiguracion)()
     End Sub
 End Class

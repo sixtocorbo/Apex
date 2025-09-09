@@ -291,7 +291,7 @@ Public Class frmFuncionarioSituacion
                     ' Si es una Notificación, abre el formulario de REPORTE (impresión).
                     ' Sabemos que es pendiente porque solo esas se cargan en la grilla.
                     Dim frm As New frmNotificacionRPT(registroId)
-                    NavegacionHelper.AbrirFormEnDashboard(frm)
+                    NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
 
             End Select
 
@@ -306,7 +306,7 @@ Public Class frmFuncionarioSituacion
         Try
             If estadoIdEspecifico > 0 Then
                 Dim frm As New frmDesignacionRPT(estadoIdEspecifico)
-                NavegacionHelper.AbrirFormEnDashboard(frm)
+                NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
                 Return
             End If
 
@@ -349,7 +349,7 @@ Public Class frmFuncionarioSituacion
 
             If idParaReporte > 0 Then
                 Dim frm As New frmDesignacionRPT(idParaReporte)
-                NavegacionHelper.AbrirFormEnDashboard(frm)
+                NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
             End If
 
         Catch ex As Exception

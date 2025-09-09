@@ -120,7 +120,7 @@ Public Class frmIncidencias
     End Sub
 
     Private Sub btnCerrar_Click(sender As Object, e As EventArgs) Handles btnCerrar.Click
-        NavegacionHelper.AbrirFormEnDashboard(New frmConfiguracion())
+        NavegacionHelper.AbrirFormUnicoEnDashboard(Of frmConfiguracion)()
     End Sub
 
     Private Sub frmGestionIncidencias_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing

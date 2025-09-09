@@ -1,30 +1,46 @@
-﻿' Apex/Helpers/NavegacionHelper.vb
-Imports System.Windows.Forms
+﻿Imports System.Windows.Forms
+Imports System.Linq
 
 Public Module NavegacionHelper
 
     ''' <summary>
-    ''' Busca el Dashboard principal y abre un formulario dentro de su panel.
-    ''' Si no encuentra el Dashboard, abre el formulario de forma normal.
+    ''' Busca si ya existe una instancia del formulario especificado. Si existe, la trae al frente.
+    ''' Si no existe, crea una nueva instancia y la abre dentro del panel del Dashboard.
     ''' </summary>
-    ''' <param name="formularioAAbrir">La instancia del formulario que se desea abrir.</param>
-    Public Sub AbrirFormEnDashboard(ByVal formularioAAbrir As Form)
+    ''' <typeparam name="T">El tipo del formulario a abrir (ej: frmConfiguracion).</typeparam>
+    Public Sub AbrirFormUnicoEnDashboard(Of T As {Form, New})()
 
-        ' 1. Busca la instancia abierta del Dashboard en toda la aplicación.
+        ' 1. Busca la instancia abierta del Dashboard.
         Dim dashboard = Application.OpenForms.OfType(Of frmDashboard)().FirstOrDefault()
-
-        ' 2. Comprueba si se encontró el Dashboard.
-        If dashboard IsNot Nothing Then
-            ' Si se encontró, llama a su método público para mostrar el formulario.
-            dashboard.AbrirFormEnPanel(formularioAAbrir)
-        Else
-            ' 3. Si no se encontró, muestra un aviso y abre el formulario de forma independiente.
-            '    Esto asegura que la aplicación no falle si el Dashboard no está disponible.
-            MessageBox.Show("No se encontró el dashboard principal. El formulario se abrirá en una nueva ventana.",
-                            "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-            formularioAAbrir.Show()
+        If dashboard Is Nothing Then
+            MessageBox.Show("No se encontró el dashboard principal.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Return
         End If
 
+        ' 2. Busca si ya existe una instancia del formulario que queremos abrir (del tipo T).
+        Dim formularioExistente = dashboard.MdiChildren.OfType(Of T)().FirstOrDefault()
+
+        If formularioExistente IsNot Nothing Then
+            ' 3. Si ya existe, lo trae al frente y lo activa.
+            dashboard.AbrirFormEnPanel(formularioExistente)
+        Else
+            ' 4. Si no existe, crea una nueva instancia y la abre.
+            Dim nuevoFormulario As New T()
+            dashboard.AbrirFormEnPanel(nuevoFormulario)
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' Mantiene la funcionalidad original por si necesitas abrir múltiples instancias de otros formularios.
+    ''' </summary>
+    Public Sub AbrirNuevaInstanciaEnDashboard(ByVal formularioAAbrir As Form)
+        Dim dashboard = Application.OpenForms.OfType(Of frmDashboard)().FirstOrDefault()
+        If dashboard IsNot Nothing Then
+            dashboard.AbrirFormEnPanel(formularioAAbrir)
+        Else
+            formularioAAbrir.Show()
+        End If
     End Sub
 
 End Module

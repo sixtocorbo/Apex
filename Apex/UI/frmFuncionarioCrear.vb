@@ -760,7 +760,8 @@ Public Class frmFuncionarioCrear
             Return
         End If
         Dim frm As New frmAuditoriaViewer(_funcionario.Id.ToString())
-        NavegacionHelper.AbrirFormEnDashboard(frm)
+        NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
+
     End Sub
 
     Private Sub DgvEstadosTransitorios_CellDoubleClick(sender As Object, e As DataGridViewCellEventArgs)

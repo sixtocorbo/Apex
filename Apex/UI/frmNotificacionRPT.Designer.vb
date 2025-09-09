@@ -38,7 +38,7 @@ Partial Class frmNotificacionRPT
         '
         'btnConfirmarFirma
         '
-        Me.btnConfirmarFirma.Location = New System.Drawing.Point(1054, 54)
+        Me.btnConfirmarFirma.Location = New System.Drawing.Point(554, 72)
         Me.btnConfirmarFirma.Name = "btnConfirmarFirma"
         Me.btnConfirmarFirma.Size = New System.Drawing.Size(103, 33)
         Me.btnConfirmarFirma.TabIndex = 1

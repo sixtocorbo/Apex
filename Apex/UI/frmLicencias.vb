@@ -7,17 +7,23 @@ Imports System.Windows.Forms
 Public Class frmLicencias
 
     Private ReadOnly _licenciaSvc As New LicenciaService()
+    ' --- NUEVO: Timer para controlar la búsqueda ---
+    Private WithEvents _searchTimer As New Timer()
+    Private _isFirstLoad As Boolean = True
 
     ' --- Suscripción al notificador ---
     Private Sub frmGestionLicencias_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
         ConfigurarGrillaLicencias()
+
+        ' --- Configuración del Timer ---
+        _searchTimer.Interval = 500 ' Medio segundo de espera antes de buscar
+        _searchTimer.Enabled = False
+
         txtBusquedaLicencia.Focus()
-
-        ' Se suscribe al evento genérico, que ahora vuelve a existir.
         AddHandler NotificadorEventos.DatosActualizados, AddressOf OnDatosActualizados
-
         chkSoloVigentes.Checked = True
+        _isFirstLoad = False
     End Sub
 
     Private Sub frmGestionLicencias_FormClosed(sender As Object, e As FormClosedEventArgs) Handles Me.FormClosed
@@ -83,20 +89,28 @@ Public Class frmLicencias
 
 #Region "Manejo de Búsqueda y Acciones"
 
-    Private Async Sub txtBusquedaLicencia_KeyDown(sender As Object, e As KeyEventArgs) Handles txtBusquedaLicencia.KeyDown
-        If e.KeyCode = Keys.Enter Then
-            e.SuppressKeyPress = True
-            Await CargarDatosLicenciasAsync()
-        End If
+    ' --- CAMBIO: Se utiliza TextChanged en lugar de KeyDown para mayor fluidez ---
+    Private Sub txtBusquedaLicencia_TextChanged(sender As Object, e As EventArgs) Handles txtBusquedaLicencia.TextChanged
+        ' Reinicia el temporizador cada vez que el usuario escribe algo.
+        _searchTimer.Stop()
+        _searchTimer.Start()
+    End Sub
+
+    ' --- NUEVO: El Timer ejecuta la búsqueda cuando el usuario deja de escribir ---
+    Private Async Sub SearchTimer_Tick(sender As Object, e As EventArgs) Handles _searchTimer.Tick
+        _searchTimer.Stop() ' Detiene el timer para que no se ejecute repetidamente.
+        Await CargarDatosLicenciasAsync()
     End Sub
 
     Private Async Sub chkSoloVigentes_CheckedChanged(sender As Object, e As EventArgs) Handles chkSoloVigentes.CheckedChanged
+        ' Evitamos que se ejecute durante la carga inicial del formulario
+        If _isFirstLoad Then Return
         Await CargarDatosLicenciasAsync()
     End Sub
 
     Private Sub btnNuevaLicencia_Click(sender As Object, e As EventArgs) Handles btnNuevaLicencia.Click
         Dim frm As New frmLicenciaCrear()
-        NavegacionHelper.AbrirFormEnDashboard(frm)
+        NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
     End Sub
 
     Private Sub btnEditarLicencia_Click(sender As Object, e As EventArgs) Handles btnEditarLicencia.Click
@@ -132,7 +146,6 @@ Public Class frmLicencias
         If MessageBox.Show($"¿Eliminar la licencia de '{nombre}'?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
             Try
                 Await _licenciaSvc.DeleteAsync(dto.LicenciaId.Value)
-                ' --- CAMBIO CLAVE: Llamada a la notificación genérica correcta ---
                 NotificadorEventos.NotificarActualizacionGeneral()
             Catch ex As Exception
                 MessageBox.Show("Error al eliminar la licencia: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)

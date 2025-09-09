@@ -7,7 +7,7 @@ Public Class frmNotificaciones
     Private ReadOnly _svc As New NotificacionService()
     ' Timer para la búsqueda demorada, gestionado directamente en este formulario.
     Private WithEvents tmrFiltro As New Timer()
-
+    Private _entidadActual As vw_NotificacionesCompletas
     Public Sub New()
         InitializeComponent()
     End Sub
@@ -80,7 +80,12 @@ Public Class frmNotificaciones
     End Sub
 
 #Region "Lógica de Búsqueda"
-
+    Private Sub dgvNotificaciones_SelectionChanged(sender As Object, e As EventArgs) Handles dgvNotificaciones.SelectionChanged
+        If dgvNotificaciones.SelectedRows.Count > 0 Then
+            _entidadActual = CType(dgvNotificaciones.SelectedRows(0).DataBoundItem, vw_NotificacionesCompletas)
+            rtbNotificacion.Text = _entidadActual.Texto
+        End If
+    End Sub
     Private Async Function IniciarBusquedaAsync() As Task
         LoadingHelper.MostrarCargando(Me)
         Try
@@ -118,6 +123,10 @@ Public Class frmNotificaciones
     End Sub
 
     Private Async Sub dgvNotificaciones_DoubleClick(sender As Object, e As EventArgs) Handles dgvNotificaciones.DoubleClick
+        Await CambiarEstado()
+    End Sub
+
+    Private Async Function CambiarEstado() As Task
         If dgvNotificaciones.SelectedRows.Count > 0 Then
             Dim selectedNotification = CType(dgvNotificaciones.SelectedRows(0).DataBoundItem, vw_NotificacionesCompletas)
             Using frm As New frmNotificacionCambiarEstado(selectedNotification.EstadoId)
@@ -132,7 +141,7 @@ Public Class frmNotificaciones
                 End If
             End Using
         End If
-    End Sub
+    End Function
 
 #End Region
 
@@ -168,7 +177,7 @@ Public Class frmNotificaciones
         End If
         Dim idSeleccionado = CInt(dgvNotificaciones.SelectedRows(0).Cells("Id").Value)
         Dim frm As New frmNotificacionRPT(idSeleccionado)
-        NavegacionHelper.AbrirFormEnDashboard(frm)
+        NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
     End Sub
 
     Private Async Sub btnEliminar_Click(sender As Object, e As EventArgs) Handles btnEliminar.Click
@@ -205,6 +214,10 @@ Public Class frmNotificaciones
             Case Keys.Delete
                 btnEliminar.PerformClick()
         End Select
+    End Sub
+
+    Private Async Sub btnCambiarEstado_Click(sender As Object, e As EventArgs) Handles btnCambiarEstado.Click
+        Await CambiarEstado()
     End Sub
 
 #End Region

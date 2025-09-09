@@ -81,7 +81,7 @@ Public Class frmConceptoFuncional
 
         ' Crear y mostrar el formulario del reporte, pasándole las listas
         Dim frm As New frmConceptoFuncionalRPT(_funcionarioSeleccionado, dtpFechaInicio.Value, dtpFechaFin.Value, salud, graves, leves)
-        NavegacionHelper.AbrirFormEnDashboard(frm)
+        NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
     End Sub
 
     ''' <summary>

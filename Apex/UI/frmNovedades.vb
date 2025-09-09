@@ -293,10 +293,10 @@ Public Class frmNovedades
             ToList()
 
             ' 5. Abrimos el formulario visor y le pasamos los datos
-            Dim frmVisor As New frmNovedadesRPT(datosMapeados)
+            Dim frm As New frmNovedadesRPT(datosMapeados)
 
             ' Usamos nuestro nuevo método de ayuda para manejar toda la lógica.
-            NavegacionHelper.AbrirFormEnDashboard(frmVisor)
+            NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
 
         Catch ex As InvalidCastException
             MessageBox.Show("Ocurrió un error de datos internos al preparar la impresión.", "Error de Datos", MessageBoxButtons.OK, MessageBoxIcon.Error)
