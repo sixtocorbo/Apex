@@ -2,6 +2,24 @@
 Imports System.Globalization
 Imports System.Text
 
+' --- DTO para manejar la selección de designaciones ---
+' Puedes ponerlo en su propio archivo o dejarlo aquí.
+Public Class DesignacionSeleccionDTO
+    Public Property NotificacionId As Integer
+    Public Property FechaDesde As Date?
+    Public Property FechaHasta As Date?
+    Public Property Descripcion As String
+
+    Public ReadOnly Property Vigente As Boolean
+        Get
+            Dim hoy = Date.Today
+            Dim esVigenteSinFechaFin = Not FechaHasta.HasValue AndAlso FechaDesde.HasValue AndAlso FechaDesde.Value.Date <= hoy
+            Dim esVigenteConFechaFin = FechaDesde.HasValue AndAlso FechaHasta.HasValue AndAlso FechaDesde.Value.Date <= hoy AndAlso FechaHasta.Value.Date >= hoy
+            Return esVigenteSinFechaFin OrElse esVigenteConFechaFin
+        End Get
+    End Property
+End Class
+
 Public Class frmFuncionarioSituacion
 
 #Region " Campos y Constructor "
@@ -270,6 +288,7 @@ Public Class frmFuncionarioSituacion
 #End Region
 
 #Region "Lógica de grilla y estados"
+
     Private Async Sub dgvEstados_CellDoubleClick(sender As Object, e As DataGridViewCellEventArgs)
         If e.RowIndex < 0 OrElse dgvEstados.CurrentRow Is Nothing Then Return
         Try
@@ -277,37 +296,87 @@ Public Class frmFuncionarioSituacion
             Dim tipoEvento = NormalizarTexto(GetPropValue(Of String)(rowData, "TipoEvento", ""))
             Dim tipoTexto = NormalizarTexto(GetPropValue(Of String)(rowData, "Tipo", ""))
 
-            Dim notificacionIdParaAbrir As Integer = 0
-
-            ' CASO 1: El usuario hace clic en una Notificación Pendiente de Designación
-            If tipoEvento = "NOTIFICACION" AndAlso tipoTexto.Contains("DESIGNACION") Then
-                notificacionIdParaAbrir = GetPropValue(Of Integer)(rowData, "Id", 0)
-
-                ' CASO 2: El usuario hace clic en un Estado de Designación (el escenario principal)
-            ElseIf tipoEvento = "ESTADO" AndAlso tipoTexto.Contains("DESIGNACION") Then
-                Dim fechaDesde = GetPropValue(Of Date?)(rowData, "Desde", Nothing)
-
-                If fechaDesde.HasValue Then
-                    ' Buscamos la notificación que coincida con la fecha de inicio del estado
-                    notificacionIdParaAbrir = Await BuscarNotificacionDesignacionPorFecha(_funcionarioId, fechaDesde.Value)
-                End If
-            End If
-
-            ' --- Abrir el formulario si encontramos un ID ---
-            If notificacionIdParaAbrir > 0 Then
-                Dim frm As New frmDesignacionRPT(notificacionIdParaAbrir)
-                NavegacionHelper.AbrirFormEnDashboard(frm)
-            ElseIf tipoEvento = "ESTADO" AndAlso tipoTexto.Contains("DESIGNACION") Then
-                ' Mostramos el mensaje de error solo si la búsqueda falló para un estado
-                MessageBox.Show("No se encontró una notificación de Designación asociada a la fecha de inicio de este estado.", "Aviso",
-                                MessageBoxButtons.OK, MessageBoxIcon.Information)
+            If tipoEvento = "ESTADO" AndAlso tipoTexto.Contains("DESIGNACION") Then
+                Await MostrarReporteDesignacionAsync()
             End If
 
         Catch ex As Exception
             MessageBox.Show("No se pudo procesar la acción: " & ex.Message, "Error",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                            MessageBoxButtons.OK, MessageBoxIcon.Warning)
         End Try
     End Sub
+
+    Private Async Function MostrarReporteDesignacionAsync() As Task
+        Try
+            ' 1) Traer TODOS los estados "Designación" del funcionario
+            Dim estadosDesignacion = Await _uow.Context.Set(Of vw_EstadosTransitoriosCompletos)() _
+            .Where(Function(e) e.FuncionarioId = _funcionarioId AndAlso
+                                 e.FechaDesde.HasValue AndAlso
+                                 e.TipoEstadoNombre.ToUpper().Contains("DESIGNACI")) _
+            .OrderByDescending(Function(e) e.FechaDesde) _
+            .AsNoTracking() _
+            .ToListAsync()
+
+            If estadosDesignacion Is Nothing OrElse estadosDesignacion.Count = 0 Then
+                MessageBox.Show("No se encontraron estados de Designación para este funcionario.", "Aviso",
+                                MessageBoxButtons.OK, MessageBoxIcon.Information)
+                Return
+            End If
+
+            ' 2) Mapear a DTO + enlazar cada estado con su Notificación (para el RPT)
+            Dim lista As New List(Of DesignacionSeleccionDTO)
+            For Each est In estadosDesignacion
+                Dim notiId = Await BuscarNotificacionDesignacionPorFecha(est.FechaDesde.Value)
+                If notiId > 0 Then
+                    lista.Add(New DesignacionSeleccionDTO With {
+                        .NotificacionId = notiId,
+                        .FechaDesde = est.FechaDesde,
+                        .FechaHasta = est.FechaHasta,
+                        .Descripcion = $"Desde {If(est.FechaDesde.HasValue, est.FechaDesde.Value.ToString("dd/MM/yyyy"), "-")} hasta {If(est.FechaHasta.HasValue, est.FechaHasta.Value.ToString("dd/MM/yyyy"), "VIGENTE")}"
+                    })
+                End If
+            Next
+
+            If lista.Count = 0 Then
+                MessageBox.Show("No se encontró ninguna notificación asociada a designaciones para abrir el reporte.", "Aviso",
+                                MessageBoxButtons.OK, MessageBoxIcon.Information)
+                Return
+            End If
+
+            ' 3) Chequear las vigentes HOY
+            Dim vigentes = lista.Where(Function(x) x.Vigente).ToList()
+
+            If vigentes.Count = 1 Then
+                ' Caso ideal: una sola vigente → abrir directo
+                Dim frm As New frmDesignacionRPT(vigentes(0).NotificacionId)
+                NavegacionHelper.AbrirFormEnDashboard(frm)
+                Return
+            End If
+
+            ' 4) Si no hay vigente única, ofrecer selector con TODAS las designaciones encontradas
+            Using selector As New frmElegirDesignacion(lista)
+                If selector.ShowDialog(Me) = DialogResult.OK AndAlso selector.Seleccion IsNot Nothing Then
+                    Dim frm As New frmDesignacionRPT(selector.Seleccion.NotificacionId)
+                    NavegacionHelper.AbrirFormEnDashboard(frm)
+                End If
+            End Using
+
+        Catch ex As Exception
+            MessageBox.Show("No se pudo abrir el/los reporte(s) de Designación: " & ex.Message, "Error",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Function
+
+    Private Async Function BuscarNotificacionDesignacionPorFecha(fecha As Date) As Task(Of Integer)
+        Return Await _uow.Context.Set(Of NotificacionPersonal)() _
+            .Include(Function(n) n.TipoNotificacion) _
+            .Where(Function(n) n.FuncionarioId = _funcionarioId AndAlso
+                              n.TipoNotificacion.Nombre.ToUpper().Contains("DESIGNACI") AndAlso
+                              DbFunctions.TruncateTime(n.FechaProgramada) <= DbFunctions.TruncateTime(fecha)) _
+            .OrderByDescending(Function(n) n.FechaProgramada) _
+            .Select(Function(n) n.Id) _
+            .FirstOrDefaultAsync()
+    End Function
 
     Private Function NormalizarTexto(s As String) As String
         If String.IsNullOrWhiteSpace(s) Then Return String.Empty
@@ -318,18 +387,6 @@ Public Class frmFuncionarioSituacion
             If cat <> Globalization.UnicodeCategory.NonSpacingMark Then sb.Append(ch)
         Next
         Return sb.ToString().Normalize(NormalizationForm.FormC).ToUpperInvariant()
-    End Function
-    ' --- REEMPLAZA LA FUNCIÓN ANTERIOR CON ESTA ---
-    ' --- REEMPLAZA TU FUNCIÓN DE BÚSQUEDA CON ESTA VERSIÓN MEJORADA ---
-    Private Async Function BuscarNotificacionDesignacionPorFecha(funcionarioId As Integer, fecha As Date) As Task(Of Integer)
-        Return Await _uow.Context.Set(Of NotificacionPersonal)() _
-    .Include(Function(n) n.TipoNotificacion) _
-    .Where(Function(n) n.FuncionarioId = funcionarioId AndAlso
-                      n.TipoNotificacion.Nombre.ToUpper().Contains("DESIGNACI") AndAlso
-                      DbFunctions.TruncateTime(n.FechaProgramada) <= DbFunctions.TruncateTime(fecha)) _
-    .OrderByDescending(Function(n) n.FechaProgramada) _
-    .Select(Function(n) n.Id) _
-    .FirstOrDefaultAsync()
     End Function
 
 #End Region

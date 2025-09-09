@@ -496,6 +496,12 @@
     <Compile Include="UI\frmDesignacionRPT.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="UI\frmElegirDesignacion.Designer.vb">
+      <DependentUpon>frmElegirDesignacion.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmElegirDesignacion.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="UI\frmNotificacionCambiarEstado.Designer.vb">
       <DependentUpon>frmNotificacionCambiarEstado.vb</DependentUpon>
     </Compile>
@@ -588,9 +594,7 @@
     <Compile Include="UI\frmFuncionarioSituacion.Designer.vb">
       <DependentUpon>frmFuncionarioSituacion.vb</DependentUpon>
     </Compile>
-    <Compile Include="UI\frmFuncionarioSituacion.vb">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="UI\frmFuncionarioSituacion.vb" />
     <Compile Include="UI\frmAreaTrabajoCategorias.Designer.vb">
       <DependentUpon>frmAreaTrabajoCategorias.vb</DependentUpon>
     </Compile>
@@ -764,6 +768,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmDashboard.resx">
       <DependentUpon>frmDashboard.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmElegirDesignacion.resx">
+      <DependentUpon>frmElegirDesignacion.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmEstadosTransitoriosGeneral.resx">
       <DependentUpon>frmEstadosTransitoriosGeneral.vb</DependentUpon>
