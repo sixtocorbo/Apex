@@ -1,44 +1,63 @@
-﻿Imports System.Windows.Forms
+﻿' /Modules/NavegacionHelper.vb
+
+Imports System.Windows.Forms
 Imports System.Linq
 
 Public Module NavegacionHelper
 
     ''' <summary>
-    ''' Busca si ya existe una instancia del formulario especificado. Si existe, la trae al frente.
-    ''' Si no existe, crea una nueva instancia y la abre dentro del panel del Dashboard.
+    ''' ✅ CASO 1: Para formularios SIN parámetros que deben ser únicos (ej: Configuración).
+    ''' Cierra el formulario de origen.
     ''' </summary>
-    ''' <typeparam name="T">El tipo del formulario a abrir (ej: frmConfiguracion).</typeparam>
-    Public Sub AbrirFormUnicoEnDashboard(Of T As {Form, New})()
-
-        ' 1. Busca la instancia abierta del Dashboard.
+    Public Sub AbrirFormUnicoEnDashboard(Of T As {Form, New})(Optional sourceForm As Form = Nothing)
         Dim dashboard = Application.OpenForms.OfType(Of frmDashboard)().FirstOrDefault()
-        If dashboard Is Nothing Then
-            MessageBox.Show("No se encontró el dashboard principal.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            Return
-        End If
+        If dashboard Is Nothing Then Return
 
-        ' 2. Busca si ya existe una instancia del formulario que queremos abrir (del tipo T).
-        Dim formularioExistente = dashboard.MdiChildren.OfType(Of T)().FirstOrDefault()
+        Dim panelContenido = CType(dashboard.Controls("panelContenido"), Panel)
+        Dim formularioExistente = panelContenido.Controls.OfType(Of T)().FirstOrDefault()
+        Dim formToShow As Form
 
         If formularioExistente IsNot Nothing Then
-            ' 3. Si ya existe, lo trae al frente y lo activa.
-            dashboard.AbrirFormEnPanel(formularioExistente)
+            formToShow = formularioExistente
         Else
-            ' 4. Si no existe, crea una nueva instancia y la abre.
-            Dim nuevoFormulario As New T()
-            dashboard.AbrirFormEnPanel(nuevoFormulario)
+            formToShow = New T()
         End If
 
+        dashboard.AbrirFormEnPanel(formToShow)
+
+        If sourceForm IsNot Nothing Then
+            sourceForm.Close()
+        End If
     End Sub
 
     ''' <summary>
-    ''' Mantiene la funcionalidad original por si necesitas abrir múltiples instancias de otros formularios.
+    ''' ✅ CASO 2: Para formularios de detalle que necesitan un ID y deben ser únicos.
+    ''' Cierra una instancia previa antes de abrir la nueva.
+    ''' </summary>
+    Public Sub AbrirFormDetalleUnico(Of T As Form)(id As Integer, sourceForm As Form)
+        Dim dashboard = Application.OpenForms.OfType(Of frmDashboard)().FirstOrDefault()
+        If dashboard Is Nothing Then Return
+
+        Dim panelContenido = CType(dashboard.Controls("panelContenido"), Panel)
+        Dim formExistente = panelContenido.Controls.OfType(Of T)().FirstOrDefault()
+        If formExistente IsNot Nothing Then
+            formExistente.Close()
+        End If
+
+        Dim nuevoFormulario = CType(Activator.CreateInstance(GetType(T), id), Form)
+        dashboard.AbrirFormEnPanel(nuevoFormulario)
+    End Sub
+
+    ''' <summary>
+    ''' ✅ CASO 3: Para formularios que ya creaste (con 'New') porque necesitan muchos parámetros (ej: Reportes).
+    ''' Simplemente toma el formulario y lo muestra en el panel.
     ''' </summary>
     Public Sub AbrirNuevaInstanciaEnDashboard(ByVal formularioAAbrir As Form)
         Dim dashboard = Application.OpenForms.OfType(Of frmDashboard)().FirstOrDefault()
         If dashboard IsNot Nothing Then
             dashboard.AbrirFormEnPanel(formularioAAbrir)
         Else
+            ' Fallback por si el dashboard no se encuentra
             formularioAAbrir.Show()
         End If
     End Sub

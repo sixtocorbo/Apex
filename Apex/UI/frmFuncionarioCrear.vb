@@ -121,8 +121,8 @@ Public Class frmFuncionarioCrear
         dtpFechaNacimiento.Value = SafePickerDate(dtpFechaNacimiento, _funcionario.FechaNacimiento)
 
         ' Combos (usa helpers que dejan -1 si el valor no existe en el origen de datos)
-        SetSelectedOrNone(cboTipoFuncionario, _funcionario.TipoFuncionarioId)               ' no-nullable
-        SetSelectedOrNone(cboCargo, _funcionario.CargoId)                                   ' nullable
+        SetSelectedOrNone(cboTipoFuncionario, _funcionario.TipoFuncionarioId)        ' no-nullable
+        SetSelectedOrNone(cboCargo, _funcionario.CargoId)                       ' nullable
         SetSelectedOrNone(cboEscalafon, _funcionario.EscalafonId)
         SetSelectedOrNone(cboFuncion, _funcionario.FuncionId)
         SetSelectedOrNone(cboEstadoCivil, _funcionario.EstadoCivilId)
@@ -416,10 +416,10 @@ Public Class frmFuncionarioCrear
         ' 2) Fallback: consultar solo ese Id
         Try
             Dim nombre As String = _uow.Repository(Of Cargo)().
-                                   GetAll().
-                                   Where(Function(x) x.Id = targetId.Value).
-                                   Select(Function(x) x.Nombre).
-                                   FirstOrDefault()
+                                       GetAll().
+                                       Where(Function(x) x.Id = targetId.Value).
+                                       Select(Function(x) x.Nombre).
+                                       FirstOrDefault()
             If Not String.IsNullOrWhiteSpace(nombre) Then Return nombre
         Catch
             ' silencioso
@@ -590,7 +590,7 @@ Public Class frmFuncionarioCrear
         LoadingHelper.MostrarCargando(Me)
         Try
             Dim query = _uow.Context.Set(Of EstadoTransitorio)().
-                        Where(Function(et) et.FuncionarioId = _idFuncionario)
+                            Where(Function(et) et.FuncionarioId = _idFuncionario)
 
             ' Includes completos (evita N+1 al construir filas)
             Dim historial = Await query.
@@ -655,7 +655,7 @@ Public Class frmFuncionarioCrear
         If row?.EntityRef Is Nothing Then Return
 
         If MessageBox.Show("¿Está seguro de que desea quitar este estado transitorio?", "Confirmar Eliminación",
-                           MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then Return
+                            MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then Return
 
         Dim entidad = row.EntityRef
 
@@ -754,15 +754,18 @@ Public Class frmFuncionarioCrear
         cboTurno.SelectedIndex = -1 : cboSemana.SelectedIndex = -1 : cboHorario.SelectedIndex = -1
     End Function
 
+    ' --- INICIO DE LA CORRECCIÓN ---
+    ' Se revierte el cambio. Este botón NO debe cerrar el formulario.
     Private Sub btnAuditoria_Click(sender As Object, e As EventArgs) Handles btnAuditoria.Click
         If _modo = ModoFormulario.Crear Then
             MessageBox.Show("Debe guardar el funcionario antes de poder ver su historial de cambios.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Return
         End If
+
         Dim frm As New frmAuditoriaViewer(_funcionario.Id.ToString())
         NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
-
     End Sub
+    ' --- FIN DE LA CORRECCIÓN ---
 
     Private Sub DgvEstadosTransitorios_CellDoubleClick(sender As Object, e As DataGridViewCellEventArgs)
         If e.RowIndex < 0 Then Return

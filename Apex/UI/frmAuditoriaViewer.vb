@@ -27,8 +27,8 @@ Public Class frmAuditoriaViewer
         LoadingHelper.MostrarCargando(Me)
         Try
             Dim query = _uow.Context.Set(Of AuditoriaCambios)().
-                        Where(Function(a) a.RegistroId = _idRegistro).
-                        OrderByDescending(Function(a) a.FechaHora)
+                            Where(Function(a) a.RegistroId = _idRegistro).
+                            OrderByDescending(Function(a) a.FechaHora)
 
             Dim resultados = Await query.ToListAsync()
             _registrosAuditoria = New BindingList(Of AuditoriaCambios)(resultados)
@@ -62,7 +62,8 @@ Public Class frmAuditoriaViewer
             .ResumeLayout()
         End With
     End Sub
-    ' --- INICIO DE LA MODIFICACIÓN ---
+
+    ' --- INICIO DE LA CORRECCIÓN ---
     ''' <summary>
     ''' Este evento se dispara cada vez que se presiona una tecla mientras el formulario tiene el foco.
     ''' </summary>
@@ -74,11 +75,10 @@ Public Class frmAuditoriaViewer
             e.Handled = True
             e.SuppressKeyPress = True ' Evita el sonido "ding" del sistema.
 
-            ' 2. Simplemente cerramos ESTE formulario.
+            ' 2. Simplemente cerramos ESTE formulario. El control volverá
+            '    de forma natural al formulario del funcionario que lo abrió.
             Me.Close()
         End If
     End Sub
-    ' --- FIN DE LA MODIFICACIÓN ---
-
-
+    ' --- FIN DE LA CORRECCIÓN ---
 End Class

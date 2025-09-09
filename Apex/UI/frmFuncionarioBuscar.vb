@@ -360,6 +360,7 @@ Public Class frmFuncionarioBuscar
         End Using
     End Sub
 
+    ' Este código funciona bien si quieres abrir múltiples ventanas de situación.
     Private Sub btnVerSituacion_Click(sender As Object, e As EventArgs)
         If dgvResultados.CurrentRow Is Nothing Then Return
         Dim id = CInt(dgvResultados.CurrentRow.Cells("Id").Value)
@@ -372,6 +373,7 @@ Public Class frmFuncionarioBuscar
         Public Property Tipo As String
         Public Property ColorIndicador As String
     End Class
+    ' Busca y reemplaza este método en tu archivo frmFuncionarioBuscar.vb
 
     Private Sub OnDgvDoubleClick(sender As Object, e As DataGridViewCellEventArgs)
         If dgvResultados.CurrentRow Is Nothing Then Return
@@ -380,10 +382,40 @@ Public Class frmFuncionarioBuscar
             SeleccionarYcerrar()
         Else ' Modo Navegacion
             Dim id As Integer = CInt(dgvResultados.CurrentRow.Cells("Id").Value)
-            Dim frm As New frmFuncionarioCrear(id)
-            NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
+
+            ' --- INICIO DE LA CORRECCIÓN ---
+            ' Busca si ya hay un formulario de edición abierto PARA ESTE funcionario específico.
+            Dim dashboard = Application.OpenForms.OfType(Of frmDashboard).FirstOrDefault()
+            If dashboard Is Nothing Then Return ' Seguridad por si no encuentra el dashboard
+
+            ' Usamos el Tag del formulario para guardar y buscar el ID del funcionario.
+            Dim editorExistente = dashboard.panelContenido.Controls.OfType(Of frmFuncionarioCrear)().
+                              FirstOrDefault(Function(f) f.Tag IsNot Nothing AndAlso f.Tag.ToString() = id.ToString())
+
+            If editorExistente IsNot Nothing Then
+                ' Si ya existe un editor para este funcionario, simplemente lo mostramos.
+                NavegacionHelper.AbrirNuevaInstanciaEnDashboard(editorExistente)
+            Else
+                ' Si no existe, creamos uno nuevo y le asignamos el ID en el Tag
+                ' para poder encontrarlo la próxima vez.
+                Dim frm As New frmFuncionarioCrear(id)
+                frm.Tag = id.ToString() ' Guardamos el ID para futuras búsquedas.
+                NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
+            End If
+            ' --- FIN DE LA CORRECCIÓN ---
         End If
     End Sub
+    'Private Sub OnDgvDoubleClick(sender As Object, e As DataGridViewCellEventArgs)
+    '    If dgvResultados.CurrentRow Is Nothing Then Return
+
+    '    If _modo = ModoApertura.Seleccion Then
+    '        SeleccionarYcerrar()
+    '    Else ' Modo Navegacion
+    '        Dim id As Integer = CInt(dgvResultados.CurrentRow.Cells("Id").Value)
+    '        Dim frm As New frmFuncionarioCrear(id)
+    '        NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
+    '    End If
+    'End Sub
 
     Private Async Function ObtenerPresenciaAsync(id As Integer, fecha As Date) As Task(Of String)
         Using uow As New UnitOfWork()

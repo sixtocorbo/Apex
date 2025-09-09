@@ -137,6 +137,6 @@ Public Class frmSecciones
         ' CAMBIO CLAVE:
         ' Ya no crea una nueva instancia. Llama al helper para que
         ' busque y muestre el frmConfiguracion que ya está abierto.
-        NavegacionHelper.AbrirFormUnicoEnDashboard(Of frmConfiguracion)()
+        NavegacionHelper.AbrirFormUnicoEnDashboard(Of frmConfiguracion)(Me)
     End Sub
 End Class

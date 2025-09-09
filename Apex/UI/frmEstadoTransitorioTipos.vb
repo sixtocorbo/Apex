@@ -130,6 +130,6 @@ Public Class frmEstadoTransitorioTipos
     Private Sub btnVolver_Click(sender As Object, e As EventArgs) Handles btnVolver.Click
         ' Simplemente creamos una nueva instancia del menú de configuración
         ' y le pedimos a nuestro ayudante que la muestre.
-        NavegacionHelper.AbrirFormUnicoEnDashboard(Of frmConfiguracion)()
+        NavegacionHelper.AbrirFormUnicoEnDashboard(Of frmConfiguracion)(Me)
     End Sub
 End Class
