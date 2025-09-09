@@ -1,10 +1,7 @@
 ﻿' Apex/UI/frmNovedades.vb
 Imports System.ComponentModel
 Imports System.Data.Entity
-Imports System.Data.SqlClient
-Imports System.Globalization
 Imports System.IO
-Imports System.Text
 
 Public Class frmNovedades
 
@@ -12,8 +9,8 @@ Public Class frmNovedades
     Private _pictureBoxSeleccionado As PictureBox = Nothing
     Private _idNovedadSeleccionada As Integer?
     Private _funcionariosSeleccionadosFiltro As New Dictionary(Of Integer, String)
+    Private _esPrimeraNotificacionRecibida As Boolean = True
 
-    ' --- 1. MODIFICAR EL CONSTRUCTOR Y AGREGAR UN MANEJADOR PARA EL EVENTO "DISPOSED" ---
     Public Sub New()
         ' Esta llamada es requerida por el diseñador.
         InitializeComponent()
@@ -44,6 +41,39 @@ Public Class frmNovedades
         Await ActualizarDetalleDesdeSeleccion()
     End Sub
 
+#Region "Suscripción a Eventos (Notificador)"
+
+    ''' <summary>
+    ''' Se ejecuta cuando NotificadorEventos informa un cambio en un funcionario.
+    ''' Filtra la grilla para mostrar las novedades del funcionario afectado.
+    ''' </summary>
+    Private Async Sub HandleFuncionarioActualizado(sender As Object, e As FuncionarioEventArgs)
+        ' Usamos una bandera para saber cuándo empezar un nuevo filtro.
+        ' Si es la primera notificación de un "lote", limpiamos el filtro anterior.
+        If _esPrimeraNotificacionRecibida Then
+            _funcionariosSeleccionadosFiltro.Clear()
+            _esPrimeraNotificacionRecibida = False
+        End If
+
+        ' Agregamos el funcionario de la notificación al filtro.
+        Using uow As New UnitOfWork()
+            Dim funcionario = Await uow.Repository(Of Funcionario).GetByIdAsync(e.FuncionarioId)
+            If funcionario IsNot Nothing AndAlso Not _funcionariosSeleccionadosFiltro.ContainsKey(e.FuncionarioId) Then
+                _funcionariosSeleccionadosFiltro.Add(funcionario.Id, funcionario.Nombre)
+            End If
+        End Using
+
+        ' Actualizamos la UI y disparamos la búsqueda.
+        ActualizarListaFuncionarios()
+        Await BuscarAsync()
+
+        ' Rearmamos la bandera para la próxima vez que se guarde una novedad.
+        ' Usamos BeginInvoke para que se ejecute después de procesar todas las notificaciones pendientes del lote actual.
+        Me.BeginInvoke(Sub() _esPrimeraNotificacionRecibida = True)
+    End Sub
+
+#End Region
+
 #Region "Carga de Datos y Búsqueda"
 
     Private Sub ConfigurarGrilla()
@@ -62,25 +92,21 @@ Public Class frmNovedades
     End Sub
 
     Private Async Function BuscarAsync() As Task
-        ' 1. Recopilar todos los criterios de búsqueda de la UI
         Dim textoBusqueda As String = txtBusqueda.Text.Trim()
         Dim fechaDesde As DateTime? = Nothing
         Dim fechaHasta As DateTime? = Nothing
         If chkFiltrarPorFecha.Checked Then
             fechaDesde = dtpFechaDesde.Value.Date
-            ' Establece la hora al último instante del día para incluir todos los registros de esa fecha.
             fechaHasta = dtpFechaHasta.Value.Date.AddDays(1).AddTicks(-1)
         End If
         Dim idsFuncionarios As List(Of Integer) = _funcionariosSeleccionadosFiltro.Keys.ToList()
 
-        ' 2. Mostrar feedback al usuario
         LoadingHelper.MostrarCargando(Me)
         btnBuscar.Enabled = False
         _bsNovedades.DataSource = Nothing
         LimpiarDetalles()
 
         Try
-            ' 3. Llamar al NUEVO método de servicio que acepta todos los filtros
             Using svc As New NovedadService()
                 _bsNovedades.DataSource = Await svc.BuscarNovedadesAvanzadoAsync(textoBusqueda, fechaDesde, fechaHasta, idsFuncionarios)
             End Using
@@ -113,9 +139,9 @@ Public Class frmNovedades
         lstFuncionarios.DataSource = Nothing
         flpFotos.Controls.Clear()
         _pictureBoxSeleccionado = Nothing
-
         _idNovedadSeleccionada = Nothing
     End Sub
+
     Private Sub ActualizarListaFuncionarios()
         lstFuncionariosFiltro.DataSource = Nothing
         If _funcionariosSeleccionadosFiltro.Any() Then
@@ -124,15 +150,18 @@ Public Class frmNovedades
             lstFuncionariosFiltro.ValueMember = "Key"
         End If
     End Sub
+
     Private Async Function ActualizarDetalleDesdeSeleccion() As Task
         If dgvNovedades.CurrentRow Is Nothing OrElse dgvNovedades.CurrentRow.DataBoundItem Is Nothing Then
             LimpiarDetalles()
             Return
         End If
+
         Dim novedadSeleccionada = CType(dgvNovedades.CurrentRow.DataBoundItem, vw_NovedadesAgrupadas)
         If _idNovedadSeleccionada.HasValue AndAlso _idNovedadSeleccionada.Value = novedadSeleccionada.Id Then
             Return
         End If
+
         _idNovedadSeleccionada = novedadSeleccionada.Id
         Using svc As New NovedadService()
             Dim novedadCompleta = Await svc.GetByIdAsync(novedadSeleccionada.Id)
@@ -173,6 +202,7 @@ Public Class frmNovedades
     Private Sub PictureBox_Click(sender As Object, e As EventArgs)
         Dim picClickeado = TryCast(sender, PictureBox)
         If picClickeado Is Nothing Then Return
+
         If _pictureBoxSeleccionado IsNot Nothing Then
             _pictureBoxSeleccionado.BackColor = Color.Transparent
         End If
@@ -190,42 +220,11 @@ Public Class frmNovedades
     End Sub
 #End Region
 
-#Region "Gestión de Novedades (CRUD)"
+#Region "Gestión de Novedades (CRUD) y Filtros"
 
     Private Sub btnNuevaNovedad_Click(sender As Object, e As EventArgs) Handles btnNuevaNovedad.Click
-        Dim dashboard = Me.ParentForm
-        If dashboard IsNot Nothing AndAlso TypeOf dashboard Is frmDashboard Then
-            Dim formCrear As New frmNovedadCrear()
-            CType(dashboard, frmDashboard).AbrirFormEnPanel(formCrear)
-        Else
-            Dim formCrear As New frmNovedadCrear()
-            formCrear.Show()
-        End If
-    End Sub
-    ' --- 3. AÑADIR EL NUEVO MÉTODO MANEJADOR ---
-    ''' <summary>
-    ''' Se ejecuta cuando NotificadorEventos informa un cambio en un funcionario.
-    ''' </summary>
-    Private Async Sub HandleFuncionarioActualizado(sender As Object, e As FuncionarioEventArgs)
-        ' Para evitar que el filtro se llene con IDs de otras gestiones,
-        ' lo limpiamos la primera vez que llega una notificación de este "lote".
-        ' Una forma sencilla es verificar si el ID ya está en la lista. Si no hay ninguno, es un lote nuevo.
-        If Not _funcionariosSeleccionadosFiltro.ContainsKey(e.FuncionarioId) Then
-            ' Opcional: Si quieres que cada nueva gestión reemplace el filtro anterior, descomenta la siguiente línea:
-            ' _funcionariosSeleccionadosFiltro.Clear()
-        End If
-
-        ' Agregamos el funcionario de la notificación al filtro.
-        Using uow As New UnitOfWork()
-            Dim funcionario = Await uow.Repository(Of Funcionario).GetByIdAsync(e.FuncionarioId)
-            If funcionario IsNot Nothing AndAlso Not _funcionariosSeleccionadosFiltro.ContainsKey(e.FuncionarioId) Then
-                _funcionariosSeleccionadosFiltro.Add(funcionario.Id, funcionario.Nombre)
-            End If
-        End Using
-
-        ' Actualizamos la UI y disparamos la búsqueda.
-        ActualizarListaFuncionarios()
-        Await BuscarAsync()
+        ' El NavegacionHelper se encarga de abrir el formulario de forma desacoplada.
+        NavegacionHelper.AbrirNuevaInstanciaEnDashboard(New frmNovedadCrear())
     End Sub
 
     Private Async Sub btnEditarNovedad_Click(sender As Object, e As EventArgs) Handles btnEditarNovedad.Click
@@ -235,8 +234,10 @@ Public Class frmNovedades
         End If
         Dim novedadId = CInt(dgvNovedades.CurrentRow.Cells("Id").Value)
         Using frm As New frmNovedadCrear(novedadId)
+            ' Aquí ShowDialog es correcto porque la edición es una acción modal que debe completarse.
             If frm.ShowDialog(Me) = DialogResult.OK Then
-                Await BuscarAsync()
+                ' No necesitamos llamar a NotificadorEventos aquí, porque el formulario de edición ya lo hace.
+                ' La actualización se recibirá a través de HandleFuncionarioActualizado.
             End If
         End Using
     End Sub
@@ -256,7 +257,7 @@ Public Class frmNovedades
                 Using svc As New NovedadService()
                     Await svc.DeleteNovedadCompletaAsync(novedadSeleccionada.Id)
                 End Using
-                Await BuscarAsync()
+                Await BuscarAsync() ' Refrescamos la lista después de eliminar.
             Catch ex As Exception
                 MessageBox.Show("Ocurrió un error al eliminar la novedad: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             Finally
@@ -268,18 +269,10 @@ Public Class frmNovedades
     Private Sub btnAgregarFuncionario_Click(sender As Object, e As EventArgs) Handles btnAgregarFuncionario.Click
         Using frm As New frmFuncionarioBuscar(frmFuncionarioBuscar.ModoApertura.Seleccion)
             If frm.ShowDialog(Me) = DialogResult.OK Then
-                ' --- CORRECCIÓN AQUÍ ---
-                ' Se accede al ID a través del FuncionarioSeleccionado
                 Dim funcId = frm.FuncionarioSeleccionado.Id
-                ' --- FIN DE LA CORRECCIÓN ---
                 If funcId > 0 AndAlso Not _funcionariosSeleccionadosFiltro.ContainsKey(funcId) Then
-                    Dim uow As New UnitOfWork()
-                    Dim repo = uow.Repository(Of Funcionario)()
-                    Dim funcionario = repo.GetById(funcId)
-                    If funcionario IsNot Nothing Then
-                        _funcionariosSeleccionadosFiltro.Add(funcionario.Id, funcionario.Nombre)
-                        ActualizarListaFuncionarios()
-                    End If
+                    _funcionariosSeleccionadosFiltro.Add(frm.FuncionarioSeleccionado.Id, frm.FuncionarioSeleccionado.Nombre)
+                    ActualizarListaFuncionarios()
                 End If
             End If
         End Using
@@ -299,7 +292,6 @@ Public Class frmNovedades
     End Sub
 
     Private Async Sub btnImprimir_Click(sender As Object, e As EventArgs) Handles btnImprimir.Click
-        ' 1. Verificamos si hay datos en la grilla para imprimir
         If _bsNovedades.DataSource Is Nothing OrElse _bsNovedades.Count = 0 Then
             MessageBox.Show("Primero debe generar un reporte para poder imprimirlo.", "Sin datos", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Return
@@ -307,42 +299,30 @@ Public Class frmNovedades
 
         LoadingHelper.MostrarCargando(Me)
         Try
-            ' 2. Obtenemos la lista de datos DESDE el BindingSource
             Dim novedadesEnGrilla = CType(_bsNovedades.DataSource, List(Of vw_NovedadesAgrupadas))
-
             If novedadesEnGrilla Is Nothing OrElse Not novedadesEnGrilla.Any() Then
                 MessageBox.Show("No hay datos para imprimir.", "Sin datos", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 Return
             End If
 
             Dim novedadIds = novedadesEnGrilla.Select(Function(n) n.Id).ToList()
-
-            ' 3. Buscamos los datos completos de las novedades desde el servicio
             Dim novedadService As New NovedadService()
             Dim datosCompletosParaReporte = Await novedadService.GetNovedadesCompletasByIds(novedadIds)
 
-            ' 4. Mapeamos los datos para el reporte
             Dim datosMapeados = datosCompletosParaReporte.
-            GroupBy(Function(n) n.Id).
-            Select(Function(g) New With {
-                .Id = g.Key,
-                .Fecha = g.First().Fecha,
-                .Texto = g.First().Texto,
-                .Funcionarios = g.Select(Function(n) New With {
-                    .NombreFuncionario = n.NombreFuncionario
-                }).ToList()
-            }).
-            OrderByDescending(Function(n) n.Fecha).
-            ToList()
+                GroupBy(Function(n) n.Id).
+                Select(Function(g) New With {
+                    .Id = g.Key,
+                    .Fecha = g.First().Fecha,
+                    .Texto = g.First().Texto,
+                    .Funcionarios = String.Join(", ", g.Select(Function(f) f.NombreFuncionario).Distinct())
+                }).
+                OrderByDescending(Function(n) n.Fecha).
+                ToList()
 
-            ' 5. Abrimos el formulario visor y le pasamos los datos
             Dim frm As New frmNovedadesRPT(datosMapeados)
-
-            ' Usamos nuestro nuevo método de ayuda para manejar toda la lógica.
             NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
 
-        Catch ex As InvalidCastException
-            MessageBox.Show("Ocurrió un error de datos internos al preparar la impresión.", "Error de Datos", MessageBoxButtons.OK, MessageBoxIcon.Error)
         Catch ex As Exception
             MessageBox.Show($"Ocurrió un error al preparar la impresión: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         Finally
