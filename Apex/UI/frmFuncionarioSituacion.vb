@@ -270,24 +270,18 @@ Public Class frmFuncionarioSituacion
 #End Region
 
 #Region "Lógica de grilla y estados"
-    ' En frmFuncionarioSituacion.vb
-
-    ' --- MÉTODO CORREGIDO Y AMPLIADO ---
-    ' Lo convertimos en Async para poder buscar la notificación en la base de datos
-    Private Async Sub dgvEstados_CellDoubleClick(sender As Object, e As DataGridViewCellEventArgs)
+    Private Sub dgvEstados_CellDoubleClick(sender As Object, e As DataGridViewCellEventArgs)
         If e.RowIndex < 0 OrElse dgvEstados.CurrentRow Is Nothing Then Return
-
         Try
             Dim rowData = dgvEstados.CurrentRow.DataBoundItem
-            Dim tipoEvento = CStr(GetPropValue(Of String)(rowData, "TipoEvento", String.Empty))
+            Dim tipoEvento = NormalizarTexto(GetPropValue(Of String)(rowData, "TipoEvento", ""))
 
-            If tipoEvento = "Notificacion" Then
-                ' --- Lógica para Notificaciones (sin cambios) ---
+            If tipoEvento = "NOTIFICACION" Then
                 Dim notificacionId = GetPropValue(Of Integer)(rowData, "Id", 0)
-                Dim tipoNotificacion = GetPropValue(Of String)(rowData, "TipoNotificacionNombre", String.Empty)
+                Dim tipoNotificacion = NormalizarTexto(GetPropValue(Of String)(rowData, "TipoNotificacionNombre", ""))
 
-                If notificacionId > 0 AndAlso Not String.IsNullOrEmpty(tipoNotificacion) Then
-                    If tipoNotificacion.ToUpper().Contains("DESIGNACION") Then
+                If notificacionId > 0 AndAlso tipoNotificacion <> "" Then
+                    If tipoNotificacion.Contains("DESIGNACION") Then
                         Dim frm As New frmDesignacionRPT(notificacionId)
                         NavegacionHelper.AbrirFormEnDashboard(frm)
                     Else
@@ -296,37 +290,47 @@ Public Class frmFuncionarioSituacion
                     End If
                 End If
 
-            ElseIf tipoEvento = "Estado" Then
-                ' --- NUEVA LÓGICA para Estados Transitorios ---
-                Dim tipoEstado = CStr(GetPropValue(Of String)(rowData, "Tipo", String.Empty))
-
-                If tipoEstado.ToUpper().Contains("DESIGNACION") Then
-                    Dim estadoId = GetPropValue(Of Integer)(rowData, "Id", 0)
-                    If estadoId > 0 Then
-                        LoadingHelper.MostrarCargando(Me)
-
-                        ' Buscamos la notificación pendiente que está vinculada a este estado
-                        Dim notificacionAsociada = Await _uow.Repository(Of NotificacionPersonal)().GetAll().
-                        FirstOrDefaultAsync(Function(n) n.Documento = estadoId.ToString() AndAlso n.FuncionarioId = _funcionarioId)
-
-                        LoadingHelper.OcultarCargando(Me)
-
-                        If notificacionAsociada IsNot Nothing Then
-                            ' Si la encontramos, abrimos el reporte de designación
-                            Dim frm As New frmDesignacionRPT(notificacionAsociada.Id)
-                            NavegacionHelper.AbrirFormEnDashboard(frm)
-                        Else
-                            MessageBox.Show("Este estado de designación no tiene una notificación pendiente asociada para imprimir.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
-                        End If
+                ' (Opcional) permitir abrir también cuando es un ESTADO de Designación
+            ElseIf tipoEvento = "ESTADO" Then
+                Dim tipo = NormalizarTexto(GetPropValue(Of String)(rowData, "Tipo", ""))
+                If tipo.Contains("DESIGNACION") Then
+                    Dim notiId = BuscarNotificacionDesignacionMasReciente(_funcionarioId).Result
+                    If notiId > 0 Then
+                        Dim frm As New frmDesignacionRPT(notiId)
+                        NavegacionHelper.AbrirFormEnDashboard(frm)
+                    Else
+                        MessageBox.Show("No se encontró la notificación de Designación asociada.", "Aviso",
+                                        MessageBoxButtons.OK, MessageBoxIcon.Information)
                     End If
                 End If
+
             End If
 
         Catch ex As Exception
-            LoadingHelper.OcultarCargando(Me)
-            MessageBox.Show("No se pudo procesar la acción: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            MessageBox.Show("No se pudo procesar la acción: " & ex.Message, "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning)
         End Try
     End Sub
+    Private Function NormalizarTexto(s As String) As String
+        If String.IsNullOrWhiteSpace(s) Then Return String.Empty
+        Dim formD = s.Normalize(NormalizationForm.FormD)
+        Dim sb As New StringBuilder()
+        For Each ch In formD
+            Dim cat = Globalization.CharUnicodeInfo.GetUnicodeCategory(ch)
+            If cat <> Globalization.UnicodeCategory.NonSpacingMark Then sb.Append(ch)
+        Next
+        Return sb.ToString().Normalize(NormalizationForm.FormC).ToUpperInvariant()
+    End Function
+    Private Async Function BuscarNotificacionDesignacionMasReciente(funcionarioId As Integer) As Task(Of Integer)
+        Return Await _uow.Context.Set(Of NotificacionPersonal)() _
+        .Include(Function(n) n.TipoNotificacion) _
+        .Where(Function(n) n.FuncionarioId = funcionarioId AndAlso
+                          n.TipoNotificacion.Nombre.Contains("Designación")) _
+        .OrderByDescending(Function(n) n.FechaProgramada) _
+        .Select(Function(n) n.Id) _
+        .FirstOrDefaultAsync()
+    End Function
+
 #End Region
 
 #Region " Configuración y Eventos de Grillas "

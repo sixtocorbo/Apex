@@ -487,7 +487,6 @@ Public Class frmFuncionarioBuscar
 #End Region
     ' --- FIN DE NUEVA REGIÓN ---
 
-
 #Region "DTO ligero"
     Public Class FuncionarioMin
         Public Property Id As Integer
