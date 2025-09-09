@@ -62,15 +62,23 @@ Public Class frmAuditoriaViewer
             .ResumeLayout()
         End With
     End Sub
-    ' --- INICIO DE LA MODIFICACIÓN #2 ---
+    ' --- INICIO DE LA MODIFICACIÓN ---
     ''' <summary>
     ''' Este evento se dispara cada vez que se presiona una tecla mientras el formulario tiene el foco.
     ''' </summary>
     Private Sub frmAuditoriaViewer_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
-        ' Si la tecla presionada es Escape, se cierra el formulario.
+        ' Si la tecla presionada es Escape...
         If e.KeyCode = Keys.Escape Then
-            NavegacionHelper.AbrirFormUnicoEnDashboard(Of frmFuncionarioCrear)()
+            ' 1. Marcamos el evento como "manejado".
+            '    Esto detiene la propagación de la tecla a otros formularios.
+            e.Handled = True
+            e.SuppressKeyPress = True ' Evita el sonido "ding" del sistema.
+
+            ' 2. Simplemente cerramos ESTE formulario.
+            Me.Close()
         End If
     End Sub
-    ' --- FIN DE LA MODIFICACIÓN #2 ---
+    ' --- FIN DE LA MODIFICACIÓN ---
+
+
 End Class

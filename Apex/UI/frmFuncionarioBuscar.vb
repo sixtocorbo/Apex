@@ -360,8 +360,6 @@ Public Class frmFuncionarioBuscar
         End Using
     End Sub
 
-
-
     Private Sub btnVerSituacion_Click(sender As Object, e As EventArgs)
         If dgvResultados.CurrentRow Is Nothing Then Return
         Dim id = CInt(dgvResultados.CurrentRow.Cells("Id").Value)
