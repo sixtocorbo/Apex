@@ -122,47 +122,31 @@ Public Class ReportesService
             GetAll().
             FirstOrDefaultAsync(Function(n) n.Id = notificacionId) ' Cambiar a n.NotificacionId si tu vista lo llama así
     End Function
-    ''' <summary>
-    ''' Obtiene los datos combinados de una notificación y su detalle de designación para un reporte.
-    ''' </summary>
-    Public Async Function GetDatosDesignacionAsync(notificacionId As Integer) As Task(Of DesignacionReporteDTO)
+
+    Public Async Function GetDatosDesignacionAsync(estadoTransitorioId As Integer) As Task(Of DesignacionReporteDTO)
         Using uow As New UnitOfWork()
-            ' 1. Buscamos la notificación
-            Dim notificacion = Await uow.Repository(Of NotificacionPersonal)().GetAll().
-                Include(Function(n) n.Funcionario).
-                FirstOrDefaultAsync(Function(n) n.Id = notificacionId)
+            ' --- CAMBIO CLAVE: Consultamos la VISTA 'vw_EstadosTransitoriosCompletos' ---
+            ' Esta vista ya une la tabla de estados con sus detalles.
+            Dim estadoCompleto = Await uow.Context.Set(Of vw_EstadosTransitoriosCompletos)() _
+                        .AsNoTracking() _
+                        .FirstOrDefaultAsync(Function(e) e.Id = estadoTransitorioId)
 
-            If notificacion Is Nothing Then Return Nothing
-
-            ' 2. Asumimos que el campo "Documento" de la notificación guarda el ID del EstadoTransitorio.
-            Dim estadoTransitorioId As Integer = 0
-            If Integer.TryParse(notificacion.Documento, estadoTransitorioId) AndAlso estadoTransitorioId > 0 Then
-
-                ' 3. Buscamos el detalle de la designación (CON LA CORRECCIÓN DE GETALL())
-                Dim designacionDetalle = Await uow.Repository(Of DesignacionDetalle)().GetAll().
-                    FirstOrDefaultAsync(Function(d) d.EstadoTransitorioId = estadoTransitorioId)
-
-                If designacionDetalle IsNot Nothing Then
-                    ' --- INICIO DE LA CORRECCIÓN ---
-                    ' 4. Creamos el objeto DTO con los campos correctos de tu entidad
-                    Dim dto As New DesignacionReporteDTO With {
-                        .NombreFuncionario = notificacion.Funcionario.Nombre,
-                        .CedulaFuncionario = notificacion.Funcionario.CI,
-                        .FechaProgramada = notificacion.FechaProgramada,
-                        .FechaDesde = designacionDetalle.FechaDesde,
-                        .FechaHasta = designacionDetalle.FechaHasta,
-                        .Observaciones = designacionDetalle.Observaciones,
-                        .DocResolucion = designacionDetalle.DocResolucion,
-                        .FechaResolucion = designacionDetalle.FechaResolucion,
-                        .Expediente = notificacion.ExpMinisterial ' O el campo que corresponda
-                    }
-                    Return dto
-                    ' --- FIN DE LA CORRECCIÓN ---
-                End If
+            ' Si la vista no devuelve un resultado, significa que el registro no se encontró.
+            If estadoCompleto Is Nothing Then
+                Return Nothing
             End If
 
-            ' Si no se encuentra el detalle, devolvemos Nothing
-            Return Nothing
+            ' --- MAPEO CORRECTO: Mapeamos los campos de la VISTA al DTO del reporte ---
+            Dim dto As New DesignacionReporteDTO With {
+            .NombreFuncionario = estadoCompleto.NombreFuncionario,
+            .CedulaFuncionario = estadoCompleto.CI,
+            .FechaDesde = estadoCompleto.FechaDesde,
+            .FechaHasta = estadoCompleto.FechaHasta,
+            .Observaciones = estadoCompleto.Observaciones,
+            .FechaProgramada = Nothing ' Este campo no aplica y se deja en nulo
+        }
+
+            Return dto
         End Using
     End Function
 End Class

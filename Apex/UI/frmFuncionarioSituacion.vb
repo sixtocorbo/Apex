@@ -2,24 +2,6 @@
 Imports System.Globalization
 Imports System.Text
 
-' --- DTO para manejar la selección de designaciones ---
-' Puedes ponerlo en su propio archivo o dejarlo aquí.
-Public Class DesignacionSeleccionDTO
-    Public Property NotificacionId As Integer
-    Public Property FechaDesde As Date?
-    Public Property FechaHasta As Date?
-    Public Property Descripcion As String
-
-    Public ReadOnly Property Vigente As Boolean
-        Get
-            Dim hoy = Date.Today
-            Dim esVigenteSinFechaFin = Not FechaHasta.HasValue AndAlso FechaDesde.HasValue AndAlso FechaDesde.Value.Date <= hoy
-            Dim esVigenteConFechaFin = FechaDesde.HasValue AndAlso FechaHasta.HasValue AndAlso FechaDesde.Value.Date <= hoy AndAlso FechaHasta.Value.Date >= hoy
-            Return esVigenteSinFechaFin OrElse esVigenteConFechaFin
-        End Get
-    End Property
-End Class
-
 Public Class frmFuncionarioSituacion
 
 #Region " Campos y Constructor "
@@ -297,18 +279,37 @@ Public Class frmFuncionarioSituacion
             Dim tipoTexto = NormalizarTexto(GetPropValue(Of String)(rowData, "Tipo", ""))
 
             If tipoEvento = "ESTADO" AndAlso tipoTexto.Contains("DESIGNACION") Then
-                Await MostrarReporteDesignacionAsync()
+                ' Capturamos el ID específico de la fila seleccionada.
+                Dim estadoId = GetPropValue(Of Integer)(rowData, "Id", 0)
+                If estadoId > 0 Then
+                    ' Llamamos a la función de reporte pasándole este ID.
+                    Await MostrarReporteDesignacionAsync(estadoId)
+                Else
+                    MessageBox.Show("No se pudo identificar el ID de la designación seleccionada.", "Aviso",
+                                MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                End If
             End If
 
         Catch ex As Exception
             MessageBox.Show("No se pudo procesar la acción: " & ex.Message, "Error",
-                            MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning)
         End Try
     End Sub
 
-    Private Async Function MostrarReporteDesignacionAsync() As Task
+    ' Agregamos el parámetro opcional "estadoIdEspecifico"
+    Private Async Function MostrarReporteDesignacionAsync(Optional estadoIdEspecifico As Integer = 0) As Task
         Try
-            ' 1) Traer TODOS los estados "Designación" del funcionario
+            ' --- NUEVA LÓGICA ---
+            ' Si recibimos un ID específico (del doble clic), abrimos el reporte y terminamos.
+            If estadoIdEspecifico > 0 Then
+                Dim frm As New frmDesignacionRPT(estadoIdEspecifico)
+                NavegacionHelper.AbrirFormEnDashboard(frm)
+                Return
+            End If
+            ' --- FIN DE LA NUEVA LÓGICA ---
+
+            ' El resto del código (la lógica anterior) solo se ejecutará si no se pasó un ID,
+            ' manteniendo la funcionalidad del botón de imprimir.
             Dim estadosDesignacion = Await _uow.Context.Set(Of vw_EstadosTransitoriosCompletos)() _
             .Where(Function(e) e.FuncionarioId = _funcionarioId AndAlso
                                  e.FechaDesde.HasValue AndAlso
@@ -317,53 +318,43 @@ Public Class frmFuncionarioSituacion
             .AsNoTracking() _
             .ToListAsync()
 
-            If estadosDesignacion Is Nothing OrElse estadosDesignacion.Count = 0 Then
-                MessageBox.Show("No se encontraron estados de Designación para este funcionario.", "Aviso",
-                                MessageBoxButtons.OK, MessageBoxIcon.Information)
+            If estadosDesignacion Is Nothing OrElse Not estadosDesignacion.Any() Then
+                MessageBox.Show("No se encontraron estados de 'Designación' para este funcionario.", "Aviso",
+                             MessageBoxButtons.OK, MessageBoxIcon.Information)
                 Return
             End If
 
-            ' 2) Mapear a DTO + enlazar cada estado con su Notificación (para el RPT)
             Dim lista As New List(Of DesignacionSeleccionDTO)
             For Each est In estadosDesignacion
-                Dim notiId = Await BuscarNotificacionDesignacionPorFecha(est.FechaDesde.Value)
-                If notiId > 0 Then
-                    lista.Add(New DesignacionSeleccionDTO With {
-                        .NotificacionId = notiId,
-                        .FechaDesde = est.FechaDesde,
-                        .FechaHasta = est.FechaHasta,
-                        .Descripcion = $"Desde {If(est.FechaDesde.HasValue, est.FechaDesde.Value.ToString("dd/MM/yyyy"), "-")} hasta {If(est.FechaHasta.HasValue, est.FechaHasta.Value.ToString("dd/MM/yyyy"), "VIGENTE")}"
-                    })
-                End If
+                lista.Add(New DesignacionSeleccionDTO With {
+                .EstadoTransitorioId = est.Id,
+                .FechaDesde = est.FechaDesde,
+                .FechaHasta = est.FechaHasta,
+                .Descripcion = $"Desde {If(est.FechaDesde.HasValue, est.FechaDesde.Value.ToString("dd/MM/yyyy"), "-")} hasta {If(est.FechaHasta.HasValue, est.FechaHasta.Value.ToString("dd/MM/yyyy"), "VIGENTE")}"
+            })
             Next
 
-            If lista.Count = 0 Then
-                MessageBox.Show("No se encontró ninguna notificación asociada a designaciones para abrir el reporte.", "Aviso",
-                                MessageBoxButtons.OK, MessageBoxIcon.Information)
-                Return
-            End If
-
-            ' 3) Chequear las vigentes HOY
             Dim vigentes = lista.Where(Function(x) x.Vigente).ToList()
+            Dim idParaReporte As Integer = 0
 
             If vigentes.Count = 1 Then
-                ' Caso ideal: una sola vigente → abrir directo
-                Dim frm As New frmDesignacionRPT(vigentes(0).NotificacionId)
-                NavegacionHelper.AbrirFormEnDashboard(frm)
-                Return
+                idParaReporte = vigentes(0).EstadoTransitorioId
+            Else
+                Using selector As New frmElegirDesignacion(lista)
+                    If selector.ShowDialog(Me) = DialogResult.OK AndAlso selector.Seleccion IsNot Nothing Then
+                        idParaReporte = selector.Seleccion.EstadoTransitorioId
+                    End If
+                End Using
             End If
 
-            ' 4) Si no hay vigente única, ofrecer selector con TODAS las designaciones encontradas
-            Using selector As New frmElegirDesignacion(lista)
-                If selector.ShowDialog(Me) = DialogResult.OK AndAlso selector.Seleccion IsNot Nothing Then
-                    Dim frm As New frmDesignacionRPT(selector.Seleccion.NotificacionId)
-                    NavegacionHelper.AbrirFormEnDashboard(frm)
-                End If
-            End Using
+            If idParaReporte > 0 Then
+                Dim frm As New frmDesignacionRPT(idParaReporte)
+                NavegacionHelper.AbrirFormEnDashboard(frm)
+            End If
 
         Catch ex As Exception
-            MessageBox.Show("No se pudo abrir el/los reporte(s) de Designación: " & ex.Message, "Error",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error)
+            MessageBox.Show("No se pudo abrir el reporte de Designación: " & ex.Message, "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
     End Function
 
@@ -559,4 +550,19 @@ Public Class frmFuncionarioSituacion
 
 #End Region
 
+End Class
+Public Class DesignacionSeleccionDTO
+    Public Property EstadoTransitorioId As Integer
+    Public Property FechaDesde As Date?
+    Public Property FechaHasta As Date?
+    Public Property Descripcion As String
+
+    Public ReadOnly Property Vigente As Boolean
+        Get
+            Dim hoy = Date.Today
+            Dim esVigenteSinFechaFin = Not FechaHasta.HasValue AndAlso FechaDesde.HasValue AndAlso FechaDesde.Value.Date <= hoy
+            Dim esVigenteConFechaFin = FechaDesde.HasValue AndAlso FechaHasta.HasValue AndAlso FechaDesde.Value.Date <= hoy AndAlso FechaHasta.Value.Date >= hoy
+            Return esVigenteSinFechaFin OrElse esVigenteConFechaFin
+        End Get
+    End Property
 End Class

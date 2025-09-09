@@ -5,11 +5,13 @@ Imports Microsoft.Reporting.WinForms
 
 Public Class frmDesignacionRPT
     Private ReadOnly _reportesService As New ReportesService()
-    Private ReadOnly _notificacionId As Integer
+    ' --- CAMBIO 1: Renombrar la variable para mayor claridad ---
+    Private ReadOnly _estadoTransitorioId As Integer
 
-    Public Sub New(notificacionId As Integer)
+    ' --- CAMBIO 2: Actualizar el constructor ---
+    Public Sub New(estadoTransitorioId As Integer)
         InitializeComponent()
-        _notificacionId = notificacionId
+        _estadoTransitorioId = estadoTransitorioId
     End Sub
 
     Private Async Sub frmDesignacionRPT_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -23,29 +25,30 @@ Public Class frmDesignacionRPT
             ReportViewer1.ProcessingMode = ProcessingMode.Local
             ReportViewer1.LocalReport.DataSources.Clear()
 
+            ' --- La búsqueda del archivo .rdlc no cambia ---
             Dim reportPath As String = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Reportes", "DesignacionImprimir.rdlc")
             If Not File.Exists(reportPath) Then
                 reportPath = Path.GetFullPath(Path.Combine(Application.StartupPath, "..\..\", "Reportes", "DesignacionImprimir.rdlc"))
             End If
-
             If Not File.Exists(reportPath) Then Throw New FileNotFoundException("No se encontró el RDLC en: " & reportPath)
 
             ReportViewer1.LocalReport.ReportPath = reportPath
-            ReportViewer1.LocalReport.DisplayName = $"Designacion_{_notificacionId:000000}"
+            ReportViewer1.LocalReport.DisplayName = $"Designacion_{_estadoTransitorioId:000000}"
 
-            ' --- INICIO DE CAMBIOS ---
-            ' Llamamos al nuevo método y usamos el nuevo DTO
-            Dim designacionData = Await _reportesService.GetDatosDesignacionAsync(_notificacionId)
+            ' --- CAMBIO 3: Llamar al servicio con el ID correcto ---
+            Dim designacionData = Await _reportesService.GetDatosDesignacionAsync(_estadoTransitorioId)
+
             If designacionData Is Nothing Then
-                MessageBox.Show("No se encontraron datos detallados para la designación.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                MessageBox.Show("No se encontraron datos para el reporte de la designación.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 Me.Close()
                 Return
             End If
 
+            ' El DataSet debe coincidir con el nombre que usa el archivo .rdlc.
+            ' Asumiendo que sigue siendo "DataSetNotificaciones", aunque ahora cargue datos de estados.
             Dim rds As New ReportDataSource("DataSetNotificaciones",
                                             New List(Of DesignacionReporteDTO) From {designacionData})
             ReportViewer1.LocalReport.DataSources.Add(rds)
-            ' --- FIN DE CAMBIOS ---
 
             ReportViewer1.SetDisplayMode(DisplayMode.PrintLayout)
             ReportViewer1.ZoomMode = ZoomMode.Percent
