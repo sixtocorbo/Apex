@@ -74,7 +74,31 @@ Public Class frmNotificaciones
     End Sub
 
 #Region "Lógica de Búsqueda"
+    ' En el evento doble clic de la grilla de notificaciones (o en el evento de un botón)
+    ' En el evento doble clic de la grilla de notificaciones (o en el evento de un botón)
+    Private Async Sub dgvNotificaciones_DoubleClick(sender As Object, e As EventArgs) Handles dgvNotificaciones.DoubleClick
+        If dgvNotificaciones.SelectedRows.Count > 0 Then
+            ' Obtener la notificación seleccionada
+            Dim selectedNotification = CType(dgvNotificaciones.SelectedRows(0).DataBoundItem, vw_NotificacionesCompletas)
 
+            ' Crear y mostrar el formulario para cambiar el estado
+            ' Le pasamos el IdEstado actual para que aparezca seleccionado
+            Using frm As New frmNotificacionCambiarEstado(selectedNotification.EstadoId)
+                If frm.ShowDialog() = DialogResult.OK Then
+                    ' Llama al método que ya existe en tu NotificacionService
+                    Dim success As Boolean = Await _svc.UpdateEstadoAsync(selectedNotification.Id, frm.SelectedEstadoId)
+
+                    If success Then
+                        MessageBox.Show("Estado de la notificación actualizado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                        ' Actualizar la grilla para reflejar los cambios
+                        Await BuscarAsync()
+                    Else
+                        MessageBox.Show("Hubo un error al actualizar el estado de la notificación.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                    End If
+                End If
+            End Using
+        End If
+    End Sub
     Private Async Function BuscarAsync() As Task
         LoadingHelper.MostrarCargando(Me)
         Try
