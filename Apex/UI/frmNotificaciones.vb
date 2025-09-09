@@ -5,6 +5,8 @@ Imports System.ComponentModel
 
 Public Class frmNotificaciones
     Private ReadOnly _svc As New NotificacionService()
+    ' Timer para la búsqueda demorada, gestionado directamente en este formulario.
+    Private WithEvents tmrFiltro As New Timer()
 
     Public Sub New()
         InitializeComponent()
@@ -14,10 +16,15 @@ Public Class frmNotificaciones
         Me.KeyPreview = True
         AppTheme.Aplicar(Me)
         ConfigurarGrilla()
+        ' Configuración del Timer
+        tmrFiltro.Interval = 500 ' Espera medio segundo antes de buscar
+        tmrFiltro.Enabled = False
     End Sub
 
-    Private Sub frmGestionNotificaciones_Shown(sender As Object, e As EventArgs) Handles Me.Shown
-        Me.ActiveControl = txtFiltro
+    Private Async Sub frmGestionNotificaciones_Shown(sender As Object, e As EventArgs) Handles Me.Shown
+        ' Al mostrar el formulario, cargamos los datos iniciales
+        Await IniciarBusquedaAsync()
+        Me.ActiveControl = txtFiltro ' Foco en el filtro principal
     End Sub
 
     Private Sub ConfigurarGrilla()
@@ -32,9 +39,8 @@ Public Class frmNotificaciones
 
             .Columns.Add(New DataGridViewTextBoxColumn With {
                 .Name = "Id",
-                .DataPropertyName = "Id", ' Asegurate que la vista expone "Id". Si es "NotificacionId", cambia acá.
+                .DataPropertyName = "Id",
                 .HeaderText = "ID",
-                .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
                 .Visible = False
             })
             .Columns.Add(New DataGridViewTextBoxColumn With {
@@ -74,58 +80,57 @@ Public Class frmNotificaciones
     End Sub
 
 #Region "Lógica de Búsqueda"
-    ' En el evento doble clic de la grilla de notificaciones (o en el evento de un botón)
-    ' En el evento doble clic de la grilla de notificaciones (o en el evento de un botón)
-    Private Async Sub dgvNotificaciones_DoubleClick(sender As Object, e As EventArgs) Handles dgvNotificaciones.DoubleClick
-        If dgvNotificaciones.SelectedRows.Count > 0 Then
-            ' Obtener la notificación seleccionada
-            Dim selectedNotification = CType(dgvNotificaciones.SelectedRows(0).DataBoundItem, vw_NotificacionesCompletas)
 
-            ' Crear y mostrar el formulario para cambiar el estado
-            ' Le pasamos el IdEstado actual para que aparezca seleccionado
-            Using frm As New frmNotificacionCambiarEstado(selectedNotification.EstadoId)
-                If frm.ShowDialog() = DialogResult.OK Then
-                    ' Llama al método que ya existe en tu NotificacionService
-                    Dim success As Boolean = Await _svc.UpdateEstadoAsync(selectedNotification.Id, frm.SelectedEstadoId)
-
-                    If success Then
-                        MessageBox.Show("Estado de la notificación actualizado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
-                        ' Actualizar la grilla para reflejar los cambios
-                        Await BuscarAsync()
-                    Else
-                        MessageBox.Show("Hubo un error al actualizar el estado de la notificación.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                    End If
-                End If
-            End Using
-        End If
-    End Sub
-    Private Async Function BuscarAsync() As Task
+    Private Async Function IniciarBusquedaAsync() As Task
         LoadingHelper.MostrarCargando(Me)
         Try
-            Dim filtro = txtFiltro.Text.Trim()
-
-            ' Si querés ver “últimas” cuando está vacío, podés quitar este If.
-            If String.IsNullOrWhiteSpace(filtro) Then
-                dgvNotificaciones.DataSource = Nothing
-                Return
-            End If
-
-            Dim resultados = Await _svc.GetAllConDetallesAsync(filtro:=filtro)
-            dgvNotificaciones.DataSource = New BindingList(Of vw_NotificacionesCompletas)(resultados)
-
-        Catch ex As Exception
-            MessageBox.Show($"Ocurrió un error al buscar las notificaciones: {ex.Message}", "Error",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Await BuscarAsync()
         Finally
             LoadingHelper.OcultarCargando(Me)
         End Try
     End Function
 
-    Private Async Sub txtFiltro_KeyDown(sender As Object, e As KeyEventArgs) Handles txtFiltro.KeyDown
-        If e.KeyCode = Keys.Enter Then
-            e.Handled = True
-            e.SuppressKeyPress = True
-            Await BuscarAsync()
+    Private Async Function BuscarAsync() As Task
+        Try
+            Dim filtroGeneral = txtFiltro.Text.Trim()
+            ' CORRECCIÓN: Aseguramos que tome el texto del control correcto.
+            Dim filtroFuncionario = txtFiltro.Text.Trim()
+
+            Dim resultados = Await _svc.GetAllConDetallesAsync(filtro:=filtroGeneral, funcionarioFiltro:=filtroFuncionario)
+            dgvNotificaciones.DataSource = New BindingList(Of vw_NotificacionesCompletas)(resultados)
+
+        Catch ex As Exception
+            MessageBox.Show($"Ocurrió un error al buscar las notificaciones: {ex.Message}", "Error",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Function
+
+    ' CORRECCIÓN: El evento ahora maneja los cambios de ambos TextBox.
+    Private Sub Filtro_TextChanged(sender As Object, e As EventArgs) Handles txtFiltro.TextChanged
+        tmrFiltro.Stop()
+        tmrFiltro.Start()
+    End Sub
+
+    ' Cuando el timer finaliza, ejecuta la búsqueda.
+    Private Async Sub tmrFiltro_Tick(sender As Object, e As EventArgs) Handles tmrFiltro.Tick
+        tmrFiltro.Stop()
+        Await IniciarBusquedaAsync()
+    End Sub
+
+    Private Async Sub dgvNotificaciones_DoubleClick(sender As Object, e As EventArgs) Handles dgvNotificaciones.DoubleClick
+        If dgvNotificaciones.SelectedRows.Count > 0 Then
+            Dim selectedNotification = CType(dgvNotificaciones.SelectedRows(0).DataBoundItem, vw_NotificacionesCompletas)
+            Using frm As New frmNotificacionCambiarEstado(selectedNotification.EstadoId)
+                If frm.ShowDialog() = DialogResult.OK Then
+                    Dim success As Boolean = Await _svc.UpdateEstadoAsync(selectedNotification.Id, frm.SelectedEstadoId)
+                    If success Then
+                        MessageBox.Show("Estado de la notificación actualizado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                        Await IniciarBusquedaAsync()
+                    Else
+                        MessageBox.Show("Hubo un error al actualizar el estado de la notificación.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                    End If
+                End If
+            End Using
         End If
     End Sub
 
@@ -136,7 +141,7 @@ Public Class frmNotificaciones
     Private Async Sub btnNuevo_Click(sender As Object, e As EventArgs) Handles btnNuevo.Click
         Using frm As New frmNotificacionCrear()
             If frm.ShowDialog() = DialogResult.OK Then
-                Await BuscarAsync()
+                Await IniciarBusquedaAsync()
             End If
         End Using
     End Sub
@@ -150,7 +155,7 @@ Public Class frmNotificaciones
         Dim idSeleccionado = CInt(dgvNotificaciones.SelectedRows(0).Cells("Id").Value)
         Using frm As New frmNotificacionCrear(idSeleccionado)
             If frm.ShowDialog() = DialogResult.OK Then
-                Await BuscarAsync()
+                Await IniciarBusquedaAsync()
             End If
         End Using
     End Sub
@@ -163,7 +168,6 @@ Public Class frmNotificaciones
         End If
         Dim idSeleccionado = CInt(dgvNotificaciones.SelectedRows(0).Cells("Id").Value)
         Dim frm As New frmNotificacionRPT(idSeleccionado)
-
         NavegacionHelper.AbrirFormEnDashboard(frm)
     End Sub
 
@@ -181,9 +185,8 @@ Public Class frmNotificaciones
         If MessageBox.Show($"¿Está seguro de que desea eliminar la notificación para '{nombreFuncionario}'?",
                            "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
             Try
-                ' Usa el método atómico con auditoría:
                 Await _svc.DeleteNotificacionAsync(idSeleccionado)
-                Await BuscarAsync()
+                Await IniciarBusquedaAsync()
             Catch ex As Exception
                 MessageBox.Show($"Ocurrió un error al eliminar: {ex.Message}", "Error",
                                 MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -195,21 +198,10 @@ Public Class frmNotificaciones
 
 #Region "Mejoras de UX"
 
-    Private Async Sub dgvNotificaciones_CellDoubleClick(sender As Object, e As DataGridViewCellEventArgs) Handles dgvNotificaciones.CellDoubleClick
-        If e.RowIndex >= 0 AndAlso dgvNotificaciones.Rows.Count > 0 Then
-            Dim idSeleccionado = CInt(dgvNotificaciones.Rows(e.RowIndex).Cells("Id").Value)
-            Using frm As New frmNotificacionCrear(idSeleccionado)
-                If frm.ShowDialog() = DialogResult.OK Then
-                    Await BuscarAsync()
-                End If
-            End Using
-        End If
-    End Sub
-
     Private Async Sub frmNotificaciones_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
         Select Case e.KeyCode
             Case Keys.F5
-                Await BuscarAsync()
+                Await IniciarBusquedaAsync()
             Case Keys.Delete
                 btnEliminar.PerformClick()
         End Select

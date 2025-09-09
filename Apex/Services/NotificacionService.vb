@@ -106,40 +106,57 @@ Public Class NotificacionService
     End Function
 
     Public Async Function GetAllConDetallesAsync(
-        Optional filtro As String = "",
-        Optional fechaDesde As Date? = Nothing,
-        Optional fechaHasta As Date? = Nothing
-    ) As Task(Of List(Of vw_NotificacionesCompletas))
+    Optional filtro As String = "",
+    Optional fechaDesde As Date? = Nothing,
+    Optional fechaHasta As Date? = Nothing,
+    Optional funcionarioFiltro As String = "" ' <-- Nuevo parámetro
+) As Task(Of List(Of vw_NotificacionesCompletas))
 
         Dim baseSql As String = "SELECT vwn.* FROM vw_NotificacionesCompletas AS vwn"
         Dim parameters As New List(Of SqlParameter)
+        Dim conditions As New List(Of String)
 
+        ' Filtro genérico (Full-Text Search). Requiere JOIN.
         If Not String.IsNullOrWhiteSpace(filtro) Then
-            baseSql &= " INNER JOIN dbo.Funcionario AS f ON vwn.FuncionarioId = f.Id WHERE CONTAINS((f.CI, f.Nombre), @p0)"
-            parameters.Add(New SqlParameter("@p0", FormatearFts(filtro)))
-        Else
-            baseSql &= " WHERE 1=1"
+            If Not baseSql.Contains("dbo.Funcionario") Then
+                baseSql &= " INNER JOIN dbo.Funcionario AS f ON vwn.FuncionarioId = f.Id"
+            End If
+            conditions.Add("CONTAINS((f.CI, f.Nombre), @p_filtro)")
+            parameters.Add(New SqlParameter("@p_filtro", FormatearFts(filtro)))
         End If
 
-        Dim sb As New StringBuilder(baseSql)
+        ' Filtro específico por nombre de funcionario (LIKE). Requiere JOIN.
+        If Not String.IsNullOrWhiteSpace(funcionarioFiltro) Then
+            If Not baseSql.Contains("dbo.Funcionario") Then
+                baseSql &= " INNER JOIN dbo.Funcionario AS f ON vwn.FuncionarioId = f.Id"
+            End If
+            conditions.Add("f.Nombre LIKE @p_func")
+            parameters.Add(New SqlParameter("@p_func", $"%{funcionarioFiltro}%"))
+        End If
 
+        ' Filtros de fecha
         If fechaDesde.HasValue Then
             Dim pname = "@p" & parameters.Count
-            sb.Append(" AND vwn.FechaProgramada >= " & pname)
-            parameters.Add(New SqlParameter(pname, fechaDesde.Value))
+            conditions.Add("vwn.FechaProgramada >= " & pname)
+            parameters.Add(New SqlParameter(pname, fechaDesde.Value.Date))
         End If
 
         If fechaHasta.HasValue Then
             Dim pname = "@p" & parameters.Count
-            sb.Append(" AND vwn.FechaProgramada <= " & pname)
-            parameters.Add(New SqlParameter(pname, fechaHasta.Value))
+            conditions.Add("vwn.FechaProgramada <= " & pname)
+            parameters.Add(New SqlParameter(pname, fechaHasta.Value.Date.AddDays(1).AddSeconds(-1))) ' Incluye todo el día "hasta"
         End If
 
-        sb.Append(" ORDER BY vwn.FechaProgramada DESC")
+        ' Construye la cláusula WHERE si hay condiciones
+        If conditions.Any() Then
+            baseSql &= " WHERE " & String.Join(" AND ", conditions)
+        End If
+
+        baseSql &= " ORDER BY vwn.FechaProgramada DESC"
 
         Dim query = _unitOfWork.Context.Database.SqlQuery(Of vw_NotificacionesCompletas)(
-            sb.ToString(), parameters.ToArray()
-        )
+        baseSql, parameters.ToArray()
+    )
         Return Await query.ToListAsync()
     End Function
 
@@ -193,28 +210,40 @@ Public Class NotificacionService
     Public Async Function UpdateNotificacionAsync(req As NotificacionUpdateRequest) As Task
         ValidarUpdate(req)
 
-        Dim entidad = Await _unitOfWork.Repository(Of NotificacionPersonal)().
-            GetAll().
-            FirstOrDefaultAsync(Function(n) n.Id = req.Id)
-
-        If entidad Is Nothing Then Throw New InvalidOperationException("La notificación no existe.")
-
-        entidad.FuncionarioId = req.FuncionarioId
-        entidad.TipoNotificacionId = req.TipoNotificacionId
-        entidad.FechaProgramada = req.FechaProgramada
-        entidad.Medio = req.Medio?.Trim()
-        entidad.Documento = req.Documento?.Trim()
-        entidad.ExpMinisterial = req.ExpMinisterial?.Trim()
-        entidad.ExpINR = req.ExpINR?.Trim()
-        entidad.Oficina = req.Oficina?.Trim()
-        entidad.UpdatedAt = DateTime.Now
-
         Using tx = _unitOfWork.Context.Database.BeginTransaction()
             Try
+                ' Buscamos la entidad original que vamos a modificar
+                Dim entidad = Await _unitOfWork.Repository(Of NotificacionPersonal)().
+                GetAll().
+                FirstOrDefaultAsync(Function(n) n.Id = req.Id)
+
+                If entidad Is Nothing Then Throw New InvalidOperationException("La notificación no existe.")
+
+                ' Aplicamos los nuevos valores del formulario a la entidad
+                entidad.FuncionarioId = req.FuncionarioId
+                entidad.TipoNotificacionId = req.TipoNotificacionId
+                entidad.FechaProgramada = req.FechaProgramada
+                entidad.Medio = req.Medio?.Trim()
+                entidad.Documento = req.Documento?.Trim()
+                entidad.ExpMinisterial = req.ExpMinisterial?.Trim()
+                entidad.ExpINR = req.ExpINR?.Trim()
+                entidad.Oficina = req.Oficina?.Trim()
+                entidad.UpdatedAt = DateTime.Now
+
+                ' --- LA CORRECCIÓN CLAVE ---
+                ' Le decimos explícitamente a Entity Framework que la entidad ha cambiado.
+                ' Esto garantiza que SaveChanges() genere la consulta UPDATE.
+                _unitOfWork.Context.Entry(entidad).State = EntityState.Modified
+                ' --- FIN DE LA CORRECCIÓN ---
+
+                ' Registramos la auditoría
                 Dim desc = $"Actualización Notif #{entidad.Id} (Func #{req.FuncionarioId}, Tipo #{req.TipoNotificacionId}, Prog {req.FechaProgramada:yyyy-MM-dd HH:mm})."
                 _auditoria.EncolarActividad("Actualizar", "NotificacionPersonal", desc, entidad.Id)
 
+                ' Guardamos todos los cambios en la base de datos
                 Await _unitOfWork.CommitAsync()
+
+                ' Confirmamos la transacción
                 tx.Commit()
             Catch
                 tx.Rollback()
