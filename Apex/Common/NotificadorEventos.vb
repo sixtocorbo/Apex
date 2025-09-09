@@ -1,7 +1,5 @@
-﻿' /Common/NotificadorEventos.vb
-
-''' <summary>
-''' Clase auxiliar para pasar el ID del funcionario en el evento específico.
+﻿''' <summary>
+''' Clase auxiliar para pasar el ID del funcionario en eventos específicos.
 ''' </summary>
 Public Class FuncionarioEventArgs
     Inherits EventArgs
@@ -11,40 +9,37 @@ Public Class FuncionarioEventArgs
     End Sub
 End Class
 
-
 ''' <summary>
 ''' Gestiona la comunicación de eventos entre diferentes partes de la aplicación.
-''' Soporta tanto notificaciones genéricas como específicas por entidad.
 ''' </summary>
 Public Class NotificadorEventos
 
-    ' --- 1. Evento Genérico (EL QUE YA USAS) ---
-    ' Este se mantiene sin cambios para no romper el código existente.
-    Public Shared Event DatosActualizados(sender As Object, e As EventArgs)
+    ' --- Evento Genérico ---
+    ' Para formularios que necesitan saber que "algo" cambió, pero no qué.
+    Public Shared Event DatosActualizados As EventHandler
 
-    ''' <summary>
-    ''' Notifica de forma genérica que "algo" ha cambiado en la aplicación.
-    ''' </summary>
-    Public Shared Sub NotificarActualizacion()
-        RaiseEvent DatosActualizados(Nothing, EventArgs.Empty)
-    End Sub
-
-
-    ' --- 2. Nuevo Evento Específico para Funcionarios ---
-    ' Este es el nuevo evento que usará el formulario de situación del funcionario.
+    ' --- Evento Específico ---
+    ' Para formularios que necesitan saber qué funcionario específico cambió.
     Public Shared Event FuncionarioActualizado As EventHandler(Of FuncionarioEventArgs)
 
     ''' <summary>
-    ''' Notifica que un funcionario específico ha sido modificado.
+    ''' Notifica de forma genérica que "algo" ha cambiado en la aplicación.
+    ''' Usado por formularios como el de Gestión de Licencias.
     ''' </summary>
-    ''' <param name="funcionarioId">El ID del funcionario que se guardó o modificó.</param>
-    Public Shared Sub NotificarActualizacionFuncionario(funcionarioId As Integer)
-        ' Dispara el evento específico, pasando el ID del funcionario.
+    Public Shared Sub NotificarActualizacionGeneral()
+        RaiseEvent DatosActualizados(Nothing, EventArgs.Empty)
+    End Sub
+
+    ''' <summary>
+    ''' Notifica que un funcionario específico ha sido modificado o sus datos relacionados han cambiado.
+    ''' </summary>
+    ''' <param name="funcionarioId">El ID del funcionario afectado.</param>
+    Public Shared Sub NotificarCambiosEnFuncionario(funcionarioId As Integer)
+        ' Dispara el evento específico para formularios como frmFuncionarioBuscar y frmFuncionarioSituacion
         RaiseEvent FuncionarioActualizado(Nothing, New FuncionarioEventArgs(funcionarioId))
 
-        ' También dispara el evento genérico para mantener la compatibilidad con
-        ' los formularios antiguos que solo escuchan la notificación general.
-        NotificarActualizacion()
+        ' También dispara el evento genérico para mantener la compatibilidad con otros formularios.
+        NotificarActualizacionGeneral()
     End Sub
 
 End Class

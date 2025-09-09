@@ -25,4 +25,13 @@ Public Class ModConstantesApex
     Public Const ESTADO_NOTI_ENVIADA As Byte = 2
     Public Const ESTADO_NOTI_ENTREGADA As Byte = 3
 
+    ''' <summary>
+    ''' Define los IDs de los estados de una notificación personal.
+    ''' </summary>
+    Public Enum EstadoNotificacionId As Byte
+        Pendiente = 1
+        Vencida = 2
+        Firmada = 3
+    End Enum
+
 End Class

@@ -23,6 +23,7 @@ Partial Class frmNotificacionRPT
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.ReportViewer1 = New Microsoft.Reporting.WinForms.ReportViewer()
+        Me.btnConfirmarFirma = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'ReportViewer1
@@ -35,11 +36,21 @@ Partial Class frmNotificacionRPT
         Me.ReportViewer1.Size = New System.Drawing.Size(1200, 692)
         Me.ReportViewer1.TabIndex = 0
         '
+        'btnConfirmarFirma
+        '
+        Me.btnConfirmarFirma.Location = New System.Drawing.Point(1054, 54)
+        Me.btnConfirmarFirma.Name = "btnConfirmarFirma"
+        Me.btnConfirmarFirma.Size = New System.Drawing.Size(103, 33)
+        Me.btnConfirmarFirma.TabIndex = 1
+        Me.btnConfirmarFirma.Text = "Confirmar"
+        Me.btnConfirmarFirma.UseVisualStyleBackColor = True
+        '
         'frmNotificacionRPT
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1200, 692)
+        Me.Controls.Add(Me.btnConfirmarFirma)
         Me.Controls.Add(Me.ReportViewer1)
         Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
@@ -52,4 +63,5 @@ Partial Class frmNotificacionRPT
     End Sub
 
     Friend WithEvents ReportViewer1 As Microsoft.Reporting.WinForms.ReportViewer
+    Friend WithEvents btnConfirmarFirma As Button
 End Class

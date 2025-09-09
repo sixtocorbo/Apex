@@ -438,7 +438,10 @@ Public Class frmFuncionarioCrear
         If Await GuardarAsync() Then
             LoadingHelper.OcultarCargando(Me)
             MessageBox.Show(If(_modo = ModoFormulario.Crear, "Funcionario creado", "Funcionario actualizado") & " correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
-            NotificadorEventos.NotificarActualizacionFuncionario(_funcionario.Id)
+
+            ' --- CAMBIO CLAVE: Llamada al notificador específico y correcto ---
+            NotificadorEventos.NotificarCambiosEnFuncionario(_funcionario.Id)
+
             Me.DialogResult = DialogResult.OK
             _cerrandoPorCodigo = True
             Close()

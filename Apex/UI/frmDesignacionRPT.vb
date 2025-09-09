@@ -25,7 +25,6 @@ Public Class frmDesignacionRPT
             ReportViewer1.ProcessingMode = ProcessingMode.Local
             ReportViewer1.LocalReport.DataSources.Clear()
 
-            ' --- La búsqueda del archivo .rdlc no cambia ---
             Dim reportPath As String = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Reportes", "DesignacionImprimir.rdlc")
             If Not File.Exists(reportPath) Then
                 reportPath = Path.GetFullPath(Path.Combine(Application.StartupPath, "..\..\", "Reportes", "DesignacionImprimir.rdlc"))
@@ -35,7 +34,6 @@ Public Class frmDesignacionRPT
             ReportViewer1.LocalReport.ReportPath = reportPath
             ReportViewer1.LocalReport.DisplayName = $"Designacion_{_estadoTransitorioId:000000}"
 
-            ' --- CAMBIO 3: Llamar al servicio con el ID correcto ---
             Dim designacionData = Await _reportesService.GetDatosDesignacionAsync(_estadoTransitorioId)
 
             If designacionData Is Nothing Then
@@ -44,10 +42,9 @@ Public Class frmDesignacionRPT
                 Return
             End If
 
-            ' El DataSet debe coincidir con el nombre que usa el archivo .rdlc.
-            ' Asumiendo que sigue siendo "DataSetNotificaciones", aunque ahora cargue datos de estados.
-            Dim rds As New ReportDataSource("DataSetNotificaciones",
-                                            New List(Of DesignacionReporteDTO) From {designacionData})
+            ' --- CAMBIO CLAVE: El nombre del DataSource ahora es "DataSetDesignaciones" ---
+            Dim rds As New ReportDataSource("DataSetDesignaciones",
+                                        New List(Of DesignacionReporteDTO) From {designacionData})
             ReportViewer1.LocalReport.DataSources.Add(rds)
 
             ReportViewer1.SetDisplayMode(DisplayMode.PrintLayout)

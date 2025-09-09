@@ -38,8 +38,9 @@ Public Class frmFuncionarioSituacion
         AddHandler dgvNovedades.CellDoubleClick, AddressOf dgvNovedades_CellDoubleClick
         AddHandler dgvNovedades.DataBindingComplete, AddressOf DgvNovedades_DataBindingComplete
         AddHandler dgvEstados.DataBindingComplete, AddressOf DgvEstados_DataBindingComplete
-        AddHandler NotificadorEventos.FuncionarioActualizado, _funcionarioActualizadoHandler
         AddHandler dgvEstados.CellDoubleClick, AddressOf dgvEstados_CellDoubleClick
+        ' --- Se suscribe al único evento de notificación ---
+        AddHandler NotificadorEventos.FuncionarioActualizado, _funcionarioActualizadoHandler
 
         ' Configuración inicial
         dtpDesde.Value = Date.Today
@@ -86,6 +87,7 @@ Public Class frmFuncionarioSituacion
 #Region " Lógica de Actualización y Eventos "
 
     Private Async Sub ManejarFuncionarioActualizado(sender As Object, e As FuncionarioEventArgs)
+        ' Si el evento corresponde al funcionario que estamos viendo, recargamos todo.
         If e.FuncionarioId = _funcionarioId Then
             If Me.InvokeRequired Then
                 Me.Invoke(New Action(Async Sub()
@@ -101,7 +103,6 @@ Public Class frmFuncionarioSituacion
 
     Private Async Function ActualizarTodo() As Task
         Dim fechaInicio = dtpDesde.Value.Date
-        ' Hacemos que la fecha final represente el INICIO del día SIGUIENTE
         Dim fechaFin = dtpHasta.Value.Date.AddDays(1)
 
         GenerarTimeline(fechaInicio, fechaFin)
@@ -116,7 +117,7 @@ Public Class frmFuncionarioSituacion
 #End Region
 
 #Region " Lógica del Timeline de Novedades "
-
+    ' --- SIN CAMBIOS EN ESTA REGIÓN ---
     Private Sub GenerarTimeline(fechaInicio As Date, fechaFin As Date)
         flpTimeline.SuspendLayout()
         flpTimeline.Controls.Clear()
@@ -189,71 +190,61 @@ Public Class frmFuncionarioSituacion
 
 #Region " Lógica de la Grilla de Estados "
 
+    ' --- FUNCIÓN CLAVE ACTUALIZADA Y SIMPLIFICADA ---
     Private Async Function PoblarGrillaEstados(fechaInicio As Date, fechaFin As Date) As Task
         LoadingHelper.MostrarCargando(dgvEstados)
         Try
             ' 1) Estados transitorios
             Dim estadosEnPeriodo = Await _uow.Context.Set(Of vw_EstadosTransitoriosCompletos)() _
                 .Where(Function(e) e.FuncionarioId = _funcionarioId AndAlso
-                                  e.FechaDesde.HasValue AndAlso
-                                  e.FechaDesde.Value < fechaFin AndAlso
-                                  (Not e.FechaHasta.HasValue OrElse e.FechaHasta.Value >= fechaInicio)) _
+                                    e.FechaDesde.HasValue AndAlso
+                                    e.FechaDesde.Value < fechaFin AndAlso
+                                    (Not e.FechaHasta.HasValue OrElse e.FechaHasta.Value >= fechaInicio)) _
                 .AsNoTracking().ToListAsync()
 
             ' 2) Licencias
             Dim licenciasEnPeriodo = Await _uow.Context.Set(Of HistoricoLicencia)() _
                 .Include(Function(l) l.TipoLicencia) _
                 .Where(Function(l) l.FuncionarioId = _funcionarioId AndAlso
-                                       l.inicio < fechaFin AndAlso
-                                       l.finaliza >= fechaInicio) _
+                                        l.inicio < fechaFin AndAlso
+                                        l.finaliza >= fechaInicio) _
                 .AsNoTracking().ToListAsync()
 
             ' 3) Notificaciones PENDIENTES
-            Dim estadoPendienteId As Byte = 1
+            Dim estadoPendienteId As Byte = CType(ModConstantesApex.EstadoNotificacionId.Pendiente, Byte)
             Dim notificacionesEnPeriodo = Await _uow.Context.Set(Of NotificacionPersonal)() _
                 .Include(Function(n) n.TipoNotificacion) _
                 .Where(Function(n) n.FuncionarioId = _funcionarioId AndAlso
-                                  n.EstadoId = estadoPendienteId AndAlso
-                                  n.FechaProgramada >= fechaInicio AndAlso
-                                  n.FechaProgramada < fechaFin) _
+                                    n.EstadoId = estadoPendienteId AndAlso
+                                    n.FechaProgramada >= fechaInicio AndAlso
+                                    n.FechaProgramada < fechaFin) _
                 .AsNoTracking().ToListAsync()
 
             Dim eventosUnificados As New List(Of Object)
 
-            ' Agregar Estados
+            ' Unificamos todos los eventos en un solo tipo de objeto para la grilla
             eventosUnificados.AddRange(estadosEnPeriodo.Select(Function(s) New With {
                 .Id = s.Id,
                 .TipoEvento = "Estado",
                 .Tipo = s.TipoEstadoNombre,
                 .Desde = s.FechaDesde,
-                .Hasta = s.FechaHasta,
-                .IsEstado = True,
-                .TipoId = s.TipoEstadoTransitorioId,
-                .TipoNotificacionNombre = CStr(Nothing) ' Propiedad de relleno
+                .Hasta = s.FechaHasta
             }))
 
-            ' Agregar Licencias
             eventosUnificados.AddRange(licenciasEnPeriodo.Select(Function(l) New With {
                 .Id = l.Id,
                 .TipoEvento = "Licencia",
                 .Tipo = $"LICENCIA: {l.TipoLicencia.Nombre}",
                 .Desde = CType(l.inicio, Date?),
-                .Hasta = CType(l.finaliza, Date?),
-                .IsEstado = False,
-                .TipoId = 0,
-                .TipoNotificacionNombre = CStr(Nothing) ' Propiedad de relleno
+                .Hasta = CType(l.finaliza, Date?)
             }))
 
-            ' Agregar Notificaciones
             eventosUnificados.AddRange(notificacionesEnPeriodo.Select(Function(n) New With {
                 .Id = n.Id,
                 .TipoEvento = "Notificacion",
                 .Tipo = $"NOTIFICACIÓN PENDIENTE: {n.TipoNotificacion.Nombre}",
                 .Desde = CType(n.FechaProgramada, Date?),
-                .Hasta = CType(Nothing, Date?),
-                .IsEstado = False,
-                .TipoId = -1,
-                .TipoNotificacionNombre = n.TipoNotificacion.Nombre
+                .Hasta = CType(Nothing, Date?)
             }))
 
             dgvEstados.DataSource = eventosUnificados _
@@ -271,45 +262,54 @@ Public Class frmFuncionarioSituacion
 
 #Region "Lógica de grilla y estados"
 
+    ' --- FUNCIÓN CLAVE ACTUALIZADA ---
     Private Async Sub dgvEstados_CellDoubleClick(sender As Object, e As DataGridViewCellEventArgs)
         If e.RowIndex < 0 OrElse dgvEstados.CurrentRow Is Nothing Then Return
         Try
             Dim rowData = dgvEstados.CurrentRow.DataBoundItem
+
+            ' Obtenemos las propiedades clave de la fila seleccionada
             Dim tipoEvento = NormalizarTexto(GetPropValue(Of String)(rowData, "TipoEvento", ""))
             Dim tipoTexto = NormalizarTexto(GetPropValue(Of String)(rowData, "Tipo", ""))
+            Dim registroId = GetPropValue(Of Integer)(rowData, "Id", 0)
 
-            If tipoEvento = "ESTADO" AndAlso tipoTexto.Contains("DESIGNACION") Then
-                ' Capturamos el ID específico de la fila seleccionada.
-                Dim estadoId = GetPropValue(Of Integer)(rowData, "Id", 0)
-                If estadoId > 0 Then
-                    ' Llamamos a la función de reporte pasándole este ID.
-                    Await MostrarReporteDesignacionAsync(estadoId)
-                Else
-                    MessageBox.Show("No se pudo identificar el ID de la designación seleccionada.", "Aviso",
+            If registroId = 0 Then
+                MessageBox.Show("No se pudo identificar el ID del registro seleccionado.", "Aviso",
                                 MessageBoxButtons.OK, MessageBoxIcon.Warning)
-                End If
+                Return
             End If
+
+            ' --- Lógica Definitiva ---
+            Select Case tipoEvento
+                Case "ESTADO"
+                    ' Si es un Estado y contiene "DESIGNACION", abre el reporte.
+                    If tipoTexto.Contains("DESIGNACION") Then
+                        Await MostrarReporteDesignacionAsync(registroId)
+                    End If
+
+                Case "NOTIFICACION"
+                    ' Si es una Notificación, abre el formulario de REPORTE (impresión).
+                    ' Sabemos que es pendiente porque solo esas se cargan en la grilla.
+                    Dim frm As New frmNotificacionRPT(registroId)
+                    NavegacionHelper.AbrirFormEnDashboard(frm)
+
+            End Select
 
         Catch ex As Exception
             MessageBox.Show("No se pudo procesar la acción: " & ex.Message, "Error",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                            MessageBoxButtons.OK, MessageBoxIcon.Warning)
         End Try
     End Sub
 
-    ' Agregamos el parámetro opcional "estadoIdEspecifico"
+    ' --- SIN CAMBIOS EN ESTA FUNCIÓN ---
     Private Async Function MostrarReporteDesignacionAsync(Optional estadoIdEspecifico As Integer = 0) As Task
         Try
-            ' --- NUEVA LÓGICA ---
-            ' Si recibimos un ID específico (del doble clic), abrimos el reporte y terminamos.
             If estadoIdEspecifico > 0 Then
                 Dim frm As New frmDesignacionRPT(estadoIdEspecifico)
                 NavegacionHelper.AbrirFormEnDashboard(frm)
                 Return
             End If
-            ' --- FIN DE LA NUEVA LÓGICA ---
 
-            ' El resto del código (la lógica anterior) solo se ejecutará si no se pasó un ID,
-            ' manteniendo la funcionalidad del botón de imprimir.
             Dim estadosDesignacion = Await _uow.Context.Set(Of vw_EstadosTransitoriosCompletos)() _
             .Where(Function(e) e.FuncionarioId = _funcionarioId AndAlso
                                  e.FechaDesde.HasValue AndAlso
@@ -320,7 +320,7 @@ Public Class frmFuncionarioSituacion
 
             If estadosDesignacion Is Nothing OrElse Not estadosDesignacion.Any() Then
                 MessageBox.Show("No se encontraron estados de 'Designación' para este funcionario.", "Aviso",
-                             MessageBoxButtons.OK, MessageBoxIcon.Information)
+                                 MessageBoxButtons.OK, MessageBoxIcon.Information)
                 Return
             End If
 
@@ -354,21 +354,11 @@ Public Class frmFuncionarioSituacion
 
         Catch ex As Exception
             MessageBox.Show("No se pudo abrir el reporte de Designación: " & ex.Message, "Error",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error)
+                            MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
     End Function
 
-    Private Async Function BuscarNotificacionDesignacionPorFecha(fecha As Date) As Task(Of Integer)
-        Return Await _uow.Context.Set(Of NotificacionPersonal)() _
-            .Include(Function(n) n.TipoNotificacion) _
-            .Where(Function(n) n.FuncionarioId = _funcionarioId AndAlso
-                              n.TipoNotificacion.Nombre.ToUpper().Contains("DESIGNACI") AndAlso
-                              DbFunctions.TruncateTime(n.FechaProgramada) <= DbFunctions.TruncateTime(fecha)) _
-            .OrderByDescending(Function(n) n.FechaProgramada) _
-            .Select(Function(n) n.Id) _
-            .FirstOrDefaultAsync()
-    End Function
-
+    ' --- SIN CAMBIOS EN ESTA FUNCIÓN ---
     Private Function NormalizarTexto(s As String) As String
         If String.IsNullOrWhiteSpace(s) Then Return String.Empty
         Dim formD = s.Normalize(NormalizationForm.FormD)
@@ -383,6 +373,7 @@ Public Class frmFuncionarioSituacion
 #End Region
 
 #Region " Configuración y Eventos de Grillas "
+    ' --- SIN CAMBIOS EN ESTA REGIÓN ---
     Private Sub ConfigurarGrillaNovedades()
         If dgvNovedades.Columns.Count > 0 Then Return
         dgvNovedades.AutoGenerateColumns = False
@@ -451,10 +442,6 @@ Public Class frmFuncionarioSituacion
         ' Ocultamos las columnas que no son para el usuario
         If dgv.Columns.Contains("Id") Then dgv.Columns("Id").Visible = False
         If dgv.Columns.Contains("TipoEvento") Then dgv.Columns("TipoEvento").Visible = False
-        If dgv.Columns.Contains("IsEstado") Then dgv.Columns("IsEstado").Visible = False
-        If dgv.Columns.Contains("TipoId") Then dgv.Columns("TipoId").Visible = False
-        If dgv.Columns.Contains("TipoNotificacionNombre") Then dgv.Columns("TipoNotificacionNombre").Visible = False
-
         AplicarColoresEstados(dgv)
     End Sub
 
@@ -465,6 +452,7 @@ Public Class frmFuncionarioSituacion
 #End Region
 
 #Region " Severidad y Colores "
+    ' --- FUNCIÓN CLAVE ACTUALIZADA ---
     Private Enum Severidad
         Info = 0
         Baja = 1
@@ -479,18 +467,15 @@ Public Class frmFuncionarioSituacion
             If data Is Nothing Then Continue For
 
             Dim tipoTxt As String = GetPropValue(Of String)(data, "Tipo", "")
-            Dim tipoId As Integer = GetPropValue(Of Integer)(data, "TipoId", 0)
-            Dim isEstado As Boolean = GetPropValue(Of Boolean)(data, "IsEstado", False)
-
-            Dim sev As Severidad = ClasificarSeveridad(tipoTxt, tipoId, isEstado)
+            Dim sev As Severidad = ClasificarSeveridad(tipoTxt)
             PintarFilaPorSeveridad(row, sev)
         Next
     End Sub
 
-    Private Function ClasificarSeveridad(tipoTexto As String, tipoId As Integer, isEstado As Boolean) As Severidad
+    Private Function ClasificarSeveridad(tipoTexto As String) As Severidad
         Dim t As String = If(tipoTexto, String.Empty).ToUpperInvariant()
 
-        If t.StartsWith("NOTIFICACIÓN PENDIENTE") Then Return Severidad.Media
+        If t.StartsWith("NOTIFICACIÓN") Then Return Severidad.Media ' Simplificado
         If t.StartsWith("LICENCIA") Then Return Severidad.Info
         If t.Contains("INICIO DE PROCESAMIENTO") Then Return Severidad.Critica
         If t.Contains("SEPARACION") OrElse t.Contains("SEPARACIÓN") Then Return Severidad.Critica
@@ -551,6 +536,7 @@ Public Class frmFuncionarioSituacion
 #End Region
 
 End Class
+
 Public Class DesignacionSeleccionDTO
     Public Property EstadoTransitorioId As Integer
     Public Property FechaDesde As Date?
