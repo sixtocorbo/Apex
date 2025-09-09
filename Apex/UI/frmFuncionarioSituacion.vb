@@ -270,40 +270,37 @@ Public Class frmFuncionarioSituacion
 #End Region
 
 #Region "Lógica de grilla y estados"
-    Private Sub dgvEstados_CellDoubleClick(sender As Object, e As DataGridViewCellEventArgs)
+    Private Async Sub dgvEstados_CellDoubleClick(sender As Object, e As DataGridViewCellEventArgs)
         If e.RowIndex < 0 OrElse dgvEstados.CurrentRow Is Nothing Then Return
         Try
             Dim rowData = dgvEstados.CurrentRow.DataBoundItem
             Dim tipoEvento = NormalizarTexto(GetPropValue(Of String)(rowData, "TipoEvento", ""))
+            Dim tipoTexto = NormalizarTexto(GetPropValue(Of String)(rowData, "Tipo", ""))
 
-            If tipoEvento = "NOTIFICACION" Then
-                Dim notificacionId = GetPropValue(Of Integer)(rowData, "Id", 0)
-                Dim tipoNotificacion = NormalizarTexto(GetPropValue(Of String)(rowData, "TipoNotificacionNombre", ""))
+            Dim notificacionIdParaAbrir As Integer = 0
 
-                If notificacionId > 0 AndAlso tipoNotificacion <> "" Then
-                    If tipoNotificacion.Contains("DESIGNACION") Then
-                        Dim frm As New frmDesignacionRPT(notificacionId)
-                        NavegacionHelper.AbrirFormEnDashboard(frm)
-                    Else
-                        Dim frm As New frmNotificacionRPT(notificacionId)
-                        NavegacionHelper.AbrirFormEnDashboard(frm)
-                    End If
+            ' CASO 1: El usuario hace clic en una Notificación Pendiente de Designación
+            If tipoEvento = "NOTIFICACION" AndAlso tipoTexto.Contains("DESIGNACION") Then
+                notificacionIdParaAbrir = GetPropValue(Of Integer)(rowData, "Id", 0)
+
+                ' CASO 2: El usuario hace clic en un Estado de Designación (el escenario principal)
+            ElseIf tipoEvento = "ESTADO" AndAlso tipoTexto.Contains("DESIGNACION") Then
+                Dim fechaDesde = GetPropValue(Of Date?)(rowData, "Desde", Nothing)
+
+                If fechaDesde.HasValue Then
+                    ' Buscamos la notificación que coincida con la fecha de inicio del estado
+                    notificacionIdParaAbrir = Await BuscarNotificacionDesignacionPorFecha(_funcionarioId, fechaDesde.Value)
                 End If
+            End If
 
-                ' (Opcional) permitir abrir también cuando es un ESTADO de Designación
-            ElseIf tipoEvento = "ESTADO" Then
-                Dim tipo = NormalizarTexto(GetPropValue(Of String)(rowData, "Tipo", ""))
-                If tipo.Contains("DESIGNACION") Then
-                    Dim notiId = BuscarNotificacionDesignacionMasReciente(_funcionarioId).Result
-                    If notiId > 0 Then
-                        Dim frm As New frmDesignacionRPT(notiId)
-                        NavegacionHelper.AbrirFormEnDashboard(frm)
-                    Else
-                        MessageBox.Show("No se encontró la notificación de Designación asociada.", "Aviso",
-                                        MessageBoxButtons.OK, MessageBoxIcon.Information)
-                    End If
-                End If
-
+            ' --- Abrir el formulario si encontramos un ID ---
+            If notificacionIdParaAbrir > 0 Then
+                Dim frm As New frmDesignacionRPT(notificacionIdParaAbrir)
+                NavegacionHelper.AbrirFormEnDashboard(frm)
+            ElseIf tipoEvento = "ESTADO" AndAlso tipoTexto.Contains("DESIGNACION") Then
+                ' Mostramos el mensaje de error solo si la búsqueda falló para un estado
+                MessageBox.Show("No se encontró una notificación de Designación asociada a la fecha de inicio de este estado.", "Aviso",
+                                MessageBoxButtons.OK, MessageBoxIcon.Information)
             End If
 
         Catch ex As Exception
@@ -311,6 +308,7 @@ Public Class frmFuncionarioSituacion
                         MessageBoxButtons.OK, MessageBoxIcon.Warning)
         End Try
     End Sub
+
     Private Function NormalizarTexto(s As String) As String
         If String.IsNullOrWhiteSpace(s) Then Return String.Empty
         Dim formD = s.Normalize(NormalizationForm.FormD)
@@ -321,14 +319,17 @@ Public Class frmFuncionarioSituacion
         Next
         Return sb.ToString().Normalize(NormalizationForm.FormC).ToUpperInvariant()
     End Function
-    Private Async Function BuscarNotificacionDesignacionMasReciente(funcionarioId As Integer) As Task(Of Integer)
+    ' --- REEMPLAZA LA FUNCIÓN ANTERIOR CON ESTA ---
+    ' --- REEMPLAZA TU FUNCIÓN DE BÚSQUEDA CON ESTA VERSIÓN MEJORADA ---
+    Private Async Function BuscarNotificacionDesignacionPorFecha(funcionarioId As Integer, fecha As Date) As Task(Of Integer)
         Return Await _uow.Context.Set(Of NotificacionPersonal)() _
-        .Include(Function(n) n.TipoNotificacion) _
-        .Where(Function(n) n.FuncionarioId = funcionarioId AndAlso
-                          n.TipoNotificacion.Nombre.Contains("Designación")) _
-        .OrderByDescending(Function(n) n.FechaProgramada) _
-        .Select(Function(n) n.Id) _
-        .FirstOrDefaultAsync()
+    .Include(Function(n) n.TipoNotificacion) _
+    .Where(Function(n) n.FuncionarioId = funcionarioId AndAlso
+                      n.TipoNotificacion.Nombre.ToUpper().Contains("DESIGNACI") AndAlso
+                      DbFunctions.TruncateTime(n.FechaProgramada) <= DbFunctions.TruncateTime(fecha)) _
+    .OrderByDescending(Function(n) n.FechaProgramada) _
+    .Select(Function(n) n.Id) _
+    .FirstOrDefaultAsync()
     End Function
 
 #End Region
