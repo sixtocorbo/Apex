@@ -19,6 +19,8 @@ Public Class frmNotificaciones
         ' Configuración del Timer
         tmrFiltro.Interval = 500 ' Espera medio segundo antes de buscar
         tmrFiltro.Enabled = False
+        'quiero suscribirme al notificador de eventos
+        AddHandler NotificadorEventos.DatosActualizados, AddressOf OnDatosActualizados
     End Sub
 
     Private Async Sub frmGestionNotificaciones_Shown(sender As Object, e As EventArgs) Handles Me.Shown
@@ -26,6 +28,13 @@ Public Class frmNotificaciones
         Await IniciarBusquedaAsync()
         Me.ActiveControl = txtFiltro ' Foco en el filtro principal
     End Sub
+
+    Private Async Function OnDatosActualizados() As Task
+        ' Este método se llama cuando se recibe la notificación de que los datos han sido actualizados.
+        ' Iniciamos una nueva búsqueda para refrescar los datos en la grilla.
+        Await BuscarAsync()
+    End Function
+
 
     Private Sub ConfigurarGrilla()
         With dgvNotificaciones

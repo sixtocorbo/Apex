@@ -128,7 +128,8 @@ Public Class frmNotificacionCrear
 
                 Dim creada = Await _svc.CreateNotificacionAsync(req)
                 Me.NotificacionId = creada.Id
-
+                'quiero notificar a los otros formularios que se actualizó un funcionario específicouiero notificar a los otros formularios que se creó un funcionario específico
+                NotificadorEventos.NotificarCambiosEnFuncionario(req.FuncionarioId)
             Else
                 ' Editar
                 Dim req As New NotificacionUpdateRequest With {
@@ -145,6 +146,11 @@ Public Class frmNotificacionCrear
 
                 Await _svc.UpdateNotificacionAsync(req)
                 Me.NotificacionId = _idNotificacion
+
+                'quiero notificar a los otros formularios que se actualizó un funcionario específico
+                NotificadorEventos.NotificarCambiosEnFuncionario(req.FuncionarioId)
+
+
             End If
 
             DialogResult = DialogResult.OK
