@@ -9,6 +9,7 @@ Public Class frmNotificacionCrear
     Private _notificacion As NotificacionPersonal
     Private _modo As ModoFormulario
     Private _idNotificacion As Integer
+    Private _idFuncionarioPreseleccionado As Integer? = Nothing
     Public Property NotificacionId As Integer? = Nothing
 
     Public Enum ModoFormulario
@@ -22,6 +23,20 @@ Public Class frmNotificacionCrear
         _modo = ModoFormulario.Crear
         Me.Text = "Nueva Notificación"
     End Sub
+    ' --- INICIO DEL CAMBIO ---
+    ' Nuevo constructor para crear con funcionario preseleccionado.
+    ' Se añade un segundo argumento Booleano para diferenciar la firma.
+    ''' <summary>
+    ''' Crea una nueva notificación y preselecciona un funcionario.
+    ''' </summary>
+    ''' <param name="funcionarioId">ID del funcionario a seleccionar.</param>
+    ''' <param name="esPreseleccion">Argumento para diferenciar la firma del constructor de edición.</param>
+    Public Sub New(funcionarioId As Integer, esPreseleccion As Boolean)
+        Me.New() ' Llama al constructor base
+        _modo = ModoFormulario.Crear
+        _idFuncionarioPreseleccionado = funcionarioId
+    End Sub
+    ' --- FIN DEL CAMBIO ---
 
     ' Constructor para editar
     Public Sub New(id As Integer)
@@ -30,6 +45,7 @@ Public Class frmNotificacionCrear
         _idNotificacion = id
         Me.Text = "Editar Notificación"
     End Sub
+
 
     Private Async Sub frmNotificacionCrear_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.KeyPreview = True
@@ -40,7 +56,12 @@ Public Class frmNotificacionCrear
 
         If _modo = ModoFormulario.Editar Then
             Await CargarDatosAsync()
+            ' --- CAMBIO EN LA LÓGICA DEL LOAD ---
+            ' Se comprueba la variable para preseleccionar al funcionario
+        ElseIf _idFuncionarioPreseleccionado.HasValue Then
+            cboFuncionario.SelectedValue = _idFuncionarioPreseleccionado.Value
         End If
+        ' --- FIN DEL CAMBIO ---
     End Sub
 
     Private Async Function CargarCombosAsync() As Task
@@ -113,45 +134,59 @@ Public Class frmNotificacionCrear
         btnGuardar.Enabled = False
         btnCancelar.Enabled = False
         Try
+            ' --- INICIO DE LA MODIFICACIÓN ---
+            Dim idNotificacionGuardada As Integer
+
             If _modo = ModoFormulario.Crear Then
                 ' Armar request y delegar en el Service (CreateNotificacionAsync)
                 Dim req As New NotificacionCreateRequest With {
-                    .FuncionarioId = CInt(cboFuncionario.SelectedValue),
-                    .TipoNotificacionId = CByte(cboTipoNotificacion.SelectedValue),
-                    .FechaProgramada = dtpFechaProgramada.Value,
-                    .Medio = txtMedio.Text.Trim(),
-                    .Documento = txtDocumento.Text.Trim(),
-                    .ExpMinisterial = txtExpMinisterial.Text.Trim(),
-                    .ExpINR = txtExpINR.Text.Trim(),
-                    .Oficina = txtOficina.Text.Trim()
-                }
+                .FuncionarioId = CInt(cboFuncionario.SelectedValue),
+                .TipoNotificacionId = CByte(cboTipoNotificacion.SelectedValue),
+                .FechaProgramada = dtpFechaProgramada.Value,
+                .Medio = txtMedio.Text.Trim(),
+                .Documento = txtDocumento.Text.Trim(),
+                .ExpMinisterial = txtExpMinisterial.Text.Trim(),
+                .ExpINR = txtExpINR.Text.Trim(),
+                .Oficina = txtOficina.Text.Trim()
+            }
 
                 Dim creada = Await _svc.CreateNotificacionAsync(req)
-                Me.NotificacionId = creada.Id
-                'quiero notificar a los otros formularios que se actualizó un funcionario específicouiero notificar a los otros formularios que se creó un funcionario específico
+                idNotificacionGuardada = creada.Id ' Guardamos el ID de la nueva notificación
+                Me.NotificacionId = idNotificacionGuardada
                 NotificadorEventos.NotificarCambiosEnFuncionario(req.FuncionarioId)
             Else
                 ' Editar
                 Dim req As New NotificacionUpdateRequest With {
-                    .Id = _idNotificacion,
-                    .FuncionarioId = CInt(cboFuncionario.SelectedValue),
-                    .TipoNotificacionId = CByte(cboTipoNotificacion.SelectedValue),
-                    .FechaProgramada = dtpFechaProgramada.Value,
-                    .Medio = txtMedio.Text.Trim(),
-                    .Documento = txtDocumento.Text.Trim(),
-                    .ExpMinisterial = txtExpMinisterial.Text.Trim(),
-                    .ExpINR = txtExpINR.Text.Trim(),
-                    .Oficina = txtOficina.Text.Trim()
-                }
+                .Id = _idNotificacion,
+                .FuncionarioId = CInt(cboFuncionario.SelectedValue),
+                .TipoNotificacionId = CByte(cboTipoNotificacion.SelectedValue),
+                .FechaProgramada = dtpFechaProgramada.Value,
+                .Medio = txtMedio.Text.Trim(),
+                .Documento = txtDocumento.Text.Trim(),
+                .ExpMinisterial = txtExpMinisterial.Text.Trim(),
+                .ExpINR = txtExpINR.Text.Trim(),
+                .Oficina = txtOficina.Text.Trim()
+            }
 
                 Await _svc.UpdateNotificacionAsync(req)
-                Me.NotificacionId = _idNotificacion
-
-                'quiero notificar a los otros formularios que se actualizó un funcionario específico
+                idNotificacionGuardada = _idNotificacion ' Usamos el ID de la notificación existente
+                Me.NotificacionId = idNotificacionGuardada
                 NotificadorEventos.NotificarCambiosEnFuncionario(req.FuncionarioId)
-
-
             End If
+
+            ' Preguntamos al usuario si desea imprimir el comprobante
+            Dim resultadoImprimir = MessageBox.Show(
+            "La notificación ha sido guardada correctamente." & Environment.NewLine & "¿Desea imprimir el comprobante ahora?",
+            "Imprimir Notificación",
+            MessageBoxButtons.YesNo,
+            MessageBoxIcon.Question)
+
+            ' Si el usuario responde que sí, abrimos el formulario del reporte
+            If resultadoImprimir = DialogResult.Yes Then
+                Dim frmReporte As New frmNotificacionRPT(idNotificacionGuardada)
+                NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frmReporte)
+            End If
+            ' --- FIN DE LA MODIFICACIÓN ---
 
             DialogResult = DialogResult.OK
             Close()

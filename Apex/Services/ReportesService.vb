@@ -181,3 +181,11 @@ Public Class FichaFuncionalDTO
     Public Property DatosLaborales As String
     Public Property SituacionGeneral As String
 End Class
+' Objeto para transportar los datos al reporte
+Public Class NotificacionReporteDTO
+    Public Property NombreFuncionario As String
+    Public Property CedulaFuncionario As String
+    Public Property FechaProgramada As DateTime
+    Public Property Texto As String
+    Public Property TipoNotificacion As String ' <-- El nuevo campo que necesitamos
+End Class

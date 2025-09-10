@@ -19,7 +19,7 @@ Public Class frmNotificaciones
         ' Configuración del Timer
         tmrFiltro.Interval = 500 ' Espera medio segundo antes de buscar
         tmrFiltro.Enabled = False
-        'quiero suscribirme al notificador de eventos
+        ' La suscripción al evento es correcta.
         AddHandler NotificadorEventos.DatosActualizados, AddressOf OnDatosActualizados
     End Sub
 
@@ -29,11 +29,14 @@ Public Class frmNotificaciones
         Me.ActiveControl = txtFiltro ' Foco en el filtro principal
     End Sub
 
-    Private Async Function OnDatosActualizados() As Task
-        ' Este método se llama cuando se recibe la notificación de que los datos han sido actualizados.
+    ''' <summary>
+    ''' Este método se ejecuta cuando NotificadorEventos.DatosActualizados se dispara.
+    ''' Su firma ahora coincide con la de un EventHandler estándar.
+    ''' </summary>
+    Private Async Sub OnDatosActualizados(sender As Object, e As EventArgs)
         ' Iniciamos una nueva búsqueda para refrescar los datos en la grilla.
         Await BuscarAsync()
-    End Function
+    End Sub
 
 
     Private Sub ConfigurarGrilla()
@@ -211,7 +214,7 @@ Public Class frmNotificaciones
         Dim nombreFuncionario = filaSeleccionada.Cells("NombreFuncionario").Value.ToString()
 
         If MessageBox.Show($"¿Está seguro de que desea eliminar la notificación para '{nombreFuncionario}'?",
-                           "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
+                            "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
             Try
                 Await _svc.DeleteNotificacionAsync(idSeleccionado)
                 Await IniciarBusquedaAsync()
