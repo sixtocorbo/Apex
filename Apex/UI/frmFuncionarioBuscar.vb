@@ -44,8 +44,8 @@ Public Class frmFuncionarioBuscar
     Private Sub frmFuncionarioBuscar_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         ' Este botón indica estado prioritario: que no cambie de color al pasar el mouse
         btnVerSituacion.Tag = "KeepBackColor"
-
-        'AppTheme.Aplicar(Me)
+        panelDetalle.Visible = False
+        AppTheme.Aplicar(Me)
         ConfigurarGrilla()
         AddHandler btnVerSituacion.Click, AddressOf btnVerSituacion_Click
         AddHandler btnGenerarFicha.Click, AddressOf btnGenerarFicha_Click
@@ -172,13 +172,13 @@ Public Class frmFuncionarioBuscar
                 Dim filtro As String = txtBusqueda.Text.Trim()
 
                 Dim terminos = filtro.Split(" "c) _
-                                     .Where(Function(w) Not String.IsNullOrWhiteSpace(w)) _
-                                     .Select(Function(w) $"""{w}*""")
+                                    .Where(Function(w) Not String.IsNullOrWhiteSpace(w)) _
+                                    .Select(Function(w) $"""{w}*""")
                 Dim expresionFts = String.Join(" AND ", terminos)
 
                 Dim sb As New StringBuilder()
                 sb.AppendLine("SELECT TOP (@limite)")
-                sb.AppendLine("      Id, CI, Nombre")
+                sb.AppendLine("     Id, CI, Nombre")
                 sb.AppendLine("FROM   dbo.Funcionario WITH (NOLOCK)")
                 sb.AppendLine("WHERE  CONTAINS((CI, Nombre), @patron)")
                 sb.AppendLine("ORDER BY Nombre;")
@@ -188,8 +188,8 @@ Public Class frmFuncionarioBuscar
                 Dim pPatron = New SqlParameter("@patron", expresionFts)
 
                 Dim lista = Await ctx.Database _
-                                     .SqlQuery(Of FuncionarioMin)(sql, pLimite, pPatron) _
-                                     .ToListAsync()
+                                 .SqlQuery(Of FuncionarioMin)(sql, pLimite, pPatron) _
+                                 .ToListAsync()
 
                 dgvResultados.DataSource = Nothing
                 dgvResultados.DataSource = lista
@@ -198,29 +198,29 @@ Public Class frmFuncionarioBuscar
                     dgvResultados.ClearSelection()
                     dgvResultados.Rows(0).Selected = True
                     dgvResultados.CurrentCell = dgvResultados.Rows(0).Cells("CI")
-                    btnGenerarFicha.Visible = True
                 Else
                     LimpiarDetalle()
                 End If
 
                 If lista.Count = LIMITE_FILAS Then
                     MessageBox.Show($"Mostrando los primeros {LIMITE_FILAS} resultados." &
-                                    "Refiná la búsqueda para ver más.",
-                                    "Aviso",
-                                    MessageBoxButtons.OK, MessageBoxIcon.Information)
+                                "Refiná la búsqueda para ver más.",
+                                "Aviso",
+                                MessageBoxButtons.OK, MessageBoxIcon.Information)
                 End If
             End Using
 
         Catch ex As SqlException When ex.Number = -2
             MessageBox.Show("La consulta excedió el tiempo de espera. Refiná los filtros o intentá nuevamente.",
-                    "Timeout", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                "Timeout", MessageBoxButtons.OK, MessageBoxIcon.Warning)
 
         Catch ex As Exception
             MessageBox.Show("Ocurrió un error inesperado: " & ex.Message,
-                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
 
         Finally
             LoadingHelper.OcultarCargando(Me)
+
         End Try
     End Function
 
@@ -261,40 +261,44 @@ Public Class frmFuncionarioBuscar
 
 
 #Region "Detalle lateral (Foto on-demand)"
-
-    ''' <summary>
-    ''' Carga y muestra los detalles del funcionario seleccionado en la grilla.
-    ''' </summary>
     Private Async Sub MostrarDetalle(sender As Object, e As EventArgs)
         If dgvResultados.CurrentRow Is Nothing OrElse dgvResultados.CurrentRow.DataBoundItem Is Nothing Then
             LimpiarDetalle()
             Return
         End If
+
+        panelDetalle.Visible = True
         Dim id = CInt(dgvResultados.CurrentRow.Cells("Id").Value)
 
         Using uow As New UnitOfWork()
             Dim f = Await uow.Repository(Of Funcionario)() _
-         .GetAll() _
-         .Include(Function(x) x.Cargo) _
-         .Include(Function(x) x.TipoFuncionario) _
-         .Include(Function(x) x.Semana) _
-         .Include(Function(x) x.Turno) _
-         .Include(Function(x) x.Horario) _
-         .AsNoTracking() _
-         .FirstOrDefaultAsync(Function(x) x.Id = id)
+            .GetAll() _
+            .Include(Function(x) x.Cargo) _
+            .Include(Function(x) x.TipoFuncionario) _
+            .Include(Function(x) x.Semana) _
+            .Include(Function(x) x.Turno) _
+            .Include(Function(x) x.Horario) _
+            .AsNoTracking() _
+            .FirstOrDefaultAsync(Function(x) x.Id = id)
 
             If dgvResultados.CurrentRow Is Nothing OrElse CInt(dgvResultados.CurrentRow.Cells("Id").Value) <> id Then Return
             If f Is Nothing Then Return
 
-            lblCI.Text = f.CI
-            lblNombreCompleto.Text = f.Nombre
-            lblCargo.Text = If(f.Cargo Is Nothing, "-", f.Cargo.Nombre)
-            lblTipo.Text = f.TipoFuncionario.Nombre
-            lblFechaIngreso.Text = f.FechaIngreso.ToShortDateString()
-            lblHorarioCompleto.Text = $"{If(f.Semana IsNot Nothing, f.Semana.Nombre, "-")} / {If(f.Turno IsNot Nothing, f.Turno.Nombre, "-")} / {If(f.Horario IsNot Nothing, f.Horario.Nombre, "-")}"
+            ' Muestra los botones de acción
+            btnSancionar.Visible = True
+            btnNovedades.Visible = True
+            btnNotificar.Visible = True
+            btnGenerarFicha.Visible = True
 
-            pbCopyCI.Visible = True
-            pbCopyNombre.Visible = True
+            ' Concatenamos el texto fijo con el valor
+            lblCI.Text = "CI: " & f.CI
+            lblNombreCompleto.Text = f.Nombre ' El nombre principal no lleva etiqueta
+            lblCargo.Text = "Cargo: " & If(f.Cargo Is Nothing, "-", f.Cargo.Nombre)
+            lblTipo.Text = "Tipo: " & f.TipoFuncionario.Nombre
+            lblFechaIngreso.Text = "Fecha Ingreso: " & f.FechaIngreso.ToShortDateString()
+            lblHorarioCompleto.Text = $"Horario: {If(f.Semana IsNot Nothing, f.Semana.Nombre, "-")} / {If(f.Turno IsNot Nothing, f.Turno.Nombre, "-")} / {If(f.Horario IsNot Nothing, f.Horario.Nombre, "-")}"
+
+            ' El estado ya estaba correcto, lo mantenemos igual
             If f.Activo Then
                 lblEstadoActividad.Text = "Estado: Activo"
                 lblEstadoActividad.ForeColor = Color.DarkGreen
@@ -303,9 +307,13 @@ Public Class frmFuncionarioBuscar
                 lblEstadoActividad.ForeColor = Color.Maroon
             End If
 
+            ' Hacemos visibles los botones de copiar
+            pbCopyCI.Visible = True
+            pbCopyNombre.Visible = True
+
             Dim situaciones = Await uow.Context.Database.SqlQuery(Of SituacionParaBoton)(
-        "SELECT Prioridad, Tipo, ColorIndicador FROM dbo.vw_FuncionarioSituacionActual WHERE FuncionarioId = @p0 ORDER BY Prioridad",
-        id
+            "SELECT Prioridad, Tipo, ColorIndicador FROM dbo.vw_FuncionarioSituacionActual WHERE FuncionarioId = @p0 ORDER BY Prioridad",
+            id
         ).ToListAsync()
 
             If situaciones IsNot Nothing AndAlso situaciones.Any() Then
@@ -351,7 +359,13 @@ Public Class frmFuncionarioBuscar
                 End Using
             End If
         End Using
+
+        ' ▼▼▼ LÍNEA FINAL PARA CORREGIR EL FOCO ▼▼▼
+        ' Después de que toda la actualización visual ha terminado,
+        ' forzamos el foco de vuelta al TextBox de búsqueda.
+        txtBusqueda.Focus()
     End Sub
+
 
     ' Este código funciona bien si quieres abrir múltiples ventanas de situación.
     Private Sub btnVerSituacion_Click(sender As Object, e As EventArgs)
@@ -425,21 +439,27 @@ Public Class frmFuncionarioBuscar
     End Function
 
     Private Sub LimpiarDetalle()
-        lblCI.Text = ""
-        lblNombreCompleto.Text = ""
-        lblCargo.Text = ""
-        lblTipo.Text = ""
-        lblFechaIngreso.Text = ""
-        lblEstadoActividad.Text = ""
+        lblCI.Text = "CI: -"
+        lblNombreCompleto.Text = "Seleccione un funcionario"
+        lblCargo.Text = "Cargo: -"
+        lblTipo.Text = "Tipo: -"
+        lblFechaIngreso.Text = "Fecha Ingreso: -"
+        lblEstadoActividad.Text = "Estado: -"
         lblPresencia.Text = ""
         pbFotoDetalle.Image = Nothing
-        lblHorarioCompleto.Text = ""
+        lblHorarioCompleto.Text = "Horario: -"
         _detallesEstadoActual.Clear()
+
+        ' ▼▼▼ AQUÍ OCULTAS TODO ▼▼▼
         btnGenerarFicha.Visible = False
         btnVerSituacion.Visible = False
+        btnSancionar.Visible = False
+        btnNovedades.Visible = False
+        btnNotificar.Visible = False
+
         pbCopyCI.Visible = False
         pbCopyNombre.Visible = False
-
+        panelDetalle.Visible = False
     End Sub
 
     Private Sub lblEstadoTransitorio_DoubleClick(sender As Object, e As EventArgs)
@@ -492,7 +512,7 @@ Public Class frmFuncionarioBuscar
         pb.BackColor = colorOriginal
         pb.Enabled = True
     End Function
-    Private Async Sub pbCopyCI_Click(sender As Object, e As EventArgs) Handles pbCopyCI.Click
+    Private Async Sub pbCopyCI_Click(sender As Object, e As EventArgs)
         ' Copia el texto de la cédula al portapapeles, si no está vacío.
         If Not String.IsNullOrWhiteSpace(lblCI.Text) Then
             My.Computer.Clipboard.SetText(lblCI.Text)
@@ -500,7 +520,7 @@ Public Class frmFuncionarioBuscar
         End If
     End Sub
 
-    Private Async Sub pbCopyNombre_Click(sender As Object, e As EventArgs) Handles pbCopyNombre.Click
+    Private Async Sub pbCopyNombre_Click(sender As Object, e As EventArgs)
         ' Copia el texto del nombre al portapapeles, si no está vacío.
         If Not String.IsNullOrWhiteSpace(lblNombreCompleto.Text) Then
             My.Computer.Clipboard.SetText(lblNombreCompleto.Text)
