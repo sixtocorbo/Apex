@@ -45,7 +45,7 @@ Public Class frmFuncionarioBuscar
         ' Este botón indica estado prioritario: que no cambie de color al pasar el mouse
         btnVerSituacion.Tag = "KeepBackColor"
 
-        AppTheme.Aplicar(Me)
+        'AppTheme.Aplicar(Me)
         ConfigurarGrilla()
         AddHandler btnVerSituacion.Click, AddressOf btnVerSituacion_Click
         AddHandler btnGenerarFicha.Click, AddressOf btnGenerarFicha_Click
