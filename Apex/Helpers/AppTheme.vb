@@ -1,5 +1,6 @@
 ﻿' Apex/Services/AppTheme.vb
 Imports System.Drawing
+Imports System.Runtime.InteropServices
 Imports System.Windows.Forms
 
 Public Module AppTheme
@@ -233,4 +234,48 @@ Public Module AppTheme
         Return Color.FromArgb(c.A, r, g, b)
     End Function
 
+    ' ======= Cue/Placeholder helpers =======
+    Private NotInheritable Class Native
+        Private Sub New()
+        End Sub
+
+        Friend Const EM_SETCUEBANNER As Integer = &H1501
+        Friend Const CB_SETCUEBANNER As Integer = &H1703
+
+        <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
+        Friend Shared Function SendMessage(hWnd As IntPtr,
+                                           msg As Integer,
+                                           wParam As IntPtr,
+                                           lParam As String) As IntPtr
+        End Function
+    End Class
+
+    ''' <summary>
+    ''' Asigna un placeholder (cue banner) a TextBox/TextBoxBase o ComboBox.
+    ''' </summary>
+    ''' <param name="ctrl">Control destino (TextBox, RichTextBox, ComboBox).</param>
+    ''' <param name="text">Texto del placeholder.</param>
+    ''' <param name="showWhenFocused">En TextBox: mostrar incluso con foco (por defecto False).</param>
+    Public Sub SetCue(ctrl As Control, text As String, Optional showWhenFocused As Boolean = False)
+        If ctrl Is Nothing Then Throw New ArgumentNullException(NameOf(ctrl))
+
+        If TypeOf ctrl Is TextBoxBase Then
+            Dim tb = DirectCast(ctrl, TextBoxBase)
+            ' wParam: 1 = mostrar aún con foco; 0 = ocultar con foco
+            Dim w = If(showWhenFocused, New IntPtr(1), IntPtr.Zero)
+            Native.SendMessage(tb.Handle, Native.EM_SETCUEBANNER, w, text)
+
+        ElseIf TypeOf ctrl Is ComboBox Then
+            Dim cb = DirectCast(ctrl, ComboBox)
+            ' Para ComboBox, wParam debe ser 0
+            Native.SendMessage(cb.Handle, Native.CB_SETCUEBANNER, IntPtr.Zero, text)
+        Else
+            ' Otros controles: sin-op
+            ' (Si quieres, aquí podrías implementar un watermark con Label superpuesta)
+        End If
+    End Sub
+
+
 End Module
+
+

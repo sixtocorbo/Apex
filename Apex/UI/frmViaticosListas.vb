@@ -9,6 +9,12 @@ Public Class frmViaticosListas
 
     Private Sub frmGestionViaticos_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
+        Try
+            AppTheme.SetCue(txtFiltroDinamico, "Filtrar por Nombre, Cédula, Motivo o Sección...")
+
+        Catch
+            ' Ignorar si no existe SetCue
+        End Try
         ConfigurarGrilla()
         ' Por defecto, mostramos el mes anterior al actual
         dtpPeriodo.Value = Date.Today.AddMonths(-1)

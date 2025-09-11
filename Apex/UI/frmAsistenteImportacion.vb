@@ -35,6 +35,25 @@ Public Class frmAsistenteImportacion
     Private Sub frmAsistenteImportacion_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
         Temporizador.Interval = 100
+        Try
+            AppTheme.SetCue(rbLicencias, "Importar licencias desde SGH...")
+            AppTheme.SetCue(rbPresentismo, "Importar históricos de presentismo...")
+            AppTheme.SetCue(rbNocturnidad, "Importar históricos de nocturnidad...")
+            AppTheme.SetCue(rbDotaciones, "Importar dotaciones...")
+            AppTheme.SetCue(lblDropZone, "Haga clic o arrastre un archivo de Excel aquí...")
+            AppTheme.SetCue(btnDescargarErrores, "Descargar reporte de errores...")
+            AppTheme.SetCue(btnPaso1_Siguiente, "Continuar al siguiente paso...")
+            AppTheme.SetCue(btnPaso2_Procesar, "Procesar el archivo seleccionado...")
+            AppTheme.SetCue(btnPaso3_Importar, "Importar los datos validados a la base de datos...")
+            AppTheme.SetCue(btnPaso3_Volver, "Volver al paso anterior...")
+            AppTheme.SetCue(btnPaso4_OtraVez, "Iniciar una nueva importación...")
+            AppTheme.SetCue(btnPaso4_Finalizar, "Finalizar y cerrar el asistente...")
+            AppTheme.SetCue(lstNuevosFuncionarios, "Lista de nuevos funcionarios creados durante la importación.")
+            AppTheme.SetCue(lstNuevosTiposLicencia, "Lista de nuevos tipos de licencia creados durante la importación.")
+
+        Catch
+            ' Ignorar si no existe SetCue
+        End Try
         NavegarPaso(1) ' Inicia directamente en el paso 1 unificado
     End Sub
 

@@ -98,6 +98,7 @@ Public Class frmFuncionarioCrear
             btnGuardar.Text = "Guardar"
             pbFoto.Image = My.Resources.Police
         End If
+        AplicarLayoutModernoFuncionarioCrear()
     End Sub
     Private Sub CargarDatosEnControles()
         If _funcionario Is Nothing Then Return
@@ -884,5 +885,318 @@ Public Class frmFuncionarioCrear
         ' 3) Borrar el principal
         ctx.Entry(estado).State = EntityState.Deleted
     End Sub
+    '================================================================
+    ' ================== MODERNO + RESPONSIVO PARA frmFuncionarioCrear ==================
+    ' Ejemplo de uso:
+    ' Public Sub New()
+    '     InitializeComponent()
+    '     AplicarLayoutModernoFuncionarioCrear()
+    ' End Sub
+    '
+    ' Private Sub frmFuncionarioCrear_Load(...) Handles MyBase.Load
+    '     AplicarLayoutModernoFuncionarioCrear()
+    ' End Sub
+
+    Private Sub AplicarLayoutModernoFuncionarioCrear()
+        ' Base
+        Me.AutoScaleMode = AutoScaleMode.Dpi
+        Me.MinimumSize = New Size(1100, 650)
+        Me.KeyPreview = True
+
+        ' ---------- Barra superior de acciones ----------
+        If flowlayoutPanelBotones IsNot Nothing Then
+            With flowlayoutPanelBotones
+                .Dock = DockStyle.Top
+                .AutoSize = True
+                .AutoSizeMode = AutoSizeMode.GrowAndShrink
+                .FlowDirection = FlowDirection.RightToLeft
+                .Padding = New Padding(12, 8, 12, 8)
+                .WrapContents = True
+            End With
+            PrepararBotonPrimario(btnGuardar)
+            PrepararBotonSecundario(btnCancelar)
+            PrepararBotonSecundario(btnAuditoria)
+        End If
+
+        ' ---------- TabControl ----------
+        With TabControlMain
+            .Dock = DockStyle.Fill
+            .Padding = New Point(12, 6)
+            .SizeMode = TabSizeMode.Fixed
+            .ItemSize = New Size(130, 28)
+            .Appearance = TabAppearance.Normal
+        End With
+
+        ' ---------- Tab: General ----------
+        ' TLP lateral foto + datos
+        ConfigurarTlpGeneral()
+
+        ' ---------- Tab: Datos Personales ----------
+        ConfigurarTlpDatosPersonales()
+
+        ' ---------- Tab: Dotación ----------
+        If dgvDotacion IsNot Nothing Then
+            AplicarEstiloGrilla(dgvDotacion)
+        End If
+        If FlowLayoutPanelDotacion IsNot Nothing Then
+            PrepararBarraInferior(FlowLayoutPanelDotacion, {btnQuitarDotacion, btnEditarDotacion, btnAñadirDotacion})
+        End If
+
+        ' ---------- Tab: Estados Transitorios ----------
+        If dgvEstadosTransitorios IsNot Nothing Then
+            AplicarEstiloGrilla(dgvEstadosTransitorios)
+        End If
+        If FlowLayoutPanelEstados IsNot Nothing Then
+            PrepararBarraInferior(FlowLayoutPanelEstados, {btnQuitarEstado, btnEditarEstado, btnAñadirEstado})
+        End If
+
+        ' ---------- Placeholders / UX ----------
+        EstablecerPlaceholder(txtCI, "NRO. DOCUMENTO...")
+        EstablecerPlaceholder(txtNombre, "NOMBRE COMPLETO...")
+        EstablecerPlaceholder(txtDomicilio, "CALLE Y NÚMERO...")
+        EstablecerPlaceholder(txtEmail, "EMAIL...")
+        EstablecerPlaceholder(txtCiudad, "CIUDAD / LOCALIDAD...")
+        EstablecerPlaceholder(txtSeccional, "SECCIONAL...")
+        EstablecerPlaceholder(txtCredencial, "CREDENCIAL...")
+
+        ' Fechas amigables
+        If dtpFechaIngreso IsNot Nothing Then
+            dtpFechaIngreso.MaxDate = Date.Today
+        End If
+        If dtpFechaNacimiento IsNot Nothing Then
+            dtpFechaNacimiento.MaxDate = Date.Today
+            dtpFechaNacimiento.MinDate = New Date(1900, 1, 1)
+        End If
+    End Sub
+
+    ' ================== Helpers de layout ==================
+    Private Sub ConfigurarTlpGeneral()
+        ' Foto + datos
+        If TableLayoutPanelGeneral Is Nothing Then Return
+
+        With TableLayoutPanelGeneral
+            .Dock = DockStyle.Fill
+            .ColumnCount = 2
+            .ColumnStyles.Clear()
+            .ColumnStyles.Add(New ColumnStyle(SizeType.Absolute, 280)) ' panel foto fijo
+            .ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100.0!)) ' datos
+            .RowStyles.Clear()
+            .RowCount = 3
+            .RowStyles.Add(New RowStyle(SizeType.Percent, 100.0!))
+            .RowStyles.Add(New RowStyle(SizeType.AutoSize))
+            .RowStyles.Add(New RowStyle(SizeType.Absolute, 24.0!))
+            .Padding = New Padding(8)
+        End With
+
+        If pbFoto IsNot Nothing Then
+            pbFoto.Dock = DockStyle.Fill
+            pbFoto.BorderStyle = BorderStyle.FixedSingle
+            pbFoto.SizeMode = PictureBoxSizeMode.Zoom
+            pbFoto.MinimumSize = New Size(240, 260)
+        End If
+
+        If btnSeleccionarFoto IsNot Nothing Then
+            PrepararBotonSecundario(btnSeleccionarFoto)
+            btnSeleccionarFoto.Anchor = AnchorStyles.Top
+            btnSeleccionarFoto.Margin = New Padding(24, 8, 24, 8)
+            btnSeleccionarFoto.AutoSize = True
+        End If
+
+        ' Datos generales (4 columnas: etiqueta/campo + etiqueta/campo)
+        If TableLayoutPanelDatosGenerales IsNot Nothing Then
+            With TableLayoutPanelDatosGenerales
+                .Dock = DockStyle.Fill
+                .Padding = New Padding(8)
+                .ColumnStyles.Clear()
+                .ColumnCount = 4
+                .ColumnStyles.Add(New ColumnStyle(SizeType.Absolute, 120))           ' Etq izquierda
+                .ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 50.0!))          ' Campo izq
+                .ColumnStyles.Add(New ColumnStyle(SizeType.Absolute, 120))           ' Etq derecha
+                .ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 50.0!))          ' Campo der
+                .RowStyles.Clear()
+                .RowCount = 8
+                For i = 0 To 6 : .RowStyles.Add(New RowStyle(SizeType.Absolute, 48)) : Next
+                .RowStyles.Add(New RowStyle(SizeType.Percent, 100.0!)) ' fila acciones/activo
+            End With
+
+            ' Campos: bordes finos y dock fill
+            PrepararEntradaTexto(txtCI)
+            PrepararEntradaTexto(txtNombre)
+            PrepararEntradaTexto(txtCiudad)
+            PrepararEntradaTexto(txtSeccional)
+            PrepararEntradaTexto(txtCredencial)
+
+            PrepararCombo(cboTipoFuncionario)
+            PrepararCombo(cboCargo)
+            PrepararCombo(cboEscalafon)
+            PrepararCombo(cboFuncion)
+            PrepararCombo(cboSeccion)
+            PrepararCombo(cboPuestoTrabajo)
+            PrepararCombo(cboTurno)
+            PrepararCombo(cboSemana)
+            PrepararCombo(cboHorario)
+
+            If chkActivo IsNot Nothing Then
+                chkActivo.Margin = New Padding(0, 8, 8, 8)
+                chkActivo.AutoSize = True
+            End If
+        End If
+    End Sub
+
+    Private Sub ConfigurarTlpDatosPersonales()
+        If TableLayoutPanelDatosPersonales Is Nothing Then Return
+
+        With TableLayoutPanelDatosPersonales
+            .Dock = DockStyle.Fill
+            .Padding = New Padding(12)
+            .ColumnStyles.Clear()
+            .ColumnCount = 4
+            .ColumnStyles.Add(New ColumnStyle(SizeType.Absolute, 180))           ' Etq izq
+            .ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 50.0!))          ' Campo izq
+            .ColumnStyles.Add(New ColumnStyle(SizeType.Absolute, 180))           ' Etq der
+            .ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 50.0!))          ' Campo der
+            .RowStyles.Clear()
+            ' 7 filas fijas + una elástica
+            For i = 0 To 6 : .RowStyles.Add(New RowStyle(SizeType.Absolute, 44)) : Next
+            .RowStyles.Add(New RowStyle(SizeType.Percent, 100.0!))
+        End With
+
+        PrepararEntradaTexto(txtDomicilio)
+        PrepararEntradaTexto(txtTelefono, anchoCompleto:=False)
+        PrepararEntradaTexto(txtEmail)
+        PrepararEntradaTexto(txtCiudad)
+        PrepararEntradaTexto(txtSeccional)
+        PrepararEntradaTexto(txtCredencial)
+
+        PrepararCombo(cboEstadoCivil)
+        PrepararCombo(cboGenero)
+        PrepararCombo(cboNivelEstudio)
+
+        If dtpFechaNacimiento IsNot Nothing Then
+            dtpFechaNacimiento.Anchor = AnchorStyles.Left
+        End If
+        If chkEstudia IsNot Nothing Then
+            chkEstudia.AutoSize = True
+            chkEstudia.Margin = New Padding(8, 6, 8, 6)
+        End If
+    End Sub
+
+    ' ================== Estética común ==================
+    Private Sub PrepararBotonPrimario(b As Button)
+        If b Is Nothing Then Return
+        b.AutoSize = True
+        b.AutoSizeMode = AutoSizeMode.GrowAndShrink
+        b.FlatStyle = FlatStyle.Flat
+        b.FlatAppearance.BorderColor = Color.Silver
+        b.FlatAppearance.MouseOverBackColor = Color.Gainsboro
+        b.Font = New Font("Segoe UI", 9.5!, FontStyle.Bold)
+        b.Padding = New Padding(16, 8, 16, 8)
+        b.Margin = New Padding(8)
+    End Sub
+
+    Private Sub PrepararBotonSecundario(b As Button)
+        If b Is Nothing Then Return
+        b.AutoSize = True
+        b.AutoSizeMode = AutoSizeMode.GrowAndShrink
+        b.FlatStyle = FlatStyle.Flat
+        b.FlatAppearance.BorderColor = Color.Silver
+        b.FlatAppearance.MouseOverBackColor = Color.Gainsboro
+        b.Font = New Font("Segoe UI", 9.0!, FontStyle.Regular)
+        b.Padding = New Padding(14, 8, 14, 8)
+        b.Margin = New Padding(8)
+    End Sub
+
+    Private Sub PrepararBarraInferior(flp As FlowLayoutPanel, botones() As Button)
+        With flp
+            .AutoSize = True
+            .AutoSizeMode = AutoSizeMode.GrowAndShrink
+            .Dock = DockStyle.Fill
+            .FlowDirection = FlowDirection.RightToLeft
+            .Padding = New Padding(0, 6, 0, 6)
+            .WrapContents = True
+        End With
+        For Each b In botones
+            PrepararBotonSecundario(b)
+        Next
+    End Sub
+
+    Private Sub PrepararEntradaTexto(tb As TextBox, Optional anchoCompleto As Boolean = True)
+        If tb Is Nothing Then Return
+        tb.BorderStyle = BorderStyle.FixedSingle
+        tb.Margin = New Padding(0, 4, 0, 4)
+        If anchoCompleto Then tb.Dock = DockStyle.Fill Else tb.Anchor = AnchorStyles.Left Or AnchorStyles.Right
+    End Sub
+
+    Private Sub PrepararCombo(cbo As ComboBox)
+        If cbo Is Nothing Then Return
+        cbo.DropDownStyle = ComboBoxStyle.DropDownList
+        cbo.Margin = New Padding(0, 4, 0, 4)
+        cbo.Anchor = AnchorStyles.Left Or AnchorStyles.Right
+    End Sub
+
+    Private Sub AplicarEstiloGrilla(dgv As DataGridView)
+        dgv.Dock = DockStyle.Fill
+        dgv.ReadOnly = True
+        dgv.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+        dgv.SelectionMode = DataGridViewSelectionMode.FullRowSelect
+        dgv.RowHeadersVisible = False
+        dgv.AllowUserToResizeRows = False
+        dgv.AllowUserToAddRows = False
+        dgv.AllowUserToDeleteRows = False
+
+        dgv.EnableHeadersVisualStyles = False
+        dgv.ColumnHeadersDefaultCellStyle.BackColor = Color.WhiteSmoke
+        dgv.ColumnHeadersDefaultCellStyle.ForeColor = Color.Black
+        dgv.ColumnHeadersDefaultCellStyle.Font = New Font("Segoe UI", 9.5!, FontStyle.Bold)
+        dgv.ColumnHeadersHeight = 36
+        dgv.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None
+
+        dgv.DefaultCellStyle.Font = New Font("Segoe UI", 9.0!)
+        dgv.DefaultCellStyle.SelectionBackColor = Color.Gainsboro
+        dgv.DefaultCellStyle.SelectionForeColor = Color.Black
+        dgv.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(248, 248, 248)
+        dgv.RowTemplate.Height = 28
+
+        ' Doble buffer para scroll suave
+        Try
+            Dim pi = GetType(DataGridView).GetProperty("DoubleBuffered",
+            Reflection.BindingFlags.Instance Or Reflection.BindingFlags.NonPublic)
+            If pi IsNot Nothing Then pi.SetValue(dgv, True, Nothing)
+        Catch
+        End Try
+    End Sub
+
+    ' ================== UX extra ==================
+    ' Placeholder (CueBanner) nativo para TextBox
+    Private Class NativeMethods
+        <Runtime.InteropServices.DllImport("user32.dll", CharSet:=Runtime.InteropServices.CharSet.Unicode)>
+        Public Shared Function SendMessage(hWnd As IntPtr, msg As Integer, wParam As IntPtr, lParam As String) As IntPtr
+        End Function
+    End Class
+
+    Private Sub EstablecerPlaceholder(tb As TextBox, texto As String)
+        If tb Is Nothing Then Return
+        Const EM_SETCUEBANNER As Integer = &H1501
+        Try
+            NativeMethods.SendMessage(tb.Handle, EM_SETCUEBANNER, IntPtr.Zero, texto)
+        Catch
+        End Try
+    End Sub
+
+    ' Atajos: Ctrl+S guardar, Esc cancelar, Ctrl+Tab cambia de pestaña
+    Protected Overrides Function ProcessCmdKey(ByRef msg As Message, keyData As Keys) As Boolean
+        Select Case keyData
+            Case (Keys.Control Or Keys.S) : If btnGuardar IsNot Nothing AndAlso btnGuardar.Enabled Then btnGuardar.PerformClick() : Return True
+            Case Keys.Escape : If btnCancelar IsNot Nothing AndAlso btnCancelar.Enabled Then btnCancelar.PerformClick() : Return True
+            Case (Keys.Control Or Keys.Tab)
+                If TabControlMain IsNot Nothing AndAlso TabControlMain.TabPages.Count > 1 Then
+                    Dim idx = (TabControlMain.SelectedIndex + 1) Mod TabControlMain.TabPages.Count
+                    TabControlMain.SelectedIndex = idx
+                    Return True
+                End If
+        End Select
+        Return MyBase.ProcessCmdKey(msg, keyData)
+    End Function
+    ' ================== /FIN BLOQUE ==================
 
 End Class

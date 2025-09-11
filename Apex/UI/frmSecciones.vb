@@ -11,6 +11,13 @@ Public Class frmSecciones
     Private Async Sub frmGestionSecciones_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
         ConfigurarGrilla()
+        Try
+            AppTheme.SetCue(txtBuscar, "Buscar por nombre de sección...")
+            AppTheme.SetCue(txtNombre, "Ingrese el nombre de la sección...")
+
+        Catch
+            ' Ignorar si no existe SetCue
+        End Try
         Await CargarDatosAsync()
         LimpiarCampos()
     End Sub

@@ -440,10 +440,11 @@ Public Class LicenciaService
             query = query.Where(Function(s) s.TipoLicenciaId = tipoLicenciaId.Value)
         Else
             ' Si no hay un tipo específico, trae TODAS las licencias que sean de categoría Sanción
-            Dim idsCategoriasSancion As New List(Of Integer) From {
-                ModConstantesApex.CATEGORIA_ID_SANCION_LEVE,
-                ModConstantesApex.CATEGORIA_ID_SANCION_GRAVE
+            Dim idsCategoriasSancion As Integer() = {
+                ModConstantesApex.CategoriaAusenciaId.SancionLeve,
+                ModConstantesApex.CategoriaAusenciaId.SancionGrave
             }
+
 
             ' Necesitamos unir con TipoLicencia para acceder a CategoriaAusenciaId
             Dim licenciasQuery = _unitOfWork.Repository(Of TipoLicencia)().GetAll()

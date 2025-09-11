@@ -82,7 +82,8 @@ Public Class frmNotificacionRPT
                     If notificacion IsNot Nothing Then
                         ' Asumimos que el ID de estado para "Notificado" o "Firmado" es 2.
                         ' ¡Verifica en tu tabla NotificacionEstado que este sea el ID correcto!
-                        notificacion.EstadoId = CType(ModConstantesApex.EstadoNotificacionId.Firmada, Byte)
+                        notificacion.EstadoId = CByte(ModConstantesApex.EstadoNotificacionPersonal.Firmada)
+
                         notificacion.FechaProgramada = Date.Now ' Guardamos la fecha actual
 
                         Await uow.CommitAsync()

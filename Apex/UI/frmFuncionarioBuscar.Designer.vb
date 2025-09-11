@@ -29,25 +29,25 @@ Partial Class frmFuncionarioBuscar
         Me.tlpBusqueda = New System.Windows.Forms.TableLayoutPanel()
         Me.lblBuscar = New System.Windows.Forms.Label()
         Me.txtBusqueda = New System.Windows.Forms.TextBox()
+        Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
+        Me.btnGenerarFicha = New System.Windows.Forms.Button()
+        Me.btnSancionar = New System.Windows.Forms.Button()
+        Me.btnNovedades = New System.Windows.Forms.Button()
+        Me.btnNotificar = New System.Windows.Forms.Button()
         Me.panelDetalle = New System.Windows.Forms.Panel()
         Me.tlpDetalleVertical = New System.Windows.Forms.TableLayoutPanel()
         Me.pbFotoDetalle = New System.Windows.Forms.PictureBox()
         Me.lblNombreCompleto = New System.Windows.Forms.Label()
         Me.lblCI = New System.Windows.Forms.Label()
         Me.lblTipo = New System.Windows.Forms.Label()
+        Me.pbCopyCI = New System.Windows.Forms.PictureBox()
+        Me.pbCopyNombre = New System.Windows.Forms.PictureBox()
         Me.btnVerSituacion = New System.Windows.Forms.Button()
         Me.lblPresencia = New System.Windows.Forms.Label()
         Me.lblFechaIngreso = New System.Windows.Forms.Label()
         Me.lblHorarioCompleto = New System.Windows.Forms.Label()
         Me.lblCargo = New System.Windows.Forms.Label()
         Me.lblEstadoActividad = New System.Windows.Forms.Label()
-        Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
-        Me.btnGenerarFicha = New System.Windows.Forms.Button()
-        Me.btnSancionar = New System.Windows.Forms.Button()
-        Me.btnNovedades = New System.Windows.Forms.Button()
-        Me.btnNotificar = New System.Windows.Forms.Button()
-        Me.pbCopyNombre = New System.Windows.Forms.PictureBox()
-        Me.pbCopyCI = New System.Windows.Forms.PictureBox()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         CType(Me.splitContenedor, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.splitContenedor.Panel1.SuspendLayout()
@@ -56,12 +56,12 @@ Partial Class frmFuncionarioBuscar
         CType(Me.dgvResultados, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.PanelBusquedaLista.SuspendLayout()
         Me.tlpBusqueda.SuspendLayout()
+        Me.FlowLayoutPanel1.SuspendLayout()
         Me.panelDetalle.SuspendLayout()
         Me.tlpDetalleVertical.SuspendLayout()
         CType(Me.pbFotoDetalle, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.FlowLayoutPanel1.SuspendLayout()
-        CType(Me.pbCopyNombre, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.pbCopyCI, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.pbCopyNombre, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'splitContenedor
@@ -74,7 +74,6 @@ Partial Class frmFuncionarioBuscar
         '
         Me.splitContenedor.Panel1.Controls.Add(Me.dgvResultados)
         Me.splitContenedor.Panel1.Controls.Add(Me.PanelBusquedaLista)
-        Me.splitContenedor.Panel1.Controls.Add(Me.FlowLayoutPanel1)
         Me.splitContenedor.Panel1MinSize = 280
         '
         'splitContenedor.Panel2
@@ -142,8 +141,63 @@ Partial Class frmFuncionarioBuscar
         Me.txtBusqueda.Size = New System.Drawing.Size(188, 33)
         Me.txtBusqueda.TabIndex = 1
         '
+        'FlowLayoutPanel1
+        '
+        Me.FlowLayoutPanel1.Controls.Add(Me.btnGenerarFicha)
+        Me.FlowLayoutPanel1.Controls.Add(Me.btnSancionar)
+        Me.FlowLayoutPanel1.Controls.Add(Me.btnNovedades)
+        Me.FlowLayoutPanel1.Controls.Add(Me.btnNotificar)
+        Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.FlowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
+        Me.FlowLayoutPanel1.Location = New System.Drawing.Point(3, 3)
+        Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
+        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(738, 45)
+        Me.FlowLayoutPanel1.TabIndex = 2
+        '
+        'btnGenerarFicha
+        '
+        Me.btnGenerarFicha.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.btnGenerarFicha.Location = New System.Drawing.Point(582, 3)
+        Me.btnGenerarFicha.Name = "btnGenerarFicha"
+        Me.btnGenerarFicha.Size = New System.Drawing.Size(153, 36)
+        Me.btnGenerarFicha.TabIndex = 16
+        Me.btnGenerarFicha.Text = "Ficha"
+        Me.btnGenerarFicha.UseVisualStyleBackColor = True
+        Me.btnGenerarFicha.Visible = False
+        '
+        'btnSancionar
+        '
+        Me.btnSancionar.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.btnSancionar.Location = New System.Drawing.Point(423, 3)
+        Me.btnSancionar.Name = "btnSancionar"
+        Me.btnSancionar.Size = New System.Drawing.Size(153, 36)
+        Me.btnSancionar.TabIndex = 1
+        Me.btnSancionar.Text = "Sancionar"
+        Me.btnSancionar.UseVisualStyleBackColor = True
+        '
+        'btnNovedades
+        '
+        Me.btnNovedades.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.btnNovedades.Location = New System.Drawing.Point(264, 3)
+        Me.btnNovedades.Name = "btnNovedades"
+        Me.btnNovedades.Size = New System.Drawing.Size(153, 36)
+        Me.btnNovedades.TabIndex = 2
+        Me.btnNovedades.Text = "Novedades"
+        Me.btnNovedades.UseVisualStyleBackColor = True
+        '
+        'btnNotificar
+        '
+        Me.btnNotificar.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.btnNotificar.Location = New System.Drawing.Point(105, 3)
+        Me.btnNotificar.Name = "btnNotificar"
+        Me.btnNotificar.Size = New System.Drawing.Size(153, 36)
+        Me.btnNotificar.TabIndex = 0
+        Me.btnNotificar.Text = "Notificar"
+        Me.btnNotificar.UseVisualStyleBackColor = True
+        '
         'panelDetalle
         '
+        Me.panelDetalle.AutoScroll = True
         Me.panelDetalle.BackColor = System.Drawing.Color.White
         Me.panelDetalle.Controls.Add(Me.tlpDetalleVertical)
         Me.panelDetalle.Dock = System.Windows.Forms.DockStyle.Fill
@@ -156,24 +210,26 @@ Partial Class frmFuncionarioBuscar
         'tlpDetalleVertical
         '
         Me.tlpDetalleVertical.ColumnCount = 2
-        Me.tlpDetalleVertical.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 70.0!))
+        Me.tlpDetalleVertical.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
         Me.tlpDetalleVertical.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 48.0!))
-        Me.tlpDetalleVertical.Controls.Add(Me.pbFotoDetalle, 0, 0)
-        Me.tlpDetalleVertical.Controls.Add(Me.lblNombreCompleto, 0, 3)
-        Me.tlpDetalleVertical.Controls.Add(Me.lblCI, 0, 4)
-        Me.tlpDetalleVertical.Controls.Add(Me.lblTipo, 0, 5)
-        Me.tlpDetalleVertical.Controls.Add(Me.pbCopyCI, 1, 4)
-        Me.tlpDetalleVertical.Controls.Add(Me.pbCopyNombre, 1, 3)
-        Me.tlpDetalleVertical.Controls.Add(Me.btnVerSituacion, 0, 2)
-        Me.tlpDetalleVertical.Controls.Add(Me.lblPresencia, 0, 6)
-        Me.tlpDetalleVertical.Controls.Add(Me.lblFechaIngreso, 0, 7)
-        Me.tlpDetalleVertical.Controls.Add(Me.lblHorarioCompleto, 0, 8)
-        Me.tlpDetalleVertical.Controls.Add(Me.lblCargo, 0, 9)
-        Me.tlpDetalleVertical.Controls.Add(Me.lblEstadoActividad, 0, 10)
+        Me.tlpDetalleVertical.Controls.Add(Me.pbFotoDetalle, 0, 1)
+        Me.tlpDetalleVertical.Controls.Add(Me.lblNombreCompleto, 0, 4)
+        Me.tlpDetalleVertical.Controls.Add(Me.FlowLayoutPanel1, 0, 0)
+        Me.tlpDetalleVertical.Controls.Add(Me.lblCI, 0, 5)
+        Me.tlpDetalleVertical.Controls.Add(Me.lblTipo, 0, 6)
+        Me.tlpDetalleVertical.Controls.Add(Me.pbCopyCI, 1, 5)
+        Me.tlpDetalleVertical.Controls.Add(Me.pbCopyNombre, 1, 4)
+        Me.tlpDetalleVertical.Controls.Add(Me.btnVerSituacion, 0, 3)
+        Me.tlpDetalleVertical.Controls.Add(Me.lblPresencia, 0, 7)
+        Me.tlpDetalleVertical.Controls.Add(Me.lblFechaIngreso, 0, 8)
+        Me.tlpDetalleVertical.Controls.Add(Me.lblHorarioCompleto, 0, 9)
+        Me.tlpDetalleVertical.Controls.Add(Me.lblCargo, 0, 10)
+        Me.tlpDetalleVertical.Controls.Add(Me.lblEstadoActividad, 0, 11)
         Me.tlpDetalleVertical.Dock = System.Windows.Forms.DockStyle.Fill
         Me.tlpDetalleVertical.Location = New System.Drawing.Point(12, 12)
         Me.tlpDetalleVertical.Name = "tlpDetalleVertical"
-        Me.tlpDetalleVertical.RowCount = 11
+        Me.tlpDetalleVertical.RowCount = 12
+        Me.tlpDetalleVertical.RowStyles.Add(New System.Windows.Forms.RowStyle())
         Me.tlpDetalleVertical.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
         Me.tlpDetalleVertical.RowStyles.Add(New System.Windows.Forms.RowStyle())
         Me.tlpDetalleVertical.RowStyles.Add(New System.Windows.Forms.RowStyle())
@@ -191,10 +247,10 @@ Partial Class frmFuncionarioBuscar
         'pbFotoDetalle
         '
         Me.pbFotoDetalle.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.pbFotoDetalle.Location = New System.Drawing.Point(3, 3)
+        Me.pbFotoDetalle.Location = New System.Drawing.Point(3, 54)
         Me.pbFotoDetalle.Margin = New System.Windows.Forms.Padding(3, 3, 3, 16)
         Me.pbFotoDetalle.Name = "pbFotoDetalle"
-        Me.pbFotoDetalle.Size = New System.Drawing.Size(738, 206)
+        Me.pbFotoDetalle.Size = New System.Drawing.Size(738, 155)
         Me.pbFotoDetalle.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
         Me.pbFotoDetalle.TabIndex = 0
         Me.pbFotoDetalle.TabStop = False
@@ -236,6 +292,30 @@ Partial Class frmFuncionarioBuscar
         Me.lblTipo.Size = New System.Drawing.Size(66, 25)
         Me.lblTipo.TabIndex = 6
         Me.lblTipo.Text = "Tipo: -"
+        '
+        'pbCopyCI
+        '
+        Me.pbCopyCI.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.pbCopyCI.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.pbCopyCI.Location = New System.Drawing.Point(747, 324)
+        Me.pbCopyCI.Name = "pbCopyCI"
+        Me.pbCopyCI.Size = New System.Drawing.Size(42, 30)
+        Me.pbCopyCI.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
+        Me.pbCopyCI.TabIndex = 18
+        Me.pbCopyCI.TabStop = False
+        Me.pbCopyCI.Visible = False
+        '
+        'pbCopyNombre
+        '
+        Me.pbCopyNombre.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.pbCopyNombre.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.pbCopyNombre.Location = New System.Drawing.Point(747, 270)
+        Me.pbCopyNombre.Name = "pbCopyNombre"
+        Me.pbCopyNombre.Size = New System.Drawing.Size(42, 48)
+        Me.pbCopyNombre.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
+        Me.pbCopyNombre.TabIndex = 19
+        Me.pbCopyNombre.TabStop = False
+        Me.pbCopyNombre.Visible = False
         '
         'btnVerSituacion
         '
@@ -312,83 +392,6 @@ Partial Class frmFuncionarioBuscar
         Me.lblEstadoActividad.TabIndex = 14
         Me.lblEstadoActividad.Text = "Estado: -"
         '
-        'FlowLayoutPanel1
-        '
-        Me.FlowLayoutPanel1.Controls.Add(Me.btnGenerarFicha)
-        Me.FlowLayoutPanel1.Controls.Add(Me.btnSancionar)
-        Me.FlowLayoutPanel1.Controls.Add(Me.btnNovedades)
-        Me.FlowLayoutPanel1.Controls.Add(Me.btnNotificar)
-        Me.FlowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.TopDown
-        Me.FlowLayoutPanel1.Location = New System.Drawing.Point(12, 78)
-        Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
-        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(161, 184)
-        Me.FlowLayoutPanel1.TabIndex = 2
-        '
-        'btnGenerarFicha
-        '
-        Me.btnGenerarFicha.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.btnGenerarFicha.Location = New System.Drawing.Point(3, 3)
-        Me.btnGenerarFicha.Name = "btnGenerarFicha"
-        Me.btnGenerarFicha.Size = New System.Drawing.Size(153, 36)
-        Me.btnGenerarFicha.TabIndex = 16
-        Me.btnGenerarFicha.Text = "Ficha"
-        Me.btnGenerarFicha.UseVisualStyleBackColor = True
-        Me.btnGenerarFicha.Visible = False
-        '
-        'btnSancionar
-        '
-        Me.btnSancionar.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.btnSancionar.Location = New System.Drawing.Point(3, 45)
-        Me.btnSancionar.Name = "btnSancionar"
-        Me.btnSancionar.Size = New System.Drawing.Size(153, 36)
-        Me.btnSancionar.TabIndex = 1
-        Me.btnSancionar.Text = "Sancionar"
-        Me.btnSancionar.UseVisualStyleBackColor = True
-        '
-        'btnNovedades
-        '
-        Me.btnNovedades.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.btnNovedades.Location = New System.Drawing.Point(3, 87)
-        Me.btnNovedades.Name = "btnNovedades"
-        Me.btnNovedades.Size = New System.Drawing.Size(153, 36)
-        Me.btnNovedades.TabIndex = 2
-        Me.btnNovedades.Text = "Novedades"
-        Me.btnNovedades.UseVisualStyleBackColor = True
-        '
-        'btnNotificar
-        '
-        Me.btnNotificar.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.btnNotificar.Location = New System.Drawing.Point(3, 129)
-        Me.btnNotificar.Name = "btnNotificar"
-        Me.btnNotificar.Size = New System.Drawing.Size(153, 36)
-        Me.btnNotificar.TabIndex = 0
-        Me.btnNotificar.Text = "Notificar"
-        Me.btnNotificar.UseVisualStyleBackColor = True
-        '
-        'pbCopyNombre
-        '
-        Me.pbCopyNombre.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.pbCopyNombre.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.pbCopyNombre.Location = New System.Drawing.Point(747, 270)
-        Me.pbCopyNombre.Name = "pbCopyNombre"
-        Me.pbCopyNombre.Size = New System.Drawing.Size(42, 48)
-        Me.pbCopyNombre.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
-        Me.pbCopyNombre.TabIndex = 19
-        Me.pbCopyNombre.TabStop = False
-        Me.pbCopyNombre.Visible = False
-        '
-        'pbCopyCI
-        '
-        Me.pbCopyCI.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.pbCopyCI.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.pbCopyCI.Location = New System.Drawing.Point(747, 324)
-        Me.pbCopyCI.Name = "pbCopyCI"
-        Me.pbCopyCI.Size = New System.Drawing.Size(42, 30)
-        Me.pbCopyCI.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
-        Me.pbCopyCI.TabIndex = 18
-        Me.pbCopyCI.TabStop = False
-        Me.pbCopyCI.Visible = False
-        '
         'frmFuncionarioBuscar
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 25.0!)
@@ -408,13 +411,13 @@ Partial Class frmFuncionarioBuscar
         Me.PanelBusquedaLista.ResumeLayout(False)
         Me.tlpBusqueda.ResumeLayout(False)
         Me.tlpBusqueda.PerformLayout()
+        Me.FlowLayoutPanel1.ResumeLayout(False)
         Me.panelDetalle.ResumeLayout(False)
         Me.tlpDetalleVertical.ResumeLayout(False)
         Me.tlpDetalleVertical.PerformLayout()
         CType(Me.pbFotoDetalle, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.FlowLayoutPanel1.ResumeLayout(False)
-        CType(Me.pbCopyNombre, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.pbCopyCI, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.pbCopyNombre, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub

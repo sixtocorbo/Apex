@@ -20,6 +20,13 @@ Public Class frmNotificaciones
         tmrFiltro.Interval = 500 ' Espera medio segundo antes de buscar
         tmrFiltro.Enabled = False
         ' La suscripción al evento es correcta.
+        Try
+            AppTheme.SetCue(txtFiltro, "Filtrar por funcionario...")
+            AppTheme.SetCue(rtbNotificacion, "Aquí se muestra el texto completo de la notificación seleccionada...")
+
+        Catch
+            ' Ignorar si no existe SetCue
+        End Try
         AddHandler NotificadorEventos.DatosActualizados, AddressOf OnDatosActualizados
     End Sub
 

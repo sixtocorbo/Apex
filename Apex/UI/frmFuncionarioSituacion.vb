@@ -211,7 +211,7 @@ Public Class frmFuncionarioSituacion
                 .AsNoTracking().ToListAsync()
 
             ' 3) Notificaciones PENDIENTES
-            Dim estadoPendienteId As Byte = CType(ModConstantesApex.EstadoNotificacionId.Pendiente, Byte)
+            Dim estadoPendienteId As Byte = CByte(ModConstantesApex.EstadoNotificacionPersonal.Pendiente)
             Dim notificacionesEnPeriodo = Await _uow.Context.Set(Of NotificacionPersonal)() _
                 .Include(Function(n) n.TipoNotificacion) _
                 .Where(Function(n) n.FuncionarioId = _funcionarioId AndAlso

@@ -32,7 +32,11 @@ Public Class frmNovedades
         ' Configuración inicial de los filtros
         dtpFechaDesde.Value = DateTime.Now.AddMonths(-1)
         dtpFechaHasta.Value = DateTime.Now
-
+        Try
+            AppTheme.SetCue(txtBusqueda, "Buscar por funcionario o novedad…")
+        Catch
+            ' Ignorar si no existe SetCue
+        End Try
         ' Carga las novedades al abrir el formulario usando los filtros por defecto
         Await BuscarAsync()
     End Sub

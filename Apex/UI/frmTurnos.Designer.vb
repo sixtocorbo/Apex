@@ -21,6 +21,7 @@ Partial Class frmTurnos
         Me.dgvTurnos = New System.Windows.Forms.DataGridView()
         Me.txtBuscar = New System.Windows.Forms.TextBox()
         Me.Label8 = New System.Windows.Forms.Label()
+        Me.btnVolver = New System.Windows.Forms.Button()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.chkNocturno = New System.Windows.Forms.CheckBox()
         Me.dtpHoraFin = New System.Windows.Forms.DateTimePicker()
@@ -32,7 +33,6 @@ Partial Class frmTurnos
         Me.btnNuevo = New System.Windows.Forms.Button()
         Me.btnEliminar = New System.Windows.Forms.Button()
         Me.btnGuardar = New System.Windows.Forms.Button()
-        Me.btnVolver = New System.Windows.Forms.Button()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -105,6 +105,16 @@ Partial Class frmTurnos
         Me.Label8.Size = New System.Drawing.Size(63, 20)
         Me.Label8.TabIndex = 0
         Me.Label8.Text = "Buscar:"
+        '
+        'btnVolver
+        '
+        Me.btnVolver.Location = New System.Drawing.Point(430, 340)
+        Me.btnVolver.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnVolver.Name = "btnVolver"
+        Me.btnVolver.Size = New System.Drawing.Size(180, 46)
+        Me.btnVolver.TabIndex = 5
+        Me.btnVolver.Text = "Volver"
+        Me.btnVolver.UseVisualStyleBackColor = True
         '
         'GroupBox1
         '
@@ -223,16 +233,6 @@ Partial Class frmTurnos
         Me.btnGuardar.TabIndex = 1
         Me.btnGuardar.Text = "Guardar"
         Me.btnGuardar.UseVisualStyleBackColor = True
-        '
-        'btnVolver
-        '
-        Me.btnVolver.Location = New System.Drawing.Point(430, 340)
-        Me.btnVolver.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnVolver.Name = "btnVolver"
-        Me.btnVolver.Size = New System.Drawing.Size(180, 46)
-        Me.btnVolver.TabIndex = 5
-        Me.btnVolver.Text = "Volver"
-        Me.btnVolver.UseVisualStyleBackColor = True
         '
         'frmTurnos
         '

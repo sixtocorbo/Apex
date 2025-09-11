@@ -55,6 +55,13 @@ Public Class frmFuncionarioBuscar
         SearchTimer.Interval = 500 ' 500ms de espera antes de buscar
         AddHandler SearchTimer.Tick, AddressOf SearchTimer_Tick
         AddHandler txtBusqueda.TextChanged, AddressOf txtBusqueda_TextChanged
+        ' Placeholder en la búsqueda (si agregaste AppTheme.SetCue)
+        Try
+            AppTheme.SetCue(txtBusqueda, "Buscar…")
+        Catch
+            ' Ignorar si no existe SetCue
+        End Try
+        AplicarLayoutResponsivo()
     End Sub
 #Region "Atajos de Acciones"
 
@@ -543,5 +550,107 @@ Public Class frmFuncionarioBuscar
 
 
 #End Region
+    '======================================================================================
+    ' === Ajustes responsivos (fuera del diseñador) ===
+    Private Sub AplicarLayoutResponsivo()
+        ' --- SplitContainer: que ambas mitades se adapten y no desaparezcan ---
+        splitContenedor.Dock = DockStyle.Fill
+        splitContenedor.IsSplitterFixed = False
+        splitContenedor.FixedPanel = FixedPanel.None
+        splitContenedor.Panel1MinSize = 220
+        splitContenedor.Panel2MinSize = 320
 
+        ' Colocar la distancia del splitter en ~32% del ancho y mantenerlo en Resize
+        AjustarSplitter()
+        AddHandler Me.Resize, Sub(sender As Object, e As EventArgs)
+                                  AjustarSplitter()
+                              End Sub
+
+        ' --- Panel izquierdo: apilar arriba y que la grilla llene lo restante ---
+        PanelBusquedaLista.Dock = DockStyle.Top
+
+        FlowLayoutPanel1.AutoSize = True
+        FlowLayoutPanel1.AutoSizeMode = AutoSizeMode.GrowAndShrink
+        FlowLayoutPanel1.WrapContents = False
+        FlowLayoutPanel1.FlowDirection = FlowDirection.LeftToRight
+        FlowLayoutPanel1.Dock = DockStyle.Top
+        FlowLayoutPanel1.Padding = New Padding(8, 6, 8, 6)
+
+        dgvResultados.Dock = DockStyle.Fill
+        dgvResultados.RowHeadersVisible = False
+        dgvResultados.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+        dgvResultados.AllowUserToResizeRows = False
+
+        ' --- Panel derecho: scroll y textos que respondan al ancho ---
+        panelDetalle.AutoScroll = True
+
+        ' Para labels de una línea: usar “…” al achicar
+        PrepararLabelUnaLinea(lblCI)
+        PrepararLabelUnaLinea(lblTipo)
+        PrepararLabelUnaLinea(lblPresencia)
+        PrepararLabelUnaLinea(lblFechaIngreso)
+        PrepararLabelUnaLinea(lblHorarioCompleto)
+        PrepararLabelUnaLinea(lblCargo)
+        PrepararLabelUnaLinea(lblEstadoActividad)
+
+        ' Para el nombre: preferible que envuelva (multilínea) en lugar de “...”
+        lblNombreCompleto.AutoSize = True
+        lblNombreCompleto.MaximumSize = New Size(0, 0) ' luego lo ajustamos al ancho de la columna
+        AddHandler tlpDetalleVertical.SizeChanged, Sub(sender As Object, e As EventArgs)
+                                                       AjustarAnchosDetalle()
+                                                   End Sub
+
+
+        ' --- Tamaños del form: permitir achicar más sin romper vista ---
+        Me.MinimumSize = New Size(640, 480) ' bájalo si necesitás aún más chico
+    End Sub
+
+    Private Sub AjustarSplitter()
+        Dim ancho As Integer = Me.ClientSize.Width
+        If ancho <= 0 Then Return
+        Dim deseado As Integer = CInt(ancho * 0.32)
+        splitContenedor.SplitterDistance = Math.Max(splitContenedor.Panel1MinSize, Math.Min(deseado, ancho - splitContenedor.Panel2MinSize))
+    End Sub
+
+    ' Ajusta MaximumSize de la columna de texto para que las etiquetas hagan wrap correctamente
+    Private Sub AjustarAnchosDetalle()
+        ' Ancho de la primera columna del TLP (la de los textos)
+        Dim anchos() = tlpDetalleVertical.GetColumnWidths()
+        If anchos Is Nothing OrElse anchos.Length = 0 Then Return
+        Dim anchoTexto = Math.Max(anchos(0) - 12, 50) ' margen de seguridad
+
+        lblNombreCompleto.MaximumSize = New Size(anchoTexto, 0)
+        ' si quisieras que otras labels también envuelvan en varias líneas:
+        ' lblCargo.MaximumSize = New Size(anchoTexto, 0) : lblCargo.AutoSize = True
+    End Sub
+
+    ' Convierte una Label en “una línea con puntos suspensivos” y ancho adaptable
+    Private Sub PrepararLabelUnaLinea(lbl As Label)
+        lbl.AutoSize = False
+        lbl.AutoEllipsis = True
+        lbl.Dock = DockStyle.Top
+        ' Altura a una línea según fuente
+        Dim h = TextRenderer.MeasureText("X", lbl.Font).Height + 6
+        lbl.Height = h
+        ' Que respete el ancho disponible en el TLP
+        AddHandler tlpDetalleVertical.SizeChanged, Sub(sender As Object, e As EventArgs)
+                                                       Dim anchos() = tlpDetalleVertical.GetColumnWidths()
+                                                       If anchos Is Nothing OrElse anchos.Length = 0 Then Return
+                                                       lbl.Width = Math.Max(anchos(0) - 12, 50)
+                                                   End Sub
+
+
+    End Sub
+
+    ' Llamalo desde el constructor o el Load:
+    ' Public Sub New()
+    '     InitializeComponent()
+    '     AplicarLayoutResponsivo()
+    ' End Sub
+    '
+    ' Private Sub frmFuncionarioBuscar_Load(...) Handles MyBase.Load
+    '     AplicarLayoutResponsivo()
+    ' End Sub
+
+    '===========
 End Class

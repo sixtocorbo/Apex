@@ -11,6 +11,13 @@ Public Class frmTurnos
     Private Async Sub frmGestionTurnos_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
         ConfigurarGrilla()
+        Try
+            AppTheme.SetCue(txtBuscar, "Buscar por nombre de turno...")
+            AppTheme.SetCue(txtNombre, "Ingrese el nombre del turno...")
+
+        Catch
+            ' Ignorar si no existe SetCue
+        End Try
         Await CargarDatosAsync()
         LimpiarCampos()
     End Sub

@@ -51,6 +51,15 @@ Public Class frmSancionCrear
             chkFechaHasta.Checked = True ' Por defecto, sin fecha de fin
             cmbTipoSancion.SelectedIndex = 0 ' Por defecto, "Puntos de Demérito"
         End If
+        Try
+            AppTheme.SetCue(cboFuncionario, "Seleccione un funcionario...")
+            AppTheme.SetCue(cmbTipoSancion, "Seleccione un tipo de sanción...")
+            AppTheme.SetCue(txtResolucion, "Ingrese la resolución...")
+            AppTheme.SetCue(txtObservaciones, "Ingrese observaciones...")
+
+        Catch
+            ' Ignorar si no existe SetCue
+        End Try
     End Sub
 
     Private Async Function CargarCombosAsync() As Task

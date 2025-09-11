@@ -35,6 +35,18 @@
             Await CargarDatosAsync()
             cboEstado.Text = _estadoInicial
         End If
+        Try
+            AppTheme.SetCue(txtComentario, "Observaciones...")
+            AppTheme.SetCue(cboFuncionario, "Seleccione un funcionario...")
+            AppTheme.SetCue(cboTipoLicencia, "Seleccione un tipo de licencia...")
+            AppTheme.SetCue(cboEstado, "Seleccione un estado...")
+            AppTheme.SetCue(dtpFechaInicio, "Seleccione la fecha de inicio...")
+            AppTheme.SetCue(dtpFechaFin, "Seleccione la fecha de fin...")
+
+
+        Catch
+            ' Ignorar si no existe SetCue
+        End Try
     End Sub
 
     Private Async Function CargarCombosAsync() As Task

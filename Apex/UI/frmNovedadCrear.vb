@@ -43,7 +43,15 @@ Public Class frmNovedadCrear
         lstFuncionariosSeleccionados.DataSource = _funcionariosSeleccionados
         lstFuncionariosSeleccionados.DisplayMember = "Nombre"
         lstFuncionariosSeleccionados.ValueMember = "Id"
+        Try
+            AppTheme.SetCue(txtTexto, "Ingrese el texto de la novedad...")
+            AppTheme.SetCue(dtpFecha, "Seleccione la fecha de la novedad...")
+            AppTheme.SetCue(lstFuncionariosSeleccionados, "No hay funcionarios seleccionados...")
+            AppTheme.SetCue(flpFotos, "No hay fotos agregadas...")
 
+        Catch
+            ' Ignorar si no existe SetCue
+        End Try
         If _modo = ModoFormulario.Editar Then
             Await CargarDatosParaEdicion()
         End If

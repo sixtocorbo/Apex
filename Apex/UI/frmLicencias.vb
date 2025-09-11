@@ -24,6 +24,11 @@ Public Class frmLicencias
         AddHandler NotificadorEventos.DatosActualizados, AddressOf OnDatosActualizados
         chkSoloVigentes.Checked = True
         _isFirstLoad = False
+        Try
+            AppTheme.SetCue(txtBusquedaLicencia, "Buscar por funcionario…")
+        Catch
+            ' Ignorar si no existe SetCue
+        End Try
     End Sub
 
     Private Sub frmGestionLicencias_FormClosed(sender As Object, e As FormClosedEventArgs) Handles Me.FormClosed

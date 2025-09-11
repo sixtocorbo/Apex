@@ -19,7 +19,13 @@ Public Class frmSanciones
         AddHandler txtBusquedaSancion.TextChanged, AddressOf IniciarTemporizador
         AddHandler cmbTipoLicencia.SelectedIndexChanged, AddressOf IniciarTemporizador
         AddHandler SearchTimer.Tick, AddressOf Temporizador_Tick
+        Try
+            AppTheme.SetCue(txtBusquedaSancion, "Buscar por nombre de funcionario...")
+            AppTheme.SetCue(cmbTipoLicencia, "Filtrar por tipo de sanción...")
 
+        Catch
+            ' Ignorar si no existe SetCue
+        End Try
         txtBusquedaSancion.Focus()
     End Sub
 
@@ -27,7 +33,11 @@ Public Class frmSanciones
 
     Private Async Function CargarCombosAsync() As Task
         Dim todosLosTipos As List(Of TipoLicencia) = Await _tipoLicenciaSvc.GetAllAsync()
-        Dim tiposLicencia = todosLosTipos.Where(Function(tl) tl.CategoriaAusenciaId = ModConstantesApex.CATEGORIA_ID_SANCION_GRAVE Or tl.CategoriaAusenciaId = ModConstantesApex.CATEGORIA_ID_SANCION_LEVE).ToList()
+        Dim tiposLicencia = todosLosTipos.Where(Function(tl) _
+    tl.CategoriaAusenciaId = ModConstantesApex.CategoriaAusenciaId.SancionGrave OrElse
+    tl.CategoriaAusenciaId = ModConstantesApex.CategoriaAusenciaId.SancionLeve
+).ToList()
+
         Dim listaConTodos = tiposLicencia.OrderBy(Function(x) x.Nombre).ToList()
         listaConTodos.Insert(0, New TipoLicencia With {.Id = 0, .Nombre = "[TODOS]"})
 

@@ -10,6 +10,12 @@ Public Class frmEstadosTransitoriosGeneral
 
     Private Sub frmEstadosTransitoriosGeneral_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
+        Try
+            AppTheme.SetCue(txtFiltro, "Filtrar por nombre o CI del funcionario...")
+
+        Catch
+            ' Ignorar si no existe SetCue
+        End Try
         CargarDatos()
     End Sub
 

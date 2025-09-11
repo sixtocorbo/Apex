@@ -107,5 +107,11 @@ Public Class frmConceptoFuncional
 
     Private Sub frmConceptoFuncional_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
+        Try
+            AppTheme.SetCue(txtFuncionarioSeleccionado, "Seleccione un funcionario...")
+
+        Catch
+            ' Ignorar si no existe SetCue
+        End Try
     End Sub
 End Class

@@ -110,27 +110,77 @@ Partial Public Class frmFiltros
 #End Region
 
 #Region "Ciclo de Vida del Formulario"
-
     Private Sub frmFiltroAvanzado_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        ' Tema base
         AppTheme.Aplicar(Me)
-        ' --- MEJORA: Optimización del renderizado del DataGridView ---
+
+        ' DGV sin parpadeo
         dgvDatos.DoubleBuffered(True)
         dgvDatos.SendToBack()
 
-        cmbOrigenDatos.DataSource = System.Enum.GetValues(GetType(TipoOrigenDatos))
+        ' Fuente de datos del combo
+        cmbOrigenDatos.DataSource = [Enum].GetValues(GetType(TipoOrigenDatos))
         cmbOrigenDatos.SelectedIndex = -1
 
-        ' Organiza los paneles para evitar solapamientos
+        ' Orden visual
         gbxBusquedaGlobal.BringToFront()
         flpChips.BringToFront()
         pnlAcciones.BringToFront()
 
+        ' Action bars alineadas a la derecha
+        pnlFiltroBotones.FlowDirection = FlowDirection.RightToLeft
+        flpAcciones.FlowDirection = FlowDirection.RightToLeft
+
+        ' Botones “neutros” (mantienen BackColor del tema)
+        btnLimpiar.Tag = "KeepBackColor"
+        btnExportarExcel.Tag = "KeepBackColor"
+        btnCopiarCorreos.Tag = "KeepBackColor"
+        btnExportarFichasPDF.Tag = "KeepBackColor"
+
+        ' Placeholder en la búsqueda (si agregaste AppTheme.SetCue)
+        Try
+            AppTheme.SetCue(txtBusquedaGlobal, "Buscar en todos los campos…")
+        Catch
+            ' Ignorar si no existe SetCue
+        End Try
+
+        ' Atajos
+        Me.AcceptButton = btnFiltrar
+        Me.KeyPreview = True
+        AddHandler Me.KeyDown, AddressOf Form_KeyDown_EscCierra
+
+        ' Eventos
         AddHandler btnCargar.Click, AddressOf btnCargar_Click_Async
         AddHandler lstColumnas.SelectedIndexChanged, AddressOf LstColumnas_SelectedIndexChanged
         AddHandler txtBusquedaGlobal.TextChanged, AddressOf TxtBusquedaGlobal_TextChanged
 
         UpdateUIState()
     End Sub
+
+    Private Sub Form_KeyDown_EscCierra(sender As Object, e As KeyEventArgs)
+        If e.KeyCode = Keys.Escape Then Me.Close()
+    End Sub
+
+    'Private Sub frmFiltroAvanzado_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    '    AppTheme.Aplicar(Me)
+    '    ' --- MEJORA: Optimización del renderizado del DataGridView ---
+    '    dgvDatos.DoubleBuffered(True)
+    '    dgvDatos.SendToBack()
+
+    '    cmbOrigenDatos.DataSource = System.Enum.GetValues(GetType(TipoOrigenDatos))
+    '    cmbOrigenDatos.SelectedIndex = -1
+
+    '    ' Organiza los paneles para evitar solapamientos
+    '    gbxBusquedaGlobal.BringToFront()
+    '    flpChips.BringToFront()
+    '    pnlAcciones.BringToFront()
+
+    '    AddHandler btnCargar.Click, AddressOf btnCargar_Click_Async
+    '    AddHandler lstColumnas.SelectedIndexChanged, AddressOf LstColumnas_SelectedIndexChanged
+    '    AddHandler txtBusquedaGlobal.TextChanged, AddressOf TxtBusquedaGlobal_TextChanged
+
+    '    UpdateUIState()
+    'End Sub
 
 #End Region
 

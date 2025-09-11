@@ -1,9 +1,10 @@
 ﻿' Apex/Services/ConceptoFuncionalService.vb
+Option Strict On
+Option Infer On
 Imports System.Data.Entity
 
 ''' <summary>
-''' Clase DTO (Objeto de Transferencia de Datos) unificada para mostrar todas las incidencias en el reporte.
-''' ESTA ES LA ESTRUCTURA CORRECTA QUE EL REPORTE DEBE USAR EN TODOS SUS DATASETS.
+''' DTO unificado para el reporte/consola de conceptos funcionales.
 ''' </summary>
 Public Class ConceptoFuncionalItem
     Public Property FechaInicio As DateTime
@@ -20,85 +21,137 @@ Public Class ConceptoFuncionalService
         _unitOfWork = unitOfWork
     End Sub
 
+    ' Claves normalizadas para TipoEstadoTransitorio (no tenemos IDs canónicos aquí)
+    Private Const KEY_ENFERMEDAD As String = "enfermedad"
+    Private Const KEY_SANCION As String = "sancion"
+
+    ''' <summary>
+    ''' Incidencias de salud: Licencias (cat SALUD) + Estados Transitorios "Enfermedad".
+    ''' </summary>
     Public Function ObtenerIncidenciasDeSalud(funcionarioId As Integer, fechaInicio As DateTime, fechaFin As DateTime) As List(Of ConceptoFuncionalItem)
-        ' 1. Obtener Licencias de categoría "Salud"
-        Dim licenciasSalud = _unitOfWork.Repository(Of HistoricoLicencia).GetAll().
-            Where(Function(lic) lic.FuncionarioId = funcionarioId AndAlso
-                                 lic.TipoLicencia.CategoriaAusencia.Nombre.Trim().ToLower() = "salud" AndAlso
-                                 DbFunctions.TruncateTime(lic.inicio) >= fechaInicio.Date AndAlso
-                                 DbFunctions.TruncateTime(lic.inicio) <= fechaFin.Date
-            ).Select(Function(l) New ConceptoFuncionalItem With {
+        Dim desde = fechaInicio.Date
+        Dim hastaExcl = fechaFin.Date.AddDays(1) ' límite superior exclusivo para comparar DateTime
+
+        ' 1) Licencias categoría SALUD (por ID) con solapamiento en el período
+        Dim licenciasSalud = _unitOfWork.Repository(Of HistoricoLicencia).GetAll() _
+            .Where(Function(lic) lic.FuncionarioId = funcionarioId _
+                               AndAlso lic.TipoLicencia.CategoriaAusenciaId = ModConstantesApex.CategoriaAusenciaId.Salud _
+                               AndAlso lic.inicio < hastaExcl AndAlso lic.finaliza >= desde) _
+            .Select(Function(l) New ConceptoFuncionalItem With {
                 .FechaInicio = l.inicio,
                 .FechaFinal = l.finaliza,
                 .Tipo = l.TipoLicencia.Nombre,
                 .Observaciones = l.datos,
                 .Origen = "Licencia"
-            }).ToList()
+            }) _
+            .AsNoTracking() _
+            .ToList()
 
-        ' 2. Obtener Estados Transitorios de tipo "Enfermedad"
-        Dim estadosEnfermedad = _unitOfWork.Repository(Of EstadoTransitorio).GetAll().
-            Where(Function(et) et.FuncionarioId = funcionarioId AndAlso
-                                 et.TipoEstadoTransitorio.Nombre.Trim().ToLower() = "enfermedad" AndAlso
-                                 et.EnfermedadDetalle IsNot Nothing AndAlso
-                                 DbFunctions.TruncateTime(et.EnfermedadDetalle.FechaDesde) >= fechaInicio.Date AndAlso
-                                 DbFunctions.TruncateTime(et.EnfermedadDetalle.FechaDesde) <= fechaFin.Date
-            ).Select(Function(et) New ConceptoFuncionalItem With {
-                .FechaInicio = et.EnfermedadDetalle.FechaDesde,
-                .FechaFinal = et.EnfermedadDetalle.FechaHasta,
+        ' 2) Estados Transitorios de tipo "Enfermedad" (normalizado por nombre)
+        Dim estadosBase = _unitOfWork.Repository(Of EstadoTransitorio).GetAll() _
+            .Where(Function(et) et.FuncionarioId = funcionarioId _
+                               AndAlso et.EnfermedadDetalle IsNot Nothing _
+                               AndAlso et.EnfermedadDetalle.FechaDesde < hastaExcl _
+                               AndAlso (Not et.EnfermedadDetalle.FechaHasta.HasValue OrElse et.EnfermedadDetalle.FechaHasta.Value >= desde)) _
+            .Select(Function(et) New With {
                 .Tipo = et.TipoEstadoTransitorio.Nombre,
-                .Observaciones = et.EnfermedadDetalle.Observaciones,
-                .Origen = "Estado Transitorio"
-            }).ToList()
+                .Desde = et.EnfermedadDetalle.FechaDesde,
+                .Hasta = et.EnfermedadDetalle.FechaHasta,
+                .Obs = et.EnfermedadDetalle.Observaciones
+            }) _
+            .AsNoTracking() _
+            .ToList()
 
-        Return licenciasSalud.Concat(estadosEnfermedad).OrderBy(Function(i) i.FechaInicio).ToList()
+        Dim estadosEnfermedad = estadosBase _
+            .Where(Function(x) ModConstantesApex.Normalizar(x.Tipo) = KEY_ENFERMEDAD) _
+            .Select(Function(x) New ConceptoFuncionalItem With {
+                .FechaInicio = x.Desde,
+                .FechaFinal = x.Hasta,
+                .Tipo = "Enfermedad",
+                .Observaciones = x.Obs,
+                .Origen = "Estado Transitorio"
+            }) _
+            .ToList()
+
+        Return licenciasSalud.Concat(estadosEnfermedad).
+               OrderBy(Function(i) i.FechaInicio).
+               ToList()
     End Function
 
+    ''' <summary>
+    ''' Sanciones Graves: sólo licencias cuya categoría es SANCION_GRAVE.
+    ''' </summary>
     Public Function ObtenerSancionesGraves(funcionarioId As Integer, fechaInicio As DateTime, fechaFin As DateTime) As List(Of ConceptoFuncionalItem)
-        Return _unitOfWork.Repository(Of HistoricoLicencia).GetAll().
-            Where(Function(lic) lic.FuncionarioId = funcionarioId AndAlso
-                                 lic.TipoLicencia.CategoriaAusencia.Nombre.Trim().ToLower() = "sanciongrave" AndAlso
-                                 DbFunctions.TruncateTime(lic.inicio) >= fechaInicio.Date AndAlso
-                                 DbFunctions.TruncateTime(lic.inicio) <= fechaFin.Date
-            ).Select(Function(l) New ConceptoFuncionalItem With {
+        Dim desde = fechaInicio.Date
+        Dim hastaExcl = fechaFin.Date.AddDays(1)
+
+        Return _unitOfWork.Repository(Of HistoricoLicencia).GetAll() _
+            .Where(Function(lic) lic.FuncionarioId = funcionarioId _
+                               AndAlso lic.TipoLicencia.CategoriaAusenciaId = ModConstantesApex.CategoriaAusenciaId.SancionGrave _
+                               AndAlso lic.inicio < hastaExcl AndAlso lic.finaliza >= desde) _
+            .Select(Function(l) New ConceptoFuncionalItem With {
                 .FechaInicio = l.inicio,
                 .FechaFinal = l.finaliza,
-                .Tipo = l.TipoLicencia.Nombre,
+                .Tipo = l.TipoLicencia.Nombre,              ' ej: "Sumario Medio Sueldo"
                 .Observaciones = l.datos,
                 .Origen = "Sanción Grave"
-            }).OrderBy(Function(i) i.FechaInicio).ToList()
+            }) _
+            .AsNoTracking() _
+            .OrderBy(Function(i) i.FechaInicio) _
+            .ToList()
     End Function
 
+    ''' <summary>
+    ''' Observaciones y Leves: Licencias SANCION_LEVE + Estados Transitorios de tipo "Sanción".
+    ''' </summary>
     Public Function ObtenerObservacionesYLeves(funcionarioId As Integer, fechaInicio As DateTime, fechaFin As DateTime) As List(Of ConceptoFuncionalItem)
-        ' 1. Obtener Sanciones Leves
-        Dim sancionesLeves = _unitOfWork.Repository(Of HistoricoLicencia).GetAll().
-            Where(Function(lic) lic.FuncionarioId = funcionarioId AndAlso
-                                 lic.TipoLicencia.CategoriaAusencia.Nombre.Trim().ToLower() = "sancionleve" AndAlso
-                                 DbFunctions.TruncateTime(lic.inicio) >= fechaInicio.Date AndAlso
-                                 DbFunctions.TruncateTime(lic.inicio) <= fechaFin.Date
-            ).Select(Function(l) New ConceptoFuncionalItem With {
+        Dim desde = fechaInicio.Date
+        Dim hastaExcl = fechaFin.Date.AddDays(1)
+
+        ' 1) Licencias categoría SANCION_LEVE
+        Dim sancionesLeves = _unitOfWork.Repository(Of HistoricoLicencia).GetAll() _
+            .Where(Function(lic) lic.FuncionarioId = funcionarioId _
+                               AndAlso lic.TipoLicencia.CategoriaAusenciaId = ModConstantesApex.CategoriaAusenciaId.SancionLeve _
+                               AndAlso lic.inicio < hastaExcl AndAlso lic.finaliza >= desde) _
+            .Select(Function(l) New ConceptoFuncionalItem With {
                 .FechaInicio = l.inicio,
                 .FechaFinal = l.finaliza,
                 .Tipo = l.TipoLicencia.Nombre,
                 .Observaciones = l.datos,
                 .Origen = "Sanción Leve"
-            }).ToList()
+            }) _
+            .AsNoTracking() _
+            .ToList()
 
-        ' 2. Obtener Estados Transitorios de tipo "Sanción"
-        Dim estadosSancion = _unitOfWork.Repository(Of EstadoTransitorio).GetAll().
-            Where(Function(et) et.FuncionarioId = funcionarioId AndAlso
-                                 et.TipoEstadoTransitorio.Nombre.Trim().ToLower() = "sanción" AndAlso
-                                 et.SancionDetalle IsNot Nothing AndAlso
-                                 DbFunctions.TruncateTime(et.SancionDetalle.FechaDesde) >= fechaInicio.Date AndAlso
-                                 DbFunctions.TruncateTime(et.SancionDetalle.FechaDesde) <= fechaFin.Date
-            ).Select(Function(et) New ConceptoFuncionalItem With {
-                .FechaInicio = et.SancionDetalle.FechaDesde,
-                .FechaFinal = et.SancionDetalle.FechaHasta,
+        ' 2) Estados Transitorios de tipo "Sanción" (normalizado por nombre)
+        Dim estadosSancionBase = _unitOfWork.Repository(Of EstadoTransitorio).GetAll() _
+            .Where(Function(et) et.FuncionarioId = funcionarioId _
+                               AndAlso et.SancionDetalle IsNot Nothing _
+                               AndAlso et.SancionDetalle.FechaDesde < hastaExcl _
+                               AndAlso (Not et.SancionDetalle.FechaHasta.HasValue OrElse et.SancionDetalle.FechaHasta.Value >= desde)) _
+            .Select(Function(et) New With {
                 .Tipo = et.TipoEstadoTransitorio.Nombre,
-                .Observaciones = et.SancionDetalle.Observaciones,
-                .Origen = "Observación"
-            }).ToList()
+                .Desde = et.SancionDetalle.FechaDesde,
+                .Hasta = et.SancionDetalle.FechaHasta,
+                .Obs = et.SancionDetalle.Observaciones
+            }) _
+            .AsNoTracking() _
+            .ToList()
 
-        Return sancionesLeves.Concat(estadosSancion).OrderBy(Function(i) i.FechaInicio).ToList()
+        Dim estadosSancion = estadosSancionBase _
+            .Where(Function(x) ModConstantesApex.Normalizar(x.Tipo) = KEY_SANCION) _
+            .Select(Function(x) New ConceptoFuncionalItem With {
+                .FechaInicio = x.Desde,
+                .FechaFinal = x.Hasta,
+                .Tipo = "Sanción",
+                .Observaciones = x.Obs,
+                .Origen = "Observación"
+            }) _
+            .ToList()
+
+        Return sancionesLeves.Concat(estadosSancion).
+               OrderBy(Function(i) i.FechaInicio).
+               ToList()
     End Function
 
 End Class

@@ -12,6 +12,19 @@ Public Class frmNomenclaturas
         ConfigurarGrilla()
         LimpiarCampos()
         AppTheme.Aplicar(Me)
+        Try
+            AppTheme.SetCue(txtBuscar, "Buscar por Nombre, Código o Área Responsable...")
+            AppTheme.SetCue(txtNombre, "Nombre de la Nomenclatura")
+            AppTheme.SetCue(txtCodigo, "Código de la Nomenclatura")
+            AppTheme.SetCue(txtArea, "Área Responsable")
+            AppTheme.SetCue(txtPatron, "Patrón de la Nomenclatura (ej: DOC-YYYY-MM-DD-XXX)")
+            AppTheme.SetCue(txtEjemplo, "Ejemplo de la Nomenclatura (ej: DOC-2023-10-01-001)")
+            AppTheme.SetCue(txtUbicacion, "Ubicación del Archivo (ej: C:\Documentos\)")
+            AppTheme.SetCue(txtObservaciones, "Observaciones adicionales")
+
+        Catch
+            ' Ignorar si no existe SetCue
+        End Try
         Me.Cursor = Cursors.Default
     End Sub
 

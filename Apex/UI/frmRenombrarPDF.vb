@@ -46,7 +46,19 @@ Public Class frmRenombrarPDF
 
         ' Forzar el recalculado del diseño la primera vez (opcional)
         Me.PerformLayout()
+        Try
+            AppTheme.SetCue(txtCodigo, "Código adicional...")
+            AppTheme.SetCue(txtNombreModificado, "Nombre propuesto...")
+            AppTheme.SetCue(txtNombre, "Nombre del funcionario...")
+            AppTheme.SetCue(txtCedula, "Cédula del funcionario...")
+            AppTheme.SetCue(ListBox1, "Lista de archivos PDF...")
+            AppTheme.SetCue(TextBox1, "Buscar en nombre de archivo...")
+            AppTheme.SetCue(TextBox2, "Buscar en ruta de archivo...")
+            AppTheme.SetCue(dgvTiposNomenclaturas, "Seleccione una nomenclatura...")
 
+        Catch
+            ' Ignorar si no existe SetCue
+        End Try
         ' Devolver el cursor a su estado normal
         Me.Cursor = Cursors.Default
     End Sub

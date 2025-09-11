@@ -62,6 +62,19 @@ Public Class frmNotificacionCrear
             cboFuncionario.SelectedValue = _idFuncionarioPreseleccionado.Value
         End If
         ' --- FIN DEL CAMBIO ---
+        Try
+            AppTheme.SetCue(cboFuncionario, "Buscar por funcionario…")
+            AppTheme.SetCue(txtDocumento, "Número de documento...")
+            AppTheme.SetCue(txtExpMinisterial, "Número de expediente ministerial...")
+            AppTheme.SetCue(txtExpINR, "Número de expediente INR...")
+            AppTheme.SetCue(txtOficina, "Oficina...")
+            AppTheme.SetCue(txtMedio, "Texto de notificación...")
+            AppTheme.SetCue(cboTipoNotificacion, "Seleccionar tipo de notificación...")
+
+
+        Catch
+            ' Ignorar si no existe SetCue
+        End Try
     End Sub
 
     Private Async Function CargarCombosAsync() As Task

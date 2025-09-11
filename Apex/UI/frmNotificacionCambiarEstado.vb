@@ -25,7 +25,11 @@ Public Class frmNotificacionCambiarEstado
         If _idEstadoActual > 0 Then
             cboEstados.SelectedValue = _idEstadoActual
         End If
-        ' --- FIN DE LA CORRECCIÓN ---
+        Try
+            AppTheme.SetCue(cboEstados, "Seleccione un estado...")
+        Catch
+            ' Ignorar si no existe SetCue
+        End Try
     End Sub
 
     Private Async Function CargarCombosAsync() As Task
