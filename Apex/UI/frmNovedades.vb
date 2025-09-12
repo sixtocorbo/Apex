@@ -321,9 +321,9 @@ Public Class frmNovedades
 
                 If datosParaReporte IsNot Nothing AndAlso datosParaReporte.Any() Then
                     ' 4. Pasar la lista de DTOs (el tipo de dato correcto) al formulario del reporte.
-                    Using frm As New frmNovedadesRPT(datosParaReporte)
-                        NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
-                    End Using
+                    Dim frm As New frmNovedadesRPT(datosParaReporte)
+                    NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
+
                 Else
                     Notifier.Warn(Me, "No se encontraron detalles para las novedades seleccionadas.")
                 End If

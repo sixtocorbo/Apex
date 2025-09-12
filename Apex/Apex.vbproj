@@ -746,13 +746,13 @@
     <EmbeddedResource Include="Reportes\DesignacionImprimir.rdlc" />
     <EmbeddedResource Include="Reportes\NotificacionImprimir.rdlc" />
     <EmbeddedResource Include="Reportes\ReporteNovedades_Fotos.rdlc">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Reportes\ReporteNovedades_Funcionarios.rdlc">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Reportes\NovedadDetallada.rdlc">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmAnalisisEstacionalidad.resx">
       <DependentUpon>frmAnalisisEstacionalidad.vb</DependentUpon>

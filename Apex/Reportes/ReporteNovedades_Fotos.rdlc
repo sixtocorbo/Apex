@@ -1,105 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2008/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
-	<Body>
-		<ReportItems>
-			<List Name="List1">
-				<DataSetName>DataSetFotos</DataSetName>
-				<Top>0.1cm</Top>
-				<Left>0.1cm</Left>
-				<Height>3.5cm</Height>
-				<Width>18cm</Width>
-				<Style>
-					<Border>
-						<Style>None</Style>
-					</Border>
-				</Style>
-				<ListContents>
-					<Rectangle Name="Rectangle1">
-						<ReportItems>
-							<Image Name="Image1">
-								<Source>Database</Source>
-								<Value>=Fields!Foto.Value</Value>
-								<MIMEType>image/jpeg</MIMEType>
-								<Sizing>FitProportional</Sizing>
-								<Top>0.1cm</Top>
-								<Left>0.1cm</Left>
-								<Height>3.3cm</Height>
-								<Width>4.5cm</Width>
-								<Style>
-									<Border>
-										<Style>Solid</Style>
-										<Width>0.5pt</Width>
-									</Border>
-								</Style>
-							</Image>
-						</ReportItems>
-						<KeepTogether>true</KeepTogether>
-						<Style>
-							<Border>
-								<Style>None</Style>
-							</Border>
-						</Style>
-					</Rectangle>
-				</ListContents>
-				<Grouping Name="List1_Details">
-					<GroupExpressions>
-						<GroupExpression>=Fields!Id.Value</GroupExpression>
-					</GroupExpressions>
-				</Grouping>
-				<ReportItems>
-					<Rectangle Name="Rectangle2">
-						<ReportItems>
-							<Image Name="Image2">
-								<Source>Database</Source>
-								<Value>=Fields!Foto.Value</Value>
-								<MIMEType>image/jpeg</MIMEType>
-								<Sizing>FitProportional</Sizing>
-								<ToolTip>=Fields!FileName.Value</ToolTip>
-								<Top>0.1cm</Top>
-								<Left>0.1cm</Left>
-								<Height>3.3cm</Height>
-								<Width>4.5cm</Width>
-								<Style>
-									<Border>
-										<Color>LightGrey</Color>
-										<Style>Solid</Style>
-									</Border>
-									<PaddingLeft>2pt</PaddingLeft>
-									<PaddingRight>2pt</PaddingRight>
-									<PaddingTop>2pt</PaddingTop>
-									<PaddingBottom>2pt</PaddingBottom>
-								</Style>
-							</Image>
-						</ReportItems>
-						<KeepTogether>true</KeepTogether>
-						<Height>3.5cm</Height>
-						<Width>4.7cm</Width>
-						<Style>
-							<Border>
-								<Style>None</Style>
-							</Border>
-						</Style>
-					</Rectangle>
-				</ReportItems>
-				<Left>0cm</Left>
-				<Height>3.5cm</Height>
-				<Width>4.7cm</Width>
-			</List>
-		</ReportItems>
-		<Height>3.7cm</Height>
-		<Style />
-	</Body>
-	<Width>18.2cm</Width>
-	<Page>
-		<PageHeight>29.7cm</PageHeight>
-		<PageWidth>21cm</PageWidth>
-		<LeftMargin>1cm</LeftMargin>
-		<RightMargin>1cm</RightMargin>
-		<TopMargin>1cm</TopMargin>
-		<BottomMargin>1cm</BottomMargin>
-		<ColumnSpacing>0.13cm</ColumnSpacing>
-		<Style />
-	</Page>
 	<AutoRefresh>0</AutoRefresh>
 	<DataSources>
 		<DataSource Name="ApexServices">
@@ -107,7 +7,7 @@
 				<DataProvider>System.Data.DataSet</DataProvider>
 				<ConnectString>/* Local Connection */</ConnectString>
 			</ConnectionProperties>
-			<rd:DataSourceID>c1a9c3b8-3a45-4b0d-9b1a-1d5f2a1c0d4e</rd:DataSourceID>
+			<rd:DataSourceID>e8b9e6e8-2c8c-4a3d-9c3f-7e6e5a6f2b4a</rd:DataSourceID>
 		</DataSource>
 	</DataSources>
 	<DataSets>
@@ -137,7 +37,126 @@
 			</rd:DataSetInfo>
 		</DataSet>
 	</DataSets>
+	<ReportParameters>
+		<ReportParameter Name="NovedadId">
+			<DataType>Integer</DataType>
+			<Prompt>Novedad Id</Prompt>
+		</ReportParameter>
+	</ReportParameters>
+	<Body>
+		<ReportItems>
+			<Tablix Name="TablixFotos">
+				<TablixBody>
+					<TablixColumns>
+						<TablixColumn>
+							<Width>5.5cm</Width>
+						</TablixColumn>
+					</TablixColumns>
+					<TablixRows>
+						<TablixRow>
+							<Height>4cm</Height>
+							<TablixCells>
+								<TablixCell>
+									<CellContents>
+										<Image Name="ImageFoto">
+											<Source>Database</Source>
+											<Value>=Fields!Foto.Value</Value>
+											<MIMEType>image/jpeg</MIMEType>
+											<Sizing>FitProportional</Sizing>
+											<Style>
+												<Border>
+													<Color>LightGrey</Color>
+													<Style>Solid</Style>
+												</Border>
+											</Style>
+										</Image>
+										<rd:Selected>true</rd:Selected>
+									</CellContents>
+								</TablixCell>
+							</TablixCells>
+						</TablixRow>
+					</TablixRows>
+				</TablixBody>
+				<TablixColumnHierarchy>
+					<TablixMembers>
+						<TablixMember>
+							<Group Name="ColumnGroup">
+								<GroupExpressions>
+									<GroupExpression>= (RowNumber(Nothing) - 1) Mod 3</GroupExpression>
+								</GroupExpressions>
+							</Group>
+							<SortExpressions>
+								<SortExpression>
+									<Value>=Fields!Id.Value</Value>
+								</SortExpression>
+							</SortExpressions>
+							<TablixHeader>
+								<Size>0cm</Size>
+								<CellContents>
+									<Textbox Name="Textbox11">
+										<CanGrow>true</CanGrow>
+										<KeepTogether>true</KeepTogether>
+										<Paragraphs>
+											<Paragraph>
+												<TextRuns>
+													<TextRun>
+														<Value />
+														<Style />
+													</TextRun>
+												</TextRuns>
+												<Style />
+											</Paragraph>
+										</Paragraphs>
+										<rd:DefaultName>Textbox11</rd:DefaultName>
+										<Style>
+											<Border>
+												<Color>LightGrey</Color>
+												<Style>Solid</Style>
+											</Border>
+											<PaddingLeft>2pt</PaddingLeft>
+											<PaddingRight>2pt</PaddingRight>
+											<PaddingTop>2pt</PaddingTop>
+											<PaddingBottom>2pt</PaddingBottom>
+										</Style>
+									</Textbox>
+								</CellContents>
+							</TablixHeader>
+						</TablixMember>
+					</TablixMembers>
+				</TablixColumnHierarchy>
+				<TablixRowHierarchy>
+					<TablixMembers>
+						<TablixMember>
+							<Group Name="RowGroup">
+								<GroupExpressions>
+									<GroupExpression>=Ceiling(RowNumber(Nothing)/3)</GroupExpression>
+								</GroupExpressions>
+							</Group>
+							<SortExpressions>
+								<SortExpression>
+									<Value>=Fields!Id.Value</Value>
+								</SortExpression>
+							</SortExpressions>
+						</TablixMember>
+					</TablixMembers>
+				</TablixRowHierarchy>
+				<DataSetName>DataSetFotos</DataSetName>
+				<Height>4cm</Height>
+				<Width>5.5cm</Width>
+				<Style>
+					<Border>
+						<Style>None</Style>
+					</Border>
+				</Style>
+			</Tablix>
+		</ReportItems>
+		<Height>4.05292cm</Height>
+		<Style />
+	</Body>
+	<Width>16.5cm</Width>
+	<Page>
+		<Style />
+	</Page>
+	<rd:ReportID>a1b2c3d4-e5f6-7890-1234-567890abcdef</rd:ReportID>
 	<rd:ReportUnitType>Cm</rd:ReportUnitType>
-	<rd:ReportID>
-		a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d</rd:or:ReportID>
-	</Report>
+</Report>
