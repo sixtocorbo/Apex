@@ -231,7 +231,7 @@ Public Class frmNovedades
         NavegacionHelper.AbrirNuevaInstanciaEnDashboard(New frmNovedadCrear())
     End Sub
 
-    Private Async Sub btnEditarNovedad_Click(sender As Object, e As EventArgs) Handles btnEditarNovedad.Click
+    Private Sub btnEditarNovedad_Click(sender As Object, e As EventArgs) Handles btnEditarNovedad.Click
         If dgvNovedades.CurrentRow Is Nothing Then
             MessageBox.Show("Por favor, seleccione una novedad para editar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Return
@@ -296,39 +296,43 @@ Public Class frmNovedades
     End Sub
 
     Private Async Sub btnImprimir_Click(sender As Object, e As EventArgs) Handles btnImprimir.Click
+        ' 1. Validar que haya datos en la grilla para imprimir.
         If _bsNovedades.DataSource Is Nothing OrElse _bsNovedades.Count = 0 Then
-            MessageBox.Show("Primero debe generar un reporte para poder imprimirlo.", "Sin datos", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Notifier.Warn(Me, "Primero debe realizar una búsqueda para poder imprimir.")
             Return
         End If
 
+        ' 2. Obtener los IDs de las novedades que se muestran actualmente.
+        Dim novedadesEnGrilla = CType(_bsNovedades.DataSource, List(Of vw_NovedadesAgrupadas))
+        If novedadesEnGrilla Is Nothing OrElse Not novedadesEnGrilla.Any() Then
+            Notifier.Warn(Me, "No hay datos para imprimir.")
+            Return
+        End If
+        Dim novedadIds = novedadesEnGrilla.Select(Function(n) n.Id).ToList()
+
+
         LoadingHelper.MostrarCargando(Me)
         Try
-            Dim novedadesEnGrilla = CType(_bsNovedades.DataSource, List(Of vw_NovedadesAgrupadas))
-            If novedadesEnGrilla Is Nothing OrElse Not novedadesEnGrilla.Any() Then
-                MessageBox.Show("No hay datos para imprimir.", "Sin datos", MessageBoxButtons.OK, MessageBoxIcon.Information)
-                Return
-            End If
+            ' --- INICIO DE LA CORRECCIÓN CLAVE ---
 
-            Dim novedadIds = novedadesEnGrilla.Select(Function(n) n.Id).ToList()
-            Dim novedadService As New NovedadService()
-            Dim datosCompletosParaReporte = Await novedadService.GetNovedadesCompletasByIds(novedadIds)
+            ' 3. Llamar al NUEVO método del servicio que devuelve los DTOs jerárquicos.
+            Using service As New NovedadService()
+                Dim datosParaReporte = Await service.GetNovedadesParaReporteAsync(novedadIds)
 
-            Dim datosMapeados = datosCompletosParaReporte.
-                GroupBy(Function(n) n.Id).
-                Select(Function(g) New With {
-                    .Id = g.Key,
-                    .Fecha = g.First().Fecha,
-                    .Texto = g.First().Texto,
-                    .Funcionarios = String.Join(", ", g.Select(Function(f) f.NombreFuncionario).Distinct())
-                }).
-                OrderByDescending(Function(n) n.Fecha).
-                ToList()
+                If datosParaReporte IsNot Nothing AndAlso datosParaReporte.Any() Then
+                    ' 4. Pasar la lista de DTOs (el tipo de dato correcto) al formulario del reporte.
+                    Using frm As New frmNovedadesRPT(datosParaReporte)
+                        NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
+                    End Using
+                Else
+                    Notifier.Warn(Me, "No se encontraron detalles para las novedades seleccionadas.")
+                End If
+            End Using
 
-            Dim frm As New frmNovedadesRPT(datosMapeados)
-            NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
+            ' --- FIN DE LA CORRECCIÓN CLAVE ---
 
         Catch ex As Exception
-            MessageBox.Show($"Ocurrió un error al preparar la impresión: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Notifier.Error(Me, $"Ocurrió un error al preparar la impresión: {ex.Message}")
         Finally
             LoadingHelper.OcultarCargando(Me)
         End Try

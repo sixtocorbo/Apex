@@ -23,8 +23,8 @@ Public Class frmFuncionarioBuscar
     Public ReadOnly Property FuncionarioSeleccionado As FuncionarioMin
 
         Get
-            If dgvResultados.CurrentRow IsNot Nothing Then
-                Return CType(dgvResultados.CurrentRow.DataBoundItem, FuncionarioMin)
+            If dgvFuncionarios.CurrentRow IsNot Nothing Then
+                Return CType(dgvFuncionarios.CurrentRow.DataBoundItem, FuncionarioMin)
             End If
             Return Nothing
         End Get
@@ -62,6 +62,32 @@ Public Class frmFuncionarioBuscar
             ' Ignorar si no existe SetCue
         End Try
 
+    End Sub
+    Private Sub dgvFuncionarios_SelectionChanged(sender As Object, e As EventArgs) Handles dgvFuncionarios.SelectionChanged
+        ' Hacemos visible el botón si hay al menos una celda seleccionada
+        If dgvFuncionarios.GetCellCount(DataGridViewElementStates.Selected) > 0 Then
+            btnCopiarContenido.Visible = True
+        Else
+            btnCopiarContenido.Visible = False
+        End If
+    End Sub
+    Private Sub btnCopiarContenido_Click(sender As Object, e As EventArgs) Handles btnCopiarContenido.Click
+        If dgvFuncionarios.SelectedCells.Count > 0 Then
+            Try
+                ' 1. Se realiza la operación de copiar al portapapeles
+                Dim clipboardContent = dgvFuncionarios.GetClipboardContent()
+                If clipboardContent IsNot Nothing Then
+                    Clipboard.SetDataObject(clipboardContent)
+
+                    ' 2. ¡Aquí llamas a la notificación de éxito!
+                    Notifier.Success(Me, "¡Contenido copiado al portapapeles!")
+                End If
+
+            Catch ex As Exception
+                ' En caso de un error, puedes notificarlo también
+                Notifier.Error(Me, "No se pudo copiar el contenido.")
+            End Try
+        End If
     End Sub
 #Region "Atajos de Acciones"
 
@@ -124,7 +150,7 @@ Public Class frmFuncionarioBuscar
 
 #Region "Diseño de grilla"
     Private Sub ConfigurarGrilla()
-        With dgvResultados
+        With dgvFuncionarios
             .AutoGenerateColumns = False
             .RowTemplate.Height = 40
             .RowTemplate.MinimumHeight = 40
@@ -154,11 +180,11 @@ Public Class frmFuncionarioBuscar
 
         ' --- CAMBIO REALIZADO AQUÍ ---
         ' Cambiamos el evento para que la actualización con las teclas sea robusta.
-        AddHandler dgvResultados.CurrentCellChanged, AddressOf MostrarDetalle
+        AddHandler dgvFuncionarios.CurrentCellChanged, AddressOf MostrarDetalle
         ' --- FIN DEL CAMBIO ---
 
-        AddHandler dgvResultados.CellDoubleClick, AddressOf OnDgvDoubleClick
-        AddHandler dgvResultados.DataError, Sub(s, ev) ev.ThrowException = False
+        AddHandler dgvFuncionarios.CellDoubleClick, AddressOf OnDgvDoubleClick
+        AddHandler dgvFuncionarios.DataError, Sub(s, ev) ev.ThrowException = False
     End Sub
 #End Region
 
@@ -166,7 +192,7 @@ Public Class frmFuncionarioBuscar
     Private Async Function BuscarAsync() As Task
         ' Si no hay texto en la caja de búsqueda, limpiamos la grilla y el detalle.
         If String.IsNullOrWhiteSpace(txtBusqueda.Text) Then
-            dgvResultados.DataSource = New List(Of FuncionarioMin)()
+            dgvFuncionarios.DataSource = New List(Of FuncionarioMin)()
             LimpiarDetalle()
             Return
         End If
@@ -198,13 +224,13 @@ Public Class frmFuncionarioBuscar
                                  .SqlQuery(Of FuncionarioMin)(sql, pLimite, pPatron) _
                                  .ToListAsync()
 
-                dgvResultados.DataSource = Nothing
-                dgvResultados.DataSource = lista
+                dgvFuncionarios.DataSource = Nothing
+                dgvFuncionarios.DataSource = lista
 
                 If lista.Any() Then
-                    dgvResultados.ClearSelection()
-                    dgvResultados.Rows(0).Selected = True
-                    dgvResultados.CurrentCell = dgvResultados.Rows(0).Cells("CI")
+                    dgvFuncionarios.ClearSelection()
+                    dgvFuncionarios.Rows(0).Selected = True
+                    dgvFuncionarios.CurrentCell = dgvFuncionarios.Rows(0).Cells("CI")
                 Else
                     LimpiarDetalle()
                 End If
@@ -240,7 +266,7 @@ Public Class frmFuncionarioBuscar
             e.SuppressKeyPress = True
         End If
 
-        If dgvResultados.Rows.Count = 0 Then Return
+        If dgvFuncionarios.Rows.Count = 0 Then Return
 
         Select Case e.KeyCode
             Case Keys.Down : MoverSeleccion(+1) : e.Handled = True
@@ -249,33 +275,33 @@ Public Class frmFuncionarioBuscar
     End Sub
 
     Private Sub MoverSeleccion(direccion As Integer)
-        Dim total = dgvResultados.Rows.Count
+        Dim total = dgvFuncionarios.Rows.Count
         If total = 0 Then
             LimpiarDetalle()
             Exit Sub
         End If
 
         Dim indexActual As Integer =
-        If(dgvResultados.CurrentRow Is Nothing, -1, dgvResultados.CurrentRow.Index)
+        If(dgvFuncionarios.CurrentRow Is Nothing, -1, dgvFuncionarios.CurrentRow.Index)
 
         Dim nuevoIndex = Math.Max(0, Math.Min(total - 1, indexActual + direccion))
 
-        dgvResultados.ClearSelection()
-        dgvResultados.Rows(nuevoIndex).Selected = True
-        dgvResultados.CurrentCell = dgvResultados.Rows(nuevoIndex).Cells("CI")
+        dgvFuncionarios.ClearSelection()
+        dgvFuncionarios.Rows(nuevoIndex).Selected = True
+        dgvFuncionarios.CurrentCell = dgvFuncionarios.Rows(nuevoIndex).Cells("CI")
     End Sub
 #End Region
 
 
 #Region "Detalle lateral (Foto on-demand)"
     Private Async Sub MostrarDetalle(sender As Object, e As EventArgs)
-        If dgvResultados.CurrentRow Is Nothing OrElse dgvResultados.CurrentRow.DataBoundItem Is Nothing Then
+        If dgvFuncionarios.CurrentRow Is Nothing OrElse dgvFuncionarios.CurrentRow.DataBoundItem Is Nothing Then
             LimpiarDetalle()
             Return
         End If
 
         panelDetalle.Visible = True
-        Dim id = CInt(dgvResultados.CurrentRow.Cells("Id").Value)
+        Dim id = CInt(dgvFuncionarios.CurrentRow.Cells("Id").Value)
 
         Using uow As New UnitOfWork()
             Dim f = Await uow.Repository(Of Funcionario)() _
@@ -288,7 +314,7 @@ Public Class frmFuncionarioBuscar
             .AsNoTracking() _
             .FirstOrDefaultAsync(Function(x) x.Id = id)
 
-            If dgvResultados.CurrentRow Is Nothing OrElse CInt(dgvResultados.CurrentRow.Cells("Id").Value) <> id Then Return
+            If dgvFuncionarios.CurrentRow Is Nothing OrElse CInt(dgvFuncionarios.CurrentRow.Cells("Id").Value) <> id Then Return
             If f Is Nothing Then Return
 
             ' Muestra los botones de acción
@@ -372,8 +398,8 @@ Public Class frmFuncionarioBuscar
 
     ' Este código funciona bien si quieres abrir múltiples ventanas de situación.
     Private Sub btnVerSituacion_Click(sender As Object, e As EventArgs)
-        If dgvResultados.CurrentRow Is Nothing Then Return
-        Dim id = CInt(dgvResultados.CurrentRow.Cells("Id").Value)
+        If dgvFuncionarios.CurrentRow Is Nothing Then Return
+        Dim id = CInt(dgvFuncionarios.CurrentRow.Cells("Id").Value)
         Dim frm As New frmFuncionarioSituacion(id)
         NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
     End Sub
@@ -386,12 +412,12 @@ Public Class frmFuncionarioBuscar
     ' Busca y reemplaza este método en tu archivo frmFuncionarioBuscar.vb
 
     Private Sub OnDgvDoubleClick(sender As Object, e As DataGridViewCellEventArgs)
-        If dgvResultados.CurrentRow Is Nothing Then Return
+        If dgvFuncionarios.CurrentRow Is Nothing Then Return
 
         If _modo = ModoApertura.Seleccion Then
             SeleccionarYcerrar()
         Else ' Modo Navegacion
-            Dim id As Integer = CInt(dgvResultados.CurrentRow.Cells("Id").Value)
+            Dim id As Integer = CInt(dgvFuncionarios.CurrentRow.Cells("Id").Value)
 
             ' --- INICIO DE LA CORRECCIÓN ---
             ' Busca si ya hay un formulario de edición abierto PARA ESTE funcionario específico.

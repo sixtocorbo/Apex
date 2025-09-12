@@ -186,6 +186,9 @@
     <Compile Include="Common\IRepository.vb" />
     <Compile Include="Common\NotificadorEventos.vb" />
     <Compile Include="Common\StringExtensions.vb" />
+    <Compile Include="Common\Toast.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Data\AreaTrabajo.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
@@ -447,6 +450,7 @@
     <Compile Include="Services\AuditoriaService.vb" />
     <Compile Include="Services\CargoService.vb" />
     <Compile Include="Services\CategoriaAusenciaService.vb" />
+    <Compile Include="Services\NovedadReporteDTO.vb" />
     <Compile Include="UI\ChipControl.vb">
       <SubType>UserControl</SubType>
     </Compile>
@@ -741,6 +745,9 @@
     <EmbeddedResource Include="Reportes\FichaFuncional.rdlc" />
     <EmbeddedResource Include="Reportes\DesignacionImprimir.rdlc" />
     <EmbeddedResource Include="Reportes\NotificacionImprimir.rdlc" />
+    <EmbeddedResource Include="Reportes\ReporteNovedades_Fotos.rdlc">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Reportes\ReporteNovedades_Funcionarios.rdlc">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>

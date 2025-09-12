@@ -24,7 +24,7 @@ Partial Class frmFuncionarioBuscar
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Me.splitContenedor = New System.Windows.Forms.SplitContainer()
-        Me.dgvResultados = New System.Windows.Forms.DataGridView()
+        Me.dgvFuncionarios = New System.Windows.Forms.DataGridView()
         Me.PanelBusquedaLista = New System.Windows.Forms.Panel()
         Me.tlpBusqueda = New System.Windows.Forms.TableLayoutPanel()
         Me.lblBuscar = New System.Windows.Forms.Label()
@@ -47,11 +47,12 @@ Partial Class frmFuncionarioBuscar
         Me.lblPresencia = New System.Windows.Forms.Label()
         Me.lblEstadoActividad = New System.Windows.Forms.Label()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
+        Me.btnCopiarContenido = New System.Windows.Forms.Button()
         CType(Me.splitContenedor, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.splitContenedor.Panel1.SuspendLayout()
         Me.splitContenedor.Panel2.SuspendLayout()
         Me.splitContenedor.SuspendLayout()
-        CType(Me.dgvResultados, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.dgvFuncionarios, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.PanelBusquedaLista.SuspendLayout()
         Me.tlpBusqueda.SuspendLayout()
         Me.panelDetalle.SuspendLayout()
@@ -68,7 +69,7 @@ Partial Class frmFuncionarioBuscar
         '
         'splitContenedor.Panel1
         '
-        Me.splitContenedor.Panel1.Controls.Add(Me.dgvResultados)
+        Me.splitContenedor.Panel1.Controls.Add(Me.dgvFuncionarios)
         Me.splitContenedor.Panel1.Controls.Add(Me.PanelBusquedaLista)
         Me.splitContenedor.Panel1MinSize = 280
         '
@@ -82,14 +83,14 @@ Partial Class frmFuncionarioBuscar
         '
         'dgvResultados
         '
-        Me.dgvResultados.ColumnHeadersHeight = 34
-        Me.dgvResultados.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.dgvResultados.Location = New System.Drawing.Point(0, 72)
-        Me.dgvResultados.Name = "dgvResultados"
-        Me.dgvResultados.ReadOnly = True
-        Me.dgvResultados.RowHeadersWidth = 62
-        Me.dgvResultados.Size = New System.Drawing.Size(301, 472)
-        Me.dgvResultados.TabIndex = 1
+        Me.dgvFuncionarios.ColumnHeadersHeight = 34
+        Me.dgvFuncionarios.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.dgvFuncionarios.Location = New System.Drawing.Point(0, 115)
+        Me.dgvFuncionarios.Name = "dgvResultados"
+        Me.dgvFuncionarios.ReadOnly = True
+        Me.dgvFuncionarios.RowHeadersWidth = 62
+        Me.dgvFuncionarios.Size = New System.Drawing.Size(301, 429)
+        Me.dgvFuncionarios.TabIndex = 1
         '
         'PanelBusquedaLista
         '
@@ -99,7 +100,7 @@ Partial Class frmFuncionarioBuscar
         Me.PanelBusquedaLista.Location = New System.Drawing.Point(0, 0)
         Me.PanelBusquedaLista.Name = "PanelBusquedaLista"
         Me.PanelBusquedaLista.Padding = New System.Windows.Forms.Padding(12)
-        Me.PanelBusquedaLista.Size = New System.Drawing.Size(301, 72)
+        Me.PanelBusquedaLista.Size = New System.Drawing.Size(301, 115)
         Me.PanelBusquedaLista.TabIndex = 0
         '
         'tlpBusqueda
@@ -109,12 +110,14 @@ Partial Class frmFuncionarioBuscar
         Me.tlpBusqueda.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
         Me.tlpBusqueda.Controls.Add(Me.lblBuscar, 0, 0)
         Me.tlpBusqueda.Controls.Add(Me.txtBusqueda, 1, 0)
+        Me.tlpBusqueda.Controls.Add(Me.btnCopiarContenido, 1, 1)
         Me.tlpBusqueda.Dock = System.Windows.Forms.DockStyle.Fill
         Me.tlpBusqueda.Location = New System.Drawing.Point(12, 12)
         Me.tlpBusqueda.Name = "tlpBusqueda"
-        Me.tlpBusqueda.RowCount = 1
+        Me.tlpBusqueda.RowCount = 2
         Me.tlpBusqueda.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-        Me.tlpBusqueda.Size = New System.Drawing.Size(277, 48)
+        Me.tlpBusqueda.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 44.0!))
+        Me.tlpBusqueda.Size = New System.Drawing.Size(277, 91)
         Me.tlpBusqueda.TabIndex = 0
         '
         'lblBuscar
@@ -382,6 +385,17 @@ Partial Class frmFuncionarioBuscar
         Me.lblEstadoActividad.TabIndex = 21
         Me.lblEstadoActividad.Text = "Estado: -"
         '
+        'btnCopiarContenido
+        '
+        Me.btnCopiarContenido.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.btnCopiarContenido.Location = New System.Drawing.Point(86, 50)
+        Me.btnCopiarContenido.Name = "btnCopiarContenido"
+        Me.btnCopiarContenido.Size = New System.Drawing.Size(188, 38)
+        Me.btnCopiarContenido.TabIndex = 3
+        Me.btnCopiarContenido.Text = "Copiar selección"
+        Me.btnCopiarContenido.UseVisualStyleBackColor = True
+        Me.btnCopiarContenido.Visible = False
+        '
         'frmFuncionarioBuscar
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 25.0!)
@@ -397,7 +411,7 @@ Partial Class frmFuncionarioBuscar
         Me.splitContenedor.Panel2.ResumeLayout(False)
         CType(Me.splitContenedor, System.ComponentModel.ISupportInitialize).EndInit()
         Me.splitContenedor.ResumeLayout(False)
-        CType(Me.dgvResultados, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.dgvFuncionarios, System.ComponentModel.ISupportInitialize).EndInit()
         Me.PanelBusquedaLista.ResumeLayout(False)
         Me.tlpBusqueda.ResumeLayout(False)
         Me.tlpBusqueda.PerformLayout()
@@ -411,7 +425,7 @@ Partial Class frmFuncionarioBuscar
     End Sub
 
     Friend WithEvents splitContenedor As SplitContainer
-    Friend WithEvents dgvResultados As DataGridView
+    Friend WithEvents dgvFuncionarios As DataGridView
     Friend WithEvents panelDetalle As Panel
     Friend WithEvents pbFotoDetalle As PictureBox
     Friend WithEvents ToolTip1 As ToolTip
@@ -434,4 +448,5 @@ Partial Class frmFuncionarioBuscar
     Friend WithEvents lblCargo As Label
     Friend WithEvents lblPresencia As Label
     Friend WithEvents lblEstadoActividad As Label
+    Friend WithEvents btnCopiarContenido As Button
 End Class

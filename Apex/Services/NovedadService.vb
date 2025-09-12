@@ -449,5 +449,49 @@ Public Class NovedadService
             )
         End If
     End Function
+    ''' <summary>
+    ''' Obtiene todos los datos necesarios (incluyendo funcionarios y fotos) para el reporte detallado.
+    ''' </summary>
+    Public Async Function GetNovedadesParaReporteAsync(novedadIds As List(Of Integer)) As Task(Of List(Of NovedadReporteDTO))
+        If novedadIds Is Nothing OrElse Not novedadIds.Any() Then
+            Return New List(Of NovedadReporteDTO)()
+        End If
 
+        ' Usamos Include para traer todas las entidades relacionadas en una sola consulta
+        Dim novedadesConTodo = Await _unitOfWork.Repository(Of Novedad)().GetAll().
+            Include(Function(n) n.NovedadFuncionario.Select(Function(nf) nf.Funcionario)).
+            Include(Function(n) n.NovedadFoto).
+            Where(Function(n) novedadIds.Contains(n.Id)).
+            ToListAsync()
+
+        ' Mapeamos los resultados a nuestra estructura de DTOs
+        Dim resultado As New List(Of NovedadReporteDTO)()
+        For Each n In novedadesConTodo
+            Dim dto = New NovedadReporteDTO With {
+                .Id = n.Id,
+                .Fecha = n.Fecha,
+                .Texto = n.Texto
+            }
+
+            ' Mapear funcionarios
+            For Each funcRel In n.NovedadFuncionario
+                dto.Funcionarios.Add(New FuncionarioReporteDTO With {
+                    .Id = funcRel.Funcionario.Id,
+                    .Nombre = funcRel.Funcionario.Nombre
+                })
+            Next
+
+            ' Mapear fotos
+            For Each fotoEntidad In n.NovedadFoto
+                dto.Fotos.Add(New FotoReporteDTO With {
+                    .Id = fotoEntidad.Id,
+                    .Foto = fotoEntidad.Foto,
+                    .FileName = fotoEntidad.FileName
+                })
+            Next
+            resultado.Add(dto)
+        Next
+
+        Return resultado.OrderByDescending(Function(n) n.Fecha).ThenByDescending(Function(n) n.Id).ToList()
+    End Function
 End Class
