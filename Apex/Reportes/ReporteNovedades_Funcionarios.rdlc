@@ -1,35 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2008/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+	<AutoRefresh>0</AutoRefresh>
 	<DataSources>
-		<DataSource Name="DummyDataSource">
+		<DataSource Name="ApexServices">
 			<ConnectionProperties>
-				<DataProvider>SQL</DataProvider>
-				<ConnectString />
+				<DataProvider>System.Data.DataSet</DataProvider>
+				<ConnectString>/* Local Connection */</ConnectString>
 			</ConnectionProperties>
-			<rd:DataSourceID>fedcba98-7654-3210-fedc-ba9876543210</rd:DataSourceID>
+			<rd:DataSourceID>e8b9e6e8-2c8c-4a3d-9c3f-7e6e5a6f2b4a</rd:DataSourceID>
 		</DataSource>
 	</DataSources>
 	<DataSets>
 		<DataSet Name="DataSetFuncionarios">
 			<Query>
-				<DataSourceName>DummyDataSource</DataSourceName>
+				<DataSourceName>ApexServices</DataSourceName>
 				<CommandText>/* Local Query */</CommandText>
 			</Query>
 			<Fields>
-				<Field Name="NombreFuncionario">
-					<DataField>NombreFuncionario</DataField>
+				<Field Name="Id">
+					<DataField>Id</DataField>
+					<rd:TypeName>System.Int32</rd:TypeName>
+				</Field>
+				<Field Name="Nombre">
+					<DataField>Nombre</DataField>
 					<rd:TypeName>System.String</rd:TypeName>
 				</Field>
 			</Fields>
+			<rd:DataSetInfo>
+				<rd:DataSetName>Apex.Services</rd:DataSetName>
+				<rd:TableName>FuncionarioReporteDTO</rd:TableName>
+				<rd:ObjectDataSourceType>Apex.FuncionarioReporteDTO, Apex, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</rd:ObjectDataSourceType>
+			</rd:DataSetInfo>
 		</DataSet>
 	</DataSets>
+	<ReportParameters>
+		<ReportParameter Name="NovedadId">
+			<DataType>Integer</DataType>
+			<Prompt>Novedad Id</Prompt>
+		</ReportParameter>
+	</ReportParameters>
 	<Body>
 		<ReportItems>
-			<Tablix Name="TablixFuncionarios">
+			<Tablix Name="Tablix1">
 				<TablixBody>
 					<TablixColumns>
 						<TablixColumn>
-							<Width>15.6cm</Width>
+							<Width>16.6cm</Width>
 						</TablixColumn>
 					</TablixColumns>
 					<TablixRows>
@@ -38,28 +54,27 @@
 							<TablixCells>
 								<TablixCell>
 									<CellContents>
-										<Textbox Name="NombreFuncionario">
+										<Textbox Name="Nombre">
 											<CanGrow>true</CanGrow>
 											<KeepTogether>true</KeepTogether>
 											<Paragraphs>
 												<Paragraph>
 													<TextRuns>
 														<TextRun>
-															<Value>=Fields!NombreFuncionario.Value</Value>
-															<Style>
-																<FontStyle>Italic</FontStyle>
-																<Color>Gray</Color>
-															</Style>
+															<Value>=Fields!Nombre.Value</Value>
+															<Style />
 														</TextRun>
 													</TextRuns>
 													<Style />
 												</Paragraph>
 											</Paragraphs>
+											<rd:DefaultName>Nombre</rd:DefaultName>
 											<Style>
 												<Border>
-													<Style>None</Style>
+													<Color>LightGrey</Color>
+													<Style>Solid</Style>
 												</Border>
-												<PaddingLeft>5pt</PaddingLeft>
+												<PaddingLeft>2pt</PaddingLeft>
 												<PaddingRight>2pt</PaddingRight>
 												<PaddingTop>2pt</PaddingTop>
 												<PaddingBottom>2pt</PaddingBottom>
@@ -85,7 +100,7 @@
 				</TablixRowHierarchy>
 				<DataSetName>DataSetFuncionarios</DataSetName>
 				<Height>0.6cm</Height>
-				<Width>15.6cm</Width>
+				<Width>16.6cm</Width>
 				<Style>
 					<Border>
 						<Style>None</Style>
@@ -96,16 +111,17 @@
 		<Height>0.6cm</Height>
 		<Style />
 	</Body>
-	<Width>15.6cm</Width>
+	<Width>16.6cm</Width>
 	<Page>
+		<PageHeight>29.7cm</PageHeight>
+		<PageWidth>21cm</PageWidth>
+		<LeftMargin>2cm</LeftMargin>
+		<RightMargin>2cm</RightMargin>
+		<TopMargin>2cm</TopMargin>
+		<BottomMargin>2cm</BottomMargin>
+		<ColumnSpacing>0.13cm</ColumnSpacing>
 		<Style />
 	</Page>
-	<ReportParameters>
-		<ReportParameter Name="NovedadId">
-			<DataType>Integer</DataType>
-			<Prompt>Novedad Id</Prompt>
-		</ReportParameter>
-	</ReportParameters>
 	<rd:ReportUnitType>Cm</rd:ReportUnitType>
-	<rd:ReportID>a1b2c3d4-e5f6-4a9b-8c7d-6e5f4a3b2c1d</rd:ReportID>
+	<rd:ReportID>a9e7f2d7-c1d5-4e3f-8a9d-1b3b1c1d1e1f</rd:ReportID>
 </Report>
