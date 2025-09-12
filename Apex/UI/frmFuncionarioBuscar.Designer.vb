@@ -44,9 +44,9 @@ Partial Class frmFuncionarioBuscar
         Me.lblFechaIngreso = New System.Windows.Forms.Label()
         Me.lblHorarioCompleto = New System.Windows.Forms.Label()
         Me.lblCargo = New System.Windows.Forms.Label()
-        Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.lblPresencia = New System.Windows.Forms.Label()
         Me.lblEstadoActividad = New System.Windows.Forms.Label()
+        Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         CType(Me.splitContenedor, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.splitContenedor.Panel1.SuspendLayout()
         Me.splitContenedor.Panel2.SuspendLayout()
@@ -86,6 +86,7 @@ Partial Class frmFuncionarioBuscar
         Me.dgvResultados.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgvResultados.Location = New System.Drawing.Point(0, 72)
         Me.dgvResultados.Name = "dgvResultados"
+        Me.dgvResultados.ReadOnly = True
         Me.dgvResultados.RowHeadersWidth = 62
         Me.dgvResultados.Size = New System.Drawing.Size(301, 472)
         Me.dgvResultados.TabIndex = 1
