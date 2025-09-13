@@ -62,8 +62,9 @@ Public Class frmFuncionarioSituacion
         LoadingHelper.MostrarCargando(Me)
         Try
             _funcionario = Await _uow.Context.Set(Of Funcionario)().FindAsync(_funcionarioId)
+
             If _funcionario Is Nothing Then
-                MessageBox.Show("No se encontró el funcionario.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                Notifier.[Error](Me, "No se encontró el funcionario.")
                 Close()
                 Return
             End If
@@ -71,16 +72,17 @@ Public Class frmFuncionarioSituacion
             lblNombre.Text = $"Situación de: {_funcionario.Nombre} ({_funcionario.CI})"
 
             _todasLasNovedades = Await _uow.Context.Set(Of vw_NovedadesCompletas)().
-                Where(Function(n) n.FuncionarioId = _funcionario.Id).
-                AsNoTracking().
-                ToListAsync()
+            Where(Function(n) n.FuncionarioId = _funcionario.Id).
+            AsNoTracking().
+            ToListAsync()
 
         Catch ex As Exception
-            MessageBox.Show($"Error al cargar los datos iniciales: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Notifier.[Error](Me, $"Error al cargar los datos iniciales: {ex.Message}")
         Finally
             LoadingHelper.OcultarCargando(Me)
         End Try
     End Function
+
 
 #End Region
 

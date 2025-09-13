@@ -702,39 +702,108 @@ Public Class frmFuncionarioCrear
     End Sub
 
     Private Sub btnQuitarEstado_Click(sender As Object, e As EventArgs) Handles btnQuitarEstado.Click
-        Dim row = TryCast(dgvEstadosTransitorios.CurrentRow?.DataBoundItem, EstadoRow)
-        If row?.EntityRef Is Nothing Then Return
-
-        If MessageBox.Show("¿Está seguro de que desea quitar este estado transitorio?", "Confirmar Eliminación",
-                            MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then Return
-
-        Dim entidad = row.EntityRef
-
-        If entidad.Id > 0 Then
-            ' Importante: NO romper la relación de navegación.
-            ' Marcá la entidad (y su detalle) como Deleted ya, así EF no intenta nullear FKs
-            MarcarParaEliminar(entidad)
-        Else
-            ' Era nuevo/no persistido: simplemente sacarlo del contexto
-            If _uow.Context.Entry(entidad).State <> EntityState.Detached Then
-                _uow.Context.Entry(entidad).State = EntityState.Detached
-            End If
+        ' 1) Validación de selección
+        Dim row As EstadoRow = TryCast(dgvEstadosTransitorios.CurrentRow?.DataBoundItem, EstadoRow)
+        If row Is Nothing OrElse row.EntityRef Is Nothing Then
+            Notifier.Warn(Me, "No hay ningún estado seleccionado.")
+            Return
         End If
 
-        ' Actualizar solo UI
-        _estadoRows.Remove(row)
-        bsEstados.ResetBindings(False)
+        ' 2) Confirmación destructiva
+        If MessageBox.Show("¿Está seguro de que desea quitar este estado transitorio?",
+                       "Confirmar Eliminación",
+                       MessageBoxButtons.YesNo,
+                       MessageBoxIcon.Question) <> DialogResult.Yes Then
+            Return
+        End If
+
+        Dim oldCursor = Me.Cursor
+        btnQuitarEstado.Enabled = False
+        Me.Cursor = Cursors.WaitCursor
+
+        Try
+            Dim entidad = row.EntityRef
+
+            If entidad.Id > 0 Then
+                ' Persistido: marcar para eliminar en EF (sin romper navegación/FKs)
+                MarcarParaEliminar(entidad)
+                ' Nota: el commit real ocurrirá al guardar el formulario/pantalla
+                Notifier.Info(Me, "Estado marcado para eliminar. Se aplicará al guardar.")
+            Else
+                ' No persistido: sacar del contexto si estaba adjunto
+                Dim entry = _uow.Context.Entry(entidad)
+                If entry IsNot Nothing AndAlso entry.State <> EntityState.Detached Then
+                    entry.State = EntityState.Detached
+                End If
+                Notifier.Success(Me, "Estado quitado de la lista.")
+            End If
+
+            ' 3) Actualizar solo UI (lista y binding)
+            _estadoRows.Remove(row)
+            bsEstados.ResetBindings(False)
+
+            ' (Opcional) limpiar selección visual
+            dgvEstadosTransitorios.ClearSelection()
+
+        Catch ex As Exception
+            Notifier.[Error](Me, $"No se pudo quitar el estado: {ex.Message}")
+        Finally
+            Me.Cursor = oldCursor
+            btnQuitarEstado.Enabled = True
+        End Try
     End Sub
 
-    Private Sub dgvDotacion_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
+
+    Private Sub dgvDotacion_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs) _
+    Handles dgvDotacion.CellFormatting
+
         Dim dgv = CType(sender, DataGridView)
+
+        ' Guardas defensivas básicas
+        If dgv Is Nothing OrElse dgv.DataSource Is Nothing Then Return
         If e.RowIndex < 0 OrElse e.ColumnIndex < 0 OrElse e.ColumnIndex >= dgv.Columns.Count Then Return
-        Dim dataItem = TryCast(dgv.Rows(e.RowIndex).DataBoundItem, FuncionarioDotacion)
+
+        ' Si hay "fila nueva" visible, evitar formatearla
+        If dgv.AllowUserToAddRows AndAlso e.RowIndex = dgv.NewRowIndex Then Return
+
+        ' Si por cambios de binding el RowCount se quedó atrás, evitá acceder
+        If e.RowIndex >= dgv.RowCount Then Return
+
+        ' Evitar formatear filas compartidas sin DataBoundItem (virtualización)
+        Dim row As DataGridViewRow = dgv.Rows(e.RowIndex)
+        If row Is Nothing OrElse row.IsNewRow Then Return
+
+        ' Este acceso puede lanzar si el CurrencyManager está desincronizado → Try/Catch
+        Dim dataItem As FuncionarioDotacion = Nothing
+        Try
+            dataItem = TryCast(row.DataBoundItem, FuncionarioDotacion)
+        Catch
+            ' Si falla, salimos silenciosamente: el ciclo de binding volverá a llamar cuando esté estable
+            Return
+        End Try
+
         If dataItem Is Nothing Then Return
+
+        ' Formateo por nombre de columna
         Dim colName = dgv.Columns(e.ColumnIndex).Name
-        If colName = "colItem" Then e.Value = _itemsDotacion?.FirstOrDefault(Function(i) i.Id = dataItem.DotacionItemId)?.Nombre : e.FormattingApplied = True
-        If colName = "FechaAsign" AndAlso e.Value IsNot Nothing Then e.Value = CType(e.Value, DateTime).ToString("dd/MM/yyyy") : e.FormattingApplied = True
+
+        If colName = "colItem" Then
+            e.Value = _itemsDotacion?.FirstOrDefault(Function(i) i.Id = dataItem.DotacionItemId)?.Nombre
+            e.FormattingApplied = True
+            Return
+        End If
+
+        If colName = "FechaAsign" AndAlso e.Value IsNot Nothing Then
+            ' Evitar casteos inseguros si el valor viene nulo o con tipo diferente
+            Dim dt As DateTime
+            If TypeOf e.Value Is DateTime Then
+                dt = DirectCast(e.Value, DateTime)
+                e.Value = dt.ToString("dd/MM/yyyy")
+                e.FormattingApplied = True
+            End If
+        End If
     End Sub
+
 
     Private Sub ConfigurarGrillaDotacion()
         dgvDotacion.AutoGenerateColumns = False : dgvDotacion.Columns.Clear()
@@ -865,22 +934,86 @@ Public Class frmFuncionarioCrear
     End Sub
 
     Private Async Sub btnQuitarDotacion_Click(sender As Object, e As EventArgs) Handles btnQuitarDotacion.Click
-        If dgvDotacion.CurrentRow Is Nothing Then Return
-        Dim dotacionSeleccionada = TryCast(dgvDotacion.CurrentRow.DataBoundItem, FuncionarioDotacion)
-        If dotacionSeleccionada Is Nothing Then Return
-        If MessageBox.Show("¿Está seguro de que desea quitar este elemento de dotación?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
-            Try
-                _dotaciones.Remove(dotacionSeleccionada)
-                If dotacionSeleccionada.Id > 0 Then
-                    _uow.Repository(Of FuncionarioDotacion).Remove(dotacionSeleccionada)
-                    Await _uow.CommitAsync()
-                End If
-            Catch ex As Exception
-                MessageBox.Show("Ocurrió un error al quitar la dotación: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                _dotaciones.Add(dotacionSeleccionada)
-            End Try
+        ' 1) Validación de selección
+        If dgvDotacion.CurrentRow Is Nothing Then
+            Notifier.Warn(Me, "No hay ninguna dotación seleccionada.")
+            Return
         End If
+        If dgvDotacion.AllowUserToAddRows AndAlso dgvDotacion.CurrentRow.Index = dgvDotacion.NewRowIndex Then
+            Notifier.Warn(Me, "La fila nueva no puede eliminarse.")
+            Return
+        End If
+
+        Dim dotacionSeleccionada = TryCast(dgvDotacion.CurrentRow.DataBoundItem, FuncionarioDotacion)
+        If dotacionSeleccionada Is Nothing Then
+            Notifier.Warn(Me, "No se pudo determinar la dotación seleccionada.")
+            Return
+        End If
+
+        ' 2) Confirmación destructiva (mantenemos modal)
+        If MessageBox.Show("¿Está seguro de que desea quitar este elemento de dotación?",
+                       "Confirmar",
+                       MessageBoxButtons.YesNo,
+                       MessageBoxIcon.Question) <> DialogResult.Yes Then
+            Return
+        End If
+
+        ' 3) UX: deshabilitar botón + cursor espera
+        Dim oldCursor = Me.Cursor
+        btnQuitarDotacion.Enabled = False
+        Me.Cursor = Cursors.WaitCursor
+
+        ' 4) Pausar eventos del BindingSource para evitar inconsistencias durante el borrado
+        Dim bs = TryCast(dgvDotacion.DataSource, BindingSource)
+        If bs IsNot Nothing Then bs.RaiseListChangedEvents = False
+
+        Dim removidaLocal As Boolean = False
+
+        Try
+            ' 5) Remover de la colección enlazada a la grilla (UI)
+            If _dotaciones IsNot Nothing Then
+                removidaLocal = _dotaciones.Remove(dotacionSeleccionada)
+            End If
+
+            ' 6) Si estaba persistida, borrar en BD
+            If dotacionSeleccionada.Id > 0 Then
+                Dim repo = _uow.Repository(Of FuncionarioDotacion)()
+                repo.Remove(dotacionSeleccionada)
+                Await _uow.CommitAsync()
+                Notifier.Info(Me, "Dotación eliminada de la base de datos.")
+            Else
+                Notifier.Success(Me, "Dotación quitada de la lista (aún no persistida).")
+            End If
+
+        Catch ex As Exception
+            ' Revertir eliminación local si falló el commit
+            If removidaLocal AndAlso _dotaciones IsNot Nothing Then
+                _dotaciones.Add(dotacionSeleccionada)
+            End If
+            Notifier.[Error](Me, $"Ocurrió un error al quitar la dotación: {ex.Message}")
+
+        Finally
+            ' 7) Reanudar eventos y refrescar binding
+            If bs IsNot Nothing Then
+                bs.RaiseListChangedEvents = True
+                bs.ResetBindings(False)
+            Else
+                ' Si no hay BindingSource, al menos refrescar la grilla
+                dgvDotacion.Refresh()
+            End If
+
+            ' 8) Limpiar selección y refrescar cuando el CurrencyManager ya se estabilizó
+            BeginInvoke(CType(Sub()
+                                  dgvDotacion.ClearSelection()
+                                  dgvDotacion.Refresh()
+                              End Sub, MethodInvoker))
+
+            ' 9) Restaurar UX
+            Me.Cursor = oldCursor
+            btnQuitarDotacion.Enabled = True
+        End Try
     End Sub
+
 #End Region
 
     Private Sub MarcarParaEliminar(estado As EstadoTransitorio)
@@ -944,12 +1077,36 @@ Public Class frmFuncionarioCrear
     End Function
 
     Private Sub AbrirChildEnDashboard(formHijo As Form)
-        Dim dash = GetDashboard()
-        If dash Is Nothing Then
-            MessageBox.Show("No se encontró el Dashboard activo.", "Navegación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+        ' 1) Validaciones
+        If formHijo Is Nothing Then
+            Notifier.Warn(Me, "No hay formulario para abrir.")
             Return
         End If
-        dash.AbrirChild(formHijo) ' ← usa la pila (Opción A)
+
+        Dim dash = GetDashboard()
+        If dash Is Nothing OrElse dash.IsDisposed Then
+            Notifier.Warn(Me, "No se encontró el Dashboard activo.")
+            Return
+        End If
+
+        ' 2) Garantizar que corra en el hilo de UI del dashboard
+        If dash.InvokeRequired Then
+            dash.BeginInvoke(CType(Sub() AbrirChildEnDashboard(formHijo), MethodInvoker))
+            Return
+        End If
+
+        ' 3) Intentar abrir y dar feedback
+        Try
+            dash.Activate()
+            dash.BringToFront()
+            dash.AbrirChild(formHijo) ' ← usa la pila (Opción A)
+
+            ' Toast de éxito anclado al Dashboard
+            Notifier.Success(dash, $"Abierto: {formHijo.Text}")
+        Catch ex As Exception
+            Notifier.[Error](dash, $"No se pudo abrir la ventana: {ex.Message}")
+        End Try
     End Sub
+
 
 End Class

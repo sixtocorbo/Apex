@@ -12,26 +12,37 @@ Public Class frmIncidencias
     End Sub
 
     Private Async Sub frmGestionIncidencias_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Await CargarDatos()
         AppTheme.Aplicar(Me)
+        Me.KeyPreview = True
+        Await CargarDatos()
     End Sub
 
+
     Private Async Function CargarDatos() As Task
-        Dim repo = _uow.Repository(Of TipoLicencia)()
+        Dim oldCursor = Me.Cursor
+        Me.Cursor = Cursors.WaitCursor
+        Try
+            Dim repo = _uow.Repository(Of TipoLicencia)()
 
-        ' --- INICIO DE LA CORRECCIÓN ---
-        ' Se agrega AsNoTracking() para evitar conflictos de seguimiento en el futuro.
-        _tiposLicencia = Await repo.GetAll().
-        Include(Function(t) t.CategoriaAusencia).
-        OrderByDescending(Function(t) t.Id).
-        AsNoTracking().
-        ToListAsync()
-        ' --- FIN DE LA CORRECCIÓN ---
+            _tiposLicencia = Await repo.GetAll().
+            Include(Function(t) t.CategoriaAusencia).
+            OrderByDescending(Function(t) t.Id).
+            AsNoTracking().
+            ToListAsync()
 
-        dgvIncidencias.DataSource = Nothing
-        dgvIncidencias.DataSource = _tiposLicencia
-        ConfigurarGrilla()
+            dgvIncidencias.DataSource = Nothing
+            dgvIncidencias.DataSource = _tiposLicencia
+            ConfigurarGrilla()
+            dgvIncidencias.ClearSelection()
+
+        Catch ex As Exception
+            Notifier.[Error](Me, $"Ocurrió un error al cargar las incidencias: {ex.Message}")
+            dgvIncidencias.DataSource = Nothing
+        Finally
+            Me.Cursor = oldCursor
+        End Try
     End Function
+
     Private Sub ConfigurarGrilla()
         dgvIncidencias.Columns.Clear()
         dgvIncidencias.AutoGenerateColumns = False
@@ -49,75 +60,113 @@ Public Class frmIncidencias
     End Sub
 
     Private Sub dgvIncidencias_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs) Handles dgvIncidencias.CellFormatting
-        If e.RowIndex >= 0 AndAlso dgvIncidencias.Columns(e.ColumnIndex).Name = "Categoria" Then
-            Dim licencia = TryCast(dgvIncidencias.Rows(e.RowIndex).DataBoundItem, TipoLicencia)
-            If licencia IsNot Nothing AndAlso licencia.CategoriaAusencia IsNot Nothing Then
-                e.Value = licencia.CategoriaAusencia.Nombre
+        Dim dgv = CType(sender, DataGridView)
+        If dgv Is Nothing OrElse dgv.DataSource Is Nothing Then Return
+        If e.RowIndex < 0 OrElse e.ColumnIndex < 0 OrElse e.ColumnIndex >= dgv.Columns.Count Then Return
+        If dgv.AllowUserToAddRows AndAlso e.RowIndex = dgv.NewRowIndex Then Return
+        If e.RowIndex >= dgv.RowCount Then Return
+
+        If dgv.Columns(e.ColumnIndex).Name = "Categoria" Then
+            Dim lic As TipoLicencia = Nothing
+            Try
+                lic = TryCast(dgv.Rows(e.RowIndex).DataBoundItem, TipoLicencia)
+            Catch
+                Return
+            End Try
+            If lic IsNot Nothing AndAlso lic.CategoriaAusencia IsNot Nothing Then
+                e.Value = lic.CategoriaAusencia.Nombre
                 e.FormattingApplied = True
             End If
         End If
     End Sub
 
+
     Private Async Sub btnAgregar_Click(sender As Object, e As EventArgs) Handles btnAgregar.Click
         Using frm As New frmIncidenciasConfiguracion(_uow)
             If frm.ShowDialog(Me) = DialogResult.OK Then
-                _uow.Repository(Of TipoLicencia).Add(frm.Incidencia)
-                Await _uow.CommitAsync()
-                Await CargarDatos()
+                Dim oldCursor = Me.Cursor
+                btnAgregar.Enabled = False
+                Me.Cursor = Cursors.WaitCursor
+                Try
+                    _uow.Repository(Of TipoLicencia).Add(frm.Incidencia)
+                    Await _uow.CommitAsync()
+                    Notifier.Success(Me, "Incidencia creada correctamente.")
+                    Await CargarDatos()
+                Catch ex As Exception
+                    Notifier.[Error](Me, $"No se pudo crear la incidencia: {ex.Message}")
+                Finally
+                    Me.Cursor = oldCursor
+                    btnAgregar.Enabled = True
+                End Try
             End If
         End Using
     End Sub
 
-
-    ' Archivo: sixtocorbo/apex/Apex-aabdb9cacb3f1a24cadc076438a2c915e94e714c/Apex/UI/frmGestionIncidencias.vb
-
     Private Async Sub btnEditar_Click(sender As Object, e As EventArgs) Handles btnEditar.Click
-        If dgvIncidencias.CurrentRow Is Nothing Then Return
-
-        Dim idSeleccionado = CInt(dgvIncidencias.CurrentRow.Cells("Id").Value)
-        Dim repo = _uow.Repository(Of TipoLicencia)()
-
-        ' Paso 1: Cargar una copia "desconectada" para la edición, para no interferir con el contexto.
-        Dim tipoLicenciaParaEditar = Await repo.GetAll().
-    Include(Function(t) t.CategoriaAusencia).
-    AsNoTracking().
-    FirstOrDefaultAsync(Function(t) t.Id = idSeleccionado)
-
-        If tipoLicenciaParaEditar Is Nothing Then
-            MessageBox.Show("No se encontró el registro a editar.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        If dgvIncidencias.CurrentRow Is Nothing Then
+            Notifier.Warn(Me, "Seleccioná una incidencia para editar.")
+            Return
+        End If
+        If dgvIncidencias.AllowUserToAddRows AndAlso dgvIncidencias.CurrentRow.Index = dgvIncidencias.NewRowIndex Then
+            Notifier.Warn(Me, "La fila nueva no es editable.")
             Return
         End If
 
-        ' Paso 2: Abrir el formulario de detalle para que el usuario haga los cambios.
+        Dim idSeleccionado As Integer
+        Dim idCell = dgvIncidencias.CurrentRow.Cells("Id")
+        If idCell Is Nothing OrElse idCell.Value Is Nothing OrElse Not Integer.TryParse(idCell.Value.ToString(), idSeleccionado) Then
+            Notifier.Warn(Me, "No se pudo determinar el ID de la incidencia.")
+            Return
+        End If
+
+        Dim repo = _uow.Repository(Of TipoLicencia)()
+
+        ' Cargar copia desconectada para edición
+        Dim tipoLicenciaParaEditar = Await repo.GetAll().
+        Include(Function(t) t.CategoriaAusencia).
+        AsNoTracking().
+        FirstOrDefaultAsync(Function(t) t.Id = idSeleccionado)
+
+        If tipoLicenciaParaEditar Is Nothing Then
+            Notifier.[Error](Me, "No se encontró el registro a editar.")
+            Return
+        End If
+
         Using frm As New frmIncidenciasConfiguracion(_uow, tipoLicenciaParaEditar)
             If frm.ShowDialog(Me) = DialogResult.OK Then
+                Dim oldCursor = Me.Cursor
+                btnEditar.Enabled = False
+                Me.Cursor = Cursors.WaitCursor
+                Try
+                    ' Cargar la entidad original rastreada por el contexto
+                    Dim entidadOriginal = Await _uow.Context.Set(Of TipoLicencia)().
+                    FirstOrDefaultAsync(Function(t) t.Id = idSeleccionado)
 
-                ' --- INICIO DE LA SOLUCIÓN FINAL ---
+                    If entidadOriginal Is Nothing Then
+                        Notifier.[Error](Me, "La incidencia ya no existe en la base de datos.")
+                        Return
+                    End If
 
-                ' Paso 3: Cargar la entidad ORIGINAL que el contexto SÍ está rastreando.
-                ' CORRECCIÓN: Se obtiene la entidad directamente del context para que sea rastreada.
-                Dim entidadOriginal = Await _uow.Context.Set(Of TipoLicencia)().
-                                    FirstOrDefaultAsync(Function(t) t.Id = idSeleccionado)
-
-                If entidadOriginal IsNot Nothing Then
-                    ' Paso 4: Copiar los valores escalares (texto, checkboxes, etc.)
-                    ' desde el objeto editado (frm.Incidencia) al objeto original.
+                    ' Copiar valores escalares
                     _uow.Context.Entry(entidadOriginal).CurrentValues.SetValues(frm.Incidencia)
 
-                    ' Paso 5: Actualizar explícitamente la clave foránea de la relación.
+                    ' Actualizar FK explícitamente
                     entidadOriginal.CategoriaAusenciaId = frm.Incidencia.CategoriaAusenciaId
 
-                    ' Paso 6: Guardar el objeto original, que ahora tiene los valores actualizados.
                     Await _uow.CommitAsync()
-                End If
+                    Notifier.Success(Me, "Incidencia actualizada correctamente.")
+                    Await CargarDatos()
 
-                ' --- FIN DE LA SOLUCIÓN FINAL ---
-
-                ' Paso 7: Refrescar la grilla.
-                Await CargarDatos()
+                Catch ex As Exception
+                    Notifier.[Error](Me, $"No se pudo actualizar la incidencia: {ex.Message}")
+                Finally
+                    Me.Cursor = oldCursor
+                    btnEditar.Enabled = True
+                End Try
             End If
         End Using
     End Sub
+
 
     Private Sub btnCerrar_Click(sender As Object, e As EventArgs) Handles btnCerrar.Click
         NavegacionHelper.AbrirFormUnicoEnDashboard(Of frmConfiguracion)(Me)

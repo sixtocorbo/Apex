@@ -27,69 +27,115 @@ Public Class frmIncidenciasConfiguracion
     End Sub
 
     Private Async Sub frmIncidenciaDetalle_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        AppTheme.Aplicar(Me)
+        Me.KeyPreview = True
+        Me.AcceptButton = btnGuardar
+        Me.CancelButton = btnCancelar
+
         Await CargarCategorias()
         SiEsEdicionCargarDatos()
-        AppTheme.Aplicar(Me)
+
+        Notifier.Info(Me, If(_esNuevo, "Creá una nueva incidencia.", "Editá la incidencia y guardá los cambios."))
     End Sub
 
+
     Private Async Function CargarCategorias() As Task
-        _categorias = Await _uow.Repository(Of CategoriaAusencia)().GetAll().ToListAsync()
-        cboCategoria.DataSource = _categorias
-        cboCategoria.DisplayMember = "Nombre"
-        cboCategoria.ValueMember = "Id"
+        Dim oldCursor = Me.Cursor
+        Me.Cursor = Cursors.WaitCursor
+        Try
+            _categorias = Await _uow.Repository(Of CategoriaAusencia)().
+            GetAll().
+            OrderBy(Function(c) c.Nombre).
+            AsNoTracking().
+            ToListAsync()
+
+            cboCategoria.DropDownStyle = ComboBoxStyle.DropDownList
+            cboCategoria.DataSource = _categorias
+            cboCategoria.DisplayMember = "Nombre"
+            cboCategoria.ValueMember = "Id"
+            cboCategoria.SelectedIndex = -1
+        Catch ex As Exception
+            Notifier.[Error](Me, $"No se pudieron cargar las categorías: {ex.Message}")
+            _categorias = New List(Of CategoriaAusencia)()
+            cboCategoria.DataSource = Nothing
+        Finally
+            Me.Cursor = oldCursor
+        End Try
     End Function
 
-    Private Sub SiEsEdicionCargarDatos()
-        If Not _esNuevo Then
-            txtNombre.Text = Incidencia.Nombre
-            chkEsAusencia.Checked = Incidencia.EsAusencia
-            chkSuspendeViatico.Checked = Incidencia.SuspendeViatico
-            chkAfectaPresentismo.Checked = Incidencia.AfectaPresentismo
 
-            ' --- INICIO DE LA CORRECCIÓN ---
-            '
-            ' Se cambia la comprobación de "HasValue" por una comprobación
-            ' para ver si el ID es un número válido (mayor que 0).
-            '
-            If Incidencia.CategoriaAusenciaId > 0 Then
-                cboCategoria.SelectedValue = Incidencia.CategoriaAusenciaId
-            Else
-                cboCategoria.SelectedIndex = -1 ' No hay categoría seleccionada
-            End If
-            ' --- FIN DE LA CORRECCIÓN ---
+    Private Sub SiEsEdicionCargarDatos()
+        If _esNuevo OrElse Incidencia Is Nothing Then Return
+
+        txtNombre.Text = Incidencia.Nombre
+        chkEsAusencia.Checked = Incidencia.EsAusencia
+        chkSuspendeViatico.Checked = Incidencia.SuspendeViatico
+        chkAfectaPresentismo.Checked = Incidencia.AfectaPresentismo
+
+        If Incidencia.CategoriaAusenciaId > 0 AndAlso _categorias IsNot Nothing Then
+            Dim exists = _categorias.Any(Function(c) c.Id = Incidencia.CategoriaAusenciaId)
+            cboCategoria.SelectedValue = If(exists, Incidencia.CategoriaAusenciaId, -1)
+        Else
+            cboCategoria.SelectedIndex = -1
         End If
     End Sub
 
+
     Private Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
-        Incidencia.Nombre = txtNombre.Text.Trim()
+        ' Validación: nombre requerido
+        Dim nombre As String = If(txtNombre.Text, String.Empty).Trim()
+        If nombre.Length = 0 Then
+            Notifier.Warn(Me, "El nombre de la incidencia no puede estar vacío.")
+            txtNombre.Focus()
+            txtNombre.SelectAll()
+            Return
+        End If
+
+        ' Mapear campos
+        Incidencia.Nombre = nombre
         Incidencia.EsAusencia = chkEsAusencia.Checked
         Incidencia.SuspendeViatico = chkSuspendeViatico.Checked
         Incidencia.AfectaPresentismo = chkAfectaPresentismo.Checked
 
-        ' --- INICIO DE LA CORRECCIÓN CLAVE ---
-        ' Sincronizamos tanto el ID como el objeto de navegación.
-        ' Esto previene el error de integridad referencial.
+        ' Sincronizar FK + navegación (categoría puede ser opcional)
         If cboCategoria.SelectedValue IsNot Nothing Then
-            Dim selectedCategoryId = CInt(cboCategoria.SelectedValue)
-            Incidencia.CategoriaAusenciaId = selectedCategoryId
-            ' Asignamos el objeto completo desde la lista que ya cargamos.
-            Incidencia.CategoriaAusencia = _categorias.FirstOrDefault(Function(c) c.Id = selectedCategoryId)
+            Dim selectedId As Integer
+            If Integer.TryParse(cboCategoria.SelectedValue.ToString(), selectedId) AndAlso selectedId > 0 Then
+                Incidencia.CategoriaAusenciaId = selectedId
+                If _categorias IsNot Nothing Then
+                    Incidencia.CategoriaAusencia = _categorias.FirstOrDefault(Function(c) c.Id = selectedId)
+                Else
+                    Incidencia.CategoriaAusencia = Nothing
+                End If
+            Else
+                Incidencia.CategoriaAusenciaId = Nothing
+                Incidencia.CategoriaAusencia = Nothing
+            End If
         Else
             Incidencia.CategoriaAusenciaId = Nothing
             Incidencia.CategoriaAusencia = Nothing
         End If
-        ' --- FIN DE LA CORRECCIÓN CLAVE ---
 
+        ' Éxito: cerramos con OK y avisamos
+        Notifier.Success(Me, If(_esNuevo, "Incidencia lista para crear.", "Cambios listos para guardar."))
         Me.DialogResult = DialogResult.OK
+        ' (ShowDialog cerrará el form automáticamente al establecer DialogResult)
     End Sub
+
 
     Private Sub btnCancelar_Click(sender As Object, e As EventArgs) Handles btnCancelar.Click
+        Notifier.Info(Me, "Edición cancelada.")
         Me.DialogResult = DialogResult.Cancel
     End Sub
+
     Private Sub Cerrando(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
-        ' Si la tecla presionada es Escape, se cierra el formulario.
         If e.KeyCode = Keys.Escape Then
-            Me.Close()
+            btnCancelar.PerformClick()
+            e.Handled = True
+        ElseIf e.KeyCode = Keys.Enter AndAlso Not btnGuardar.Focused Then
+            btnGuardar.PerformClick()
+            e.Handled = True
         End If
     End Sub
+
 End Class

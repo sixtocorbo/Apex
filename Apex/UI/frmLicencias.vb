@@ -27,7 +27,10 @@ Public Class frmLicencias
             AppTheme.SetCue(txtBusquedaLicencia, "Buscar por funcionario…")
         Catch
         End Try
+
+        Notifier.Info(Me, "Escribí para filtrar o cambiá 'Solo vigentes'.")
     End Sub
+
 
     Private Sub frmGestionLicencias_FormClosed(sender As Object, e As FormClosedEventArgs) Handles Me.FormClosed
         RemoveHandler NotificadorEventos.DatosActualizados, AddressOf OnDatosActualizados
@@ -72,44 +75,64 @@ Public Class frmLicencias
 
     Private Async Function CargarDatosLicenciasAsync() As Task
         If _estaCargandoLicencias Then Return
+        _estaCargandoLicencias = True
         Try
-            _estaCargandoLicencias = True
-
             Dim filtro = txtBusquedaLicencia.Text.Trim()
             Dim soloVigentes = (chkSoloVigentes IsNot Nothing AndAlso chkSoloVigentes.Checked)
 
             LoadingHelper.MostrarCargando(Me)
             dgvLicencias.DataSource = Nothing
+
             Dim datos As List(Of LicenciaConFuncionarioExtendidoDto)
             If soloVigentes Then
                 datos = Await _licenciaSvc.GetVigentesHoyAsync(filtroNombre:=filtro)
             Else
                 datos = Await _licenciaSvc.GetAllConDetallesAsync(filtroNombre:=filtro)
             End If
+
             dgvLicencias.DataSource = datos
+            dgvLicencias.ClearSelection()
+
         Catch ex As Exception
-            MessageBox.Show("Error al cargar licencias: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Notifier.[Error](Me, $"Error al cargar licencias: {ex.Message}")
+            dgvLicencias.DataSource = Nothing
         Finally
             _estaCargandoLicencias = False
             LoadingHelper.OcultarCargando(Me)
         End Try
     End Function
 
+
 #End Region
 
 #Region "Helpers de navegación (pila del Dashboard)"
-
     Private Function GetDashboard() As frmDashboard
         Return Application.OpenForms.OfType(Of frmDashboard)().FirstOrDefault()
     End Function
 
     Private Sub AbrirChildEnDashboard(formHijo As Form)
-        Dim dash = GetDashboard()
-        If dash Is Nothing Then
-            MessageBox.Show("No se encontró el Dashboard activo.", "Navegación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+        If formHijo Is Nothing Then
+            Notifier.Warn(Me, "No hay formulario para abrir.")
             Return
         End If
-        dash.AbrirChild(formHijo) ' ← usa la pila (Opción A)
+
+        Dim dash = GetDashboard()
+        If dash Is Nothing OrElse dash.IsDisposed Then
+            Notifier.Warn(Me, "No se encontró el Dashboard activo.")
+            Return
+        End If
+
+        If dash.InvokeRequired Then
+            dash.BeginInvoke(CType(Sub() AbrirChildEnDashboard(formHijo), MethodInvoker))
+            Return
+        End If
+
+        Try
+            dash.AbrirChild(formHijo)
+            Notifier.Success(dash, $"Abierto: {formHijo.Text}")
+        Catch ex As Exception
+            Notifier.[Error](dash, $"No se pudo abrir la ventana: {ex.Message}")
+        End Try
     End Sub
 
 #End Region
@@ -124,7 +147,9 @@ Public Class frmLicencias
     Private Async Sub SearchTimer_Tick(sender As Object, e As EventArgs) Handles _searchTimer.Tick
         _searchTimer.Stop()
         Await CargarDatosLicenciasAsync()
+        Notifier.Info(Me, "Búsqueda actualizada.")
     End Sub
+
 
     Private Async Sub chkSoloVigentes_CheckedChanged(sender As Object, e As EventArgs) Handles chkSoloVigentes.CheckedChanged
         If _isFirstLoad Then Return
@@ -148,35 +173,55 @@ Public Class frmLicencias
     End Sub
 
     Private Sub EditarSeleccionada()
-        If dgvLicencias.CurrentRow Is Nothing Then Return
+        If dgvLicencias.CurrentRow Is Nothing Then
+            Notifier.Warn(Me, "Seleccioná una licencia para editar.")
+            Return
+        End If
         Dim dto = TryCast(dgvLicencias.CurrentRow.DataBoundItem, LicenciaConFuncionarioExtendidoDto)
         If dto Is Nothing OrElse Not dto.LicenciaId.HasValue Then
-            MessageBox.Show("No se pudo determinar la licencia a editar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Notifier.Warn(Me, "No se pudo determinar la licencia a editar.")
             Return
         End If
 
-        ' Antes: ShowDialog(Me)
-        ' Ahora: abrir como child; al cerrar, el Dashboard restaura frmLicencias
         AbrirChildEnDashboard(New frmLicenciaCrear(dto.LicenciaId.Value, dto.EstadoLicencia))
     End Sub
 
+
     Private Async Sub btnEliminarLicencia_Click(sender As Object, e As EventArgs) Handles btnEliminarLicencia.Click
-        If dgvLicencias.CurrentRow Is Nothing Then Return
-        Dim dto = TryCast(dgvLicencias.CurrentRow.DataBoundItem, LicenciaConFuncionarioExtendidoDto)
-        If dto Is Nothing OrElse Not dto.LicenciaId.HasValue Then
-            MessageBox.Show("No se pudo determinar la licencia a eliminar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        If dgvLicencias.CurrentRow Is Nothing Then
+            Notifier.Warn(Me, "Seleccioná una licencia para eliminar.")
             Return
         End If
-        Dim nombre = If(dto.NombreFuncionario, "(sin nombre)")
-        If MessageBox.Show($"¿Eliminar la licencia de '{nombre}'?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
-            Try
-                Await _licenciaSvc.DeleteAsync(dto.LicenciaId.Value)
-                NotificadorEventos.NotificarActualizacionGeneral()
-            Catch ex As Exception
-                MessageBox.Show("Error al eliminar la licencia: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            End Try
+
+        Dim dto = TryCast(dgvLicencias.CurrentRow.DataBoundItem, LicenciaConFuncionarioExtendidoDto)
+        If dto Is Nothing OrElse Not dto.LicenciaId.HasValue Then
+            Notifier.Warn(Me, "No se pudo determinar la licencia a eliminar.")
+            Return
         End If
+
+        Dim nombre = If(dto.NombreFuncionario, "(sin nombre)")
+        If MessageBox.Show($"¿Eliminar la licencia de '{nombre}'?", "Confirmar",
+                           MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then
+            Return
+        End If
+
+        Dim oldCursor = Me.Cursor
+        btnEliminarLicencia.Enabled = False
+        Me.Cursor = Cursors.WaitCursor
+
+        Try
+            Await _licenciaSvc.DeleteAsync(dto.LicenciaId.Value)
+            Notifier.Info(Me, "Licencia eliminada.")
+            NotificadorEventos.NotificarActualizacionGeneral()
+            Await CargarDatosLicenciasAsync()
+        Catch ex As Exception
+            Notifier.[Error](Me, $"Error al eliminar la licencia: {ex.Message}")
+        Finally
+            Me.Cursor = oldCursor
+            btnEliminarLicencia.Enabled = True
+        End Try
     End Sub
+
 
 #End Region
 

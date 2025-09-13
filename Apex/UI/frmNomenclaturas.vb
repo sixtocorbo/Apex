@@ -8,60 +8,94 @@ Public Class frmNomenclaturas
 
     Private Async Sub frmGestionNomenclaturas_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Cursor = Cursors.WaitCursor
-        Await CargarDatosAsync()
-        ConfigurarGrilla()
-        LimpiarCampos()
-        AppTheme.Aplicar(Me)
         Try
-            AppTheme.SetCue(txtBuscar, "Buscar por Nombre, Código o Área Responsable...")
-            AppTheme.SetCue(txtNombre, "Nombre de la Nomenclatura")
-            AppTheme.SetCue(txtCodigo, "Código de la Nomenclatura")
-            AppTheme.SetCue(txtArea, "Área Responsable")
-            AppTheme.SetCue(txtPatron, "Patrón de la Nomenclatura (ej: DOC-YYYY-MM-DD-XXX)")
-            AppTheme.SetCue(txtEjemplo, "Ejemplo de la Nomenclatura (ej: DOC-2023-10-01-001)")
-            AppTheme.SetCue(txtUbicacion, "Ubicación del Archivo (ej: C:\Documentos\)")
-            AppTheme.SetCue(txtObservaciones, "Observaciones adicionales")
+            AppTheme.Aplicar(Me)
+            Await CargarDatosAsync()
+            ConfigurarGrilla()
+            LimpiarCampos()
 
-        Catch
-            ' Ignorar si no existe SetCue
+            Try
+                AppTheme.SetCue(txtBuscar, "Buscar por Nombre, Código o Área Responsable...")
+                AppTheme.SetCue(txtNombre, "Nombre de la Nomenclatura")
+                AppTheme.SetCue(txtCodigo, "Código de la Nomenclatura")
+                AppTheme.SetCue(txtArea, "Área Responsable")
+                AppTheme.SetCue(txtPatron, "Patrón (ej: DOC-YYYY-MM-DD-XXX)")
+                AppTheme.SetCue(txtEjemplo, "Ejemplo (ej: DOC-2023-10-01-001)")
+                AppTheme.SetCue(txtUbicacion, "Ubicación (ej: C:\Documentos\)")
+                AppTheme.SetCue(txtObservaciones, "Observaciones")
+            Catch
+                ' Ignorar si SetCue no está disponible
+            End Try
+
+            Notifier.Info(Me, "Listado de nomenclaturas listo.")
+        Catch ex As Exception
+            Notifier.[Error](Me, $"Error al inicializar: {ex.Message}")
+        Finally
+            Me.Cursor = Cursors.Default
         End Try
-        Me.Cursor = Cursors.Default
     End Sub
 
+
     Private Async Function CargarDatosAsync() As Task
-        Dim repo = _unitOfWork.Repository(Of Nomenclatura)()
-        _listaNomenclaturas = Await repo.GetAll().OrderBy(Function(n) n.Nombre).ToListAsync()
-        dgvNomenclaturas.DataSource = _listaNomenclaturas
+        Dim oldCursor = Me.Cursor
+        Me.Cursor = Cursors.WaitCursor
+        Try
+            Dim repo = _unitOfWork.Repository(Of Nomenclatura)()
+            _listaNomenclaturas = Await repo.GetAll().OrderBy(Function(n) n.Nombre).ToListAsync()
+            dgvNomenclaturas.DataSource = _listaNomenclaturas
+            dgvNomenclaturas.ClearSelection()
+        Catch ex As Exception
+            Notifier.[Error](Me, $"No se pudieron cargar las nomenclaturas: {ex.Message}")
+            dgvNomenclaturas.DataSource = New List(Of Nomenclatura)()
+        Finally
+            Me.Cursor = oldCursor
+        End Try
     End Function
+
 
     Private Sub ConfigurarGrilla()
         If dgvNomenclaturas.Columns.Count = 0 Then Return
 
-        ' Ocultamos las columnas que no necesitamos en la vista principal
-        dgvNomenclaturas.Columns("Id").Visible = False
-        dgvNomenclaturas.Columns("Patron").Visible = False
-        dgvNomenclaturas.Columns("Ejemplo").Visible = False
-        dgvNomenclaturas.Columns("UbicacionArchivo").Visible = False
-        dgvNomenclaturas.Columns("Observaciones").Visible = False
+        dgvNomenclaturas.RowHeadersVisible = False
+        dgvNomenclaturas.SelectionMode = DataGridViewSelectionMode.FullRowSelect
+        dgvNomenclaturas.MultiSelect = False
+        dgvNomenclaturas.ReadOnly = True
+        dgvNomenclaturas.AllowUserToAddRows = False
+        dgvNomenclaturas.AllowUserToDeleteRows = False
 
-        ' Ajustamos los anchos y los títulos
-        dgvNomenclaturas.Columns("Nombre").AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-        dgvNomenclaturas.Columns("Codigo").Width = 120
-        dgvNomenclaturas.Columns("AreaResponsable").HeaderText = "Área Resp."
-        dgvNomenclaturas.Columns("AreaResponsable").Width = 100
-        dgvNomenclaturas.Columns("UsaFecha").HeaderText = "Usa Fecha"
-        dgvNomenclaturas.Columns("UsaFecha").Width = 80
-        dgvNomenclaturas.Columns("UsaNomenclaturaCodigo").HeaderText = "Usa Código"
-        dgvNomenclaturas.Columns("UsaNomenclaturaCodigo").Width = 80
-    End Sub
+        ' Ocultas
+        If dgvNomenclaturas.Columns.Contains("Id") Then dgvNomenclaturas.Columns("Id").Visible = False
+        If dgvNomenclaturas.Columns.Contains("Patron") Then dgvNomenclaturas.Columns("Patron").Visible = False
+        If dgvNomenclaturas.Columns.Contains("Ejemplo") Then dgvNomenclaturas.Columns("Ejemplo").Visible = False
+        If dgvNomenclaturas.Columns.Contains("UbicacionArchivo") Then dgvNomenclaturas.Columns("UbicacionArchivo").Visible = False
+        If dgvNomenclaturas.Columns.Contains("Observaciones") Then dgvNomenclaturas.Columns("Observaciones").Visible = False
 
-    Private Sub dgvNomenclaturas_SelectionChanged(sender As Object, e As EventArgs) Handles dgvNomenclaturas.SelectionChanged
-        If dgvNomenclaturas.CurrentRow IsNot Nothing Then
-            Dim idSeleccionado = CInt(dgvNomenclaturas.CurrentRow.Cells("Id").Value)
-            _nomenclaturaSeleccionada = _listaNomenclaturas.FirstOrDefault(Function(n) n.Id = idSeleccionado)
-            MostrarDetalles()
+        ' Ajustes
+        If dgvNomenclaturas.Columns.Contains("Nombre") Then dgvNomenclaturas.Columns("Nombre").AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+        If dgvNomenclaturas.Columns.Contains("Codigo") Then dgvNomenclaturas.Columns("Codigo").Width = 120
+        If dgvNomenclaturas.Columns.Contains("AreaResponsable") Then
+            dgvNomenclaturas.Columns("AreaResponsable").HeaderText = "Área Resp."
+            dgvNomenclaturas.Columns("AreaResponsable").Width = 120
+        End If
+        If dgvNomenclaturas.Columns.Contains("UsaFecha") Then dgvNomenclaturas.Columns("UsaFecha").Width = 90
+        If dgvNomenclaturas.Columns.Contains("UsaNomenclaturaCodigo") Then
+            dgvNomenclaturas.Columns("UsaNomenclaturaCodigo").HeaderText = "Usa Código"
+            dgvNomenclaturas.Columns("UsaNomenclaturaCodigo").Width = 90
         End If
     End Sub
+
+
+    Private Sub dgvNomenclaturas_SelectionChanged(sender As Object, e As EventArgs) Handles dgvNomenclaturas.SelectionChanged
+        If dgvNomenclaturas.CurrentRow Is Nothing Then Return
+        If dgvNomenclaturas.AllowUserToAddRows AndAlso dgvNomenclaturas.CurrentRow.Index = dgvNomenclaturas.NewRowIndex Then Return
+
+        Dim item = TryCast(dgvNomenclaturas.CurrentRow.DataBoundItem, Nomenclatura)
+        If item Is Nothing Then Return
+
+        _nomenclaturaSeleccionada = item
+        MostrarDetalles()
+    End Sub
+
 
     Private Sub MostrarDetalles()
         If _nomenclaturaSeleccionada IsNot Nothing Then
@@ -102,7 +136,8 @@ Public Class frmNomenclaturas
 
     Private Async Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
         If String.IsNullOrWhiteSpace(txtNombre.Text) OrElse String.IsNullOrWhiteSpace(txtCodigo.Text) Then
-            MessageBox.Show("El Nombre y el Código son obligatorios.", "Datos incompletos", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Notifier.Warn(Me, "El Nombre y el Código son obligatorios.")
+            If String.IsNullOrWhiteSpace(txtNombre.Text) Then txtNombre.Focus() Else txtCodigo.Focus()
             Return
         End If
 
@@ -116,60 +151,91 @@ Public Class frmNomenclaturas
         _nomenclaturaSeleccionada.UsaFecha = chkUsaFecha.Checked
         _nomenclaturaSeleccionada.UsaNomenclaturaCodigo = chkUsaNomenclaturaCodigo.Checked
 
-        Me.Cursor = Cursors.WaitCursor
         Dim repo = _unitOfWork.Repository(Of Nomenclatura)()
 
-        If _nomenclaturaSeleccionada.Id = 0 Then ' Es un registro nuevo
-            repo.Add(_nomenclaturaSeleccionada)
-        Else ' Es una actualización
-            repo.Update(_nomenclaturaSeleccionada)
-        End If
+        Dim oldCursor = Me.Cursor
+        btnGuardar.Enabled = False
+        Me.Cursor = Cursors.WaitCursor
 
-        ' --- CORRECCIÓN AQUÍ ---
-        Await _unitOfWork.CommitAsync()
+        Try
+            If _nomenclaturaSeleccionada.Id = 0 Then
+                repo.Add(_nomenclaturaSeleccionada)
+            Else
+                repo.Update(_nomenclaturaSeleccionada)
+            End If
 
-        Await CargarDatosAsync() ' Recargamos la grilla
-        LimpiarCampos()
-        Me.Cursor = Cursors.Default
-        MessageBox.Show("Datos guardados correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
-    End Sub
-
-    Private Async Sub btnEliminar_Click(sender As Object, e As EventArgs) Handles btnEliminar.Click
-        If _nomenclaturaSeleccionada Is Nothing OrElse _nomenclaturaSeleccionada.Id = 0 Then
-            MessageBox.Show("Debe seleccionar una nomenclatura para eliminar.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-            Return
-        End If
-
-        Dim confirmacion = MessageBox.Show($"¿Está seguro de que desea eliminar la nomenclatura '{_nomenclaturaSeleccionada.Nombre}'?", "Confirmar eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
-
-        If confirmacion = DialogResult.Yes Then
-            Me.Cursor = Cursors.WaitCursor
-            Dim repo = _unitOfWork.Repository(Of Nomenclatura)()
-            repo.Remove(_nomenclaturaSeleccionada)
-
-            ' --- CORRECCIÓN AQUÍ ---
             Await _unitOfWork.CommitAsync()
+            Notifier.Success(Me, "Nomenclatura guardada correctamente.")
 
             Await CargarDatosAsync()
             LimpiarCampos()
-            Me.Cursor = Cursors.Default
-            MessageBox.Show("Nomenclatura eliminada.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
-        End If
+
+        Catch ex As Exception
+            Notifier.[Error](Me, $"Ocurrió un error al guardar: {ex.Message}")
+        Finally
+            Me.Cursor = oldCursor
+            btnGuardar.Enabled = True
+        End Try
     End Sub
 
-    Private Sub txtBuscar_TextChanged(sender As Object, e As EventArgs) Handles txtBuscar.TextChanged
-        Dim textoBusqueda = txtBuscar.Text.Trim().ToUpper()
-        If String.IsNullOrEmpty(textoBusqueda) Then
-            dgvNomenclaturas.DataSource = _listaNomenclaturas
-        Else
-            Dim resultado = _listaNomenclaturas.Where(Function(n)
-                                                          Return n.Nombre.ToUpper().Contains(textoBusqueda) OrElse
-                                                                 n.Codigo.ToUpper().Contains(textoBusqueda) OrElse
-                                                                 (n.AreaResponsable IsNot Nothing AndAlso n.AreaResponsable.ToUpper().Contains(textoBusqueda))
-                                                      End Function).ToList()
-            dgvNomenclaturas.DataSource = resultado
+
+    Private Async Sub btnEliminar_Click(sender As Object, e As EventArgs) Handles btnEliminar.Click
+        If _nomenclaturaSeleccionada Is Nothing OrElse _nomenclaturaSeleccionada.Id = 0 Then
+            Notifier.Warn(Me, "Debe seleccionar una nomenclatura para eliminar.")
+            Return
         End If
+
+        If MessageBox.Show(
+        $"¿Eliminar la nomenclatura '{_nomenclaturaSeleccionada.Nombre}'?",
+        "Confirmar eliminación",
+        MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then
+            Return
+        End If
+
+        Dim oldCursor = Me.Cursor
+        btnEliminar.Enabled = False
+        Me.Cursor = Cursors.WaitCursor
+
+        Try
+            Dim repo = _unitOfWork.Repository(Of Nomenclatura)()
+            repo.Remove(_nomenclaturaSeleccionada)
+            Await _unitOfWork.CommitAsync()
+
+            Notifier.Info(Me, "Nomenclatura eliminada.")
+            Await CargarDatosAsync()
+            LimpiarCampos()
+
+        Catch ex As Exception
+            Notifier.[Error](Me, $"Ocurrió un error al eliminar: {ex.Message}")
+        Finally
+            Me.Cursor = oldCursor
+            btnEliminar.Enabled = True
+        End Try
     End Sub
+
+
+    Private Sub txtBuscar_TextChanged(sender As Object, e As EventArgs) Handles txtBuscar.TextChanged
+        If _listaNomenclaturas Is Nothing Then Return
+
+        Dim q = If(txtBuscar.Text, String.Empty).Trim().ToUpperInvariant()
+        If q.Length = 0 Then
+            dgvNomenclaturas.DataSource = _listaNomenclaturas
+            dgvNomenclaturas.ClearSelection()
+            Return
+        End If
+
+        Dim resultado As List(Of Nomenclatura) =
+        _listaNomenclaturas.Where(Function(n)
+                                      Dim nombre = If(n?.Nombre, String.Empty).ToUpperInvariant()
+                                      Dim codigo = If(n?.Codigo, String.Empty).ToUpperInvariant()
+                                      Dim area = If(n?.AreaResponsable, String.Empty).ToUpperInvariant()
+                                      Return nombre.Contains(q) OrElse codigo.Contains(q) OrElse area.Contains(q)
+                                  End Function).ToList()
+
+        dgvNomenclaturas.DataSource = resultado
+        dgvNomenclaturas.ClearSelection()
+    End Sub
+
     Private Sub Cerrando(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
         ' Si la tecla presionada es Escape, se cierra el formulario.
         If e.KeyCode = Keys.Escape Then
@@ -178,7 +244,8 @@ Public Class frmNomenclaturas
     End Sub
 
     Private Sub btnVolver_Click(sender As Object, e As EventArgs) Handles btnVolver.Click
-        ' Le pedimos que abra el menú de Configuración y que cierre ESTE formulario (Me).
+        Notifier.Info(Me, "Volviendo a Configuración…")
         NavegacionHelper.AbrirFormUnicoEnDashboard(Of frmConfiguracion)(Me)
     End Sub
+
 End Class

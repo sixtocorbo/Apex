@@ -13,44 +13,52 @@ Public Class frmNotificacionRPT
     End Sub
 
     Private Async Sub frmNotificacionRPT_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Await CargarReporteAsync()
         AppTheme.Aplicar(Me)
+        Me.KeyPreview = True
+
+        Try
+            Await CargarReporteAsync()
+            Notifier.Success(Me, "Reporte listo para imprimir.")
+        Catch ex As Exception
+            Notifier.[Error](Me, $"No se pudo cargar el reporte: {ex.Message}")
+            Close()
+        End Try
     End Sub
 
+
     Private Async Function CargarReporteAsync() As Task
+        Dim oldCursor = Me.Cursor
+        Dim oldEnabled = btnConfirmarFirma.Enabled
+        Me.Cursor = Cursors.WaitCursor
+        btnConfirmarFirma.Enabled = False
+
         Try
-            Me.Cursor = Cursors.WaitCursor
             ReportViewer1.ProcessingMode = ProcessingMode.Local
             ReportViewer1.LocalReport.DataSources.Clear()
 
-            Dim reportPath As String = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Reportes", "NotificacionImprimir.rdlc")
+            Dim base = AppDomain.CurrentDomain.BaseDirectory
+            Dim reportPath As String = Path.Combine(base, "Reportes", "NotificacionImprimir.rdlc")
             If Not File.Exists(reportPath) Then
                 reportPath = Path.GetFullPath(Path.Combine(Application.StartupPath, "..\..\", "Reportes", "NotificacionImprimir.rdlc"))
             End If
-            If Not File.Exists(reportPath) Then Throw New FileNotFoundException("No se encontró el archivo del reporte (RDLC) en: " & reportPath)
+            If Not File.Exists(reportPath) Then
+                Notifier.[Error](Me, "No se encontró el archivo de reporte 'NotificacionImprimir.rdlc'.")
+                Close()
+                Return
+            End If
 
             ReportViewer1.LocalReport.ReportPath = reportPath
             ReportViewer1.LocalReport.DisplayName = $"Notificacion_{_notificacionId:000000}"
 
-            ' Se asume que tu ReportesService tiene un método GetDatosNotificacionAsync que devuelve los datos necesarios.
             Dim notificacionData = Await _reportesService.GetDatosNotificacionAsync(_notificacionId)
             If notificacionData Is Nothing Then
-                MessageBox.Show("No se encontraron datos detallados para la notificación.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
-                Me.Close()
+                Notifier.Info(Me, "No se encontraron datos para esta notificación.")
+                Close()
                 Return
             End If
 
-            ' --- INICIO DE LA CORRECCIÓN ---
-            ' El ReportViewer espera una colección (IEnumerable), no un solo objeto.
-            ' Creamos una lista y añadimos el único objeto a ella.
-            ' REEMPLAZA "TuTipoDeObjetoNotificacion" por el nombre real de la clase que devuelve el servicio.
-
             Dim reportDataList As New List(Of Object) From {notificacionData}
-
-            ' Ahora pasamos la lista al ReportDataSource en lugar del objeto individual.
             Dim rds As New ReportDataSource("DataSetNotificaciones", reportDataList)
-            ' --- FIN DE LA CORRECCIÓN ---
-
             ReportViewer1.LocalReport.DataSources.Add(rds)
 
             ReportViewer1.SetDisplayMode(DisplayMode.PrintLayout)
@@ -59,60 +67,67 @@ Public Class frmNotificacionRPT
             ReportViewer1.RefreshReport()
 
         Catch ex As Exception
-            MessageBox.Show($"Error al cargar el reporte: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Notifier.[Error](Me, $"Error al cargar el reporte: {ex.Message}")
+            Throw
         Finally
-            Me.Cursor = Cursors.Default
+            Me.Cursor = oldCursor
+            btnConfirmarFirma.Enabled = oldEnabled
         End Try
     End Function
 
+
     ' --- LÓGICA PARA CONFIRMAR LA FIRMA ---
     Private Async Sub btnConfirmarFirma_Click(sender As Object, e As EventArgs) Handles btnConfirmarFirma.Click
+        If MessageBox.Show("¿Confirmás que la notificación fue firmada y deseás archivarla?",
+                       "Confirmar Acción", MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then
+            Return
+        End If
+
+        Dim oldCursor = Me.Cursor
+        Dim oldEnabled = btnConfirmarFirma.Enabled
+        btnConfirmarFirma.Enabled = False
+        Me.Cursor = Cursors.WaitCursor
+        LoadingHelper.MostrarCargando(Me)
+
         Try
-            Dim confirmResult = MessageBox.Show("¿Confirmas que la notificación fue firmada y deseas archivarla?",
-                                                 "Confirmar Acción",
-                                                 MessageBoxButtons.YesNo,
-                                                 MessageBoxIcon.Question)
+            Using uow As New UnitOfWork()
+                Dim notificacion = Await uow.Context.Set(Of NotificacionPersonal).FindAsync(_notificacionId)
+                If notificacion Is Nothing Then
+                    Notifier.[Error](Me, "No se encontró la notificación para actualizar.")
+                    Return
+                End If
 
-            If confirmResult = DialogResult.Yes Then
-                LoadingHelper.MostrarCargando(Me)
+                notificacion.EstadoId = CByte(ModConstantesApex.EstadoNotificacionPersonal.Firmada)
+                notificacion.FechaProgramada = Date.Now
 
-                Using uow As New UnitOfWork()
-                    Dim notificacion = Await uow.Context.Set(Of NotificacionPersonal).FindAsync(_notificacionId)
-
-                    If notificacion IsNot Nothing Then
-                        ' Asumimos que el ID de estado para "Notificado" o "Firmado" es 2.
-                        ' ¡Verifica en tu tabla NotificacionEstado que este sea el ID correcto!
-                        notificacion.EstadoId = CByte(ModConstantesApex.EstadoNotificacionPersonal.Firmada)
-
-                        notificacion.FechaProgramada = Date.Now ' Guardamos la fecha actual
-
-                        Await uow.CommitAsync()
-
-                        ' Notificamos al resto de la aplicación que los datos de este funcionario cambiaron.
-                        NotificadorEventos.NotificarCambiosEnFuncionario(notificacion.FuncionarioId)
-
-                        MessageBox.Show("La notificación ha sido archivada correctamente.", "Éxito",
-                                        MessageBoxButtons.OK, MessageBoxIcon.Information)
-
-                        Me.Close() ' Cerramos la ventana de impresión.
-                    Else
-                        MessageBox.Show("No se encontró la notificación para actualizar.", "Error",
-                                        MessageBoxButtons.OK, MessageBoxIcon.Error)
-                    End If
-                End Using
-            End If
-
+                Await uow.CommitAsync()
+                NotificadorEventos.NotificarCambiosEnFuncionario(notificacion.FuncionarioId)
+                Notifier.Success(Me, "Notificación archivada correctamente.")
+                Close()
+            End Using
         Catch ex As Exception
-            MessageBox.Show($"Ocurrió un error al actualizar el estado: {ex.Message}", "Error",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Notifier.[Error](Me, $"Ocurrió un error al actualizar el estado: {ex.Message}")
         Finally
             LoadingHelper.OcultarCargando(Me)
+            Me.Cursor = oldCursor
+            btnConfirmarFirma.Enabled = oldEnabled
         End Try
     End Sub
+
 
     Private Sub Cerrando(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
         If e.KeyCode = Keys.Escape Then
             Me.Close()
+            e.Handled = True
+        ElseIf e.Control AndAlso e.KeyCode = Keys.P Then
+            ' Atajo: Ctrl+P para abrir el diálogo de impresión del visor
+            Try
+                ReportViewer1.PrintDialog()
+            Catch
+                Notifier.Warn(Me, "No fue posible abrir el diálogo de impresión.")
+            End Try
+            e.Handled = True
         End If
     End Sub
+
 End Class

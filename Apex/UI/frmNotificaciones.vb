@@ -18,23 +18,29 @@ Public Class frmNotificaciones
         Me.KeyPreview = True
         AppTheme.Aplicar(Me)
         ConfigurarGrilla()
-        ' Configuración del Timer
-        tmrFiltro.Interval = 500 ' Espera medio segundo antes de buscar
+
+        tmrFiltro.Interval = 500
         tmrFiltro.Enabled = False
-        ' Cues
+
         Try
             AppTheme.SetCue(txtFiltro, "Filtrar por funcionario...")
             AppTheme.SetCue(rtbNotificacion, "Aquí se muestra el texto completo de la notificación seleccionada...")
         Catch
         End Try
+
         AddHandler NotificadorEventos.DatosActualizados, AddressOf OnDatosActualizados
+        Notifier.Info(Me, "Escribí para filtrar; doble clic abre cambio de estado.")
     End Sub
 
     Private Async Sub frmGestionNotificaciones_Shown(sender As Object, e As EventArgs) Handles Me.Shown
-        ' Al mostrar el formulario, cargamos los datos iniciales
-        Await IniciarBusquedaAsync()
-        Me.ActiveControl = txtFiltro ' Foco en el filtro principal
+        Try
+            Await IniciarBusquedaAsync()
+            Me.ActiveControl = txtFiltro
+        Catch ex As Exception
+            Notifier.[Error](Me, $"No se pudieron cargar las notificaciones: {ex.Message}")
+        End Try
     End Sub
+
 
     Private Sub frmGestionNotificaciones_FormClosed(sender As Object, e As FormClosedEventArgs) Handles Me.FormClosed
         RemoveHandler NotificadorEventos.DatosActualizados, AddressOf OnDatosActualizados
@@ -105,27 +111,46 @@ Public Class frmNotificaciones
     End Function
 
     Private Sub AbrirChildEnDashboard(formHijo As Form)
-        Dim dash = GetDashboard()
-        If dash Is Nothing Then
-            MessageBox.Show("No se encontró el Dashboard activo.", "Navegación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+        If formHijo Is Nothing Then
+            Notifier.Warn(Me, "No hay formulario para abrir.")
             Return
         End If
-        dash.AbrirChild(formHijo) ' ← usa la pila (Opción A)
+
+        Dim dash = GetDashboard()
+        If dash Is Nothing OrElse dash.IsDisposed Then
+            Notifier.Warn(Me, "No se encontró el Dashboard activo.")
+            Return
+        End If
+
+        Try
+            dash.AbrirChild(formHijo)
+            Notifier.Success(dash, $"Abierto: {formHijo.Text}")
+        Catch ex As Exception
+            Notifier.[Error](dash, $"No se pudo abrir la ventana: {ex.Message}")
+        End Try
     End Sub
+
 #End Region
 
 #Region "Lógica de Búsqueda"
     Private Sub dgvNotificaciones_SelectionChanged(sender As Object, e As EventArgs) Handles dgvNotificaciones.SelectionChanged
-        If dgvNotificaciones.SelectedRows.Count > 0 Then
-            _entidadActual = CType(dgvNotificaciones.SelectedRows(0).DataBoundItem, vw_NotificacionesCompletas)
-            rtbNotificacion.Text = _entidadActual.Texto
+        If dgvNotificaciones.SelectedRows.Count = 0 Then
+            _entidadActual = Nothing
+            rtbNotificacion.Text = "—"
+            Return
         End If
+        Dim item = TryCast(dgvNotificaciones.SelectedRows(0).DataBoundItem, vw_NotificacionesCompletas)
+        _entidadActual = item
+        rtbNotificacion.Text = If(item?.Texto, "—")
     End Sub
+
 
     Private Async Function IniciarBusquedaAsync() As Task
         LoadingHelper.MostrarCargando(Me)
         Try
             Await BuscarAsync()
+        Catch ex As Exception
+            Notifier.[Error](Me, $"No se pudo completar la búsqueda: {ex.Message}")
         Finally
             LoadingHelper.OcultarCargando(Me)
         End Try
@@ -135,14 +160,18 @@ Public Class frmNotificaciones
         Try
             Dim filtroGeneral = txtFiltro.Text.Trim()
             Dim filtroFuncionario = txtFiltro.Text.Trim()
-
             Dim resultados = Await _svc.GetAllConDetallesAsync(filtro:=filtroGeneral, funcionarioFiltro:=filtroFuncionario)
+
             dgvNotificaciones.DataSource = New BindingList(Of vw_NotificacionesCompletas)(resultados)
+            dgvNotificaciones.ClearSelection()
+            rtbNotificacion.Text = "—"
         Catch ex As Exception
-            MessageBox.Show($"Ocurrió un error al buscar las notificaciones: {ex.Message}", "Error",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Notifier.[Error](Me, $"Ocurrió un error al buscar las notificaciones: {ex.Message}")
+            dgvNotificaciones.DataSource = New BindingList(Of vw_NotificacionesCompletas)()
+            rtbNotificacion.Text = "—"
         End Try
     End Function
+
 
     Private Sub Filtro_TextChanged(sender As Object, e As EventArgs) Handles txtFiltro.TextChanged
         tmrFiltro.Stop()
@@ -152,6 +181,7 @@ Public Class frmNotificaciones
     Private Async Sub tmrFiltro_Tick(sender As Object, e As EventArgs) Handles tmrFiltro.Tick
         tmrFiltro.Stop()
         Await IniciarBusquedaAsync()
+        Notifier.Info(Me, "Búsqueda actualizada.")
     End Sub
 
     Private Async Sub dgvNotificaciones_DoubleClick(sender As Object, e As EventArgs) Handles dgvNotificaciones.DoubleClick
@@ -159,76 +189,93 @@ Public Class frmNotificaciones
     End Sub
 
     Private Async Function CambiarEstado() As Task
-        If dgvNotificaciones.SelectedRows.Count > 0 Then
-            Dim selectedNotification = CType(dgvNotificaciones.SelectedRows(0).DataBoundItem, vw_NotificacionesCompletas)
-            Using frm As New frmNotificacionCambiarEstado(selectedNotification.EstadoId)
-                If frm.ShowDialog() = DialogResult.OK Then
+        If dgvNotificaciones.SelectedRows.Count = 0 Then
+            Notifier.Warn(Me, "Seleccioná una notificación para cambiar su estado.")
+            Return
+        End If
+
+        Dim selectedNotification = TryCast(dgvNotificaciones.SelectedRows(0).DataBoundItem, vw_NotificacionesCompletas)
+        If selectedNotification Is Nothing Then
+            Notifier.Warn(Me, "No se pudo leer la notificación seleccionada.")
+            Return
+        End If
+
+        Using frm As New frmNotificacionCambiarEstado(selectedNotification.EstadoId)
+            If frm.ShowDialog() = DialogResult.OK Then
+                Dim btnOld = btnCambiarEstado.Enabled
+                btnCambiarEstado.Enabled = False
+                Try
                     Dim success As Boolean = Await _svc.UpdateEstadoAsync(selectedNotification.Id, frm.SelectedEstadoId)
                     If success Then
-                        MessageBox.Show("Estado de la notificación actualizado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                        Notifier.Success(Me, "Estado actualizado.")
                         Await IniciarBusquedaAsync()
                     Else
-                        MessageBox.Show("Hubo un error al actualizar el estado de la notificación.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                        Notifier.[Error](Me, "No se pudo actualizar el estado.")
                     End If
-                End If
-            End Using
-        End If
+                Catch ex As Exception
+                    Notifier.[Error](Me, $"Error al actualizar el estado: {ex.Message}")
+                Finally
+                    btnCambiarEstado.Enabled = btnOld
+                End Try
+            End If
+        End Using
     End Function
+
 #End Region
 
 #Region "Acciones (CRUD)"
     Private Sub btnNuevo_Click(sender As Object, e As EventArgs) Handles btnNuevo.Click
-        ' Antes: buscabas el dashboard y llamabas AbrirFormEnPanel o Show()
-        ' Ahora: abrir como child para volver automáticamente a esta lista
         AbrirChildEnDashboard(New frmNotificacionCrear())
     End Sub
 
     Private Sub btnImprimir_Click(sender As Object, e As EventArgs) Handles btnImprimir.Click
         If dgvNotificaciones.SelectedRows.Count = 0 Then
-            MessageBox.Show("Seleccione una notificación para imprimir.", "Aviso",
-                            MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Notifier.Warn(Me, "Seleccione una notificación para imprimir.")
             Return
         End If
         Dim idSeleccionado = CInt(dgvNotificaciones.SelectedRows(0).Cells("Id").Value)
-
-        ' Abrimos el RPT como child; al cerrarlo volvés a esta pantalla
         AbrirChildEnDashboard(New frmNotificacionRPT(idSeleccionado))
     End Sub
 
     Private Sub btnEditar_Click(sender As Object, e As EventArgs) Handles btnEditar.Click
         If dgvNotificaciones.SelectedRows.Count = 0 Then
-            MessageBox.Show("Seleccione una notificación para editar.", "Aviso",
-                            MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Notifier.Warn(Me, "Seleccione una notificación para editar.")
             Return
         End If
         Dim idSeleccionado = CInt(dgvNotificaciones.SelectedRows(0).Cells("Id").Value)
-
-        ' Antes: ShowDialog
-        ' Ahora: abrir como child en el Dashboard (se restaura al cerrar)
         AbrirChildEnDashboard(New frmNotificacionCrear(idSeleccionado))
     End Sub
 
     Private Async Sub btnEliminar_Click(sender As Object, e As EventArgs) Handles btnEliminar.Click
         If dgvNotificaciones.SelectedRows.Count = 0 Then
-            MessageBox.Show("Seleccione una notificación para eliminar.", "Aviso",
-                            MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Notifier.Warn(Me, "Seleccione una notificación para eliminar.")
             Return
         End If
 
-        Dim filaSeleccionada = dgvNotificaciones.SelectedRows(0)
-        Dim idSeleccionado = CInt(filaSeleccionada.Cells("Id").Value)
-        Dim nombreFuncionario = filaSeleccionada.Cells("NombreFuncionario").Value.ToString()
+        Dim fila = dgvNotificaciones.SelectedRows(0)
+        Dim idSeleccionado = CInt(fila.Cells("Id").Value)
+        Dim nombreFuncionario = fila.Cells("NombreFuncionario").Value.ToString()
 
-        If MessageBox.Show($"¿Está seguro de que desea eliminar la notificación para '{nombreFuncionario}'?",
-                            "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
-            Try
-                Await _svc.DeleteNotificacionAsync(idSeleccionado)
-                Await IniciarBusquedaAsync()
-            Catch ex As Exception
-                MessageBox.Show($"Ocurrió un error al eliminar: {ex.Message}", "Error",
-                                MessageBoxButtons.OK, MessageBoxIcon.Error)
-            End Try
+        If MessageBox.Show($"¿Eliminar la notificación de '{nombreFuncionario}'?",
+                       "Confirmar eliminación",
+                       MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then
+            Return
         End If
+
+        Dim oldCursor = Me.Cursor
+        btnEliminar.Enabled = False
+        Me.Cursor = Cursors.WaitCursor
+
+        Try
+            Await _svc.DeleteNotificacionAsync(idSeleccionado)
+            Notifier.Info(Me, "Notificación eliminada.")
+            Await IniciarBusquedaAsync()
+        Catch ex As Exception
+            Notifier.[Error](Me, $"Ocurrió un error al eliminar: {ex.Message}")
+        Finally
+            Me.Cursor = oldCursor
+            btnEliminar.Enabled = True
+        End Try
     End Sub
 #End Region
 

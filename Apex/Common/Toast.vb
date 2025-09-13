@@ -161,7 +161,7 @@ Public NotInheritable Class Toast
                 For i = idx To OpenToasts.Count - 1
                     Dim t = OpenToasts(i)
                     Dim wa = t._targetScreen.WorkingArea
-                    Dim desiredY = wa.Bottom - t.Height - MarginFromEdges - (i * (t.Height + StackGap))
+                    Dim desiredY = wa.Top + MarginFromEdges + (i * (t.Height + StackGap))
                     t.Location = New Point(t.Location.X, desiredY)
                 Next
             End If
@@ -181,8 +181,9 @@ Public NotInheritable Class Toast
         Dim wa = screen.WorkingArea
         SyncLock OpenToasts
             Dim stackIndex = OpenToasts.Count
+            ' TOP-RIGHT: arranca desde arriba y apila hacia abajo
             Dim x = wa.Right - t.Width - MarginFromEdges
-            Dim y = wa.Bottom - t.Height - MarginFromEdges - (stackIndex * (t.Height + StackGap))
+            Dim y = wa.Top + MarginFromEdges + (stackIndex * (t.Height + StackGap))
             t.Location = New Point(x, y)
             OpenToasts.Add(t)
         End SyncLock

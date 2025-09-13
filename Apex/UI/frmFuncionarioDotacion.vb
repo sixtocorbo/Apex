@@ -37,25 +37,45 @@ Public Class frmFuncionarioDotacion
     End Function
 
     Private Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
-        If cboItem.SelectedIndex = -1 Then
-            MessageBox.Show("Debe seleccionar un ítem de la lista.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+        ' Validación: ítem requerido
+        If cboItem.SelectedIndex = -1 OrElse cboItem.SelectedValue Is Nothing Then
+            Notifier.Warn(Me, "Debe seleccionar un ítem de la lista.")
             Return
         End If
 
-        ' --- INICIO DE LA CORRECCIÓN CLAVE ---
-        ' Asignamos únicamente el ID del ítem de dotación.
-        ' Esto evita que Entity Framework intente insertar un nuevo DotacionItem duplicado.
-        Dotacion.DotacionItemId = CInt(cboItem.SelectedValue)
-        ' La línea que asignaba el objeto completo ha sido eliminada.
-        ' --- FIN DE LA CORRECCIÓN CLAVE ---
+        Dim oldCursor = Me.Cursor
+        btnGuardar.Enabled = False
+        Me.Cursor = Cursors.WaitCursor
 
-        Dotacion.Talla = txtTalla.Text.Trim()
-        Dotacion.Observaciones = txtObservaciones.Text.Trim()
-        Dotacion.FechaAsign = DateTime.Now
+        Try
+            ' --- CORRECCIÓN CLAVE ---
+            ' Asignar sólo el ID para evitar que EF intente insertar un DotacionItem duplicado.
+            Dim dotacionItemId As Integer
+            If Not Integer.TryParse(cboItem.SelectedValue.ToString(), dotacionItemId) Then
+                Notifier.Warn(Me, "El ítem seleccionado no es válido.")
+                Return
+            End If
+            Dotacion.DotacionItemId = dotacionItemId
+            ' (Importante: NO asignar la navegación DotacionItem = cboItem.SelectedItem)
 
-        DialogResult = DialogResult.OK
-        Close()
+            ' Otros campos
+            Dotacion.Talla = txtTalla.Text.Trim()
+            Dotacion.Observaciones = txtObservaciones.Text.Trim()
+            Dotacion.FechaAsign = DateTime.Now
+
+            ' Éxito (mostrar antes de cerrar)
+            Notifier.Success(Me, "Dotación guardada correctamente.")
+            DialogResult = DialogResult.OK
+            Close()
+
+        Catch ex As Exception
+            Notifier.[Error](Me, $"Ocurrió un error al guardar la dotación: {ex.Message}")
+        Finally
+            Me.Cursor = oldCursor
+            btnGuardar.Enabled = True
+        End Try
     End Sub
+
 
 
     Private Sub Cerrando(sender As Object, e As KeyEventArgs) Handles Me.KeyDown

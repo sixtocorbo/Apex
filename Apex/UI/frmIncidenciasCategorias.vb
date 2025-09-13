@@ -10,23 +10,31 @@ Public Class frmIncidenciasCategorias
 
     Private Async Sub frmGestionCategoriasAusencia_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
-        Me.KeyPreview = True   ' ← permite que ESC cierre el form aun si el foco está en otro control
+        Me.KeyPreview = True
         ConfigurarGrilla()
         Await CargarDatosAsync()
         LimpiarCampos()
+        Notifier.Info(Me, "Listado de categorías listo.")
     End Sub
 
+
     Private Async Function CargarDatosAsync() As Task
+        Dim oldCursor = Me.Cursor
         Me.Cursor = Cursors.WaitCursor
         Try
             Dim lista = Await _categoriaService.GetAllAsync()
             _listaCategorias = New BindingList(Of CategoriaAusencia)(lista.ToList())
             dgvCategorias.DataSource = _listaCategorias
             ConfigurarGrilla()
+            dgvCategorias.ClearSelection()
+        Catch ex As Exception
+            Notifier.[Error](Me, $"Ocurrió un error al cargar las categorías: {ex.Message}")
+            dgvCategorias.DataSource = New BindingList(Of CategoriaAusencia)()
         Finally
-            Me.Cursor = Cursors.Default
+            Me.Cursor = oldCursor
         End Try
     End Function
+
 
     Private Sub ConfigurarGrilla()
         dgvCategorias.AutoGenerateColumns = False
@@ -60,14 +68,27 @@ Public Class frmIncidenciasCategorias
     End Sub
 
     Private Sub txtBuscar_TextChanged(sender As Object, e As EventArgs) Handles txtBuscar.TextChanged
-        Dim filtro = txtBuscar.Text.Trim()
-        If String.IsNullOrWhiteSpace(filtro) Then
+        If _listaCategorias Is Nothing Then Return
+
+        Dim filtro As String = If(txtBuscar.Text, String.Empty).Trim()
+        If filtro.Length = 0 Then
             dgvCategorias.DataSource = _listaCategorias
-        Else
-            Dim resultado = _listaCategorias.Where(Function(c) c.Nombre.ToUpper().Contains(filtro.ToUpper())).ToList()
-            dgvCategorias.DataSource = New BindingList(Of CategoriaAusencia)(resultado)
+            dgvCategorias.ClearSelection()
+            Return
         End If
+
+        Dim upperFiltro As String = filtro.ToUpperInvariant()
+
+        Dim resultado As List(Of CategoriaAusencia) =
+        _listaCategorias.Where(Function(c)
+                                   Dim nombre As String = If(c Is Nothing OrElse c.Nombre Is Nothing, String.Empty, c.Nombre)
+                                   Return nombre.ToUpperInvariant().Contains(upperFiltro)
+                               End Function).ToList()
+
+        dgvCategorias.DataSource = New BindingList(Of CategoriaAusencia)(resultado)
+        dgvCategorias.ClearSelection()
     End Sub
+
 
     Private Sub btnNuevo_Click(sender As Object, e As EventArgs) Handles btnNuevo.Click
         LimpiarCampos()
@@ -75,59 +96,76 @@ Public Class frmIncidenciasCategorias
 
     Private Async Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
         If String.IsNullOrWhiteSpace(txtNombre.Text) Then
-            MessageBox.Show("El nombre de la categoría no puede estar vacío.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Notifier.Warn(Me, "El nombre de la categoría no puede estar vacío.")
             Return
         End If
 
         _categoriaSeleccionada.Nombre = txtNombre.Text.Trim()
 
+        Dim oldCursor = Me.Cursor
+        btnGuardar.Enabled = False
         Me.Cursor = Cursors.WaitCursor
+
         Try
             If _categoriaSeleccionada.Id = 0 Then
-                ' CreatedAt eliminado: la entidad no lo tiene
                 Await _categoriaService.CreateAsync(_categoriaSeleccionada)
+                Notifier.Success(Me, "Categoría creada correctamente.")
             Else
                 Await _categoriaService.UpdateAsync(_categoriaSeleccionada)
+                Notifier.Success(Me, "Categoría actualizada correctamente.")
             End If
 
-            MessageBox.Show("Categoría guardada correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Await CargarDatosAsync()
             LimpiarCampos()
+
         Catch ex As Exception
-            MessageBox.Show("Ocurrió un error al guardar la categoría: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Notifier.[Error](Me, $"Ocurrió un error al guardar la categoría: {ex.Message}")
         Finally
-            Me.Cursor = Cursors.Default
+            Me.Cursor = oldCursor
+            btnGuardar.Enabled = True
         End Try
     End Sub
 
+
     Private Async Sub btnEliminar_Click(sender As Object, e As EventArgs) Handles btnEliminar.Click
         If _categoriaSeleccionada Is Nothing OrElse _categoriaSeleccionada.Id = 0 Then
-            MessageBox.Show("Debe seleccionar una categoría para eliminar.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Notifier.Warn(Me, "Debe seleccionar una categoría para eliminar.")
             Return
         End If
 
-        Dim confirmacion = MessageBox.Show($"¿Está seguro de que desea eliminar la categoría '{_categoriaSeleccionada.Nombre}'?", "Confirmar eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
+        Dim confirmacion = MessageBox.Show(
+        $"¿Está seguro de que desea eliminar la categoría '{_categoriaSeleccionada.Nombre}'?",
+        "Confirmar eliminación",
+        MessageBoxButtons.YesNo,
+        MessageBoxIcon.Question)
 
-        If confirmacion = DialogResult.Yes Then
-            Me.Cursor = Cursors.WaitCursor
-            Try
-                Await _categoriaService.DeleteAsync(_categoriaSeleccionada.Id)
-                MessageBox.Show("Categoría eliminada.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
-                Await CargarDatosAsync()
-                LimpiarCampos()
-            Catch ex As Exception
-                MessageBox.Show("Ocurrió un error al eliminar la categoría: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            Finally
-                Me.Cursor = Cursors.Default
-            End Try
-        End If
+        If confirmacion <> DialogResult.Yes Then Return
+
+        Dim oldCursor = Me.Cursor
+        btnEliminar.Enabled = False
+        Me.Cursor = Cursors.WaitCursor
+
+        Try
+            Await _categoriaService.DeleteAsync(_categoriaSeleccionada.Id)
+            Notifier.Info(Me, "Categoría eliminada.")
+            Await CargarDatosAsync()
+            LimpiarCampos()
+        Catch ex As Exception
+            Notifier.[Error](Me, $"Ocurrió un error al eliminar la categoría: {ex.Message}")
+        Finally
+            Me.Cursor = oldCursor
+            btnEliminar.Enabled = True
+        End Try
     End Sub
 
-    ' --- ESC para cerrar/volver (la pila del Dashboard hace el resto) ---
     Private Sub Cerrando(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
         If e.KeyCode = Keys.Escape Then
             Me.Close()
+        ElseIf e.KeyCode = Keys.Enter AndAlso btnGuardar.Focused = False Then
+            btnGuardar.PerformClick()
+            e.Handled = True
         End If
     End Sub
+
 
 End Class
