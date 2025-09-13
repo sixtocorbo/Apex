@@ -213,7 +213,10 @@ Public Class frmNovedadCrear
             Return
         End If
 
+        ' --- SOLUCIÓN: Deshabilitar el botón para evitar múltiples clics ---
+        btnGuardar.Enabled = False
         LoadingHelper.MostrarCargando(Me)
+
         Try
             Dim funcionarioIds = _funcionariosSeleccionados.Select(Function(f) f.Id).ToList()
 
@@ -269,9 +272,80 @@ Public Class frmNovedadCrear
         Catch ex As Exception
             MessageBox.Show("Ocurrió un error al guardar la novedad: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         Finally
+            ' --- SOLUCIÓN: Volver a habilitar el botón en cualquier caso ---
+            btnGuardar.Enabled = True
             LoadingHelper.OcultarCargando(Me)
         End Try
     End Sub
+    'Private Async Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
+    '    If String.IsNullOrWhiteSpace(txtTexto.Text) Then
+    '        MessageBox.Show("El texto de la novedad no puede estar vacío.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+    '        Return
+    '    End If
+    '    If _funcionariosSeleccionados.Count = 0 Then
+    '        MessageBox.Show("Debe seleccionar al menos un funcionario.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+    '        Return
+    '    End If
+
+    '    LoadingHelper.MostrarCargando(Me)
+    '    Try
+    '        Dim funcionarioIds = _funcionariosSeleccionados.Select(Function(f) f.Id).ToList()
+
+    '        If _modo = ModoFormulario.Crear Then
+    '            ' 1. Crear la novedad principal
+    '            Dim nuevaNovedad = Await _svc.CrearNovedadCompletaAsync(dtpFecha.Value.Date, txtTexto.Text.Trim(), funcionarioIds)
+
+    '            ' 2. Si se creó, agregar las fotos nuevas
+    '            If nuevaNovedad IsNot Nothing AndAlso _rutasFotosNuevas.Any() Then
+    '                For Each ruta In _rutasFotosNuevas
+    '                    Await _svc.AddFotoAsync(nuevaNovedad.Id, ruta)
+    '                Next
+    '            End If
+    '            MessageBox.Show("Novedad creada con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
+    '            ' *** USAMOS EL NOTIFICADOR DE EVENTOS ***
+    '            ' Notificamos por cada funcionario que sus datos relacionados han cambiado.
+    '            For Each id In funcionarioIds
+    '                NotificadorEventos.NotificarCambiosEnFuncionario(id)
+    '            Next
+
+    '        Else ' Modo Editar
+    '            ' --- MODIFICACIÓN CLAVE: Lógica de guardado en edición ---
+
+    '            ' 1. Eliminar las fotos que el usuario marcó para borrar
+    '            If _fotosParaEliminar.Any() Then
+    '                For Each foto In _fotosParaEliminar
+    '                    Await _svc.DeleteFotoAsync(foto.Id)
+    '                Next
+    '            End If
+
+    '            ' 2. Agregar las nuevas fotos que el usuario seleccionó
+    '            If _rutasFotosNuevas.Any() Then
+    '                For Each ruta In _rutasFotosNuevas
+    '                    Await _svc.AddFotoAsync(_novedadId, ruta)
+    '                Next
+    '            End If
+
+    '            ' 3. Actualizar los datos principales de la novedad
+    '            _novedad.Fecha = dtpFecha.Value.Date
+    '            _novedad.Texto = txtTexto.Text.Trim()
+    '            Await _svc.ActualizarNovedadCompletaAsync(_novedad, funcionarioIds)
+
+    '            MessageBox.Show("Novedad actualizada con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
+    '        End If
+
+    '        ' También notificamos al finalizar la edición
+    '        For Each id In funcionarioIds
+    '            NotificadorEventos.NotificarCambiosEnFuncionario(id)
+    '        Next
+
+    '        DialogResult = DialogResult.OK
+    '        Close()
+    '    Catch ex As Exception
+    '        MessageBox.Show("Ocurrió un error al guardar la novedad: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+    '    Finally
+    '        LoadingHelper.OcultarCargando(Me)
+    '    End Try
+    'End Sub
 
     Private Sub btnCancelar_Click(sender As Object, e As EventArgs) Handles btnCancelar.Click
         DialogResult = DialogResult.Cancel

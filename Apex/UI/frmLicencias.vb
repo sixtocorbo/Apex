@@ -70,11 +70,25 @@ Public Class frmLicencias
         End With
     End Sub
 
+    ' --- SOLUCIÓN: Añadir una variable a nivel de clase para controlar el estado de carga ---
+    Private _estaCargandoLicencias As Boolean = False
+
     Private Async Function CargarDatosLicenciasAsync() As Task
-        Dim filtro = txtBusquedaLicencia.Text.Trim()
-        Dim soloVigentes = (chkSoloVigentes IsNot Nothing AndAlso chkSoloVigentes.Checked)
-        LoadingHelper.MostrarCargando(Me)
+        ' Si ya hay una operación de carga en curso, no hacer nada y salir.
+        If _estaCargandoLicencias Then Return
+
         Try
+            ' Marcar que la carga ha comenzado.
+            _estaCargandoLicencias = True
+
+            Dim filtro = txtBusquedaLicencia.Text.Trim()
+            Dim soloVigentes = (chkSoloVigentes IsNot Nothing AndAlso chkSoloVigentes.Checked)
+
+            LoadingHelper.MostrarCargando(Me)
+            ' Opcional: Deshabilitar controles de UI que puedan disparar el evento de nuevo
+            ' txtBusquedaLicencia.Enabled = False
+            ' chkSoloVigentes.Enabled = False
+
             dgvLicencias.DataSource = Nothing
             Dim datos As List(Of LicenciaConFuncionarioExtendidoDto)
             If soloVigentes Then
@@ -86,6 +100,12 @@ Public Class frmLicencias
         Catch ex As Exception
             MessageBox.Show("Error al cargar licencias: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         Finally
+            ' Marcar que la carga ha finalizado, permitiendo futuras cargas.
+            _estaCargandoLicencias = False
+
+            ' Opcional: Volver a habilitar los controles de UI
+            ' txtBusquedaLicencia.Enabled = True
+            ' chkSoloVigentes.Enabled = True
             LoadingHelper.OcultarCargando(Me)
         End Try
     End Function
