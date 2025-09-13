@@ -1,48 +1,54 @@
-﻿'' Apex/Services/ModConstantesApex.vb
-
-'Public Class ModConstantesApex
-'    ''' <summary>
-'    ''' Contiene los IDs de las categorías de ausencias tal como figuran en la base de datos.
-'    ''' </summary>
-'    Public Const CATEGORIA_ID_GENERAL As Integer = 1
-'    Public Const CATEGORIA_ID_SALUD As Integer = 2
-'    Public Const CATEGORIA_ID_ESPECIAL As Integer = 3
-'    Public Const CATEGORIA_ID_SANCION_LEVE As Integer = 4
-'    Public Const CATEGORIA_ID_SANCION_GRAVE As Integer = 5
-
-'    ''' <summary>
-'    ''' Contiene los nombres de las categorías de ausencias.
-'    ''' </summary>
-'    Public Const CATEGORIA_NOMBRE_SALUD As String = "Salud"
-'    Public Const CATEGORIA_NOMBRE_SANCION_LEVE As String = "Sanción Leve"
-'    Public Const CATEGORIA_NOMBRE_SANCION_GRAVE As String = "Sanción Grave"
-'    Public Const CATEGORIA_NOMBRE_ESPECIAL As String = "Especial"
-'    Public Const CATEGORIA_NOMBRE_GENERAL As String = "General"
-
-'    ' -------- Notificaciones ----------
-'    Public Const ESTADO_NOTI_PENDIENTE As Byte = 1
-'    ' Si ya tenés otros estados, podés agregarlos aquí:
-'    Public Const ESTADO_NOTI_ENVIADA As Byte = 2
-'    Public Const ESTADO_NOTI_ENTREGADA As Byte = 3
-
-'    ''' <summary>
-'    ''' Define los IDs de los estados de una notificación personal.
-'    ''' </summary>
-'    Public Enum EstadoNotificacionId As Byte
-'        Pendiente = 1
-'        Vencida = 2
-'        Firmada = 3
-'    End Enum
-
-'End Class
-' Apex/Services/ModConstantesApex.vb
-Option Strict On
+﻿Option Strict On
 Option Infer On
 Imports System.Globalization
 Imports System.Text
 Imports System.Linq
 
 Public Module ModConstantesApex
+#Region "Tipos de Estado Transitorio (IDs de BD)"
+    ' IDs según la tabla [dbo].[TipoEstadoTransitorio]
+    Public NotInheritable Class TipoEstadoTransitorioId
+        Public Const Designacion As Integer = 1
+        Public Const Enfermedad As Integer = 2
+        Public Const Sancion As Integer = 3
+        Public Const OrdenCinco As Integer = 4
+        Public Const Reten As Integer = 5
+        Public Const Sumario As Integer = 6
+        Public Const BajaDeFuncionario As Integer = 7
+        Public Const CambioDeCargo As Integer = 8
+        Public Const ReactivacionDeFuncionario As Integer = 9
+        Public Const SeparacionDelCargo As Integer = 10
+        Public Const InicioDeProcesamiento As Integer = 11
+        Public Const Desarmado As Integer = 12
+        Public Const Traslado As Integer = 21
+        Private Sub New() : End Sub
+    End Class
+
+    ' Compatibilidad con código existente: reexpone con el nombre usado en otras partes
+    Public NotInheritable Class TiposEstadoCatalog
+        Public Const Designacion = TipoEstadoTransitorioId.Designacion
+        Public Const Enfermedad = TipoEstadoTransitorioId.Enfermedad
+        Public Const Sancion = TipoEstadoTransitorioId.Sancion
+        Public Const OrdenCinco = TipoEstadoTransitorioId.OrdenCinco
+        Public Const Reten = TipoEstadoTransitorioId.Reten
+        Public Const Sumario = TipoEstadoTransitorioId.Sumario
+        Public Const BajaDeFuncionario = TipoEstadoTransitorioId.BajaDeFuncionario
+        Public Const CambioDeCargo = TipoEstadoTransitorioId.CambioDeCargo
+        Public Const ReactivacionDeFuncionario = TipoEstadoTransitorioId.ReactivacionDeFuncionario
+        Public Const SeparacionDelCargo = TipoEstadoTransitorioId.SeparacionDelCargo
+        Public Const InicioDeProcesamiento = TipoEstadoTransitorioId.InicioDeProcesamiento
+        Public Const Desarmado = TipoEstadoTransitorioId.Desarmado
+        Public Const Traslado = TipoEstadoTransitorioId.Traslado
+        Private Sub New() : End Sub
+    End Class
+
+    ' Helpers de uso común
+    Public Function RequiereFechaHasta(tipoId As Integer) As Boolean
+        ' No requiere fecha hasta: Retén y Reactivación
+        Return Not (tipoId = TipoEstadoTransitorioId.Reten OrElse
+                tipoId = TipoEstadoTransitorioId.ReactivacionDeFuncionario)
+    End Function
+#End Region
 
 #Region "Categorías de Ausencia"
     ' --- IDs tal cual en BD ---

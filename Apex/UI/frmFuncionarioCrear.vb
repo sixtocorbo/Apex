@@ -805,8 +805,6 @@ Public Class frmFuncionarioCrear
         cboTurno.SelectedIndex = -1 : cboSemana.SelectedIndex = -1 : cboHorario.SelectedIndex = -1
     End Function
 
-    ' --- INICIO DE LA CORRECCIÓN ---
-    ' Se revierte el cambio. Este botón NO debe cerrar el formulario.
     Private Sub btnAuditoria_Click(sender As Object, e As EventArgs) Handles btnAuditoria.Click
         If _modo = ModoFormulario.Crear Then
             MessageBox.Show("Debe guardar el funcionario antes de poder ver su historial de cambios.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
@@ -814,9 +812,9 @@ Public Class frmFuncionarioCrear
         End If
 
         Dim frm As New frmAuditoriaViewer(_funcionario.Id.ToString())
-        NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
+        AbrirChildEnDashboard(frm)  ' ← en vez de NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
     End Sub
-    ' --- FIN DE LA CORRECCIÓN ---
+
 
     Private Sub DgvEstadosTransitorios_CellDoubleClick(sender As Object, e As DataGridViewCellEventArgs)
         If e.RowIndex < 0 Then Return
@@ -934,6 +932,24 @@ Public Class frmFuncionarioCrear
 
         ' 3) Borrar el principal
         ctx.Entry(estado).State = EntityState.Deleted
+    End Sub
+    Private Sub frmFuncionarioCrear_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
+        If e.KeyCode = Keys.Escape Then
+            btnCancelar.PerformClick()  ' respeta tu lógica de cierre existente
+        End If
+    End Sub
+    ' ==== Helpers de navegación (pila del Dashboard) ====
+    Private Function GetDashboard() As frmDashboard
+        Return Application.OpenForms.OfType(Of frmDashboard)().FirstOrDefault()
+    End Function
+
+    Private Sub AbrirChildEnDashboard(formHijo As Form)
+        Dim dash = GetDashboard()
+        If dash Is Nothing Then
+            MessageBox.Show("No se encontró el Dashboard activo.", "Navegación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return
+        End If
+        dash.AbrirChild(formHijo) ' ← usa la pila (Opción A)
     End Sub
 
 End Class

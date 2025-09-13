@@ -114,126 +114,107 @@ Public Class frmFuncionarioEstadoTransitorio
     Private Sub CargarDatosDeDetalle()
         Dim fechaHasta As Date? = Nothing
         Dim observaciones As String = ""
-        ' >>> NOVEDAD: Variable para la nueva fecha
-        Dim fechaResolucion As Date? = Nothing
+        Dim fechaResolucion As Date? = Nothing ' si luego agregás la columna
 
         Select Case Estado.TipoEstadoTransitorioId
-            Case 1 ' Designacion
-                Dim d = Estado.DesignacionDetalle
-                If d Is Nothing Then Exit Select
+            Case TipoEstadoTransitorioId.Designacion
+                Dim d = Estado.DesignacionDetalle : If d Is Nothing Then GoTo Fin
                 dtpFechaDesde.Value = d.FechaDesde
                 fechaHasta = d.FechaHasta
                 observaciones = d.Observaciones
                 txtResolucion.Text = d.DocResolucion
-                ' >>> NOVEDAD: Cargar fecha de resolución (suponiendo que la propiedad existirá)
-                ' fechaResolucion = d.FechaResolucion
+            ' fechaResolucion = d.FechaResolucion
 
-            Case 2 ' Enfermedad
-                Dim d = Estado.EnfermedadDetalle
-                If d Is Nothing Then Exit Select
+            Case TipoEstadoTransitorioId.Enfermedad
+                Dim d = Estado.EnfermedadDetalle : If d Is Nothing Then GoTo Fin
                 dtpFechaDesde.Value = d.FechaDesde
                 fechaHasta = d.FechaHasta
                 observaciones = d.Observaciones
                 txtDiagnostico.Text = d.Diagnostico
 
-            Case 3 ' Sancion
-                Dim d = Estado.SancionDetalle
-                If d Is Nothing Then Exit Select
+            Case TipoEstadoTransitorioId.Sancion
+                Dim d = Estado.SancionDetalle : If d Is Nothing Then GoTo Fin
                 dtpFechaDesde.Value = d.FechaDesde
                 fechaHasta = d.FechaHasta
                 observaciones = d.Observaciones
                 txtResolucion.Text = d.Resolucion
-                ' >>> NOVEDAD: Cargar fecha de resolución (suponiendo que la propiedad existirá)
-                ' fechaResolucion = d.FechaResolucion
+            ' fechaResolucion = d.FechaResolucion
 
-            Case 4 ' OrdenCinco
-                Dim d = Estado.OrdenCincoDetalle
-                If d Is Nothing Then Exit Select
+            Case TipoEstadoTransitorioId.OrdenCinco
+                Dim d = Estado.OrdenCincoDetalle : If d Is Nothing Then GoTo Fin
                 dtpFechaDesde.Value = d.FechaDesde
                 fechaHasta = d.FechaHasta
                 observaciones = d.Observaciones
 
-            Case 5 ' Reten
-                Dim d = Estado.RetenDetalle
-                If d Is Nothing Then Exit Select
+            Case TipoEstadoTransitorioId.Reten
+                Dim d = Estado.RetenDetalle : If d Is Nothing Then GoTo Fin
                 dtpFechaDesde.Value = d.FechaReten
                 observaciones = d.Observaciones
                 txtTurnoReten.Text = d.Turno
 
-            Case 6 ' Sumario
-                Dim d = Estado.SumarioDetalle
-                If d Is Nothing Then Exit Select
+            Case TipoEstadoTransitorioId.Sumario
+                Dim d = Estado.SumarioDetalle : If d Is Nothing Then GoTo Fin
                 dtpFechaDesde.Value = d.FechaDesde
                 fechaHasta = d.FechaHasta
                 observaciones = d.Observaciones
                 txtResolucion.Text = d.Expediente
-                ' >>> NOVEDAD: Cargar fecha de resolución (suponiendo que la propiedad existirá)
-                ' fechaResolucion = d.FechaResolucion
+            ' fechaResolucion = d.FechaResolucion
 
-            Case 21 ' Traslado
-                Dim d = Estado.TrasladoDetalle
-                If d Is Nothing Then Exit Select
+            Case TipoEstadoTransitorioId.Traslado
+                Dim d = Estado.TrasladoDetalle : If d Is Nothing Then GoTo Fin
                 dtpFechaDesde.Value = d.FechaDesde
                 fechaHasta = d.FechaHasta
                 observaciones = d.Observaciones
 
-            Case 29 ' Baja de Funcionario
-                Dim d = Estado.BajaDeFuncionarioDetalle
-                If d Is Nothing Then Exit Select
+            Case TipoEstadoTransitorioId.BajaDeFuncionario
+                Dim d = Estado.BajaDeFuncionarioDetalle : If d Is Nothing Then GoTo Fin
                 dtpFechaDesde.Value = d.FechaDesde
                 fechaHasta = d.FechaHasta
                 observaciones = d.Observaciones
 
-            Case 30 ' Cambio de Cargo
-                Dim d = Estado.CambioDeCargoDetalle
-                If d Is Nothing Then Exit Select
+            Case TipoEstadoTransitorioId.CambioDeCargo
+                Dim d = Estado.CambioDeCargoDetalle : If d Is Nothing Then GoTo Fin
                 dtpFechaDesde.Value = d.FechaDesde
                 fechaHasta = d.FechaHasta
                 observaciones = d.Observaciones
                 txtResolucion.Text = d.Resolucion
                 cboCargoAnterior.SelectedValue = d.CargoAnteriorId
                 cboCargoNuevo.SelectedValue = d.CargoNuevoId
-                ' >>> NOVEDAD: Cargar fecha de resolución (suponiendo que la propiedad existirá)
-                ' fechaResolucion = d.FechaResolucion
+            ' fechaResolucion = d.FechaResolucion
 
-            Case 31 ' Reactivación de Funcionario
-                Dim d = Estado.ReactivacionDeFuncionarioDetalle
-                If d Is Nothing Then Exit Select
+            Case TipoEstadoTransitorioId.ReactivacionDeFuncionario
+                Dim d = Estado.ReactivacionDeFuncionarioDetalle : If d Is Nothing Then GoTo Fin
                 dtpFechaDesde.Value = d.FechaDesde
                 observaciones = d.Observaciones
                 txtResolucion.Text = d.Resolucion
-                ' >>> NOVEDAD: Cargar fecha de resolución (suponiendo que la propiedad existirá)
-                ' fechaResolucion = d.FechaResolucion
+            ' fechaResolucion = d.FechaResolucion
 
-            Case 32 ' Separación del Cargo
-                Dim d = Estado.SeparacionDelCargoDetalle
-                If d Is Nothing Then Exit Select
+            Case TipoEstadoTransitorioId.SeparacionDelCargo
+                Dim d = Estado.SeparacionDelCargoDetalle : If d Is Nothing Then GoTo Fin
                 dtpFechaDesde.Value = d.FechaDesde
                 fechaHasta = d.FechaHasta
                 observaciones = d.Observaciones
 
-            Case 33 ' Inicio de Procesamiento
-                Dim d = Estado.InicioDeProcesamientoDetalle
-                If d Is Nothing Then Exit Select
+            Case TipoEstadoTransitorioId.InicioDeProcesamiento
+                Dim d = Estado.InicioDeProcesamientoDetalle : If d Is Nothing Then GoTo Fin
                 dtpFechaDesde.Value = d.FechaDesde
                 fechaHasta = d.FechaHasta
                 observaciones = d.Observaciones
                 txtResolucion.Text = d.Expediente
-                ' >>> NOVEDAD: Cargar fecha de resolución (suponiendo que la propiedad existirá)
-                ' fechaResolucion = d.FechaResolucion
+            ' fechaResolucion = d.FechaResolucion
 
-            Case 34 ' Desarmado
-                Dim d = Estado.DesarmadoDetalle
-                If d Is Nothing Then Exit Select
+            Case TipoEstadoTransitorioId.Desarmado
+                Dim d = Estado.DesarmadoDetalle : If d Is Nothing Then GoTo Fin
                 dtpFechaDesde.Value = d.FechaDesde
                 fechaHasta = d.FechaHasta
                 observaciones = d.Observaciones
         End Select
 
+Fin:
         txtObservaciones.Text = observaciones
 
-        ' --- Lógica para Fecha Hasta ---
-        If Estado.TipoEstadoTransitorioId <> 5 AndAlso Estado.TipoEstadoTransitorioId <> 31 Then
+        ' --- Fecha Hasta: usar helper para clarificar la regla ---
+        If RequiereFechaHasta(Estado.TipoEstadoTransitorioId) Then
             If fechaHasta.HasValue Then
                 dtpFechaHasta.Value = fechaHasta.Value
                 dtpFechaHasta.Enabled = True
@@ -242,9 +223,13 @@ Public Class frmFuncionarioEstadoTransitorio
                 dtpFechaHasta.Enabled = False
                 chkFechaHasta.Checked = True
             End If
+        Else
+            ' Retén y Reactivación: ocultar/deshabilitar si corresponde
+            dtpFechaHasta.Enabled = False
+            chkFechaHasta.Checked = True
         End If
 
-        ' --- >>> NOVEDAD: Lógica para la nueva Fecha de Resolución ---
+        ' --- Fecha de Resolución si la agregás a tu modelo ---
         If fechaResolucion.HasValue Then
             dtpFechaResolucion.Value = fechaResolucion.Value
             dtpFechaResolucion.Enabled = True
@@ -254,6 +239,7 @@ Public Class frmFuncionarioEstadoTransitorio
             chkSinFechaResolucion.Checked = True
         End If
     End Sub
+
 
     Private Sub TipoEstado_Changed(sender As Object, e As EventArgs)
         ' Reset UI
@@ -268,30 +254,52 @@ Public Class frmFuncionarioEstadoTransitorio
         If Not Integer.TryParse(cboTipoEstado.SelectedValue.ToString(), tipoId) Then Exit Sub
 
         Select Case tipoId
-            Case 1, 3, 6, 31, 33
-                ShowExtra(True, False, False, False)
-                If tipoId = 1 Then lblResolucion.Text = "Doc. Resolución:"
-                If tipoId = 6 Or tipoId = 33 Then lblResolucion.Text = "Expediente:"
+        ' Designación, Sanción, Sumario, Reactivación, Inicio de Procesamiento
+            Case ModConstantesApex.TipoEstadoTransitorioId.Designacion,
+             ModConstantesApex.TipoEstadoTransitorioId.Sancion,
+             ModConstantesApex.TipoEstadoTransitorioId.Sumario,
+             ModConstantesApex.TipoEstadoTransitorioId.ReactivacionDeFuncionario,
+             ModConstantesApex.TipoEstadoTransitorioId.InicioDeProcesamiento
 
-            Case 30 ' Cambio de Cargo
+                ShowExtra(True, False, False, False)
+                If tipoId = ModConstantesApex.TipoEstadoTransitorioId.Designacion Then
+                    lblResolucion.Text = "Doc. Resolución:"
+                End If
+                If tipoId = ModConstantesApex.TipoEstadoTransitorioId.Sumario _
+               OrElse tipoId = ModConstantesApex.TipoEstadoTransitorioId.InicioDeProcesamiento Then
+                    lblResolucion.Text = "Expediente:"
+                End If
+
+        ' Cambio de cargo
+            Case ModConstantesApex.TipoEstadoTransitorioId.CambioDeCargo
                 ShowExtra(True, False, False, True)
                 lblResolucion.Text = "Resolución:"
                 SetCargoAnteriorDesdeFuncionario()
 
-            Case 2 ' Enfermedad
+        ' Enfermedad
+            Case ModConstantesApex.TipoEstadoTransitorioId.Enfermedad
                 ShowExtra(False, True, False, False)
 
-            Case 5 ' Reten
+        ' Retén (sin fecha hasta)
+            Case ModConstantesApex.TipoEstadoTransitorioId.Reten
                 ShowExtra(False, False, True, False)
                 lblFechaDesde.Text = "Fecha Retén:"
                 ToggleHastaSection(False)
 
-            Case 4, 21, 29, 32, 34
+        ' Orden Cinco, Traslado, Baja, Separación del Cargo, Desarmado
+            Case ModConstantesApex.TipoEstadoTransitorioId.OrdenCinco,
+             ModConstantesApex.TipoEstadoTransitorioId.Traslado,
+             ModConstantesApex.TipoEstadoTransitorioId.BajaDeFuncionario,
+             ModConstantesApex.TipoEstadoTransitorioId.SeparacionDelCargo,
+             ModConstantesApex.TipoEstadoTransitorioId.Desarmado
+
                 ShowExtra(False, False, False, False)
+
             Case Else
                 ShowExtra(False, False, False, False)
         End Select
     End Sub
+
 
     ' >>> MODIFICADO: Se añade el manejo de visibilidad para los controles de Fecha Resolución
     Private Sub ShowExtra(showResol As Boolean, showDiag As Boolean, showReten As Boolean, showCargos As Boolean)
@@ -355,11 +363,16 @@ Public Class frmFuncionarioEstadoTransitorio
         End If
 
         Dim tipoId As Integer = CInt(cboTipoEstado.SelectedValue)
-        Dim fechaHastaSel As Date? = If(chkFechaHasta.Checked Or Not chkFechaHasta.Visible, CType(Nothing, Date?), dtpFechaHasta.Value.Date)
-        ' >>> NOVEDAD: Capturar el valor de la nueva fecha de resolución
-        Dim fechaResolucionSel As Date? = If(chkSinFechaResolucion.Checked Or Not chkSinFechaResolucion.Visible, CType(Nothing, Date?), dtpFechaResolucion.Value.Date)
+        Dim fechaHastaSel As Date? = If(chkFechaHasta.Checked OrElse Not chkFechaHasta.Visible, CType(Nothing, Date?), dtpFechaHasta.Value.Date)
+        ' Opcional: nueva “fecha de resolución” si la agregás al modelo
+        Dim fechaResolucionSel As Date? = If(chkSinFechaResolucion.Checked OrElse Not chkSinFechaResolucion.Visible, CType(Nothing, Date?), dtpFechaResolucion.Value.Date)
 
-        If tipoId <> 5 AndAlso tipoId <> 31 AndAlso fechaHastaSel.HasValue AndAlso fechaHastaSel.Value < dtpFechaDesde.Value.Date Then
+        ' Validación: excepto Retén y Reactivación no se permite Hasta < Desde
+        If tipoId <> ModConstantesApex.TipoEstadoTransitorioId.Reten _
+       AndAlso tipoId <> ModConstantesApex.TipoEstadoTransitorioId.ReactivacionDeFuncionario _
+       AndAlso fechaHastaSel.HasValue _
+       AndAlso fechaHastaSel.Value < dtpFechaDesde.Value.Date Then
+
             MessageBox.Show("La fecha de fin no puede ser anterior a la fecha de inicio.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             Return
         End If
@@ -367,17 +380,16 @@ Public Class frmFuncionarioEstadoTransitorio
         Estado.TipoEstadoTransitorioId = tipoId
 
         Select Case tipoId
-            Case 1 ' Designacion
+            Case ModConstantesApex.TipoEstadoTransitorioId.Designacion
                 Dim d = If(Estado.DesignacionDetalle, New DesignacionDetalle())
                 d.FechaDesde = dtpFechaDesde.Value.Date
                 d.FechaHasta = fechaHastaSel
                 d.Observaciones = txtObservaciones.Text.Trim()
                 d.DocResolucion = txtResolucion.Text.Trim()
-                ' >>> NOVEDAD: Guardar fecha de resolución
-                ' d.FechaResolucion = fechaResolucionSel
+                ' d.FechaResolucion = fechaResolucionSel ' <-- si existe en el modelo
                 Estado.DesignacionDetalle = d
 
-            Case 2 ' Enfermedad
+            Case ModConstantesApex.TipoEstadoTransitorioId.Enfermedad
                 Dim d = If(Estado.EnfermedadDetalle, New EnfermedadDetalle())
                 d.FechaDesde = dtpFechaDesde.Value.Date
                 d.FechaHasta = fechaHastaSel
@@ -385,63 +397,60 @@ Public Class frmFuncionarioEstadoTransitorio
                 d.Diagnostico = txtDiagnostico.Text.Trim()
                 Estado.EnfermedadDetalle = d
 
-            Case 3 ' Sancion
+            Case ModConstantesApex.TipoEstadoTransitorioId.Sancion
                 Dim d = If(Estado.SancionDetalle, New SancionDetalle())
                 d.FechaDesde = dtpFechaDesde.Value.Date
                 d.FechaHasta = fechaHastaSel
                 d.Observaciones = txtObservaciones.Text.Trim()
                 d.Resolucion = txtResolucion.Text.Trim()
-                ' >>> NOVEDAD: Guardar fecha de resolución
-                ' d.FechaResolucion = fechaResolucionSel
+                ' d.FechaResolucion = fechaResolucionSel ' <-- si existe en el modelo
                 Estado.SancionDetalle = d
 
-            Case 4 ' OrdenCinco
+            Case ModConstantesApex.TipoEstadoTransitorioId.OrdenCinco
                 Dim d = If(Estado.OrdenCincoDetalle, New OrdenCincoDetalle())
                 d.FechaDesde = dtpFechaDesde.Value.Date
                 d.FechaHasta = fechaHastaSel
                 d.Observaciones = txtObservaciones.Text.Trim()
                 Estado.OrdenCincoDetalle = d
 
-            Case 5 ' Reten
+            Case ModConstantesApex.TipoEstadoTransitorioId.Reten
                 Dim d = If(Estado.RetenDetalle, New RetenDetalle())
                 d.FechaReten = dtpFechaDesde.Value.Date
                 d.Observaciones = txtObservaciones.Text.Trim()
                 d.Turno = txtTurnoReten.Text.Trim()
                 Estado.RetenDetalle = d
 
-            Case 6 ' Sumario
+            Case ModConstantesApex.TipoEstadoTransitorioId.Sumario
                 Dim d = If(Estado.SumarioDetalle, New SumarioDetalle())
                 d.FechaDesde = dtpFechaDesde.Value.Date
                 d.FechaHasta = fechaHastaSel
                 d.Observaciones = txtObservaciones.Text.Trim()
                 d.Expediente = txtResolucion.Text.Trim()
-                ' >>> NOVEDAD: Guardar fecha de resolución
-                ' d.FechaResolucion = fechaResolucionSel
+                ' d.FechaResolucion = fechaResolucionSel ' <-- si existe en el modelo
                 Estado.SumarioDetalle = d
 
-            Case 21 ' Traslado
+            Case ModConstantesApex.TipoEstadoTransitorioId.Traslado
                 Dim d = If(Estado.TrasladoDetalle, New TrasladoDetalle())
                 d.FechaDesde = dtpFechaDesde.Value.Date
                 d.FechaHasta = fechaHastaSel
                 d.Observaciones = txtObservaciones.Text.Trim()
                 Estado.TrasladoDetalle = d
 
-            Case 29 ' Baja de Funcionario
+            Case ModConstantesApex.TipoEstadoTransitorioId.BajaDeFuncionario
                 Dim d = If(Estado.BajaDeFuncionarioDetalle, New BajaDeFuncionarioDetalle())
                 d.FechaDesde = dtpFechaDesde.Value.Date
                 d.FechaHasta = fechaHastaSel
                 d.Observaciones = txtObservaciones.Text.Trim()
                 Estado.BajaDeFuncionarioDetalle = d
 
-            Case 30 ' Cambio de Cargo
+            Case ModConstantesApex.TipoEstadoTransitorioId.CambioDeCargo
                 If cboCargoNuevo.SelectedIndex = -1 Then
                     MessageBox.Show("Debe seleccionar el nuevo cargo.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
                     Return
                 End If
 
                 If Estado.Funcionario Is Nothing AndAlso Estado.Id > 0 Then
-                    Try : _unitOfWork.Context.Entry(Estado).Reference(Function(x) x.Funcionario).Load()
-                    Catch : End Try
+                    Try : _unitOfWork.Context.Entry(Estado).Reference(Function(x) x.Funcionario).Load() : Catch : End Try
                 End If
 
                 Dim cargoActualId As Integer? = Estado.Funcionario?.CargoId
@@ -451,7 +460,6 @@ Public Class frmFuncionarioEstadoTransitorio
                 End If
 
                 Dim cargoNuevoId = CType(cboCargoNuevo.SelectedValue, Integer)
-
                 If cargoNuevoId = cargoActualId.Value Then
                     MessageBox.Show("El nuevo cargo no puede ser igual al cargo actual.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
                     Return
@@ -459,7 +467,6 @@ Public Class frmFuncionarioEstadoTransitorio
 
                 Dim cargoNuevo = _listaCargos.FirstOrDefault(Function(c) c.Id = cargoNuevoId)
                 Dim cargoActual = _listaCargos.FirstOrDefault(Function(c) c.Id = cargoActualId.Value)
-
                 Dim gradoNuevo = cargoNuevo?.Grado.GetValueOrDefault(0)
                 Dim gradoActual = cargoActual?.Grado.GetValueOrDefault(0)
 
@@ -476,9 +483,7 @@ Public Class frmFuncionarioEstadoTransitorio
                     mensajeConfirmacion = $"El nuevo cargo '{cargoNuevo.Nombre}' tiene el mismo grado que el actual (movimiento lateral)." & vbCrLf & "¿Desea confirmar el cambio?"
                 End If
 
-                If MessageBox.Show(mensajeConfirmacion, tituloConfirmacion, MessageBoxButtons.YesNo, icono) = DialogResult.No Then
-                    Return
-                End If
+                If MessageBox.Show(mensajeConfirmacion, tituloConfirmacion, MessageBoxButtons.YesNo, icono) = DialogResult.No Then Return
 
                 Dim d = If(Estado.CambioDeCargoDetalle, New CambioDeCargoDetalle())
                 d.FechaDesde = dtpFechaDesde.Value.Date
@@ -487,38 +492,35 @@ Public Class frmFuncionarioEstadoTransitorio
                 d.Resolucion = txtResolucion.Text.Trim()
                 d.CargoAnteriorId = cargoActualId.Value
                 d.CargoNuevoId = cargoNuevoId
-                ' >>> NOVEDAD: Guardar fecha de resolución
-                ' d.FechaResolucion = fechaResolucionSel
+                ' d.FechaResolucion = fechaResolucionSel ' <-- si existe en el modelo
                 Estado.CambioDeCargoDetalle = d
                 Estado.Funcionario.CargoId = cargoNuevoId
 
-            Case 31 ' Reactivación de Funcionario
+            Case ModConstantesApex.TipoEstadoTransitorioId.ReactivacionDeFuncionario
                 Dim d = If(Estado.ReactivacionDeFuncionarioDetalle, New ReactivacionDeFuncionarioDetalle())
                 d.FechaDesde = dtpFechaDesde.Value.Date
                 d.Observaciones = txtObservaciones.Text.Trim()
                 d.Resolucion = txtResolucion.Text.Trim()
-                ' >>> NOVEDAD: Guardar fecha de resolución
-                ' d.FechaResolucion = fechaResolucionSel
+                ' d.FechaResolucion = fechaResolucionSel ' <-- si existe en el modelo
                 Estado.ReactivacionDeFuncionarioDetalle = d
 
-            Case 32 ' Separación del Cargo
+            Case ModConstantesApex.TipoEstadoTransitorioId.SeparacionDelCargo
                 Dim d = If(Estado.SeparacionDelCargoDetalle, New SeparacionDelCargoDetalle())
                 d.FechaDesde = dtpFechaDesde.Value.Date
                 d.FechaHasta = fechaHastaSel
                 d.Observaciones = txtObservaciones.Text.Trim()
                 Estado.SeparacionDelCargoDetalle = d
 
-            Case 33 ' Inicio de Procesamiento
+            Case ModConstantesApex.TipoEstadoTransitorioId.InicioDeProcesamiento
                 Dim d = If(Estado.InicioDeProcesamientoDetalle, New InicioDeProcesamientoDetalle())
                 d.FechaDesde = dtpFechaDesde.Value.Date
                 d.FechaHasta = fechaHastaSel
                 d.Observaciones = txtObservaciones.Text.Trim()
                 d.Expediente = txtResolucion.Text.Trim()
-                ' >>> NOVEDAD: Guardar fecha de resolución
-                ' d.FechaResolucion = fechaResolucionSel
+                ' d.FechaResolucion = fechaResolucionSel ' <-- si existe en el modelo
                 Estado.InicioDeProcesamientoDetalle = d
 
-            Case 34 ' Desarmado
+            Case ModConstantesApex.TipoEstadoTransitorioId.Desarmado
                 Dim d = If(Estado.DesarmadoDetalle, New DesarmadoDetalle())
                 d.FechaDesde = dtpFechaDesde.Value.Date
                 d.FechaHasta = fechaHastaSel
@@ -535,6 +537,7 @@ Public Class frmFuncionarioEstadoTransitorio
         DialogResult = DialogResult.OK
         Close()
     End Sub
+
 
     Private Sub btnCancelar_Click(sender As Object, e As EventArgs) Handles btnCancelar.Click
         DialogResult = DialogResult.Cancel
