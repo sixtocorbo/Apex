@@ -2,12 +2,14 @@
 Option Explicit On
 
 Imports System.ComponentModel
+Imports System.Windows.Forms
 
 Public Class frmNotificaciones
     Private ReadOnly _svc As New NotificacionService()
     ' Timer para la búsqueda demorada, gestionado directamente en este formulario.
     Private WithEvents tmrFiltro As New Timer()
     Private _entidadActual As vw_NotificacionesCompletas
+
     Public Sub New()
         InitializeComponent()
     End Sub
@@ -19,13 +21,11 @@ Public Class frmNotificaciones
         ' Configuración del Timer
         tmrFiltro.Interval = 500 ' Espera medio segundo antes de buscar
         tmrFiltro.Enabled = False
-        ' La suscripción al evento es correcta.
+        ' Cues
         Try
             AppTheme.SetCue(txtFiltro, "Filtrar por funcionario...")
             AppTheme.SetCue(rtbNotificacion, "Aquí se muestra el texto completo de la notificación seleccionada...")
-
         Catch
-            ' Ignorar si no existe SetCue
         End Try
         AddHandler NotificadorEventos.DatosActualizados, AddressOf OnDatosActualizados
     End Sub
@@ -36,15 +36,16 @@ Public Class frmNotificaciones
         Me.ActiveControl = txtFiltro ' Foco en el filtro principal
     End Sub
 
-    ''' <summary>
-    ''' Este método se ejecuta cuando NotificadorEventos.DatosActualizados se dispara.
-    ''' Su firma ahora coincide con la de un EventHandler estándar.
-    ''' </summary>
-    Private Async Sub OnDatosActualizados(sender As Object, e As EventArgs)
-        ' Iniciamos una nueva búsqueda para refrescar los datos en la grilla.
-        Await BuscarAsync()
+    Private Sub frmGestionNotificaciones_FormClosed(sender As Object, e As FormClosedEventArgs) Handles Me.FormClosed
+        RemoveHandler NotificadorEventos.DatosActualizados, AddressOf OnDatosActualizados
     End Sub
 
+    ''' <summary>
+    ''' Se ejecuta cuando NotificadorEventos.DatosActualizados se dispara.
+    ''' </summary>
+    Private Async Sub OnDatosActualizados(sender As Object, e As EventArgs)
+        Await BuscarAsync()
+    End Sub
 
     Private Sub ConfigurarGrilla()
         With dgvNotificaciones
@@ -98,6 +99,21 @@ Public Class frmNotificaciones
         End With
     End Sub
 
+#Region "Helpers de navegación (pila del Dashboard)"
+    Private Function GetDashboard() As frmDashboard
+        Return Application.OpenForms.OfType(Of frmDashboard)().FirstOrDefault()
+    End Function
+
+    Private Sub AbrirChildEnDashboard(formHijo As Form)
+        Dim dash = GetDashboard()
+        If dash Is Nothing Then
+            MessageBox.Show("No se encontró el Dashboard activo.", "Navegación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return
+        End If
+        dash.AbrirChild(formHijo) ' ← usa la pila (Opción A)
+    End Sub
+#End Region
+
 #Region "Lógica de Búsqueda"
     Private Sub dgvNotificaciones_SelectionChanged(sender As Object, e As EventArgs) Handles dgvNotificaciones.SelectionChanged
         If dgvNotificaciones.SelectedRows.Count > 0 Then
@@ -105,6 +121,7 @@ Public Class frmNotificaciones
             rtbNotificacion.Text = _entidadActual.Texto
         End If
     End Sub
+
     Private Async Function IniciarBusquedaAsync() As Task
         LoadingHelper.MostrarCargando(Me)
         Try
@@ -117,25 +134,21 @@ Public Class frmNotificaciones
     Private Async Function BuscarAsync() As Task
         Try
             Dim filtroGeneral = txtFiltro.Text.Trim()
-            ' CORRECCIÓN: Aseguramos que tome el texto del control correcto.
             Dim filtroFuncionario = txtFiltro.Text.Trim()
 
             Dim resultados = Await _svc.GetAllConDetallesAsync(filtro:=filtroGeneral, funcionarioFiltro:=filtroFuncionario)
             dgvNotificaciones.DataSource = New BindingList(Of vw_NotificacionesCompletas)(resultados)
-
         Catch ex As Exception
             MessageBox.Show($"Ocurrió un error al buscar las notificaciones: {ex.Message}", "Error",
                             MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
     End Function
 
-    ' CORRECCIÓN: El evento ahora maneja los cambios de ambos TextBox.
     Private Sub Filtro_TextChanged(sender As Object, e As EventArgs) Handles txtFiltro.TextChanged
         tmrFiltro.Stop()
         tmrFiltro.Start()
     End Sub
 
-    ' Cuando el timer finaliza, ejecuta la búsqueda.
     Private Async Sub tmrFiltro_Tick(sender As Object, e As EventArgs) Handles tmrFiltro.Tick
         tmrFiltro.Stop()
         Await IniciarBusquedaAsync()
@@ -161,41 +174,13 @@ Public Class frmNotificaciones
             End Using
         End If
     End Function
-
 #End Region
 
 #Region "Acciones (CRUD)"
-
     Private Sub btnNuevo_Click(sender As Object, e As EventArgs) Handles btnNuevo.Click
-        ' Buscamos el formulario principal (Dashboard) que contiene a este.
-        Dim dashboard = Me.ParentForm
-
-        ' Verificamos que el formulario padre sea el Dashboard.
-        If dashboard IsNot Nothing AndAlso TypeOf dashboard Is frmDashboard Then
-            ' Creamos el formulario para la nueva notificación.
-            Dim formCrear As New frmNotificacionCrear()
-
-            ' Usamos el método público del Dashboard para abrir el formulario en el panel.
-            CType(dashboard, frmDashboard).AbrirFormEnPanel(formCrear)
-        Else
-            ' Comportamiento anterior por si no se encuentra el Dashboard.
-            Dim formCrear As New frmNotificacionCrear()
-            formCrear.Show()
-        End If
-    End Sub
-
-    Private Async Sub btnEditar_Click(sender As Object, e As EventArgs) Handles btnEditar.Click
-        If dgvNotificaciones.SelectedRows.Count = 0 Then
-            MessageBox.Show("Seleccione una notificación para editar.", "Aviso",
-                            MessageBoxButtons.OK, MessageBoxIcon.Information)
-            Return
-        End If
-        Dim idSeleccionado = CInt(dgvNotificaciones.SelectedRows(0).Cells("Id").Value)
-        Using frm As New frmNotificacionCrear(idSeleccionado)
-            If frm.ShowDialog() = DialogResult.OK Then
-                Await IniciarBusquedaAsync()
-            End If
-        End Using
+        ' Antes: buscabas el dashboard y llamabas AbrirFormEnPanel o Show()
+        ' Ahora: abrir como child para volver automáticamente a esta lista
+        AbrirChildEnDashboard(New frmNotificacionCrear())
     End Sub
 
     Private Sub btnImprimir_Click(sender As Object, e As EventArgs) Handles btnImprimir.Click
@@ -205,8 +190,22 @@ Public Class frmNotificaciones
             Return
         End If
         Dim idSeleccionado = CInt(dgvNotificaciones.SelectedRows(0).Cells("Id").Value)
-        Dim frm As New frmNotificacionRPT(idSeleccionado)
-        NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
+
+        ' Abrimos el RPT como child; al cerrarlo volvés a esta pantalla
+        AbrirChildEnDashboard(New frmNotificacionRPT(idSeleccionado))
+    End Sub
+
+    Private Sub btnEditar_Click(sender As Object, e As EventArgs) Handles btnEditar.Click
+        If dgvNotificaciones.SelectedRows.Count = 0 Then
+            MessageBox.Show("Seleccione una notificación para editar.", "Aviso",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return
+        End If
+        Dim idSeleccionado = CInt(dgvNotificaciones.SelectedRows(0).Cells("Id").Value)
+
+        ' Antes: ShowDialog
+        ' Ahora: abrir como child en el Dashboard (se restaura al cerrar)
+        AbrirChildEnDashboard(New frmNotificacionCrear(idSeleccionado))
     End Sub
 
     Private Async Sub btnEliminar_Click(sender As Object, e As EventArgs) Handles btnEliminar.Click
@@ -231,11 +230,9 @@ Public Class frmNotificaciones
             End Try
         End If
     End Sub
-
 #End Region
 
 #Region "Mejoras de UX"
-
     Private Async Sub frmNotificaciones_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
         Select Case e.KeyCode
             Case Keys.F5
@@ -248,7 +245,6 @@ Public Class frmNotificaciones
     Private Async Sub btnCambiarEstado_Click(sender As Object, e As EventArgs) Handles btnCambiarEstado.Click
         Await CambiarEstado()
     End Sub
-
 #End Region
 
 End Class

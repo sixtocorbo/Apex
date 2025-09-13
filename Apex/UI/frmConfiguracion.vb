@@ -6,37 +6,92 @@ Public Class frmConfiguracion
         AppTheme.Aplicar(Me)
     End Sub
 
+    ' === Helper local para abrir hijos en el Dashboard (usando la pila) ===
+    Private Sub AbrirHijoEnDashboard(Of T As {Form, New})()
+        Dim dash = Application.OpenForms.OfType(Of frmDashboard)().FirstOrDefault()
+        If dash Is Nothing Then
+            MessageBox.Show("No se encontró el Dashboard activo.", "Navegación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return
+        End If
+        ' Creamos una instancia fresca del hijo y lo abrimos como “child”.
+        dash.AbrirChild(New T())
+    End Sub
+
     Private Sub btnGestionarIncidencias_Click(sender As Object, e As EventArgs) Handles btnGestionarIncidencias.Click
-        NavegacionHelper.AbrirFormUnicoEnDashboard(Of frmIncidencias)(Me)
+        AbrirHijoEnDashboard(Of frmIncidencias)()
     End Sub
 
     Private Sub btnCargos_Click(sender As Object, e As EventArgs) Handles btnCargos.Click
-        NavegacionHelper.AbrirFormUnicoEnDashboard(Of frmGrados)(Me)
+        AbrirHijoEnDashboard(Of frmGrados)()
     End Sub
 
     Private Sub btnSecciones_Click(sender As Object, e As EventArgs) Handles btnSecciones.Click
-        NavegacionHelper.AbrirFormUnicoEnDashboard(Of frmSecciones)(Me)
+        AbrirHijoEnDashboard(Of frmSecciones)()
     End Sub
 
     Private Sub btnAreasTrabajo_Click(sender As Object, e As EventArgs) Handles btnAreasTrabajo.Click
-        NavegacionHelper.AbrirFormUnicoEnDashboard(Of frmAreaTrabajoCategorias)(Me)
+        AbrirHijoEnDashboard(Of frmAreaTrabajoCategorias)()
     End Sub
 
     Private Sub btnTurnos_Click(sender As Object, e As EventArgs) Handles btnTurnos.Click
-        NavegacionHelper.AbrirFormUnicoEnDashboard(Of frmTurnos)(Me)
+        AbrirHijoEnDashboard(Of frmTurnos)()
     End Sub
 
     Private Sub btnTiposEstadoTransitorio_Click(sender As Object, e As EventArgs) Handles btnTiposEstadoTransitorio.Click
-        NavegacionHelper.AbrirFormUnicoEnDashboard(Of frmEstadoTransitorioTipos)(Me)
+        AbrirHijoEnDashboard(Of frmEstadoTransitorioTipos)()
     End Sub
 
     Private Sub btnCategoriasAusencia_Click(sender As Object, e As EventArgs) Handles btnCategoriasAusencia.Click
-        NavegacionHelper.AbrirFormUnicoEnDashboard(Of frmIncidenciasCategorias)(Me)
+        AbrirHijoEnDashboard(Of frmIncidenciasCategorias)()
     End Sub
 
     Private Sub btnNomenclaturas_Click(sender As Object, e As EventArgs) Handles btnNomenclaturas.Click
-        ' Le decimos que abra Nomenclaturas y cierre ESTE formulario (Me).
-        NavegacionHelper.AbrirFormUnicoEnDashboard(Of frmNomenclaturas)(Me)
+        ' Antes: abrías y cerrabas este formulario.
+        ' Ahora: lo abrimos como “child”; este queda oculto y se restaura al cerrar el hijo.
+        AbrirHijoEnDashboard(Of frmNomenclaturas)()
     End Sub
 
 End Class
+
+'Imports System.ComponentModel
+
+'Public Class frmConfiguracion
+
+'    Private Sub frmConfiguracion_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+'        AppTheme.Aplicar(Me)
+'    End Sub
+
+'    Private Sub btnGestionarIncidencias_Click(sender As Object, e As EventArgs) Handles btnGestionarIncidencias.Click
+'        NavegacionHelper.AbrirFormUnicoEnDashboard(Of frmIncidencias)(Me)
+'    End Sub
+
+'    Private Sub btnCargos_Click(sender As Object, e As EventArgs) Handles btnCargos.Click
+'        NavegacionHelper.AbrirFormUnicoEnDashboard(Of frmGrados)(Me)
+'    End Sub
+
+'    Private Sub btnSecciones_Click(sender As Object, e As EventArgs) Handles btnSecciones.Click
+'        NavegacionHelper.AbrirFormUnicoEnDashboard(Of frmSecciones)(Me)
+'    End Sub
+
+'    Private Sub btnAreasTrabajo_Click(sender As Object, e As EventArgs) Handles btnAreasTrabajo.Click
+'        NavegacionHelper.AbrirFormUnicoEnDashboard(Of frmAreaTrabajoCategorias)(Me)
+'    End Sub
+
+'    Private Sub btnTurnos_Click(sender As Object, e As EventArgs) Handles btnTurnos.Click
+'        NavegacionHelper.AbrirFormUnicoEnDashboard(Of frmTurnos)(Me)
+'    End Sub
+
+'    Private Sub btnTiposEstadoTransitorio_Click(sender As Object, e As EventArgs) Handles btnTiposEstadoTransitorio.Click
+'        NavegacionHelper.AbrirFormUnicoEnDashboard(Of frmEstadoTransitorioTipos)(Me)
+'    End Sub
+
+'    Private Sub btnCategoriasAusencia_Click(sender As Object, e As EventArgs) Handles btnCategoriasAusencia.Click
+'        NavegacionHelper.AbrirFormUnicoEnDashboard(Of frmIncidenciasCategorias)(Me)
+'    End Sub
+
+'    Private Sub btnNomenclaturas_Click(sender As Object, e As EventArgs) Handles btnNomenclaturas.Click
+'        ' Le decimos que abra Nomenclaturas y cierre ESTE formulario (Me).
+'        NavegacionHelper.AbrirFormUnicoEnDashboard(Of frmNomenclaturas)(Me)
+'    End Sub
+
+'End Class

@@ -7,17 +7,16 @@ Imports System.Windows.Forms
 Public Class frmLicencias
 
     Private ReadOnly _licenciaSvc As New LicenciaService()
-    ' --- NUEVO: Timer para controlar la búsqueda ---
+    ' --- Timer para controlar la búsqueda ---
     Private WithEvents _searchTimer As New Timer()
     Private _isFirstLoad As Boolean = True
 
-    ' --- Suscripción al notificador ---
+    ' --- LOAD / UNLOAD ---
     Private Sub frmGestionLicencias_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
         ConfigurarGrillaLicencias()
 
-        ' --- Configuración del Timer ---
-        _searchTimer.Interval = 500 ' Medio segundo de espera antes de buscar
+        _searchTimer.Interval = 500
         _searchTimer.Enabled = False
 
         txtBusquedaLicencia.Focus()
@@ -27,7 +26,6 @@ Public Class frmLicencias
         Try
             AppTheme.SetCue(txtBusquedaLicencia, "Buscar por funcionario…")
         Catch
-            ' Ignorar si no existe SetCue
         End Try
     End Sub
 
@@ -70,25 +68,17 @@ Public Class frmLicencias
         End With
     End Sub
 
-    ' --- SOLUCIÓN: Añadir una variable a nivel de clase para controlar el estado de carga ---
     Private _estaCargandoLicencias As Boolean = False
 
     Private Async Function CargarDatosLicenciasAsync() As Task
-        ' Si ya hay una operación de carga en curso, no hacer nada y salir.
         If _estaCargandoLicencias Then Return
-
         Try
-            ' Marcar que la carga ha comenzado.
             _estaCargandoLicencias = True
 
             Dim filtro = txtBusquedaLicencia.Text.Trim()
             Dim soloVigentes = (chkSoloVigentes IsNot Nothing AndAlso chkSoloVigentes.Checked)
 
             LoadingHelper.MostrarCargando(Me)
-            ' Opcional: Deshabilitar controles de UI que puedan disparar el evento de nuevo
-            ' txtBusquedaLicencia.Enabled = False
-            ' chkSoloVigentes.Enabled = False
-
             dgvLicencias.DataSource = Nothing
             Dim datos As List(Of LicenciaConFuncionarioExtendidoDto)
             If soloVigentes Then
@@ -100,42 +90,51 @@ Public Class frmLicencias
         Catch ex As Exception
             MessageBox.Show("Error al cargar licencias: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         Finally
-            ' Marcar que la carga ha finalizado, permitiendo futuras cargas.
             _estaCargandoLicencias = False
-
-            ' Opcional: Volver a habilitar los controles de UI
-            ' txtBusquedaLicencia.Enabled = True
-            ' chkSoloVigentes.Enabled = True
             LoadingHelper.OcultarCargando(Me)
         End Try
     End Function
 
 #End Region
 
-#Region "Manejo de Búsqueda y Acciones"
+#Region "Helpers de navegación (pila del Dashboard)"
 
-    ' --- CAMBIO: Se utiliza TextChanged en lugar de KeyDown para mayor fluidez ---
+    Private Function GetDashboard() As frmDashboard
+        Return Application.OpenForms.OfType(Of frmDashboard)().FirstOrDefault()
+    End Function
+
+    Private Sub AbrirChildEnDashboard(formHijo As Form)
+        Dim dash = GetDashboard()
+        If dash Is Nothing Then
+            MessageBox.Show("No se encontró el Dashboard activo.", "Navegación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return
+        End If
+        dash.AbrirChild(formHijo) ' ← usa la pila (Opción A)
+    End Sub
+
+#End Region
+
+#Region "Búsqueda y Acciones"
+
     Private Sub txtBusquedaLicencia_TextChanged(sender As Object, e As EventArgs) Handles txtBusquedaLicencia.TextChanged
-        ' Reinicia el temporizador cada vez que el usuario escribe algo.
         _searchTimer.Stop()
         _searchTimer.Start()
     End Sub
 
-    ' --- NUEVO: El Timer ejecuta la búsqueda cuando el usuario deja de escribir ---
     Private Async Sub SearchTimer_Tick(sender As Object, e As EventArgs) Handles _searchTimer.Tick
-        _searchTimer.Stop() ' Detiene el timer para que no se ejecute repetidamente.
+        _searchTimer.Stop()
         Await CargarDatosLicenciasAsync()
     End Sub
 
     Private Async Sub chkSoloVigentes_CheckedChanged(sender As Object, e As EventArgs) Handles chkSoloVigentes.CheckedChanged
-        ' Evitamos que se ejecute durante la carga inicial del formulario
         If _isFirstLoad Then Return
         Await CargarDatosLicenciasAsync()
     End Sub
 
     Private Sub btnNuevaLicencia_Click(sender As Object, e As EventArgs) Handles btnNuevaLicencia.Click
-        Dim frm As New frmLicenciaCrear()
-        NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
+        ' Antes: NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
+        ' Ahora: abrir como child para que al cerrar vuelva a esta pantalla
+        AbrirChildEnDashboard(New frmLicenciaCrear())
     End Sub
 
     Private Sub btnEditarLicencia_Click(sender As Object, e As EventArgs) Handles btnEditarLicencia.Click
@@ -155,9 +154,10 @@ Public Class frmLicencias
             MessageBox.Show("No se pudo determinar la licencia a editar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Return
         End If
-        Using frm As New frmLicenciaCrear(dto.LicenciaId.Value, dto.EstadoLicencia)
-            frm.ShowDialog(Me)
-        End Using
+
+        ' Antes: ShowDialog(Me)
+        ' Ahora: abrir como child; al cerrar, el Dashboard restaura frmLicencias
+        AbrirChildEnDashboard(New frmLicenciaCrear(dto.LicenciaId.Value, dto.EstadoLicencia))
     End Sub
 
     Private Async Sub btnEliminarLicencia_Click(sender As Object, e As EventArgs) Handles btnEliminarLicencia.Click

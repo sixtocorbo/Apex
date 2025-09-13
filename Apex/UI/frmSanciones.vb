@@ -118,18 +118,12 @@ Public Class frmSanciones
 
 #Region "Acciones para Sanciones"
 
-    Private Async Sub btnNuevaSancion_Click(sender As Object, e As EventArgs) Handles btnNuevaSancion.Click
-        ' Al crear una nueva sanción, se debe abrir un formulario para crear una LICENCIA
-        Using frm As New frmLicenciaCrear() ' Asumimos que existe un frmLicenciaCrear
-            ' Opcionalmente, se puede pasar un parámetro para filtrar solo tipos de sanción
-            ' frm.CategoriaFiltro = "Sanción" 
-            If frm.ShowDialog(Me) = DialogResult.OK Then
-                Await CargarDatosSancionesAsync()
-            End If
-        End Using
+    Private Sub btnNuevaSancion_Click(sender As Object, e As EventArgs) Handles btnNuevaSancion.Click
+        AbrirChildEnDashboard(New frmLicenciaCrear())
     End Sub
 
-    Private Async Sub btnEditarSancion_Click(sender As Object, e As EventArgs) Handles btnEditarSancion.Click
+
+    Private Sub btnEditarSancion_Click(sender As Object, e As EventArgs) Handles btnEditarSancion.Click
         If dgvSanciones.CurrentRow Is Nothing Then Return
 
         ' --- CORRECCIÓN 1: Asegurarse de que el tipo de dato es el correcto ---
@@ -139,13 +133,8 @@ Public Class frmSanciones
         Dim idSeleccionado = sancionSeleccionada.Id
         Dim estadoActual = sancionSeleccionada.Estado
 
-        ' --- CORRECCIÓN 2: Usar el constructor correcto para editar ---
-        ' Se le pasa el ID y el estado actual directamente al crearlo.
-        Using frm As New frmLicenciaCrear(idSeleccionado, estadoActual)
-            If frm.ShowDialog(Me) = DialogResult.OK Then
-                Await CargarDatosSancionesAsync()
-            End If
-        End Using
+        AbrirChildEnDashboard(New frmLicenciaCrear(idSeleccionado, estadoActual))
+
     End Sub
 
     Private Async Sub btnEliminarSancion_Click(sender As Object, e As EventArgs) Handles btnEliminarSancion.Click
@@ -164,5 +153,18 @@ Public Class frmSanciones
     End Sub
 
 #End Region
+    ' ==== Helpers de navegación (pila del Dashboard) ====
+    Private Function GetDashboard() As frmDashboard
+        Return Application.OpenForms.OfType(Of frmDashboard)().FirstOrDefault()
+    End Function
+
+    Private Sub AbrirChildEnDashboard(formHijo As Form)
+        Dim dash = GetDashboard()
+        If dash Is Nothing Then
+            MessageBox.Show("No se encontró el Dashboard activo.", "Navegación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return
+        End If
+        dash.AbrirChild(formHijo) ' ← usa la pila (Opción A)
+    End Sub
 
 End Class

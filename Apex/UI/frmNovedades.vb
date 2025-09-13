@@ -228,7 +228,8 @@ Public Class frmNovedades
 
     Private Sub btnNuevaNovedad_Click(sender As Object, e As EventArgs) Handles btnNuevaNovedad.Click
         ' El NavegacionHelper se encarga de abrir el formulario de forma desacoplada.
-        NavegacionHelper.AbrirNuevaInstanciaEnDashboard(New frmNovedadCrear())
+        AbrirChildEnDashboard(New frmNovedadCrear())
+
     End Sub
 
     Private Sub btnEditarNovedad_Click(sender As Object, e As EventArgs) Handles btnEditarNovedad.Click
@@ -237,13 +238,8 @@ Public Class frmNovedades
             Return
         End If
         Dim novedadId = CInt(dgvNovedades.CurrentRow.Cells("Id").Value)
-        Using frm As New frmNovedadCrear(novedadId)
-            ' Aquí ShowDialog es correcto porque la edición es una acción modal que debe completarse.
-            If frm.ShowDialog(Me) = DialogResult.OK Then
-                ' No necesitamos llamar a NotificadorEventos aquí, porque el formulario de edición ya lo hace.
-                ' La actualización se recibirá a través de HandleFuncionarioActualizado.
-            End If
-        End Using
+        AbrirChildEnDashboard(New frmNovedadCrear(novedadId))
+
     End Sub
 
     Private Async Sub btnEliminarNovedad_Click(sender As Object, e As EventArgs) Handles btnEliminarNovedad.Click
@@ -322,7 +318,8 @@ Public Class frmNovedades
                 If datosParaReporte IsNot Nothing AndAlso datosParaReporte.Any() Then
                     ' 4. Pasar la lista de DTOs (el tipo de dato correcto) al formulario del reporte.
                     Dim frm As New frmNovedadesRPT(datosParaReporte)
-                    NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
+                    AbrirChildEnDashboard(frm)
+
 
                 Else
                     Notifier.Warn(Me, "No se encontraron detalles para las novedades seleccionadas.")
@@ -338,5 +335,18 @@ Public Class frmNovedades
         End Try
     End Sub
 #End Region
+    ' ==== Helpers de navegación (pila del Dashboard) ====
+    Private Function GetDashboard() As frmDashboard
+        Return Application.OpenForms.OfType(Of frmDashboard)().FirstOrDefault()
+    End Function
+
+    Private Sub AbrirChildEnDashboard(formHijo As Form)
+        Dim dash = GetDashboard()
+        If dash Is Nothing Then
+            MessageBox.Show("No se encontró el Dashboard activo.", "Navegación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return
+        End If
+        dash.AbrirChild(formHijo) ' ← usa la pila (Opción A)
+    End Sub
 
 End Class

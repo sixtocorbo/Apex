@@ -10,6 +10,7 @@ Public Class frmIncidenciasCategorias
 
     Private Async Sub frmGestionCategoriasAusencia_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
+        Me.KeyPreview = True   ' ← permite que ESC cierre el form aun si el foco está en otro control
         ConfigurarGrilla()
         Await CargarDatosAsync()
         LimpiarCampos()
@@ -83,9 +84,7 @@ Public Class frmIncidenciasCategorias
         Me.Cursor = Cursors.WaitCursor
         Try
             If _categoriaSeleccionada.Id = 0 Then
-                ' --- CORRECCIÓN ---
-                ' La siguiente línea ha sido eliminada porque 'CreatedAt' no existe en 'CategoriaAusencia'.
-                ' _categoriaSeleccionada.CreatedAt = DateTime.Now 
+                ' CreatedAt eliminado: la entidad no lo tiene
                 Await _categoriaService.CreateAsync(_categoriaSeleccionada)
             Else
                 Await _categoriaService.UpdateAsync(_categoriaSeleccionada)
@@ -123,16 +122,12 @@ Public Class frmIncidenciasCategorias
             End Try
         End If
     End Sub
+
+    ' --- ESC para cerrar/volver (la pila del Dashboard hace el resto) ---
     Private Sub Cerrando(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
-        ' Si la tecla presionada es Escape, se cierra el formulario.
         If e.KeyCode = Keys.Escape Then
             Me.Close()
         End If
     End Sub
 
-    Private Sub btnVolver_Click(sender As Object, e As EventArgs) Handles btnVolver.Click
-        ' Simplemente creamos una nueva instancia del menú de configuración
-        ' y le pedimos a nuestro ayudante que la muestre.
-        NavegacionHelper.AbrirFormUnicoEnDashboard(Of frmConfiguracion)(Me)
-    End Sub
 End Class

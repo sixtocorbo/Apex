@@ -10,28 +10,22 @@ Public Class frmGrados
     Private _listaCargos As BindingList(Of Cargo)
     Private _cargoSeleccionado As Cargo
 
-    ' --- CORRECCIÓN 1: El evento Load ahora es más limpio y lógico ---
+    ' --- LOAD: tema, KeyPreview para ESC, grilla, datos, limpiar ---
     Private Async Sub frmGestionCargos_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
-        ' Primero se configura la grilla una sola vez.
+        Me.KeyPreview = True            ' ← importante para que ESC cierre el form aunque el foco esté en otro control
         ConfigurarGrilla()
-        ' Luego se cargan los datos de forma asíncrona.
         Await CargarDatosAsync()
-        ' Finalmente, se limpian los campos.
         LimpiarCampos()
     End Sub
 
-    ' --- CORRECCIÓN 2: Se simplifica la carga de datos ---
+    ' --- Carga de datos ---
     Private Async Function CargarDatosAsync() As Task
         Me.Cursor = Cursors.WaitCursor
         Try
-            ' Obtiene los datos de forma asíncrona.
             Dim lista = Await _cargoService.GetAllAsync()
             _listaCargos = New BindingList(Of Cargo)(lista.ToList())
-
-            ' Asigna los datos a la grilla. Esto ya está en el hilo de la UI gracias al 'await'.
             dgvCargos.DataSource = _listaCargos
-
         Catch ex As Exception
             MessageBox.Show($"Ocurrió un error al cargar los datos: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         Finally
@@ -39,11 +33,10 @@ Public Class frmGrados
         End Try
     End Function
 
-    ' --- CORRECCIÓN 3: Se elimina el código innecesario de InvokeRequired ---
-    ' Este método ahora se llama solo una vez y desde el hilo de la UI, por lo que es seguro.
+    ' --- Configuración de grilla ---
     Private Sub ConfigurarGrilla()
         dgvCargos.AutoGenerateColumns = False
-        dgvCargos.Columns.Clear() ' Esta línea ya no dará error.
+        dgvCargos.Columns.Clear()
         dgvCargos.Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Id", .HeaderText = "Id", .Visible = False})
         dgvCargos.Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Nombre", .HeaderText = "Nombre", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
         dgvCargos.Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Grado", .HeaderText = "Grado", .Width = 80})
@@ -151,16 +144,12 @@ Public Class frmGrados
             End Try
         End If
     End Sub
+
+    ' --- Atajo ESC para volver/cerrar (la pila del Dashboard hace el resto) ---
     Private Sub Cerrando(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
-        ' Si la tecla presionada es Escape, se cierra el formulario.
         If e.KeyCode = Keys.Escape Then
             Close()
         End If
     End Sub
 
-    Private Sub btnVolver_Click(sender As Object, e As EventArgs) Handles btnVolver.Click
-        ' Simplemente creamos una nueva instancia del menú de configuración
-        ' y le pedimos a nuestro ayudante que la muestre.
-        NavegacionHelper.AbrirFormUnicoEnDashboard(Of frmConfiguracion)(Me)
-    End Sub
 End Class

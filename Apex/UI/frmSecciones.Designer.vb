@@ -21,7 +21,6 @@ Partial Class frmSecciones
         Me.dgvSecciones = New System.Windows.Forms.DataGridView()
         Me.txtBuscar = New System.Windows.Forms.TextBox()
         Me.Label8 = New System.Windows.Forms.Label()
-        Me.btnVolver = New System.Windows.Forms.Button()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.txtNombre = New System.Windows.Forms.TextBox()
         Me.Label1 = New System.Windows.Forms.Label()
@@ -51,7 +50,6 @@ Partial Class frmSecciones
         '
         'SplitContainer1.Panel2
         '
-        Me.SplitContainer1.Panel2.Controls.Add(Me.btnVolver)
         Me.SplitContainer1.Panel2.Controls.Add(Me.GroupBox1)
         Me.SplitContainer1.Panel2.Controls.Add(Me.btnNuevo)
         Me.SplitContainer1.Panel2.Controls.Add(Me.btnEliminar)
@@ -100,16 +98,6 @@ Partial Class frmSecciones
         Me.Label8.Size = New System.Drawing.Size(63, 20)
         Me.Label8.TabIndex = 0
         Me.Label8.Text = "Buscar:"
-        '
-        'btnVolver
-        '
-        Me.btnVolver.Location = New System.Drawing.Point(430, 237)
-        Me.btnVolver.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnVolver.Name = "btnVolver"
-        Me.btnVolver.Size = New System.Drawing.Size(180, 46)
-        Me.btnVolver.TabIndex = 5
-        Me.btnVolver.Text = "Volver"
-        Me.btnVolver.UseVisualStyleBackColor = True
         '
         'GroupBox1
         '
@@ -206,5 +194,4 @@ Partial Class frmSecciones
     Friend WithEvents btnNuevo As Button
     Friend WithEvents btnEliminar As Button
     Friend WithEvents btnGuardar As Button
-    Friend WithEvents btnVolver As Button
 End Class
