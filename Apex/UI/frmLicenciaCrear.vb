@@ -114,18 +114,26 @@
             Return
         End If
 
-        ' Asegurar que el Funcionario esté en el combo (aunque inactivo)
+        ' Asegurar que el funcionario esté en el combo (aunque esté inactivo)
         Dim funcionariosSource = TryCast(cboFuncionario.DataSource, List(Of KeyValuePair(Of Integer, String)))
         If funcionariosSource IsNot Nothing AndAlso
-       Not funcionariosSource.Any(Function(kvp) kvp.Key = _licencia.FuncionarioId) Then
+   Not funcionariosSource.Any(Function(kvp) kvp.Key = _licencia.FuncionarioId) Then
 
-            Dim funcionarioDeLicencia = Await _svc.UnitOfWork.Repository(Of Funcionario)().GetByIdAsync(_licencia.FuncionarioId)
+            Dim funcionarioDeLicencia As Funcionario = Nothing
+            Using uow As New UnitOfWork()
+                funcionarioDeLicencia = Await uow.Repository(Of Funcionario)().
+                                   GetByIdAsync(_licencia.FuncionarioId)
+            End Using
+
             If funcionarioDeLicencia IsNot Nothing Then
                 funcionariosSource.Add(New KeyValuePair(Of Integer, String)(
-                funcionarioDeLicencia.Id, funcionarioDeLicencia.Nombre & " (Inactivo)"))
-                cboFuncionario.DataSource = funcionariosSource.OrderBy(Function(kvp) kvp.Value).ToList()
+            funcionarioDeLicencia.Id, funcionarioDeLicencia.Nombre & " (Inactivo)"))
+                cboFuncionario.DataSource = funcionariosSource.
+                                    OrderBy(Function(kvp) kvp.Value).
+                                    ToList()
             End If
         End If
+
 
         ' Setear valores
         cboFuncionario.SelectedValue = _licencia.FuncionarioId

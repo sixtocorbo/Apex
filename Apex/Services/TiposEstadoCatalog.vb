@@ -2,9 +2,11 @@
 Option Strict On
 Option Explicit On
 
-Imports System.Text
+Imports System.Collections.ObjectModel
+Imports System.Data.Entity
 Imports System.Globalization
 Imports System.Linq
+Imports System.Text
 
 Public NotInheritable Class TiposEstadoCatalog
     Private Sub New()
@@ -12,9 +14,10 @@ Public NotInheritable Class TiposEstadoCatalog
 
     Private Shared ReadOnly _syncRoot As New Object()
     Private Shared _byName As Dictionary(Of String, Integer)
+    Private Shared _allReadOnly As IReadOnlyDictionary(Of String, Integer)
     Private Shared _initialized As Boolean
 
-    ' Llamalo una sola vez al arrancar (p. ej. en frmMain/frmDashboard).
+    ' Init con UoW externo (se comparte contexto si ya estás en una operación)
     Public Shared Sub Init(uow As IUnitOfWork)
         If uow Is Nothing Then Throw New ArgumentNullException(NameOf(uow))
         SyncLock _syncRoot
@@ -22,6 +25,13 @@ Public NotInheritable Class TiposEstadoCatalog
             LoadFromDb(uow)
             _initialized = True
         End SyncLock
+    End Sub
+
+    ' Init cómodo: crea y dispone su propio UnitOfWork
+    Public Shared Sub Init()
+        Using uow As New UnitOfWork()
+            Init(uow)
+        End Using
     End Sub
 
     ' Si agregás tipos nuevos en DB en tiempo de ejecución, podés refrescar.
@@ -34,9 +44,13 @@ Public NotInheritable Class TiposEstadoCatalog
     End Sub
 
     Private Shared Sub LoadFromDb(uow As IUnitOfWork)
-        Dim all = uow.Repository(Of TipoEstadoTransitorio)().GetAll().ToList()
+        ' GetAll() ya es AsNoTracking, pero explicitamos por claridad
+        Dim all = uow.Repository(Of TipoEstadoTransitorio)().
+                    GetAll().
+                    AsNoTracking().
+                    ToList()
 
-        Dim dict As New Dictionary(Of String, Integer)()
+        Dim dict As New Dictionary(Of String, Integer)(StringComparer.Ordinal)
         For Each t In all
             If t Is Nothing OrElse String.IsNullOrWhiteSpace(t.Nombre) Then Continue For
             Dim key = Normalize(t.Nombre)
@@ -45,9 +59,7 @@ Public NotInheritable Class TiposEstadoCatalog
             End If
         Next
 
-        ' ---- Aliases / sinónimos frecuentes (CORREGIDOS Y AMPLIADOS) ----
-        ' **CORRECCIÓN**: Las licencias médicas son un tipo de estado transitorio de "Enfermedad".
-        ' Se corrige el alias para que apunte al tipo correcto en lugar de a "Licencia".
+        ' Aliases / sinónimos
         AddAlias(dict, "Orden 5", "Orden Cinco")
         AddAlias(dict, "Orden V", "Orden Cinco")
         AddAlias(dict, "Baja", "Baja de Funcionario")
@@ -59,8 +71,8 @@ Public NotInheritable Class TiposEstadoCatalog
         AddAlias(dict, "Licencia Medica", "Enfermedad")
         AddAlias(dict, "Licencia por enfermedad", "Enfermedad")
 
-
         _byName = dict
+        _allReadOnly = New ReadOnlyDictionary(Of String, Integer)(_byName)
     End Sub
 
     Private Shared Sub AddAlias(dict As Dictionary(Of String, Integer), aliasName As String, targetName As String)
@@ -85,7 +97,7 @@ Public NotInheritable Class TiposEstadoCatalog
 
     Private Shared Function EnsureInit() As Boolean
         If Not _initialized OrElse _byName Is Nothing Then
-            Throw New InvalidOperationException("TiposEstadoCatalog no inicializado. Llamá a Init(uow) al arrancar.")
+            Throw New InvalidOperationException("TiposEstadoCatalog no inicializado. Llamá a Init(uow) o Init() al arrancar.")
         End If
         Return True
     End Function
@@ -98,7 +110,7 @@ Public NotInheritable Class TiposEstadoCatalog
         Throw New KeyNotFoundException($"No se encontró TipoEstadoTransitorio '{nombre}'.")
     End Function
 
-    ' API pública extra por si la necesitás
+    ' API pública extra
     Public Shared Function TryGetId(nombre As String, ByRef id As Integer) As Boolean
         EnsureInit()
         Return _byName.TryGetValue(Normalize(nombre), id)
@@ -111,11 +123,11 @@ Public NotInheritable Class TiposEstadoCatalog
     Public Shared ReadOnly Property All As IReadOnlyDictionary(Of String, Integer)
         Get
             EnsureInit()
-            Return _byName
+            Return _allReadOnly
         End Get
     End Property
 
-    ' ---- Propiedades fuertes (sin magic numbers) - COMPLETAS ----
+    ' Propiedades fuertes (sin números mágicos)
     Public Shared ReadOnly Property Designacion As Integer
         Get
             Return IdDe("Designación")

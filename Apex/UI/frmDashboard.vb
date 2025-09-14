@@ -387,12 +387,24 @@ Public Class frmDashboard
         End Try
     End Function
 
+    Private Shared _tiposInitDone As Boolean = False
+
     Private Sub frmDashboard_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Using uow As New UnitOfWork()
-            TiposEstadoCatalog.Init(uow) ' ← UNA sola vez por proceso
-        End Using
+        If Not _tiposInitDone Then
+            Try
+                Using uow As New UnitOfWork()
+                    TiposEstadoCatalog.Init(uow) ' UNA sola vez por proceso
+                End Using
+                _tiposInitDone = True
+            Catch ex As Exception
+                ' Evita que la app crashee si la DB no está disponible al arrancar
+                Notifier.Error(Me, "No se pudo inicializar TiposEstadoCatalog: " & ex.Message)
+            End Try
+        End If
+
         ActualizarTituloDashboard()
     End Sub
+
 
 #End Region
 

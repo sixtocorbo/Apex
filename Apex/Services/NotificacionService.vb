@@ -4,11 +4,13 @@ Option Explicit On
 Imports System.Data.Entity
 Imports System.Data.SqlClient
 Imports System.Text
+
 Public Class ResultadoMasivo
     Public Property Creadas As Integer
     Public Property OmitidasPorDuplicado As Integer
     Public Property Errores As New List(Of (FuncionarioId As Integer, ErrorMsg As String))
 End Class
+
 ' ---------- DTOs de entrada ----------
 Public Class NotificacionCreateRequest
     Public Property FuncionarioId As Integer
@@ -43,13 +45,13 @@ Public Class NotificacionService
     Public Sub New()
         MyBase.New(New UnitOfWork())
         _unitOfWork = MyBase._unitOfWork
-        _auditoria = New AuditoriaService(_unitOfWork)
+        _auditoria = New AuditoriaService(_unitOfWork) ' MISMA UoW
     End Sub
 
     Public Sub New(unitOfWork As IUnitOfWork)
         MyBase.New(unitOfWork)
         _unitOfWork = unitOfWork
-        _auditoria = New AuditoriaService(_unitOfWork)
+        _auditoria = New AuditoriaService(_unitOfWork) ' MISMA UoW
     End Sub
 
     ' ----------------- Helpers -----------------
@@ -81,16 +83,13 @@ Public Class NotificacionService
         Return String.Join(" AND ", terminos)
     End Function
 
-    ' Si no querés depender de una constante para “Pendiente”, resolvelo por DB:
     Private Async Function ObtenerEstadoNotiPendienteAsync() As Task(Of Byte)
         Dim repo = _unitOfWork.Repository(Of NotificacionEstado)()
-        ' 1) Por orden = 1
         Dim id As Byte = CByte(Await repo.GetAll().
             Where(Function(e) e.Orden = 1).
             Select(Function(e) e.Id).
             FirstOrDefaultAsync())
         If id = 0 Then
-            ' 2) Por nombre literal
             id = CByte(Await repo.GetAll().
                 Where(Function(e) e.Nombre = "Pendiente").
                 Select(Function(e) e.Id).
@@ -110,17 +109,16 @@ Public Class NotificacionService
     End Function
 
     Public Async Function GetAllConDetallesAsync(
-    Optional filtro As String = "",
-    Optional fechaDesde As Date? = Nothing,
-    Optional fechaHasta As Date? = Nothing,
-    Optional funcionarioFiltro As String = "" ' <-- Nuevo parámetro
-) As Task(Of List(Of vw_NotificacionesCompletas))
+        Optional filtro As String = "",
+        Optional fechaDesde As Date? = Nothing,
+        Optional fechaHasta As Date? = Nothing,
+        Optional funcionarioFiltro As String = ""
+    ) As Task(Of List(Of vw_NotificacionesCompletas))
 
         Dim baseSql As String = "SELECT vwn.* FROM vw_NotificacionesCompletas AS vwn"
         Dim parameters As New List(Of SqlParameter)
         Dim conditions As New List(Of String)
 
-        ' Filtro genérico (Full-Text Search). Requiere JOIN.
         If Not String.IsNullOrWhiteSpace(filtro) Then
             If Not baseSql.Contains("dbo.Funcionario") Then
                 baseSql &= " INNER JOIN dbo.Funcionario AS f ON vwn.FuncionarioId = f.Id"
@@ -129,7 +127,6 @@ Public Class NotificacionService
             parameters.Add(New SqlParameter("@p_filtro", FormatearFts(filtro)))
         End If
 
-        ' Filtro específico por nombre de funcionario (LIKE). Requiere JOIN.
         If Not String.IsNullOrWhiteSpace(funcionarioFiltro) Then
             If Not baseSql.Contains("dbo.Funcionario") Then
                 baseSql &= " INNER JOIN dbo.Funcionario AS f ON vwn.FuncionarioId = f.Id"
@@ -138,7 +135,6 @@ Public Class NotificacionService
             parameters.Add(New SqlParameter("@p_func", $"%{funcionarioFiltro}%"))
         End If
 
-        ' Filtros de fecha
         If fechaDesde.HasValue Then
             Dim pname = "@p" & parameters.Count
             conditions.Add("vwn.FechaProgramada >= " & pname)
@@ -148,10 +144,9 @@ Public Class NotificacionService
         If fechaHasta.HasValue Then
             Dim pname = "@p" & parameters.Count
             conditions.Add("vwn.FechaProgramada <= " & pname)
-            parameters.Add(New SqlParameter(pname, fechaHasta.Value.Date.AddDays(1).AddSeconds(-1))) ' Incluye todo el día "hasta"
+            parameters.Add(New SqlParameter(pname, fechaHasta.Value.Date.AddDays(1).AddSeconds(-1)))
         End If
 
-        ' Construye la cláusula WHERE si hay condiciones
         If conditions.Any() Then
             baseSql &= " WHERE " & String.Join(" AND ", conditions)
         End If
@@ -159,17 +154,15 @@ Public Class NotificacionService
         baseSql &= " ORDER BY vwn.FechaProgramada DESC"
 
         Dim query = _unitOfWork.Context.Database.SqlQuery(Of vw_NotificacionesCompletas)(
-        baseSql, parameters.ToArray()
-    )
+            baseSql, parameters.ToArray()
+        )
         Return Await query.ToListAsync()
     End Function
 
     ' ----------------- Escrituras con transacción + auditoría -----------------
-
     Public Async Function CreateNotificacionAsync(req As NotificacionCreateRequest) As Task(Of NotificacionPersonal)
         ValidarCreate(req)
 
-        ' Validaciones de existencia (para mensajes claros y evitar FK)
         Dim funcExiste = Await _unitOfWork.Repository(Of Funcionario)().
             AnyAsync(Function(f) f.Id = req.FuncionarioId)
         If Not funcExiste Then Throw New InvalidOperationException("El funcionario seleccionado no existe.")
@@ -178,18 +171,17 @@ Public Class NotificacionService
             AnyAsync(Function(t) t.Id = req.TipoNotificacionId)
         If Not tipoExiste Then Throw New InvalidOperationException("El tipo de notificación seleccionado no existe.")
 
-        ' Estado “Pendiente” resuelto por DB (evita constantes mágicas)
         Dim estadoPendiente As Byte = Await ObtenerEstadoNotiPendienteAsync()
 
         Dim entidad As New NotificacionPersonal With {
             .FuncionarioId = req.FuncionarioId,
             .TipoNotificacionId = req.TipoNotificacionId,
             .FechaProgramada = req.FechaProgramada,
-            .Medio = req.Medio?.Trim(),
-            .Documento = req.Documento?.Trim(),
-            .ExpMinisterial = req.ExpMinisterial?.Trim(),
-            .ExpINR = req.ExpINR?.Trim(),
-            .Oficina = req.Oficina?.Trim(),
+            .Medio = If(req.Medio, String.Empty).Trim(),
+            .Documento = If(req.Documento, String.Empty).Trim(),
+            .ExpMinisterial = If(req.ExpMinisterial, String.Empty).Trim(),
+            .ExpINR = If(req.ExpINR, String.Empty).Trim(),
+            .Oficina = If(req.Oficina, String.Empty).Trim(),
             .EstadoId = estadoPendiente,
             .CreatedAt = DateTime.Now
         }
@@ -216,38 +208,28 @@ Public Class NotificacionService
 
         Using tx = _unitOfWork.Context.Database.BeginTransaction()
             Try
-                ' Buscamos la entidad original que vamos a modificar
                 Dim entidad = Await _unitOfWork.Repository(Of NotificacionPersonal)().
-                GetAll().
-                FirstOrDefaultAsync(Function(n) n.Id = req.Id)
+                    GetAll().
+                    FirstOrDefaultAsync(Function(n) n.Id = req.Id)
 
                 If entidad Is Nothing Then Throw New InvalidOperationException("La notificación no existe.")
 
-                ' Aplicamos los nuevos valores del formulario a la entidad
                 entidad.FuncionarioId = req.FuncionarioId
                 entidad.TipoNotificacionId = req.TipoNotificacionId
                 entidad.FechaProgramada = req.FechaProgramada
-                entidad.Medio = req.Medio?.Trim()
-                entidad.Documento = req.Documento?.Trim()
-                entidad.ExpMinisterial = req.ExpMinisterial?.Trim()
-                entidad.ExpINR = req.ExpINR?.Trim()
-                entidad.Oficina = req.Oficina?.Trim()
+                entidad.Medio = If(req.Medio, String.Empty).Trim()
+                entidad.Documento = If(req.Documento, String.Empty).Trim()
+                entidad.ExpMinisterial = If(req.ExpMinisterial, String.Empty).Trim()
+                entidad.ExpINR = If(req.ExpINR, String.Empty).Trim()
+                entidad.Oficina = If(req.Oficina, String.Empty).Trim()
                 entidad.UpdatedAt = DateTime.Now
 
-                ' --- LA CORRECCIÓN CLAVE ---
-                ' Le decimos explícitamente a Entity Framework que la entidad ha cambiado.
-                ' Esto garantiza que SaveChanges() genere la consulta UPDATE.
                 _unitOfWork.Context.Entry(entidad).State = EntityState.Modified
-                ' --- FIN DE LA CORRECCIÓN ---
 
-                ' Registramos la auditoría
                 Dim desc = $"Actualización Notif #{entidad.Id} (Func #{req.FuncionarioId}, Tipo #{req.TipoNotificacionId}, Prog {req.FechaProgramada:yyyy-MM-dd HH:mm})."
                 _auditoria.EncolarActividad("Actualizar", "NotificacionPersonal", desc, entidad.Id)
 
-                ' Guardamos todos los cambios en la base de datos
                 Await _unitOfWork.CommitAsync()
-
-                ' Confirmamos la transacción
                 tx.Commit()
             Catch
                 tx.Rollback()
@@ -332,6 +314,8 @@ Public Class NotificacionService
             ToListAsync()
         Return lista.Select(Function(e) New KeyValuePair(Of Byte, String)(e.Id, e.Nombre)).ToList()
     End Function
+
+    ' ----------------- Masivo (contexto aislado) -----------------
     Public Async Function CreateNotificacionesMasivasAsync(
         funcionarioIds As IEnumerable(Of Integer),
         baseReq As NotificacionCreateRequest,
@@ -345,9 +329,8 @@ Public Class NotificacionService
         Using uow As New UnitOfWork()
             Dim ctx = uow.Context
 
-            ' Precalcular rango del día para “misma fecha”
             Dim d As Date = baseReq.FechaProgramada.Date
-            Dim dSiguiente = d.AddDays(1)
+            Dim dSiguiente As Date = d.AddDays(1)
 
             For Each fid In funcionarioIds
                 Try
@@ -359,7 +342,7 @@ Public Class NotificacionService
                                                n.FechaProgramada >= d AndAlso n.FechaProgramada < dSiguiente)
                         If yaExiste Then
                             res.OmitidasPorDuplicado += 1
-                            reportProgress?.Invoke()
+                            If reportProgress IsNot Nothing Then reportProgress()
                             Continue For
                         End If
                     End If
@@ -379,19 +362,15 @@ Public Class NotificacionService
                     }
 
                     ctx.Set(Of NotificacionPersonal)().Add(nueva)
-                    ' Guardamos “por ítem” para aislar errores y poder continuar
                     Await uow.CommitAsync()
 
-                    ' disparar evento por funcionario (si querés al toque)
                     NotificadorEventos.NotificarCambiosEnFuncionario(fid)
-
                     res.Creadas += 1
 
                 Catch ex As Exception
                     res.Errores.Add((fid, ex.Message))
-                    ' Continuar con el siguiente
                 Finally
-                    reportProgress?.Invoke()
+                    If reportProgress IsNot Nothing Then reportProgress()
                 End Try
             Next
         End Using
@@ -399,4 +378,3 @@ Public Class NotificacionService
         Return res
     End Function
 End Class
-

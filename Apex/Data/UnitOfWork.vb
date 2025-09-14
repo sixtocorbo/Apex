@@ -52,8 +52,9 @@ Public Class UnitOfWork
         End If
     End Sub
 
-    Public Sub Dispose() Implements IDisposable.Dispose, IUnitOfWork.Dispose
+    Public Sub Dispose() Implements IDisposable.Dispose
         Dispose(True)
         GC.SuppressFinalize(Me)
     End Sub
+
 End Class

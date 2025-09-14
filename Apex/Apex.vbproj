@@ -450,13 +450,13 @@
     <Compile Include="Services\AuditoriaService.vb" />
     <Compile Include="Services\CargoService.vb" />
     <Compile Include="Services\CategoriaAusenciaService.vb" />
-    <Compile Include="Services\NovedadReporteDTO.vb" />
+    <Compile Include="DTO\NovedadReporteDTO.vb" />
     <Compile Include="UI\ChipControl.vb">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Services\ConceptoFuncionalService.vb" />
     <Compile Include="Helpers\ConsultasGenericas.vb" />
-    <Compile Include="Services\DesignacionReporteDTO.vb" />
+    <Compile Include="DTO\DesignacionReporteDTO.vb" />
     <Compile Include="Services\LicenciaService.vb" />
     <Compile Include="Helpers\LoadingHelper.vb" />
     <Compile Include="Helpers\ModConstantesApex.vb" />
