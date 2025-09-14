@@ -2,50 +2,32 @@
 
 Public Class frmSanciones
 
-    ' --- CORRECCIÓN 1: Usar el servicio de licencias ---
-    Private _licenciaSvc As New LicenciaService()
-    Private _tipoLicenciaSvc As New GenericService(Of TipoLicencia)(New UnitOfWork())
+    Private ReadOnly _svc As New SancionService()
     Private WithEvents SearchTimer As New System.Windows.Forms.Timer()
 
-    Private Async Sub frmGestionSanciones_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Private Async Sub frmSanciones_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
+        Me.KeyPreview = True
+
         ConfigurarGrillaSanciones()
+        CargarComboTipoSancion()
+        Await CargarDatosSancionesAsync()
 
-        Await CargarCombosAsync()
-        Await CargarDatosSancionesAsync() ' <-- AÑADIDO: Carga los datos al abrir el formulario
-
-        ' Configura el temporizador para la búsqueda automática
-        SearchTimer.Interval = 500 ' 500 ms de espera
+        ' Búsqueda diferida
+        SearchTimer.Interval = 500
         AddHandler txtBusquedaSancion.TextChanged, AddressOf IniciarTemporizador
-        AddHandler cmbTipoLicencia.SelectedIndexChanged, AddressOf IniciarTemporizador
+        AddHandler cmbTipoSancion.SelectedIndexChanged, AddressOf IniciarTemporizador
         AddHandler SearchTimer.Tick, AddressOf Temporizador_Tick
-        Try
-            AppTheme.SetCue(txtBusquedaSancion, "Buscar por nombre de funcionario...")
-            AppTheme.SetCue(cmbTipoLicencia, "Filtrar por tipo de sanción...")
 
+        Try
+            AppTheme.SetCue(txtBusquedaSancion, "Buscar por nombre o CI…")
+            AppTheme.SetCue(cmbTipoSancion, "Filtrar por tipo de sanción…")
         Catch
-            ' Ignorar si no existe SetCue
         End Try
         txtBusquedaSancion.Focus()
     End Sub
 
-#Region "Configuración y Carga de Datos"
-
-    Private Async Function CargarCombosAsync() As Task
-        Dim todosLosTipos As List(Of TipoLicencia) = Await _tipoLicenciaSvc.GetAllAsync()
-        Dim tiposLicencia = todosLosTipos.Where(Function(tl) _
-    tl.CategoriaAusenciaId = ModConstantesApex.CategoriaAusenciaId.SancionGrave OrElse
-    tl.CategoriaAusenciaId = ModConstantesApex.CategoriaAusenciaId.SancionLeve
-).ToList()
-
-        Dim listaConTodos = tiposLicencia.OrderBy(Function(x) x.Nombre).ToList()
-        listaConTodos.Insert(0, New TipoLicencia With {.Id = 0, .Nombre = "[TODOS]"})
-
-        cmbTipoLicencia.DataSource = listaConTodos
-        cmbTipoLicencia.DisplayMember = "Nombre"
-        cmbTipoLicencia.ValueMember = "Id"
-    End Function
-
+#Region "UI"
     Private Sub ConfigurarGrillaSanciones()
         With dgvSanciones
             .AutoGenerateColumns = False
@@ -53,49 +35,68 @@ Public Class frmSanciones
             .RowHeadersVisible = False
             .SelectionMode = DataGridViewSelectionMode.FullRowSelect
             .MultiSelect = False
+            .ReadOnly = True
+            .AllowUserToAddRows = False
+            .AllowUserToDeleteRows = False
 
             .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Id", .DataPropertyName = "Id", .Visible = False})
             .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "NombreFuncionario", .DataPropertyName = "NombreFuncionario", .HeaderText = "Funcionario", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
 
-            ' --- CORRECCIÓN 2: Ajustar los DataPropertyName a la vista vw_LicenciasCompletas ---
-            Dim colDesde As New DataGridViewTextBoxColumn With {.Name = "FechaDesde", .DataPropertyName = "FechaInicio", .HeaderText = "Desde", .Width = 100}
+            Dim colDesde As New DataGridViewTextBoxColumn With {.Name = "FechaDesde", .DataPropertyName = "FechaDesde", .HeaderText = "Desde", .Width = 100}
             colDesde.DefaultCellStyle.Format = "dd/MM/yyyy"
             .Columns.Add(colDesde)
 
-            Dim colHasta As New DataGridViewTextBoxColumn With {.Name = "FechaHasta", .DataPropertyName = "FechaFin", .HeaderText = "Hasta", .Width = 100}
+            Dim colHasta As New DataGridViewTextBoxColumn With {.Name = "FechaHasta", .DataPropertyName = "FechaHasta", .HeaderText = "Hasta", .Width = 100}
             colHasta.DefaultCellStyle.Format = "dd/MM/yyyy"
             .Columns.Add(colHasta)
 
-            ' La columna 'Resolucion' no existe en HistoricoLicencia, la reemplazamos por 'Estado'
-            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Estado", .DataPropertyName = "Estado", .HeaderText = "Estado", .Width = 120})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Observaciones", .DataPropertyName = "Comentario", .HeaderText = "Observaciones", .Width = 200})
+            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "TipoSancion", .DataPropertyName = "TipoSancion", .HeaderText = "Tipo", .Width = 150})
+            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Estado", .DataPropertyName = "Estado", .HeaderText = "Estado", .Width = 130})
+            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Comentario", .DataPropertyName = "Comentario", .HeaderText = "Observaciones", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
         End With
+
+        AddHandler dgvSanciones.CellDoubleClick,
+     Sub(sender As Object, e As DataGridViewCellEventArgs)
+         btnEditarSancion.PerformClick()
+     End Sub
+
     End Sub
 
+    Private Sub CargarComboTipoSancion()
+        ' Valores que usás en frmSancionCrear (coherencia)
+        Dim items = New List(Of String) From {
+            "[TODOS]",
+            "Puntos de Demérito",
+            "Observaciones Escritas"
+        }
+        cmbTipoSancion.DataSource = items
+        cmbTipoSancion.SelectedIndex = 0
+    End Sub
+#End Region
+
+#Region "Carga de datos"
     Private Async Function CargarDatosSancionesAsync() As Task
         Dim filtro = txtBusquedaSancion.Text.Trim()
-        Dim tipoLicenciaId As Integer? = Nothing
-
-        If cmbTipoLicencia.SelectedValue IsNot Nothing AndAlso CInt(cmbTipoLicencia.SelectedValue) > 0 Then
-            tipoLicenciaId = CInt(cmbTipoLicencia.SelectedValue)
+        Dim filtroTipo As String = Nothing
+        If cmbTipoSancion.SelectedItem IsNot Nothing AndAlso cmbTipoSancion.SelectedItem.ToString() <> "[TODOS]" Then
+            filtroTipo = cmbTipoSancion.SelectedItem.ToString()
         End If
 
         LoadingHelper.MostrarCargando(Me)
         Try
+            ' Proyección a DTO para evitar ChangeTracker
+            Dim lista As List(Of SancionListadoItem) = Await _svc.GetListadoAsync(filtro, filtroTipo)
             dgvSanciones.DataSource = Nothing
-            ' Llama al servicio de licencias para obtener las que son sanciones
-            dgvSanciones.DataSource = Await _licenciaSvc.GetSancionesAsync(filtro, tipoLicenciaId)
+            dgvSanciones.DataSource = lista
         Catch ex As Exception
             MessageBox.Show("Error al cargar sanciones: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         Finally
             LoadingHelper.OcultarCargando(Me)
         End Try
     End Function
-
 #End Region
 
-#Region "Manejo de Búsqueda"
-
+#Region "Búsqueda"
     Private Sub IniciarTemporizador(sender As Object, e As EventArgs)
         SearchTimer.Stop()
         SearchTimer.Start()
@@ -114,46 +115,49 @@ Public Class frmSanciones
         End If
     End Sub
 
+    Private Async Sub frmSanciones_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
+        If e.KeyCode = Keys.F5 Then
+            Await CargarDatosSancionesAsync()
+            e.Handled = True
+        ElseIf e.KeyCode = Keys.Delete Then
+            btnEliminarSancion.PerformClick()
+            e.Handled = True
+        End If
+    End Sub
 #End Region
 
-#Region "Acciones para Sanciones"
-
+#Region "Acciones"
     Private Sub btnNuevaSancion_Click(sender As Object, e As EventArgs) Handles btnNuevaSancion.Click
-        AbrirChildEnDashboard(New frmLicenciaCrear())
+        AbrirChildEnDashboard(New frmSancionCrear())
     End Sub
-
 
     Private Sub btnEditarSancion_Click(sender As Object, e As EventArgs) Handles btnEditarSancion.Click
         If dgvSanciones.CurrentRow Is Nothing Then Return
+        Dim fila = TryCast(dgvSanciones.CurrentRow.DataBoundItem, SancionListadoItem)
+        If fila Is Nothing Then Return
 
-        ' --- CORRECCIÓN 1: Asegurarse de que el tipo de dato es el correcto ---
-        Dim sancionSeleccionada = TryCast(dgvSanciones.CurrentRow.DataBoundItem, vw_LicenciasCompletas)
-        If sancionSeleccionada Is Nothing Then Return
-
-        Dim idSeleccionado = sancionSeleccionada.Id
-        Dim estadoActual = sancionSeleccionada.Estado
-
-        AbrirChildEnDashboard(New frmLicenciaCrear(idSeleccionado, estadoActual))
-
+        Dim frm = New frmSancionCrear() With {.SancionId = fila.Id}
+        AbrirChildEnDashboard(frm)
     End Sub
 
     Private Async Sub btnEliminarSancion_Click(sender As Object, e As EventArgs) Handles btnEliminarSancion.Click
         If dgvSanciones.CurrentRow Is Nothing Then Return
-        Dim idSeleccionado = CInt(dgvSanciones.CurrentRow.Cells("Id").Value)
-        Dim nombre = dgvSanciones.CurrentRow.Cells("NombreFuncionario").Value.ToString()
-        If MessageBox.Show($"¿Está seguro de que desea eliminar la sanción para '{nombre}'?", "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
+
+        Dim fila = TryCast(dgvSanciones.CurrentRow.DataBoundItem, SancionListadoItem)
+        If fila Is Nothing Then Return
+
+        If MessageBox.Show($"¿Eliminar la sanción de '{fila.NombreFuncionario}'?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
             Try
-                ' --- CORRECCIÓN 3: Usar el servicio de licencias para eliminar ---
-                Await _licenciaSvc.DeleteAsync(idSeleccionado)
+                Await _svc.DeleteAsync(fila.Id) ' GenericService borra por PK
                 Await CargarDatosSancionesAsync()
             Catch ex As Exception
                 MessageBox.Show("Error al eliminar la sanción: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
         End If
     End Sub
-
 #End Region
-    ' ==== Helpers de navegación (pila del Dashboard) ====
+
+#Region "Navegación"
     Private Function GetDashboard() As frmDashboard
         Return Application.OpenForms.OfType(Of frmDashboard)().FirstOrDefault()
     End Function
@@ -164,7 +168,18 @@ Public Class frmSanciones
             MessageBox.Show("No se encontró el Dashboard activo.", "Navegación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             Return
         End If
-        dash.AbrirChild(formHijo) ' ← usa la pila (Opción A)
+        dash.AbrirChild(formHijo)
     End Sub
+#End Region
 
 End Class
+Public Class SancionListadoItem
+    Public Property Id As Integer              ' PK de EstadoTransitorio (Sanción)
+    Public Property NombreFuncionario As String
+    Public Property FechaDesde As Date
+    Public Property FechaHasta As Date?
+    Public Property Estado As String
+    Public Property Comentario As String
+    Public Property TipoSancion As String
+End Class
+

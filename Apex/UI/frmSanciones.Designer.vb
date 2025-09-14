@@ -29,7 +29,7 @@ Partial Class frmSanciones
         Me.btnNuevaSancion = New System.Windows.Forms.Button()
         Me.PanelBusquedaSanciones = New System.Windows.Forms.Panel()
         Me.Label1 = New System.Windows.Forms.Label()
-        Me.cmbTipoLicencia = New System.Windows.Forms.ComboBox()
+        Me.cmbTipoSancion = New System.Windows.Forms.ComboBox()
         Me.txtBusquedaSancion = New System.Windows.Forms.TextBox()
         Me.Label3 = New System.Windows.Forms.Label()
         CType(Me.dgvSanciones, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -100,7 +100,7 @@ Partial Class frmSanciones
         'PanelBusquedaSanciones
         '
         Me.PanelBusquedaSanciones.Controls.Add(Me.Label1)
-        Me.PanelBusquedaSanciones.Controls.Add(Me.cmbTipoLicencia)
+        Me.PanelBusquedaSanciones.Controls.Add(Me.cmbTipoSancion)
         Me.PanelBusquedaSanciones.Controls.Add(Me.txtBusquedaSancion)
         Me.PanelBusquedaSanciones.Controls.Add(Me.Label3)
         Me.PanelBusquedaSanciones.Dock = System.Windows.Forms.DockStyle.Top
@@ -118,14 +118,14 @@ Partial Class frmSanciones
         Me.Label1.TabIndex = 3
         Me.Label1.Text = "Tipo Sanción:"
         '
-        'cmbTipoLicencia
+        'cmbTipoSancion
         '
-        Me.cmbTipoLicencia.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cmbTipoLicencia.FormattingEnabled = True
-        Me.cmbTipoLicencia.Location = New System.Drawing.Point(550, 14)
-        Me.cmbTipoLicencia.Name = "cmbTipoLicencia"
-        Me.cmbTipoLicencia.Size = New System.Drawing.Size(280, 28)
-        Me.cmbTipoLicencia.TabIndex = 2
+        Me.cmbTipoSancion.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cmbTipoSancion.FormattingEnabled = True
+        Me.cmbTipoSancion.Location = New System.Drawing.Point(550, 14)
+        Me.cmbTipoSancion.Name = "cmbTipoSancion"
+        Me.cmbTipoSancion.Size = New System.Drawing.Size(280, 28)
+        Me.cmbTipoSancion.TabIndex = 2
         '
         'txtBusquedaSancion
         '
@@ -172,6 +172,6 @@ Partial Class frmSanciones
     Friend WithEvents PanelBusquedaSanciones As Panel
     Friend WithEvents txtBusquedaSancion As TextBox
     Friend WithEvents Label3 As Label
-    Friend WithEvents cmbTipoLicencia As ComboBox
+    Friend WithEvents cmbTipoSancion As ComboBox
     Friend WithEvents Label1 As Label
 End Class
