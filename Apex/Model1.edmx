@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="ApexModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+      <Schema Namespace="ApexModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="AreaTrabajo">
           <Key>
             <PropertyRef Name="Id" />
@@ -884,7 +884,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             <PropertyRef Name="CI" />
             <PropertyRef Name="NombreFuncionario" />
             <PropertyRef Name="FechaDesde" />
-            <PropertyRef Name="TipoLicenciaId" />
+            <PropertyRef Name="Estado" />
           </Key>
           <Property Name="Id" Type="int" Nullable="false" />
           <Property Name="FuncionarioId" Type="int" Nullable="false" />
@@ -893,8 +893,9 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <Property Name="FechaDesde" Type="date" Nullable="false" />
           <Property Name="FechaHasta" Type="date" />
           <Property Name="Resolucion" Type="nvarchar" MaxLength="100" />
-          <Property Name="Observaciones" Type="nvarchar(max)" />
-          <Property Name="TipoLicenciaId" Type="int" Nullable="false" />
+          <Property Name="Comentario" Type="nvarchar(max)" />
+          <Property Name="TipoSancion" Type="nvarchar" MaxLength="50" />
+          <Property Name="Estado" Type="varchar" MaxLength="10" Nullable="false" />
         </EntityType>
         <Association Name="FK__Funcionar__Estad__282DF8C2">
           <End Role="EstadoCivil" Type="Self.EstadoCivil" Multiplicity="0..1" />
@@ -1861,8 +1862,9 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
     [vw_SancionesCompletas].[FechaDesde] AS [FechaDesde], 
     [vw_SancionesCompletas].[FechaHasta] AS [FechaHasta], 
     [vw_SancionesCompletas].[Resolucion] AS [Resolucion], 
-    [vw_SancionesCompletas].[Observaciones] AS [Observaciones], 
-    [vw_SancionesCompletas].[TipoLicenciaId] AS [TipoLicenciaId]
+    [vw_SancionesCompletas].[Comentario] AS [Comentario], 
+    [vw_SancionesCompletas].[TipoSancion] AS [TipoSancion], 
+    [vw_SancionesCompletas].[Estado] AS [Estado]
     FROM [dbo].[vw_SancionesCompletas] AS [vw_SancionesCompletas]</DefiningQuery>
           </EntitySet>
           <AssociationSet Name="FK__Funcionar__Estad__282DF8C2" Association="Self.FK__Funcionar__Estad__282DF8C2">
@@ -2102,7 +2104,8 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             <End Role="Usuario" EntitySet="Usuario" />
           </AssociationSet>
         </EntityContainer>
-      </Schema></edmx:StorageModels>
+      </Schema>
+    </edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="ApexModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -2741,6 +2744,18 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <Property Name="UpdatedAt" Type="DateTime" Precision="7" />
           <NavigationProperty Name="RegimenDetalle" Relationship="Self.FK_RegimenDetalle_RegimenTrabajo" FromRole="RegimenTrabajo" ToRole="RegimenDetalle" />
         </EntityType>
+        <EntityType Name="RegistroActividad">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FechaHora" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Usuario" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Accion" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="TipoEntidad" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="EntidadId" Type="Int32" />
+          <Property Name="Descripcion" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+        </EntityType>
         <EntityType Name="RetenDetalle">
           <Key>
             <PropertyRef Name="EstadoTransitorioId" />
@@ -3073,7 +3088,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             <PropertyRef Name="CI" />
             <PropertyRef Name="NombreFuncionario" />
             <PropertyRef Name="FechaDesde" />
-            <PropertyRef Name="TipoLicenciaId" />
+            <PropertyRef Name="Estado" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" />
           <Property Name="FuncionarioId" Type="Int32" Nullable="false" />
@@ -3082,8 +3097,9 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <Property Name="FechaDesde" Type="DateTime" Nullable="false" Precision="0" />
           <Property Name="FechaHasta" Type="DateTime" Precision="0" />
           <Property Name="Resolucion" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
-          <Property Name="Observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="TipoLicenciaId" Type="Int32" Nullable="false" />
+          <Property Name="Comentario" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="TipoSancion" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Estado" Type="String" MaxLength="10" FixedLength="false" Unicode="false" Nullable="false" />
         </EntityType>
         <Association Name="FK_PuestoTrabajo_AreaTrabajo">
           <End Role="AreaTrabajo" Type="Self.AreaTrabajo" Multiplicity="0..1" />
@@ -3872,6 +3888,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <EntitySet Name="RegimenAlternancia" EntityType="Self.RegimenAlternancia" />
           <EntitySet Name="RegimenDetalle" EntityType="Self.RegimenDetalle" />
           <EntitySet Name="RegimenTrabajo" EntityType="Self.RegimenTrabajo" />
+          <EntitySet Name="RegistroActividad" EntityType="Self.RegistroActividad" />
           <EntitySet Name="RetenDetalle" EntityType="Self.RetenDetalle" />
           <EntitySet Name="RolUsuario" EntityType="Self.RolUsuario" />
           <EntitySet Name="SancionDetalle" EntityType="Self.SancionDetalle" />
@@ -4169,18 +4186,17 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           </FunctionImport>
           <FunctionImport Name="usp_Apex_ImportarDotacionFuncionario" />
           <FunctionImport Name="usp_Apex_ImportarLicenciasMasivas">
-          <Parameter Name="RegistrosAfectados" Mode="InOut" Type="Int32" />
+            <Parameter Name="RegistrosAfectados" Mode="InOut" Type="Int32" />
           </FunctionImport>
           <FunctionImport Name="usp_DeleteFuncionario">
-          <Parameter Name="FuncionarioId" Mode="In" Type="Int32" />
+            <Parameter Name="FuncionarioId" Mode="In" Type="Int32" />
           </FunctionImport>
           <FunctionImport Name="usp_LimpiarDatosDeApex" />
           <FunctionImport Name="usp_MigrarDotacionesCompletas" />
           <FunctionImport Name="usp_PresenciaFecha_Apex" ReturnType="Collection(ApexModel.usp_PresenciaFecha_Apex_Result)">
-          <Parameter Name="Fecha" Mode="In" Type="DateTime" />
+            <Parameter Name="Fecha" Mode="In" Type="DateTime" />
           </FunctionImport>
           <FunctionImport Name="usp_ProcesarEstadoNotificaciones" />
-          <EntitySet Name="RegistroActividad" EntityType="ApexModel.RegistroActividad" />
         </EntityContainer>
         <ComplexType Name="sp_helpdiagramdefinition_Result">
           <Property Type="Int32" Name="version" Nullable="true" />
@@ -4197,18 +4213,6 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <Property Type="Int32" Name="FuncionarioId" Nullable="false" />
           <Property Type="String" Name="Resultado" Nullable="true" />
         </ComplexType>
-        <EntityType Name="RegistroActividad">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="FechaHora" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="Usuario" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
-          <Property Name="Accion" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
-          <Property Name="TipoEntidad" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="EntidadId" Type="Int32" />
-          <Property Name="Descripcion" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
-        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -4790,6 +4794,19 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="RegistroActividad">
+            <EntityTypeMapping TypeName="ApexModel.RegistroActividad">
+              <MappingFragment StoreEntitySet="RegistroActividad">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="FechaHora" ColumnName="FechaHora" />
+                <ScalarProperty Name="Usuario" ColumnName="Usuario" />
+                <ScalarProperty Name="Accion" ColumnName="Accion" />
+                <ScalarProperty Name="TipoEntidad" ColumnName="TipoEntidad" />
+                <ScalarProperty Name="EntidadId" ColumnName="EntidadId" />
+                <ScalarProperty Name="Descripcion" ColumnName="Descripcion" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="RetenDetalle">
             <EntityTypeMapping TypeName="ApexModel.RetenDetalle">
               <MappingFragment StoreEntitySet="RetenDetalle">
@@ -5092,8 +5109,9 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
                 <ScalarProperty Name="FechaDesde" ColumnName="FechaDesde" />
                 <ScalarProperty Name="FechaHasta" ColumnName="FechaHasta" />
                 <ScalarProperty Name="Resolucion" ColumnName="Resolucion" />
-                <ScalarProperty Name="Observaciones" ColumnName="Observaciones" />
-                <ScalarProperty Name="TipoLicenciaId" ColumnName="TipoLicenciaId" />
+                <ScalarProperty Name="Comentario" ColumnName="Comentario" />
+                <ScalarProperty Name="TipoSancion" ColumnName="TipoSancion" />
+                <ScalarProperty Name="Estado" ColumnName="Estado" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -5136,19 +5154,6 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             </ResultMapping>
           </FunctionImportMapping>
           <FunctionImportMapping FunctionImportName="usp_ProcesarEstadoNotificaciones" FunctionName="ApexModel.Store.usp_ProcesarEstadoNotificaciones" />
-          <EntitySetMapping Name="RegistroActividad">
-            <EntityTypeMapping TypeName="ApexModel.RegistroActividad">
-              <MappingFragment StoreEntitySet="RegistroActividad">
-                <ScalarProperty Name="Descripcion" ColumnName="Descripcion" />
-                <ScalarProperty Name="EntidadId" ColumnName="EntidadId" />
-                <ScalarProperty Name="TipoEntidad" ColumnName="TipoEntidad" />
-                <ScalarProperty Name="Accion" ColumnName="Accion" />
-                <ScalarProperty Name="Usuario" ColumnName="Usuario" />
-                <ScalarProperty Name="FechaHora" ColumnName="FechaHora" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

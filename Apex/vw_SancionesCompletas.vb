@@ -18,7 +18,8 @@ Partial Public Class vw_SancionesCompletas
     Public Property FechaDesde As Date
     Public Property FechaHasta As Nullable(Of Date)
     Public Property Resolucion As String
-    Public Property Observaciones As String
-    Public Property TipoLicenciaId As Integer
+    Public Property Comentario As String
+    Public Property TipoSancion As String
+    Public Property Estado As String
 
 End Class

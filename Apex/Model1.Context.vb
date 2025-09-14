@@ -72,6 +72,7 @@ Partial Public Class ApexEntities
     Public Overridable Property RegimenAlternancia() As DbSet(Of RegimenAlternancia)
     Public Overridable Property RegimenDetalle() As DbSet(Of RegimenDetalle)
     Public Overridable Property RegimenTrabajo() As DbSet(Of RegimenTrabajo)
+    Public Overridable Property RegistroActividad() As DbSet(Of RegistroActividad)
     Public Overridable Property RetenDetalle() As DbSet(Of RetenDetalle)
     Public Overridable Property RolUsuario() As DbSet(Of RolUsuario)
     Public Overridable Property SancionDetalle() As DbSet(Of SancionDetalle)
@@ -97,7 +98,6 @@ Partial Public Class ApexEntities
     Public Overridable Property vw_NovedadesAgrupadas() As DbSet(Of vw_NovedadesAgrupadas)
     Public Overridable Property vw_NovedadesCompletas() As DbSet(Of vw_NovedadesCompletas)
     Public Overridable Property vw_SancionesCompletas() As DbSet(Of vw_SancionesCompletas)
-    Public Overridable Property RegistroActividad() As DbSet(Of RegistroActividad)
 
     Public Overridable Function sp_alterdiagram(diagramname As String, owner_id As Nullable(Of Integer), version As Nullable(Of Integer), definition As Byte()) As Integer
         Dim diagramnameParameter As ObjectParameter = If(diagramname IsNot Nothing, New ObjectParameter("diagramname", diagramname), New ObjectParameter("diagramname", GetType(String)))
