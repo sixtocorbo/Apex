@@ -32,27 +32,50 @@ Public Module EstadoTransitorioExtensions
             Case TiposEstadoCatalog.Sumario
                 FillFromDetail(et.SumarioDetalle, {"FechaDesde"}, {"FechaHasta"}, desde, hasta)
 
+            Case TiposEstadoCatalog.Traslado
+                FillFromDetail(et.TrasladoDetalle, {"FechaDesde"}, {"FechaHasta"}, desde, hasta)
+
+            Case TiposEstadoCatalog.CambioDeCargo
+                FillFromDetail(et.CambioDeCargoDetalle, {"FechaDesde"}, {"FechaHasta"}, desde, hasta)
+
+            ' ### INICIO DE CORRECCIÓN ###
+            ' Se agregan los casos para los nuevos tipos de estado que antes estaban ignorados.
+            ' Todos estos ahora se tratan como eventos con un posible rango de fechas.
+
+            Case TiposEstadoCatalog.SeparacionDelCargo
+                FillFromDetail(et.SeparacionDelCargoDetalle, {"FechaDesde"}, {"FechaHasta"}, desde, hasta)
+
+            Case TiposEstadoCatalog.InicioDeProcesamiento
+                ' Asumimos que la tabla de detalle se llama ProcesadoDetalle o similar y está mapeada en el .edmx
+                ' Si el nombre de la propiedad en 'et' es diferente, ajústalo aquí.
+                ' Por ejemplo: FillFromDetail(et.ProcesadoDetalle, ...)
+                FillFromDetail(et.InicioDeProcesamientoDetalle, {"FechaDesde"}, {"FechaHasta"}, desde, hasta)
+
+            Case TiposEstadoCatalog.Desarmado
+                FillFromDetail(et.DesarmadoDetalle, {"FechaDesde"}, {"FechaHasta"}, desde, hasta)
+
             ' --- Casos con fecha PUNTUAL ---
             Case TiposEstadoCatalog.Reten
-                ' Para un Retén, la fecha es un evento único. Se fuerza Desde y Hasta al mismo día.
                 Dim fechaReten = ReadDate(et.RetenDetalle, "FechaReten")
                 If fechaReten.HasValue Then
                     desde = fechaReten
                     hasta = fechaReten
                 End If
 
-            ' --- Casos que NO tienen tabla de detalle propia en tu modelo actual ---
-            ' Si en el futuro se añaden tablas de detalle para estos tipos,
-            ' se deberán agregar sus respectivos `Case` aquí.
-            ' Por ahora, no se hace nada y las fechas quedarán en Nothing, lo cual es correcto.
-            Case TiposEstadoCatalog.Traslado,
-                 TiposEstadoCatalog.BajaDeFuncionario,
-                 TiposEstadoCatalog.CambioDeCargo,
-                 TiposEstadoCatalog.ReactivacionDeFuncionario,
-                 TiposEstadoCatalog.SeparacionDelCargo,
-                 TiposEstadoCatalog.InicioDeProcesamiento,
-                 TiposEstadoCatalog.Desarmado
-                ' No hay tabla de detalle asociada de la cual leer fechas.
+            Case TiposEstadoCatalog.BajaDeFuncionario
+                Dim fechaBaja = ReadDate(et.BajaDeFuncionarioDetalle, "Fecha")
+                If fechaBaja.HasValue Then
+                    desde = fechaBaja
+                    hasta = fechaBaja
+                End If
+
+            Case TiposEstadoCatalog.ReactivacionDeFuncionario
+                Dim fechaReactivacion = ReadDate(et.ReactivacionDeFuncionarioDetalle, "Fecha")
+                If fechaReactivacion.HasValue Then
+                    desde = fechaReactivacion
+                    hasta = fechaReactivacion
+                End If
+                ' ### FIN DE CORRECCIÓN ###
 
         End Select
     End Sub

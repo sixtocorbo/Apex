@@ -67,6 +67,7 @@ Partial Public Class ApexEntities
     Public Overridable Property NovedadFuncionario() As DbSet(Of NovedadFuncionario)
     Public Overridable Property NovedadGenerada() As DbSet(Of NovedadGenerada)
     Public Overridable Property OrdenCincoDetalle() As DbSet(Of OrdenCincoDetalle)
+    Public Overridable Property ProcesadoDetalle() As DbSet(Of ProcesadoDetalle)
     Public Overridable Property PuestoTrabajo() As DbSet(Of PuestoTrabajo)
     Public Overridable Property ReactivacionDeFuncionarioDetalle() As DbSet(Of ReactivacionDeFuncionarioDetalle)
     Public Overridable Property RegimenAlternancia() As DbSet(Of RegimenAlternancia)

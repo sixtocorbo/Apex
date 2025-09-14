@@ -27,6 +27,7 @@ Partial Public Class EstadoTransitorio
     Public Overridable Property EstadoTransitorioAdjunto As ICollection(Of EstadoTransitorioAdjunto) = New HashSet(Of EstadoTransitorioAdjunto)
     Public Overridable Property InicioDeProcesamientoDetalle As InicioDeProcesamientoDetalle
     Public Overridable Property OrdenCincoDetalle As OrdenCincoDetalle
+    Public Overridable Property ProcesadoDetalle As ICollection(Of ProcesadoDetalle) = New HashSet(Of ProcesadoDetalle)
     Public Overridable Property ReactivacionDeFuncionarioDetalle As ReactivacionDeFuncionarioDetalle
     Public Overridable Property RetenDetalle As RetenDetalle
     Public Overridable Property SancionDetalle As SancionDetalle

@@ -483,6 +483,17 @@
           <Property Name="Observaciones" Type="nvarchar(max)" />
           <Property Name="FechaResolucion" Type="datetime" />
         </EntityType>
+        <EntityType Name="ProcesadoDetalle">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="EstadoTransitorioId" Type="int" Nullable="false" />
+          <Property Name="FechaDesde" Type="datetime2" Precision="7" />
+          <Property Name="FechaHasta" Type="datetime2" Precision="7" />
+          <Property Name="Observaciones" Type="nvarchar(max)" />
+          <Property Name="Expediente" Type="nvarchar" MaxLength="255" />
+        </EntityType>
         <EntityType Name="PuestoTrabajo">
           <Key>
             <PropertyRef Name="Id" />
@@ -1479,6 +1490,20 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_ProcesadoDetalle_EstadoTransitorio">
+          <End Role="EstadoTransitorio" Type="Self.EstadoTransitorio" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="ProcesadoDetalle" Type="Self.ProcesadoDetalle" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="EstadoTransitorio">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ProcesadoDetalle">
+              <PropertyRef Name="EstadoTransitorioId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_PuestoTrabajo_AreaTrabajo">
           <End Role="AreaTrabajo" Type="Self.AreaTrabajo" Multiplicity="0..1" />
           <End Role="PuestoTrabajo" Type="Self.PuestoTrabajo" Multiplicity="*" />
@@ -1730,6 +1755,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <EntitySet Name="NovedadFuncionario" EntityType="Self.NovedadFuncionario" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="NovedadGenerada" EntityType="Self.NovedadGenerada" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="OrdenCincoDetalle" EntityType="Self.OrdenCincoDetalle" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ProcesadoDetalle" EntityType="Self.ProcesadoDetalle" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="PuestoTrabajo" EntityType="Self.PuestoTrabajo" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ReactivacionDeFuncionarioDetalle" EntityType="Self.ReactivacionDeFuncionarioDetalle" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="RegimenAlternancia" EntityType="Self.RegimenAlternancia" Schema="dbo" store:Type="Tables" />
@@ -2055,6 +2081,10 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             <End Role="EstadoTransitorio" EntitySet="EstadoTransitorio" />
             <End Role="OrdenCincoDetalle" EntitySet="OrdenCincoDetalle" />
           </AssociationSet>
+          <AssociationSet Name="FK_ProcesadoDetalle_EstadoTransitorio" Association="Self.FK_ProcesadoDetalle_EstadoTransitorio">
+            <End Role="EstadoTransitorio" EntitySet="EstadoTransitorio" />
+            <End Role="ProcesadoDetalle" EntitySet="ProcesadoDetalle" />
+          </AssociationSet>
           <AssociationSet Name="FK_PuestoTrabajo_AreaTrabajo" Association="Self.FK_PuestoTrabajo_AreaTrabajo">
             <End Role="AreaTrabajo" EntitySet="AreaTrabajo" />
             <End Role="PuestoTrabajo" EntitySet="PuestoTrabajo" />
@@ -2278,6 +2308,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <NavigationProperty Name="EstadoTransitorioAdjunto" Relationship="Self.FK_EstadoTransitorioAdjunto_EstadoTransitorio" FromRole="EstadoTransitorio" ToRole="EstadoTransitorioAdjunto" />
           <NavigationProperty Name="InicioDeProcesamientoDetalle" Relationship="Self.FK_InicioDeProcesamientoDetalle_EstadoTransitorio" FromRole="EstadoTransitorio" ToRole="InicioDeProcesamientoDetalle" />
           <NavigationProperty Name="OrdenCincoDetalle" Relationship="Self.FK_OrdenCincoDetalle_EstadoTransitorio" FromRole="EstadoTransitorio" ToRole="OrdenCincoDetalle" />
+          <NavigationProperty Name="ProcesadoDetalle" Relationship="Self.FK_ProcesadoDetalle_EstadoTransitorio" FromRole="EstadoTransitorio" ToRole="ProcesadoDetalle" />
           <NavigationProperty Name="ReactivacionDeFuncionarioDetalle" Relationship="Self.FK_ReactivacionDeFuncionarioDetalle_EstadoTransitorio" FromRole="EstadoTransitorio" ToRole="ReactivacionDeFuncionarioDetalle" />
           <NavigationProperty Name="RetenDetalle" Relationship="Self.FK_RetenDetalle_EstadoTransitorio" FromRole="EstadoTransitorio" ToRole="RetenDetalle" />
           <NavigationProperty Name="SancionDetalle" Relationship="Self.FK_SancionDetalle_EstadoTransitorio" FromRole="EstadoTransitorio" ToRole="SancionDetalle" />
@@ -2681,6 +2712,18 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <Property Name="Observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="FechaResolucion" Type="DateTime" Precision="3" />
           <NavigationProperty Name="EstadoTransitorio" Relationship="Self.FK_OrdenCincoDetalle_EstadoTransitorio" FromRole="OrdenCincoDetalle" ToRole="EstadoTransitorio" />
+        </EntityType>
+        <EntityType Name="ProcesadoDetalle">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="EstadoTransitorioId" Type="Int32" Nullable="false" />
+          <Property Name="FechaDesde" Type="DateTime" Precision="7" />
+          <Property Name="FechaHasta" Type="DateTime" Precision="7" />
+          <Property Name="Observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Expediente" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="EstadoTransitorio" Relationship="Self.FK_ProcesadoDetalle_EstadoTransitorio" FromRole="ProcesadoDetalle" ToRole="EstadoTransitorio" />
         </EntityType>
         <EntityType Name="PuestoTrabajo">
           <Key>
@@ -3345,6 +3388,20 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_ProcesadoDetalle_EstadoTransitorio">
+          <End Role="EstadoTransitorio" Type="Self.EstadoTransitorio" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="ProcesadoDetalle" Type="Self.ProcesadoDetalle" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="EstadoTransitorio">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ProcesadoDetalle">
+              <PropertyRef Name="EstadoTransitorioId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_ReactivacionDeFuncionarioDetalle_EstadoTransitorio">
           <End Role="EstadoTransitorio" Type="Self.EstadoTransitorio" Multiplicity="1">
             <OnDelete Action="Cascade" />
@@ -3883,6 +3940,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <EntitySet Name="NovedadFuncionario" EntityType="Self.NovedadFuncionario" />
           <EntitySet Name="NovedadGenerada" EntityType="Self.NovedadGenerada" />
           <EntitySet Name="OrdenCincoDetalle" EntityType="Self.OrdenCincoDetalle" />
+          <EntitySet Name="ProcesadoDetalle" EntityType="Self.ProcesadoDetalle" />
           <EntitySet Name="PuestoTrabajo" EntityType="Self.PuestoTrabajo" />
           <EntitySet Name="ReactivacionDeFuncionarioDetalle" EntityType="Self.ReactivacionDeFuncionarioDetalle" />
           <EntitySet Name="RegimenAlternancia" EntityType="Self.RegimenAlternancia" />
@@ -3989,6 +4047,10 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <AssociationSet Name="FK_OrdenCincoDetalle_EstadoTransitorio" Association="Self.FK_OrdenCincoDetalle_EstadoTransitorio">
             <End Role="EstadoTransitorio" EntitySet="EstadoTransitorio" />
             <End Role="OrdenCincoDetalle" EntitySet="OrdenCincoDetalle" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProcesadoDetalle_EstadoTransitorio" Association="Self.FK_ProcesadoDetalle_EstadoTransitorio">
+            <End Role="EstadoTransitorio" EntitySet="EstadoTransitorio" />
+            <End Role="ProcesadoDetalle" EntitySet="ProcesadoDetalle" />
           </AssociationSet>
           <AssociationSet Name="FK_ReactivacionDeFuncionarioDetalle_EstadoTransitorio" Association="Self.FK_ReactivacionDeFuncionarioDetalle_EstadoTransitorio">
             <End Role="EstadoTransitorio" EntitySet="EstadoTransitorio" />
@@ -4730,6 +4792,18 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
                 <ScalarProperty Name="FechaHasta" ColumnName="FechaHasta" />
                 <ScalarProperty Name="Observaciones" ColumnName="Observaciones" />
                 <ScalarProperty Name="FechaResolucion" ColumnName="FechaResolucion" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ProcesadoDetalle">
+            <EntityTypeMapping TypeName="ApexModel.ProcesadoDetalle">
+              <MappingFragment StoreEntitySet="ProcesadoDetalle">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="EstadoTransitorioId" ColumnName="EstadoTransitorioId" />
+                <ScalarProperty Name="FechaDesde" ColumnName="FechaDesde" />
+                <ScalarProperty Name="FechaHasta" ColumnName="FechaHasta" />
+                <ScalarProperty Name="Observaciones" ColumnName="Observaciones" />
+                <ScalarProperty Name="Expediente" ColumnName="Expediente" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
