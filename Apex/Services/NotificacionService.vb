@@ -4,7 +4,11 @@ Option Explicit On
 Imports System.Data.Entity
 Imports System.Data.SqlClient
 Imports System.Text
-
+Public Class ResultadoMasivo
+    Public Property Creadas As Integer
+    Public Property OmitidasPorDuplicado As Integer
+    Public Property Errores As New List(Of (FuncionarioId As Integer, ErrorMsg As String))
+End Class
 ' ---------- DTOs de entrada ----------
 Public Class NotificacionCreateRequest
     Public Property FuncionarioId As Integer
@@ -328,5 +332,71 @@ Public Class NotificacionService
             ToListAsync()
         Return lista.Select(Function(e) New KeyValuePair(Of Byte, String)(e.Id, e.Nombre)).ToList()
     End Function
+    Public Async Function CreateNotificacionesMasivasAsync(
+        funcionarioIds As IEnumerable(Of Integer),
+        baseReq As NotificacionCreateRequest,
+        Optional skipDuplicadas As Boolean = True,
+        Optional reportProgress As Action = Nothing
+    ) As Task(Of ResultadoMasivo)
 
+        Dim res As New ResultadoMasivo()
+        If funcionarioIds Is Nothing Then Return res
+
+        Using uow As New UnitOfWork()
+            Dim ctx = uow.Context
+
+            ' Precalcular rango del día para “misma fecha”
+            Dim d As Date = baseReq.FechaProgramada.Date
+            Dim dSiguiente = d.AddDays(1)
+
+            For Each fid In funcionarioIds
+                Try
+                    If skipDuplicadas Then
+                        Dim yaExiste = Await ctx.Set(Of NotificacionPersonal)().
+                            AnyAsync(Function(n) n.FuncionarioId = fid AndAlso
+                                               n.TipoNotificacionId = baseReq.TipoNotificacionId AndAlso
+                                               n.EstadoId = CByte(ModConstantesApex.EstadoNotificacionPersonal.Pendiente) AndAlso
+                                               n.FechaProgramada >= d AndAlso n.FechaProgramada < dSiguiente)
+                        If yaExiste Then
+                            res.OmitidasPorDuplicado += 1
+                            reportProgress?.Invoke()
+                            Continue For
+                        End If
+                    End If
+
+                    Dim nueva As New NotificacionPersonal With {
+                        .FuncionarioId = fid,
+                        .TipoNotificacionId = baseReq.TipoNotificacionId,
+                        .FechaProgramada = baseReq.FechaProgramada,
+                        .Medio = baseReq.Medio,
+                        .Documento = baseReq.Documento,
+                        .ExpMinisterial = baseReq.ExpMinisterial,
+                        .ExpINR = baseReq.ExpINR,
+                        .Oficina = baseReq.Oficina,
+                        .EstadoId = CByte(ModConstantesApex.EstadoNotificacionPersonal.Pendiente),
+                        .CreatedAt = DateTime.Now,
+                        .UpdatedAt = DateTime.Now
+                    }
+
+                    ctx.Set(Of NotificacionPersonal)().Add(nueva)
+                    ' Guardamos “por ítem” para aislar errores y poder continuar
+                    Await uow.CommitAsync()
+
+                    ' disparar evento por funcionario (si querés al toque)
+                    NotificadorEventos.NotificarCambiosEnFuncionario(fid)
+
+                    res.Creadas += 1
+
+                Catch ex As Exception
+                    res.Errores.Add((fid, ex.Message))
+                    ' Continuar con el siguiente
+                Finally
+                    reportProgress?.Invoke()
+                End Try
+            Next
+        End Using
+
+        Return res
+    End Function
 End Class
+

@@ -292,6 +292,11 @@ Public Class frmNotificaciones
     Private Async Sub btnCambiarEstado_Click(sender As Object, e As EventArgs) Handles btnCambiarEstado.Click
         Await CambiarEstado()
     End Sub
+
+    Private Sub btnNuevaMasiva_Click(sender As Object, e As EventArgs) Handles btnNuevaMasiva.Click
+        AbrirChildEnDashboard(New frmNotificacionMasiva())
+    End Sub
+
 #End Region
 
 End Class

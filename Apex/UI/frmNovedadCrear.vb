@@ -3,6 +3,7 @@ Imports System.ComponentModel
 Imports System.Data.Entity
 Imports System.IO
 
+
 Public Class frmNovedadCrear
 
     Private _svc As New NovedadService()
@@ -40,29 +41,40 @@ Public Class frmNovedadCrear
 
     Private Async Sub frmNovedadCrear_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
+        Me.KeyPreview = True
+        Me.AcceptButton = btnGuardar
+
         lstFuncionariosSeleccionados.DataSource = _funcionariosSeleccionados
         lstFuncionariosSeleccionados.DisplayMember = "Nombre"
         lstFuncionariosSeleccionados.ValueMember = "Id"
+
         Try
             AppTheme.SetCue(txtTexto, "Ingrese el texto de la novedad...")
-            AppTheme.SetCue(dtpFecha, "Seleccione la fecha de la novedad...")
-            AppTheme.SetCue(lstFuncionariosSeleccionados, "No hay funcionarios seleccionados...")
-            AppTheme.SetCue(flpFotos, "No hay fotos agregadas...")
-
+            AppTheme.SetCue(dtpFecha, "Fecha de la novedad…")
+            AppTheme.SetCue(lstFuncionariosSeleccionados, "No hay funcionarios seleccionados…")
+            AppTheme.SetCue(flpFotos, "No hay fotos agregadas…")
         Catch
-            ' Ignorar si no existe SetCue
         End Try
+
         If _modo = ModoFormulario.Editar Then
-            Await CargarDatosParaEdicion()
+            Try
+                Await CargarDatosParaEdicion()
+            Catch ex As Exception
+                Notifier.[Error](Me, $"No se pudo cargar la novedad: {ex.Message}")
+                Close()
+                Return
+            End Try
+        Else
+            Notifier.Info(Me, "Tip: podés arrastrar varias fotos o usar 'Agregar foto'.")
         End If
     End Sub
 
+
     Private Async Function CargarDatosParaEdicion() As Task
         _novedad = Await _svc.GetByIdAsync(_novedadId)
-
         If _novedad Is Nothing Then
-            MessageBox.Show("No se encontró la novedad para editar.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            Me.Close()
+            Notifier.[Error](Me, "No se encontró la novedad para editar.")
+            Close()
             Return
         End If
 
@@ -78,6 +90,7 @@ Public Class frmNovedadCrear
         Await CargarFotosAsync()
     End Function
 
+
 #Region "Lógica de Funcionarios"
     Private Async Sub btnAgregarFuncionario_Click(sender As Object, e As EventArgs) Handles btnAgregarFuncionario.Click
         Using frm As New frmFuncionarioBuscar(frmFuncionarioBuscar.ModoApertura.Seleccion)
@@ -88,28 +101,67 @@ Public Class frmNovedadCrear
                         Dim funcCompleto = Await uow.Repository(Of Funcionario)().GetByIdAsync(idFuncionarioSeleccionado)
                         If funcCompleto IsNot Nothing Then
                             _funcionariosSeleccionados.Add(funcCompleto)
+                            Notifier.Success(Me, $"Agregado: {funcCompleto.Nombre}")
                         End If
                     End Using
                 Else
-                    MessageBox.Show("El funcionario seleccionado ya se encuentra en la lista.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                    Notifier.Warn(Me, "Ese funcionario ya está en la lista.")
                 End If
             End If
         End Using
     End Sub
 
     Private Sub btnQuitarFuncionario_Click(sender As Object, e As EventArgs) Handles btnQuitarFuncionario.Click
-        If lstFuncionariosSeleccionados.SelectedItems.Count > 0 Then
-            Dim itemsAQuitar = lstFuncionariosSeleccionados.SelectedItems.Cast(Of Funcionario).ToList()
-            For Each item In itemsAQuitar
-                _funcionariosSeleccionados.Remove(item)
-            Next
+        If lstFuncionariosSeleccionados.SelectedItems.Count = 0 Then
+            Notifier.Info(Me, "Seleccioná al menos un funcionario para quitar.")
+            Return
         End If
+
+        Dim itemsAQuitar = lstFuncionariosSeleccionados.SelectedItems.Cast(Of Funcionario).ToList()
+        For Each item In itemsAQuitar
+            _funcionariosSeleccionados.Remove(item)
+        Next
+        Notifier.Info(Me, "Funcionario/s quitado/s del listado.")
     End Sub
+
 #End Region
 
 #Region "Lógica de Fotos"
-    Private Async Function CargarFotosAsync() As Task
+    ' Crea una copia desacoplada del stream para evitar locks
+    Private Function CrearImagenCopia(bytes() As Byte) As Image
+        Using ms As New MemoryStream(bytes)
+            Using bmp As New Bitmap(ms)
+                Return New Bitmap(bmp)
+            End Using
+        End Using
+    End Function
+
+    Private Sub LimpiarFotos()
+        For Each ctrl As Control In flpFotos.Controls
+            Dim pic = TryCast(ctrl, PictureBox)
+            If pic IsNot Nothing Then
+                Dim img = pic.Image
+                pic.Image = Nothing
+                If img IsNot Nothing Then img.Dispose()
+                pic.Dispose()
+            End If
+        Next
         flpFotos.Controls.Clear()
+    End Sub
+
+    Private Sub DisposePictureBox(ByRef pic As PictureBox)
+        If pic Is Nothing Then Exit Sub
+        If pic.Image IsNot Nothing Then
+            pic.Image.Dispose()
+            pic.Image = Nothing
+        End If
+        flpFotos.Controls.Remove(pic)
+        pic.Dispose()
+        pic = Nothing
+    End Sub
+
+    Private Async Function CargarFotosAsync() As Task
+        LimpiarFotos()
         _fotosExistentes.Clear()
         _pictureBoxSeleccionado = Nothing
 
@@ -117,21 +169,21 @@ Public Class frmNovedadCrear
             Dim fotosDb = Await _svc.GetFotosPorNovedadAsync(_novedadId)
             For Each foto In fotosDb
                 _fotosExistentes.Add(foto)
-                AgregarPictureBox(foto.Foto, foto)
+                AgregarPictureBox(foto.Foto, foto) ' tag = NovedadFoto (persistida)
             Next
         End If
     End Function
 
     Private Sub AgregarPictureBox(imageData As Byte(), tag As Object)
         Dim pic As New PictureBox With {
-            .Image = Image.FromStream(New MemoryStream(imageData)),
-            .SizeMode = PictureBoxSizeMode.Zoom,
-            .Size = New Size(120, 120),
-            .Margin = New Padding(5),
-            .BorderStyle = BorderStyle.FixedSingle,
-            .Tag = tag,
-            .Cursor = Cursors.Hand
-        }
+        .Image = CrearImagenCopia(imageData),
+        .SizeMode = PictureBoxSizeMode.Zoom,
+        .Size = New Size(120, 120),
+        .Margin = New Padding(5),
+        .BorderStyle = BorderStyle.FixedSingle,
+        .Tag = tag,
+        .Cursor = Cursors.Hand
+    }
         AddHandler pic.DoubleClick, AddressOf PictureBox_DoubleClick
         AddHandler pic.Click, AddressOf PictureBox_Click
         flpFotos.Controls.Add(pic)
@@ -160,16 +212,42 @@ Public Class frmNovedadCrear
 
     Private Sub btnAgregarFoto_Click(sender As Object, e As EventArgs) Handles btnAgregarFoto.Click
         Using ofd As New OpenFileDialog With {
-            .Filter = "Imágenes|*.jpg;*.jpeg;*.png;*.bmp",
-            .Multiselect = True
-        }
+        .Filter = "Imágenes|*.jpg;*.jpeg;*.png;*.bmp",
+        .Multiselect = True
+    }
             If ofd.ShowDialog() = DialogResult.OK Then
+                Dim agregadas As Integer = 0
                 For Each archivo In ofd.FileNames
-                    ' Siempre añadimos las fotos nuevas a la lista temporal
-                    _rutasFotosNuevas.Add(archivo)
-                    ' Y mostramos una vista previa
-                    AgregarPictureBox(File.ReadAllBytes(archivo), archivo)
+                    Try
+                        If Not File.Exists(archivo) Then Continue For
+                        Dim ext = Path.GetExtension(archivo).ToLowerInvariant()
+                        If Not {".jpg", ".jpeg", ".png", ".bmp"}.Contains(ext) Then Continue For
+
+                        ' Tamaño ≤ 15 MB
+                        Dim fi = New FileInfo(archivo)
+                        If fi.Length > 15 * 1024 * 1024 Then
+                            Notifier.Warn(Me, $"Se omitió {fi.Name}: supera 15 MB.")
+                            Continue For
+                        End If
+
+                        ' Evitar duplicados por ruta
+                        If _rutasFotosNuevas.Contains(archivo) Then
+                            Continue For
+                        End If
+
+                        _rutasFotosNuevas.Add(archivo)
+                        AgregarPictureBox(File.ReadAllBytes(archivo), archivo) ' tag = String (nueva)
+                        agregadas += 1
+                    Catch ex As Exception
+                        Notifier.[Error](Me, $"No se pudo agregar '{Path.GetFileName(archivo)}': {ex.Message}")
+                    End Try
                 Next
+
+                If agregadas > 0 Then
+                    Notifier.Success(Me, $"{agregadas} foto(s) agregada(s).")
+                Else
+                    Notifier.Info(Me, "No se agregaron fotos.")
+                End If
             End If
         End Using
     End Sub
@@ -177,175 +255,102 @@ Public Class frmNovedadCrear
     ' --- MODIFICACIÓN CLAVE: Lógica de eliminación ---
     Private Sub btnEliminarFoto_Click(sender As Object, e As EventArgs) Handles btnEliminarFoto.Click
         If _pictureBoxSeleccionado Is Nothing Then
-            MessageBox.Show("Por favor, seleccione una foto para eliminar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Notifier.Info(Me, "Seleccioná una foto para eliminar.")
             Return
         End If
 
-        If MessageBox.Show("¿Está seguro de que desea eliminar la foto seleccionada?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
-
-            ' Si la foto ya existía en la BD, la añadimos a la lista de "pendientes para eliminar".
-            If TypeOf _pictureBoxSeleccionado.Tag Is NovedadFoto Then
-                Dim fotoAEliminar = CType(_pictureBoxSeleccionado.Tag, NovedadFoto)
-                _fotosParaEliminar.Add(fotoAEliminar)
-
-                ' Si la foto era nueva (aún no guardada), simplemente la quitamos de la lista de "pendientes para añadir".
-            ElseIf TypeOf _pictureBoxSeleccionado.Tag Is String Then
-                Dim rutaAEliminar = CType(_pictureBoxSeleccionado.Tag, String)
-                _rutasFotosNuevas.Remove(rutaAEliminar)
-            End If
-
-            ' En ambos casos, quitamos el control visual de la pantalla.
-            flpFotos.Controls.Remove(_pictureBoxSeleccionado)
-            _pictureBoxSeleccionado.Dispose()
-            _pictureBoxSeleccionado = Nothing
+        If MessageBox.Show("¿Eliminar la foto seleccionada?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then
+            Return
         End If
+
+        If TypeOf _pictureBoxSeleccionado.Tag Is NovedadFoto Then
+            Dim fotoAEliminar = CType(_pictureBoxSeleccionado.Tag, NovedadFoto)
+            If Not _fotosParaEliminar.Contains(fotoAEliminar) Then _fotosParaEliminar.Add(fotoAEliminar)
+        ElseIf TypeOf _pictureBoxSeleccionado.Tag Is String Then
+            Dim rutaAEliminar = CType(_pictureBoxSeleccionado.Tag, String)
+            _rutasFotosNuevas.Remove(rutaAEliminar)
+        End If
+
+        DisposePictureBox(_pictureBoxSeleccionado)
+        Notifier.Info(Me, "Foto eliminada de la selección.")
     End Sub
+
 #End Region
 
 #Region "Guardado y Cancelación"
     Private Async Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
         If String.IsNullOrWhiteSpace(txtTexto.Text) Then
-            MessageBox.Show("El texto de la novedad no puede estar vacío.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Notifier.Warn(Me, "El texto de la novedad no puede estar vacío.")
             Return
         End If
         If _funcionariosSeleccionados.Count = 0 Then
-            MessageBox.Show("Debe seleccionar al menos un funcionario.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Notifier.Warn(Me, "Seleccioná al menos un funcionario.")
             Return
         End If
 
-        ' --- SOLUCIÓN: Deshabilitar el botón para evitar múltiples clics ---
         btnGuardar.Enabled = False
         LoadingHelper.MostrarCargando(Me)
+        Dim oldCursor = Me.Cursor
+        Me.Cursor = Cursors.WaitCursor
 
         Try
             Dim funcionarioIds = _funcionariosSeleccionados.Select(Function(f) f.Id).ToList()
 
             If _modo = ModoFormulario.Crear Then
-                ' 1. Crear la novedad principal
+                ' Crear novedad
                 Dim nuevaNovedad = Await _svc.CrearNovedadCompletaAsync(dtpFecha.Value.Date, txtTexto.Text.Trim(), funcionarioIds)
 
-                ' 2. Si se creó, agregar las fotos nuevas
+                ' Agregar fotos nuevas
                 If nuevaNovedad IsNot Nothing AndAlso _rutasFotosNuevas.Any() Then
                     For Each ruta In _rutasFotosNuevas
                         Await _svc.AddFotoAsync(nuevaNovedad.Id, ruta)
                     Next
                 End If
-                MessageBox.Show("Novedad creada con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
-                ' *** USAMOS EL NOTIFICADOR DE EVENTOS ***
-                ' Notificamos por cada funcionario que sus datos relacionados han cambiado.
+
+                Notifier.Success(Me, "Novedad creada correctamente.")
+
                 For Each id In funcionarioIds
                     NotificadorEventos.NotificarCambiosEnFuncionario(id)
                 Next
 
-            Else ' Modo Editar
-                ' --- MODIFICACIÓN CLAVE: Lógica de guardado en edición ---
-
-                ' 1. Eliminar las fotos que el usuario marcó para borrar
+            Else
+                ' Eliminar marcadas
                 If _fotosParaEliminar.Any() Then
                     For Each foto In _fotosParaEliminar
                         Await _svc.DeleteFotoAsync(foto.Id)
                     Next
                 End If
 
-                ' 2. Agregar las nuevas fotos que el usuario seleccionó
+                ' Agregar nuevas
                 If _rutasFotosNuevas.Any() Then
                     For Each ruta In _rutasFotosNuevas
                         Await _svc.AddFotoAsync(_novedadId, ruta)
                     Next
                 End If
 
-                ' 3. Actualizar los datos principales de la novedad
+                ' Actualizar novedad
                 _novedad.Fecha = dtpFecha.Value.Date
                 _novedad.Texto = txtTexto.Text.Trim()
                 Await _svc.ActualizarNovedadCompletaAsync(_novedad, funcionarioIds)
 
-                MessageBox.Show("Novedad actualizada con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
-            End If
+                Notifier.Success(Me, "Novedad actualizada.")
 
-            ' También notificamos al finalizar la edición
-            For Each id In funcionarioIds
-                NotificadorEventos.NotificarCambiosEnFuncionario(id)
-            Next
+                For Each id In funcionarioIds
+                    NotificadorEventos.NotificarCambiosEnFuncionario(id)
+                Next
+            End If
 
             DialogResult = DialogResult.OK
             Close()
+
         Catch ex As Exception
-            MessageBox.Show("Ocurrió un error al guardar la novedad: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Notifier.[Error](Me, $"Ocurrió un error al guardar: {ex.Message}")
         Finally
-            ' --- SOLUCIÓN: Volver a habilitar el botón en cualquier caso ---
+            Me.Cursor = oldCursor
             btnGuardar.Enabled = True
             LoadingHelper.OcultarCargando(Me)
         End Try
     End Sub
-    'Private Async Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
-    '    If String.IsNullOrWhiteSpace(txtTexto.Text) Then
-    '        MessageBox.Show("El texto de la novedad no puede estar vacío.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-    '        Return
-    '    End If
-    '    If _funcionariosSeleccionados.Count = 0 Then
-    '        MessageBox.Show("Debe seleccionar al menos un funcionario.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-    '        Return
-    '    End If
-
-    '    LoadingHelper.MostrarCargando(Me)
-    '    Try
-    '        Dim funcionarioIds = _funcionariosSeleccionados.Select(Function(f) f.Id).ToList()
-
-    '        If _modo = ModoFormulario.Crear Then
-    '            ' 1. Crear la novedad principal
-    '            Dim nuevaNovedad = Await _svc.CrearNovedadCompletaAsync(dtpFecha.Value.Date, txtTexto.Text.Trim(), funcionarioIds)
-
-    '            ' 2. Si se creó, agregar las fotos nuevas
-    '            If nuevaNovedad IsNot Nothing AndAlso _rutasFotosNuevas.Any() Then
-    '                For Each ruta In _rutasFotosNuevas
-    '                    Await _svc.AddFotoAsync(nuevaNovedad.Id, ruta)
-    '                Next
-    '            End If
-    '            MessageBox.Show("Novedad creada con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
-    '            ' *** USAMOS EL NOTIFICADOR DE EVENTOS ***
-    '            ' Notificamos por cada funcionario que sus datos relacionados han cambiado.
-    '            For Each id In funcionarioIds
-    '                NotificadorEventos.NotificarCambiosEnFuncionario(id)
-    '            Next
-
-    '        Else ' Modo Editar
-    '            ' --- MODIFICACIÓN CLAVE: Lógica de guardado en edición ---
-
-    '            ' 1. Eliminar las fotos que el usuario marcó para borrar
-    '            If _fotosParaEliminar.Any() Then
-    '                For Each foto In _fotosParaEliminar
-    '                    Await _svc.DeleteFotoAsync(foto.Id)
-    '                Next
-    '            End If
-
-    '            ' 2. Agregar las nuevas fotos que el usuario seleccionó
-    '            If _rutasFotosNuevas.Any() Then
-    '                For Each ruta In _rutasFotosNuevas
-    '                    Await _svc.AddFotoAsync(_novedadId, ruta)
-    '                Next
-    '            End If
-
-    '            ' 3. Actualizar los datos principales de la novedad
-    '            _novedad.Fecha = dtpFecha.Value.Date
-    '            _novedad.Texto = txtTexto.Text.Trim()
-    '            Await _svc.ActualizarNovedadCompletaAsync(_novedad, funcionarioIds)
-
-    '            MessageBox.Show("Novedad actualizada con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
-    '        End If
-
-    '        ' También notificamos al finalizar la edición
-    '        For Each id In funcionarioIds
-    '            NotificadorEventos.NotificarCambiosEnFuncionario(id)
-    '        Next
-
-    '        DialogResult = DialogResult.OK
-    '        Close()
-    '    Catch ex As Exception
-    '        MessageBox.Show("Ocurrió un error al guardar la novedad: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-    '    Finally
-    '        LoadingHelper.OcultarCargando(Me)
-    '    End Try
-    'End Sub
 
     Private Sub btnCancelar_Click(sender As Object, e As EventArgs) Handles btnCancelar.Click
         DialogResult = DialogResult.Cancel
@@ -353,9 +358,10 @@ Public Class frmNovedadCrear
     End Sub
 #End Region
     Private Sub Cerrando(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
-        ' Si la tecla presionada es Escape, se cierra el formulario.
         If e.KeyCode = Keys.Escape Then
             Me.Close()
+            e.Handled = True
         End If
     End Sub
+
 End Class

@@ -548,8 +548,36 @@ Partial Public Class frmFiltros
             MessageBox.Show("No se encontraron correos válidos en la selección actual.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning)
         End If
     End Sub
+    Public Function GetIdsFiltrados(nombreColumnaId As String) As List(Of Integer)
+        Dim ids As New List(Of Integer)
+        If _dvDatos Is Nothing OrElse Not _dvDatos.Table.Columns.Contains(nombreColumnaId) Then Return ids
+        For Each rowView As DataRowView In _dvDatos
+            Dim v = rowView.Row.Field(Of Object)(nombreColumnaId)
+            If v IsNot Nothing Then
+                Dim id As Integer
+                If Integer.TryParse(v.ToString(), id) Then ids.Add(id)
+            End If
+        Next
+        Return ids.Distinct().ToList()
+    End Function
+    Public Function GetDiccionarioIdNombre(nombreColumnaId As String, nombreColumnaNombre As String) As Dictionary(Of Integer, String)
+        Dim dict As New Dictionary(Of Integer, String)
+        If _dvDatos Is Nothing OrElse
+           Not _dvDatos.Table.Columns.Contains(nombreColumnaId) OrElse
+           Not _dvDatos.Table.Columns.Contains(nombreColumnaNombre) Then Return dict
 
-
+        For Each rowView As DataRowView In _dvDatos
+            Dim vId = rowView.Row.Field(Of Object)(nombreColumnaId)
+            Dim vNom = rowView.Row.Field(Of Object)(nombreColumnaNombre)
+            If vId Is Nothing Then Continue For
+            Dim id As Integer
+            If Integer.TryParse(vId.ToString(), id) Then
+                Dim nom = If(vNom?.ToString(), $"Funcionario #{id}")
+                If Not dict.ContainsKey(id) Then dict.Add(id, nom)
+            End If
+        Next
+        Return dict
+    End Function
 End Class
 
 Public Module ControlExtensions

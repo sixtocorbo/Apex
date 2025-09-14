@@ -643,6 +643,12 @@
     <Compile Include="UI\frmNotificaciones.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="UI\frmNotificacionMasiva.Designer.vb">
+      <DependentUpon>frmNotificacionMasiva.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmNotificacionMasiva.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="UI\frmReportes.Designer.vb">
       <DependentUpon>frmReportes.vb</DependentUpon>
     </Compile>

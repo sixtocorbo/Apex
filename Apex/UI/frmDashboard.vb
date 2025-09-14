@@ -81,61 +81,88 @@ Public Class frmDashboard
     ''' Si isChild=True, apila el formulario actual y ocúltalo, para restaurarlo al cerrar el hijo.
     ''' </summary>
     Public Sub AbrirFormEnPanel(formToShow As Form, Optional isChild As Boolean = False)
-        ' --- Manejo del activo: ocultar o cerrar ---
+        ' --- Guard clause ---
+        If formToShow Is Nothing Then
+            Notifier.Error(Me, "No se pudo abrir la ventana: referencia nula.")
+            Exit Sub
+        End If
+
+        ' Si ya viene disposed (por un error en el Load del ctor, por ejemplo), abortar elegante.
+        If formToShow.IsDisposed Then
+            Notifier.Error(Me, $"No se pudo abrir la ventana: el formulario '{formToShow.Name}' ya se cerró.")
+            Exit Sub
+        End If
+
+        ' --- Manejo del activo ---
         If _activeForm IsNot Nothing Then
-            If isChild Then
-                ' Empujar el actual a la pila para “volver” cuando se cierre el hijo
-                _navStack.Push(_activeForm)
-            End If
+            If isChild Then _navStack.Push(_activeForm)
 
             If Not _formularios.ContainsValue(_activeForm) Then
-                ' Si no es persistente, cerramos (dispara FormClosed y hace cleanup)
                 _activeForm.Close()
             Else
-                ' Si es persistente, ocúltalo
                 _activeForm.Hide()
             End If
         End If
 
-        ' --- Embebido si no está aún en el contenedor ---
+        ' --- Embebido ---
         If Not Me.panelContenido.Controls.Contains(formToShow) Then
             formToShow.TopLevel = False
             formToShow.FormBorderStyle = FormBorderStyle.None
             formToShow.Dock = DockStyle.Fill
             Me.panelContenido.Controls.Add(formToShow)
 
-            ' Handler de cierre: restaurar padre si corresponde; si no, fallback a Buscar
             AddHandler formToShow.FormClosed,
-                Sub(s, args)
-                    Dim f = CType(s, Form)
-                    Me.panelContenido.Controls.Remove(f)
-                    f.Dispose()
-
-                    If _navStack.Count > 0 Then
-                        ' Volver al anterior exacto
-                        Dim volver = _navStack.Pop()
-                        If volver IsNot Nothing AndAlso Not volver.IsDisposed Then
-                            _activeForm = volver
+            Sub(s, args)
+                Dim f = CType(s, Form)
+                Me.panelContenido.Controls.Remove(f)
+                ' f.Dispose() no es necesario: ya viene dispuesto tras Close/CloseReason
+                If _navStack.Count > 0 Then
+                    Dim volver = _navStack.Pop()
+                    If volver IsNot Nothing AndAlso Not volver.IsDisposed Then
+                        _activeForm = volver
+                        Try
                             _activeForm.Show()
                             _activeForm.BringToFront()
                             EnfocarControlPreferido(_activeForm)
-                            ActualizarTituloDashboard()
-                            Exit Sub
-                        End If
+                        Catch ex As ObjectDisposedException
+                            Notifier.Warn(Me, "La ventana anterior ya no está disponible. Volviendo al inicio.")
+                            btnBuscarFuncionario.PerformClick()
+                        End Try
+                        ActualizarTituloDashboard()
+                        Exit Sub
                     End If
-
-                    ' Sin pila o inválido → ir a Buscar por defecto
-                    btnBuscarFuncionario.PerformClick()
-                    ActualizarTituloDashboard()
-                End Sub
+                End If
+                btnBuscarFuncionario.PerformClick()
+                ActualizarTituloDashboard()
+            End Sub
         End If
 
+        ' --- Mostrar activo con resguardo ---
         _activeForm = formToShow
-        _activeForm.Show()
-        _activeForm.BringToFront()
-        EnfocarControlPreferido(_activeForm)
+        Try
+            _activeForm.Show()
+            _activeForm.BringToFront()
+            EnfocarControlPreferido(_activeForm)
+        Catch ex As ObjectDisposedException
+            Notifier.Error(Me, "No se pudo abrir la ventana: el objeto fue desechado durante la inicialización.")
+            ' Fallback razonable
+            If _navStack.Count > 0 Then
+                Dim volver = _navStack.Pop()
+                If volver IsNot Nothing AndAlso Not volver.IsDisposed Then
+                    _activeForm = volver
+                    _activeForm.Show()
+                    _activeForm.BringToFront()
+                Else
+                    btnBuscarFuncionario.PerformClick()
+                End If
+            Else
+                btnBuscarFuncionario.PerformClick()
+            End If
+        End Try
+
         ActualizarTituloDashboard()
     End Sub
+
 
     ''' <summary>
     ''' Abrir un formulario como “hijo” del actual (lo apila y restaura al cerrarse).

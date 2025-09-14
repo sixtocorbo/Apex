@@ -33,6 +33,7 @@ Partial Class frmNotificaciones
         Me.Label1 = New System.Windows.Forms.Label()
         Me.dgvNotificaciones = New System.Windows.Forms.DataGridView()
         Me.rtbNotificacion = New System.Windows.Forms.RichTextBox()
+        Me.btnNuevaMasiva = New System.Windows.Forms.Button()
         Me.Panel1.SuspendLayout()
         Me.Panel2.SuspendLayout()
         CType(Me.dgvNotificaciones, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -40,6 +41,7 @@ Partial Class frmNotificaciones
         '
         'Panel1
         '
+        Me.Panel1.Controls.Add(Me.btnNuevaMasiva)
         Me.Panel1.Controls.Add(Me.btnCambiarEstado)
         Me.Panel1.Controls.Add(Me.btnImprimir)
         Me.Panel1.Controls.Add(Me.btnEliminar)
@@ -195,6 +197,22 @@ Partial Class frmNotificaciones
         Me.rtbNotificacion.TabIndex = 3
         Me.rtbNotificacion.Text = ""
         '
+        'btnNuevaMasiva
+        '
+        Me.btnNuevaMasiva.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnNuevaMasiva.BackColor = System.Drawing.Color.CornflowerBlue
+        Me.btnNuevaMasiva.FlatAppearance.BorderSize = 0
+        Me.btnNuevaMasiva.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnNuevaMasiva.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnNuevaMasiva.ForeColor = System.Drawing.Color.White
+        Me.btnNuevaMasiva.Location = New System.Drawing.Point(18, 13)
+        Me.btnNuevaMasiva.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.btnNuevaMasiva.Name = "btnNuevaMasiva"
+        Me.btnNuevaMasiva.Size = New System.Drawing.Size(209, 36)
+        Me.btnNuevaMasiva.TabIndex = 5
+        Me.btnNuevaMasiva.Text = "Notificación masiva"
+        Me.btnNuevaMasiva.UseVisualStyleBackColor = False
+        '
         'frmNotificaciones
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -228,4 +246,5 @@ Partial Class frmNotificaciones
     Friend WithEvents btnImprimir As Button
     Friend WithEvents rtbNotificacion As RichTextBox
     Friend WithEvents btnCambiarEstado As Button
+    Friend WithEvents btnNuevaMasiva As Button
 End Class
