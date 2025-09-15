@@ -29,6 +29,7 @@ Partial Class frmFuncionarioBuscar
         Me.tlpBusqueda = New System.Windows.Forms.TableLayoutPanel()
         Me.lblBuscar = New System.Windows.Forms.Label()
         Me.txtBusqueda = New System.Windows.Forms.TextBox()
+        Me.btnCopiarContenido = New System.Windows.Forms.Button()
         Me.panelDetalle = New System.Windows.Forms.Panel()
         Me.tlpDetalleVertical = New System.Windows.Forms.TableLayoutPanel()
         Me.tlpAcciones = New System.Windows.Forms.TableLayoutPanel()
@@ -47,7 +48,6 @@ Partial Class frmFuncionarioBuscar
         Me.lblPresencia = New System.Windows.Forms.Label()
         Me.lblEstadoActividad = New System.Windows.Forms.Label()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
-        Me.btnCopiarContenido = New System.Windows.Forms.Button()
         CType(Me.splitContenedor, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.splitContenedor.Panel1.SuspendLayout()
         Me.splitContenedor.Panel2.SuspendLayout()
@@ -77,19 +77,23 @@ Partial Class frmFuncionarioBuscar
         '
         Me.splitContenedor.Panel2.Controls.Add(Me.panelDetalle)
         Me.splitContenedor.Panel2MinSize = 400
-        Me.splitContenedor.Size = New System.Drawing.Size(1121, 544)
+        Me.splitContenedor.Size = New System.Drawing.Size(1121, 611)
         Me.splitContenedor.SplitterDistance = 301
         Me.splitContenedor.TabIndex = 0
         '
-        'dgvResultados
+        'dgvFuncionarios
         '
+        Me.dgvFuncionarios.AllowUserToAddRows = False
+        Me.dgvFuncionarios.AllowUserToDeleteRows = False
+        Me.dgvFuncionarios.AllowUserToResizeColumns = False
+        Me.dgvFuncionarios.AllowUserToResizeRows = False
         Me.dgvFuncionarios.ColumnHeadersHeight = 34
         Me.dgvFuncionarios.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgvFuncionarios.Location = New System.Drawing.Point(0, 115)
-        Me.dgvFuncionarios.Name = "dgvResultados"
+        Me.dgvFuncionarios.Name = "dgvFuncionarios"
         Me.dgvFuncionarios.ReadOnly = True
         Me.dgvFuncionarios.RowHeadersWidth = 62
-        Me.dgvFuncionarios.Size = New System.Drawing.Size(301, 429)
+        Me.dgvFuncionarios.Size = New System.Drawing.Size(301, 496)
         Me.dgvFuncionarios.TabIndex = 1
         '
         'PanelBusquedaLista
@@ -142,6 +146,17 @@ Partial Class frmFuncionarioBuscar
         Me.txtBusqueda.Size = New System.Drawing.Size(188, 33)
         Me.txtBusqueda.TabIndex = 1
         '
+        'btnCopiarContenido
+        '
+        Me.btnCopiarContenido.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.btnCopiarContenido.Location = New System.Drawing.Point(86, 50)
+        Me.btnCopiarContenido.Name = "btnCopiarContenido"
+        Me.btnCopiarContenido.Size = New System.Drawing.Size(188, 38)
+        Me.btnCopiarContenido.TabIndex = 3
+        Me.btnCopiarContenido.Text = "Copiar selección"
+        Me.btnCopiarContenido.UseVisualStyleBackColor = True
+        Me.btnCopiarContenido.Visible = False
+        '
         'panelDetalle
         '
         Me.panelDetalle.AutoScroll = True
@@ -151,7 +166,7 @@ Partial Class frmFuncionarioBuscar
         Me.panelDetalle.Location = New System.Drawing.Point(0, 0)
         Me.panelDetalle.Name = "panelDetalle"
         Me.panelDetalle.Padding = New System.Windows.Forms.Padding(12)
-        Me.panelDetalle.Size = New System.Drawing.Size(816, 544)
+        Me.panelDetalle.Size = New System.Drawing.Size(816, 611)
         Me.panelDetalle.TabIndex = 0
         '
         'tlpDetalleVertical
@@ -174,6 +189,7 @@ Partial Class frmFuncionarioBuscar
         Me.tlpDetalleVertical.Name = "tlpDetalleVertical"
         Me.tlpDetalleVertical.RowCount = 15
         Me.tlpDetalleVertical.RowStyles.Add(New System.Windows.Forms.RowStyle())
+        Me.tlpDetalleVertical.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
         Me.tlpDetalleVertical.RowStyles.Add(New System.Windows.Forms.RowStyle())
         Me.tlpDetalleVertical.RowStyles.Add(New System.Windows.Forms.RowStyle())
         Me.tlpDetalleVertical.RowStyles.Add(New System.Windows.Forms.RowStyle())
@@ -187,8 +203,7 @@ Partial Class frmFuncionarioBuscar
         Me.tlpDetalleVertical.RowStyles.Add(New System.Windows.Forms.RowStyle())
         Me.tlpDetalleVertical.RowStyles.Add(New System.Windows.Forms.RowStyle())
         Me.tlpDetalleVertical.RowStyles.Add(New System.Windows.Forms.RowStyle())
-        Me.tlpDetalleVertical.RowStyles.Add(New System.Windows.Forms.RowStyle())
-        Me.tlpDetalleVertical.Size = New System.Drawing.Size(792, 520)
+        Me.tlpDetalleVertical.Size = New System.Drawing.Size(792, 587)
         Me.tlpDetalleVertical.TabIndex = 0
         '
         'tlpAcciones
@@ -265,7 +280,7 @@ Partial Class frmFuncionarioBuscar
         Me.pbFotoDetalle.Location = New System.Drawing.Point(3, 47)
         Me.pbFotoDetalle.Margin = New System.Windows.Forms.Padding(3, 3, 3, 16)
         Me.pbFotoDetalle.Name = "pbFotoDetalle"
-        Me.pbFotoDetalle.Size = New System.Drawing.Size(786, 185)
+        Me.pbFotoDetalle.Size = New System.Drawing.Size(786, 230)
         Me.pbFotoDetalle.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
         Me.pbFotoDetalle.TabIndex = 0
         Me.pbFotoDetalle.TabStop = False
@@ -274,7 +289,7 @@ Partial Class frmFuncionarioBuscar
         '
         Me.btnVerSituacion.Dock = System.Windows.Forms.DockStyle.Fill
         Me.btnVerSituacion.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.btnVerSituacion.Location = New System.Drawing.Point(3, 251)
+        Me.btnVerSituacion.Location = New System.Drawing.Point(3, 296)
         Me.btnVerSituacion.Name = "btnVerSituacion"
         Me.btnVerSituacion.Size = New System.Drawing.Size(786, 36)
         Me.btnVerSituacion.TabIndex = 17
@@ -287,7 +302,7 @@ Partial Class frmFuncionarioBuscar
         Me.lblNombreCompleto.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.lblNombreCompleto.AutoSize = True
         Me.lblNombreCompleto.Font = New System.Drawing.Font("Segoe UI", 14.0!, System.Drawing.FontStyle.Bold)
-        Me.lblNombreCompleto.Location = New System.Drawing.Point(3, 298)
+        Me.lblNombreCompleto.Location = New System.Drawing.Point(3, 343)
         Me.lblNombreCompleto.Margin = New System.Windows.Forms.Padding(3, 8, 3, 8)
         Me.lblNombreCompleto.Name = "lblNombreCompleto"
         Me.lblNombreCompleto.Size = New System.Drawing.Size(288, 38)
@@ -300,7 +315,7 @@ Partial Class frmFuncionarioBuscar
         Me.lblCI.AutoSize = True
         Me.lblCI.Font = New System.Drawing.Font("Segoe UI", 10.0!)
         Me.lblCI.ForeColor = System.Drawing.SystemColors.ControlDarkDark
-        Me.lblCI.Location = New System.Drawing.Point(3, 344)
+        Me.lblCI.Location = New System.Drawing.Point(3, 389)
         Me.lblCI.Margin = New System.Windows.Forms.Padding(3, 0, 3, 8)
         Me.lblCI.Name = "lblCI"
         Me.lblCI.Size = New System.Drawing.Size(46, 28)
@@ -313,7 +328,7 @@ Partial Class frmFuncionarioBuscar
         Me.lblTipo.AutoSize = True
         Me.lblTipo.Font = New System.Drawing.Font("Segoe UI", 9.5!)
         Me.lblTipo.ForeColor = System.Drawing.Color.DimGray
-        Me.lblTipo.Location = New System.Drawing.Point(3, 380)
+        Me.lblTipo.Location = New System.Drawing.Point(3, 425)
         Me.lblTipo.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
         Me.lblTipo.Name = "lblTipo"
         Me.lblTipo.Size = New System.Drawing.Size(66, 25)
@@ -326,7 +341,7 @@ Partial Class frmFuncionarioBuscar
         Me.lblFechaIngreso.AutoSize = True
         Me.lblFechaIngreso.Font = New System.Drawing.Font("Segoe UI", 9.5!)
         Me.lblFechaIngreso.ForeColor = System.Drawing.Color.DimGray
-        Me.lblFechaIngreso.Location = New System.Drawing.Point(3, 407)
+        Me.lblFechaIngreso.Location = New System.Drawing.Point(3, 452)
         Me.lblFechaIngreso.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
         Me.lblFechaIngreso.Name = "lblFechaIngreso"
         Me.lblFechaIngreso.Size = New System.Drawing.Size(146, 25)
@@ -339,7 +354,7 @@ Partial Class frmFuncionarioBuscar
         Me.lblHorarioCompleto.AutoSize = True
         Me.lblHorarioCompleto.Font = New System.Drawing.Font("Segoe UI", 9.5!)
         Me.lblHorarioCompleto.ForeColor = System.Drawing.Color.DimGray
-        Me.lblHorarioCompleto.Location = New System.Drawing.Point(3, 434)
+        Me.lblHorarioCompleto.Location = New System.Drawing.Point(3, 479)
         Me.lblHorarioCompleto.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
         Me.lblHorarioCompleto.Name = "lblHorarioCompleto"
         Me.lblHorarioCompleto.Size = New System.Drawing.Size(93, 25)
@@ -352,7 +367,7 @@ Partial Class frmFuncionarioBuscar
         Me.lblCargo.AutoSize = True
         Me.lblCargo.Font = New System.Drawing.Font("Segoe UI", 9.5!)
         Me.lblCargo.ForeColor = System.Drawing.Color.DimGray
-        Me.lblCargo.Location = New System.Drawing.Point(3, 461)
+        Me.lblCargo.Location = New System.Drawing.Point(3, 506)
         Me.lblCargo.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
         Me.lblCargo.Name = "lblCargo"
         Me.lblCargo.Size = New System.Drawing.Size(80, 25)
@@ -365,7 +380,7 @@ Partial Class frmFuncionarioBuscar
         Me.lblPresencia.AutoSize = True
         Me.lblPresencia.Font = New System.Drawing.Font("Segoe UI", 9.5!)
         Me.lblPresencia.ForeColor = System.Drawing.Color.DimGray
-        Me.lblPresencia.Location = New System.Drawing.Point(3, 488)
+        Me.lblPresencia.Location = New System.Drawing.Point(3, 533)
         Me.lblPresencia.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
         Me.lblPresencia.Name = "lblPresencia"
         Me.lblPresencia.Size = New System.Drawing.Size(110, 25)
@@ -378,29 +393,18 @@ Partial Class frmFuncionarioBuscar
         Me.lblEstadoActividad.AutoSize = True
         Me.lblEstadoActividad.Font = New System.Drawing.Font("Segoe UI", 9.5!)
         Me.lblEstadoActividad.ForeColor = System.Drawing.Color.DimGray
-        Me.lblEstadoActividad.Location = New System.Drawing.Point(3, 515)
+        Me.lblEstadoActividad.Location = New System.Drawing.Point(3, 560)
         Me.lblEstadoActividad.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
         Me.lblEstadoActividad.Name = "lblEstadoActividad"
         Me.lblEstadoActividad.Size = New System.Drawing.Size(85, 25)
         Me.lblEstadoActividad.TabIndex = 21
         Me.lblEstadoActividad.Text = "Estado: -"
         '
-        'btnCopiarContenido
-        '
-        Me.btnCopiarContenido.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.btnCopiarContenido.Location = New System.Drawing.Point(86, 50)
-        Me.btnCopiarContenido.Name = "btnCopiarContenido"
-        Me.btnCopiarContenido.Size = New System.Drawing.Size(188, 38)
-        Me.btnCopiarContenido.TabIndex = 3
-        Me.btnCopiarContenido.Text = "Copiar selección"
-        Me.btnCopiarContenido.UseVisualStyleBackColor = True
-        Me.btnCopiarContenido.Visible = False
-        '
         'frmFuncionarioBuscar
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 25.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1121, 544)
+        Me.ClientSize = New System.Drawing.Size(1121, 611)
         Me.Controls.Add(Me.splitContenedor)
         Me.Font = New System.Drawing.Font("Segoe UI", 9.0!)
         Me.KeyPreview = True

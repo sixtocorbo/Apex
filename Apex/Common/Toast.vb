@@ -127,9 +127,7 @@ Public NotInheritable Class Toast
         MyBase.Show()
     End Sub
 
-    ' ======================= LÍNEA CORREGIDA =======================
     Private Sub LifeTimer_Tick(sender As Object, e As EventArgs)
-        ' ===============================================================
         _lifeTimer.Stop()
         BeginFadeOut()
     End Sub
@@ -169,6 +167,14 @@ Public NotInheritable Class Toast
     End Sub
 
     Public Shared Shadows Sub Show(owner As Form, message As String, Optional type As ToastType = ToastType.Success, Optional durationMs As Integer = DefaultDurationMs)
+        ' ======================= INICIO DE LA CORRECCIÓN =======================
+        ' Primero, verificar si el formulario 'owner' es válido antes de intentar cualquier operación con él.
+        ' Si ya fue desechado (IsDisposed), salimos silenciosamente para evitar el crash.
+        If owner IsNot Nothing AndAlso owner.IsDisposed Then
+            Exit Sub
+        End If
+        ' ======================= FIN DE LA CORRECCIÓN =======================
+
         If owner IsNot Nothing AndAlso owner.InvokeRequired Then
             owner.BeginInvoke(CType(Sub() Show(owner, message, type, durationMs), MethodInvoker))
             Return

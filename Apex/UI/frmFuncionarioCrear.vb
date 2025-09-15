@@ -839,15 +839,40 @@ Public Class frmFuncionarioCrear
 #Region " Cierre y Métodos Misceláneos "
 
     Private Sub frmFuncionarioCrear_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
+        ' Si el formulario se está cerrando programáticamente o ya se guardó, no hacer nada.
         If _cerrandoPorCodigo OrElse _seGuardo Then Return
+
+        ' Verificar si hay cambios pendientes.
         If _uow.Context.ChangeTracker.HasChanges() OrElse _estadoRows.Any(Function(r) r.EntityRef.Id <= 0) OrElse _estadosParaEliminar.Any() Then
             Dim result = MessageBox.Show("Hay cambios sin guardar. ¿Desea guardarlos antes de salir?", "Cambios Pendientes", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning)
+
             Select Case result
                 Case DialogResult.Yes
-                    Me.BeginInvoke(New MethodInvoker(AddressOf btnGuardar.PerformClick))
-                    If Not _seGuardo Then e.Cancel = True
+                    ' --- INICIO DE LA CORRECCIÓN ---
+
+                    ' 1. Llama al guardado de forma DIRECTA y SINCRÓNICA.
+                    '    Esto fuerza al programa a esperar que el guardado termine.
+                    btnGuardar.PerformClick()
+
+                    ' 2. Ahora, la variable _seGuardo tendrá el valor correcto (True si se guardó, False si falló).
+                    '    Si el guardado falló (por ejemplo, por una validación), cancelamos el cierre
+                    '    para que el usuario pueda corregir el problema.
+                    If Not _seGuardo Then
+                        e.Cancel = True
+                    End If
+
+                ' --- FIN DE LA CORRECCIÓN ---
+
                 Case DialogResult.No
-                Case DialogResult.Cancel : e.Cancel = True
+                    ' El usuario no quiere guardar. Descartamos los cambios explícitamente.
+                    If _uow IsNot Nothing Then
+                        _uow.Dispose()
+                    End If
+                ' Dejamos que el formulario se cierre.
+
+                Case DialogResult.Cancel
+                    ' El usuario canceló la acción de cierre.
+                    e.Cancel = True
             End Select
         End If
     End Sub
