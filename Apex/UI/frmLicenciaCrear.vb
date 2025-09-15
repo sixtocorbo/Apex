@@ -198,6 +198,7 @@
                 _licencia.fecha_registro = DateTime.Now
                 _licencia.fecha_actualizado = DateTime.Now
                 Await _svc.CreateAsync(_licencia)
+
                 Notifier.Success(Me, "Licencia creada correctamente.")
             Else
                 _licencia.fecha_actualizado = DateTime.Now
@@ -205,8 +206,11 @@
                 Notifier.Success(Me, "Licencia actualizada correctamente.")
             End If
 
-            ' Notificación genérica para que otras pantallas se refresquen si lo necesitan
-            NotificadorEventos.NotificarActualizacionGeneral()
+            '' Notificación genérica para que otras pantallas se refresquen si lo necesitan
+            'NotificadorEventos.NotificarActualizacionGeneral()
+            ' <<< MEJORA PROPUESTA >>>
+            ' Notificamos qué funcionario específico fue afectado.
+            NotificadorEventos.NotificarCambiosEnFuncionario(_licencia.FuncionarioId)
 
             Me.DialogResult = DialogResult.OK
             Close()
