@@ -161,9 +161,6 @@ Public Class frmIncidenciasCategorias
     Private Sub Cerrando(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
         If e.KeyCode = Keys.Escape Then
             Me.Close()
-        ElseIf e.KeyCode = Keys.Enter AndAlso btnGuardar.Focused = False Then
-            btnGuardar.PerformClick()
-            e.Handled = True
         End If
     End Sub
 

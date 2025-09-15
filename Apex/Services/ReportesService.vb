@@ -160,6 +160,43 @@ Public Class ReportesService
         End If
     End Sub
 
+    ''' <summary>
+    ''' Obtiene los datos para una o varias notificaciones para ser usadas en un reporte.
+    ''' </summary>
+    ''' <param name="notificacionIds">Lista de IDs de las notificaciones a buscar.</param>
+    ''' <returns>Una lista de DTOs con la información para el reporte.</returns>
+    Public Async Function GetDatosParaNotificacionesAsync(notificacionIds As List(Of Integer)) As Task(Of List(Of NotificacionImprimirDTO))
+        ' Si no se reciben IDs, devuelve una lista vacía para evitar errores.
+        If notificacionIds Is Nothing OrElse Not notificacionIds.Any() Then
+            Return New List(Of NotificacionImprimirDTO)()
+        End If
+
+        ' <<< SOLUCIÓN: Creamos un UnitOfWork local para esta operación >>>
+        ' Esto asegura que el contexto de la base de datos solo se use aquí y se libere correctamente.
+        Using uow As New UnitOfWork()
+            ' Realiza una única consulta a la base de datos para obtener todas las notificaciones necesarias.
+            Dim datos = Await uow.Context.Set(Of NotificacionPersonal).AsNoTracking().
+                Where(Function(n) notificacionIds.Contains(n.Id)).
+                Select(Function(n) New NotificacionImprimirDTO With {
+                    .FuncionarioId = n.Funcionario.Id,
+                    .NombreFuncionario = n.Funcionario.Nombre,
+                    .CI = n.Funcionario.CI,
+                    .Cargo = If(n.Funcionario.Cargo IsNot Nothing, n.Funcionario.Cargo.Nombre, "N/A"),
+                    .Seccion = If(n.Funcionario.Seccion IsNot Nothing, n.Funcionario.Seccion.Nombre, "N/A"),
+                    .FechaProgramada = n.FechaProgramada,
+                    .Texto = n.Medio, ' 'Medio' contiene el texto principal de la notificación
+                    .TipoNotificacion = n.TipoNotificacion.Nombre,
+                    .Documento = n.Documento,
+                    .ExpMinisterial = n.ExpMinisterial,
+                    .ExpINR = n.ExpINR,
+                    .Oficina = n.Oficina
+                }).
+                ToListAsync()
+
+            Return datos
+        End Using
+    End Function
+
     Public Sub Dispose() Implements IDisposable.Dispose
         Dispose(True)
         GC.SuppressFinalize(Me)

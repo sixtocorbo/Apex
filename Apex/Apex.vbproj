@@ -450,6 +450,7 @@
     <Compile Include="Data\TipoHistorico.vb" />
     <Compile Include="Data\TipoOrigenDatos.vb" />
     <Compile Include="Data\UnitOfWork.vb" />
+    <Compile Include="DTO\NotificacionImprimirDTO.vb" />
     <Compile Include="Helpers\NavegacionHelper.vb" />
     <Compile Include="Helpers\AppTheme.vb" />
     <Compile Include="Services\AreaTrabajoService.vb" />
@@ -846,6 +847,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmNotificaciones.resx">
       <DependentUpon>frmNotificaciones.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmNotificacionMasiva.resx">
+      <DependentUpon>frmNotificacionMasiva.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmNotificacionRPT.resx">
       <DependentUpon>frmNotificacionRPT.vb</DependentUpon>

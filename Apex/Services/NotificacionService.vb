@@ -316,64 +316,72 @@ Public Class NotificacionService
     End Function
 
     ' ----------------- Masivo (contexto aislado) -----------------
+    ' En NotificacionService.vb
+
     Public Async Function CreateNotificacionesMasivasAsync(
-        funcionarioIds As IEnumerable(Of Integer),
-        baseReq As NotificacionCreateRequest,
-        Optional skipDuplicadas As Boolean = True,
-        Optional reportProgress As Action = Nothing
-    ) As Task(Of ResultadoMasivo)
+    funcionarioIds As IEnumerable(Of Integer),
+    baseReq As NotificacionCreateRequest,
+    Optional skipDuplicadas As Boolean = True,
+    Optional reportProgress As Action = Nothing
+) As Task(Of ResultadoMasivo)
 
         Dim res As New ResultadoMasivo()
-        If funcionarioIds Is Nothing Then Return res
+        If funcionarioIds Is Nothing OrElse Not funcionarioIds.Any() Then Return res
 
+        ' Usamos un único UnitOfWork para toda la operación masiva
         Using uow As New UnitOfWork()
             Dim ctx = uow.Context
-
             Dim d As Date = baseReq.FechaProgramada.Date
             Dim dSiguiente As Date = d.AddDays(1)
+            Dim estadoPendienteId = CByte(ModConstantesApex.EstadoNotificacionPersonal.Pendiente)
 
             For Each fid In funcionarioIds
                 Try
                     If skipDuplicadas Then
+                        ' Verificamos si ya existe una notificación similar
                         Dim yaExiste = Await ctx.Set(Of NotificacionPersonal)().
-                            AnyAsync(Function(n) n.FuncionarioId = fid AndAlso
-                                               n.TipoNotificacionId = baseReq.TipoNotificacionId AndAlso
-                                               n.EstadoId = CByte(ModConstantesApex.EstadoNotificacionPersonal.Pendiente) AndAlso
-                                               n.FechaProgramada >= d AndAlso n.FechaProgramada < dSiguiente)
+                        AnyAsync(Function(n) n.FuncionarioId = fid AndAlso
+                                           n.TipoNotificacionId = baseReq.TipoNotificacionId AndAlso
+                                           n.EstadoId = estadoPendienteId AndAlso
+                                           n.FechaProgramada >= d AndAlso n.FechaProgramada < dSiguiente)
                         If yaExiste Then
                             res.OmitidasPorDuplicado += 1
-                            If reportProgress IsNot Nothing Then reportProgress()
-                            Continue For
+                            Continue For ' Saltamos a la siguiente iteración si ya existe
                         End If
                     End If
 
+                    ' Creamos la nueva entidad
                     Dim nueva As New NotificacionPersonal With {
-                        .FuncionarioId = fid,
-                        .TipoNotificacionId = baseReq.TipoNotificacionId,
-                        .FechaProgramada = baseReq.FechaProgramada,
-                        .Medio = baseReq.Medio,
-                        .Documento = baseReq.Documento,
-                        .ExpMinisterial = baseReq.ExpMinisterial,
-                        .ExpINR = baseReq.ExpINR,
-                        .Oficina = baseReq.Oficina,
-                        .EstadoId = CByte(ModConstantesApex.EstadoNotificacionPersonal.Pendiente),
-                        .CreatedAt = DateTime.Now,
-                        .UpdatedAt = DateTime.Now
-                    }
+                    .FuncionarioId = fid,
+                    .TipoNotificacionId = baseReq.TipoNotificacionId,
+                    .FechaProgramada = baseReq.FechaProgramada,
+                    .Medio = baseReq.Medio,
+                    .Documento = baseReq.Documento,
+                    .ExpMinisterial = baseReq.ExpMinisterial,
+                    .ExpINR = baseReq.ExpINR,
+                    .Oficina = baseReq.Oficina,
+                    .EstadoId = estadoPendienteId,
+                    .CreatedAt = DateTime.Now
+                }
 
+                    ' <<< CAMBIO CLAVE 1: Solo agregamos la entidad al contexto, NO guardamos >>>
                     ctx.Set(Of NotificacionPersonal)().Add(nueva)
-                    Await uow.CommitAsync()
-
-                    NotificadorEventos.NotificarCambiosEnFuncionario(fid)
                     res.Creadas += 1
 
                 Catch ex As Exception
                     res.Errores.Add((fid, ex.Message))
                 Finally
+                    ' El progreso se reporta en cada iteración, esté bien o mal
                     If reportProgress IsNot Nothing Then reportProgress()
                 End Try
             Next
-        End Using
+
+            ' <<< CAMBIO CLAVE 2: Guardamos TODOS los cambios en una sola transacción al final >>>
+            If res.Creadas > 0 Then
+                Await uow.CommitAsync()
+            End If
+
+        End Using ' El UnitOfWork se libera aquí
 
         Return res
     End Function

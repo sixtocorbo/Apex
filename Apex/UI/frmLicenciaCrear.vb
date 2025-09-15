@@ -71,14 +71,14 @@
 
     Private Async Function CargarCombosAsync() As Task
         ' Funcionario
-        cboFuncionario.DropDownStyle = ComboBoxStyle.DropDownList
+        cboFuncionario.DropDownStyle = ComboBoxStyle.DropDown
         cboFuncionario.DisplayMember = "Value"
         cboFuncionario.ValueMember = "Key"
         Dim funcionarios = Await _svc.ObtenerFuncionariosParaComboAsync()
         cboFuncionario.DataSource = funcionarios
 
         ' Tipo de Licencia
-        cboTipoLicencia.DropDownStyle = ComboBoxStyle.DropDownList
+        cboTipoLicencia.DropDownStyle = ComboBoxStyle.DropDown
         cboTipoLicencia.DisplayMember = "Value"
         cboTipoLicencia.ValueMember = "Key"
         Dim tipos = Await _svc.ObtenerTiposLicenciaParaComboAsync()
@@ -206,10 +206,6 @@
                 Notifier.Success(Me, "Licencia actualizada correctamente.")
             End If
 
-            '' Notificación genérica para que otras pantallas se refresquen si lo necesitan
-            'NotificadorEventos.NotificarActualizacionGeneral()
-            ' <<< MEJORA PROPUESTA >>>
-            ' Notificamos qué funcionario específico fue afectado.
             NotificadorEventos.NotificarCambiosEnFuncionario(_licencia.FuncionarioId)
 
             Me.DialogResult = DialogResult.OK
@@ -228,9 +224,7 @@
         If e.KeyCode = Keys.Escape Then
             Close()
             e.Handled = True
-        ElseIf e.KeyCode = Keys.Enter AndAlso Not btnGuardar.Focused Then
-            btnGuardar.PerformClick()
-            e.Handled = True
+
         End If
     End Sub
     Private Sub dtpFechaInicio_ValueChanged(sender As Object, e As EventArgs) Handles dtpFechaInicio.ValueChanged

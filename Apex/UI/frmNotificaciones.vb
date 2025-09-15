@@ -58,6 +58,7 @@ Public Class frmNotificaciones
             .SuspendLayout()
             .AutoGenerateColumns = False
             .Columns.Clear()
+            .MultiSelect = True
             .ReadOnly = True
             .AllowUserToAddRows = False
             .SelectionMode = DataGridViewSelectionMode.FullRowSelect
@@ -228,13 +229,36 @@ Public Class frmNotificaciones
         AbrirChildEnDashboard(New frmNotificacionCrear())
     End Sub
 
+    ' En frmNotificaciones.vb
+
     Private Sub btnImprimir_Click(sender As Object, e As EventArgs) Handles btnImprimir.Click
+        ' <<< LÓGICA MEJORADA PARA MANEJAR MÚLTIPLES SELECCIONES >>>
+
         If dgvNotificaciones.SelectedRows.Count = 0 Then
-            Notifier.Warn(Me, "Seleccione una notificación para imprimir.")
+            Notifier.Warn(Me, "Seleccione una o más notificaciones para imprimir.")
             Return
         End If
-        Dim idSeleccionado = CInt(dgvNotificaciones.SelectedRows(0).Cells("Id").Value)
-        AbrirChildEnDashboard(New frmNotificacionRPT(idSeleccionado))
+
+        ' Creamos una lista para guardar los IDs de todas las filas seleccionadas
+        Dim idsSeleccionados As New List(Of Integer)
+
+        ' Recorremos cada fila seleccionada y extraemos su ID
+        For Each row As DataGridViewRow In dgvNotificaciones.SelectedRows
+            ' Usamos TryCast para evitar errores si una fila no tiene datos
+            Dim notificacion = TryCast(row.DataBoundItem, vw_NotificacionesCompletas)
+            If notificacion IsNot Nothing Then
+                idsSeleccionados.Add(notificacion.Id)
+            End If
+        Next
+
+        If idsSeleccionados.Count = 0 Then
+            Notifier.Error(Me, "No se pudieron obtener los IDs de las notificaciones seleccionadas.")
+            Return
+        End If
+
+        ' Abrimos el formulario del reporte pasándole la LISTA de IDs
+        ' (Necesitaremos crear un nuevo constructor en frmNotificacionRPT para esto)
+        AbrirChildEnDashboard(New frmNotificacionRPT(idsSeleccionados))
     End Sub
 
     Private Sub btnEditar_Click(sender As Object, e As EventArgs) Handles btnEditar.Click

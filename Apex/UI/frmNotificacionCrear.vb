@@ -282,9 +282,7 @@ Public Class frmNotificacionCrear
         If e.KeyCode = Keys.Escape Then
             btnCancelar.PerformClick()
             e.Handled = True
-        ElseIf e.KeyCode = Keys.Enter AndAlso Not btnGuardar.Focused Then
-            btnGuardar.PerformClick()
-            e.Handled = True
+
         End If
     End Sub
 

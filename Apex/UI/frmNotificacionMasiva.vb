@@ -87,8 +87,11 @@ Public Class frmNotificacionMasiva
                 reportProgress:=Sub() Me.BeginInvoke(Sub() pbProgreso.Increment(1))
             )
 
-            ' refresco global
-            NotificadorEventos.NotificarActualizacionGeneral()
+            ' <<< CAMBIO CLAVE: La notificación se hace aquí, DESPUÉS de que la operación masiva termine >>>
+            If resultado.Creadas > 0 Then
+                ' Notificamos una sola vez que algo cambió en la aplicación.
+                NotificadorEventos.NotificarActualizacionGeneral()
+            End If
 
             ' Resumen UX
             Dim msg =
