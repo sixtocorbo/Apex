@@ -414,6 +414,9 @@
     <Compile Include="DataBase\vw_EstadosTransitoriosCompletos.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
+    <Compile Include="DataBase\vw_FuncionarioEstadosActivos.vb">
+      <DependentUpon>Model1.tt</DependentUpon>
+    </Compile>
     <Compile Include="DataBase\vw_FuncionarioEstadosConsolidados.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
@@ -980,6 +983,7 @@
       <Isolated>False</Isolated>
     </COMReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

@@ -10,14 +10,11 @@
 Imports System
 Imports System.Collections.Generic
 
-Partial Public Class TipoEstadoTransitorio
-    Public Property Id As Integer
-    Public Property Nombre As String
-    Public Property EsJerarquico As Boolean
-    Public Property CreatedAt As Date
-    Public Property UpdatedAt As Nullable(Of Date)
+Partial Public Class vw_FuncionarioEstadosActivos
+    Public Property FuncionarioId As Integer
     Public Property Prioridad As Integer
-
-    Public Overridable Property EstadoTransitorio As ICollection(Of EstadoTransitorio) = New HashSet(Of EstadoTransitorio)
+    Public Property Tipo As String
+    Public Property Detalles As String
+    Public Property ColorIndicador As String
 
 End Class

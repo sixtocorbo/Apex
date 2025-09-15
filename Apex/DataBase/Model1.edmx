@@ -647,6 +647,7 @@
           <Property Name="EsJerarquico" Type="bit" Nullable="false" />
           <Property Name="CreatedAt" Type="datetime2" Precision="7" Nullable="false" />
           <Property Name="UpdatedAt" Type="datetime2" Precision="7" />
+          <Property Name="Prioridad" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="TipoFuncionario">
           <Key>
@@ -744,6 +745,21 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_EstadosTransitoriosCompletos' no
           <Property Name="Observaciones" Type="nvarchar(max)" />
           <Property Name="CreatedAt" Type="datetime2" Precision="7" Nullable="false" />
           <Property Name="UpdatedAt" Type="datetime2" Precision="7" />
+        </EntityType>
+        <!--Errores durante la generación:
+advertencia 6002: La tabla o vista 'Apex.dbo.vw_FuncionarioEstadosActivos' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
+        <EntityType Name="vw_FuncionarioEstadosActivos">
+          <Key>
+            <PropertyRef Name="FuncionarioId" />
+            <PropertyRef Name="Prioridad" />
+            <PropertyRef Name="Tipo" />
+            <PropertyRef Name="ColorIndicador" />
+          </Key>
+          <Property Name="FuncionarioId" Type="int" Nullable="false" />
+          <Property Name="Prioridad" Type="int" Nullable="false" />
+          <Property Name="Tipo" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="Detalles" Type="nvarchar(max)" />
+          <Property Name="ColorIndicador" Type="varchar" MaxLength="14" Nullable="false" />
         </EntityType>
         <!--Errores durante la generación:
 advertencia 6002: La tabla o vista 'Apex.dbo.vw_FuncionarioEstadosConsolidados' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
@@ -1792,6 +1808,15 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
     [vw_EstadosTransitoriosCompletos].[CreatedAt] AS [CreatedAt], 
     [vw_EstadosTransitoriosCompletos].[UpdatedAt] AS [UpdatedAt]
     FROM [dbo].[vw_EstadosTransitoriosCompletos] AS [vw_EstadosTransitoriosCompletos]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="vw_FuncionarioEstadosActivos" EntityType="Self.vw_FuncionarioEstadosActivos" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [vw_FuncionarioEstadosActivos].[FuncionarioId] AS [FuncionarioId], 
+    [vw_FuncionarioEstadosActivos].[Prioridad] AS [Prioridad], 
+    [vw_FuncionarioEstadosActivos].[Tipo] AS [Tipo], 
+    [vw_FuncionarioEstadosActivos].[Detalles] AS [Detalles], 
+    [vw_FuncionarioEstadosActivos].[ColorIndicador] AS [ColorIndicador]
+    FROM [dbo].[vw_FuncionarioEstadosActivos] AS [vw_FuncionarioEstadosActivos]</DefiningQuery>
           </EntitySet>
           <EntitySet Name="vw_FuncionarioEstadosConsolidados" EntityType="Self.vw_FuncionarioEstadosConsolidados" store:Type="Views" store:Schema="dbo">
             <DefiningQuery>SELECT 
@@ -2891,6 +2916,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <Property Name="EsJerarquico" Type="Boolean" Nullable="false" />
           <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
           <Property Name="UpdatedAt" Type="DateTime" Precision="7" />
+          <Property Name="Prioridad" Type="Int32" Nullable="false" />
           <NavigationProperty Name="EstadoTransitorio" Relationship="Self.FK_EstadoTransitorio_Tipo" FromRole="TipoEstadoTransitorio" ToRole="EstadoTransitorio" />
         </EntityType>
         <EntityType Name="TipoFuncionario">
@@ -2996,6 +3022,19 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <Property Name="Observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
           <Property Name="UpdatedAt" Type="DateTime" Precision="7" />
+        </EntityType>
+        <EntityType Name="vw_FuncionarioEstadosActivos">
+          <Key>
+            <PropertyRef Name="FuncionarioId" />
+            <PropertyRef Name="Prioridad" />
+            <PropertyRef Name="Tipo" />
+            <PropertyRef Name="ColorIndicador" />
+          </Key>
+          <Property Name="FuncionarioId" Type="Int32" Nullable="false" />
+          <Property Name="Prioridad" Type="Int32" Nullable="false" />
+          <Property Name="Tipo" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Detalles" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="ColorIndicador" Type="String" MaxLength="14" FixedLength="false" Unicode="false" Nullable="false" />
         </EntityType>
         <EntityType Name="vw_FuncionarioEstadosConsolidados">
           <Key>
@@ -3964,6 +4003,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <EntitySet Name="Turno" EntityType="Self.Turno" />
           <EntitySet Name="Usuario" EntityType="Self.Usuario" />
           <EntitySet Name="vw_EstadosTransitoriosCompletos" EntityType="Self.vw_EstadosTransitoriosCompletos" />
+          <EntitySet Name="vw_FuncionarioEstadosActivos" EntityType="Self.vw_FuncionarioEstadosActivos" />
           <EntitySet Name="vw_FuncionarioEstadosConsolidados" EntityType="Self.vw_FuncionarioEstadosConsolidados" />
           <EntitySet Name="vw_FuncionarioSituacionActual" EntityType="Self.vw_FuncionarioSituacionActual" />
           <EntitySet Name="vw_LicenciasCompletas" EntityType="Self.vw_LicenciasCompletas" />
@@ -4973,6 +5013,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
                 <ScalarProperty Name="EsJerarquico" ColumnName="EsJerarquico" />
                 <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
                 <ScalarProperty Name="UpdatedAt" ColumnName="UpdatedAt" />
+                <ScalarProperty Name="Prioridad" ColumnName="Prioridad" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -5070,6 +5111,17 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
                 <ScalarProperty Name="Observaciones" ColumnName="Observaciones" />
                 <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
                 <ScalarProperty Name="UpdatedAt" ColumnName="UpdatedAt" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vw_FuncionarioEstadosActivos">
+            <EntityTypeMapping TypeName="ApexModel.vw_FuncionarioEstadosActivos">
+              <MappingFragment StoreEntitySet="vw_FuncionarioEstadosActivos">
+                <ScalarProperty Name="FuncionarioId" ColumnName="FuncionarioId" />
+                <ScalarProperty Name="Prioridad" ColumnName="Prioridad" />
+                <ScalarProperty Name="Tipo" ColumnName="Tipo" />
+                <ScalarProperty Name="Detalles" ColumnName="Detalles" />
+                <ScalarProperty Name="ColorIndicador" ColumnName="ColorIndicador" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
