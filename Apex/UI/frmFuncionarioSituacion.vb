@@ -3,7 +3,7 @@ Imports System.Globalization
 Imports System.Text
 
 Public Class frmFuncionarioSituacion
-
+    Inherits FormActualizable
 #Region " Campos y Constructor "
 
     '--- Variables de clase ---
@@ -17,14 +17,11 @@ Public Class frmFuncionarioSituacion
     '--- UI State ---
     Private _selectedTimelineButton As Button = Nothing
 
-    '--- Manejador de eventos para suscripción asíncrona ---
-    Private ReadOnly _funcionarioActualizadoHandler As EventHandler(Of FuncionarioEventArgs)
 
     Public Sub New(idFuncionario As Integer)
         InitializeComponent()
         _funcionarioId = idFuncionario
         _uow = New UnitOfWork()
-        _funcionarioActualizadoHandler = AddressOf ManejarFuncionarioActualizado
     End Sub
 
 #End Region
@@ -39,8 +36,7 @@ Public Class frmFuncionarioSituacion
         AddHandler dgvNovedades.DataBindingComplete, AddressOf DgvNovedades_DataBindingComplete
         AddHandler dgvEstados.DataBindingComplete, AddressOf DgvEstados_DataBindingComplete
         AddHandler dgvEstados.CellDoubleClick, AddressOf dgvEstados_CellDoubleClick
-        ' --- Se suscribe al único evento de notificación ---
-        AddHandler NotificadorEventos.FuncionarioActualizado, _funcionarioActualizadoHandler
+
 
         ' Configuración inicial
         dtpDesde.Value = Date.Today
@@ -52,9 +48,20 @@ Public Class frmFuncionarioSituacion
         Await CargarDatosEsenciales()
         Await ActualizarTodo()
     End Sub
+    Protected Overrides Async Function RefrescarSegunEventoAsync(e As FuncionarioCambiadoEventArgs) As Task
+        ' Refrescá sólo si corresponde al funcionario visible,
+        ' o si es un refresco global (sin Id).
+        If e IsNot Nothing AndAlso e.FuncionarioId.HasValue AndAlso e.FuncionarioId.Value <> _funcionarioId Then
+            Return
+        End If
 
+        If Not Me.IsHandleCreated OrElse Me.IsDisposed Then Return
+
+        ' Importante: mantené tu secuencia actual
+        Await CargarDatosEsenciales()
+        Await ActualizarTodo()
+    End Function
     Private Sub frmFuncionarioSituacion_FormClosed(sender As Object, e As FormClosedEventArgs) Handles Me.FormClosed
-        RemoveHandler NotificadorEventos.FuncionarioActualizado, _funcionarioActualizadoHandler
         _uow.Dispose()
     End Sub
 
@@ -87,21 +94,6 @@ Public Class frmFuncionarioSituacion
 #End Region
 
 #Region " Lógica de Actualización y Eventos "
-
-    Private Async Sub ManejarFuncionarioActualizado(sender As Object, e As FuncionarioEventArgs)
-        ' Si el evento corresponde al funcionario que estamos viendo, recargamos todo.
-        If e.FuncionarioId = _funcionarioId Then
-            If Me.InvokeRequired Then
-                Me.Invoke(New Action(Async Sub()
-                                         Await CargarDatosEsenciales()
-                                         Await ActualizarTodo()
-                                     End Sub))
-            Else
-                Await CargarDatosEsenciales()
-                Await ActualizarTodo()
-            End If
-        End If
-    End Sub
 
     Private Async Function ActualizarTodo() As Task
         Dim fechaInicio = dtpDesde.Value.Date

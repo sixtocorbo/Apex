@@ -90,7 +90,9 @@ Public Class frmNotificacionMasiva
             ' <<< CAMBIO CLAVE: La notificación se hace aquí, DESPUÉS de que la operación masiva termine >>>
             If resultado.Creadas > 0 Then
                 ' Notificamos una sola vez que algo cambió en la aplicación.
-                NotificadorEventos.NotificarActualizacionGeneral()
+                ' Después
+                NotificadorEventos.NotificarRefrescoTotal()
+
             End If
 
             ' Resumen UX

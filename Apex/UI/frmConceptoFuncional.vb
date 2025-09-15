@@ -107,8 +107,7 @@ Public Class frmConceptoFuncional
 
     Private Sub frmConceptoFuncional_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
-        ' <<< PASO 1: Suscribirse al notificador de eventos >>>
-        AddHandler NotificadorEventos.FuncionarioActualizado, AddressOf ManejarCambiosEnFuncionario
+
         Try
             AppTheme.SetCue(txtFuncionarioSeleccionado, "Seleccione un funcionario...")
 
@@ -118,33 +117,37 @@ Public Class frmConceptoFuncional
     End Sub
     ' NUEVO: Agrega un evento FormClosed para desuscribirte
     Private Sub frmConceptoFuncional_FormClosed(sender As Object, e As FormClosedEventArgs) Handles Me.FormClosed
-        ' <<< PASO 3: Desuscribirse para evitar fugas de memoria >>>
-        RemoveHandler NotificadorEventos.FuncionarioActualizado, AddressOf ManejarCambiosEnFuncionario
         _unitOfWork.Dispose() ' Buena práctica para liberar recursos
     End Sub
 #Region "Manejo de Notificaciones"
 
-    ' <<< PASO 2: Agregar el manejador del evento >>>
-    ''' <summary>
-    ''' Se activa cuando NotificadorEventos anuncia un cambio.
-    ''' Recarga los datos solo si el cambio afecta al funcionario seleccionado.
-    ''' </summary>
-    Private Sub ManejarCambiosEnFuncionario(sender As Object, e As FuncionarioEventArgs)
-        ' Si no hay ningún funcionario seleccionado, no hacemos nada
-        If _funcionarioSeleccionado Is Nothing Then Return
 
-        ' Comprueba si el cambio es para el funcionario que estamos viendo
-        If e.FuncionarioId = _funcionarioSeleccionado.Id Then
-            ' Usamos Invoke para asegurar que la actualización se ejecute en el hilo de la UI
+
+    Private Sub ManejarCambiosEnFuncionario(sender As Object, e As FuncionarioCambiadoEventArgs)
+        If _funcionarioSeleccionado Is Nothing OrElse e Is Nothing Then Return
+
+        ' Si viene sin Id → refresco “global” (por ejemplo, cambios de catálogos)
+        If Not e.FuncionarioId.HasValue Then
             If Me.InvokeRequired Then
-                Me.Invoke(New Action(Sub()
-                                         ActualizarDatos()
-                                         Notifier.Info(Me, "Los datos del funcionario se han actualizado.")
-                                     End Sub))
+                Me.BeginInvoke(New Action(AddressOf ActualizarDatos))
             Else
                 ActualizarDatos()
-                Notifier.Info(Me, "Los datos del funcionario se han actualizado.")
             End If
+            Exit Sub
+        End If
+
+        ' Sólo refrescar si el cambio es del funcionario actualmente seleccionado
+        If e.FuncionarioId.Value <> _funcionarioSeleccionado.Id Then Return
+
+        ' Asegurar ejecución en el hilo de UI
+        If Me.InvokeRequired Then
+            Me.BeginInvoke(New Action(Sub()
+                                          ActualizarDatos()
+                                          Notifier.Info(Me, "Los datos del funcionario se han actualizado.")
+                                      End Sub))
+        Else
+            ActualizarDatos()
+            Notifier.Info(Me, "Los datos del funcionario se han actualizado.")
         End If
     End Sub
 

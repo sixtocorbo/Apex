@@ -181,7 +181,7 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Common\FormBaseActualizable.vb">
+    <Compile Include="Common\FormActualizable.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Common\IFormularioActualizable.vb" />

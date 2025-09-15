@@ -4,7 +4,7 @@ Imports System.IO
 Imports System.Text
 
 Public Class frmFuncionarioBuscar
-    Inherits Form
+    Inherits FormActualizable
 
 
 
@@ -57,7 +57,7 @@ Public Class frmFuncionarioBuscar
         ConfigurarGrilla()
         AddHandler btnVerSituacion.Click, AddressOf btnVerSituacion_Click
         AddHandler btnGenerarFicha.Click, AddressOf btnGenerarFicha_Click
-        AddHandler NotificadorEventos.DatosActualizados, AddressOf OnDatosActualizados
+        'AddHandler NotificadorEventos.DatosActualizados, AddressOf OnDatosActualizados
 
         ' Configurar el temporizador de búsqueda
         SearchTimer.Interval = 500 ' 500ms de espera antes de buscar
@@ -72,6 +72,11 @@ Public Class frmFuncionarioBuscar
 
     End Sub
 
+    ' Implementación requerida por la base:
+    Protected Overrides Async Function RefrescarSegunEventoAsync(e As FuncionarioCambiadoEventArgs) As Task
+        If Not Me.IsHandleCreated OrElse Me.IsDisposed Then Return
+        Await BuscarAsync()
+    End Function
     Private Sub dgvFuncionarios_SelectionChanged(sender As Object, e As EventArgs) Handles dgvFuncionarios.SelectionChanged
         ' Hacemos visible el botón si hay al menos una celda seleccionada
         If dgvFuncionarios.GetCellCount(DataGridViewElementStates.Selected) > 0 Then
@@ -153,9 +158,9 @@ Public Class frmFuncionarioBuscar
     End Sub
 
     ' Es una buena práctica desuscribirse para evitar fugas de memoria.
-    Private Sub frmFuncionarioBuscar_FormClosed(sender As Object, e As FormClosedEventArgs) Handles Me.FormClosed
-        RemoveHandler NotificadorEventos.DatosActualizados, AddressOf OnDatosActualizados
-    End Sub
+    'Private Sub frmFuncionarioBuscar_FormClosed(sender As Object, e As FormClosedEventArgs) Handles Me.FormClosed
+    '    RemoveHandler NotificadorEventos.DatosActualizados, AddressOf OnDatosActualizados
+    'End Sub
 
 #Region "Diseño de grilla"
     Private Sub ConfigurarGrilla()

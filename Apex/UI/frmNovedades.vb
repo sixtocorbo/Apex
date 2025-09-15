@@ -15,14 +15,9 @@ Public Class frmNovedades
         ' Esta llamada es requerida por el diseñador.
         InitializeComponent()
 
-        ' Nos suscribimos al evento del notificador cuando se crea el formulario.
-        AddHandler NotificadorEventos.FuncionarioActualizado, AddressOf HandleFuncionarioActualizado
     End Sub
 
-    Private Sub frmNovedades_Disposed(sender As Object, e As EventArgs) Handles Me.Disposed
-        ' Es MUY IMPORTANTE desuscribirse del evento para evitar fugas de memoria.
-        RemoveHandler NotificadorEventos.FuncionarioActualizado, AddressOf HandleFuncionarioActualizado
-    End Sub
+
 
     Private Async Sub frmNovedades_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
@@ -54,32 +49,38 @@ Public Class frmNovedades
 
 #Region "Suscripción a Eventos (Notificador)"
 
-    ''' <summary>
-    ''' Se ejecuta cuando NotificadorEventos informa un cambio en un funcionario.
-    ''' Filtra la grilla para mostrar las novedades del funcionario afectado.
-    ''' </summary>
-    Private Async Sub HandleFuncionarioActualizado(sender As Object, e As FuncionarioEventArgs)
-        ' Usamos una bandera para saber cuándo empezar un nuevo filtro.
-        ' Si es la primera notificación de un "lote", limpiamos el filtro anterior.
+    Private Async Sub HandleFuncionarioActualizado(sender As Object, e As FuncionarioCambiadoEventArgs)
+        If e Is Nothing Then Return
+
+        ' Si viene sin Id -> refresco global (limpio filtro y busco)
+        If Not e.FuncionarioId.HasValue Then
+            _funcionariosSeleccionadosFiltro.Clear()
+            ActualizarListaFuncionarios()
+            Await BuscarAsync()
+            Return
+        End If
+
+        ' Lote: si es el primero, limpio filtro anterior
         If _esPrimeraNotificacionRecibida Then
             _funcionariosSeleccionadosFiltro.Clear()
             _esPrimeraNotificacionRecibida = False
         End If
 
-        ' Agregamos el funcionario de la notificación al filtro.
+        Dim id = e.FuncionarioId.Value
+
+        ' Agrego el funcionario afectado al filtro (si no está)
         Using uow As New UnitOfWork()
-            Dim funcionario = Await uow.Repository(Of Funcionario).GetByIdAsync(e.FuncionarioId)
-            If funcionario IsNot Nothing AndAlso Not _funcionariosSeleccionadosFiltro.ContainsKey(e.FuncionarioId) Then
+            Dim funcionario = Await uow.Repository(Of Funcionario).GetByIdAsync(id)
+            If funcionario IsNot Nothing AndAlso Not _funcionariosSeleccionadosFiltro.ContainsKey(id) Then
                 _funcionariosSeleccionadosFiltro.Add(funcionario.Id, funcionario.Nombre)
             End If
         End Using
 
-        ' Actualizamos la UI y disparamos la búsqueda.
+        ' Refresco UI + búsqueda
         ActualizarListaFuncionarios()
         Await BuscarAsync()
 
-        ' Rearmamos la bandera para la próxima vez que se guarde una novedad.
-        ' Usamos BeginInvoke para que se ejecute después de procesar todas las notificaciones pendientes del lote actual.
+        ' Al final del lote, rearmo la bandera
         Me.BeginInvoke(Sub() _esPrimeraNotificacionRecibida = True)
     End Sub
 

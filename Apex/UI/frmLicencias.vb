@@ -20,7 +20,7 @@ Public Class frmLicencias
         _searchTimer.Enabled = False
 
         txtBusquedaLicencia.Focus()
-        AddHandler NotificadorEventos.DatosActualizados, AddressOf OnDatosActualizados
+        AddHandler NotificadorEventos.FuncionarioActualizado, AddressOf OnFuncionarioActualizado
         chkSoloVigentes.Checked = True
         _isFirstLoad = False
         Try
@@ -33,16 +33,23 @@ Public Class frmLicencias
 
 
     Private Sub frmGestionLicencias_FormClosed(sender As Object, e As FormClosedEventArgs) Handles Me.FormClosed
-        RemoveHandler NotificadorEventos.DatosActualizados, AddressOf OnDatosActualizados
+        RemoveHandler NotificadorEventos.FuncionarioActualizado, AddressOf OnFuncionarioActualizado
     End Sub
 
-    Private Async Sub OnDatosActualizados(sender As Object, e As EventArgs)
-        If Me.IsHandleCreated AndAlso Not Me.IsDisposed Then
-            If Me.InvokeRequired Then
-                Me.BeginInvoke(New Action(Async Sub() Await CargarDatosLicenciasAsync()))
-            Else
-                Await CargarDatosLicenciasAsync()
-            End If
+    Private Async Sub OnFuncionarioActualizado(sender As Object, e As FuncionarioCambiadoEventArgs)
+        If Me.IsDisposed OrElse Not Me.IsHandleCreated Then Return
+
+        ' Si querés que solo refresque ante cambios globales:
+        ' If e Is Nothing OrElse Not e.FuncionarioId.HasValue Then
+        '     ' refresco global
+        ' Else
+        '     Return ' ignorar cambios puntuales
+        ' End If
+
+        If Me.InvokeRequired Then
+            Me.BeginInvoke(New Action(Async Sub() Await CargarDatosLicenciasAsync()))
+        Else
+            Await CargarDatosLicenciasAsync()
         End If
     End Sub
 
@@ -212,7 +219,7 @@ Public Class frmLicencias
         Try
             Await _licenciaSvc.DeleteAsync(dto.LicenciaId.Value)
             Notifier.Info(Me, "Licencia eliminada.")
-            NotificadorEventos.NotificarActualizacionGeneral()
+            NotificadorEventos.NotificarRefrescoTotal()
             Await CargarDatosLicenciasAsync()
         Catch ex As Exception
             Notifier.[Error](Me, $"Error al eliminar la licencia: {ex.Message}")
