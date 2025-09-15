@@ -30,6 +30,12 @@ Public Class frmFuncionarioBuscar
         End Get
     End Property
 
+    ''=============
+    '' Variables para guardar el estado original
+    'Private originalFormSize As Size
+    'Private originalControlBounds As New Dictionary(Of Control, Rectangle)
+    'Private originalFontSizes As New Dictionary(Of Control, Single)
+    ''=============
     Public Sub New()
         InitializeComponent()
 
@@ -42,6 +48,7 @@ Public Class frmFuncionarioBuscar
     End Sub
 
     Private Sub frmFuncionarioBuscar_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
         ' Este botón indica estado prioritario: que no cambie de color al pasar el mouse
         btnVerSituacion.Tag = "KeepBackColor"
         panelDetalle.Visible = False
@@ -63,6 +70,7 @@ Public Class frmFuncionarioBuscar
         End Try
 
     End Sub
+
     Private Sub dgvFuncionarios_SelectionChanged(sender As Object, e As EventArgs) Handles dgvFuncionarios.SelectionChanged
         ' Hacemos visible el botón si hay al menos una celda seleccionada
         If dgvFuncionarios.GetCellCount(DataGridViewElementStates.Selected) > 0 Then
