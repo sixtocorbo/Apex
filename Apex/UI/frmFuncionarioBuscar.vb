@@ -49,7 +49,9 @@ Public Class frmFuncionarioBuscar
     End Sub
 
     Private Sub frmFuncionarioBuscar_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-
+        ConfigurarLayoutResponsivo()
+        AjustarSplitter()
+        AjustarAnchosTexto()
         ' Este botón indica estado prioritario: que no cambie de color al pasar el mouse
         btnVerSituacion.Tag = "KeepBackColor"
         panelDetalle.Visible = False
@@ -574,4 +576,105 @@ Public Class frmFuncionarioBuscar
 
 #End Region
 
+    '==============
+    Private _splitRatio As Double = 0.32
+    Private Sub ConfigurarLayoutResponsivo()
+        ' --- SplitContainer: libre y proporcional ---
+        splitContenedor.Dock = DockStyle.Fill
+        splitContenedor.FixedPanel = FixedPanel.None
+        splitContenedor.IsSplitterFixed = False
+
+        ' Recordar proporción cuando el usuario mueva el splitter
+        AddHandler splitContenedor.SplitterMoved, AddressOf splitContenedor_SplitterMoved
+        AddHandler Me.Resize, AddressOf frmFuncionarioBuscar_Resize
+
+        ' --- Búsqueda (izquierda) ---
+        ' Etiqueta autosize y textbox ocupa el resto
+        If tlpBusqueda.ColumnStyles.Count >= 2 Then
+            tlpBusqueda.ColumnStyles(0).SizeType = SizeType.AutoSize
+            tlpBusqueda.ColumnStyles(1).SizeType = SizeType.Percent
+            tlpBusqueda.ColumnStyles(1).Width = 100.0!
+        End If
+
+        ' --- Grilla (izquierda) ---
+        dgvFuncionarios.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+        dgvFuncionarios.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCells
+        dgvFuncionarios.RowHeadersVisible = False
+        dgvFuncionarios.SelectionMode = DataGridViewSelectionMode.FullRowSelect
+        dgvFuncionarios.MultiSelect = False
+        SetDoubleBuffered(dgvFuncionarios)
+
+        ' --- Panel derecho: TableLayout en porcentajes ---
+        tlpDetalleVertical.SuspendLayout()
+        tlpDetalleVertical.RowStyles.Clear()
+        tlpDetalleVertical.RowCount = 4
+        ' Fila 0: Acciones (alto según contenido)
+        tlpDetalleVertical.RowStyles.Add(New RowStyle(SizeType.AutoSize))
+        ' Fila 1: Foto (55% del alto disponible)
+        tlpDetalleVertical.RowStyles.Add(New RowStyle(SizeType.Percent, 55.0!))
+        ' Fila 2: Botón Situación (alto según contenido)
+        tlpDetalleVertical.RowStyles.Add(New RowStyle(SizeType.AutoSize))
+        ' Fila 3: Detalles (45% del alto disponible)
+        tlpDetalleVertical.RowStyles.Add(New RowStyle(SizeType.Percent, 45.0!))
+
+        ' Foto: ya está en Zoom. Dejar Dock Fill garantiza que expanda/reduzca bien.
+        pbFotoDetalle.Dock = DockStyle.Fill
+
+        ' Detalles: que LLENE la celda y haga scroll, con items en columna
+        flpDetalles.Dock = DockStyle.Fill
+        flpDetalles.AutoScroll = True
+        flpDetalles.WrapContents = False
+        flpDetalles.FlowDirection = FlowDirection.TopDown
+
+        ' Acciones: que el TLP se ajuste a su contenido dentro de su celda
+        tlpAcciones.AutoSize = True
+        tlpAcciones.AutoSizeMode = AutoSizeMode.GrowAndShrink
+
+        tlpDetalleVertical.ResumeLayout()
+
+        ' Ajustar ancho de etiquetas cuando cambie el tamaño del contenedor
+        AddHandler flpDetalles.SizeChanged, AddressOf AjustarAnchosTexto
+
+        ' (Opcional) Habilitar AutoScale por DPI si trabajás con monitores HiDPI
+        ' Me.AutoScaleMode = AutoScaleMode.Dpi
+    End Sub
+
+    Private Sub frmFuncionarioBuscar_Resize(sender As Object, e As EventArgs)
+        AjustarSplitter()
+        AjustarAnchosTexto()
+    End Sub
+
+    Private Sub splitContenedor_SplitterMoved(sender As Object, e As SplitterEventArgs)
+        _splitRatio = splitContenedor.SplitterDistance / Math.Max(1, splitContenedor.Width)
+    End Sub
+
+    Private Sub AjustarSplitter()
+        Dim ancho = Math.Max(1, splitContenedor.Width)
+        Dim deseado = CInt(ancho * _splitRatio)
+        splitContenedor.SplitterDistance = Math.Max(splitContenedor.Panel1MinSize, Math.Min(deseado, ancho - splitContenedor.Panel2MinSize))
+    End Sub
+
+    Private Sub AjustarAnchosTexto(Optional sender As Object = Nothing, Optional e As EventArgs = Nothing)
+        ' Para que las etiquetas hagan wrap y no se corten
+        Dim margen As Integer = 24
+        Dim anchoDisponible As Integer = Math.Max(120, flpDetalles.ClientSize.Width - margen)
+        For Each lbl As Label In New Label() {
+            lblNombreCompleto, lblCI, lblTipo, lblFechaIngreso,
+            lblHorarioCompleto, lblCargo, lblPresencia, lblEstadoActividad
+        }
+            lbl.MaximumSize = New Size(anchoDisponible, 0) ' 0 = altura auto
+            lbl.AutoEllipsis = True
+        Next
+    End Sub
+
+    ' Reduce el flicker en la grilla cuando se redimensiona
+    Private Sub SetDoubleBuffered(ctrl As Control)
+        Try
+            Dim pi = ctrl.GetType().GetProperty("DoubleBuffered", Reflection.BindingFlags.Instance Or Reflection.BindingFlags.NonPublic)
+            If pi IsNot Nothing Then pi.SetValue(ctrl, True, Nothing)
+        Catch
+            ' Ignorar si no se puede (no crítico)
+        End Try
+    End Sub
+    '======================
 End Class
