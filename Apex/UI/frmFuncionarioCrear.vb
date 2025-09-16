@@ -467,8 +467,6 @@ Public Class frmFuncionarioCrear
             Dim mensajeExito As String = If(_modo = ModoFormulario.Crear, "Funcionario creado", "Funcionario actualizado") & " correctamente."
             Notifier.Success(Me, mensajeExito)
 
-            ' NotificadorEventos.NotificarCambiosEnFuncionario(_funcionario.Id) ' <--- LÍNEA ELIMINADA
-
             Me.DialogResult = DialogResult.OK
             _cerrandoPorCodigo = True
             Close()
@@ -490,10 +488,7 @@ Public Class frmFuncionarioCrear
             SincronizarEstados()
 
             ' 2. Se llama al nuevo método del servicio para que él se encargue de guardar y notificar
-            Await _svc.GuardarFuncionarioAsync(_funcionario, _uow) ' <--- CAMBIO CLAVE
-
-            ' 3. Ya no se necesita el .Commit() aquí
-            ' Await _uow.CommitAsync() ' <--- LÍNEA ELIMINADA
+            Await _svc.GuardarFuncionarioAsync(_funcionario, _uow)
 
             _seGuardo = True
             Return True
