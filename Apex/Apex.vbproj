@@ -28,7 +28,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>216</ApplicationRevision>
+    <ApplicationRevision>217</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -184,7 +184,6 @@
     <Compile Include="Common\FormActualizable.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Common\IFormularioActualizable.vb" />
     <Compile Include="Common\IFormularioConFoco.vb" />
     <Compile Include="Common\IRepository.vb" />
     <Compile Include="Common\NotificadorEventos.vb" />

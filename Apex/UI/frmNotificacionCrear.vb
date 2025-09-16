@@ -225,7 +225,7 @@ Public Class frmNotificacionCrear
                 Dim creada = Await _svc.CreateNotificacionAsync(req)
                 idNotificacionGuardada = creada.Id
                 Me.NotificacionId = idNotificacionGuardada
-                NotificadorEventos.NotificarCambiosEnFuncionario(req.FuncionarioId)
+
                 Notifier.Success(Me, "Notificación creada correctamente.")
             Else
                 Dim req As New NotificacionUpdateRequest With {
@@ -242,7 +242,7 @@ Public Class frmNotificacionCrear
                 Await _svc.UpdateNotificacionAsync(req)
                 idNotificacionGuardada = _idNotificacion
                 Me.NotificacionId = idNotificacionGuardada
-                NotificadorEventos.NotificarCambiosEnFuncionario(req.FuncionarioId)
+
                 Notifier.Success(Me, "Notificación actualizada correctamente.")
             End If
 

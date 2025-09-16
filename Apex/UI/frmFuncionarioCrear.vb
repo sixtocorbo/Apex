@@ -464,20 +464,10 @@ Public Class frmFuncionarioCrear
         If Await GuardarAsync() Then
             LoadingHelper.OcultarCargando(Me)
 
-            ' --- INICIO DE LA MODIFICACIÓN ---
-
-            ' 1. Preparamos el mensaje de éxito
             Dim mensajeExito As String = If(_modo = ModoFormulario.Crear, "Funcionario creado", "Funcionario actualizado") & " correctamente."
-
-            ' 2. Reemplazamos el MessageBox que bloquea la pantalla
-            ' MessageBox.Show(mensajeExito, "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
-
-            ' 3. Usamos nuestro nuevo notificador, que no interrumpe al usuario
             Notifier.Success(Me, mensajeExito)
 
-            ' --- FIN DE LA MODIFICACIÓN ---
-
-            NotificadorEventos.NotificarCambiosEnFuncionario(_funcionario.Id)
+            ' NotificadorEventos.NotificarCambiosEnFuncionario(_funcionario.Id) ' <--- LÍNEA ELIMINADA
 
             Me.DialogResult = DialogResult.OK
             _cerrandoPorCodigo = True
@@ -489,33 +479,26 @@ Public Class frmFuncionarioCrear
         End If
     End Sub
 
+    ' Archivo: UI/frmFuncionarioCrear.vb
+
     Private Async Function GuardarAsync() As Task(Of Boolean)
         Try
             If Not ValidarDatos() Then Return False
+
+            ' 1. El mapeo y la sincronización se mantienen en el form
             MapearControlesAFuncionario()
-            If _modo = ModoFormulario.Crear Then
-                _uow.Repository(Of Funcionario).Add(_funcionario)
-            Else
-                _uow.Repository(Of Funcionario).Update(_funcionario)
-            End If
             SincronizarEstados()
-            Await _uow.CommitAsync()
+
+            ' 2. Se llama al nuevo método del servicio para que él se encargue de guardar y notificar
+            Await _svc.GuardarFuncionarioAsync(_funcionario, _uow) ' <--- CAMBIO CLAVE
+
+            ' 3. Ya no se necesita el .Commit() aquí
+            ' Await _uow.CommitAsync() ' <--- LÍNEA ELIMINADA
+
             _seGuardo = True
             Return True
         Catch ex As Exception
-            ' --- INICIO DE LA MODIFICACIÓN ---
-
-            ' 1. Reemplazamos el MessageBox que bloquea la UI.
-            ' MessageBox.Show("Ocurrió un error al guardar: " & ex.Message & vbCrLf & ex.InnerException?.Message, "Error de Guardado", MessageBoxButtons.OK, MessageBoxIcon.Error)
-
-            ' 2. Usamos el notificador con un mensaje de error claro y conciso para el usuario.
             Notifier.Error(Me, "Ocurrió un error al intentar guardar los datos.")
-
-            ' Opcional: Si quieres registrar el error completo para depuración, puedes hacerlo aquí.
-            ' Por ejemplo: Console.WriteLine("Error en GuardarAsync: " & ex.ToString())
-
-            ' --- FIN DE LA MODIFICACIÓN ---
-
             Return False
         End Try
     End Function

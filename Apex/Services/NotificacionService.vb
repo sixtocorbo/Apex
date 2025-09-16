@@ -195,6 +195,10 @@ Public Class NotificacionService
 
                 Await _unitOfWork.CommitAsync()
                 tx.Commit()
+                ' --- INICIO DEL CAMBIO ---
+                ' Notificar DESPUÉS de que todo se guardó correctamente.
+                NotificadorEventos.NotificarCambiosEnFuncionario(req.FuncionarioId)
+                ' --- FIN DEL CAMBIO ---
                 Return entidad
             Catch
                 tx.Rollback()
@@ -231,6 +235,10 @@ Public Class NotificacionService
 
                 Await _unitOfWork.CommitAsync()
                 tx.Commit()
+                ' --- INICIO DEL CAMBIO ---
+                ' Notificar también en la actualización.
+                NotificadorEventos.NotificarCambiosEnFuncionario(req.FuncionarioId)
+                ' --- FIN DEL CAMBIO ---
             Catch
                 tx.Rollback()
                 Throw

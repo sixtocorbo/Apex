@@ -2,7 +2,8 @@
 Imports System.Windows.Forms
 Imports System.Threading.Tasks
 
-Public MustInherit Class FormActualizable
+' --- CAMBIO 1: Se quita "MustInherit" ---
+Public Class FormActualizable
     Inherits Form
 
     Private _suscripcion As IDisposable
@@ -12,8 +13,11 @@ Public MustInherit Class FormActualizable
 
     Protected Overrides Sub OnLoad(e As EventArgs)
         MyBase.OnLoad(e)
-        AddHandler _debounce.Tick, AddressOf DebounceTick
-        _suscripcion = NotificadorEventos.Suscribir(AddressOf OnEvent)
+        ' Solo ejecutar en modo de ejecución, no en el diseñador
+        If Not Me.DesignMode Then
+            AddHandler _debounce.Tick, AddressOf DebounceTick
+            _suscripcion = NotificadorEventos.Suscribir(AddressOf OnEvent)
+        End If
     End Sub
 
     Private Sub OnEvent(sender As Object, e As FuncionarioCambiadoEventArgs)
@@ -34,8 +38,13 @@ Public MustInherit Class FormActualizable
         End Try
     End Sub
 
+    ' --- CAMBIO 2: Se reemplaza "MustOverride" por "Overridable" y se agrega una implementación base ---
     ' Cada form define cómo refrescarse ante el evento
-    Protected MustOverride Function RefrescarSegunEventoAsync(e As FuncionarioCambiadoEventArgs) As Task
+    Protected Overridable Function RefrescarSegunEventoAsync(e As FuncionarioCambiadoEventArgs) As Task
+        ' Implementación base vacía para que el diseñador no falle.
+        ' Las clases que hereden de esta deben sobreescribir este método.
+        Return Task.CompletedTask
+    End Function
 
     Protected Overrides Sub OnFormClosed(e As FormClosedEventArgs)
         _suscripcion?.Dispose()
