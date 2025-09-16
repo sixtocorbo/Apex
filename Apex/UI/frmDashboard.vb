@@ -415,6 +415,7 @@ Public Class frmDashboard
     Private Shared _tiposInitDone As Boolean = False
 
     Private Sub frmDashboard_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
         ConfigurarEstilosIniciales()
         AplicarLayoutResponsivo(force:=True)
 
@@ -611,7 +612,15 @@ Public Class frmDashboard
         End If
 
         ' ¿El cursor está fuera de la barra (en coords de pantalla)?
-        Dim r As Rectangle = panelNavegacion.RectangleToScreen(panelNavegacion.ClientRectangle)
+
+        ' ANTES (Incorrecto para tu caso de uso):
+        ' Dim r As Rectangle = panelNavegacion.RectangleToScreen(panelNavegacion.ClientRectangle)
+
+        ' DESPUÉS (Correcto):
+        ' Creamos un rectángulo usando el tamaño completo del control en la pantalla.
+        ' Esto SÍ incluye la barra de scroll.
+        Dim r As New Rectangle(panelNavegacion.PointToScreen(Point.Empty), panelNavegacion.Size)
+
         If Not r.Contains(Cursor.Position) Then
             _hoverOutTimer.Stop()
             CollapsePeekAnimated()

@@ -6,8 +6,6 @@ Imports System.Text
 Public Class frmFuncionarioBuscar
     Inherits FormActualizable
 
-
-
     Public Enum ModoApertura
         Navegacion ' Para ver y editar desde el Dashboard
         Seleccion  ' Para seleccionar un funcionario y devolverlo

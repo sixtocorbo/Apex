@@ -111,6 +111,11 @@ Partial Public Class frmFiltros
 
 #Region "Ciclo de Vida del Formulario"
     Private Sub frmFiltroAvanzado_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        ' >>> INICIO DE LÍNEAS NUEVAS <<<
+        ConfigurarLayoutResponsivo()
+        AjustarSplitter()
+        ' >>> FIN DE LÍNEAS NUEVAS <<<
+
         ' Tema base
         AppTheme.Aplicar(Me)
 
@@ -287,6 +292,13 @@ Partial Public Class frmFiltros
 
             dgvDatos.Columns.Add(dgvCol)
         Next
+        ' >>> INICIO DE MEJORA VISUAL <<<
+        ' Hacer que la última columna visible llene el espacio restante.
+        Dim ultimaColumnaVisible = dgvDatos.Columns.Cast(Of DataGridViewColumn).LastOrDefault(Function(c) c.Visible)
+        If ultimaColumnaVisible IsNot Nothing Then
+            ultimaColumnaVisible.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+        End If
+        ' >>> FIN DE MEJORA VISUAL <<<
     End Sub
 
     Private Sub ActualizarListaColumnas()
@@ -578,6 +590,53 @@ Partial Public Class frmFiltros
         Next
         Return dict
     End Function
+
+#Region "Diseño Responsivo"
+
+    ' Variable para guardar la proporción del splitter elegida por el usuario.
+    Private _splitRatio As Double = 0.3 ' Proporción inicial del 30% para el panel de filtros.
+
+    Private Sub ConfigurarLayoutResponsivo()
+        ' Configura el SplitContainer para que sea flexible.
+        Me.splitContenedorPrincipal.FixedPanel = FixedPanel.None
+        Me.splitContenedorPrincipal.IsSplitterFixed = False
+
+        ' Habilita DoubleBuffering en los contenedores principales para un redimensionamiento suave.
+        Me.splitContenedorPrincipal.DoubleBuffered(True)
+        Me.splitContenedorPrincipal.Panel1.DoubleBuffered(True)
+        Me.splitContenedorPrincipal.Panel2.DoubleBuffered(True)
+        Me.TableLayoutPanelLeft.DoubleBuffered(True)
+        Me.TableLayoutPanelRight.DoubleBuffered(True)
+        ' La grilla ya tiene su propio DoubleBuffered, pero no hace daño reasegurarlo.
+        Me.dgvDatos.DoubleBuffered(True)
+
+        ' Asocia los eventos de redimensionamiento.
+        AddHandler Me.Resize, AddressOf frmFiltros_Resize
+        AddHandler Me.splitContenedorPrincipal.SplitterMoved, AddressOf splitContenedorPrincipal_SplitterMoved
+    End Sub
+
+    Private Sub frmFiltros_Resize(sender As Object, e As EventArgs)
+        ' Cada vez que el formulario cambia de tamaño, ajustamos el splitter.
+        AjustarSplitter()
+    End Sub
+
+    Private Sub splitContenedorPrincipal_SplitterMoved(sender As Object, e As SplitterEventArgs)
+        ' Cuando el usuario mueve el splitter, guardamos la nueva proporción.
+        ' Usamos Math.Max para evitar una división por cero si el control es muy pequeño.
+        _splitRatio = splitContenedorPrincipal.SplitterDistance / Math.Max(1, splitContenedorPrincipal.Width)
+    End Sub
+
+    Private Sub AjustarSplitter()
+        ' Aplica la proporción guardada al ancho actual del SplitContainer.
+        Dim ancho As Integer = Math.Max(1, splitContenedorPrincipal.Width)
+        Dim distanciaDeseada As Integer = CInt(ancho * _splitRatio)
+
+        ' Asegura que la nueva distancia respete los tamaños mínimos de los paneles.
+        splitContenedorPrincipal.SplitterDistance = Math.Max(splitContenedorPrincipal.Panel1MinSize,
+                                                      Math.Min(distanciaDeseada, ancho - splitContenedorPrincipal.Panel2MinSize))
+    End Sub
+
+#End Region
 End Class
 
 Public Module ControlExtensions
