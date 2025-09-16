@@ -28,7 +28,7 @@ Public Class frmNotificaciones
         Catch
         End Try
 
-        AddHandler NotificadorEventos.DatosActualizados, AddressOf OnDatosActualizados
+        AddHandler NotificadorEventos.FuncionarioActualizado, AddressOf OnFuncionarioActualizado
         Notifier.Info(Me, "Escribí para filtrar; doble clic abre cambio de estado.")
     End Sub
 
@@ -41,15 +41,7 @@ Public Class frmNotificaciones
         End Try
     End Sub
 
-
-    Private Sub frmGestionNotificaciones_FormClosed(sender As Object, e As FormClosedEventArgs) Handles Me.FormClosed
-        RemoveHandler NotificadorEventos.DatosActualizados, AddressOf OnDatosActualizados
-    End Sub
-
-    ''' <summary>
-    ''' Se ejecuta cuando NotificadorEventos.DatosActualizados se dispara.
-    ''' </summary>
-    Private Async Sub OnDatosActualizados(sender As Object, e As EventArgs)
+    Private Async Sub OnFuncionarioActualizado(sender As Object, e As FuncionarioCambiadoEventArgs)
         Await BuscarAsync()
     End Sub
 

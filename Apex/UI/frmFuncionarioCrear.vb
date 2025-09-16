@@ -728,7 +728,7 @@ Public Class frmFuncionarioCrear
                 ' Persistido: marcar para eliminar en EF (sin romper navegación/FKs)
                 MarcarParaEliminar(entidad)
                 ' Nota: el commit real ocurrirá al guardar el formulario/pantalla
-                Notifier.Info(Me, "Estado marcado para eliminar. Se aplicará al guardar.")
+                Notifier.Info(Me, "Estado marcado para eliminar. Se aplicará al actualizar.")
             Else
                 ' No persistido: sacar del contexto si estaba adjunto
                 Dim entry = _uow.Context.Entry(entidad)
