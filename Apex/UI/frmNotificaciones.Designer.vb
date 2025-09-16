@@ -23,6 +23,7 @@ Partial Class frmNotificaciones
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.Panel1 = New System.Windows.Forms.Panel()
+        Me.btnNuevaMasiva = New System.Windows.Forms.Button()
         Me.btnCambiarEstado = New System.Windows.Forms.Button()
         Me.btnImprimir = New System.Windows.Forms.Button()
         Me.btnEliminar = New System.Windows.Forms.Button()
@@ -33,7 +34,6 @@ Partial Class frmNotificaciones
         Me.Label1 = New System.Windows.Forms.Label()
         Me.dgvNotificaciones = New System.Windows.Forms.DataGridView()
         Me.rtbNotificacion = New System.Windows.Forms.RichTextBox()
-        Me.btnNuevaMasiva = New System.Windows.Forms.Button()
         Me.Panel1.SuspendLayout()
         Me.Panel2.SuspendLayout()
         CType(Me.dgvNotificaciones, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -53,6 +53,22 @@ Partial Class frmNotificaciones
         Me.Panel1.Name = "Panel1"
         Me.Panel1.Size = New System.Drawing.Size(900, 62)
         Me.Panel1.TabIndex = 0
+        '
+        'btnNuevaMasiva
+        '
+        Me.btnNuevaMasiva.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnNuevaMasiva.BackColor = System.Drawing.Color.CornflowerBlue
+        Me.btnNuevaMasiva.FlatAppearance.BorderSize = 0
+        Me.btnNuevaMasiva.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnNuevaMasiva.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnNuevaMasiva.ForeColor = System.Drawing.Color.White
+        Me.btnNuevaMasiva.Location = New System.Drawing.Point(18, 13)
+        Me.btnNuevaMasiva.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.btnNuevaMasiva.Name = "btnNuevaMasiva"
+        Me.btnNuevaMasiva.Size = New System.Drawing.Size(209, 36)
+        Me.btnNuevaMasiva.TabIndex = 5
+        Me.btnNuevaMasiva.Text = "Notificación masiva"
+        Me.btnNuevaMasiva.UseVisualStyleBackColor = False
         '
         'btnCambiarEstado
         '
@@ -174,6 +190,7 @@ Partial Class frmNotificaciones
         Me.dgvNotificaciones.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.dgvNotificaciones.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells
         Me.dgvNotificaciones.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvNotificaciones.Location = New System.Drawing.Point(0, 62)
         Me.dgvNotificaciones.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
@@ -196,22 +213,6 @@ Partial Class frmNotificaciones
         Me.rtbNotificacion.Size = New System.Drawing.Size(900, 150)
         Me.rtbNotificacion.TabIndex = 3
         Me.rtbNotificacion.Text = ""
-        '
-        'btnNuevaMasiva
-        '
-        Me.btnNuevaMasiva.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnNuevaMasiva.BackColor = System.Drawing.Color.CornflowerBlue
-        Me.btnNuevaMasiva.FlatAppearance.BorderSize = 0
-        Me.btnNuevaMasiva.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.btnNuevaMasiva.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnNuevaMasiva.ForeColor = System.Drawing.Color.White
-        Me.btnNuevaMasiva.Location = New System.Drawing.Point(18, 13)
-        Me.btnNuevaMasiva.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
-        Me.btnNuevaMasiva.Name = "btnNuevaMasiva"
-        Me.btnNuevaMasiva.Size = New System.Drawing.Size(209, 36)
-        Me.btnNuevaMasiva.TabIndex = 5
-        Me.btnNuevaMasiva.Text = "Notificación masiva"
-        Me.btnNuevaMasiva.UseVisualStyleBackColor = False
         '
         'frmNotificaciones
         '

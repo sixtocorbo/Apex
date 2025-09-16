@@ -165,28 +165,6 @@ Partial Public Class frmFiltros
     Private Sub Form_KeyDown_EscCierra(sender As Object, e As KeyEventArgs)
         If e.KeyCode = Keys.Escape Then Me.Close()
     End Sub
-
-    'Private Sub frmFiltroAvanzado_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-    '    AppTheme.Aplicar(Me)
-    '    ' --- MEJORA: Optimización del renderizado del DataGridView ---
-    '    dgvDatos.DoubleBuffered(True)
-    '    dgvDatos.SendToBack()
-
-    '    cmbOrigenDatos.DataSource = System.Enum.GetValues(GetType(TipoOrigenDatos))
-    '    cmbOrigenDatos.SelectedIndex = -1
-
-    '    ' Organiza los paneles para evitar solapamientos
-    '    gbxBusquedaGlobal.BringToFront()
-    '    flpChips.BringToFront()
-    '    pnlAcciones.BringToFront()
-
-    '    AddHandler btnCargar.Click, AddressOf btnCargar_Click_Async
-    '    AddHandler lstColumnas.SelectedIndexChanged, AddressOf LstColumnas_SelectedIndexChanged
-    '    AddHandler txtBusquedaGlobal.TextChanged, AddressOf TxtBusquedaGlobal_TextChanged
-
-    '    UpdateUIState()
-    'End Sub
-
 #End Region
 
 #Region "Lógica de Carga de Datos"

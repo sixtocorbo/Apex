@@ -149,7 +149,7 @@ Partial Class frmFiltros
         Me.TableLayoutPanelOrigen.Controls.Add(Me.Label3, 0, 2)
         Me.TableLayoutPanelOrigen.Controls.Add(Me.dtpFechaFin, 1, 2)
         Me.TableLayoutPanelOrigen.Controls.Add(Me.btnCargar, 1, 3)
-        Me.TableLayoutPanelOrigen.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.TableLayoutPanelOrigen.Dock = System.Windows.Forms.DockStyle.Top
         Me.TableLayoutPanelOrigen.Location = New System.Drawing.Point(10, 29)
         Me.TableLayoutPanelOrigen.Name = "TableLayoutPanelOrigen"
         Me.TableLayoutPanelOrigen.RowCount = 4
@@ -157,7 +157,7 @@ Partial Class frmFiltros
         Me.TableLayoutPanelOrigen.RowStyles.Add(New System.Windows.Forms.RowStyle())
         Me.TableLayoutPanelOrigen.RowStyles.Add(New System.Windows.Forms.RowStyle())
         Me.TableLayoutPanelOrigen.RowStyles.Add(New System.Windows.Forms.RowStyle())
-        Me.TableLayoutPanelOrigen.Size = New System.Drawing.Size(257, 150)
+        Me.TableLayoutPanelOrigen.Size = New System.Drawing.Size(257, 147)
         Me.TableLayoutPanelOrigen.TabIndex = 0
         '
         'Label1
@@ -220,10 +220,9 @@ Partial Class frmFiltros
         '
         'btnCargar
         '
-        Me.btnCargar.Dock = System.Windows.Forms.DockStyle.Fill
         Me.btnCargar.Location = New System.Drawing.Point(69, 101)
         Me.btnCargar.Name = "btnCargar"
-        Me.btnCargar.Size = New System.Drawing.Size(185, 46)
+        Me.btnCargar.Size = New System.Drawing.Size(185, 33)
         Me.btnCargar.TabIndex = 6
         Me.btnCargar.Text = "Cargar"
         Me.btnCargar.UseVisualStyleBackColor = True
