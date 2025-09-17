@@ -290,6 +290,7 @@ End Class
 
 ' --- DTOs para la Ficha Funcional (versión simplificada) ---
 Public Class FichaFuncionalDTO
+    Public Property FuncionarioId As Integer
     Public Property NombreCompleto As String
     Public Property Cedula As String
     Public Property Grado As String

@@ -610,79 +610,103 @@ Partial Public Class frmFiltros
 #Region "Lógica de Exportación"
 
     ' 2. AGREGA ESTE NUEVO MÉTODO COMPLETO A TU FORMULARIO
-    Private Async Sub btnExportarFichasPDF_Click(sender As Object, e As EventArgs) Handles btnExportarFichasPDF.Click
-        ' --- (Validaciones iniciales, sin cambios) ---
-        If cmbOrigenDatos.SelectedItem Is Nothing OrElse CType(cmbOrigenDatos.SelectedItem, TipoOrigenDatos) <> TipoOrigenDatos.Funcionarios Then
-            MessageBox.Show("Para exportar fichas, primero debe seleccionar y cargar el origen de datos 'Funcionarios'.",
-                      "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
-            Return
-        End If
+    Private Async Sub btnExportarFichasPDF_Click(sender As Object, e As EventArgs) _
+    Handles btnExportarFichasPDF.Click
 
-        Dim idsFuncionarios = GetIdsFiltrados("Id")
-        If Not idsFuncionarios.Any() Then
-            MessageBox.Show("No hay funcionarios en la vista actual para exportar.",
-                      "Sin Datos", MessageBoxButtons.OK, MessageBoxIcon.Information)
-            Return
-        End If
-
-        ' --- (Diálogo para guardar, sin cambios) ---
-        Using sfd As New SaveFileDialog()
-            sfd.Filter = "Archivo PDF (*.pdf)|*.pdf"
-            sfd.Title = "Guardar Fichas de Funcionarios"
-            sfd.FileName = $"Fichas_Funcionarios_{DateTime.Now:yyyyMMdd_HHmm}.pdf"
-
-            If sfd.ShowDialog() <> DialogResult.OK Then
+        Try
+            ' 1) Validaciones básicas
+            If cmbOrigenDatos.SelectedItem Is Nothing OrElse
+               Not cmbOrigenDatos.SelectedItem.Equals(TipoOrigenDatos.Funcionarios) Then
+                MessageBox.Show("Seleccioná 'Funcionarios' como origen de datos.", "Apex",
+                                MessageBoxButtons.OK, MessageBoxIcon.Information)
                 Return
             End If
 
-            ' --- (Proceso de Generación, con correcciones) ---
-            btnExportarFichasPDF.Enabled = False
-            LoadingHelper.MostrarCargando(Me, "Generando PDF...")
+            Dim ids As List(Of Integer) = GetIdsFiltrados("Id")
+            If ids Is Nothing OrElse ids.Count = 0 Then
+                MessageBox.Show("No hay funcionarios para exportar.", "Apex",
+                                MessageBoxButtons.OK, MessageBoxIcon.Information)
+                Return
+            End If
 
-            Try
-                Dim reportService As New ReportesService()
-                Dim datosParaReporte = Await reportService.ObtenerDatosParaFichasAsync(idsFuncionarios)
+            ' 2) Elegir carpeta destino
+            Using fbd As New FolderBrowserDialog()
+                fbd.Description = "Elegí la carpeta donde guardar un PDF por funcionario"
+                If fbd.ShowDialog(Me) <> DialogResult.OK Then Return
+                Dim carpeta As String = fbd.SelectedPath
 
-                If datosParaReporte Is Nothing OrElse Not datosParaReporte.Any() Then
-                    Throw New Exception("No se encontraron datos detallados para los funcionarios seleccionados.")
-                End If
+                Cursor = Cursors.WaitCursor
+                Dim tituloOriginal = Me.Text
+                Me.Text = "Exportando fichas..."
+                Me.Refresh()
 
-                Using viewer As New ReportViewer()
-                    viewer.ProcessingMode = ProcessingMode.Local
-
-                    ' --- CORRECCIÓN 1: Asegurarse del nombre exacto del recurso ---
-                    ' Usamos el nombre del ensamblado y la ruta del archivo.
-                    viewer.LocalReport.ReportEmbeddedResource = "Apex.Reportes.FichaFuncional.rdlc"
-
-                    ' --- CORRECCIÓN 2: Usar el nombre de DataSet correcto ---
-                    ' El nombre debe ser "FichaFuncionalDataSet", como en el formulario que funciona.
-                    Dim rds As New ReportDataSource("FichaFuncionalDataSet", datosParaReporte)
-                    viewer.LocalReport.DataSources.Add(rds)
-
-                    ' Ya no es necesario llamar a RefreshReport() antes de Render()
-                    ' viewer.RefreshReport() 
-
-                    ' Renderizar el reporte a un array de bytes
-                    Dim bytes = viewer.LocalReport.Render("PDF")
-
-                    File.WriteAllBytes(sfd.FileName, bytes)
+                ' 3) Traer todos los datos en una sola consulta
+                Dim todosLosDatos As List(Of FichaFuncionalDTO)
+                Using svc As New ReportesService() ' <-- SIN pasar el tipo UnitOfWork
+                    todosLosDatos = Await svc.ObtenerDatosParaFichasAsync(ids)
                 End Using
 
-                MessageBox.Show($"Se exportaron exitosamente las fichas de {idsFuncionarios.Count} funcionarios." & vbCrLf &
-                          $"Archivo guardado en: {sfd.FileName}",
-                          "Exportación Exitosa", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                If todosLosDatos Is Nothing OrElse todosLosDatos.Count = 0 Then
+                    MessageBox.Show("No se encontraron datos para las fichas.", "Apex",
+                                    MessageBoxButtons.OK, MessageBoxIcon.Information)
+                    Me.Text = tituloOriginal
+                    Cursor = Cursors.Default
+                    Return
+                End If
 
-                Process.Start("explorer.exe", $"/select,""{sfd.FileName}""")
+                ' 4) Exportar un PDF por funcionario SIN congelar la UI
+                Dim total As Integer = ids.Count
+                Dim i As Integer = 0
 
-            Catch ex As Exception
-                MessageBox.Show($"Ocurrió un error durante la exportación a PDF: {ex.Message}",
-                          "Error de Exportación", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            Finally
-                LoadingHelper.OcultarCargando(Me)
-                btnExportarFichasPDF.Enabled = True
-            End Try
-        End Using
+                For Each id In ids
+                    i += 1
+
+                    ' Filtrar en memoria el DTO del funcionario actual
+                    ' NOTA: FichaFuncionalDTO DEBE tener la propiedad FuncionarioId
+                    Dim datosUno = todosLosDatos.Where(Function(d) d.FuncionarioId = id).ToList()
+                    If datosUno.Count = 0 Then Continue For
+
+                    Dim nombreArchivo As String = $"Ficha_{id}.pdf"
+                    Dim ruta As String = Path.Combine(carpeta, nombreArchivo)
+
+                    ' Render en segundo plano para evitar freeze
+                    Await Task.Run(
+                        Sub()
+                            Using viewer As New ReportViewer()
+                                viewer.ProcessingMode = ProcessingMode.Local
+                                viewer.LocalReport.DataSources.Clear()
+                                ' Debe coincidir con el DataSet definido en el RDLC
+                                viewer.LocalReport.DataSources.Add(
+                                    New ReportDataSource("FichaFuncionalDataSet", datosUno)
+                                )
+                                ' Debe coincidir con el recurso embebido del RDLC
+                                viewer.LocalReport.ReportEmbeddedResource = "Apex.Reportes.FichaFuncional.rdlc"
+                                viewer.LocalReport.Refresh()
+
+                                Dim bytes As Byte() = viewer.LocalReport.Render("PDF")
+                                File.WriteAllBytes(ruta, bytes)
+                            End Using
+                        End Sub
+                    )
+
+                    ' Feedback visual mínimo
+                    Me.Text = $"Exportando fichas... {i}/{total}"
+                    Application.DoEvents()
+                Next
+
+                Me.Text = tituloOriginal
+                Cursor = Cursors.Default
+                MessageBox.Show($"Se guardaron {total} archivos PDF en: {carpeta}", "Apex",
+                                MessageBoxButtons.OK, MessageBoxIcon.Information)
+            End Using
+
+        Catch ex As Exception
+            Cursor = Cursors.Default
+            MessageBox.Show("Error al exportar fichas: " & ex.Message, "Apex",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
     End Sub
+
 
 #End Region
 End Class
