@@ -183,6 +183,14 @@ Partial Public Class ApexEntities
         Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_DeleteFuncionario", funcionarioIdParameter)
     End Function
 
+    Public Overridable Function usp_Filtros_ObtenerLicenciasPorFecha(fechaInicio As Nullable(Of Date), fechaFin As Nullable(Of Date)) As ObjectResult(Of usp_Filtros_ObtenerLicenciasPorFecha_Result)
+        Dim fechaInicioParameter As ObjectParameter = If(fechaInicio.HasValue, New ObjectParameter("FechaInicio", fechaInicio), New ObjectParameter("FechaInicio", GetType(Date)))
+
+        Dim fechaFinParameter As ObjectParameter = If(fechaFin.HasValue, New ObjectParameter("FechaFin", fechaFin), New ObjectParameter("FechaFin", GetType(Date)))
+
+        Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction(Of usp_Filtros_ObtenerLicenciasPorFecha_Result)("usp_Filtros_ObtenerLicenciasPorFecha", fechaInicioParameter, fechaFinParameter)
+    End Function
+
     Public Overridable Function usp_LimpiarDatosDeApex() As Integer
         Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_LimpiarDatosDeApex")
     End Function

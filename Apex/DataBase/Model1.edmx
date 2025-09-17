@@ -1721,6 +1721,10 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
         <Function Name="usp_DeleteFuncionario" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="FuncionarioId" Type="int" Mode="In" />
         </Function>
+        <Function Name="usp_Filtros_ObtenerLicenciasPorFecha" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="FechaInicio" Type="date" Mode="In" />
+          <Parameter Name="FechaFin" Type="date" Mode="In" />
+        </Function>
         <Function Name="usp_LimpiarDatosDeApex" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="usp_MigrarDotacionesCompletas" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="usp_PresenciaFecha_Apex" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
@@ -4293,6 +4297,10 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <FunctionImport Name="usp_DeleteFuncionario">
             <Parameter Name="FuncionarioId" Mode="In" Type="Int32" />
           </FunctionImport>
+          <FunctionImport Name="usp_Filtros_ObtenerLicenciasPorFecha" ReturnType="Collection(ApexModel.usp_Filtros_ObtenerLicenciasPorFecha_Result)">
+            <Parameter Name="FechaInicio" Mode="In" Type="DateTime" />
+            <Parameter Name="FechaFin" Mode="In" Type="DateTime" />
+          </FunctionImport>
           <FunctionImport Name="usp_LimpiarDatosDeApex" />
           <FunctionImport Name="usp_MigrarDotacionesCompletas" />
           <FunctionImport Name="usp_PresenciaFecha_Apex" ReturnType="Collection(ApexModel.usp_PresenciaFecha_Apex_Result)">
@@ -4310,6 +4318,36 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <Property Type="Int32" Name="ID" Nullable="false" />
           <Property Type="String" Name="Owner" Nullable="true" MaxLength="128" />
           <Property Type="Int32" Name="OwnerID" Nullable="false" />
+        </ComplexType>
+        <ComplexType Name="usp_Filtros_ObtenerLicenciasPorFecha_Result">
+          <Property Type="Int32" Name="LicenciaId" Nullable="false" />
+          <Property Type="Int32" Name="FuncionarioId" Nullable="false" />
+          <Property Type="Int32" Name="TipoLicenciaId" Nullable="false" />
+          <Property Type="String" Name="TipoLicencia" Nullable="false" MaxLength="100" />
+          <Property Type="DateTime" Name="FechaInicio" Nullable="false" />
+          <Property Type="DateTime" Name="FechaFin" Nullable="false" />
+          <Property Type="String" Name="EstadoLicencia" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="Observaciones" Nullable="true" />
+          <Property Type="String" Name="CI" Nullable="false" MaxLength="8" />
+          <Property Type="String" Name="NombreFuncionario" Nullable="false" MaxLength="60" />
+          <Property Type="Boolean" Name="Activo" Nullable="false" />
+          <Property Type="DateTime" Name="FechaIngreso" Nullable="false" />
+          <Property Type="DateTime" Name="FechaNacimiento" Nullable="true" />
+          <Property Type="String" Name="Domicilio" Nullable="true" MaxLength="250" />
+          <Property Type="String" Name="Email" Nullable="true" MaxLength="255" />
+          <Property Type="String" Name="EstadoActual" Nullable="false" MaxLength="8" />
+          <Property Type="String" Name="Cargo" Nullable="true" MaxLength="100" />
+          <Property Type="String" Name="TipoDeFuncionario" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="Escalafon" Nullable="true" MaxLength="100" />
+          <Property Type="String" Name="Funcion" Nullable="true" MaxLength="100" />
+          <Property Type="String" Name="Seccion" Nullable="true" MaxLength="20" />
+          <Property Type="String" Name="PuestoDeTrabajo" Nullable="true" MaxLength="80" />
+          <Property Type="String" Name="Turno" Nullable="true" MaxLength="60" />
+          <Property Type="String" Name="Semana" Nullable="true" MaxLength="60" />
+          <Property Type="String" Name="Horario" Nullable="true" MaxLength="60" />
+          <Property Type="String" Name="Genero" Nullable="true" MaxLength="20" />
+          <Property Type="String" Name="EstadoCivil" Nullable="true" MaxLength="30" />
+          <Property Type="String" Name="NivelDeEstudio" Nullable="true" MaxLength="50" />
         </ComplexType>
         <ComplexType Name="usp_PresenciaFecha_Apex_Result">
           <Property Type="Int32" Name="FuncionarioId" Nullable="false" />
@@ -5269,6 +5307,40 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <FunctionImportMapping FunctionImportName="usp_Apex_ImportarDotacionFuncionario" FunctionName="ApexModel.Store.usp_Apex_ImportarDotacionFuncionario" />
           <FunctionImportMapping FunctionImportName="usp_Apex_ImportarLicenciasMasivas" FunctionName="ApexModel.Store.usp_Apex_ImportarLicenciasMasivas" />
           <FunctionImportMapping FunctionImportName="usp_DeleteFuncionario" FunctionName="ApexModel.Store.usp_DeleteFuncionario" />
+          <FunctionImportMapping FunctionImportName="usp_Filtros_ObtenerLicenciasPorFecha" FunctionName="ApexModel.Store.usp_Filtros_ObtenerLicenciasPorFecha">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ApexModel.usp_Filtros_ObtenerLicenciasPorFecha_Result">
+                <ScalarProperty Name="LicenciaId" ColumnName="LicenciaId" />
+                <ScalarProperty Name="FuncionarioId" ColumnName="FuncionarioId" />
+                <ScalarProperty Name="TipoLicenciaId" ColumnName="TipoLicenciaId" />
+                <ScalarProperty Name="TipoLicencia" ColumnName="TipoLicencia" />
+                <ScalarProperty Name="FechaInicio" ColumnName="FechaInicio" />
+                <ScalarProperty Name="FechaFin" ColumnName="FechaFin" />
+                <ScalarProperty Name="EstadoLicencia" ColumnName="EstadoLicencia" />
+                <ScalarProperty Name="Observaciones" ColumnName="Observaciones" />
+                <ScalarProperty Name="CI" ColumnName="CI" />
+                <ScalarProperty Name="NombreFuncionario" ColumnName="NombreFuncionario" />
+                <ScalarProperty Name="Activo" ColumnName="Activo" />
+                <ScalarProperty Name="FechaIngreso" ColumnName="FechaIngreso" />
+                <ScalarProperty Name="FechaNacimiento" ColumnName="FechaNacimiento" />
+                <ScalarProperty Name="Domicilio" ColumnName="Domicilio" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="EstadoActual" ColumnName="EstadoActual" />
+                <ScalarProperty Name="Cargo" ColumnName="Cargo" />
+                <ScalarProperty Name="TipoDeFuncionario" ColumnName="TipoDeFuncionario" />
+                <ScalarProperty Name="Escalafon" ColumnName="Escalafon" />
+                <ScalarProperty Name="Funcion" ColumnName="Funcion" />
+                <ScalarProperty Name="Seccion" ColumnName="Seccion" />
+                <ScalarProperty Name="PuestoDeTrabajo" ColumnName="PuestoDeTrabajo" />
+                <ScalarProperty Name="Turno" ColumnName="Turno" />
+                <ScalarProperty Name="Semana" ColumnName="Semana" />
+                <ScalarProperty Name="Horario" ColumnName="Horario" />
+                <ScalarProperty Name="Genero" ColumnName="Genero" />
+                <ScalarProperty Name="EstadoCivil" ColumnName="EstadoCivil" />
+                <ScalarProperty Name="NivelDeEstudio" ColumnName="NivelDeEstudio" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
           <FunctionImportMapping FunctionImportName="usp_LimpiarDatosDeApex" FunctionName="ApexModel.Store.usp_LimpiarDatosDeApex" />
           <FunctionImportMapping FunctionImportName="usp_MigrarDotacionesCompletas" FunctionName="ApexModel.Store.usp_MigrarDotacionesCompletas" />
           <FunctionImportMapping FunctionImportName="usp_PresenciaFecha_Apex" FunctionName="ApexModel.Store.usp_PresenciaFecha_Apex">

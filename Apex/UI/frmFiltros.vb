@@ -291,7 +291,7 @@ Partial Public Class frmFiltros
 
         If EsFiltroRedundante() Then
             MessageBox.Show("Ha seleccionado todos los valores disponibles. El filtro es redundante y no se agregará.",
-                            "Filtro Redundante", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                             "Filtro Redundante", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Return
         End If
 
@@ -434,12 +434,12 @@ Partial Public Class frmFiltros
         Dim filtro As String = txtBuscarValor.Text.Trim()
 
         Dim valoresUnicos = dtValoresUnicos.AsEnumerable().
-            Select(Function(r) r.Field(Of Object)(colName)).
-            Where(Function(v) v IsNot Nothing AndAlso Not String.IsNullOrWhiteSpace(v.ToString())).
-            Select(Function(v) v.ToString()).
-            Where(Function(s) If(filtro = "", True, s.IndexOf(filtro, StringComparison.CurrentCultureIgnoreCase) >= 0)).
-            OrderBy(Function(s) s, StringComparer.CurrentCultureIgnoreCase).
-            ToArray()
+                            Select(Function(r) r.Field(Of Object)(colName)).
+                            Where(Function(v) v IsNot Nothing AndAlso Not String.IsNullOrWhiteSpace(v.ToString())).
+                            Select(Function(v) v.ToString()).
+                            Where(Function(s) If(filtro = "", True, s.IndexOf(filtro, StringComparison.CurrentCultureIgnoreCase) >= 0)).
+                            OrderBy(Function(s) s, StringComparer.CurrentCultureIgnoreCase).
+                            ToArray()
 
         lstValores.Items.AddRange(valoresUnicos)
         lstValores.EndUpdate()
@@ -560,14 +560,14 @@ Partial Public Class frmFiltros
         Me.splitContenedorPrincipal.IsSplitterFixed = False
 
         Me.splitContenedorPrincipal.DoubleBuffered(True)
-        Me.splitContenedorPrincipal.Panel1.DoubleBuffered(True)
-        Me.splitContenedorPrincipal.Panel2.DoubleBuffered(True)
+        Me.pnlContenedor.DoubleBuffered(True)
         Me.TableLayoutPanelLeft.DoubleBuffered(True)
         Me.TableLayoutPanelRight.DoubleBuffered(True)
         Me.dgvDatos.DoubleBuffered(True)
 
-        AddHandler Me.Resize, AddressOf frmFiltros_Resize
+        ' Los eventos Resize y Layout ya no son necesarios gracias al pnlContenedor
         AddHandler Me.splitContenedorPrincipal.SplitterMoved, AddressOf splitContenedorPrincipal_SplitterMoved
+        AddHandler Me.Resize, AddressOf frmFiltros_Resize
     End Sub
 
     Private Sub frmFiltros_Resize(sender As Object, e As EventArgs)
@@ -575,14 +575,19 @@ Partial Public Class frmFiltros
     End Sub
 
     Private Sub splitContenedorPrincipal_SplitterMoved(sender As Object, e As SplitterEventArgs)
-        _splitRatio = splitContenedorPrincipal.SplitterDistance / Math.Max(1, splitContenedorPrincipal.Width)
+        If splitContenedorPrincipal.Width > 0 Then
+            _splitRatio = splitContenedorPrincipal.SplitterDistance / Math.Max(1, splitContenedorPrincipal.Width)
+        End If
     End Sub
 
     Private Sub AjustarSplitter()
         Dim ancho As Integer = Math.Max(1, splitContenedorPrincipal.Width)
         Dim distanciaDeseada As Integer = CInt(ancho * _splitRatio)
-        splitContenedorPrincipal.SplitterDistance = Math.Max(splitContenedorPrincipal.Panel1MinSize,
-                                                      Math.Min(distanciaDeseada, ancho - splitContenedorPrincipal.Panel2MinSize))
+
+        If splitContenedorPrincipal.Width > (splitContenedorPrincipal.Panel1MinSize + splitContenedorPrincipal.Panel2MinSize) Then
+            splitContenedorPrincipal.SplitterDistance = Math.Max(splitContenedorPrincipal.Panel1MinSize,
+                                                         Math.Min(distanciaDeseada, ancho - splitContenedorPrincipal.Panel2MinSize))
+        End If
     End Sub
 
 #End Region
@@ -595,8 +600,6 @@ Public Module ControlExtensions
         prop.SetValue(control, enable, Nothing)
     End Sub
 End Module
-
-'' Apex/UI/frmFiltroAvanzado.vb
 'Option Strict On
 'Option Explicit On
 
@@ -605,15 +608,10 @@ End Module
 'Imports System.Globalization
 'Imports System.Text
 
-'' NOTA: Se eliminaron imports no utilizados como System.IO y System.Runtime.InteropServices
-'' para mantener el código limpio.
-
 'Partial Public Class frmFiltros
 '    Private _dtOriginal As DataTable = New DataTable()
 '    Private _dvDatos As DataView = Nothing
 '    Private ReadOnly _filtros As New GestorFiltros()
-
-'    ' --- MEJORA: Campo para evitar la actualización redundante de la lista de valores ---
 '    Private _isUpdatingValores As Boolean = False
 
 '#Region "Modelos y Clases de Ayuda"
@@ -621,19 +619,17 @@ End Module
 '    Public Enum OperadorComparacion
 '        Igual
 '        EnLista
-'        ' Se pueden agregar más operadores aquí si es necesario
 '    End Enum
 
 '    Public Class ReglaFiltro
 '        Public Property Columna As String = String.Empty
 '        Public Property Operador As OperadorComparacion
 '        Public Property Valor1 As String = String.Empty
-'        Public Property Valor2 As String = String.Empty ' Reservado para operadores como 'Entre'
+'        Public Property Valor2 As String = String.Empty
 
 '        Public Overrides Function ToString() As String
 '            Dim opStr = System.Enum.GetName(GetType(OperadorComparacion), Me.Operador)
 '            If Operador = OperadorComparacion.EnLista Then
-'                ' Para 'EnLista', el valor puede ser muy largo. Mostramos un resumen.
 '                Return $"{Columna} {opStr} ({Valor1.Split("|"c).Length} valores)"
 '            Else
 '                Return $"{Columna} {opStr} {Valor1}"
@@ -646,35 +642,28 @@ End Module
 
 '        Private Shared Function FormatearValor(valor As String) As String
 '            If DateTime.TryParse(valor, CultureInfo.InvariantCulture, DateTimeStyles.None, Nothing) Then
-'                ' CORRECCIÓN: Usar # en lugar de ' para las fechas.
 '                Return $"#{Convert.ToDateTime(valor).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}#"
 '            End If
-
 '            If Double.TryParse(valor, NumberStyles.Any, CultureInfo.InvariantCulture, Nothing) Then
 '                Return valor
 '            End If
-
 '            Return $"'{EscapeSqlLike(valor)}'"
 '        End Function
 
 '        Public Function ToRowFilter() As String
 '            Dim colName = $"[{Columna}]"
-
 '            Select Case Operador
 '                Case OperadorComparacion.Igual
 '                    If DateTime.TryParse(Valor1, Nothing) Then
-'                        ' --- MEJORA: Filtrado de fechas para cubrir el día completo ---
 '                        Dim fecha As Date = Convert.ToDateTime(Valor1).Date
 '                        Dim siguienteDia As Date = fecha.AddDays(1)
-'                        Return $"({colName} >= #{fecha.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}# AND {colName} < #{siguienteDia.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}#)"
+'                        Return $"({colName} >= #{fecha:yyyy-MM-dd}# AND {colName} < #{siguienteDia:yyyy-MM-dd}#)"
 '                    Else
 '                        Return $"{colName} = {FormatearValor(Valor1)}"
 '                    End If
-
 '                Case OperadorComparacion.EnLista
 '                    Dim items = Valor1.Split("|"c).Select(AddressOf FormatearValor)
 '                    Return $"{colName} IN ({String.Join(",", items)})"
-
 '                Case Else
 '                    Throw New NotSupportedException($"Operador {Operador} aún no implementado.")
 '            End Select
@@ -688,7 +677,6 @@ End Module
 '                Return _reglas
 '            End Get
 '        End Property
-
 '        Public Sub Limpiar()
 '            _reglas.Clear()
 '        End Sub
@@ -698,7 +686,6 @@ End Module
 '        Public Sub Quitar(r As ReglaFiltro)
 '            _reglas.Remove(r)
 '        End Sub
-
 '        Public Function RowFilter() As String
 '            If Not _reglas.Any() Then Return String.Empty
 '            Return String.Join(" AND ", _reglas.Select(Function(x) x.ToRowFilter()))
@@ -708,14 +695,19 @@ End Module
 '#End Region
 
 '#Region "Ciclo de Vida del Formulario"
+
 '    Private Sub frmFiltroAvanzado_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-'        ' >>> INICIO DE LÍNEAS NUEVAS <<<
+'        ' Layout base responsivo + splitter
 '        ConfigurarLayoutResponsivo()
 '        AjustarSplitter()
-'        ' >>> FIN DE LÍNEAS NUEVAS <<<
 
-'        ' Tema base
+'        ' Tema
 '        AppTheme.Aplicar(Me)
+
+'        ' Pegado a los bordes, sin “gutter”
+'        Me.Margin = Padding.Empty
+'        Me.Padding = Padding.Empty
+'        splitContenedorPrincipal.Panel2.AutoScroll = False
 
 '        ' DGV sin parpadeo
 '        dgvDatos.DoubleBuffered(True)
@@ -730,22 +722,19 @@ End Module
 '        flpChips.BringToFront()
 '        pnlAcciones.BringToFront()
 
-'        ' Action bars alineadas a la derecha
+'        ' Action bars a la derecha
 '        pnlFiltroBotones.FlowDirection = FlowDirection.RightToLeft
 '        flpAcciones.FlowDirection = FlowDirection.RightToLeft
 
-'        ' Botones “neutros” (mantienen BackColor del tema)
+'        ' Botones “neutros”
 '        btnLimpiar.Tag = "KeepBackColor"
 '        btnExportarExcel.Tag = "KeepBackColor"
 '        btnCopiarCorreos.Tag = "KeepBackColor"
 '        btnExportarFichasPDF.Tag = "KeepBackColor"
 
-'        ' Placeholder en la búsqueda (si agregaste AppTheme.SetCue)
-'        Try
-'            AppTheme.SetCue(txtBusquedaGlobal, "Buscar en todos los campos…")
-'        Catch
-'            ' Ignorar si no existe SetCue
-'        End Try
+'        ' Placeholder
+'        Try : AppTheme.SetCue(txtBusquedaGlobal, "Buscar en todos los campos…") : Catch : End Try
+'        Try : AppTheme.SetCue(txtBuscarValor, "Filtrar valores…") : Catch : End Try
 
 '        ' Atajos
 '        Me.AcceptButton = btnFiltrar
@@ -756,6 +745,9 @@ End Module
 '        AddHandler btnCargar.Click, AddressOf btnCargar_Click_Async
 '        AddHandler lstColumnas.SelectedIndexChanged, AddressOf LstColumnas_SelectedIndexChanged
 '        AddHandler txtBusquedaGlobal.TextChanged, AddressOf TxtBusquedaGlobal_TextChanged
+'        ' txtBuscarValor usa Handles abajo
+
+'        BeautifyGrid()
 
 '        UpdateUIState()
 '    End Sub
@@ -763,6 +755,7 @@ End Module
 '    Private Sub Form_KeyDown_EscCierra(sender As Object, e As KeyEventArgs)
 '        If e.KeyCode = Keys.Escape Then Me.Close()
 '    End Sub
+
 '#End Region
 
 '#Region "Lógica de Carga de Datos"
@@ -789,14 +782,11 @@ End Module
 '        Try
 '            Using wait As New WaitCursor()
 '                _dtOriginal = Await ConsultasGenericas.ObtenerDatosGenericosAsync(origen, fechaI, fechaF)
-'                ' --- MEJORA: Añadir columna de búsqueda global para optimizar el rendimiento ---
 '                AñadirColumnaBusquedaGlobal(_dtOriginal)
 '                _dvDatos = _dtOriginal.DefaultView
 '            End Using
 
-'            ' Resetea el estado del formulario antes de cargar nuevos datos
 '            LimpiarFiltrosYChips()
-
 '            ConfigurarGrilla(_dtOriginal)
 '            ActualizarListaColumnas()
 
@@ -814,20 +804,18 @@ End Module
 '    End Function
 
 '    Private Sub AñadirColumnaBusquedaGlobal(dt As DataTable)
-'        ' Esta columna invisible concatena todos los campos de texto para una búsqueda global ultrarrápida.
 '        Const SEARCH_COLUMN_NAME As String = "GlobalSearch"
 '        If dt Is Nothing OrElse dt.Columns.Contains(SEARCH_COLUMN_NAME) Then Return
 
 '        dt.Columns.Add(SEARCH_COLUMN_NAME, GetType(String))
-
 '        Dim stringColumns = dt.Columns.Cast(Of DataColumn).Where(Function(c) c.DataType = GetType(String)).ToList()
 
 '        For Each row As DataRow In dt.Rows
-'            Dim combinedValue As New StringBuilder()
+'            Dim sb As New StringBuilder()
 '            For Each col In stringColumns
-'                combinedValue.Append(row(col).ToString() & " ")
+'                sb.Append(row(col).ToString()).Append(" ")
 '            Next
-'            row(SEARCH_COLUMN_NAME) = combinedValue.ToString()
+'            row(SEARCH_COLUMN_NAME) = sb.ToString()
 '        Next
 '    End Sub
 
@@ -835,10 +823,8 @@ End Module
 '        dgvDatos.DataSource = Nothing
 '        dgvDatos.Columns.Clear()
 '        dgvDatos.AutoGenerateColumns = False
-
 '        If dt Is Nothing Then Return
 
-'        ' --- MEJORA: Definiciones de columnas centralizadas para mayor claridad ---
 '        Dim columnDefinitions As New Dictionary(Of String, String) From {
 '            {"NombreCompleto", "Nombre"}, {"Cedula", "Cédula"}, {"Cargo", "Cargo"},
 '            {"Escalafon", "Escalafón"}, {"Seccion", "Sección"}, {"Turno", "Turno"},
@@ -851,7 +837,6 @@ End Module
 '                               dt.Columns.Cast(Of DataColumn).Select(Function(c) c.ColumnName))
 
 '        For Each colName In columnsToShow
-'            ' Omitir columnas 'Id' y la columna de búsqueda global
 '            If colName.ToLower().EndsWith("id") OrElse colName = "GlobalSearch" Then Continue For
 
 '            Dim headerText = If(columnDefinitions.ContainsKey(colName), columnDefinitions(colName), colName)
@@ -868,25 +853,22 @@ End Module
 
 '            dgvDatos.Columns.Add(dgvCol)
 '        Next
-'        ' >>> INICIO DE MEJORA VISUAL <<<
-'        ' Hacer que la última columna visible llene el espacio restante.
-'        Dim ultimaColumnaVisible = dgvDatos.Columns.Cast(Of DataGridViewColumn).LastOrDefault(Function(c) c.Visible)
-'        If ultimaColumnaVisible IsNot Nothing Then
-'            ultimaColumnaVisible.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-'        End If
-'        ' >>> FIN DE MEJORA VISUAL <<<
+
+'        ' Última columna “Fill”
+'        Dim ultima = dgvDatos.Columns.Cast(Of DataGridViewColumn).LastOrDefault(Function(c) c.Visible)
+'        If ultima IsNot Nothing Then ultima.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
 '    End Sub
 
 '    Private Sub ActualizarListaColumnas()
 '        lstColumnas.Items.Clear()
-'        If _dtOriginal IsNot Nothing Then
-'            Dim columnNames = _dtOriginal.Columns.Cast(Of DataColumn).
-'                              Select(Function(c) c.ColumnName).
-'                              Where(Function(name) Not name.ToLower().EndsWith("id") AndAlso name <> "GlobalSearch").
-'                              ToArray()
-'            lstColumnas.Items.AddRange(columnNames)
-'            If lstColumnas.Items.Count > 0 Then lstColumnas.SelectedIndex = 0
-'        End If
+'        If _dtOriginal Is Nothing Then Return
+
+'        Dim columnNames = _dtOriginal.Columns.Cast(Of DataColumn).
+'                          Select(Function(c) c.ColumnName).
+'                          Where(Function(name) Not name.ToLower().EndsWith("id") AndAlso name <> "GlobalSearch").
+'                          ToArray()
+'        lstColumnas.Items.AddRange(columnNames)
+'        If lstColumnas.Items.Count > 0 Then lstColumnas.SelectedIndex = 0
 '    End Sub
 
 '#End Region
@@ -902,13 +884,16 @@ End Module
 '        AplicarFiltros()
 '    End Sub
 
+'    Private Sub txtBuscarValor_TextChanged(sender As Object, e As EventArgs) Handles txtBuscarValor.TextChanged
+'        ActualizarListaDeValores()
+'    End Sub
+
 '    Private Sub btnFiltrar_Click(sender As Object, e As EventArgs) Handles btnFiltrar.Click
 '        If lstColumnas.SelectedItem Is Nothing OrElse lstValores.SelectedItems.Count = 0 Then Return
 
-'        ' --- MEJORA: Lógica de validación movida a su propia función para mayor claridad ---
 '        If EsFiltroRedundante() Then
 '            MessageBox.Show("Ha seleccionado todos los valores disponibles. El filtro es redundante y no se agregará.",
-'                            "Filtro Redundante", MessageBoxButtons.OK, MessageBoxIcon.Information)
+'                             "Filtro Redundante", MessageBoxButtons.OK, MessageBoxIcon.Information)
 '            Return
 '        End If
 
@@ -933,7 +918,6 @@ End Module
 '    End Sub
 
 '    Private Function EsFiltroRedundante() As Boolean
-'        ' Si el usuario selecciona todos los ítems, el filtro no tiene efecto.
 '        Return lstValores.SelectedItems.Count = lstValores.Items.Count
 '    End Function
 
@@ -952,12 +936,9 @@ End Module
 '        Dim filtroReglas = _filtros.RowFilter()
 '        Dim filtroGlobal = ConstruirFiltroGlobal()
 
-'        ' Se aplica el filtro combinado a la vista de datos
 '        _dvDatos.RowFilter = String.Join(" AND ", {filtroReglas, filtroGlobal}.Where(Function(s) Not String.IsNullOrWhiteSpace(s)))
 
 '        ActualizarListaDeValores()
-
-'        ' El resto del código se mantiene igual
 '        UpdateUIState()
 '    End Sub
 
@@ -965,7 +946,6 @@ End Module
 '        Dim searchText = txtBusquedaGlobal.Text.Trim()
 '        If String.IsNullOrWhiteSpace(searchText) Then Return String.Empty
 
-'        ' --- MEJORA: La búsqueda ahora se hace sobre la columna pre-calculada 'GlobalSearch' ---
 '        Dim palabras = searchText.Split({" "c}, StringSplitOptions.RemoveEmptyEntries).
 '                                Select(Function(p) $"GlobalSearch LIKE '%{p.Replace("'", "''")}%'")
 '        Return $"({String.Join(" AND ", palabras)})"
@@ -986,19 +966,16 @@ End Module
 '            _filtros.Quitar(regla)
 '            flpChips.Controls.Remove(chip)
 '            chip.Dispose()
-
-'            ' Selecciona la columna y valores del chip eliminado para una mejor experiencia de usuario
 '            RestaurarSeleccionDesdeChip(regla)
-
 '            AplicarFiltros()
 '            UpdateFiltrosPanelHeight()
 '        End If
 '    End Sub
 
 '    Private Sub RestaurarSeleccionDesdeChip(regla As ReglaFiltro)
-'        _isUpdatingValores = True ' Evita que el evento SelectedIndexChanged se dispare dos veces
+'        _isUpdatingValores = True
 '        lstColumnas.SelectedItem = regla.Columna
-'        ActualizarListaDeValores() ' Actualiza los valores para la columna seleccionada
+'        ActualizarListaDeValores()
 
 '        Dim valoresParaSeleccionar = New HashSet(Of String)(regla.Valor1.Split("|"c))
 '        For i = 0 To lstValores.Items.Count - 1
@@ -1014,19 +991,16 @@ End Module
 '#Region "Métodos de Ayuda y UI"
 
 '    Private Sub UpdateUIState()
-'        Dim hayDatos = (_dvDatos IsNot Nothing AndAlso _dvDatos.Table.Rows.Count > 0)
-'        gbxFiltros.Enabled = hayDatos
+'        Dim total As Integer = If(_dtOriginal?.Rows.Count, 0)
+'        Dim visibles As Integer = If(_dvDatos?.Count, 0)
+'        gbxFiltros.Enabled = (visibles > 0 OrElse total > 0)
 
-'        ' Asegura que el separador solo se muestre si hay botones a ambos lados
 '        Separator1.Visible = (btnExportarExcel.Visible Or btnCopiarCorreos.Visible)
 
-'        ' Actualiza el conteo de registros
-'        If _dvDatos IsNot Nothing Then
-'            lblConteoRegistros.Text = $"Registros: {_dvDatos.Count}"
-'        Else
-'            lblConteoRegistros.Text = "Registros: 0"
-'        End If
+'        lblConteoRegistros.Text = $"Registros: {visibles:n0} de {total:n0}"
+
 '        UpdateFiltrosPanelHeight()
+'        PanelChips.Visible = (flpChips.Controls.Count > 0)
 '    End Sub
 
 '    Private Sub LimpiarTodo()
@@ -1036,6 +1010,7 @@ End Module
 '        _dvDatos = Nothing
 '        lstColumnas.Items.Clear()
 '        lstValores.Items.Clear()
+'        txtBuscarValor.Clear()
 '        LimpiarFiltrosYChips()
 '        UpdateUIState()
 '    End Sub
@@ -1047,29 +1022,42 @@ End Module
 '    End Sub
 
 '    Private Sub ActualizarListaDeValores()
-'        lstValores.BeginUpdate() ' Optimiza el rendimiento
+'        lstValores.BeginUpdate()
 '        lstValores.Items.Clear()
 
-'        ' Verificamos que la columna esté seleccionada y que la vista de datos (_dvDatos) exista
 '        If lstColumnas.SelectedItem Is Nothing OrElse _dvDatos Is Nothing Then
 '            lstValores.EndUpdate()
 '            Return
 '        End If
 
 '        Dim colName = lstColumnas.SelectedItem.ToString()
-
 '        Dim dtValoresUnicos As DataTable = _dvDatos.ToTable(True, colName)
 
-'        ' Ahora extraemos los valores de esta nueva tabla pequeña y ordenada.
+'        Dim filtro As String = txtBuscarValor.Text.Trim()
+
 '        Dim valoresUnicos = dtValoresUnicos.AsEnumerable().
-'                        Select(Function(r) r.Field(Of Object)(colName)).
-'                        Where(Function(v) v IsNot Nothing AndAlso Not String.IsNullOrWhiteSpace(v.ToString())).
-'                        OrderBy(Function(v) v.ToString(), StringComparer.CurrentCultureIgnoreCase).
-'                        Select(Function(v) v.ToString()).
-'                        ToArray()
+'                            Select(Function(r) r.Field(Of Object)(colName)).
+'                            Where(Function(v) v IsNot Nothing AndAlso Not String.IsNullOrWhiteSpace(v.ToString())).
+'                            Select(Function(v) v.ToString()).
+'                            Where(Function(s) If(filtro = "", True, s.IndexOf(filtro, StringComparison.CurrentCultureIgnoreCase) >= 0)).
+'                            OrderBy(Function(s) s, StringComparer.CurrentCultureIgnoreCase).
+'                            ToArray()
 
 '        lstValores.Items.AddRange(valoresUnicos)
 '        lstValores.EndUpdate()
+
+'        AjustarHorizontalScrollbar(lstValores)
+'    End Sub
+
+'    Private Sub AjustarHorizontalScrollbar(lst As ListBox)
+'        Dim maxW As Integer = 0
+'        Using g = lst.CreateGraphics()
+'            For Each it In lst.Items
+'                Dim w = TextRenderer.MeasureText(g, it.ToString(), lst.Font).Width
+'                If w > maxW Then maxW = w
+'            Next
+'        End Using
+'        lst.HorizontalExtent = maxW + SystemInformation.VerticalScrollBarWidth
 '    End Sub
 
 '    Private Sub UpdateFiltrosPanelHeight()
@@ -1080,6 +1068,7 @@ End Module
 '            flpChips.AutoScroll = flpChips.Height >= MAX_CHIP_PANEL_HEIGHT
 '        End If
 '    End Sub
+
 '    Private NotInheritable Class WaitCursor
 '        Implements IDisposable
 '        Private ReadOnly _old As Cursor
@@ -1091,51 +1080,45 @@ End Module
 '            Cursor.Current = _old
 '        End Sub
 '    End Class
+
+'    Private Sub BeautifyGrid()
+'        dgvDatos.Dock = DockStyle.Fill
+'        dgvDatos.RowHeadersVisible = False
+'        dgvDatos.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells
+'        ' Última columna “fill” se setea al crear columnas
+'    End Sub
+
 '#End Region
 
+'#Region "Botón Copiar Correos + helpers públicos"
 
 '    Private Sub btnCopiarCorreos_Click(sender As Object, e As EventArgs) Handles btnCopiarCorreos.Click
-'        ' 1. Verifica si hay datos filtrados en la vista actual.
 '        If _dvDatos Is Nothing OrElse _dvDatos.Count = 0 Then
 '            MessageBox.Show("No hay registros en la vista actual para copiar correos.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
 '            Return
 '        End If
 
-'        ' 2. Define el nombre de la columna que contiene los correos.
-'        '    ¡IMPORTANTE! Cambia "Email" por el nombre real de tu columna si es diferente.
 '        Const NOMBRE_COLUMNA_CORREO As String = "Email"
-
-'        ' 3. Comprueba si la columna de correo existe en los datos.
 '        If Not _dvDatos.Table.Columns.Contains(NOMBRE_COLUMNA_CORREO) Then
 '            MessageBox.Show($"No se encontró la columna '{NOMBRE_COLUMNA_CORREO}' en los datos.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
 '            Return
 '        End If
 
-'        ' 4. Recolecta todos los correos de la vista filtrada.
 '        Dim correos As New List(Of String)
 '        For Each rowView As DataRowView In _dvDatos
-'            ' Obtiene el valor del correo de la fila actual.
 '            Dim correo = rowView(NOMBRE_COLUMNA_CORREO)?.ToString()
-
-'            ' Agrega el correo a la lista solo si no es nulo y no está vacío.
-'            If Not String.IsNullOrWhiteSpace(correo) Then
-'                correos.Add(correo.Trim())
-'            End If
+'            If Not String.IsNullOrWhiteSpace(correo) Then correos.Add(correo.Trim())
 '        Next
 
-'        ' 5. Si se encontraron correos, únelos y cópialos al portapapeles.
 '        If correos.Any() Then
-'            ' Une todos los correos con un punto y coma, que es el estándar para los clientes de correo.
-'            Dim correosParaCopiar = String.Join("; ", correos.Distinct()) ' Distinct() para evitar duplicados.
-
-'            ' Copia la cadena de correos al portapapeles.
+'            Dim correosParaCopiar = String.Join("; ", correos.Distinct())
 '            Clipboard.SetText(correosParaCopiar)
-
 '            MessageBox.Show($"{correos.Count} correos han sido copiados al portapapeles.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
 '        Else
 '            MessageBox.Show("No se encontraron correos válidos en la selección actual.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning)
 '        End If
 '    End Sub
+
 '    Public Function GetIdsFiltrados(nombreColumnaId As String) As List(Of Integer)
 '        Dim ids As New List(Of Integer)
 '        If _dvDatos Is Nothing OrElse Not _dvDatos.Table.Columns.Contains(nombreColumnaId) Then Return ids
@@ -1148,6 +1131,7 @@ End Module
 '        Next
 '        Return ids.Distinct().ToList()
 '    End Function
+
 '    Public Function GetDiccionarioIdNombre(nombreColumnaId As String, nombreColumnaNombre As String) As Dictionary(Of Integer, String)
 '        Dim dict As New Dictionary(Of Integer, String)
 '        If _dvDatos Is Nothing OrElse
@@ -1167,49 +1151,57 @@ End Module
 '        Return dict
 '    End Function
 
+'#End Region
+
 '#Region "Diseño Responsivo"
 
-'    ' Variable para guardar la proporción del splitter elegida por el usuario.
-'    Private _splitRatio As Double = 0.3 ' Proporción inicial del 30% para el panel de filtros.
+'    Private _splitRatio As Double = 0.3
 
 '    Private Sub ConfigurarLayoutResponsivo()
-'        ' Configura el SplitContainer para que sea flexible.
 '        Me.splitContenedorPrincipal.FixedPanel = FixedPanel.None
 '        Me.splitContenedorPrincipal.IsSplitterFixed = False
 
-'        ' Habilita DoubleBuffering en los contenedores principales para un redimensionamiento suave.
 '        Me.splitContenedorPrincipal.DoubleBuffered(True)
 '        Me.splitContenedorPrincipal.Panel1.DoubleBuffered(True)
 '        Me.splitContenedorPrincipal.Panel2.DoubleBuffered(True)
 '        Me.TableLayoutPanelLeft.DoubleBuffered(True)
 '        Me.TableLayoutPanelRight.DoubleBuffered(True)
-'        ' La grilla ya tiene su propio DoubleBuffered, pero no hace daño reasegurarlo.
 '        Me.dgvDatos.DoubleBuffered(True)
 
-'        ' Asocia los eventos de redimensionamiento.
-'        AddHandler Me.Resize, AddressOf frmFiltros_Resize
+'        ' --- MEJORA CLAVE: Usamos el evento Layout en lugar de Resize ---
+'        ' El evento Layout se dispara de forma más fiable cuando un control padre cambia de tamaño.
+'        AddHandler Me.Layout, AddressOf frmFiltros_Layout
 '        AddHandler Me.splitContenedorPrincipal.SplitterMoved, AddressOf splitContenedorPrincipal_SplitterMoved
 '    End Sub
 
-'    Private Sub frmFiltros_Resize(sender As Object, e As EventArgs)
-'        ' Cada vez que el formulario cambia de tamaño, ajustamos el splitter.
+'    ''' <summary>
+'    ''' Este manejador de evento ahora asegura que el SplitContainer ocupe todo el
+'    ''' espacio disponible ANTES de intentar ajustar el divisor.
+'    ''' </summary>
+'    Private Sub frmFiltros_Layout(sender As Object, e As LayoutEventArgs)
 '        AjustarSplitter()
 '    End Sub
 
 '    Private Sub splitContenedorPrincipal_SplitterMoved(sender As Object, e As SplitterEventArgs)
-'        ' Cuando el usuario mueve el splitter, guardamos la nueva proporción.
-'        ' Usamos Math.Max para evitar una división por cero si el control es muy pequeño.
-'        _splitRatio = splitContenedorPrincipal.SplitterDistance / Math.Max(1, splitContenedorPrincipal.Width)
+'        ' Guardamos la nueva proporción elegida por el usuario
+'        If splitContenedorPrincipal.Width > 0 Then
+'            _splitRatio = splitContenedorPrincipal.SplitterDistance / splitContenedorPrincipal.Width
+'        End If
 '    End Sub
 
 '    Private Sub AjustarSplitter()
-'        ' Aplica la proporción guardada al ancho actual del SplitContainer.
-'        Dim ancho As Integer = Math.Max(1, splitContenedorPrincipal.Width)
+'        ' Nos aseguramos de no intentar dividir si el control es demasiado pequeño
+'        If Me.ClientSize.Width < (splitContenedorPrincipal.Panel1MinSize + splitContenedorPrincipal.Panel2MinSize) Then
+'            Return
+'        End If
+
+'        ' Aplicamos la proporción guardada al ancho actual del formulario
+'        Dim ancho As Integer = Me.ClientSize.Width
 '        Dim distanciaDeseada As Integer = CInt(ancho * _splitRatio)
 
-'        ' Asegura que la nueva distancia respete los tamaños mínimos de los paneles.
+'        ' Aplicamos la nueva distancia, respetando los mínimos de cada panel
 '        splitContenedorPrincipal.SplitterDistance = Math.Max(splitContenedorPrincipal.Panel1MinSize,
-'                                                      Math.Min(distanciaDeseada, ancho - splitContenedorPrincipal.Panel2MinSize))
+'                                                     Math.Min(distanciaDeseada, ancho - splitContenedorPrincipal.Panel2MinSize))
 '    End Sub
 
 '#End Region
