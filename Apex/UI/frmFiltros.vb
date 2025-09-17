@@ -611,36 +611,35 @@ Partial Public Class frmFiltros
 
     ' 2. AGREGA ESTE NUEVO MÉTODO COMPLETO A TU FORMULARIO
     Private Async Sub btnExportarFichasPDF_Click(sender As Object, e As EventArgs) Handles btnExportarFichasPDF.Click
-        ' --- Validación Inicial ---
+        ' --- (Validaciones iniciales, sin cambios) ---
         If cmbOrigenDatos.SelectedItem Is Nothing OrElse CType(cmbOrigenDatos.SelectedItem, TipoOrigenDatos) <> TipoOrigenDatos.Funcionarios Then
             MessageBox.Show("Para exportar fichas, primero debe seleccionar y cargar el origen de datos 'Funcionarios'.",
-                          "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                      "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Return
         End If
 
         Dim idsFuncionarios = GetIdsFiltrados("Id")
         If Not idsFuncionarios.Any() Then
             MessageBox.Show("No hay funcionarios en la vista actual para exportar.",
-                          "Sin Datos", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                      "Sin Datos", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Return
         End If
 
-        ' --- Pedir al usuario dónde guardar el archivo ---
+        ' --- (Diálogo para guardar, sin cambios) ---
         Using sfd As New SaveFileDialog()
             sfd.Filter = "Archivo PDF (*.pdf)|*.pdf"
             sfd.Title = "Guardar Fichas de Funcionarios"
             sfd.FileName = $"Fichas_Funcionarios_{DateTime.Now:yyyyMMdd_HHmm}.pdf"
 
             If sfd.ShowDialog() <> DialogResult.OK Then
-                Return ' El usuario canceló
+                Return
             End If
 
-            ' --- Proceso de Generación (Asíncrono) ---
+            ' --- (Proceso de Generación, con correcciones) ---
             btnExportarFichasPDF.Enabled = False
             LoadingHelper.MostrarCargando(Me, "Generando PDF...")
 
             Try
-                ' Usamos un servicio de reportes para obtener los datos necesarios
                 Dim reportService As New ReportesService()
                 Dim datosParaReporte = Await reportService.ObtenerDatosParaFichasAsync(idsFuncionarios)
 
@@ -648,33 +647,36 @@ Partial Public Class frmFiltros
                     Throw New Exception("No se encontraron datos detallados para los funcionarios seleccionados.")
                 End If
 
-                ' Configurar el Report Viewer (sin mostrarlo)
                 Using viewer As New ReportViewer()
                     viewer.ProcessingMode = ProcessingMode.Local
+
+                    ' --- CORRECCIÓN 1: Asegurarse del nombre exacto del recurso ---
+                    ' Usamos el nombre del ensamblado y la ruta del archivo.
                     viewer.LocalReport.ReportEmbeddedResource = "Apex.Reportes.FichaFuncional.rdlc"
 
-                    ' Enlazar el origen de datos al reporte
-                    Dim rds As New ReportDataSource("DataSetFichaFuncional", datosParaReporte)
+                    ' --- CORRECCIÓN 2: Usar el nombre de DataSet correcto ---
+                    ' El nombre debe ser "FichaFuncionalDataSet", como en el formulario que funciona.
+                    Dim rds As New ReportDataSource("FichaFuncionalDataSet", datosParaReporte)
                     viewer.LocalReport.DataSources.Add(rds)
-                    viewer.RefreshReport()
+
+                    ' Ya no es necesario llamar a RefreshReport() antes de Render()
+                    ' viewer.RefreshReport() 
 
                     ' Renderizar el reporte a un array de bytes
                     Dim bytes = viewer.LocalReport.Render("PDF")
 
-                    ' Guardar los bytes en el archivo seleccionado por el usuario
                     File.WriteAllBytes(sfd.FileName, bytes)
                 End Using
 
                 MessageBox.Show($"Se exportaron exitosamente las fichas de {idsFuncionarios.Count} funcionarios." & vbCrLf &
-                              $"Archivo guardado en: {sfd.FileName}",
-                              "Exportación Exitosa", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                          $"Archivo guardado en: {sfd.FileName}",
+                          "Exportación Exitosa", MessageBoxButtons.OK, MessageBoxIcon.Information)
 
-                ' Opcional: Abrir la carpeta que contiene el archivo
                 Process.Start("explorer.exe", $"/select,""{sfd.FileName}""")
 
             Catch ex As Exception
                 MessageBox.Show($"Ocurrió un error durante la exportación a PDF: {ex.Message}",
-                              "Error de Exportación", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                          "Error de Exportación", MessageBoxButtons.OK, MessageBoxIcon.Error)
             Finally
                 LoadingHelper.OcultarCargando(Me)
                 btnExportarFichasPDF.Enabled = True

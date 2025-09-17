@@ -760,7 +760,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Reportes\ConceptoFuncional.rdlc" />
-    <EmbeddedResource Include="Reportes\FichaFuncional.rdlc" />
+    <EmbeddedResource Include="Reportes\FichaFuncional.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Reportes\DesignacionImprimir.rdlc" />
     <EmbeddedResource Include="Reportes\NotificacionImprimir.rdlc" />
     <EmbeddedResource Include="Reportes\ReporteNovedades_Fotos.rdlc">
