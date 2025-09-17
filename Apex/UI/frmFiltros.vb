@@ -7,6 +7,9 @@ Imports System.Globalization
 Imports System.IO
 Imports System.Text
 Imports Microsoft.Reporting.WinForms
+Imports System.Linq
+Imports System.Threading.Tasks
+Imports System.Diagnostics
 
 Partial Public Class frmFiltros
     Inherits FormActualizable
@@ -616,16 +619,16 @@ Partial Public Class frmFiltros
         Try
             ' 1) Validaciones básicas
             If cmbOrigenDatos.SelectedItem Is Nothing OrElse
-               Not cmbOrigenDatos.SelectedItem.Equals(TipoOrigenDatos.Funcionarios) Then
+           Not cmbOrigenDatos.SelectedItem.Equals(TipoOrigenDatos.Funcionarios) Then
                 MessageBox.Show("Seleccioná 'Funcionarios' como origen de datos.", "Apex",
-                                MessageBoxButtons.OK, MessageBoxIcon.Information)
+                            MessageBoxButtons.OK, MessageBoxIcon.Information)
                 Return
             End If
 
             Dim ids As List(Of Integer) = GetIdsFiltrados("Id")
             If ids Is Nothing OrElse ids.Count = 0 Then
-                MessageBox.Show("No hay funcionarios para exportar.", "Apex",
-                                MessageBoxButtons.OK, MessageBoxIcon.Information)
+                MessageBox.Show("No hay funcionarios para exportar en la vista actual.", "Apex",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information)
                 Return
             End If
 
@@ -633,81 +636,163 @@ Partial Public Class frmFiltros
             Using fbd As New FolderBrowserDialog()
                 fbd.Description = "Elegí la carpeta donde guardar un PDF por funcionario"
                 If fbd.ShowDialog(Me) <> DialogResult.OK Then Return
-                Dim carpeta As String = fbd.SelectedPath
 
-                Cursor = Cursors.WaitCursor
+                Dim carpeta As String = fbd.SelectedPath
                 Dim tituloOriginal = Me.Text
-                Me.Text = "Exportando fichas..."
+                Cursor = Cursors.WaitCursor
+                Me.Text = "Exportando fichas... (Preparando datos...)"
                 Me.Refresh()
 
                 ' 3) Traer todos los datos en una sola consulta
                 Dim todosLosDatos As List(Of FichaFuncionalDTO)
-                Using svc As New ReportesService() ' <-- SIN pasar el tipo UnitOfWork
+                Using svc As New ReportesService()
                     todosLosDatos = Await svc.ObtenerDatosParaFichasAsync(ids)
                 End Using
 
                 If todosLosDatos Is Nothing OrElse todosLosDatos.Count = 0 Then
-                    MessageBox.Show("No se encontraron datos para las fichas.", "Apex",
-                                    MessageBoxButtons.OK, MessageBoxIcon.Information)
+                    MessageBox.Show("El servicio no devolvió datos para las fichas de los funcionarios seleccionados.", "Apex",
+                                MessageBoxButtons.OK, MessageBoxIcon.Warning)
                     Me.Text = tituloOriginal
                     Cursor = Cursors.Default
                     Return
                 End If
 
-                ' 4) Exportar un PDF por funcionario SIN congelar la UI
-                Dim total As Integer = ids.Count
-                Dim i As Integer = 0
+                ' 4) Exportar un PDF por funcionario
+                Dim totalAExportar As Integer = ids.Count
+                Dim exportados As Integer = 0
+                Dim noEncontrados As New List(Of Integer)
 
-                For Each id In ids
-                    i += 1
-
-                    ' Filtrar en memoria el DTO del funcionario actual
-                    ' NOTA: FichaFuncionalDTO DEBE tener la propiedad FuncionarioId
-                    Dim datosUno = todosLosDatos.Where(Function(d) d.FuncionarioId = id).ToList()
-                    If datosUno.Count = 0 Then Continue For
-
-                    Dim nombreArchivo As String = $"Ficha_{id}.pdf"
-                    Dim ruta As String = Path.Combine(carpeta, nombreArchivo)
-
-                    ' Render en segundo plano para evitar freeze
-                    Await Task.Run(
-                        Sub()
-                            Using viewer As New ReportViewer()
-                                viewer.ProcessingMode = ProcessingMode.Local
-                                viewer.LocalReport.DataSources.Clear()
-                                ' Debe coincidir con el DataSet definido en el RDLC
-                                viewer.LocalReport.DataSources.Add(
-                                    New ReportDataSource("FichaFuncionalDataSet", datosUno)
-                                )
-                                ' Debe coincidir con el recurso embebido del RDLC
-                                viewer.LocalReport.ReportEmbeddedResource = "Apex.Reportes.FichaFuncional.rdlc"
-                                viewer.LocalReport.Refresh()
-
-                                Dim bytes As Byte() = viewer.LocalReport.Render("PDF")
-                                File.WriteAllBytes(ruta, bytes)
-                            End Using
-                        End Sub
-                    )
-
-                    ' Feedback visual mínimo
-                    Me.Text = $"Exportando fichas... {i}/{total}"
+                For i = 0 To totalAExportar - 1
+                    Dim id As Integer = ids(i)
+                    Me.Text = $"Exportando fichas... {i + 1}/{totalAExportar}"
                     Application.DoEvents()
+
+                    ' Filtrar el DTO del funcionario actual (requiere FichaFuncionalDTO.FuncionarioId)
+                    Dim datosUno = todosLosDatos.Where(Function(d) d.FuncionarioId = id).ToList()
+                    If datosUno.Count = 0 Then
+                        noEncontrados.Add(id)
+                        Continue For
+                    End If
+
+                    ' Nombre de archivo: "Nombre Completo - CI 4.123.456-7.pdf" (o fallback Ficha_{id}.pdf)
+                    Dim dto = datosUno(0)
+                    Dim nombreArchivo As String = ConstruirNombreArchivo(dto, id)
+                    Dim ruta As String = ObtenerRutaUnica(carpeta, nombreArchivo)
+
+                    ' Render en segundo plano usando LocalReport (sin ReportViewer)
+                    Await Task.Run(
+                    Sub()
+                        Dim lr As New Microsoft.Reporting.WinForms.LocalReport()
+                        ' Carga RDLC embebido (p.ej. "Apex.FichaFuncional.rdlc") o, si no está,
+                        ' cae al archivo físico "Reportes\FichaFuncional.rdlc"
+                        CargarDefinicionRDLC(lr, "FichaFuncional.rdlc", "Reportes\FichaFuncional.rdlc")
+
+                        lr.DataSources.Clear()
+                        lr.DataSources.Add(New Microsoft.Reporting.WinForms.ReportDataSource("FichaFuncionalDataSet", datosUno))
+
+                        Dim bytes = lr.Render("PDF")
+                        If bytes Is Nothing OrElse bytes.Length = 0 Then
+                            Throw New ApplicationException("Render devolvió 0 bytes (verificar DataSet y RDLC).")
+                        End If
+
+                        System.IO.File.WriteAllBytes(ruta, bytes)
+                        lr.ReleaseSandboxAppDomain()
+                    End Sub
+                )
+
+                    exportados += 1
                 Next
 
+                ' 5) Mensaje final
                 Me.Text = tituloOriginal
                 Cursor = Cursors.Default
-                MessageBox.Show($"Se guardaron {total} archivos PDF en: {carpeta}", "Apex",
-                                MessageBoxButtons.OK, MessageBoxIcon.Information)
+
+                Dim sb As New System.Text.StringBuilder()
+                sb.AppendLine("Exportación finalizada.")
+                sb.AppendLine($"Se guardaron {exportados} de {totalAExportar} archivos PDF en: {carpeta}")
+                If noEncontrados.Any() Then
+                    sb.AppendLine().
+                   AppendLine("No se encontraron datos para los siguientes IDs: " & String.Join(", ", noEncontrados))
+                End If
+
+                MessageBox.Show(sb.ToString(), "Apex", MessageBoxButtons.OK, MessageBoxIcon.Information)
+
+                ' (Opcional) Abrir carpeta al terminar:
+                Try : Process.Start("explorer.exe", carpeta) : Catch : End Try
             End Using
 
         Catch ex As Exception
             Cursor = Cursors.Default
+            Me.Text = "Error al exportar"
             MessageBox.Show("Error al exportar fichas: " & ex.Message, "Apex",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error)
+                        MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
     End Sub
 
+    Private Sub CargarDefinicionRDLC(lr As Microsoft.Reporting.WinForms.LocalReport,
+                                 nombreCorto As String,
+                                 rutaRelativa As String)
+        Dim asm = Me.GetType().Assembly
+        Dim recurso = asm.GetManifestResourceNames().
+        FirstOrDefault(Function(n) n.EndsWith("." & nombreCorto, StringComparison.OrdinalIgnoreCase))
+        If Not String.IsNullOrEmpty(recurso) Then
+            Using s = asm.GetManifestResourceStream(recurso)
+                lr.LoadReportDefinition(s)
+            End Using
+            Exit Sub
+        End If
 
+        Dim fullPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, rutaRelativa)
+        If Not System.IO.File.Exists(fullPath) Then
+            Throw New ApplicationException($"No se encontró el RDLC embebido ('...{nombreCorto}') ni en disco: {fullPath}")
+        End If
+        lr.ReportPath = fullPath
+    End Sub
+
+#Region "Exportacion fichas"
+    Private Function ConstruirNombreArchivo(dto As FichaFuncionalDTO, id As Integer) As String
+        Dim nombre As String = (If(dto?.NombreCompleto, "")).Trim()
+        Dim ci As String = (If(dto?.Cedula, "")).Trim()
+
+        Dim baseName As String
+        If nombre <> "" AndAlso ci <> "" Then
+            baseName = $"{nombre} - CI {ci}"
+        ElseIf nombre <> "" Then
+            baseName = nombre
+        ElseIf ci <> "" Then
+            baseName = $"CI {ci}"
+        Else
+            baseName = $"Ficha_{id}"
+        End If
+
+        baseName = QuitarCaracteresInvalidos(baseName)
+        If baseName.Length > 150 Then baseName = baseName.Substring(0, 150) 'evitar rutas largas
+        Return baseName & ".pdf"
+    End Function
+
+    Private Function QuitarCaracteresInvalidos(s As String) As String
+        If s Is Nothing Then Return ""
+        For Each ch In IO.Path.GetInvalidFileNameChars()
+            s = s.Replace(ch, "_"c)
+        Next
+        ' colapsar espacios múltiples
+        s = System.Text.RegularExpressions.Regex.Replace(s, "\s+", " ").Trim()
+        Return s
+    End Function
+
+    Private Function ObtenerRutaUnica(carpeta As String, fileName As String) As String
+        Dim ruta = IO.Path.Combine(carpeta, fileName)
+        Dim n = 2
+        While IO.File.Exists(ruta)
+            Dim sinExt = IO.Path.GetFileNameWithoutExtension(fileName)
+            Dim ext = IO.Path.GetExtension(fileName)
+            ruta = IO.Path.Combine(carpeta, $"{sinExt} ({n}){ext}")
+            n += 1
+        End While
+        Return ruta
+    End Function
+
+#End Region
 #End Region
 End Class
 

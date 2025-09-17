@@ -81,6 +81,7 @@ Public Class ReportesService
         Dim fechaIngStr As String = If(fechaIng.HasValue, fechaIng.Value.ToShortDateString(), Nothing)
 
         Dim dto As New FichaFuncionalDTO With {
+            .FuncionarioId = funcionario.Id,
             .NombreCompleto = funcionario.Nombre,
             .Cedula = funcionario.CI,
             .FechaNacimiento = funcionario.FechaNacimiento?.ToShortDateString(),
@@ -249,6 +250,7 @@ Public Class ReportesService
                                                Dim fechaIngStr As String = If(fechaIng.HasValue, fechaIng.Value.ToShortDateString(), Nothing)
 
                                                Return New FichaFuncionalDTO With {
+                .FuncionarioId = f.Id,
                 .NombreCompleto = f.Nombre,
                 .Cedula = f.CI,
                 .FechaNacimiento = f.FechaNacimiento?.ToShortDateString(),

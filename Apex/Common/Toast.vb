@@ -222,4 +222,5 @@ Public Module Notifier
     Public Sub [Error](f As Form, msg As String, Optional ms As Integer = 4000)
         Toast.Show(owner:=f, message:=msg, type:=ToastType.Error, durationMs:=ms)
     End Sub
+
 End Module
