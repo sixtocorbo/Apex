@@ -197,6 +197,91 @@ Public Class ReportesService
         End Using
     End Function
 
+
+    ''' <summary>
+    ''' Obtiene de forma eficiente los datos para las fichas funcionales de una lista de funcionarios.
+    ''' </summary>
+    ''' <param name="ids">Lista de Ids de los funcionarios a incluir.</param>
+    ''' <returns>Una lista de objetos DTO con la información lista para el reporte.</returns>
+    Public Async Function ObtenerDatosParaFichasAsync(ids As List(Of Integer)) As Task(Of List(Of FichaFuncionalDTO))
+        If ids Is Nothing OrElse Not ids.Any() Then
+            Return New List(Of FichaFuncionalDTO)()
+        End If
+
+        Using uow As New UnitOfWork()
+            ' 1. Obtenemos todos los funcionarios y sus datos relacionados en UNA SOLA CONSULTA.
+            Dim funcionarios = Await uow.Repository(Of Funcionario)().
+            GetQueryable().
+            Where(Function(f) ids.Contains(f.Id)).
+            Include(Function(f) f.Cargo).
+            Include(Function(f) f.Seccion).
+            Include(Function(f) f.PuestoTrabajo).
+            Include(Function(f) f.Turno).
+            Include(Function(f) f.Semana).
+            Include(Function(f) f.Horario).
+            Include(Function(f) f.Escalafon).
+            Include(Function(f) f.Funcion).
+            Include(Function(f) f.EstadoCivil).
+            Include(Function(f) f.NivelEstudio).
+            Include(Function(f) f.Genero).
+            ToListAsync()
+
+            ' 2. Transformamos la lista de entidades a una lista de DTOs en memoria.
+            '    Reutilizamos toda la lógica de tu función original aquí.
+            Dim dtos = funcionarios.Select(Function(f)
+                                               Dim estudia As String = If(f.Estudia, "Sí", "No")
+
+                                               Dim datosLaborales As String = JoinNonEmpty(" | ",
+                Labeled("Grado: ", f.Cargo?.Grado?.ToString()),
+                Labeled("Escalafón: ", f.Escalafon?.Nombre),
+                Labeled("Unidad: ", f.Seccion?.Nombre),
+                Labeled("Puesto de trabajo: ", f.PuestoTrabajo?.Nombre)
+            )
+
+                                               Dim situacionGeneral As String = JoinNonEmpty(" | ",
+                Labeled("Estado: ", EstadoDisplay(f.Activo)),
+                Labeled("Turno: ", f.Turno?.Nombre),
+                Labeled("Semana: ", f.Semana?.Nombre),
+                Labeled("Horario: ", f.Horario?.Nombre)
+            )
+
+                                               Dim fechaIng As Date? = f.FechaIngreso
+                                               Dim fechaIngStr As String = If(fechaIng.HasValue, fechaIng.Value.ToShortDateString(), Nothing)
+
+                                               Return New FichaFuncionalDTO With {
+                .NombreCompleto = f.Nombre,
+                .Cedula = f.CI,
+                .FechaNacimiento = f.FechaNacimiento?.ToShortDateString(),
+                .Domicilio = f.Domicilio,
+                .Telefono = f.Telefono,
+                .Correo = f.Email,
+                .EstadoCivil = f.EstadoCivil?.Nombre,
+                .NivelEstudios = f.NivelEstudio?.Nombre,
+                .FechaIngreso = fechaIngStr,
+                .Grado = f.Cargo?.Grado?.ToString(),
+                .Cargo = f.Cargo?.Nombre,
+                .Seccion = f.Seccion?.Nombre,
+                .PuestoTrabajo = f.PuestoTrabajo?.Nombre,
+                .Turno = f.Turno?.Nombre,
+                .Semana = f.Semana?.Nombre,
+                .Horario = f.Horario?.Nombre,
+                .Estado = EstadoDisplay(f.Activo),
+                .Escalafon = f.Escalafon?.Nombre,
+                .Funcion = f.Funcion?.Nombre,
+                .Foto = f.Foto,
+                .Sexo = f.Genero?.Nombre,
+                .Ciudad = f.Ciudad,
+                .Seccional = f.Seccional,
+                .Estudia = estudia,
+                .Credencial = f.Credencial,
+                .DatosLaborales = datosLaborales,
+                .SituacionGeneral = situacionGeneral
+            }
+                                           End Function).ToList()
+
+            Return dtos
+        End Using
+    End Function
     Public Sub Dispose() Implements IDisposable.Dispose
         Dispose(True)
         GC.SuppressFinalize(Me)

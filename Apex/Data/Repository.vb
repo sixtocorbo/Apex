@@ -136,4 +136,10 @@ Public Class Repository(Of T As Class)
         Return Await _dbSet.AnyAsync(predicate)
     End Function
 
+    ' AGREGA ESTA NUEVA IMPLEMENTACIÓN
+    Public Function GetQueryable() As IQueryable(Of T) Implements IRepository(Of T).GetQueryable
+        ' Devuelve el DbSet como un IQueryable para construir consultas.
+        ' Usamos AsNoTracking() porque es ideal para consultas de solo lectura (como los reportes).
+        Return _dbSet.AsNoTracking()
+    End Function
 End Class
