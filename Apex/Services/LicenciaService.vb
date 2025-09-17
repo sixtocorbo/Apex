@@ -167,120 +167,6 @@ Public Class LicenciaService
         End Using
     End Function
 
-    ' ============================================================
-    ' Consulta principal para la grilla (SQL crudo → DTO) (UoW op)
-    ' ============================================================
-
-    Public Async Function GetAllConDetallesAsync(
-        Optional filtroNombre As String = "",
-        Optional fechaDesde As Date? = Nothing,
-        Optional fechaHasta As Date? = Nothing,
-        Optional tiposLicenciaIds As List(Of Integer) = Nothing,
-        Optional soloActivos As Boolean? = Nothing
-    ) As Task(Of List(Of LicenciaConFuncionarioExtendidoDto))
-
-        Using uow As New UnitOfWork()
-
-            Dim sql As New StringBuilder()
-            Dim parameters As New List(Of SqlParameter)()
-
-            sql.AppendLine("SELECT")
-            sql.AppendLine("    h.Id              AS LicenciaId,")
-            sql.AppendLine("    h.FuncionarioId,")
-            sql.AppendLine("    tl.Id             AS TipoLicenciaId,")
-            sql.AppendLine("    tl.Nombre         AS TipoLicencia,")
-            sql.AppendLine("    h.inicio          AS FechaInicio,")
-            sql.AppendLine("    h.finaliza        AS FechaFin,")
-            sql.AppendLine("    h.estado          AS EstadoLicencia,")
-            ' --- INICIO DE LA CORRECCIÓN ---
-            sql.AppendLine("    h.Comentario      AS Observaciones,")
-            ' --- FIN DE LA CORRECCIÓN ---
-            sql.AppendLine("    f.CI,")
-            sql.AppendLine("    f.Nombre          AS NombreFuncionario,")
-            sql.AppendLine("    f.Activo,")
-            sql.AppendLine("    f.FechaIngreso,")
-            sql.AppendLine("    f.FechaNacimiento,")
-            sql.AppendLine("    f.Domicilio,")
-            sql.AppendLine("    f.Email,")
-            sql.AppendLine("    CASE WHEN f.Activo = 1 THEN 'Activo' ELSE 'Inactivo' END AS EstadoActual,")
-            sql.AppendLine("    COALESCE(c.Nombre,  'N/A') AS Cargo,")
-            sql.AppendLine("    COALESCE(tf.Nombre, 'N/A') AS TipoDeFuncionario,")
-            sql.AppendLine("    COALESCE(ecl.Nombre,'N/A') AS Escalafon,")
-            sql.AppendLine("    COALESCE(fun.Nombre,'N/A') AS Funcion,")
-            sql.AppendLine("    COALESCE(sec.Nombre,'N/A') AS Seccion,")
-            sql.AppendLine("    COALESCE(pt.Nombre, 'N/A') AS PuestoDeTrabajo,")
-            sql.AppendLine("    COALESCE(tur.Nombre,'N/A') AS Turno,")
-            sql.AppendLine("    COALESCE(sem.Nombre,'N/A') AS Semana,")
-            sql.AppendLine("    COALESCE(hor.Nombre,'N/A') AS Horario,")
-            sql.AppendLine("    COALESCE(gen.Nombre,'N/A') AS Genero,")
-            sql.AppendLine("    COALESCE(ec.Nombre, 'N/A') AS EstadoCivil,")
-            sql.AppendLine("    COALESCE(ne.Nombre, 'N/A') AS NivelDeEstudio")
-            sql.AppendLine("FROM dbo.HistoricoLicencia h")
-            sql.AppendLine("JOIN dbo.Funcionario f ON f.Id = h.FuncionarioId")
-            sql.AppendLine("JOIN dbo.TipoLicencia tl ON tl.Id = h.TipoLicenciaId")
-            sql.AppendLine("LEFT JOIN dbo.Cargo c             ON c.Id = f.CargoId")
-            sql.AppendLine("LEFT JOIN dbo.TipoFuncionario tf  ON tf.Id = f.TipoFuncionarioId")
-            sql.AppendLine("LEFT JOIN dbo.Escalafon ecl       ON ecl.Id = f.EscalafonId")
-            sql.AppendLine("LEFT JOIN dbo.Funcion fun         ON fun.Id = f.FuncionId")
-            sql.AppendLine("LEFT JOIN dbo.Seccion sec         ON sec.Id = f.SeccionId")
-            sql.AppendLine("LEFT JOIN dbo.PuestoTrabajo pt    ON pt.Id = f.PuestoTrabajoId")
-            sql.AppendLine("LEFT JOIN dbo.Turno tur           ON tur.Id = f.TurnoId")
-            sql.AppendLine("LEFT JOIN dbo.Semana sem          ON sem.Id = f.SemanaId")
-            sql.AppendLine("LEFT JOIN dbo.Horario hor         ON hor.Id = f.HorarioId")
-            sql.AppendLine("LEFT JOIN dbo.Genero gen          ON gen.Id = f.GeneroId")
-            sql.AppendLine("LEFT JOIN dbo.EstadoCivil ec      ON ec.Id = f.EstadoCivilId")
-            sql.AppendLine("LEFT JOIN dbo.NivelEstudio ne     ON ne.Id = f.NivelEstudioId")
-            sql.AppendLine("WHERE 1 = 1")
-
-            ' Rango fechas
-            If fechaDesde.HasValue Then
-                sql.AppendLine("  AND h.finaliza >= @fechaDesde")
-                parameters.Add(New SqlParameter("@fechaDesde", fechaDesde.Value))
-            End If
-            If fechaHasta.HasValue Then
-                sql.AppendLine("  AND h.inicio <= @fechaHasta")
-                parameters.Add(New SqlParameter("@fechaHasta", fechaHasta.Value))
-            End If
-
-            ' FTS sobre Funcionario (Nombre, CI)
-            If Not String.IsNullOrWhiteSpace(filtroNombre) Then
-                Dim terminos = filtroNombre.Split({" "c}, StringSplitOptions.RemoveEmptyEntries).
-                    Select(Function(w) $"""{w}*""")
-                Dim expresionFts As String = String.Join(" AND ", terminos)
-                sql.AppendLine("  AND CONTAINS((f.Nombre, f.CI), @fts)")
-                parameters.Add(New SqlParameter("@fts", expresionFts))
-            End If
-
-            ' Filtro por tipos de licencia
-            If tiposLicenciaIds IsNot Nothing AndAlso tiposLicenciaIds.Any() Then
-                Dim idParams = New List(Of String)()
-                For Each id In tiposLicenciaIds
-                    Dim paramName = "@tipoId" & parameters.Count
-                    idParams.Add(paramName)
-                    parameters.Add(New SqlParameter(paramName, id))
-                Next
-                sql.AppendLine("  AND tl.Id IN (" & String.Join(",", idParams) & ")")
-            End If
-
-            ' Activos / Inactivos
-            If soloActivos.HasValue Then
-                sql.AppendLine("  AND f.Activo = @activo")
-                parameters.Add(New SqlParameter("@activo", soloActivos.Value))
-            End If
-
-            sql.AppendLine("ORDER BY h.inicio DESC")
-
-            Dim query = uow.Context.Database.SqlQuery(Of LicenciaConFuncionarioExtendidoDto)(
-                sql.ToString(), parameters.ToArray()
-            )
-            Return Await query.ToListAsync()
-        End Using
-    End Function
-
-    ' ============================================================
-    ' Catálogos / Combos (UoW op)
-    ' ============================================================
-
     Public Function GetAllTiposLicencia() As List(Of TipoLicencia)
         Using context As New ApexEntities()
             Return context.TipoLicencia.OrderBy(Function(tl) tl.Nombre).ToList()
@@ -460,45 +346,43 @@ Public Class LicenciaService
     ''' Los filtros adicionales (nombre, tipo, etc.) se aplican en memoria sobre el conjunto de datos ya reducido.
     ''' </summary>
     Public Async Function GetAllConDetallesAsync(
-        Optional filtroNombre As String = "",
-        Optional fechaDesde As Date? = Nothing,
-        Optional fechaHasta As Date? = Nothing,
-        Optional tiposLicenciaIds As List(Of Integer) = Nothing,
-        Optional soloActivos As Boolean? = Nothing
-    ) As Task(Of List(Of LicenciaConFuncionarioExtendidoDto))
+    Optional filtroNombre As String = "",
+    Optional fechaDesde As Date? = Nothing,
+    Optional fechaHasta As Date? = Nothing,
+    Optional tiposLicenciaIds As List(Of Integer) = Nothing,
+    Optional soloActivos As Boolean? = Nothing
+) As Task(Of List(Of LicenciaConFuncionarioExtendidoDto))
 
         Using uow As New UnitOfWork()
-            ' Si no se proveen fechas, usamos un rango por defecto amplio para asegurar que traemos datos.
+            ' Si no se proveen fechas, usamos un rango por defecto amplio.
             Dim fechaInicio As Date = If(fechaDesde.HasValue, fechaDesde.Value, New Date(1900, 1, 1))
             Dim fechaFinal As Date = If(fechaHasta.HasValue, fechaHasta.Value, New Date(2100, 1, 1))
 
-            ' 1. Llamada única y optimizada a la base de datos
-            Dim paramFechaInicio = New SqlParameter("@FechaInicio", SqlDbType.Date) With {.Value = fechaInicio}
-            Dim paramFechaFin = New SqlParameter("@FechaFin", SqlDbType.Date) With {.Value = fechaFinal}
+            ' 1. Preparamos los parámetros para el procedimiento almacenado
+            ' 1. Preparamos los parámetros para el procedimiento almacenado
+            Dim parameters As New List(Of SqlParameter) From {
+    New SqlParameter("@FechaInicio", SqlDbType.Date) With {.Value = fechaInicio},
+    New SqlParameter("@FechaFin", SqlDbType.Date) With {.Value = fechaFinal},
+    New SqlParameter("@FiltroNombre", SqlDbType.NVarChar) With {
+        .Value = If(Not String.IsNullOrWhiteSpace(filtroNombre), filtroNombre, CType(DBNull.Value, Object))
+    },
+    New SqlParameter("@TiposLicenciaIds", SqlDbType.VarChar, -1) With {
+        .Value = If(tiposLicenciaIds IsNot Nothing AndAlso tiposLicenciaIds.Any(), String.Join(",", tiposLicenciaIds), CType(DBNull.Value, Object))
+    },
+    New SqlParameter("@SoloActivos", SqlDbType.Bit) With {
+        .Value = If(soloActivos.HasValue, CType(soloActivos.Value, Object), CType(DBNull.Value, Object))
+    }
+}
 
+            ' 2. Llamada ÚNICA y OPTIMIZADA a la base de datos
+            ' El procedimiento ahora hace todo el filtrado por nosotros.
             Dim licencias = Await uow.Context.Database.SqlQuery(Of LicenciaConFuncionarioExtendidoDto)(
-                "EXEC usp_Filtros_ObtenerLicenciasPorFecha @FechaInicio, @FechaFin",
-                paramFechaInicio,
-                paramFechaFin
-            ).ToListAsync()
+            "EXEC usp_Filtros_ObtenerLicenciasPorFecha @FechaInicio, @FechaFin, @FiltroNombre, @TiposLicenciaIds, @SoloActivos",
+            parameters.ToArray()
+        ).ToListAsync()
 
-            ' 2. Aplicar filtros adicionales en memoria (sobre un set de datos ya pequeño)
-            Dim query = licencias.AsQueryable()
-
-            If Not String.IsNullOrWhiteSpace(filtroNombre) Then
-                query = query.Where(Function(l) l.NombreFuncionario.IndexOf(filtroNombre, StringComparison.OrdinalIgnoreCase) >= 0 OrElse
-                                                  l.CI.IndexOf(filtroNombre, StringComparison.OrdinalIgnoreCase) >= 0)
-            End If
-
-            If tiposLicenciaIds IsNot Nothing AndAlso tiposLicenciaIds.Any() Then
-                query = query.Where(Function(l) l.TipoLicenciaId.HasValue AndAlso tiposLicenciaIds.Contains(l.TipoLicenciaId.Value))
-            End If
-
-            If soloActivos.HasValue Then
-                query = query.Where(Function(l) l.Activo = soloActivos.Value)
-            End If
-
-            Return query.ToList()
+            ' 3. ¡YA NO HAY FILTRADO EN MEMORIA! Devolvemos el resultado directamente.
+            Return licencias
         End Using
     End Function
 End Class
