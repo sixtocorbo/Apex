@@ -3,7 +3,6 @@ Option Strict On
 Option Explicit On
 
 Imports System.Data.Entity
-Imports System.Threading.Tasks
 
 Public Class TurnoService
     Inherits GenericService(Of Turno)

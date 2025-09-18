@@ -1,9 +1,6 @@
 ﻿Option Strict On
 Option Explicit On
 
-Imports System.Threading.Tasks
-Imports System.Windows.Forms
-
 Public Class frmLicencias
 
     Private ReadOnly _licenciaSvc As New LicenciaService()

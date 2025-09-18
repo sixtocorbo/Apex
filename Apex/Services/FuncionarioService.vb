@@ -4,7 +4,6 @@ Option Explicit On
 
 Imports System.Data.Entity
 Imports System.Data.SqlClient
-Imports System.Linq
 
 Public Class EstadisticaItem
     Public Property Etiqueta As String

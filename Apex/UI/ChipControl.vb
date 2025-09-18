@@ -1,8 +1,6 @@
 ﻿' Apex/Services/ChipControl.vb
 Option Strict On
 Option Explicit On
-Imports System.Drawing
-Imports System.Windows.Forms
 Imports Apex.frmFiltros
 
 Public Class ChipControl

@@ -1,5 +1,4 @@
 ﻿Imports System.Data.Entity
-Imports System.Windows.Forms
 
 Public Class frmNomenclaturas
     Private _unitOfWork As New UnitOfWork()

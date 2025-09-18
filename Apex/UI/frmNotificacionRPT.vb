@@ -1,6 +1,4 @@
-﻿Imports System.Collections.Generic
-Imports System.IO
-Imports System.Windows.Forms
+﻿Imports System.IO
 Imports Microsoft.Reporting.WinForms
 
 ''' <summary>

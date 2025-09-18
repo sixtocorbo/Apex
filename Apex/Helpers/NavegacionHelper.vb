@@ -1,8 +1,5 @@
 ﻿' /Modules/NavegacionHelper.vb
 
-Imports System.Windows.Forms
-Imports System.Linq
-
 Public Module NavegacionHelper
 
     ''' <summary>

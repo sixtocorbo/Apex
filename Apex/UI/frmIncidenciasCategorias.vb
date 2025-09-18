@@ -1,6 +1,5 @@
 ﻿' Apex/UI/frmGestionCategoriasAusencia.vb
 Imports System.ComponentModel
-Imports System.Windows.Forms
 
 Public Class frmIncidenciasCategorias
 

@@ -1,5 +1,4 @@
 ﻿' Apex/UI/frmSancionCrear.vb
-Imports System.Data.Entity
 
 Public Class frmSancionCrear
 

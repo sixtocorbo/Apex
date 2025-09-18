@@ -1,11 +1,5 @@
 ﻿' /UI/frmDashboard.vb
 
-Imports System.Data.Entity
-Imports System.Drawing
-Imports System.Threading.Tasks
-Imports System.Windows.Forms
-Imports System.Linq
-
 Public Class frmDashboard
     Inherits Form
 

@@ -1,7 +1,5 @@
-﻿Imports System.Drawing
-Imports System.Drawing.Drawing2D
+﻿Imports System.Drawing.Drawing2D
 Imports System.Runtime.InteropServices
-Imports System.Windows.Forms
 
 Public Enum ToastType
     Info

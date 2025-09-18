@@ -1,7 +1,5 @@
 ﻿Option Strict On
 Option Explicit On
-
-Imports System.Data.Entity
 Imports System.Data.SqlClient
 Imports System.Text
 

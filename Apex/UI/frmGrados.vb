@@ -1,8 +1,5 @@
 ﻿' Apex/UI/frmGestionCargos.vb
-Imports System.Data.Entity
-Imports System.Windows.Forms
 Imports System.ComponentModel
-Imports System.Threading.Tasks
 
 Public Class frmGrados
 

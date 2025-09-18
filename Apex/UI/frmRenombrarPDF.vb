@@ -1,9 +1,5 @@
 ﻿Imports System.Data.Entity
 Imports System.IO
-Imports System.Linq
-Imports System.Threading.Tasks
-Imports System.Windows.Forms
-Imports AxAcroPDFLib ' Asegúrate de tener la referencia a Adobe Acrobat Reader en tu proyecto
 
 Public Class frmRenombrarPDF
     Inherits Form

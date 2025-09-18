@@ -1,5 +1,4 @@
 ﻿' NotifierShim.vb
-Imports System.Windows.Forms
 
 ' Mantiene compatibilidad con todas las llamadas antiguas Notifier.*
 ' Delegando al nuevo Toast (o a tu ToastNotifier dentro de un namespace).

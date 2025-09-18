@@ -1,6 +1,5 @@
 ﻿' Apex/UI/frmGestionTurnos.vb
 Imports System.ComponentModel
-Imports System.Windows.Forms
 
 Public Class frmTurnos
 

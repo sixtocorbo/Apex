@@ -2,8 +2,6 @@
 Option Explicit On
 
 Imports System.Data.Entity
-Imports System.Linq
-Imports System.Threading.Tasks
 
 Public Class ReportesService
     Implements IDisposable

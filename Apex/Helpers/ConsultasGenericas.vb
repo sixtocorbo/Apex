@@ -1,9 +1,6 @@
 ﻿' Apex/Services/ConsultasGenericas.vb
-Imports System.Data
 Imports System.Data.Entity
-Imports System.Linq
 Imports System.Linq.Expressions
-Imports System.Threading.Tasks
 Public Module ConsultasGenericas
 
 

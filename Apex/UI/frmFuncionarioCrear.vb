@@ -4,9 +4,7 @@ Option Explicit On
 Imports System.ComponentModel
 Imports System.Data.Entity
 Imports System.IO
-Imports System.Linq
 Imports System.Linq.Expressions
-Imports System.Text
 
 Public Class frmFuncionarioCrear
     Inherits Form

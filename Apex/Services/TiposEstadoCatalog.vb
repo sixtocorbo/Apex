@@ -5,7 +5,6 @@ Option Explicit On
 Imports System.Collections.ObjectModel
 Imports System.Data.Entity
 Imports System.Globalization
-Imports System.Linq
 Imports System.Text
 
 Public NotInheritable Class TiposEstadoCatalog

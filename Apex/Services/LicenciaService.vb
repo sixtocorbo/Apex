@@ -4,8 +4,6 @@ Option Explicit On
 
 Imports System.Data.Entity
 Imports System.Data.SqlClient
-Imports System.Text
-Imports System.Linq
 
 ' ---- Clases auxiliares ----
 Public Class LicenciaEstacional

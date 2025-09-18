@@ -1,6 +1,4 @@
-﻿Imports System.Data.Entity
-
-Public Class frmSanciones
+﻿Public Class frmSanciones
 
     Private ReadOnly _svc As New SancionService()
     Private WithEvents SearchTimer As New System.Windows.Forms.Timer()

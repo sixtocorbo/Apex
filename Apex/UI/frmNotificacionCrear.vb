@@ -1,8 +1,6 @@
 ﻿Option Strict On
 Option Explicit On
 
-Imports System.Data.Entity
-
 Public Class frmNotificacionCrear
 
     Private _svc As NotificacionService

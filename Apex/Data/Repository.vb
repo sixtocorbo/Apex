@@ -1,5 +1,4 @@
 ﻿Imports System.Data.Entity
-Imports System.Data.Entity.Infrastructure
 Imports System.Linq.Expressions
 
 Public Class Repository(Of T As Class)

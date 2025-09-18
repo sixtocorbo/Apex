@@ -3,7 +3,6 @@ Option Explicit On
 
 Imports System.Data.Entity
 Imports System.Data.SqlClient
-Imports System.Text
 
 Public Class ResultadoMasivo
     Public Property Creadas As Integer

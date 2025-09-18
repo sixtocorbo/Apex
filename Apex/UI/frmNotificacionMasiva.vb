@@ -1,5 +1,4 @@
 ﻿Imports System.ComponentModel
-Imports System.Data.Entity
 
 Public Class frmNotificacionMasiva
     Private ReadOnly _svc As New NotificacionService()

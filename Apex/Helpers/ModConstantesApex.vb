@@ -2,7 +2,6 @@
 Option Infer On
 Imports System.Globalization
 Imports System.Text
-Imports System.Linq
 
 Public Module ModConstantesApex
 #Region "Tipos de Estado Transitorio (IDs de BD)"

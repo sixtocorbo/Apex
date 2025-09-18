@@ -1,6 +1,4 @@
-﻿Imports System.ComponentModel
-
-Public Class frmConfiguracion
+﻿Public Class frmConfiguracion
 
     Private Sub frmConfiguracion_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)

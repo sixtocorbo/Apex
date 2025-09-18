@@ -1,6 +1,4 @@
-﻿Imports System.Data.Entity
-
-Public Class frmEstadosTransitoriosGeneral
+﻿Public Class frmEstadosTransitoriosGeneral
     Private _unitOfWork As IUnitOfWork
 
     Public Sub New(uow As IUnitOfWork)

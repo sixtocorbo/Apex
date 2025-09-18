@@ -5,7 +5,6 @@ Imports System.Data.Entity
 Imports System.Data.SqlClient
 Imports System.IO
 Imports System.Text
-Imports System.Linq
 
 Public Class NovedadService
     Inherits GenericService(Of Novedad)

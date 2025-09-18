@@ -1,7 +1,4 @@
-﻿Imports System.Drawing
-Imports System.Windows.Forms
-
-Public Module LoadingHelper
+﻿Public Module LoadingHelper
 
     ' Panel con semitransparencia real y doble buffer.
     Private NotInheritable Class OverlayPanel

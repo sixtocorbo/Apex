@@ -2,9 +2,6 @@
 Option Strict On
 Option Explicit On
 
-Imports System.Threading.Tasks
-Imports System.Windows.Forms
-
 ' NOTA:
 ' - Esta clase NO es MustInherit para que el diseñador no falle.
 ' - Suscribe a dos canales:

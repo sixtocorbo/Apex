@@ -2,7 +2,6 @@
 Option Explicit On
 
 Imports System.ComponentModel
-Imports System.Windows.Forms
 
 Public Class frmNotificaciones
     Private ReadOnly _svc As New NotificacionService()

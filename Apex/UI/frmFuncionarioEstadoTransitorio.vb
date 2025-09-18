@@ -1,6 +1,4 @@
 ﻿Imports System.IO
-Imports System.Linq
-Imports System.Data.Entity
 
 Public Class frmFuncionarioEstadoTransitorio
 

@@ -1,6 +1,4 @@
 ﻿' Apex/UI/frmNovedades.vb
-Imports System.ComponentModel
-Imports System.Data.Entity
 Imports System.IO
 
 Public Class frmNovedades

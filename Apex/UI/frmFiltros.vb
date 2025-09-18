@@ -2,14 +2,8 @@
 Option Explicit On
 
 Imports System.ComponentModel
-Imports System.Data
 Imports System.Globalization
-Imports System.IO
 Imports System.Text
-Imports Microsoft.Reporting.WinForms
-Imports System.Linq
-Imports System.Threading.Tasks
-Imports System.Diagnostics
 
 Partial Public Class frmFiltros
     Inherits FormActualizable
@@ -40,7 +34,7 @@ Partial Public Class frmFiltros
             End If
         End Function
 
-        Private Shared Function EscapeSqlLike(s As String) As String
+        Private Shared Function EscapeStringLiteral(s As String) As String
             Return s.Replace("'", "''")
         End Function
 
@@ -51,7 +45,7 @@ Partial Public Class frmFiltros
             If Double.TryParse(valor, NumberStyles.Any, CultureInfo.InvariantCulture, Nothing) Then
                 Return valor
             End If
-            Return $"'{EscapeSqlLike(valor)}'"
+            Return $"'{EscapeStringLiteral(valor)}'"
         End Function
 
         Public Function ToRowFilter() As String
@@ -139,7 +133,6 @@ Partial Public Class frmFiltros
 
         ' Placeholder
         Try : AppTheme.SetCue(txtBusquedaGlobal, "Buscar en todos los campos…") : Catch : End Try
-        Try : AppTheme.SetCue(txtBuscarValor, "Filtrar valores…") : Catch : End Try
 
         ' Atajos
         Me.AcceptButton = btnFiltrar
@@ -299,10 +292,6 @@ Partial Public Class frmFiltros
         AplicarFiltros()
     End Sub
 
-    Private Sub txtBuscarValor_TextChanged(sender As Object, e As EventArgs) Handles txtBuscarValor.TextChanged
-        ActualizarListaDeValores()
-    End Sub
-
     Private Sub btnFiltrar_Click(sender As Object, e As EventArgs) Handles btnFiltrar.Click
         If lstColumnas.SelectedItem Is Nothing OrElse lstValores.SelectedItems.Count = 0 Then Return
 
@@ -425,7 +414,6 @@ Partial Public Class frmFiltros
         _dvDatos = Nothing
         lstColumnas.Items.Clear()
         lstValores.Items.Clear()
-        txtBuscarValor.Clear()
         LimpiarFiltrosYChips()
         UpdateUIState()
     End Sub
@@ -437,30 +425,42 @@ Partial Public Class frmFiltros
     End Sub
 
     Private Sub ActualizarListaDeValores()
+        ' Inicia la actualización para mejorar el rendimiento y evitar parpadeos
         lstValores.BeginUpdate()
         lstValores.Items.Clear()
 
+        ' Si no hay una columna seleccionada o no hay datos, no hace nada
         If lstColumnas.SelectedItem Is Nothing OrElse _dvDatos Is Nothing Then
             lstValores.EndUpdate()
             Return
         End If
 
+        ' Obtiene el nombre de la columna seleccionada
         Dim colName = lstColumnas.SelectedItem.ToString()
+
+        ' Crea una tabla temporal solo con los valores únicos de esa columna,
+        ' respetando los filtros ya aplicados en el DataView (_dvDatos)
         Dim dtValoresUnicos As DataTable = _dvDatos.ToTable(True, colName)
 
-        Dim filtro As String = txtBuscarValor.Text.Trim()
-
+        ' Usando LINQ, convierte la tabla a una lista de strings:
+        ' 1. Selecciona el valor de cada fila.
+        ' 2. Filtra los valores nulos o vacíos.
+        ' 3. Convierte el valor a String.
+        ' 4. Ordena la lista alfabéticamente.
         Dim valoresUnicos = dtValoresUnicos.AsEnumerable().
-                            Select(Function(r) r.Field(Of Object)(colName)).
-                            Where(Function(v) v IsNot Nothing AndAlso Not String.IsNullOrWhiteSpace(v.ToString())).
-                            Select(Function(v) v.ToString()).
-                            Where(Function(s) If(filtro = "", True, s.IndexOf(filtro, StringComparison.CurrentCultureIgnoreCase) >= 0)).
-                            OrderBy(Function(s) s, StringComparer.CurrentCultureIgnoreCase).
-                            ToArray()
+                          Select(Function(r) r.Field(Of Object)(colName)).
+                          Where(Function(v) v IsNot Nothing AndAlso Not String.IsNullOrWhiteSpace(v.ToString())).
+                          Select(Function(v) v.ToString()).
+                          OrderBy(Function(s) s, StringComparer.CurrentCultureIgnoreCase).
+                          ToArray()
 
+        ' Agrega todos los valores únicos a la lista
         lstValores.Items.AddRange(valoresUnicos)
+
+        ' Finaliza la actualización y muestra los cambios
         lstValores.EndUpdate()
 
+        ' Ajusta la barra de scroll horizontal si el texto es muy largo
         AjustarHorizontalScrollbar(lstValores)
     End Sub
 
@@ -529,7 +529,8 @@ Partial Public Class frmFiltros
             Dim setCorreos As New HashSet(Of String)(StringComparer.OrdinalIgnoreCase)
 
             For Each rv As DataRowView In _dvDatos
-                Dim raw As String = If(TryCast(rv(colCorreo), String), "").Trim()
+                ' Opción más clara y robusta
+                Dim raw As String = Convert.ToString(rv(colCorreo)).Trim()
                 If raw = "" Then Continue For
 
                 For Each correo In ExtractEmails(raw)

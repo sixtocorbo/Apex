@@ -1,6 +1,5 @@
 ﻿' Apex/UI/frmGestionSecciones.vb
 Imports System.ComponentModel
-Imports System.Windows.Forms
 
 Public Class frmSecciones
 

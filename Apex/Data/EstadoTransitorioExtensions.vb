@@ -1,8 +1,8 @@
 ﻿Option Strict On
 Option Explicit On
 
-Imports System.Runtime.CompilerServices
 Imports System.Reflection
+Imports System.Runtime.CompilerServices
 
 Public Module EstadoTransitorioExtensions
 

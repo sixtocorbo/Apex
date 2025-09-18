@@ -1,10 +1,8 @@
 ﻿' Apex/UI/frmAsistenteImportacion.vb
 Imports System.Configuration
-Imports System.Data
 Imports System.Data.Entity.Core.EntityClient
 Imports System.Data.SqlClient
 Imports System.IO
-Imports System.Threading
 Imports ExcelDataReader
 
 Public Class frmAsistenteImportacion

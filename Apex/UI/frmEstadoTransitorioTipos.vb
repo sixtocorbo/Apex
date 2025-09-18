@@ -1,6 +1,5 @@
 ﻿' Apex/UI/frmGestionTiposEstadoTransitorio.vb
 Imports System.ComponentModel
-Imports System.Windows.Forms
 
 Public Class frmEstadoTransitorioTipos
 

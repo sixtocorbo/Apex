@@ -3,8 +3,6 @@ Option Strict On
 Option Explicit On
 
 Imports System.Data.Entity
-Imports System.Linq
-Imports System.Threading.Tasks
 
 ' DTO para resultados
 Public Class ViaticoResultadoDTO

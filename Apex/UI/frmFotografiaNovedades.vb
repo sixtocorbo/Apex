@@ -1,5 +1,4 @@
 ﻿' Apex/UI/frmVisorFoto.vb
-Imports System.Drawing
 
 Public Class frmFotografiaNovedades
 

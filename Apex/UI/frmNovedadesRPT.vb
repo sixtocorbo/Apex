@@ -1,6 +1,5 @@
-﻿Imports Microsoft.Reporting.WinForms
-Imports System.IO
-Imports System.Linq
+﻿Imports System.IO
+Imports Microsoft.Reporting.WinForms
 
 Public Class frmNovedadesRPT
 
