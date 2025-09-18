@@ -280,18 +280,45 @@ Public Class LicenciaService
     ''' Este método ahora es mucho más rápido porque depende del GetAllConDetallesAsync refactorizado.
     ''' </summary>
     Public Async Function GetVigentesHoyAsync(
-        Optional filtroNombre As String = "",
-        Optional tiposLicenciaIds As List(Of Integer) = Nothing,
-        Optional soloActivos As Boolean? = True
-    ) As Task(Of List(Of LicenciaConFuncionarioExtendidoDto))
+    Optional filtroNombre As String = "",
+    Optional tiposLicenciaIds As List(Of Integer) = Nothing,
+    Optional soloActivos As Boolean? = True
+) As Task(Of List(Of LicenciaConFuncionarioExtendidoDto))
         Dim hoy As Date = Date.Today
-        Return Await GetAllConDetallesAsync(
-            filtroNombre:=filtroNombre,
-            fechaDesde:=hoy,
-            fechaHasta:=hoy,
-            tiposLicenciaIds:=tiposLicenciaIds,
-            soloActivos:=soloActivos
-        )
+
+        Using uow As New UnitOfWork()
+            Dim query = uow.Repository(Of HistoricoLicencia)().GetAll().AsNoTracking().Where(Function(l) l.inicio <= hoy AndAlso l.finaliza >= hoy)
+
+            If Not String.IsNullOrWhiteSpace(filtroNombre) Then
+                query = query.Where(Function(h) h.Funcionario.Nombre.Contains(filtroNombre) OrElse h.Funcionario.CI.Contains(filtroNombre))
+            End If
+
+            If tiposLicenciaIds IsNot Nothing AndAlso tiposLicenciaIds.Any() Then
+                query = query.Where(Function(h) tiposLicenciaIds.Contains(h.TipoLicenciaId))
+            End If
+
+            'If soloActivos.HasValue AndAlso soloActivos.Value Then
+            '    query = query.Where(Function(h) h.Funcionario.Activo)
+            'End If
+
+            Return Await query.Select(Function(h) New LicenciaConFuncionarioExtendidoDto With {
+            .LicenciaId = h.Id,
+            .FuncionarioId = h.FuncionarioId,
+            .TipoLicenciaId = h.TipoLicenciaId,
+            .TipoLicencia = h.TipoLicencia.Nombre,
+            .FechaInicio = h.inicio,
+            .FechaFin = h.finaliza,
+            .EstadoLicencia = h.estado,
+            .Observaciones = h.Comentario,
+            .CI = h.Funcionario.CI,
+            .NombreFuncionario = h.Funcionario.Nombre,
+            .Activo = h.Funcionario.Activo,
+            .EstadoActual = If(h.Funcionario.Activo, "Activo", "Inactivo"),
+            .Cargo = If(h.Funcionario.Cargo IsNot Nothing, h.Funcionario.Cargo.Nombre, "N/A"),
+            .Escalafon = If(h.Funcionario.Escalafon IsNot Nothing, h.Funcionario.Escalafon.Nombre, "N/A"),
+            .Seccion = If(h.Funcionario.Seccion IsNot Nothing, h.Funcionario.Seccion.Nombre, "N/A")
+        }).OrderByDescending(Function(r) r.FechaInicio).ToListAsync()
+        End Using
     End Function
 
 
@@ -358,7 +385,6 @@ Public Class LicenciaService
             Dim fechaInicio As Date = If(fechaDesde.HasValue, fechaDesde.Value, New Date(1900, 1, 1))
             Dim fechaFinal As Date = If(fechaHasta.HasValue, fechaHasta.Value, New Date(2100, 1, 1))
 
-            ' 1. Preparamos los parámetros para el procedimiento almacenado
             ' 1. Preparamos los parámetros para el procedimiento almacenado
             Dim parameters As New List(Of SqlParameter) From {
     New SqlParameter("@FechaInicio", SqlDbType.Date) With {.Value = fechaInicio},

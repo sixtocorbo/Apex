@@ -142,4 +142,17 @@ Public Class Repository(Of T As Class)
         ' Usamos AsNoTracking() porque es ideal para consultas de solo lectura (como los reportes).
         Return _dbSet.AsNoTracking()
     End Function
+    Public Function GetQueryable(Optional includeProperties As String = "",
+                             Optional tracking As Boolean = False) As IQueryable(Of T) _
+                             Implements IRepository(Of T).GetQueryable
+        Dim q As IQueryable(Of T) = If(tracking, _dbSet.AsQueryable(), _dbSet.AsNoTracking())
+        If Not String.IsNullOrWhiteSpace(includeProperties) Then
+            For Each prop In includeProperties.Split({","c, ";"c}, StringSplitOptions.RemoveEmptyEntries).
+                                               Select(Function(p) p.Trim()).
+                                               Distinct(StringComparer.Ordinal)
+                q = q.Include(prop)
+            Next
+        End If
+        Return q
+    End Function
 End Class
