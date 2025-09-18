@@ -336,6 +336,9 @@
     <Compile Include="DataBase\OrdenCincoDetalle.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
+    <Compile Include="DataBase\PrestadorSalud.vb">
+      <DependentUpon>Model1.tt</DependentUpon>
+    </Compile>
     <Compile Include="DataBase\ProcesadoDetalle.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
@@ -379,6 +382,12 @@
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="DataBase\sp_helpdiagrams_Result.vb">
+      <DependentUpon>Model1.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataBase\SubDireccion.vb">
+      <DependentUpon>Model1.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataBase\SubEscalafon.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="DataBase\SumarioDetalle.vb">

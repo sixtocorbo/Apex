@@ -40,6 +40,9 @@ Partial Public Class Funcionario
     Public Property Credencial As String
     Public Property Seccional As String
     Public Property Estudia As Boolean
+    Public Property SubDireccionId As Nullable(Of Integer)
+    Public Property SubEscalafonId As Nullable(Of Integer)
+    Public Property PrestadorSaludId As Nullable(Of Integer)
 
     Public Overridable Property Cargo As Cargo
     Public Overridable Property Escalafon As Escalafon
@@ -56,6 +59,9 @@ Partial Public Class Funcionario
     Public Overridable Property Semana As Semana
     Public Overridable Property Turno As Turno
     Public Overridable Property FuncionarioFotoHistorico As ICollection(Of FuncionarioFotoHistorico) = New HashSet(Of FuncionarioFotoHistorico)
+    Public Overridable Property PrestadorSalud As PrestadorSalud
+    Public Overridable Property SubDireccion As SubDireccion
+    Public Overridable Property SubEscalafon As SubEscalafon
     Public Overridable Property TipoFuncionario As TipoFuncionario
     Public Overridable Property FuncionarioArma As ICollection(Of FuncionarioArma) = New HashSet(Of FuncionarioArma)
     Public Overridable Property FuncionarioChaleco As ICollection(Of FuncionarioChaleco) = New HashSet(Of FuncionarioChaleco)

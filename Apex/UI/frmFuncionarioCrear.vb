@@ -97,6 +97,9 @@ Public Class frmFuncionarioCrear
             AppTheme.SetCue(cboTurno, "Seleccione un turno")
             AppTheme.SetCue(cboSemana, "Seleccione una semana")
             AppTheme.SetCue(cboHorario, "Seleccione un horario")
+            AppTheme.SetCue(cboSubDireccion, "Seleccione una subdirección")
+            AppTheme.SetCue(cboSubEscalafon, "Seleccione un subescalafón")
+            AppTheme.SetCue(cboPrestadorSalud, "Seleccione un prestador de salud")
 
         Catch
             ' Ignorar si no existe SetCue
@@ -159,6 +162,9 @@ Public Class frmFuncionarioCrear
         SetSelectedOrNone(cboTurno, _funcionario.TurnoId)
         SetSelectedOrNone(cboSemana, _funcionario.SemanaId)
         SetSelectedOrNone(cboHorario, _funcionario.HorarioId)
+        SetSelectedOrNone(cboSubDireccion, _funcionario.SubDireccionId)
+        SetSelectedOrNone(cboSubEscalafon, _funcionario.SubEscalafonId)
+        SetSelectedOrNone(cboPrestadorSalud, _funcionario.PrestadorSaludId)
 
         ' Foto
         If _funcionario.Foto IsNot Nothing AndAlso _funcionario.Foto.Length > 0 Then
@@ -531,6 +537,9 @@ Public Class frmFuncionarioCrear
         _funcionario.Seccional = txtSeccional.Text.Trim()
         _funcionario.Credencial = txtCredencial.Text.Trim()
         _funcionario.Estudia = chkEstudia.Checked
+        _funcionario.SubDireccionId = If(cboSubDireccion.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboSubDireccion.SelectedValue))
+        _funcionario.SubEscalafonId = If(cboSubEscalafon.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboSubEscalafon.SelectedValue))
+        _funcionario.PrestadorSaludId = If(cboPrestadorSalud.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboPrestadorSalud.SelectedValue))
         If Not String.IsNullOrWhiteSpace(_rutaFotoSeleccionada) Then _funcionario.Foto = File.ReadAllBytes(_rutaFotoSeleccionada)
     End Sub
 
@@ -875,6 +884,9 @@ Public Class frmFuncionarioCrear
         cboCargo.SelectedIndex = -1 : cboEscalafon.SelectedIndex = -1 : cboFuncion.SelectedIndex = -1
         cboEstadoCivil.SelectedIndex = -1 : cboGenero.SelectedIndex = -1 : cboNivelEstudio.SelectedIndex = -1
         cboTurno.SelectedIndex = -1 : cboSemana.SelectedIndex = -1 : cboHorario.SelectedIndex = -1
+        cboSubDireccion.DataSource = Await _svc.ObtenerSubDireccionesAsync() : cboSubDireccion.DisplayMember = "Value" : cboSubDireccion.ValueMember = "Key"
+        cboSubEscalafon.DataSource = Await _svc.ObtenerSubEscalafonesAsync() : cboSubEscalafon.DisplayMember = "Value" : cboSubEscalafon.ValueMember = "Key"
+        cboPrestadorSalud.DataSource = Await _svc.ObtenerPrestadoresSaludAsync() : cboPrestadorSalud.DisplayMember = "Value" : cboPrestadorSalud.ValueMember = "Key"
     End Function
 
     Private Sub btnAuditoria_Click(sender As Object, e As EventArgs) Handles btnAuditoria.Click

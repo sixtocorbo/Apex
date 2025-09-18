@@ -87,6 +87,9 @@ Public Class FuncionarioService
                     .Cargo = If(f.Cargo IsNot Nothing, f.Cargo.Nombre, "N/A"),
                     .TipoDeFuncionario = If(f.TipoFuncionario IsNot Nothing, f.TipoFuncionario.Nombre, "N/A"),
                     .Escalafon = If(f.Escalafon IsNot Nothing, f.Escalafon.Nombre, "N/A"),
+                    .SubEscalafon = If(f.SubEscalafon IsNot Nothing, f.SubEscalafon.Nombre, "N/A"),
+                    .SubDireccion = If(f.SubDireccion IsNot Nothing, f.SubDireccion.Nombre, "N/A"),
+                    .PrestadorSalud = If(f.PrestadorSalud IsNot Nothing, f.PrestadorSalud.Nombre, "N/A"),
                     .Funcion = If(f.Funcion IsNot Nothing, f.Funcion.Nombre, "N/A"),
                     .EstadoActual = If(f.Activo, "Activo", "Inactivo"),
                     .Seccion = If(f.Seccion IsNot Nothing, f.Seccion.Nombre, "N/A"),
@@ -113,6 +116,9 @@ Public Class FuncionarioService
                 f.Cargo,
                 f.TipoDeFuncionario,
                 f.Escalafon,
+                f.SubEscalafon,
+                f.SubDireccion,
+                f.PrestadorSalud,
                 f.Funcion,
                 f.EstadoActual,
                 f.Seccion,
@@ -394,7 +400,35 @@ Public Class FuncionarioService
         ' una vez que se ha confirmado en la base de datos.
         NotificadorEventos.NotificarCambiosEnFuncionario(funcionario.Id)
     End Function
-    ' --- FIN DEL NUEVO CÓDIGO ---
+    Public Async Function ObtenerSubDireccionesAsync() As Task(Of List(Of KeyValuePair(Of Integer, String)))
+        Using uow As New UnitOfWork()
+            Dim lista = Await uow.Context.Set(Of SubDireccion)().
+                AsNoTracking().
+                OrderBy(Function(sd) sd.Nombre).
+                ToListAsync()
+            Return lista.Select(Function(sd) New KeyValuePair(Of Integer, String)(sd.Id, sd.Nombre)).ToList()
+        End Using
+    End Function
+
+    Public Async Function ObtenerPrestadoresSaludAsync() As Task(Of List(Of KeyValuePair(Of Integer, String)))
+        Using uow As New UnitOfWork()
+            Dim lista = Await uow.Context.Set(Of PrestadorSalud)().
+                AsNoTracking().
+                OrderBy(Function(ps) ps.Nombre).
+                ToListAsync()
+            Return lista.Select(Function(ps) New KeyValuePair(Of Integer, String)(ps.Id, ps.Nombre)).ToList()
+        End Using
+    End Function
+    Public Async Function ObtenerSubEscalafonesAsync() As Task(Of List(Of KeyValuePair(Of Integer, String)))
+        Using uow As New UnitOfWork()
+            Dim lista = Await uow.Context.Set(Of SubEscalafon)().
+                AsNoTracking().
+                OrderBy(Function(se) se.Nombre).
+                ToListAsync()
+            Return lista.Select(Function(se) New KeyValuePair(Of Integer, String)(se.Id, se.Nombre)).ToList()
+        End Using
+    End Function
+
     ' DTOs
     Public Class PresenciaDTO
         Public Property FuncionarioId As Integer

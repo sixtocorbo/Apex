@@ -67,6 +67,7 @@ Partial Public Class ApexEntities
     Public Overridable Property NovedadFuncionario() As DbSet(Of NovedadFuncionario)
     Public Overridable Property NovedadGenerada() As DbSet(Of NovedadGenerada)
     Public Overridable Property OrdenCincoDetalle() As DbSet(Of OrdenCincoDetalle)
+    Public Overridable Property PrestadorSalud() As DbSet(Of PrestadorSalud)
     Public Overridable Property ProcesadoDetalle() As DbSet(Of ProcesadoDetalle)
     Public Overridable Property PuestoTrabajo() As DbSet(Of PuestoTrabajo)
     Public Overridable Property ReactivacionDeFuncionarioDetalle() As DbSet(Of ReactivacionDeFuncionarioDetalle)
@@ -80,6 +81,8 @@ Partial Public Class ApexEntities
     Public Overridable Property Seccion() As DbSet(Of Seccion)
     Public Overridable Property Semana() As DbSet(Of Semana)
     Public Overridable Property SeparacionDelCargoDetalle() As DbSet(Of SeparacionDelCargoDetalle)
+    Public Overridable Property SubDireccion() As DbSet(Of SubDireccion)
+    Public Overridable Property SubEscalafon() As DbSet(Of SubEscalafon)
     Public Overridable Property SumarioDetalle() As DbSet(Of SumarioDetalle)
     Public Overridable Property sysdiagrams() As DbSet(Of sysdiagrams)
     Public Overridable Property TipoEstadoTransitorio() As DbSet(Of TipoEstadoTransitorio)
@@ -183,12 +186,18 @@ Partial Public Class ApexEntities
         Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_DeleteFuncionario", funcionarioIdParameter)
     End Function
 
-    Public Overridable Function usp_Filtros_ObtenerLicenciasPorFecha(fechaInicio As Nullable(Of Date), fechaFin As Nullable(Of Date)) As ObjectResult(Of usp_Filtros_ObtenerLicenciasPorFecha_Result)
+    Public Overridable Function usp_Filtros_ObtenerLicenciasPorFecha(fechaInicio As Nullable(Of Date), fechaFin As Nullable(Of Date), filtroNombre As String, tiposLicenciaIds As String, soloActivos As Nullable(Of Boolean)) As ObjectResult(Of usp_Filtros_ObtenerLicenciasPorFecha_Result)
         Dim fechaInicioParameter As ObjectParameter = If(fechaInicio.HasValue, New ObjectParameter("FechaInicio", fechaInicio), New ObjectParameter("FechaInicio", GetType(Date)))
 
         Dim fechaFinParameter As ObjectParameter = If(fechaFin.HasValue, New ObjectParameter("FechaFin", fechaFin), New ObjectParameter("FechaFin", GetType(Date)))
 
-        Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction(Of usp_Filtros_ObtenerLicenciasPorFecha_Result)("usp_Filtros_ObtenerLicenciasPorFecha", fechaInicioParameter, fechaFinParameter)
+        Dim filtroNombreParameter As ObjectParameter = If(filtroNombre IsNot Nothing, New ObjectParameter("FiltroNombre", filtroNombre), New ObjectParameter("FiltroNombre", GetType(String)))
+
+        Dim tiposLicenciaIdsParameter As ObjectParameter = If(tiposLicenciaIds IsNot Nothing, New ObjectParameter("TiposLicenciaIds", tiposLicenciaIds), New ObjectParameter("TiposLicenciaIds", GetType(String)))
+
+        Dim soloActivosParameter As ObjectParameter = If(soloActivos.HasValue, New ObjectParameter("SoloActivos", soloActivos), New ObjectParameter("SoloActivos", GetType(Boolean)))
+
+        Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction(Of usp_Filtros_ObtenerLicenciasPorFecha_Result)("usp_Filtros_ObtenerLicenciasPorFecha", fechaInicioParameter, fechaFinParameter, filtroNombreParameter, tiposLicenciaIdsParameter, soloActivosParameter)
     End Function
 
     Public Overridable Function usp_LimpiarDatosDeApex() As Integer

@@ -286,9 +286,7 @@ Public Class frmNovedades
     Private Sub PictureBox_DoubleClick(sender As Object, e As EventArgs)
         Dim pic = TryCast(sender, PictureBox)
         If pic IsNot Nothing AndAlso pic.Image IsNot Nothing Then
-            Using frm As New frmFotografiaNovedades(pic.Image)
-                frm.ShowDialog(Me)
-            End Using
+            AbrirChildEnDashboard(New frmFotografiaNovedades(pic.Image))
         End If
     End Sub
 #End Region
