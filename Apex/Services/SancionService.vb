@@ -85,37 +85,63 @@ Public Class SancionService
         Dim sb As New StringBuilder("SELECT Id, NombreFuncionario, FechaDesde, FechaHasta, Estado, Comentario, TipoSancion FROM vw_SancionesCompletas WHERE 1=1")
         Dim ps As New List(Of SqlParameter)
 
-        ' Filtro por nombre/CI (FTS)
+        ' Filtro por nombre/CI (FTS) - Sin cambios aquí
         If Not String.IsNullOrWhiteSpace(filtroNombreOCi) Then
             Dim terminos = filtroNombreOCi.Split({" "c}, StringSplitOptions.RemoveEmptyEntries).
-                                       Select(Function(w) $"""{w.Trim()}*""")
+                                    Select(Function(w) $"""{w.Trim()}*""")
             Dim fts = String.Join(" AND ", terminos)
             sb.Append(" AND FuncionarioId IN (SELECT Id FROM dbo.Funcionario WHERE CONTAINS((Nombre, CI), @p" & ps.Count & "))")
             ps.Add(New SqlParameter("@p" & (ps.Count), fts))
         End If
 
-        ' Filtro por tipo de sanción (texto exacto que cargás en frmSancionCrear)
+        ' --- LÓGICA DE FILTRO MEJORADA ---
         If Not String.IsNullOrWhiteSpace(filtroTipoSancion) Then
-            sb.Append(" AND TipoSancion = @p" & ps.Count)
-            ps.Add(New SqlParameter("@p" & (ps.Count), filtroTipoSancion))
+
+            Dim paramNameTipo = "@p" & ps.Count
+            ps.Add(New SqlParameter(paramNameTipo, filtroTipoSancion))
+
+            If filtroTipoSancion.Equals("Puntos de Demérito", StringComparison.OrdinalIgnoreCase) Then
+                ' Para "Puntos de Demérito", busca en Tipo O en Comentario por ambas palabras clave
+                Dim paramPunto = "@p" & ps.Count
+                ps.Add(New SqlParameter(paramPunto, "%punto%"))
+
+                Dim paramDemerito = "@p" & ps.Count
+                ps.Add(New SqlParameter(paramDemerito, "%demerito%"))
+
+                sb.Append($" AND (TipoSancion = {paramNameTipo} OR (Comentario LIKE {paramPunto} AND Comentario LIKE {paramDemerito}))")
+
+            ElseIf filtroTipoSancion.Equals("Observaciones Escritas", StringComparison.OrdinalIgnoreCase) Then
+                ' Para "Observaciones Escritas", busca en Tipo O en Comentario por ambas palabras clave
+                Dim paramObs = "@p" & ps.Count
+                ps.Add(New SqlParameter(paramObs, "%observaci%")) ' Usamos la raíz para "observacion" u "observaciones"
+
+                Dim paramEscrita = "@p" & ps.Count
+                ps.Add(New SqlParameter(paramEscrita, "%escrita%"))
+
+                sb.Append($" AND (TipoSancion = {paramNameTipo} OR (Comentario LIKE {paramObs} AND Comentario LIKE {paramEscrita}))")
+
+            Else
+                ' Para cualquier otra categoría, mantiene el filtro exacto
+                sb.Append($" AND TipoSancion = {paramNameTipo}")
+            End If
         End If
 
         sb.Append(" ORDER BY FechaDesde DESC")
 
-        ' Ejecutamos y proyectamos directo a DTO
+        ' Ejecutamos y proyectamos directo a DTO (sin cambios aquí)
         Dim raw = Await _unitOfWork.Context.Database _
-       .SqlQuery(Of VwSancionRow)(sb.ToString(), ps.Cast(Of Object).ToArray()) _
-       .ToListAsync() ' ← quita AsNoTracking
+   .SqlQuery(Of VwSancionRow)(sb.ToString(), ps.Cast(Of Object).ToArray()) _
+   .ToListAsync()
 
         Return raw.Select(Function(r) New SancionListadoItem With {
-            .Id = r.Id,
-            .NombreFuncionario = r.NombreFuncionario,
-            .FechaDesde = r.FechaDesde,
-            .FechaHasta = r.FechaHasta,
-            .Estado = r.Estado,
-            .Comentario = r.Comentario,
-            .TipoSancion = r.TipoSancion
-        }).ToList()
+        .Id = r.Id,
+        .NombreFuncionario = r.NombreFuncionario,
+        .FechaDesde = r.FechaDesde,
+        .FechaHasta = r.FechaHasta,
+        .Estado = r.Estado,
+        .Comentario = r.Comentario,
+        .TipoSancion = r.TipoSancion
+    }).ToList()
 
     End Function
 

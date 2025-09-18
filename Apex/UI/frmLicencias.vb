@@ -12,7 +12,8 @@ Public Class frmLicencias
     Private _isFirstLoad As Boolean = True
 
     ' --- LOAD / UNLOAD ---
-    Private Sub frmGestionLicencias_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    ' Cambia "Private Sub" por "Private Async Sub"
+    Private Async Sub frmGestionLicencias_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
         ConfigurarGrillaLicencias()
 
@@ -21,14 +22,22 @@ Public Class frmLicencias
 
         txtBusquedaLicencia.Focus()
         AddHandler NotificadorEventos.FuncionarioActualizado, AddressOf OnFuncionarioActualizado
+
+        ' Esto está bien, lo dejas como está
         chkSoloVigentes.Checked = True
         _isFirstLoad = False
+
         Try
             AppTheme.SetCue(txtBusquedaLicencia, "Buscar por funcionario…")
         Catch
         End Try
 
-        Notifier.Info(Me, "Escribí para filtrar o cambiá 'Solo vigentes'.")
+        ' Notificación opcional, puedes quitarla si quieres
+        Notifier.Info(Me, "Cargando licencias vigentes...")
+
+        ' --- LÍNEA AÑADIDA ---
+        ' Esta es la llamada que faltaba para cargar los datos
+        Await CargarDatosLicenciasAsync()
     End Sub
 
 
@@ -108,26 +117,24 @@ Public Class frmLicencias
             LoadingHelper.OcultarCargando(Me)
         End Try
     End Function
-    Private Sub dgvLicencias_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs) Handles dgvLicencias.CellFormatting
-        ' Asegurarse de que no es una fila de encabezado o una fila nueva
-        If e.RowIndex < 0 OrElse e.RowIndex = Me.dgvLicencias.NewRowIndex Then
-            Return
-        End If
+    Private Sub dgvLicencias_RowPrePaint(sender As Object, e As DataGridViewRowPrePaintEventArgs) Handles dgvLicencias.RowPrePaint
+        ' Asegurarse de que no es una fila de encabezado
+        If e.RowIndex < 0 Then Return
 
         ' Obtener el objeto de datos enlazado a la fila
         Dim row = Me.dgvLicencias.Rows(e.RowIndex)
         Dim dto = TryCast(row.DataBoundItem, LicenciaConFuncionarioExtendidoDto)
 
-        ' Primero, resetear el estilo para evitar que se "herede" al reciclar filas
-        row.DefaultCellStyle.BackColor = dgvLicencias.DefaultCellStyle.BackColor
-        row.DefaultCellStyle.ForeColor = dgvLicencias.DefaultCellStyle.ForeColor
-
         If dto IsNot Nothing Then
-            ' Si el funcionario está inactivo
+            ' Si el funcionario está inactivo, pintar la fila.
             If Not dto.Activo Then
-                ' Pintar toda la fila de un color rojo suave para indicar inactividad
-                row.DefaultCellStyle.BackColor = Color.MistyRose ' Un rojo pálido y agradable
-                row.DefaultCellStyle.ForeColor = Color.DarkRed     ' Cambiar el color del texto para mejor contraste
+                row.DefaultCellStyle.BackColor = Color.MistyRose
+                row.DefaultCellStyle.ForeColor = Color.DarkRed
+            Else
+                ' IMPORTANTE: Si no está inactivo, restaurar los colores por defecto.
+                ' Esto evita que el color se "pegue" a otras filas al hacer scroll.
+                row.DefaultCellStyle.BackColor = dgvLicencias.DefaultCellStyle.BackColor
+                row.DefaultCellStyle.ForeColor = dgvLicencias.DefaultCellStyle.ForeColor
             End If
         End If
     End Sub
