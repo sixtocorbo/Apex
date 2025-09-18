@@ -2,7 +2,11 @@
 Option Strict On
 Option Explicit On
 
-' Evento tipado (permite saber si el cambio es global o de un funcionario puntual)
+' ============================
+' EventArgs tipados
+' ============================
+
+' Cambio en funcionario (puntual o global)
 Public Class FuncionarioCambiadoEventArgs
     Inherits EventArgs
     Public ReadOnly Property FuncionarioId As Integer?
@@ -12,35 +16,62 @@ Public Class FuncionarioCambiadoEventArgs
     End Sub
 End Class
 
+' Cambio en novedad (puntual o global)
+Public Class NovedadCambiadaEventArgs
+    Inherits EventArgs
+    Public ReadOnly Property NovedadId As Integer?
+
+    Public Sub New(Optional novedadId As Integer? = Nothing)
+        Me.NovedadId = novedadId
+    End Sub
+End Class
+
+' ============================
+' Notificador
+' ============================
 Public Module NotificadorEventos
 
-    ' === Evento nuevo y tipado (recomendado) ===
+    ' --------- CANAL: Funcionarios ---------
     Public Event FuncionarioActualizado As EventHandler(Of FuncionarioCambiadoEventArgs)
 
-    ' Notifica cambio puntual: incluye el Id del funcionario afectado.
-    ' Dispara también el evento legado para mantener compatibilidad.
+    ' Notifica cambio puntual de un funcionario
     Public Sub NotificarCambiosEnFuncionario(id As Integer)
         RaiseEvent FuncionarioActualizado(Nothing, New FuncionarioCambiadoEventArgs(id))
     End Sub
 
-    ' Notifica un refresco general (sin Id específico).
-    ' También dispara el evento legado para compatibilidad.
+    ' Notifica refresco general de funcionarios
     Public Sub NotificarRefrescoTotal()
         RaiseEvent FuncionarioActualizado(Nothing, New FuncionarioCambiadoEventArgs())
     End Sub
 
-    ' Suscripción conveniente al evento tipado, devolviendo IDisposable
-    ' para asegurar la desuscripción (ej.: en FormClosed).
-    Public Function Suscribir(handler As EventHandler(Of FuncionarioCambiadoEventArgs)) As IDisposable
+    ' Suscripción (devuelve IDisposable para desuscribir fácilmente)
+    Public Function SuscribirFuncionario(handler As EventHandler(Of FuncionarioCambiadoEventArgs)) As IDisposable
         AddHandler FuncionarioActualizado, handler
         Return New Subscription(Sub() RemoveHandler FuncionarioActualizado, handler)
     End Function
 
-    ' Implementación mínima de IDisposable para suscripciones
+    ' --------- CANAL: Novedades (NUEVO) ---------
+    Public Event NovedadActualizada As EventHandler(Of NovedadCambiadaEventArgs)
+
+    ' Notifica cambio puntual de una novedad
+    Public Sub NotificarCambioEnNovedad(Optional novedadId As Integer? = Nothing)
+        RaiseEvent NovedadActualizada(Nothing, New NovedadCambiadaEventArgs(novedadId))
+    End Sub
+
+    ' Suscripción para novedades
+    Public Function SuscribirNovedad(handler As EventHandler(Of NovedadCambiadaEventArgs)) As IDisposable
+        AddHandler NovedadActualizada, handler
+        Return New Subscription(Sub() RemoveHandler NovedadActualizada, handler)
+    End Function
+
+    ' ============================
+    ' Utilidad interna
+    ' ============================
     Private NotInheritable Class Subscription
         Implements IDisposable
 
         Private ReadOnly _dispose As Action
+
         Public Sub New(dispose As Action)
             _dispose = dispose
         End Sub

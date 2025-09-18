@@ -1,54 +1,144 @@
 ﻿' FormActualizable.vb
-Imports System.Windows.Forms
-Imports System.Threading.Tasks
+Option Strict On
+Option Explicit On
 
-' --- CAMBIO 1: Se quita "MustInherit" ---
+Imports System.Threading.Tasks
+Imports System.Windows.Forms
+
+' NOTA:
+' - Esta clase NO es MustInherit para que el diseñador no falle.
+' - Suscribe a dos canales:
+'     * NotificadorEventos.FuncionarioActualizado (debounce propio)
+'     * NotificadorEventos.NovedadActualizada    (debounce propio)
+' - Cada form hijo puede sobreescribir:
+'     * RefrescarSegunEventoAsync(e As FuncionarioCambiadoEventArgs)
+'     * RefrescarSegunNovedadAsync(e As NovedadCambiadaEventArgs)
+
 Public Class FormActualizable
     Inherits Form
 
-    Private _suscripcion As IDisposable
-    Private ReadOnly _debounce As New Timer() With {.Interval = 250}
-    Private _ultimoEvento As FuncionarioCambiadoEventArgs
-    Private ReadOnly _gate As New Object
+    ' Suscripciones
+    Private _suscripcionFunc As IDisposable
+    Private _suscripcionNov As IDisposable
+
+    ' Debounce para FUNCIONARIOS
+    Private ReadOnly _debounceFunc As New Timer() With {.Interval = 250}
+    Private _ultimoEventoFunc As FuncionarioCambiadoEventArgs
+    Private ReadOnly _gateFunc As New Object
+
+    ' Debounce para NOVEDADES
+    Private ReadOnly _debounceNov As New Timer() With {.Interval = 250}
+    Private _ultimoEventoNov As NovedadCambiadaEventArgs
+    Private ReadOnly _gateNov As New Object
 
     Protected Overrides Sub OnLoad(e As EventArgs)
         MyBase.OnLoad(e)
-        ' Solo ejecutar en modo de ejecución, no en el diseñador
-        If Not Me.DesignMode Then
-            AddHandler _debounce.Tick, AddressOf DebounceTick
-            _suscripcion = NotificadorEventos.Suscribir(AddressOf OnEvent)
-        End If
+
+        If Me.DesignMode Then Return
+
+        ' Handlers de debounce
+        AddHandler _debounceFunc.Tick, AddressOf DebounceFuncTick
+        AddHandler _debounceNov.Tick, AddressOf DebounceNovTick
+
+        ' Suscribir a ambos canales
+        _suscripcionFunc = NotificadorEventos.SuscribirFuncionario(AddressOf OnFuncionarioEvent)
+        _suscripcionNov = NotificadorEventos.SuscribirNovedad(AddressOf OnNovedadEvent)
     End Sub
 
-    Private Sub OnEvent(sender As Object, e As FuncionarioCambiadoEventArgs)
-        SyncLock _gate
-            _ultimoEvento = e
-            _debounce.Stop()
-            _debounce.Start()
+    ' =======================
+    ' Canal: FUNCIONARIOS
+    ' =======================
+    Private Sub OnFuncionarioEvent(sender As Object, e As FuncionarioCambiadoEventArgs)
+        SyncLock _gateFunc
+            _ultimoEventoFunc = e
+            _debounceFunc.Stop()
+            _debounceFunc.Start()
         End SyncLock
     End Sub
 
-    Private Async Sub DebounceTick(sender As Object, e As EventArgs)
-        _debounce.Stop()
+    Private Async Sub DebounceFuncTick(sender As Object, e As EventArgs)
+        _debounceFunc.Stop()
         If Not Me.IsHandleCreated OrElse Me.IsDisposed Then Exit Sub
+
         Try
-            Await RefrescarSegunEventoAsync(_ultimoEvento)
+            ' Si querés máxima seguridad de hilo, podés invocar:
+            If Me.InvokeRequired Then
+                Me.BeginInvoke(CType(Async Sub()
+                                         Try
+                                             Await RefrescarSegunEventoAsync(_ultimoEventoFunc)
+                                         Catch
+                                             ' log opcional
+                                         End Try
+                                     End Sub, MethodInvoker))
+            Else
+                Await RefrescarSegunEventoAsync(_ultimoEventoFunc)
+            End If
         Catch
             ' log opcional
         End Try
     End Sub
 
-    ' --- CAMBIO 2: Se reemplaza "MustOverride" por "Overridable" y se agrega una implementación base ---
-    ' Cada form define cómo refrescarse ante el evento
+    ' Por defecto no hace nada: los formularios hijos lo sobreescriben
     Protected Overridable Function RefrescarSegunEventoAsync(e As FuncionarioCambiadoEventArgs) As Task
-        ' Implementación base vacía para que el diseñador no falle.
-        ' Las clases que hereden de esta deben sobreescribir este método.
         Return Task.CompletedTask
     End Function
 
+    ' =======================
+    ' Canal: NOVEDADES
+    ' =======================
+    Private Sub OnNovedadEvent(sender As Object, e As NovedadCambiadaEventArgs)
+        SyncLock _gateNov
+            _ultimoEventoNov = e
+            _debounceNov.Stop()
+            _debounceNov.Start()
+        End SyncLock
+    End Sub
+
+    Private Async Sub DebounceNovTick(sender As Object, e As EventArgs)
+        _debounceNov.Stop()
+        If Not Me.IsHandleCreated OrElse Me.IsDisposed Then Exit Sub
+
+        Try
+            If Me.InvokeRequired Then
+                Me.BeginInvoke(CType(Async Sub()
+                                         Try
+                                             Await RefrescarSegunNovedadAsync(_ultimoEventoNov)
+                                         Catch
+                                             ' log opcional
+                                         End Try
+                                     End Sub, MethodInvoker))
+            Else
+                Await RefrescarSegunNovedadAsync(_ultimoEventoNov)
+            End If
+        Catch
+            ' log opcional
+        End Try
+    End Sub
+
+    ' Por defecto no hace nada: los formularios hijos lo sobreescriben
+    Protected Overridable Function RefrescarSegunNovedadAsync(e As NovedadCambiadaEventArgs) As Task
+        Return Task.CompletedTask
+    End Function
+
+    ' Limpieza
     Protected Overrides Sub OnFormClosed(e As FormClosedEventArgs)
-        _suscripcion?.Dispose()
-        _debounce?.Dispose()
+        Try
+            _suscripcionFunc?.Dispose()
+            _suscripcionNov?.Dispose()
+        Finally
+            Try
+                RemoveHandler _debounceFunc.Tick, AddressOf DebounceFuncTick
+                _debounceFunc.Dispose()
+            Catch
+            End Try
+
+            Try
+                RemoveHandler _debounceNov.Tick, AddressOf DebounceNovTick
+                _debounceNov.Dispose()
+            Catch
+            End Try
+        End Try
+
         MyBase.OnFormClosed(e)
     End Sub
 End Class

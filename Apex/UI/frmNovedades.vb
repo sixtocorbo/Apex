@@ -4,6 +4,7 @@ Imports System.Data.Entity
 Imports System.IO
 
 Public Class frmNovedades
+    Inherits FormActualizable
 
     Private _bsNovedades As New BindingSource()
     Private _pictureBoxSeleccionado As PictureBox = Nothing
@@ -42,6 +43,10 @@ Public Class frmNovedades
         End Try
     End Sub
 
+    Protected Overrides Async Function RefrescarSegunNovedadAsync(e As NovedadCambiadaEventArgs) As Task
+        ' e.NovedadId tiene el id puntual si lo enviaron; si es Nothing, refresco global
+        Await BuscarAsync() ' tu método de recarga
+    End Function
 
     Private Async Sub dgvNovedades_SelectionChanged(sender As Object, e As EventArgs) Handles dgvNovedades.SelectionChanged
         Await ActualizarDetalleDesdeSeleccion()
@@ -326,11 +331,30 @@ Public Class frmNovedades
         Me.Cursor = Cursors.WaitCursor
 
         Try
+            Dim afectados As List(Of Funcionario)
             Using svc As New NovedadService()
+                ' Obtener los funcionarios afectados ANTES del delete
+                afectados = Await svc.GetFuncionariosPorNovedadAsync(nov.Id)
+
+                ' Eliminar
                 Await svc.DeleteNovedadCompletaAsync(nov.Id)
             End Using
+
             Notifier.Info(Me, "Novedad eliminada.")
+
+            ' <<< AVISO A LISTADOS DE NOVEDADES >>>
+            NotificadorEventos.NotificarCambioEnNovedad()   ' general (el Id ya no existe)
+
+            ' <<< AVISO A PANTALLAS VINCULADAS A FUNCIONARIOS >>>
+            If afectados IsNot Nothing Then
+                For Each f In afectados
+                    NotificadorEventos.NotificarCambiosEnFuncionario(f.Id)
+                Next
+            End If
+
             Await BuscarAsync()
+
+
         Catch ex As Exception
             Notifier.[Error](Me, $"Ocurrió un error al eliminar la novedad: {ex.Message}")
         Finally

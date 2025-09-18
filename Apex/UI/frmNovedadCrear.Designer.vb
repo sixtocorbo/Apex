@@ -302,7 +302,7 @@ Partial Class frmNovedadCrear
         '
         'frmNovedadCrear
         '
-        Me.AcceptButton = Me.btnGuardar
+        Me.AcceptButton = Me.btnSiguiente
         Me.AutoScaleDimensions = New System.Drawing.SizeF(11.0!, 28.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnCancelar
