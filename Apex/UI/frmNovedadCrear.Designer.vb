@@ -43,6 +43,8 @@ Partial Class frmNovedadCrear
         Me.FlowLayoutPanel2 = New System.Windows.Forms.FlowLayoutPanel()
         Me.btnGuardar = New System.Windows.Forms.Button()
         Me.btnCancelar = New System.Windows.Forms.Button()
+        Me.btnSiguiente = New System.Windows.Forms.Button()
+        Me.btnAnterior = New System.Windows.Forms.Button()
         Me.PanelPrincipal.SuspendLayout()
         Me.TabControlMain.SuspendLayout()
         Me.TabPageNovedad.SuspendLayout()
@@ -250,6 +252,8 @@ Partial Class frmNovedadCrear
         '
         Me.FlowLayoutPanel2.Controls.Add(Me.btnGuardar)
         Me.FlowLayoutPanel2.Controls.Add(Me.btnCancelar)
+        Me.FlowLayoutPanel2.Controls.Add(Me.btnSiguiente)
+        Me.FlowLayoutPanel2.Controls.Add(Me.btnAnterior)
         Me.FlowLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Bottom
         Me.FlowLayoutPanel2.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
         Me.FlowLayoutPanel2.Location = New System.Drawing.Point(10, 405)
@@ -275,6 +279,26 @@ Partial Class frmNovedadCrear
         Me.btnCancelar.TabIndex = 1
         Me.btnCancelar.Text = "Cancelar"
         Me.btnCancelar.UseVisualStyleBackColor = True
+        '
+        'btnSiguiente
+        '
+        Me.btnSiguiente.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.btnSiguiente.Location = New System.Drawing.Point(410, 3)
+        Me.btnSiguiente.Name = "btnSiguiente"
+        Me.btnSiguiente.Size = New System.Drawing.Size(133, 40)
+        Me.btnSiguiente.TabIndex = 2
+        Me.btnSiguiente.Text = "Siguiente >"
+        Me.btnSiguiente.UseVisualStyleBackColor = True
+        '
+        'btnAnterior
+        '
+        Me.btnAnterior.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.btnAnterior.Location = New System.Drawing.Point(247, 3)
+        Me.btnAnterior.Name = "btnAnterior"
+        Me.btnAnterior.Size = New System.Drawing.Size(157, 40)
+        Me.btnAnterior.TabIndex = 3
+        Me.btnAnterior.Text = "< Anterior"
+        Me.btnAnterior.UseVisualStyleBackColor = True
         '
         'frmNovedadCrear
         '
@@ -330,4 +354,6 @@ Partial Class frmNovedadCrear
     Friend WithEvents FlowLayoutPanel3 As FlowLayoutPanel
     Friend WithEvents btnEliminarFoto As Button
     Friend WithEvents btnAgregarFoto As Button
+    Friend WithEvents btnSiguiente As Button
+    Friend WithEvents btnAnterior As Button
 End Class

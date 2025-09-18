@@ -506,33 +506,93 @@ Partial Public Class frmFiltros
 #End Region
 
 #Region "Botón Copiar Correos + helpers públicos"
+    ' --- en frmFiltros ---
 
     Private Sub btnCopiarCorreos_Click(sender As Object, e As EventArgs) Handles btnCopiarCorreos.Click
-        If _dvDatos Is Nothing OrElse _dvDatos.Count = 0 Then
-            MessageBox.Show("No hay registros en la vista actual para copiar correos.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
-            Return
-        End If
+        Try
+            If _dvDatos Is Nothing OrElse _dvDatos.Count = 0 Then
+                Notifier.Info(Me, "No hay registros en la vista actual.", 2000)
+                Return
+            End If
 
-        Const NOMBRE_COLUMNA_CORREO As String = "Email"
-        If Not _dvDatos.Table.Columns.Contains(NOMBRE_COLUMNA_CORREO) Then
-            MessageBox.Show($"No se encontró la columna '{NOMBRE_COLUMNA_CORREO}' en los datos.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            Return
-        End If
+            ' 1) detectar la columna de correo disponible
+            Dim candidatos = New String() {"CorreoElectronico", "Email", "Correo", "Mail"}
+            Dim colCorreo As String = candidatos.FirstOrDefault(Function(c) _dvDatos.Table.Columns.Contains(c))
 
-        Dim correos As New List(Of String)
-        For Each rowView As DataRowView In _dvDatos
-            Dim correo = rowView(NOMBRE_COLUMNA_CORREO)?.ToString()
-            If Not String.IsNullOrWhiteSpace(correo) Then correos.Add(correo.Trim())
-        Next
+            If String.IsNullOrEmpty(colCorreo) Then
+                MessageBox.Show("No se encontró una columna de correo (CorreoElectronico/Email/Correo).",
+                            "Apex", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                Return
+            End If
 
-        If correos.Any() Then
-            Dim correosParaCopiar = String.Join("; ", correos.Distinct())
-            Clipboard.SetText(correosParaCopiar)
-            MessageBox.Show($"{correos.Count} correos han sido copiados al portapapeles.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
-        Else
-            MessageBox.Show("No se encontraron correos válidos en la selección actual.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-        End If
+            ' 2) extraer y normalizar correos de la vista actual
+            Dim setCorreos As New HashSet(Of String)(StringComparer.OrdinalIgnoreCase)
+
+            For Each rv As DataRowView In _dvDatos
+                Dim raw As String = If(TryCast(rv(colCorreo), String), "").Trim()
+                If raw = "" Then Continue For
+
+                For Each correo In ExtractEmails(raw)
+                    setCorreos.Add(correo)
+                Next
+            Next
+
+            ' 3) copiar al portapapeles, uno por línea (CRLF)
+            If setCorreos.Count = 0 Then
+                Notifier.Warn(Me, "No se encontraron correos válidos en la lista.", 2500)
+                Return
+            End If
+
+            Dim lineas = setCorreos.OrderBy(Function(s) s, StringComparer.OrdinalIgnoreCase).ToArray()
+            Dim joined As String = String.Join(Environment.NewLine, lineas)
+
+            ' usar DataObject para máxima compatibilidad (Excel, Notepad, Outlook)
+            Dim dobj As New DataObject()
+            dobj.SetText(joined, TextDataFormat.UnicodeText)
+            dobj.SetText(joined, TextDataFormat.Text)
+            Clipboard.SetDataObject(dobj, True)
+
+            Notifier.Success(Me, $"{lineas.Length} correos copiados (ordenados por alfabeto).", 2500)
+
+
+        Catch ex As Exception
+            MessageBox.Show("Error al copiar correos: " & ex.Message, "Apex",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
     End Sub
+
+    ' --- helpers privados ---
+
+    ' Devuelve una lista de e-mails válidos encontrados en un texto (acepta múltiples separados por ; , / espacios o saltos de línea)
+    Private Function ExtractEmails(input As String) As IEnumerable(Of String)
+        If String.IsNullOrWhiteSpace(input) Then Return Enumerable.Empty(Of String)()
+
+        ' separadores comunes
+        Dim trozos = input.Split(New Char() {";"c, ","c, "/"c, " "c, ControlChars.Cr, ControlChars.Lf, ControlChars.Tab},
+                             StringSplitOptions.RemoveEmptyEntries)
+
+        Dim list As New List(Of String)
+        For Each t In trozos
+            Dim s = t.Trim().Trim("."c) ' limpiar puntitos al final
+            If IsValidEmail(s) Then list.Add(s)
+        Next
+        Return list
+    End Function
+
+    ' Validación simple y rápida (suficiente para limpieza en UI)
+    Private Function IsValidEmail(s As String) As Boolean
+        If String.IsNullOrWhiteSpace(s) Then Return False
+        ' evita strings muy largos y espacios
+        If s.Length > 254 OrElse s.Contains(" "c) Then Return False
+        Try
+            Dim addr = New System.Net.Mail.MailAddress(s)
+            ' exige que tenga dominio con punto
+            Return s.IndexOf("@"c) > 0 AndAlso addr.Host.Contains("."c)
+        Catch
+            Return False
+        End Try
+    End Function
+
 
     Public Function GetIdsFiltrados(nombreColumnaId As String) As List(Of Integer)
         Dim ids As New List(Of Integer)
@@ -643,6 +703,9 @@ Partial Public Class frmFiltros
                 Me.Text = "Exportando fichas... (Preparando datos...)"
                 Me.Refresh()
 
+                ' Toast persistente de progreso
+                Dim toast As Toast = Toast.ShowSticky(Me, "Preparando exportación...", ToastType.Info)
+
                 ' 3) Traer todos los datos en una sola consulta
                 Dim todosLosDatos As List(Of FichaFuncionalDTO)
                 Using svc As New ReportesService()
@@ -650,8 +713,8 @@ Partial Public Class frmFiltros
                 End Using
 
                 If todosLosDatos Is Nothing OrElse todosLosDatos.Count = 0 Then
-                    MessageBox.Show("El servicio no devolvió datos para las fichas de los funcionarios seleccionados.", "Apex",
-                                MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                    toast.UpdateMessage("No se encontraron datos para exportar.")
+                    toast.CloseAfter(2500)
                     Me.Text = tituloOriginal
                     Cursor = Cursors.Default
                     Return
@@ -661,6 +724,7 @@ Partial Public Class frmFiltros
                 Dim totalAExportar As Integer = ids.Count
                 Dim exportados As Integer = 0
                 Dim noEncontrados As New List(Of Integer)
+                Dim fallos As New List(Of String)
 
                 For i = 0 To totalAExportar - 1
                     Dim id As Integer = ids(i)
@@ -674,50 +738,66 @@ Partial Public Class frmFiltros
                         Continue For
                     End If
 
-                    ' Nombre de archivo: "Nombre Completo - CI 4.123.456-7.pdf" (o fallback Ficha_{id}.pdf)
                     Dim dto = datosUno(0)
+
+                    ' Actualizar toast (antes de renderizar)
+                    toast.UpdateMessage($"Exportando {i + 1}/{totalAExportar} — {dto.NombreCompleto} (CI {dto.Cedula})")
+
+                    ' Nombre de archivo: "Nombre Completo - CI ... .pdf" (o fallback Ficha_{id}.pdf)
                     Dim nombreArchivo As String = ConstruirNombreArchivo(dto, id)
                     Dim ruta As String = ObtenerRutaUnica(carpeta, nombreArchivo)
 
-                    ' Render en segundo plano usando LocalReport (sin ReportViewer)
-                    Await Task.Run(
-                    Sub()
-                        Dim lr As New Microsoft.Reporting.WinForms.LocalReport()
-                        ' Carga RDLC embebido (p.ej. "Apex.FichaFuncional.rdlc") o, si no está,
-                        ' cae al archivo físico "Reportes\FichaFuncional.rdlc"
-                        CargarDefinicionRDLC(lr, "FichaFuncional.rdlc", "Reportes\FichaFuncional.rdlc")
+                    Try
+                        ' Render en segundo plano usando LocalReport (sin ReportViewer)
+                        Await Task.Run(
+                        Sub()
+                            Dim lr As New Microsoft.Reporting.WinForms.LocalReport()
+                            ' Carga RDLC embebido (p.ej. "Apex.FichaFuncional.rdlc") o, si no está,
+                            ' cae al archivo físico "Reportes\FichaFuncional.rdlc"
+                            CargarDefinicionRDLC(lr, "FichaFuncional.rdlc", "Reportes\FichaFuncional.rdlc")
 
-                        lr.DataSources.Clear()
-                        lr.DataSources.Add(New Microsoft.Reporting.WinForms.ReportDataSource("FichaFuncionalDataSet", datosUno))
+                            lr.DataSources.Clear()
+                            lr.DataSources.Add(New Microsoft.Reporting.WinForms.ReportDataSource("FichaFuncionalDataSet", datosUno))
 
-                        Dim bytes = lr.Render("PDF")
-                        If bytes Is Nothing OrElse bytes.Length = 0 Then
-                            Throw New ApplicationException("Render devolvió 0 bytes (verificar DataSet y RDLC).")
-                        End If
+                            Dim bytes = lr.Render("PDF")
+                            If bytes Is Nothing OrElse bytes.Length = 0 Then
+                                Throw New ApplicationException("Render devolvió 0 bytes (verificar DataSet y RDLC).")
+                            End If
 
-                        System.IO.File.WriteAllBytes(ruta, bytes)
-                        lr.ReleaseSandboxAppDomain()
-                    End Sub
-                )
-
-                    exportados += 1
+                            System.IO.File.WriteAllBytes(ruta, bytes)
+                            lr.ReleaseSandboxAppDomain()
+                        End Sub
+                    )
+                        exportados += 1
+                    Catch exUno As Exception
+                        fallos.Add($"Id {id} — {dto.NombreCompleto}: {exUno.Message}")
+                    End Try
                 Next
 
-                ' 5) Mensaje final
+                ' 5) Mensaje final (toast + MessageBox opcional)
                 Me.Text = tituloOriginal
                 Cursor = Cursors.Default
 
-                Dim sb As New System.Text.StringBuilder()
-                sb.AppendLine("Exportación finalizada.")
-                sb.AppendLine($"Se guardaron {exportados} de {totalAExportar} archivos PDF en: {carpeta}")
+                Dim resumen As New System.Text.StringBuilder()
+                resumen.AppendLine("Exportación finalizada.")
+                resumen.AppendLine($"Se guardaron {exportados} de {totalAExportar} archivos PDF en: {carpeta}")
                 If noEncontrados.Any() Then
-                    sb.AppendLine().
-                   AppendLine("No se encontraron datos para los siguientes IDs: " & String.Join(", ", noEncontrados))
+                    resumen.AppendLine().AppendLine("Sin datos para IDs: " & String.Join(", ", noEncontrados))
+                End If
+                If fallos.Any() Then
+                    resumen.AppendLine().AppendLine("Errores:").AppendLine(" - " & String.Join(Environment.NewLine & " - ", fallos))
                 End If
 
-                MessageBox.Show(sb.ToString(), "Apex", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                ' Actualizar y cerrar toast
+                toast.UpdateMessage($"Listo: {exportados}/{totalAExportar} guardados en: {carpeta}")
+                toast.CloseAfter(3000)
 
-                ' (Opcional) Abrir carpeta al terminar:
+                ' (Opcional) también mostrar MessageBox resumen
+                MessageBox.Show(resumen.ToString(), "Apex",
+                            If(fallos.Any(), MessageBoxButtons.OK, MessageBoxButtons.OK),
+                            If(fallos.Any(), MessageBoxIcon.Warning, MessageBoxIcon.Information))
+
+                ' (Opcional) abrir la carpeta al terminar
                 Try : Process.Start("explorer.exe", carpeta) : Catch : End Try
             End Using
 
@@ -728,6 +808,7 @@ Partial Public Class frmFiltros
                         MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
     End Sub
+
 
     Private Sub CargarDefinicionRDLC(lr As Microsoft.Reporting.WinForms.LocalReport,
                                  nombreCorto As String,
@@ -791,6 +872,85 @@ Partial Public Class frmFiltros
         End While
         Return ruta
     End Function
+
+    ' ------------------ Exportar a Excel (CSV) ------------------
+    Private Sub btnExportarExcel_Click(sender As Object, e As EventArgs) Handles btnExportarExcel.Click
+        Try
+            If _dvDatos Is Nothing OrElse _dvDatos.Count = 0 Then
+                Notifier.Info(Me, "No hay datos para exportar.", 2000)
+                Return
+            End If
+
+            ' Columnas: solo las VISIBLES en la grilla y en su ORDEN actual
+            Dim cols = dgvDatos.Columns.Cast(Of DataGridViewColumn)().
+                       Where(Function(c) c.Visible AndAlso Not String.IsNullOrEmpty(c.DataPropertyName) AndAlso
+                                          _dvDatos.Table.Columns.Contains(c.DataPropertyName)).
+                       OrderBy(Function(c) c.DisplayIndex).
+                       Select(Function(c) New With {.Name = c.DataPropertyName, .Header = c.HeaderText}).
+                       ToList()
+
+            If cols.Count = 0 Then
+                MessageBox.Show("No hay columnas visibles para exportar.", "Apex",
+                                MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                Return
+            End If
+
+            ' File dialog
+            Using sfd As New SaveFileDialog()
+                sfd.Title = "Guardar como"
+                sfd.Filter = "CSV (separado por comas)|*.csv|Todos los archivos|*.*"
+                sfd.FileName = $"Export_{Date.Now:yyyyMMdd_HHmm}.csv"
+                If sfd.ShowDialog(Me) <> DialogResult.OK Then Return
+
+                Cursor = Cursors.WaitCursor
+
+                ' Construir CSV
+                Dim sb As New System.Text.StringBuilder(1024)
+
+                ' Encabezados
+                sb.AppendLine(String.Join(",", cols.Select(Function(c) CsvEscape(c.Header))))
+
+                ' Filas visibles (según _dvDatos con filtros aplicados)
+                For Each rv As DataRowView In _dvDatos
+                    Dim fields As New List(Of String)(cols.Count)
+                    For Each c In cols
+                        Dim val = rv.Row(c.Name)
+                        Dim s As String = If(val Is Nothing OrElse val Is DBNull.Value, "",
+                                             If(TypeOf val Is Date OrElse TypeOf val Is DateTime,
+                                                DirectCast(val, DateTime).ToString("dd/MM/yyyy"),
+                                                val.ToString()))
+                        fields.Add(CsvEscape(s))
+                    Next
+                    sb.AppendLine(String.Join(",", fields))
+                Next
+
+                ' Escribir con UTF-8 BOM para que Excel detecte bien la codificación
+                Dim bytes = New System.Text.UTF8Encoding(encoderShouldEmitUTF8Identifier:=True).GetBytes(sb.ToString())
+                System.IO.File.WriteAllBytes(sfd.FileName, bytes)
+
+                Cursor = Cursors.Default
+                Notifier.Success(Me, "Datos exportados a CSV.", 2000)
+
+                ' (Opcional) Abrir el archivo
+                Try : Process.Start("explorer.exe", "/select," & sfd.FileName) : Catch : End Try
+            End Using
+
+        Catch ex As Exception
+            Cursor = Cursors.Default
+            MessageBox.Show("Error al exportar a Excel: " & ex.Message, "Apex",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
+
+    ' Escapa un campo para CSV: comillas dobles, comas, saltos de línea, etc.
+    Private Function CsvEscape(s As String) As String
+        If s Is Nothing Then Return ""
+        Dim mustQuote = s.Contains(",") OrElse s.Contains("""") OrElse s.Contains(ControlChars.Cr) OrElse s.Contains(ControlChars.Lf)
+        s = s.Replace("""", """""")
+        If mustQuote Then s = """" & s & """"
+        Return s
+    End Function
+
 
 #End Region
 #End Region

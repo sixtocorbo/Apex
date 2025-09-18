@@ -5,6 +5,19 @@ Imports System.IO
 
 
 Public Class frmNovedadCrear
+#Region "Mini wizard"
+    ' === Wizard simple para forzar pasos ===
+    Private Enum PasoWizard
+        Novedad = 0
+        Funcionarios = 1
+        Fotos = 2
+    End Enum
+
+    Private _forzarPasos As Boolean = True
+    Private _pasoActual As PasoWizard = PasoWizard.Novedad
+    Private _pasosCompletados As New HashSet(Of PasoWizard)
+
+#End Region
 
     Private _svc As New NovedadService()
     Private _novedad As Novedad
@@ -47,7 +60,8 @@ Public Class frmNovedadCrear
         lstFuncionariosSeleccionados.DataSource = _funcionariosSeleccionados
         lstFuncionariosSeleccionados.DisplayMember = "Nombre"
         lstFuncionariosSeleccionados.ValueMember = "Id"
-
+        AddHandler btnSiguiente.Click, AddressOf btnSiguiente_Click
+        AddHandler btnAnterior.Click, AddressOf btnAnterior_Click
         Try
             AppTheme.SetCue(txtTexto, "Ingrese el texto de la novedad...")
             AppTheme.SetCue(dtpFecha, "Fecha de la novedad…")
@@ -55,17 +69,109 @@ Public Class frmNovedadCrear
             AppTheme.SetCue(flpFotos, "No hay fotos agregadas…")
         Catch
         End Try
+        'inicio wizard
+        ' === WIZARD: bloquear navegación por pestañas si _forzarPasos ===
+        If _forzarPasos Then
+            AddHandler TabControlMain.Selecting, AddressOf TabControlMain_Selecting_Bloquear
+        End If
 
+        ' Botones iniciales
+        ActualizarUIWizard()
+        'finaliza wizard
+        ' Pre-cargar si edita
         If _modo = ModoFormulario.Editar Then
             Try
                 Await CargarDatosParaEdicion()
+                ' Autocompletar pasos ya válidos
+                If ValidarPasoNovedad(silent:=True) Then _pasosCompletados.Add(PasoWizard.Novedad)
+                If ValidarPasoFuncionarios(silent:=True) Then _pasosCompletados.Add(PasoWizard.Funcionarios)
+                ' Fotos es opcional
+                _pasosCompletados.Add(PasoWizard.Fotos)
+                ActualizarUIWizard()
             Catch ex As Exception
                 Notifier.[Error](Me, $"No se pudo cargar la novedad: {ex.Message}")
                 Close()
                 Return
             End Try
         Else
-            Notifier.Info(Me, "Tip: podés arrastrar varias fotos o usar 'Agregar foto'.")
+            Notifier.Info(Me, "Paso 1: completá Fecha y Texto. Luego Siguiente.")
+        End If
+    End Sub
+    'mini wizrd
+    Private Sub btnSiguiente_Click(sender As Object, e As EventArgs)
+        Select Case _pasoActual
+            Case PasoWizard.Novedad
+                If Not ValidarPasoNovedad() Then Return
+                _pasosCompletados.Add(PasoWizard.Novedad)
+                IrAPaso(PasoWizard.Funcionarios)
+
+            Case PasoWizard.Funcionarios
+                If Not ValidarPasoFuncionarios() Then Return
+                _pasosCompletados.Add(PasoWizard.Funcionarios)
+                _pasosCompletados.Add(PasoWizard.Fotos) ' opcional, lo damos por bueno
+                IrAPaso(PasoWizard.Fotos)
+
+            Case PasoWizard.Fotos
+                ' último paso → equivalente a Guardar
+                btnGuardar.PerformClick()
+        End Select
+    End Sub
+
+    Private Sub btnAnterior_Click(sender As Object, e As EventArgs)
+        Select Case _pasoActual
+            Case PasoWizard.Funcionarios
+                IrAPaso(PasoWizard.Novedad)
+            Case PasoWizard.Fotos
+                IrAPaso(PasoWizard.Funcionarios)
+        End Select
+    End Sub
+
+    Private Sub IrAPaso(p As PasoWizard)
+        _pasoActual = p
+        TabControlMain.SelectedIndex = CInt(p)
+        ActualizarUIWizard()
+    End Sub
+
+    Private Sub ActualizarUIWizard()
+        ' Estado de botones según paso
+        btnAnterior.Enabled = (_pasoActual <> PasoWizard.Novedad)
+        btnSiguiente.Text = If(_pasoActual = PasoWizard.Fotos, "Guardar", "Siguiente >")
+
+        ' Guardar solo visible en el último paso si forzamos pasos
+        btnGuardar.Visible = Not _forzarPasos OrElse (_pasoActual = PasoWizard.Fotos)
+    End Sub
+    Private Function ValidarPasoNovedad(Optional silent As Boolean = False) As Boolean
+        Dim ok As Boolean = True
+        If String.IsNullOrWhiteSpace(txtTexto.Text) Then ok = False
+        ' Podés agregar reglas de fecha, ej: no futuro
+        ' If dtpFecha.Value.Date > Date.Today Then ok = False
+
+        If Not ok AndAlso Not silent Then
+            Notifier.Warn(Me, "Completá el texto (y verificá la fecha).")
+            TabControlMain.SelectedTab = TabPageNovedad
+            txtTexto.Focus()
+        End If
+        Return ok
+    End Function
+
+    Private Function ValidarPasoFuncionarios(Optional silent As Boolean = False) As Boolean
+        Dim ok As Boolean = (_funcionariosSeleccionados IsNot Nothing AndAlso _funcionariosSeleccionados.Count > 0)
+        If Not ok AndAlso Not silent Then
+            Notifier.Warn(Me, "Seleccioná al menos un funcionario.")
+            TabControlMain.SelectedTab = TabPageFuncionarios
+        End If
+        Return ok
+    End Function
+
+
+    'fin mini wizard
+    Private Sub TabControlMain_Selecting_Bloquear(sender As Object, e As TabControlCancelEventArgs)
+        If Not _forzarPasos Then Return
+        ' Solo permitir la pestaña del paso actual
+        Dim idxEsperado As Integer = CInt(_pasoActual)
+        If e.TabPageIndex <> idxEsperado Then
+            e.Cancel = True
+            Notifier.Warn(Me, "Seguí el orden con los botones Siguiente / Anterior.")
         End If
     End Sub
 
@@ -279,6 +385,11 @@ Public Class frmNovedadCrear
 
 #Region "Guardado y Cancelación"
     Private Async Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
+        If _forzarPasos AndAlso _pasoActual <> PasoWizard.Fotos Then
+            btnSiguiente.PerformClick()
+            Return
+        End If
+
         If String.IsNullOrWhiteSpace(txtTexto.Text) Then
             Notifier.Warn(Me, "El texto de la novedad no puede estar vacío.")
             Return

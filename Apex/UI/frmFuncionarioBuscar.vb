@@ -468,8 +468,22 @@ Public Class frmFuncionarioBuscar
             e.Handled = True
             e.SuppressKeyPress = True
             AbrirOSeleccionarActual()
+            Return
+        End If
+
+        If e.KeyCode = Keys.Escape Then
+            e.Handled = True
+            e.SuppressKeyPress = True
+            CancelarYCerrar()
+            Return
         End If
     End Sub
+    Private Sub CancelarYCerrar()
+        ' Si te abrieron con ShowDialog, devolvés Cancel; si es dentro del dashboard igual cierra.
+        Me.DialogResult = DialogResult.Cancel
+        Me.Close()
+    End Sub
+
 
 
     Private Async Function ObtenerPresenciaAsync(id As Integer, fecha As Date) As Task(Of String)
@@ -522,6 +536,7 @@ Public Class frmFuncionarioBuscar
         If FuncionarioSeleccionado IsNot Nothing Then
             Me.DialogResult = DialogResult.OK
             Me.Close()
+
         Else
             MessageBox.Show("Por favor, seleccione un funcionario de la lista.", "Selección requerida", MessageBoxButtons.OK, MessageBoxIcon.Information)
         End If
