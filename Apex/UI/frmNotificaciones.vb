@@ -170,12 +170,24 @@ Public Class frmNotificaciones
         tmrFiltro.Start()
     End Sub
 
+    ' --- MÉTODO MODIFICADO ---
     Private Async Sub tmrFiltro_Tick(sender As Object, e As EventArgs) Handles tmrFiltro.Tick
         tmrFiltro.Stop()
         Await IniciarBusquedaAsync()
-        Notifier.Info(Me, "Búsqueda actualizada.")
+        ' DEVUELVE EL FOCO al textbox después de la búsqueda.
+        txtFiltro.Focus()
     End Sub
-
+    ' --- MÉTODO NUEVO (MEJORA UX) ---
+    ' Para que el usuario pueda presionar Enter y buscar inmediatamente.
+    Private Async Sub txtFiltro_KeyDown(sender As Object, e As KeyEventArgs) Handles txtFiltro.KeyDown
+        If e.KeyCode = Keys.Enter Then
+            e.SuppressKeyPress = True ' Evita el sonido "ding"
+            tmrFiltro.Stop()
+            Await IniciarBusquedaAsync()
+            ' DEVUELVE EL FOCO también aquí.
+            txtFiltro.Focus()
+        End If
+    End Sub
     Private Async Sub dgvNotificaciones_DoubleClick(sender As Object, e As EventArgs) Handles dgvNotificaciones.DoubleClick
         Await CambiarEstado()
     End Sub

@@ -4,23 +4,29 @@ Option Explicit On
 Public Class frmLicencias
 
     Private ReadOnly _licenciaSvc As New LicenciaService()
-    ' --- Timer para controlar la búsqueda ---
     Private WithEvents _searchTimer As New Timer()
     Private _isFirstLoad As Boolean = True
+    Private _estaCargandoLicencias As Boolean = False
 
-    ' --- LOAD / UNLOAD ---
-    ' Cambia "Private Sub" por "Private Async Sub"
+    ' --- MEJORA: Variable para guardar el color original del textbox ---
+    Private _colorOriginalBusqueda As Color
+
+#Region "Ciclo de Vida del Formulario"
+
     Private Async Sub frmGestionLicencias_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
         ConfigurarGrillaLicencias()
 
-        _searchTimer.Interval = 500
+        ' MEJORA: Aumentamos el intervalo para que no se active tan rápido
+        _searchTimer.Interval = 700
         _searchTimer.Enabled = False
+
+        ' MEJORA: Guardamos el color original del textbox
+        _colorOriginalBusqueda = txtBusquedaLicencia.BackColor
 
         txtBusquedaLicencia.Focus()
         AddHandler NotificadorEventos.FuncionarioActualizado, AddressOf OnFuncionarioActualizado
 
-        ' Esto está bien, lo dejas como está
         chkSoloVigentes.Checked = True
         _isFirstLoad = False
 
@@ -29,14 +35,8 @@ Public Class frmLicencias
         Catch
         End Try
 
-        ' Notificación opcional, puedes quitarla si quieres
-        Notifier.Info(Me, "Cargando licencias vigentes...")
-
-        ' --- LÍNEA AÑADIDA ---
-        ' Esta es la llamada que faltaba para cargar los datos
         Await CargarDatosLicenciasAsync()
     End Sub
-
 
     Private Sub frmGestionLicencias_FormClosed(sender As Object, e As FormClosedEventArgs) Handles Me.FormClosed
         RemoveHandler NotificadorEventos.FuncionarioActualizado, AddressOf OnFuncionarioActualizado
@@ -45,19 +45,14 @@ Public Class frmLicencias
     Private Async Sub OnFuncionarioActualizado(sender As Object, e As FuncionarioCambiadoEventArgs)
         If Me.IsDisposed OrElse Not Me.IsHandleCreated Then Return
 
-        ' Si querés que solo refresque ante cambios globales:
-        ' If e Is Nothing OrElse Not e.FuncionarioId.HasValue Then
-        '     ' refresco global
-        ' Else
-        '     Return ' ignorar cambios puntuales
-        ' End If
-
         If Me.InvokeRequired Then
             Me.BeginInvoke(New Action(Async Sub() Await CargarDatosLicenciasAsync()))
         Else
             Await CargarDatosLicenciasAsync()
         End If
     End Sub
+
+#End Region
 
 #Region "Configuración y Carga de Datos"
 
@@ -84,17 +79,23 @@ Public Class frmLicencias
         End With
     End Sub
 
-    Private _estaCargandoLicencias As Boolean = False
-
+    ' --- MÉTODO MODIFICADO ---
+    ' Se reemplaza LoadingHelper por un feedback de carga no bloqueante.
     Private Async Function CargarDatosLicenciasAsync() As Task
         If _estaCargandoLicencias Then Return
         _estaCargandoLicencias = True
+
+        ' Inicia el feedback visual no bloqueante
+        txtBusquedaLicencia.BackColor = Color.Gold
+        dgvLicencias.Enabled = False
+        Me.Cursor = Cursors.WaitCursor
+
         Try
             Dim filtro = txtBusquedaLicencia.Text.Trim()
             Dim soloVigentes = (chkSoloVigentes IsNot Nothing AndAlso chkSoloVigentes.Checked)
 
-            LoadingHelper.MostrarCargando(Me)
-            dgvLicencias.DataSource = Nothing
+            ' Pausa breve para que la UI se actualice antes de la tarea pesada
+            Await Task.Delay(50)
 
             Dim datos As List(Of LicenciaConFuncionarioExtendidoDto)
             If soloVigentes Then
@@ -107,39 +108,36 @@ Public Class frmLicencias
             dgvLicencias.ClearSelection()
 
         Catch ex As Exception
-            Notifier.[Error](Me, $"Error al cargar licencias: {ex.Message}")
+            Notifier.Error(Me, $"Error al cargar licencias: {ex.Message}")
             dgvLicencias.DataSource = Nothing
         Finally
+            ' Restaura la UI a su estado normal
+            txtBusquedaLicencia.BackColor = _colorOriginalBusqueda
+            dgvLicencias.Enabled = True
+            Me.Cursor = Cursors.Default
             _estaCargandoLicencias = False
-            LoadingHelper.OcultarCargando(Me)
         End Try
     End Function
-    Private Sub dgvLicencias_RowPrePaint(sender As Object, e As DataGridViewRowPrePaintEventArgs) Handles dgvLicencias.RowPrePaint
-        ' Asegurarse de que no es una fila de encabezado
-        If e.RowIndex < 0 Then Return
 
-        ' Obtener el objeto de datos enlazado a la fila
+    Private Sub dgvLicencias_RowPrePaint(sender As Object, e As DataGridViewRowPrePaintEventArgs) Handles dgvLicencias.RowPrePaint
+        If e.RowIndex < 0 Then Return
         Dim row = Me.dgvLicencias.Rows(e.RowIndex)
         Dim dto = TryCast(row.DataBoundItem, LicenciaConFuncionarioExtendidoDto)
 
         If dto IsNot Nothing Then
-            ' Si el funcionario está inactivo, pintar la fila.
             If Not dto.Activo Then
                 row.DefaultCellStyle.BackColor = Color.MistyRose
                 row.DefaultCellStyle.ForeColor = Color.DarkRed
             Else
-                ' IMPORTANTE: Si no está inactivo, restaurar los colores por defecto.
-                ' Esto evita que el color se "pegue" a otras filas al hacer scroll.
                 row.DefaultCellStyle.BackColor = dgvLicencias.DefaultCellStyle.BackColor
                 row.DefaultCellStyle.ForeColor = dgvLicencias.DefaultCellStyle.ForeColor
             End If
         End If
     End Sub
 
-
 #End Region
 
-#Region "Helpers de navegación (pila del Dashboard)"
+#Region "Helpers de Navegación"
     Private Function GetDashboard() As frmDashboard
         Return Application.OpenForms.OfType(Of frmDashboard)().FirstOrDefault()
     End Function
@@ -163,12 +161,10 @@ Public Class frmLicencias
 
         Try
             dash.AbrirChild(formHijo)
-            Notifier.Success(dash, $"Abierto: {formHijo.Text}")
         Catch ex As Exception
-            Notifier.[Error](dash, $"No se pudo abrir la ventana: {ex.Message}")
+            Notifier.Error(dash, $"No se pudo abrir la ventana: {ex.Message}")
         End Try
     End Sub
-
 #End Region
 
 #Region "Búsqueda y Acciones"
@@ -178,12 +174,22 @@ Public Class frmLicencias
         _searchTimer.Start()
     End Sub
 
+    ' --- MÉTODO MODIFICADO ---
+    ' Se elimina el Notifier para una experiencia más limpia y se añade el foco.
     Private Async Sub SearchTimer_Tick(sender As Object, e As EventArgs) Handles _searchTimer.Tick
         _searchTimer.Stop()
         Await CargarDatosLicenciasAsync()
-        Notifier.Info(Me, "Búsqueda actualizada.")
+        txtBusquedaLicencia.Focus()
     End Sub
 
+    Private Async Sub txtBusquedaLicencia_KeyDown(sender As Object, e As KeyEventArgs) Handles txtBusquedaLicencia.KeyDown
+        If e.KeyCode = Keys.Enter Then
+            e.SuppressKeyPress = True
+            _searchTimer.Stop()
+            Await CargarDatosLicenciasAsync()
+            txtBusquedaLicencia.Focus()
+        End If
+    End Sub
 
     Private Async Sub chkSoloVigentes_CheckedChanged(sender As Object, e As EventArgs) Handles chkSoloVigentes.CheckedChanged
         If _isFirstLoad Then Return
@@ -191,8 +197,6 @@ Public Class frmLicencias
     End Sub
 
     Private Sub btnNuevaLicencia_Click(sender As Object, e As EventArgs) Handles btnNuevaLicencia.Click
-        ' Antes: NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
-        ' Ahora: abrir como child para que al cerrar vuelva a esta pantalla
         AbrirChildEnDashboard(New frmLicenciaCrear())
     End Sub
 
@@ -220,7 +224,6 @@ Public Class frmLicencias
         AbrirChildEnDashboard(New frmLicenciaCrear(dto.LicenciaId.Value, dto.EstadoLicencia))
     End Sub
 
-
     Private Async Sub btnEliminarLicencia_Click(sender As Object, e As EventArgs) Handles btnEliminarLicencia.Click
         If dgvLicencias.CurrentRow Is Nothing Then
             Notifier.Warn(Me, "Seleccioná una licencia para eliminar.")
@@ -235,28 +238,29 @@ Public Class frmLicencias
 
         Dim nombre = If(dto.NombreFuncionario, "(sin nombre)")
         If MessageBox.Show($"¿Eliminar la licencia de '{nombre}'?", "Confirmar",
-                           MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then
+                            MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then
             Return
         End If
 
+        ' Se usa el feedback de carga no bloqueante también aquí para consistencia
         Dim oldCursor = Me.Cursor
         btnEliminarLicencia.Enabled = False
         Me.Cursor = Cursors.WaitCursor
 
         Try
             Await _licenciaSvc.DeleteAsync(dto.LicenciaId.Value)
-            Notifier.Info(Me, "Licencia eliminada.")
+            Notifier.Success(Me, "Licencia eliminada.")
+            ' El evento OnFuncionarioActualizado se encargará de recargar los datos si es necesario
             NotificadorEventos.NotificarRefrescoTotal()
-            Await CargarDatosLicenciasAsync()
         Catch ex As Exception
-            Notifier.[Error](Me, $"Error al eliminar la licencia: {ex.Message}")
+            Notifier.Error(Me, $"Error al eliminar la licencia: {ex.Message}")
         Finally
             Me.Cursor = oldCursor
             btnEliminarLicencia.Enabled = True
         End Try
     End Sub
 
-
 #End Region
 
 End Class
+

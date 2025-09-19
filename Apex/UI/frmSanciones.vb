@@ -87,7 +87,8 @@
             dgvSanciones.DataSource = Nothing
             dgvSanciones.DataSource = lista
         Catch ex As Exception
-            MessageBox.Show("Error al cargar sanciones: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            ' --- NOTIFIER APLICADO ---
+            Notifier.Warn(Me, $"Error al cargar sanciones: {ex.Message}", 3000)
         Finally
             LoadingHelper.OcultarCargando(Me)
         End Try
@@ -116,6 +117,8 @@
     Private Async Sub frmSanciones_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
         If e.KeyCode = Keys.F5 Then
             Await CargarDatosSancionesAsync()
+            ' --- NOTIFIER APLICADO ---
+            Notifier.Success(Me, "Lista de sanciones actualizada.", 1500)
             e.Handled = True
         ElseIf e.KeyCode = Keys.Delete Then
             btnEliminarSancion.PerformClick()
@@ -130,7 +133,11 @@
     End Sub
 
     Private Sub btnEditarSancion_Click(sender As Object, e As EventArgs) Handles btnEditarSancion.Click
-        If dgvSanciones.CurrentRow Is Nothing Then Return
+        If dgvSanciones.CurrentRow Is Nothing Then
+            ' --- NOTIFIER APLICADO ---
+            Notifier.Info(Me, "Seleccioná una sanción para editar.", 2000)
+            Return
+        End If
         Dim fila = TryCast(dgvSanciones.CurrentRow.DataBoundItem, SancionListadoItem)
         If fila Is Nothing Then Return
 
@@ -139,17 +146,24 @@
     End Sub
 
     Private Async Sub btnEliminarSancion_Click(sender As Object, e As EventArgs) Handles btnEliminarSancion.Click
-        If dgvSanciones.CurrentRow Is Nothing Then Return
-
+        If dgvSanciones.CurrentRow Is Nothing Then
+            ' --- NOTIFIER APLICADO ---
+            Notifier.Info(Me, "Seleccioná una sanción para eliminar.", 2000)
+            Return
+        End If
         Dim fila = TryCast(dgvSanciones.CurrentRow.DataBoundItem, SancionListadoItem)
         If fila Is Nothing Then Return
 
         If MessageBox.Show($"¿Eliminar la sanción de '{fila.NombreFuncionario}'?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
             Try
                 Await _svc.DeleteAsync(fila.Id) ' GenericService borra por PK
+                ' --- NOTIFIER APLICADO ---
+                Notifier.Success(Me, "Sanción eliminada correctamente.", 2000)
+
                 Await CargarDatosSancionesAsync()
             Catch ex As Exception
-                MessageBox.Show("Error al eliminar la sanción: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                ' --- NOTIFIER APLICADO ---
+                Notifier.Error(Me, $"Error al eliminar: {ex.Message}", 3000)
             End Try
         End If
     End Sub
@@ -163,7 +177,8 @@
     Private Sub AbrirChildEnDashboard(formHijo As Form)
         Dim dash = GetDashboard()
         If dash Is Nothing Then
-            MessageBox.Show("No se encontró el Dashboard activo.", "Navegación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            ' --- NOTIFIER APLICADO ---
+            Notifier.Warn(Me, "No se encontró el Dashboard activo.", 2500)
             Return
         End If
         dash.AbrirChild(formHijo)

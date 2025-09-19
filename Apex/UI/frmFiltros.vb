@@ -580,15 +580,23 @@ Partial Public Class frmFiltros
         Return list
     End Function
 
-    ' Validación simple y rápida (suficiente para limpieza en UI)
+    ' Validación de email mejorada con Regex, más robusta y rápida.
     Private Function IsValidEmail(s As String) As Boolean
         If String.IsNullOrWhiteSpace(s) Then Return False
-        ' evita strings muy largos y espacios
+
+        ' Evita strings muy largos y espacios, que son inválidos y pueden hacer que el Regex sea lento.
         If s.Length > 254 OrElse s.Contains(" "c) Then Return False
+
         Try
-            Dim addr = New System.Net.Mail.MailAddress(s)
-            ' exige que tenga dominio con punto
-            Return s.IndexOf("@"c) > 0 AndAlso addr.Host.Contains("."c)
+            ' Usamos una expresión regular para validar el formato del email.
+            ' Esto es más flexible y seguro que usar New MailAddress().
+            Return System.Text.RegularExpressions.Regex.IsMatch(s,
+            "^[^@\s]+@[^@\s]+\.[^@\s]+$",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase,
+            TimeSpan.FromMilliseconds(250))
+        Catch e As System.Text.RegularExpressions.RegexMatchTimeoutException
+            ' Protección contra strings maliciosos que podrían causar un DoS.
+            Return False
         Catch
             Return False
         End Try

@@ -44,4 +44,5 @@ Public Interface IRepository(Of T As Class)
     Function GetQueryable(Optional includeProperties As String = "",
                           Optional tracking As Boolean = False) As IQueryable(Of T)
 
+
 End Interface
