@@ -189,6 +189,7 @@
     <Compile Include="Common\NotificadorEventos.vb" />
     <Compile Include="Common\NotifierShim.vb" />
     <Compile Include="Common\StringExtensions.vb" />
+    <Compile Include="Common\TaskExtensions.vb" />
     <Compile Include="Common\Toast.vb">
       <SubType>Form</SubType>
     </Compile>

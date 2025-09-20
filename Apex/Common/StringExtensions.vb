@@ -1,4 +1,5 @@
 ﻿Imports System.Globalization
+Imports System.Management.Instrumentation
 Imports System.Text
 
 Module StringExtensions
@@ -16,5 +17,6 @@ Module StringExtensions
         Next
         ' Reconstruye la cadena limpia
         Return sb.ToString().Normalize(NormalizationForm.FormC)
+
     End Function
 End Module

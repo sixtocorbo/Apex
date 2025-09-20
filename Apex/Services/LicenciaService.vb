@@ -409,6 +409,7 @@ Public Class LicenciaService
             Return licencias
         End Using
     End Function
+
 End Class
 
 ' ---- DTO para el SqlQuery de GetAllConDetallesAsync ----
