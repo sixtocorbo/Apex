@@ -103,17 +103,33 @@ Public Class frmDashboard
             Notifier.Error(Me, $"No se pudo abrir la ventana: el formulario '{formToShow.Name}' ya se cerró.")
             Exit Sub
         End If
-
-        ' --- Manejo del activo ---
         If _activeForm IsNot Nothing Then
-            If isChild Then _navStack.Push(_activeForm)
-
-            If Not _formularios.ContainsValue(_activeForm) Then
-                _activeForm.Close()
-            Else
+            If isChild Then
+                ' Si el formulario actual será un "padre",
+                ' SIEMPRE lo ocultamos para poder volver a él,
+                ' sin importar si es temporal o persistente.
+                _navStack.Push(_activeForm)
                 _activeForm.Hide()
+            Else
+                ' Si no es un padre (navegación normal desde el menú),
+                ' aplicamos la lógica original de cerrar temporales.
+                If Not _formularios.ContainsValue(_activeForm) Then
+                    _activeForm.Close()
+                Else
+                    _activeForm.Hide()
+                End If
             End If
         End If
+        '' --- Manejo del activo ---
+        'If _activeForm IsNot Nothing Then
+        '    If isChild Then _navStack.Push(_activeForm)
+
+        '    If Not _formularios.ContainsValue(_activeForm) Then
+        '        _activeForm.Close()
+        '    Else
+        '        _activeForm.Hide()
+        '    End If
+        'End If
 
         ' --- Embebido ---
         If Not Me.panelContenido.Controls.Contains(formToShow) Then
