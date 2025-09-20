@@ -204,7 +204,7 @@ Partial Public Class frmFiltros
             UpdateUIState()
         End Try
     End Function
-    Protected Overrides Async Function RefrescarSegunEventoAsync(e As FuncionarioCambiadoEventArgs) As Task
+    Protected Overrides Async Function RefrescarSegunFuncionarioAsync(e As FuncionarioCambiadoEventArgs) As Task
         ' Si hay cualquier origen de datos seleccionado, lo recargamos,
         ' ya que un cambio en un funcionario puede afectar a licencias, sanciones, etc.
         If cmbOrigenDatos.SelectedItem IsNot Nothing Then

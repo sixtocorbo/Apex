@@ -2,6 +2,7 @@
 Partial Class frmGrados
     Inherits System.Windows.Forms.Form
 
+    'Form overrides dispose to clean up the component list.
     <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
@@ -13,35 +14,45 @@ Partial Class frmGrados
         End Try
     End Sub
 
+    'Required by the Windows Form Designer
     Private components As System.ComponentModel.IContainer
 
+    'NOTE: The following procedure is required by the Windows Form Designer
+    'It can be modified using the Windows Form Designer.  
+    'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
         Me.dgvCargos = New System.Windows.Forms.DataGridView()
         Me.txtBuscar = New System.Windows.Forms.TextBox()
         Me.Label8 = New System.Windows.Forms.Label()
+        Me.pnlEdicion = New System.Windows.Forms.TableLayoutPanel()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.pnlInputs = New System.Windows.Forms.TableLayoutPanel()
         Me.txtGrado = New System.Windows.Forms.TextBox()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.txtNombre = New System.Windows.Forms.TextBox()
         Me.Label1 = New System.Windows.Forms.Label()
-        Me.btnNuevo = New System.Windows.Forms.Button()
-        Me.btnEliminar = New System.Windows.Forms.Button()
+        Me.pnlBotones = New System.Windows.Forms.TableLayoutPanel()
         Me.btnGuardar = New System.Windows.Forms.Button()
+        Me.btnEliminar = New System.Windows.Forms.Button()
+        Me.btnNuevo = New System.Windows.Forms.Button()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
         Me.SplitContainer1.SuspendLayout()
         CType(Me.dgvCargos, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.pnlEdicion.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
+        Me.pnlInputs.SuspendLayout()
+        Me.pnlBotones.SuspendLayout()
         Me.SuspendLayout()
         '
         'SplitContainer1
         '
         Me.SplitContainer1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.SplitContainer1.Location = New System.Drawing.Point(0, 0)
-        Me.SplitContainer1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.SplitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel2
+        Me.SplitContainer1.Location = New System.Drawing.Point(10, 10)
         Me.SplitContainer1.Name = "SplitContainer1"
         '
         'SplitContainer1.Panel1
@@ -52,13 +63,9 @@ Partial Class frmGrados
         '
         'SplitContainer1.Panel2
         '
-        Me.SplitContainer1.Panel2.Controls.Add(Me.GroupBox1)
-        Me.SplitContainer1.Panel2.Controls.Add(Me.btnNuevo)
-        Me.SplitContainer1.Panel2.Controls.Add(Me.btnEliminar)
-        Me.SplitContainer1.Panel2.Controls.Add(Me.btnGuardar)
-        Me.SplitContainer1.Size = New System.Drawing.Size(1200, 692)
-        Me.SplitContainer1.SplitterDistance = 565
-        Me.SplitContainer1.SplitterWidth = 6
+        Me.SplitContainer1.Panel2.Controls.Add(Me.pnlEdicion)
+        Me.SplitContainer1.Size = New System.Drawing.Size(1014, 555)
+        Me.SplitContainer1.SplitterDistance = 580
         Me.SplitContainer1.TabIndex = 0
         '
         'dgvCargos
@@ -77,7 +84,7 @@ Partial Class frmGrados
         Me.dgvCargos.RowHeadersVisible = False
         Me.dgvCargos.RowHeadersWidth = 62
         Me.dgvCargos.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgvCargos.Size = New System.Drawing.Size(565, 646)
+        Me.dgvCargos.Size = New System.Drawing.Size(580, 509)
         Me.dgvCargos.TabIndex = 2
         '
         'txtBuscar
@@ -86,7 +93,7 @@ Partial Class frmGrados
         Me.txtBuscar.Location = New System.Drawing.Point(0, 20)
         Me.txtBuscar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtBuscar.Name = "txtBuscar"
-        Me.txtBuscar.Size = New System.Drawing.Size(565, 26)
+        Me.txtBuscar.Size = New System.Drawing.Size(580, 26)
         Me.txtBuscar.TabIndex = 1
         '
         'Label8
@@ -100,25 +107,59 @@ Partial Class frmGrados
         Me.Label8.TabIndex = 0
         Me.Label8.Text = "Buscar:"
         '
+        'pnlEdicion
+        '
+        Me.pnlEdicion.ColumnCount = 1
+        Me.pnlEdicion.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+        Me.pnlEdicion.Controls.Add(Me.GroupBox1, 0, 0)
+        Me.pnlEdicion.Controls.Add(Me.pnlBotones, 0, 1)
+        Me.pnlEdicion.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.pnlEdicion.Location = New System.Drawing.Point(0, 0)
+        Me.pnlEdicion.Name = "pnlEdicion"
+        Me.pnlEdicion.RowCount = 3
+        Me.pnlEdicion.RowStyles.Add(New System.Windows.Forms.RowStyle())
+        Me.pnlEdicion.RowStyles.Add(New System.Windows.Forms.RowStyle())
+        Me.pnlEdicion.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+        Me.pnlEdicion.Size = New System.Drawing.Size(430, 555)
+        Me.pnlEdicion.TabIndex = 0
+        '
         'GroupBox1
         '
-        Me.GroupBox1.Controls.Add(Me.txtGrado)
-        Me.GroupBox1.Controls.Add(Me.Label2)
-        Me.GroupBox1.Controls.Add(Me.txtNombre)
-        Me.GroupBox1.Controls.Add(Me.Label1)
-        Me.GroupBox1.Location = New System.Drawing.Point(21, 18)
+        Me.GroupBox1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBox1.Controls.Add(Me.pnlInputs)
+        Me.GroupBox1.Location = New System.Drawing.Point(4, 5)
         Me.GroupBox1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.GroupBox1.Size = New System.Drawing.Size(590, 175)
-        Me.GroupBox1.TabIndex = 4
+        Me.GroupBox1.Padding = New System.Windows.Forms.Padding(10)
+        Me.GroupBox1.Size = New System.Drawing.Size(422, 120)
+        Me.GroupBox1.TabIndex = 0
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Detalles del Cargo"
         '
+        'pnlInputs
+        '
+        Me.pnlInputs.ColumnCount = 2
+        Me.pnlInputs.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+        Me.pnlInputs.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+        Me.pnlInputs.Controls.Add(Me.txtGrado, 1, 1)
+        Me.pnlInputs.Controls.Add(Me.Label2, 0, 1)
+        Me.pnlInputs.Controls.Add(Me.txtNombre, 1, 0)
+        Me.pnlInputs.Controls.Add(Me.Label1, 0, 0)
+        Me.pnlInputs.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.pnlInputs.Location = New System.Drawing.Point(10, 29)
+        Me.pnlInputs.Name = "pnlInputs"
+        Me.pnlInputs.RowCount = 2
+        Me.pnlInputs.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+        Me.pnlInputs.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+        Me.pnlInputs.Size = New System.Drawing.Size(402, 81)
+        Me.pnlInputs.TabIndex = 0
+        '
         'txtGrado
         '
+        Me.txtGrado.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.txtGrado.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
-        Me.txtGrado.Location = New System.Drawing.Point(93, 108)
+        Me.txtGrado.Location = New System.Drawing.Point(81, 47)
         Me.txtGrado.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtGrado.Name = "txtGrado"
         Me.txtGrado.Size = New System.Drawing.Size(148, 26)
@@ -126,8 +167,9 @@ Partial Class frmGrados
         '
         'Label2
         '
+        Me.Label2.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(18, 112)
+        Me.Label2.Location = New System.Drawing.Point(4, 50)
         Me.Label2.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(58, 20)
@@ -136,62 +178,87 @@ Partial Class frmGrados
         '
         'txtNombre
         '
+        Me.txtNombre.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtNombre.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
-        Me.txtNombre.Location = New System.Drawing.Point(93, 51)
+        Me.txtNombre.Location = New System.Drawing.Point(81, 7)
         Me.txtNombre.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtNombre.Name = "txtNombre"
-        Me.txtNombre.Size = New System.Drawing.Size(486, 26)
+        Me.txtNombre.Size = New System.Drawing.Size(317, 26)
         Me.txtNombre.TabIndex = 1
         '
         'Label1
         '
+        Me.Label1.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(18, 55)
+        Me.Label1.Location = New System.Drawing.Point(4, 10)
         Me.Label1.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(69, 20)
         Me.Label1.TabIndex = 0
         Me.Label1.Text = "Nombre:"
         '
-        'btnNuevo
+        'pnlBotones
         '
-        Me.btnNuevo.Location = New System.Drawing.Point(21, 232)
-        Me.btnNuevo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnNuevo.Name = "btnNuevo"
-        Me.btnNuevo.Size = New System.Drawing.Size(180, 46)
-        Me.btnNuevo.TabIndex = 3
-        Me.btnNuevo.Text = "Nuevo"
-        Me.btnNuevo.UseVisualStyleBackColor = True
+        Me.pnlBotones.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.pnlBotones.ColumnCount = 2
+        Me.pnlBotones.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+        Me.pnlBotones.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+        Me.pnlBotones.Controls.Add(Me.btnGuardar, 1, 0)
+        Me.pnlBotones.Controls.Add(Me.btnEliminar, 0, 1)
+        Me.pnlBotones.Controls.Add(Me.btnNuevo, 0, 0)
+        Me.pnlBotones.Location = New System.Drawing.Point(3, 133)
+        Me.pnlBotones.Name = "pnlBotones"
+        Me.pnlBotones.RowCount = 2
+        Me.pnlBotones.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+        Me.pnlBotones.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+        Me.pnlBotones.Size = New System.Drawing.Size(424, 112)
+        Me.pnlBotones.TabIndex = 1
+        '
+        'btnGuardar
+        '
+        Me.btnGuardar.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.btnGuardar.Location = New System.Drawing.Point(216, 5)
+        Me.btnGuardar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnGuardar.Name = "btnGuardar"
+        Me.btnGuardar.Size = New System.Drawing.Size(204, 46)
+        Me.btnGuardar.TabIndex = 1
+        Me.btnGuardar.Text = "Guardar"
+        Me.btnGuardar.UseVisualStyleBackColor = True
         '
         'btnEliminar
         '
-        Me.btnEliminar.Location = New System.Drawing.Point(21, 288)
+        Me.btnEliminar.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.btnEliminar.Location = New System.Drawing.Point(4, 61)
         Me.btnEliminar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnEliminar.Name = "btnEliminar"
-        Me.btnEliminar.Size = New System.Drawing.Size(180, 46)
+        Me.btnEliminar.Size = New System.Drawing.Size(204, 46)
         Me.btnEliminar.TabIndex = 2
         Me.btnEliminar.Text = "Eliminar"
         Me.btnEliminar.UseVisualStyleBackColor = True
         '
-        'btnGuardar
+        'btnNuevo
         '
-        Me.btnGuardar.Location = New System.Drawing.Point(430, 232)
-        Me.btnGuardar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnGuardar.Name = "btnGuardar"
-        Me.btnGuardar.Size = New System.Drawing.Size(180, 46)
-        Me.btnGuardar.TabIndex = 1
-        Me.btnGuardar.Text = "Guardar"
-        Me.btnGuardar.UseVisualStyleBackColor = True
+        Me.btnNuevo.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.btnNuevo.Location = New System.Drawing.Point(4, 5)
+        Me.btnNuevo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnNuevo.Name = "btnNuevo"
+        Me.btnNuevo.Size = New System.Drawing.Size(204, 46)
+        Me.btnNuevo.TabIndex = 0
+        Me.btnNuevo.Text = "Nuevo"
+        Me.btnNuevo.UseVisualStyleBackColor = True
         '
         'frmGrados
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1200, 692)
+        Me.ClientSize = New System.Drawing.Size(1034, 575)
         Me.Controls.Add(Me.SplitContainer1)
         Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.MinimumSize = New System.Drawing.Size(800, 600)
         Me.Name = "frmGrados"
+        Me.Padding = New System.Windows.Forms.Padding(10)
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Gestión de Cargos"
         Me.SplitContainer1.Panel1.ResumeLayout(False)
@@ -200,8 +267,11 @@ Partial Class frmGrados
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.SplitContainer1.ResumeLayout(False)
         CType(Me.dgvCargos, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.pnlEdicion.ResumeLayout(False)
         Me.GroupBox1.ResumeLayout(False)
-        Me.GroupBox1.PerformLayout()
+        Me.pnlInputs.ResumeLayout(False)
+        Me.pnlInputs.PerformLayout()
+        Me.pnlBotones.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub
@@ -218,4 +288,7 @@ Partial Class frmGrados
     Friend WithEvents btnNuevo As Button
     Friend WithEvents btnEliminar As Button
     Friend WithEvents btnGuardar As Button
+    Friend WithEvents pnlEdicion As TableLayoutPanel
+    Friend WithEvents pnlInputs As TableLayoutPanel
+    Friend WithEvents pnlBotones As TableLayoutPanel
 End Class

@@ -660,31 +660,71 @@ Public Class frmFuncionarioCrear
         Dim editable = (row IsNot Nothing)
         btnEditarEstado.Enabled = editable : btnQuitarEstado.Enabled = editable : btnAñadirEstado.Enabled = True
     End Sub
-
     Private Sub btnAñadirEstado_Click(sender As Object, e As EventArgs) Handles btnAñadirEstado.Click
-        ' Vincular el funcionario evita NullReference en el form de estado (Case 30)
+        ' Preparamos el nuevo estado
         Dim nuevoEstado = New EstadoTransitorio() With {
-            .Funcionario = _funcionario
-        }
+        .Funcionario = _funcionario
+    }
 
-        Using frm As New frmFuncionarioEstadoTransitorio(nuevoEstado, _tiposEstadoTransitorio, _uow)
-            If frm.ShowDialog(Me) = DialogResult.OK Then
-                _estadoRows.Add(BuildEstadoRow(frm.Estado, "Nuevo"))
-                bsEstados.ResetBindings(False)
-            End If
-        End Using
+        ' Creamos la instancia del formulario hijo
+        Dim frm As New frmFuncionarioEstadoTransitorio(nuevoEstado, _tiposEstadoTransitorio, _uow)
+
+        ' Nos suscribimos a SU evento para recibir el estado de vuelta.
+        ' Cuando 'frm' se cierre y dispare el evento, se llamará a nuestro método receptor.
+        AddHandler frm.EstadoConfigurado, AddressOf FrmEstado_EstadoConfigurado_Nuevo
+
+        ' ¡AQUÍ ESTÁ LA CLAVE! Lo abrimos en el dashboard.
+        AbrirChildEnDashboard(frm)
     End Sub
+    ' Este método se ejecutará cuando el hijo (abierto para AÑADIR) 
+    ' dispare el evento "EstadoConfigurado"
+    Private Sub FrmEstado_EstadoConfigurado_Nuevo(estado As EstadoTransitorio)
+        ' La lógica que antes estaba en "If DialogResult.OK" ahora va aquí
+        _estadoRows.Add(BuildEstadoRow(estado, "Nuevo"))
+        bsEstados.ResetBindings(False)
+    End Sub
+    'Private Sub btnAñadirEstado_Click(sender As Object, e As EventArgs) Handles btnAñadirEstado.Click
+    '    ' Vincular el funcionario evita NullReference en el form de estado (Case 30)
+    '    Dim nuevoEstado = New EstadoTransitorio() With {
+    '        .Funcionario = _funcionario
+    '    }
 
+    '    Using frm As New frmFuncionarioEstadoTransitorio(nuevoEstado, _tiposEstadoTransitorio, _uow)
+    '        If frm.ShowDialog(Me) = DialogResult.OK Then
+    '            _estadoRows.Add(BuildEstadoRow(frm.Estado, "Nuevo"))
+    '            bsEstados.ResetBindings(False)
+    '        End If
+    '    End Using
+    'End Sub
     Private Sub btnEditarEstado_Click(sender As Object, e As EventArgs) Handles btnEditarEstado.Click
+        ' Obtenemos la fila a editar
         Dim row = TryCast(dgvEstadosTransitorios.CurrentRow?.DataBoundItem, EstadoRow)
         If row?.EntityRef Is Nothing Then Return
-        Using frm As New frmFuncionarioEstadoTransitorio(row.EntityRef, _tiposEstadoTransitorio, _uow)
-            If frm.ShowDialog(Me) = DialogResult.OK Then
-                UpdateRowFromEntity(row, frm.Estado)
-                bsEstados.ResetBindings(False)
-            End If
-        End Using
+
+        ' Creamos la instancia del formulario hijo
+        Dim frm As New frmFuncionarioEstadoTransitorio(row.EntityRef, _tiposEstadoTransitorio, _uow)
+
+        ' Nos suscribimos al evento usando una expresión Lambda.
+        ' Esto nos permite ejecutar el código de actualización aquí mismo.
+        AddHandler frm.EstadoConfigurado, Sub(estadoModificado As EstadoTransitorio)
+                                              ' Esta lógica se ejecuta cuando el hijo devuelve los datos
+                                              UpdateRowFromEntity(row, estadoModificado)
+                                              bsEstados.ResetBindings(False)
+                                          End Sub
+
+        ' ¡Y lo abrimos en el dashboard!
+        AbrirChildEnDashboard(frm)
     End Sub
+    'Private Sub btnEditarEstado_Click(sender As Object, e As EventArgs) Handles btnEditarEstado.Click
+    '    Dim row = TryCast(dgvEstadosTransitorios.CurrentRow?.DataBoundItem, EstadoRow)
+    '    If row?.EntityRef Is Nothing Then Return
+    '    Using frm As New frmFuncionarioEstadoTransitorio(row.EntityRef, _tiposEstadoTransitorio, _uow)
+    '        If frm.ShowDialog(Me) = DialogResult.OK Then
+    '            UpdateRowFromEntity(row, frm.Estado)
+    '            bsEstados.ResetBindings(False)
+    '        End If
+    '    End Using
+    'End Sub
 
     Private Sub btnQuitarEstado_Click(sender As Object, e As EventArgs) Handles btnQuitarEstado.Click
         ' 1) Validación de selección

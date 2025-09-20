@@ -25,6 +25,15 @@ Public Class NovedadCambiadaEventArgs
         Me.NovedadId = novedadId
     End Sub
 End Class
+Public Class EstadoCambiadoEventArgs
+    Inherits EventArgs
+    ' Llevamos el ID del funcionario para saber a quién pertenece el estado que cambió
+    Public ReadOnly Property FuncionarioId As Integer
+
+    Public Sub New(funcionarioId As Integer)
+        Me.FuncionarioId = funcionarioId
+    End Sub
+End Class
 
 ' ============================
 ' Notificador
@@ -63,6 +72,22 @@ Public Module NotificadorEventos
         AddHandler NovedadActualizada, handler
         Return New Subscription(Sub() RemoveHandler NovedadActualizada, handler)
     End Function
+
+    ' --------- CANAL: Estados Transitorios ---------
+    Public Event EstadoActualizado As EventHandler(Of EstadoCambiadoEventArgs)
+
+    ' Notifica un cambio en los estados de un funcionario específico
+    Public Sub NotificarCambioEnEstado(funcionarioId As Integer)
+        RaiseEvent EstadoActualizado(Nothing, New EstadoCambiadoEventArgs(funcionarioId))
+    End Sub
+
+    ' Suscripción para estados
+    Public Function SuscribirEstado(handler As EventHandler(Of EstadoCambiadoEventArgs)) As IDisposable
+        AddHandler EstadoActualizado, handler
+        Return New Subscription(Sub() RemoveHandler EstadoActualizado, handler)
+    End Function
+
+    ' ---> FIN DE CÓDIGO NUEVO <---
 
     ' ============================
     ' Utilidad interna

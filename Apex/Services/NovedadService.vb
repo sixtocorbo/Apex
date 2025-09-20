@@ -53,25 +53,27 @@ Public Class NovedadService
         Return lista
     End Function
 
-    ''' <summary>Búsqueda avanzada combinando FTS, fecha y funcionarios.</summary>
+
+    ' En NovedadService.vb
+
     Public Async Function BuscarNovedadesAvanzadoAsync(textoBusqueda As String,
-                                                       fechaDesde As DateTime?,
-                                                       fechaHasta As DateTime?,
-                                                       idsFuncionarios As List(Of Integer)) As Task(Of List(Of vw_NovedadesAgrupadas))
+                                                   fechaDesde As DateTime?,
+                                                   fechaHasta As DateTime?,
+                                                   idsFuncionarios As List(Of Integer)) As Task(Of List(Of vw_NovedadesAgrupadas))
 
         ' Caso sin filtros: últimas 200
         If String.IsNullOrWhiteSpace(textoBusqueda) AndAlso
-           Not fechaDesde.HasValue AndAlso
-           (idsFuncionarios Is Nothing OrElse Not idsFuncionarios.Any()) Then
+       Not fechaDesde.HasValue AndAlso
+       (idsFuncionarios Is Nothing OrElse Not idsFuncionarios.Any()) Then
 
             Dim listaSinFiltro = Await _unitOfWork.Repository(Of vw_NovedadesAgrupadas)().GetAll().
-                                     OrderByDescending(Function(n) n.Fecha).
-                                     ThenByDescending(Function(n) n.Id).
-                                     Take(200).
-                                     ToListAsync()
+                                        OrderByDescending(Function(n) n.Fecha).
+                                        ThenByDescending(Function(n) n.Id).
+                                        Take(200).
+                                        ToListAsync()
 
             Await RegistrarAuditoriaSeguraAsync("BuscarAvanzado", "Novedad",
-                                                $"Búsqueda sin filtros. Se devuelven las últimas {listaSinFiltro.Count} novedades.")
+                                            $"Búsqueda sin filtros. Se devuelven las últimas {listaSinFiltro.Count} novedades.")
             Return listaSinFiltro
         End If
 
@@ -88,32 +90,35 @@ Public Class NovedadService
             sqlBuilder.AppendLine("INNER JOIN dbo.Novedad AS n ON v.Id = n.Id") ' Para buscar en n.Texto
 
             Dim terminos = textoBusqueda.Split({" "c}, StringSplitOptions.RemoveEmptyEntries).
-                                         Select(Function(w) $"""{w.Trim()}*""")
+                                     Select(Function(w) $"""{w.Trim()}*""")
             Dim expresionFts = String.Join(" AND ", terminos)
             parameters.Add(New SqlParameter("@patronFTS", expresionFts))
 
             Dim ftsCondition =
-                " (CONTAINS(n.Texto, @patronFTS) OR " &
-                "  EXISTS (SELECT 1 " &
-                "          FROM dbo.NovedadFuncionario nf " &
-                "          JOIN dbo.Funcionario f ON nf.FuncionarioId = f.Id " &
-                "          WHERE nf.NovedadId = v.Id AND CONTAINS(f.Nombre, @patronFTS)))"
+            " (CONTAINS(n.Texto, @patronFTS) OR " &
+            "  EXISTS (SELECT 1 " &
+            "          FROM dbo.NovedadFuncionario nf " &
+            "          JOIN dbo.Funcionario f ON nf.FuncionarioId = f.Id " &
+            "          WHERE nf.NovedadId = v.Id AND CONTAINS(f.Nombre, @patronFTS)))"
             whereClauses.Add(ftsCondition)
         End If
 
-        ' Fechas
-        If fechaDesde.HasValue Then
+        ' --- INICIO DE LA CORRECCIÓN ---
+        ' Fechas (con validación para prevenir el desbordamiento de SqlDateTime)
+        Dim minSqlDate As New Date(1753, 1, 1)
+
+        If fechaDesde.HasValue AndAlso fechaDesde.Value >= minSqlDate Then
             whereClauses.Add("v.Fecha >= @fechaDesde")
             parameters.Add(New SqlParameter("@fechaDesde", fechaDesde.Value))
         End If
-        If fechaHasta.HasValue Then
+        If fechaHasta.HasValue AndAlso fechaHasta.Value >= minSqlDate Then
             whereClauses.Add("v.Fecha <= @fechaHasta")
             parameters.Add(New SqlParameter("@fechaHasta", fechaHasta.Value))
         End If
+        ' --- FIN DE LA CORRECCIÓN ---
 
         ' Funcionarios
         If idsFuncionarios IsNot Nothing AndAlso idsFuncionarios.Any() Then
-            ' Para tamaños de lista razonables desde la UI esto va bien.
             Dim funcCondition = $"v.Id IN (SELECT nf.NovedadId FROM dbo.NovedadFuncionario nf WHERE nf.FuncionarioId IN ({String.Join(",", idsFuncionarios)}))"
             whereClauses.Add(funcCondition)
         End If
@@ -125,12 +130,12 @@ Public Class NovedadService
         sqlBuilder.AppendLine("ORDER BY v.Fecha DESC, v.Id DESC")
 
         Dim lista = Await _unitOfWork.Context.Database.SqlQuery(Of vw_NovedadesAgrupadas)(
-            sqlBuilder.ToString(), parameters.ToArray()
-        ).ToListAsync()
+        sqlBuilder.ToString(), parameters.ToArray()
+    ).ToListAsync()
 
         Dim cantFuncs As Integer = If(idsFuncionarios Is Nothing, 0, idsFuncionarios.Count)
         Await RegistrarAuditoriaSeguraAsync("BuscarAvanzado", "Novedad",
-            $"Búsqueda con filtros: Texto='{textoBusqueda}', FechaDesde='{fechaDesde}', FechaHasta='{fechaHasta}', Funcionarios='{cantFuncs}'. Resultados: {lista.Count}.")
+        $"Búsqueda con filtros: Texto='{textoBusqueda}', FechaDesde='{fechaDesde}', FechaHasta='{fechaHasta}', Funcionarios='{cantFuncs}'. Resultados: {lista.Count}.")
 
         Return lista
     End Function

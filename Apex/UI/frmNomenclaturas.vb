@@ -243,7 +243,7 @@ Public Class frmNomenclaturas
     End Sub
 
     Private Sub btnVolver_Click(sender As Object, e As EventArgs) Handles btnVolver.Click
-        Notifier.Info(Me, "Volviendo a Configuración…")
+
         NavegacionHelper.AbrirFormUnicoEnDashboard(Of frmConfiguracion)(Me)
     End Sub
 

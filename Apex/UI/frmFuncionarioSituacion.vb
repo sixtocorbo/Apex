@@ -47,7 +47,7 @@ Public Class frmFuncionarioSituacion
         Await CargarDatosEsenciales()
         Await ActualizarTodo()
     End Sub
-    Protected Overrides Async Function RefrescarSegunEventoAsync(e As FuncionarioCambiadoEventArgs) As Task
+    Protected Overrides Async Function RefrescarSegunFuncionarioAsync(e As FuncionarioCambiadoEventArgs) As Task
         ' Refrescá sólo si corresponde al funcionario visible,
         ' o si es un refresco global (sin Id).
         If e IsNot Nothing AndAlso e.FuncionarioId.HasValue AndAlso e.FuncionarioId.Value <> _funcionarioId Then

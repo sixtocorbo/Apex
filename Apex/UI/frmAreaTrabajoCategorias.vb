@@ -138,4 +138,7 @@ Public Class frmAreaTrabajoCategorias
         End If
     End Sub
 
+    Private Sub btnVolver_Click(sender As Object, e As EventArgs) Handles btnVolver.Click
+        NavegacionHelper.AbrirFormUnicoEnDashboard(Of frmConfiguracion)(Me)
+    End Sub
 End Class

@@ -2,6 +2,7 @@
 Imports System.Data.SqlClient
 Imports System.IO
 Imports System.Text
+Imports System.Threading
 
 Public Class frmFuncionarioBuscar
     Inherits FormActualizable
@@ -15,9 +16,13 @@ Public Class frmFuncionarioBuscar
     Private Const LIMITE_FILAS As Integer = 500
     Private _detallesEstadoActual As New List(Of String)
 
-    ' Temporizador para la búsqueda automática.
-    ' Se especifica el namespace completo para evitar la ambigüedad.
-    Private WithEvents SearchTimer As New System.Windows.Forms.Timer()
+    ' --- INICIO DE CAMBIOS: Variables para la búsqueda mejorada ---
+    Private WithEvents _searchTimer As New System.Windows.Forms.Timer()
+    Private _ctsBusqueda As CancellationTokenSource
+    Private _colorOriginalBusqueda As Color
+    Private _estaBuscando As Boolean = False
+    ' --- FIN DE CAMBIOS ---
+
 
     Public ReadOnly Property FuncionarioSeleccionado As FuncionarioMin
 
@@ -45,38 +50,50 @@ Public Class frmFuncionarioBuscar
         Me.New()
         _modo = modo
     End Sub
-
-    Private Sub frmFuncionarioBuscar_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+#Region "Ciclo de Vida y Eventos Principales"
+    Private Async Sub frmFuncionarioBuscar_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         ConfigurarLayoutResponsivo()
         AjustarSplitter()
         AjustarAnchosTexto()
-        ' Este botón indica estado prioritario: que no cambie de color al pasar el mouse
         btnVerSituacion.Tag = "KeepBackColor"
         panelDetalle.Visible = False
         AppTheme.Aplicar(Me)
         ConfigurarGrilla()
-        AddHandler btnVerSituacion.Click, AddressOf btnVerSituacion_Click
-        AddHandler btnGenerarFicha.Click, AddressOf btnGenerarFicha_Click
-        'AddHandler NotificadorEventos.DatosActualizados, AddressOf OnDatosActualizados
 
-        ' Configurar el temporizador de búsqueda
-        SearchTimer.Interval = 500 ' 500ms de espera antes de buscar
-        AddHandler SearchTimer.Tick, AddressOf SearchTimer_Tick
-        AddHandler txtBusqueda.TextChanged, AddressOf txtBusqueda_TextChanged
-        ' Placeholder en la búsqueda (si agregaste AppTheme.SetCue)
+        ' --- INICIO DE CAMBIOS: Configuración de la nueva búsqueda ---
+        _searchTimer.Interval = 700 ' Aumentamos el intervalo
+        _searchTimer.Enabled = False
+        _colorOriginalBusqueda = txtBusqueda.BackColor
+
+        AddHandler dgvFuncionarios.CurrentCellChanged, AddressOf MostrarDetalle
+        AddHandler dgvFuncionarios.CellDoubleClick, AddressOf OnDgvDoubleClick
+
         Try
-            AppTheme.SetCue(txtBusqueda, "Buscar…")
+            AppTheme.SetCue(txtBusqueda, "Buscar por CI o Nombre…")
         Catch
-            ' Ignorar si no existe SetCue
         End Try
 
+        ' Realizamos la primera carga de forma asíncrona
+        Dim tk = ReiniciarToken()
+        Await BuscarAsync(tk)
+        ' --- FIN DE CAMBIOS ---
     End Sub
 
     ' Implementación requerida por la base:
-    Protected Overrides Async Function RefrescarSegunEventoAsync(e As FuncionarioCambiadoEventArgs) As Task
+    Protected Overrides Async Function RefrescarSegunFuncionarioAsync(e As FuncionarioCambiadoEventArgs) As Task
         If Not Me.IsHandleCreated OrElse Me.IsDisposed Then Return
-        Await BuscarAsync()
+        Dim tk = ReiniciarToken()
+        Await BuscarAsync(tk)
     End Function
+#End Region
+    ' --- INICIO DE CAMBIOS: Método para reiniciar el token ---
+    Private Function ReiniciarToken() As CancellationToken
+        _ctsBusqueda?.Cancel()
+        _ctsBusqueda?.Dispose()
+        _ctsBusqueda = New CancellationTokenSource()
+        Return _ctsBusqueda.Token
+    End Function
+
     Private Sub dgvFuncionarios_SelectionChanged(sender As Object, e As EventArgs) Handles dgvFuncionarios.SelectionChanged
         ' Hacemos visible el botón si hay al menos una celda seleccionada
         If dgvFuncionarios.GetCellCount(DataGridViewElementStates.Selected) > 0 Then
@@ -132,33 +149,38 @@ Public Class frmFuncionarioBuscar
     End Sub
 
 #End Region
-    Private Sub txtBusqueda_TextChanged(sender As Object, e As EventArgs)
-        ' Reiniciar el temporizador cada vez que el texto cambia
-        SearchTimer.Stop()
-        SearchTimer.Start()
+    ' --- MODIFICADO: Ahora dispara el timer ---
+    Private Sub txtBusqueda_TextChanged(sender As Object, e As EventArgs) Handles txtBusqueda.TextChanged
+        _searchTimer.Stop()
+        _searchTimer.Start()
     End Sub
 
-    Private Async Sub SearchTimer_Tick(sender As Object, e As EventArgs)
-        ' Cuando el temporizador se cumple, detenerlo y ejecutar la búsqueda
-        SearchTimer.Stop()
-        Await BuscarAsync()
+    ' --- MODIFICADO: Inicia la búsqueda con el token ---
+    Private Async Sub SearchTimer_Tick(sender As Object, e As EventArgs) Handles _searchTimer.Tick
+        _searchTimer.Stop()
+        Dim tk = ReiniciarToken()
+        Await BuscarAsync(tk)
     End Sub
 
-    ''' <summary>
-    ''' Este método se ejecutará automáticamente cuando otro formulario notifique un cambio.
-    ''' </summary>
-    Private Async Sub OnDatosActualizados(sender As Object, e As EventArgs)
-
-        ' El formulario se actualizará incluso si está oculto, asegurando que los datos
-        ' estén frescos cuando el usuario vuelva a esta pantalla.
-        If Me.IsHandleCreated Then
-            Await BuscarAsync()
-        End If
-
-    End Sub
+    '''' <summary>
+    '''' Este método se ejecutará automáticamente cuando otro formulario notifique un cambio.
+    '''' </summary>
+    'Private Async Sub OnDatosActualizados(sender As Object, e As EventArgs)
+    '    If Me.IsHandleCreated Then
+    '        Await BuscarAsync()
+    '    End If
+    'End Sub
 
     ' Es una buena práctica desuscribirse para evitar fugas de memoria.
-    'Private Sub frmFuncionarioBuscar_FormClosed(sender As Object, e As FormClosedEventArgs) Handles Me.FormClosed
+    Private Sub frmFuncionarioBuscar_FormClosed(sender As Object, e As FormClosedEventArgs) Handles Me.FormClosed
+        ' Limpieza del CTS para evitar fugas de memoria
+        Try
+            _ctsBusqueda?.Cancel()
+            _ctsBusqueda?.Dispose()
+        Catch
+        End Try
+    End Sub
+
     '    RemoveHandler NotificadorEventos.DatosActualizados, AddressOf OnDatosActualizados
     'End Sub
 
@@ -169,122 +191,115 @@ Public Class frmFuncionarioBuscar
             .RowTemplate.Height = 40
             .RowTemplate.MinimumHeight = 40
             .Columns.Clear()
-
-
-            .Columns.Add(New DataGridViewTextBoxColumn With {
-                .Name = "Id",
-                .DataPropertyName = "Id",
-                .Visible = False
-            })
-
-            .Columns.Add(New DataGridViewTextBoxColumn With {
-                .Name = "CI",
-                .DataPropertyName = "CI",
-                .HeaderText = "CI",
-                .Width = 90
-            })
-
-            .Columns.Add(New DataGridViewTextBoxColumn With {
-                .Name = "Nombre",
-                .DataPropertyName = "Nombre",
-                .HeaderText = "Nombre",
-                .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-            })
+            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Id", .DataPropertyName = "Id", .Visible = False})
+            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "CI", .DataPropertyName = "CI", .HeaderText = "CI", .Width = 90})
+            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Nombre", .DataPropertyName = "Nombre", .HeaderText = "Nombre", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
         End With
-
-        ' --- CAMBIO REALIZADO AQUÍ ---
-        ' Cambiamos el evento para que la actualización con las teclas sea robusta.
-        AddHandler dgvFuncionarios.CurrentCellChanged, AddressOf MostrarDetalle
-        ' --- FIN DEL CAMBIO ---
-
-        AddHandler dgvFuncionarios.CellDoubleClick, AddressOf OnDgvDoubleClick
         AddHandler dgvFuncionarios.DataError, Sub(s, ev) ev.ThrowException = False
     End Sub
 #End Region
 
 #Region "Búsqueda con Full-Text y CONTAINS"
-    Private Async Function BuscarAsync() As Task
-        ' Si no hay texto en la caja de búsqueda, limpiamos la grilla y el detalle.
-        If String.IsNullOrWhiteSpace(txtBusqueda.Text) Then
-            dgvFuncionarios.DataSource = New List(Of FuncionarioMin)()
-            LimpiarDetalle()
-            Return
-        End If
+    ' --- MÉTODO CENTRAL MODIFICADO ---
+    Private Async Function BuscarAsync(token As CancellationToken) As Task
+        If _estaBuscando Then Return
+        _estaBuscando = True
 
-        LoadingHelper.MostrarCargando(Me)
+        ' Feedback visual no bloqueante
+        txtBusqueda.BackColor = Color.Gold
+        Me.Cursor = Cursors.WaitCursor
+        dgvFuncionarios.Enabled = False
 
         Try
+            ' Si no hay texto, limpiamos y salimos.
+            If String.IsNullOrWhiteSpace(txtBusqueda.Text) Then
+                dgvFuncionarios.DataSource = New List(Of FuncionarioMin)()
+                LimpiarDetalle()
+                Return ' Usamos Return en lugar de Exit Function en métodos Async
+            End If
+
+            token.ThrowIfCancellationRequested()
+
+            Await Task.Delay(50, token) ' Pequeña pausa para refrescar UI
+
+            Dim lista As List(Of FuncionarioMin)
             Using uow As New UnitOfWork()
                 Dim ctx = uow.Context
                 Dim filtro As String = txtBusqueda.Text.Trim()
 
-                Dim terminos = filtro.Split(" "c) _
-                                    .Where(Function(w) Not String.IsNullOrWhiteSpace(w)) _
-                                    .Select(Function(w) $"""{w}*""")
+                Dim terminos = filtro.Split(" "c).Where(Function(w) Not String.IsNullOrWhiteSpace(w)).Select(Function(w) $"""{w}*""")
                 Dim expresionFts = String.Join(" AND ", terminos)
 
                 Dim sb As New StringBuilder()
-                sb.AppendLine("SELECT TOP (@limite)")
-                sb.AppendLine("     Id, CI, Nombre")
-                sb.AppendLine("FROM   dbo.Funcionario WITH (NOLOCK)")
-                sb.AppendLine("WHERE  CONTAINS((CI, Nombre), @patron)")
+                sb.AppendLine("SELECT TOP (@limite) Id, CI, Nombre")
+                sb.AppendLine("FROM dbo.Funcionario WITH (NOLOCK)")
+                sb.AppendLine("WHERE CONTAINS((CI, Nombre), @patron)")
                 sb.AppendLine("ORDER BY Nombre;")
 
                 Dim sql = sb.ToString()
                 Dim pLimite = New SqlParameter("@limite", LIMITE_FILAS)
                 Dim pPatron = New SqlParameter("@patron", expresionFts)
 
-                Dim lista = Await ctx.Database _
-                                 .SqlQuery(Of FuncionarioMin)(sql, pLimite, pPatron) _
-                                 .ToListAsync()
-
-                dgvFuncionarios.DataSource = Nothing
-                dgvFuncionarios.DataSource = lista
-
-                If lista.Any() Then
-                    dgvFuncionarios.ClearSelection()
-                    dgvFuncionarios.Rows(0).Selected = True
-                    dgvFuncionarios.CurrentCell = dgvFuncionarios.Rows(0).Cells("CI")
-                Else
-                    LimpiarDetalle()
-                End If
-
-                If lista.Count = LIMITE_FILAS Then
-                    MessageBox.Show($"Mostrando los primeros {LIMITE_FILAS} resultados." &
-                                "Refiná la búsqueda para ver más.",
-                                "Aviso",
-                                MessageBoxButtons.OK, MessageBoxIcon.Information)
-                End If
+                ' Usamos el WaitAsync con el CancellationToken
+                lista = Await ctx.Database.SqlQuery(Of FuncionarioMin)(sql, pLimite, pPatron).ToListAsync().WaitAsync(token)
             End Using
 
+            token.ThrowIfCancellationRequested()
+
+            dgvFuncionarios.DataSource = lista
+
+            If lista.Any() Then
+                dgvFuncionarios.ClearSelection()
+                dgvFuncionarios.Rows(0).Selected = True
+                dgvFuncionarios.CurrentCell = dgvFuncionarios.Rows(0).Cells("CI")
+            Else
+                LimpiarDetalle()
+            End If
+
+            If lista.Count = LIMITE_FILAS Then
+                Notifier.Info(Me, $"Mostrando los primeros {LIMITE_FILAS} resultados.")
+            End If
+
+        Catch ex As OperationCanceledException
+            ' Búsqueda cancelada por el usuario. Silencioso.
         Catch ex As SqlException When ex.Number = -2
-            MessageBox.Show("La consulta excedió el tiempo de espera. Refiná los filtros o intentá nuevamente.",
-                "Timeout", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-
+            Notifier.Warn(Me, "La consulta excedió el tiempo de espera.")
         Catch ex As Exception
-            MessageBox.Show("Ocurrió un error inesperado: " & ex.Message,
-                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-
+            Notifier.Error(Me, "Ocurrió un error inesperado: " & ex.Message)
         Finally
-            LoadingHelper.OcultarCargando(Me)
-
+            ' Restaurar la UI a su estado normal
+            If Not Me.IsDisposed Then
+                txtBusqueda.BackColor = _colorOriginalBusqueda
+                Me.Cursor = Cursors.Default
+                dgvFuncionarios.Enabled = True
+                txtBusqueda.Focus()
+            End If
+            _estaBuscando = False
         End Try
     End Function
 
-    ' --- MÉTODO CORREGIDO: Se quita "Async" ---
-    Private Sub txtBusqueda_KeyDown(sender As Object, e As KeyEventArgs) _
-    Handles txtBusqueda.KeyDown
 
-        If e.KeyCode = Keys.Enter Then
-            e.Handled = True
-            e.SuppressKeyPress = True
-        End If
-
-        If dgvFuncionarios.Rows.Count = 0 Then Return
-
+    ' --- MODIFICADO: Búsqueda al presionar Enter ---
+    Private Async Sub txtBusqueda_KeyDown(sender As Object, e As KeyEventArgs) Handles txtBusqueda.KeyDown
         Select Case e.KeyCode
-            Case Keys.Down : MoverSeleccion(+1) : e.Handled = True
-            Case Keys.Up : MoverSeleccion(-1) : e.Handled = True
+            Case Keys.Enter
+                e.Handled = True
+                e.SuppressKeyPress = True
+                _searchTimer.Stop() ' Detenemos el timer para que no se dispare
+                Dim tk = ReiniciarToken()
+                Await BuscarAsync(tk)
+
+            Case Keys.Down
+                If dgvFuncionarios.Rows.Count > 0 Then
+                    e.Handled = True
+                    MoverSeleccion(+1)
+                End If
+
+            Case Keys.Up
+                If dgvFuncionarios.Rows.Count > 0 Then
+                    e.Handled = True
+                    MoverSeleccion(-1)
+                End If
         End Select
     End Sub
 
@@ -411,7 +426,7 @@ Public Class frmFuncionarioBuscar
 
 
     ' Este código funciona bien si quieres abrir múltiples ventanas de situación.
-    Private Sub btnVerSituacion_Click(sender As Object, e As EventArgs)
+    Private Sub btnVerSituacion_Click(sender As Object, e As EventArgs) Handles btnVerSituacion.Click
         If dgvFuncionarios.CurrentRow Is Nothing Then Return
         Dim id = CInt(dgvFuncionarios.CurrentRow.Cells("Id").Value)
         Dim frm As New frmFuncionarioSituacion(id)
@@ -689,5 +704,7 @@ Public Class frmFuncionarioBuscar
             ' Ignorar si no se puede (no crítico)
         End Try
     End Sub
+
+
     '======================
 End Class

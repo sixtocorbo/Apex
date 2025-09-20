@@ -1,6 +1,9 @@
 ﻿Imports System.IO
 
 Public Class frmFuncionarioEstadoTransitorio
+    ' ---> 1. AÑADIR EL EVENTO PÚBLICO <---
+    ' Lo nombramos "EstadoConfigurado" porque realmente no lo guarda, solo lo prepara.
+    Public Event EstadoConfigurado(estado As EstadoTransitorio)
 
     Public Estado As EstadoTransitorio
     Private _tiposEstado As List(Of TipoEstadoTransitorio)
@@ -348,12 +351,17 @@ Fin:
     Private Sub chkSinFechaResolucion_CheckedChanged(sender As Object, e As EventArgs) Handles chkSinFechaResolucion.CheckedChanged
         dtpFechaResolucion.Enabled = Not chkSinFechaResolucion.Checked
     End Sub
-
+    ''' <summary>
+    ''' Valida los datos de entrada, solicita confirmación si es necesario,
+    ''' y luego delega el mapeo de datos para finalmente disparar el evento de configuración.
+    ''' </summary>
     Private Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
         If _readOnly Then
             Close()
             Return
         End If
+
+        ' --- INICIO DE VALIDACIONES ---
 
         ' Validación de tipo de estado
         If cboTipoEstado.SelectedIndex = -1 OrElse cboTipoEstado.SelectedValue Is Nothing Then
@@ -362,203 +370,424 @@ Fin:
         End If
 
         Dim tipoId As Integer = CInt(cboTipoEstado.SelectedValue)
-
-        ' Manejo de fechas seleccionadas según tus checkboxes
         Dim fechaHastaSel As Date? = If(chkFechaHasta.Checked OrElse Not chkFechaHasta.Visible, CType(Nothing, Date?), dtpFechaHasta.Value.Date)
-        Dim fechaResolucionSel As Date? = If(chkSinFechaResolucion.Checked OrElse Not chkSinFechaResolucion.Visible, CType(Nothing, Date?), dtpFechaResolucion.Value.Date)
 
-        ' Validación: excepto Retén y Reactivación no se permite Hasta < Desde
+        ' Validación general de fechas
         If tipoId <> ModConstantesApex.TipoEstadoTransitorioId.Reten _
-       AndAlso tipoId <> ModConstantesApex.TipoEstadoTransitorioId.ReactivacionDeFuncionario _
-       AndAlso fechaHastaSel.HasValue _
-       AndAlso fechaHastaSel.Value < dtpFechaDesde.Value.Date Then
-
+    AndAlso tipoId <> ModConstantesApex.TipoEstadoTransitorioId.ReactivacionDeFuncionario _
+    AndAlso fechaHastaSel.HasValue _
+    AndAlso fechaHastaSel.Value < dtpFechaDesde.Value.Date Then
             Notifier.Warn(Me, "La fecha de fin no puede ser anterior a la fecha de inicio.")
             Return
         End If
 
-        ' Guardado
-        Dim oldCursor = Me.Cursor
-        btnGuardar.Enabled = False
-        Me.Cursor = Cursors.WaitCursor
-
-        Try
-            Estado.TipoEstadoTransitorioId = tipoId
-
-            Select Case tipoId
-                Case ModConstantesApex.TipoEstadoTransitorioId.Designacion
-                    Dim d = If(Estado.DesignacionDetalle, New DesignacionDetalle())
-                    d.FechaDesde = dtpFechaDesde.Value.Date
-                    d.FechaHasta = fechaHastaSel
-                    d.Observaciones = txtObservaciones.Text.Trim()
-                    d.DocResolucion = txtResolucion.Text.Trim()
-                    ' d.FechaResolucion = fechaResolucionSel ' si existe en el modelo
-                    Estado.DesignacionDetalle = d
-
-                Case ModConstantesApex.TipoEstadoTransitorioId.Enfermedad
-                    Dim d = If(Estado.EnfermedadDetalle, New EnfermedadDetalle())
-                    d.FechaDesde = dtpFechaDesde.Value.Date
-                    d.FechaHasta = fechaHastaSel
-                    d.Observaciones = txtObservaciones.Text.Trim()
-                    d.Diagnostico = txtDiagnostico.Text.Trim()
-                    Estado.EnfermedadDetalle = d
-
-                Case ModConstantesApex.TipoEstadoTransitorioId.Sancion
-                    Dim d = If(Estado.SancionDetalle, New SancionDetalle())
-                    d.FechaDesde = dtpFechaDesde.Value.Date
-                    d.FechaHasta = fechaHastaSel
-                    d.Observaciones = txtObservaciones.Text.Trim()
-                    d.Resolucion = txtResolucion.Text.Trim()
-                    ' d.FechaResolucion = fechaResolucionSel
-                    Estado.SancionDetalle = d
-
-                Case ModConstantesApex.TipoEstadoTransitorioId.OrdenCinco
-                    Dim d = If(Estado.OrdenCincoDetalle, New OrdenCincoDetalle())
-                    d.FechaDesde = dtpFechaDesde.Value.Date
-                    d.FechaHasta = fechaHastaSel
-                    d.Observaciones = txtObservaciones.Text.Trim()
-                    Estado.OrdenCincoDetalle = d
-
-                Case ModConstantesApex.TipoEstadoTransitorioId.Reten
-                    Dim d = If(Estado.RetenDetalle, New RetenDetalle())
-                    d.FechaReten = dtpFechaDesde.Value.Date
-                    d.Observaciones = txtObservaciones.Text.Trim()
-                    d.Turno = txtTurnoReten.Text.Trim()
-                    Estado.RetenDetalle = d
-
-                Case ModConstantesApex.TipoEstadoTransitorioId.Sumario
-                    Dim d = If(Estado.SumarioDetalle, New SumarioDetalle())
-                    d.FechaDesde = dtpFechaDesde.Value.Date
-                    d.FechaHasta = fechaHastaSel
-                    d.Observaciones = txtObservaciones.Text.Trim()
-                    d.Expediente = txtResolucion.Text.Trim()
-                    ' d.FechaResolucion = fechaResolucionSel
-                    Estado.SumarioDetalle = d
-
-                Case ModConstantesApex.TipoEstadoTransitorioId.Traslado
-                    Dim d = If(Estado.TrasladoDetalle, New TrasladoDetalle())
-                    d.FechaDesde = dtpFechaDesde.Value.Date
-                    d.FechaHasta = fechaHastaSel
-                    d.Observaciones = txtObservaciones.Text.Trim()
-                    Estado.TrasladoDetalle = d
-
-                Case ModConstantesApex.TipoEstadoTransitorioId.BajaDeFuncionario
-                    Dim d = If(Estado.BajaDeFuncionarioDetalle, New BajaDeFuncionarioDetalle())
-                    d.FechaDesde = dtpFechaDesde.Value.Date
-                    d.FechaHasta = fechaHastaSel
-                    d.Observaciones = txtObservaciones.Text.Trim()
-                    Estado.BajaDeFuncionarioDetalle = d
-
-                Case ModConstantesApex.TipoEstadoTransitorioId.CambioDeCargo
-                    ' Validaciones específicas
-                    If cboCargoNuevo.SelectedIndex = -1 Then
-                        Notifier.Warn(Me, "Debe seleccionar el nuevo cargo.")
-                        Return
-                    End If
-
-                    If Estado.Funcionario Is Nothing AndAlso Estado.Id > 0 Then
-                        Try : _unitOfWork.Context.Entry(Estado).Reference(Function(x) x.Funcionario).Load() : Catch : End Try
-                    End If
-
-                    Dim cargoActualId As Integer? = Estado.Funcionario?.CargoId
-                    If Not cargoActualId.HasValue Then
-                        Notifier.Warn(Me, "El funcionario no tiene un cargo actual asignado.")
-                        Return
-                    End If
-
-                    Dim cargoNuevoId = CType(cboCargoNuevo.SelectedValue, Integer)
-                    If cargoNuevoId = cargoActualId.Value Then
-                        Notifier.Warn(Me, "El nuevo cargo no puede ser igual al cargo actual.")
-                        Return
-                    End If
-
-                    Dim cargoNuevo = _listaCargos.FirstOrDefault(Function(c) c.Id = cargoNuevoId)
-                    Dim cargoActual = _listaCargos.FirstOrDefault(Function(c) c.Id = cargoActualId.Value)
-                    Dim gradoNuevo = cargoNuevo?.Grado.GetValueOrDefault(0)
-                    Dim gradoActual = cargoActual?.Grado.GetValueOrDefault(0)
-
-                    Dim mensajeConfirmacion As String
-                    Dim tituloConfirmacion As String = "Confirmar Cambio de Cargo"
-                    Dim icono As MessageBoxIcon = MessageBoxIcon.Question
-
-                    If gradoNuevo > gradoActual Then
-                        mensajeConfirmacion = $"¿Está seguro de que desea aplicar el ASCENSO al funcionario al cargo '{cargoNuevo.Nombre}'?"
-                    ElseIf gradoNuevo < gradoActual Then
-                        mensajeConfirmacion = $"¡ATENCIÓN! El nuevo cargo '{cargoNuevo.Nombre}' representa un DESCENSO." & vbCrLf &
-                                          "¿Desea continuar y aplicar el cambio de todas formas?"
-                        icono = MessageBoxIcon.Warning
-                    Else
-                        mensajeConfirmacion = $"El nuevo cargo '{cargoNuevo.Nombre}' tiene el mismo grado que el actual (movimiento lateral)." & vbCrLf &
-                                          "¿Desea confirmar el cambio?"
-                    End If
-
-                    If MessageBox.Show(mensajeConfirmacion, tituloConfirmacion, MessageBoxButtons.YesNo, icono) = DialogResult.No Then
-                        btnGuardar.Enabled = True
-                        Me.Cursor = oldCursor
-                        Return
-                    End If
-
-                    Dim d = If(Estado.CambioDeCargoDetalle, New CambioDeCargoDetalle())
-                    d.FechaDesde = dtpFechaDesde.Value.Date
-                    d.FechaHasta = fechaHastaSel
-                    d.Observaciones = txtObservaciones.Text.Trim()
-                    d.Resolucion = txtResolucion.Text.Trim()
-                    d.CargoAnteriorId = cargoActualId.Value
-                    d.CargoNuevoId = cargoNuevoId
-                    ' d.FechaResolucion = fechaResolucionSel
-                    Estado.CambioDeCargoDetalle = d
-                    Estado.Funcionario.CargoId = cargoNuevoId
-
-                Case ModConstantesApex.TipoEstadoTransitorioId.ReactivacionDeFuncionario
-                    Dim d = If(Estado.ReactivacionDeFuncionarioDetalle, New ReactivacionDeFuncionarioDetalle())
-                    d.FechaDesde = dtpFechaDesde.Value.Date
-                    d.Observaciones = txtObservaciones.Text.Trim()
-                    d.Resolucion = txtResolucion.Text.Trim()
-                    ' d.FechaResolucion = fechaResolucionSel
-                    Estado.ReactivacionDeFuncionarioDetalle = d
-
-                Case ModConstantesApex.TipoEstadoTransitorioId.SeparacionDelCargo
-                    Dim d = If(Estado.SeparacionDelCargoDetalle, New SeparacionDelCargoDetalle())
-                    d.FechaDesde = dtpFechaDesde.Value.Date
-                    d.FechaHasta = fechaHastaSel
-                    d.Observaciones = txtObservaciones.Text.Trim()
-                    Estado.SeparacionDelCargoDetalle = d
-
-                Case ModConstantesApex.TipoEstadoTransitorioId.InicioDeProcesamiento
-                    Dim d = If(Estado.InicioDeProcesamientoDetalle, New InicioDeProcesamientoDetalle())
-                    d.FechaDesde = dtpFechaDesde.Value.Date
-                    d.FechaHasta = fechaHastaSel
-                    d.Observaciones = txtObservaciones.Text.Trim()
-                    d.Expediente = txtResolucion.Text.Trim()
-                    ' d.FechaResolucion = fechaResolucionSel
-                    Estado.InicioDeProcesamientoDetalle = d
-
-                Case ModConstantesApex.TipoEstadoTransitorioId.Desarmado
-                    Dim d = If(Estado.DesarmadoDetalle, New DesarmadoDetalle())
-                    d.FechaDesde = dtpFechaDesde.Value.Date
-                    d.FechaHasta = fechaHastaSel
-                    d.Observaciones = txtObservaciones.Text.Trim()
-                    Estado.DesarmadoDetalle = d
-            End Select
-
-            If Estado.Id = 0 Then
-                Estado.CreatedAt = DateTime.Now
-            Else
-                Estado.UpdatedAt = DateTime.Now
+        ' Validaciones y confirmaciones específicas para "Cambio de Cargo"
+        If tipoId = ModConstantesApex.TipoEstadoTransitorioId.CambioDeCargo Then
+            If cboCargoNuevo.SelectedIndex = -1 Then
+                Notifier.Warn(Me, "Debe seleccionar el nuevo cargo.")
+                Return
             End If
 
-            ' Éxito (mostrar antes de cerrar)
-            Notifier.Success(Me, "Estado guardado correctamente.")
-            DialogResult = DialogResult.OK
+            If Estado.Funcionario Is Nothing AndAlso Estado.Id > 0 Then
+                Try : _unitOfWork.Context.Entry(Estado).Reference(Function(x) x.Funcionario).Load() : Catch : End Try
+            End If
+
+            Dim cargoActualId As Integer? = Estado.Funcionario?.CargoId
+            If Not cargoActualId.HasValue Then
+                Notifier.Warn(Me, "El funcionario no tiene un cargo actual asignado.")
+                Return
+            End If
+
+            Dim cargoNuevoId = CType(cboCargoNuevo.SelectedValue, Integer)
+            If cargoNuevoId = cargoActualId.Value Then
+                Notifier.Warn(Me, "El nuevo cargo no puede ser igual al cargo actual.")
+                Return
+            End If
+
+            ' Lógica de confirmación por MessageBox
+            Dim cargoNuevo = _listaCargos.FirstOrDefault(Function(c) c.Id = cargoNuevoId)
+            Dim cargoActual = _listaCargos.FirstOrDefault(Function(c) c.Id = cargoActualId.Value)
+            Dim gradoNuevo = cargoNuevo?.Grado.GetValueOrDefault(0)
+            Dim gradoActual = cargoActual?.Grado.GetValueOrDefault(0)
+
+            Dim mensajeConfirmacion As String
+            Dim tituloConfirmacion As String = "Confirmar Cambio de Cargo"
+            Dim icono As MessageBoxIcon = MessageBoxIcon.Question
+
+            If gradoNuevo > gradoActual Then
+                mensajeConfirmacion = $"¿Está seguro de que desea aplicar el ASCENSO al funcionario al cargo '{cargoNuevo.Nombre}'?"
+            ElseIf gradoNuevo < gradoActual Then
+                mensajeConfirmacion = $"¡ATENCIÓN! El nuevo cargo '{cargoNuevo.Nombre}' representa un DESCENSO." & vbCrLf &
+                                  "¿Desea continuar y aplicar el cambio de todas formas?"
+                icono = MessageBoxIcon.Warning
+            Else
+                mensajeConfirmacion = $"El nuevo cargo '{cargoNuevo.Nombre}' tiene el mismo grado que el actual (movimiento lateral)." & vbCrLf &
+                                  "¿Desea confirmar el cambio?"
+            End If
+
+            ' Si el usuario presiona "No", se cancela toda la operación.
+            If MessageBox.Show(mensajeConfirmacion, tituloConfirmacion, MessageBoxButtons.YesNo, icono) = DialogResult.No Then
+                Return
+            End If
+        End If
+
+        ' --- FIN DE VALIDACIONES ---
+
+        ' --- LÓGICA PRINCIPAL ---
+        Try
+            ' 1. Llama al método que puebla el objeto 'Estado' en memoria.
+            MapearDatosDesdeControles()
+
+            ' 2. Dispara el evento para devolver el objeto configurado al formulario padre.
+            RaiseEvent EstadoConfigurado(Me.Estado)
+
+            ' 3. Cierra este formulario.
             Close()
 
         Catch ex As Exception
-            Notifier.[Error](Me, $"Ocurrió un error al guardar: {ex.Message}")
-        Finally
-            Me.Cursor = oldCursor
-            btnGuardar.Enabled = True
+            Notifier.Error(Me, $"Ocurrió un error al configurar el estado: {ex.Message}")
         End Try
     End Sub
+
+    ''' <summary>
+    ''' Encapsula la lógica de transferir los datos desde los controles del formulario
+    ''' hacia el objeto de entidad 'Estado' que está en memoria.
+    ''' </summary>
+    Private Sub MapearDatosDesdeControles()
+        ' Asigna el Tipo de Estado ID desde el ComboBox
+        Estado.TipoEstadoTransitorioId = CInt(cboTipoEstado.SelectedValue)
+
+        ' Manejo de fechas opcionales
+        Dim fechaHastaSel As Date? = If(chkFechaHasta.Checked OrElse Not chkFechaHasta.Visible, CType(Nothing, Date?), dtpFechaHasta.Value.Date)
+        Dim fechaResolucionSel As Date? = If(chkSinFechaResolucion.Checked OrElse Not chkSinFechaResolucion.Visible, CType(Nothing, Date?), dtpFechaResolucion.Value.Date)
+
+        ' Mapeo de datos según el tipo de estado seleccionado
+        Select Case Estado.TipoEstadoTransitorioId
+            Case ModConstantesApex.TipoEstadoTransitorioId.Designacion
+                Dim d = If(Estado.DesignacionDetalle, New DesignacionDetalle())
+                d.FechaDesde = dtpFechaDesde.Value.Date
+                d.FechaHasta = fechaHastaSel
+                d.Observaciones = txtObservaciones.Text.Trim()
+                d.DocResolucion = txtResolucion.Text.Trim()
+                ' d.FechaResolucion = fechaResolucionSel ' Descomentar si existe en el modelo
+                Estado.DesignacionDetalle = d
+
+            Case ModConstantesApex.TipoEstadoTransitorioId.Enfermedad
+                Dim d = If(Estado.EnfermedadDetalle, New EnfermedadDetalle())
+                d.FechaDesde = dtpFechaDesde.Value.Date
+                d.FechaHasta = fechaHastaSel
+                d.Observaciones = txtObservaciones.Text.Trim()
+                d.Diagnostico = txtDiagnostico.Text.Trim()
+                Estado.EnfermedadDetalle = d
+
+            Case ModConstantesApex.TipoEstadoTransitorioId.Sancion
+                Dim d = If(Estado.SancionDetalle, New SancionDetalle())
+                d.FechaDesde = dtpFechaDesde.Value.Date
+                d.FechaHasta = fechaHastaSel
+                d.Observaciones = txtObservaciones.Text.Trim()
+                d.Resolucion = txtResolucion.Text.Trim()
+                ' d.FechaResolucion = fechaResolucionSel
+                Estado.SancionDetalle = d
+
+            Case ModConstantesApex.TipoEstadoTransitorioId.OrdenCinco
+                Dim d = If(Estado.OrdenCincoDetalle, New OrdenCincoDetalle())
+                d.FechaDesde = dtpFechaDesde.Value.Date
+                d.FechaHasta = fechaHastaSel
+                d.Observaciones = txtObservaciones.Text.Trim()
+                Estado.OrdenCincoDetalle = d
+
+            Case ModConstantesApex.TipoEstadoTransitorioId.Reten
+                Dim d = If(Estado.RetenDetalle, New RetenDetalle())
+                d.FechaReten = dtpFechaDesde.Value.Date
+                d.Observaciones = txtObservaciones.Text.Trim()
+                d.Turno = txtTurnoReten.Text.Trim()
+                Estado.RetenDetalle = d
+
+            Case ModConstantesApex.TipoEstadoTransitorioId.Sumario
+                Dim d = If(Estado.SumarioDetalle, New SumarioDetalle())
+                d.FechaDesde = dtpFechaDesde.Value.Date
+                d.FechaHasta = fechaHastaSel
+                d.Observaciones = txtObservaciones.Text.Trim()
+                d.Expediente = txtResolucion.Text.Trim()
+                ' d.FechaResolucion = fechaResolucionSel
+                Estado.SumarioDetalle = d
+
+            Case ModConstantesApex.TipoEstadoTransitorioId.Traslado
+                Dim d = If(Estado.TrasladoDetalle, New TrasladoDetalle())
+                d.FechaDesde = dtpFechaDesde.Value.Date
+                d.FechaHasta = fechaHastaSel
+                d.Observaciones = txtObservaciones.Text.Trim()
+                Estado.TrasladoDetalle = d
+
+            Case ModConstantesApex.TipoEstadoTransitorioId.BajaDeFuncionario
+                Dim d = If(Estado.BajaDeFuncionarioDetalle, New BajaDeFuncionarioDetalle())
+                d.FechaDesde = dtpFechaDesde.Value.Date
+                d.FechaHasta = fechaHastaSel
+                d.Observaciones = txtObservaciones.Text.Trim()
+                Estado.BajaDeFuncionarioDetalle = d
+
+            Case ModConstantesApex.TipoEstadoTransitorioId.CambioDeCargo
+                Dim cargoNuevoId = CType(cboCargoNuevo.SelectedValue, Integer)
+                Dim cargoActualId = Estado.Funcionario.CargoId.Value
+                Dim d = If(Estado.CambioDeCargoDetalle, New CambioDeCargoDetalle())
+                d.FechaDesde = dtpFechaDesde.Value.Date
+                d.FechaHasta = fechaHastaSel
+                d.Observaciones = txtObservaciones.Text.Trim()
+                d.Resolucion = txtResolucion.Text.Trim()
+                d.CargoAnteriorId = cargoActualId
+                d.CargoNuevoId = cargoNuevoId
+                ' d.FechaResolucion = fechaResolucionSel
+                Estado.CambioDeCargoDetalle = d
+                Estado.Funcionario.CargoId = cargoNuevoId ' Actualiza el objeto Funcionario en memoria
+
+            Case ModConstantesApex.TipoEstadoTransitorioId.ReactivacionDeFuncionario
+                Dim d = If(Estado.ReactivacionDeFuncionarioDetalle, New ReactivacionDeFuncionarioDetalle())
+                d.FechaDesde = dtpFechaDesde.Value.Date
+                d.Observaciones = txtObservaciones.Text.Trim()
+                d.Resolucion = txtResolucion.Text.Trim()
+                ' d.FechaResolucion = fechaResolucionSel
+                Estado.ReactivacionDeFuncionarioDetalle = d
+
+            Case ModConstantesApex.TipoEstadoTransitorioId.SeparacionDelCargo
+                Dim d = If(Estado.SeparacionDelCargoDetalle, New SeparacionDelCargoDetalle())
+                d.FechaDesde = dtpFechaDesde.Value.Date
+                d.FechaHasta = fechaHastaSel
+                d.Observaciones = txtObservaciones.Text.Trim()
+                Estado.SeparacionDelCargoDetalle = d
+
+            Case ModConstantesApex.TipoEstadoTransitorioId.InicioDeProcesamiento
+                Dim d = If(Estado.InicioDeProcesamientoDetalle, New InicioDeProcesamientoDetalle())
+                d.FechaDesde = dtpFechaDesde.Value.Date
+                d.FechaHasta = fechaHastaSel
+                d.Observaciones = txtObservaciones.Text.Trim()
+                d.Expediente = txtResolucion.Text.Trim()
+                ' d.FechaResolucion = fechaResolucionSel
+                Estado.InicioDeProcesamientoDetalle = d
+
+            Case ModConstantesApex.TipoEstadoTransitorioId.Desarmado
+                Dim d = If(Estado.DesarmadoDetalle, New DesarmadoDetalle())
+                d.FechaDesde = dtpFechaDesde.Value.Date
+                d.FechaHasta = fechaHastaSel
+                d.Observaciones = txtObservaciones.Text.Trim()
+                Estado.DesarmadoDetalle = d
+        End Select
+
+        If Estado.Id = 0 Then
+            Estado.CreatedAt = DateTime.Now
+        Else
+            Estado.UpdatedAt = DateTime.Now
+        End If
+    End Sub
+    'Private Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
+    '    If _readOnly Then
+    '        Close()
+    '        Return
+    '    End If
+
+    '    ' Validación de tipo de estado
+    '    If cboTipoEstado.SelectedIndex = -1 OrElse cboTipoEstado.SelectedValue Is Nothing Then
+    '        Notifier.Warn(Me, "Debe seleccionar un tipo de estado.")
+    '        Return
+    '    End If
+
+    '    Dim tipoId As Integer = CInt(cboTipoEstado.SelectedValue)
+
+    '    ' Manejo de fechas seleccionadas según tus checkboxes
+    '    Dim fechaHastaSel As Date? = If(chkFechaHasta.Checked OrElse Not chkFechaHasta.Visible, CType(Nothing, Date?), dtpFechaHasta.Value.Date)
+    '    Dim fechaResolucionSel As Date? = If(chkSinFechaResolucion.Checked OrElse Not chkSinFechaResolucion.Visible, CType(Nothing, Date?), dtpFechaResolucion.Value.Date)
+
+    '    ' Validación: excepto Retén y Reactivación no se permite Hasta < Desde
+    '    If tipoId <> ModConstantesApex.TipoEstadoTransitorioId.Reten _
+    '   AndAlso tipoId <> ModConstantesApex.TipoEstadoTransitorioId.ReactivacionDeFuncionario _
+    '   AndAlso fechaHastaSel.HasValue _
+    '   AndAlso fechaHastaSel.Value < dtpFechaDesde.Value.Date Then
+
+    '        Notifier.Warn(Me, "La fecha de fin no puede ser anterior a la fecha de inicio.")
+    '        Return
+    '    End If
+
+    '    ' Guardado
+    '    Dim oldCursor = Me.Cursor
+    '    btnGuardar.Enabled = False
+    '    Me.Cursor = Cursors.WaitCursor
+
+    '    Try
+    '        Estado.TipoEstadoTransitorioId = tipoId
+
+    '        Select Case tipoId
+    '            Case ModConstantesApex.TipoEstadoTransitorioId.Designacion
+    '                Dim d = If(Estado.DesignacionDetalle, New DesignacionDetalle())
+    '                d.FechaDesde = dtpFechaDesde.Value.Date
+    '                d.FechaHasta = fechaHastaSel
+    '                d.Observaciones = txtObservaciones.Text.Trim()
+    '                d.DocResolucion = txtResolucion.Text.Trim()
+    '                ' d.FechaResolucion = fechaResolucionSel ' si existe en el modelo
+    '                Estado.DesignacionDetalle = d
+
+    '            Case ModConstantesApex.TipoEstadoTransitorioId.Enfermedad
+    '                Dim d = If(Estado.EnfermedadDetalle, New EnfermedadDetalle())
+    '                d.FechaDesde = dtpFechaDesde.Value.Date
+    '                d.FechaHasta = fechaHastaSel
+    '                d.Observaciones = txtObservaciones.Text.Trim()
+    '                d.Diagnostico = txtDiagnostico.Text.Trim()
+    '                Estado.EnfermedadDetalle = d
+
+    '            Case ModConstantesApex.TipoEstadoTransitorioId.Sancion
+    '                Dim d = If(Estado.SancionDetalle, New SancionDetalle())
+    '                d.FechaDesde = dtpFechaDesde.Value.Date
+    '                d.FechaHasta = fechaHastaSel
+    '                d.Observaciones = txtObservaciones.Text.Trim()
+    '                d.Resolucion = txtResolucion.Text.Trim()
+    '                ' d.FechaResolucion = fechaResolucionSel
+    '                Estado.SancionDetalle = d
+
+    '            Case ModConstantesApex.TipoEstadoTransitorioId.OrdenCinco
+    '                Dim d = If(Estado.OrdenCincoDetalle, New OrdenCincoDetalle())
+    '                d.FechaDesde = dtpFechaDesde.Value.Date
+    '                d.FechaHasta = fechaHastaSel
+    '                d.Observaciones = txtObservaciones.Text.Trim()
+    '                Estado.OrdenCincoDetalle = d
+
+    '            Case ModConstantesApex.TipoEstadoTransitorioId.Reten
+    '                Dim d = If(Estado.RetenDetalle, New RetenDetalle())
+    '                d.FechaReten = dtpFechaDesde.Value.Date
+    '                d.Observaciones = txtObservaciones.Text.Trim()
+    '                d.Turno = txtTurnoReten.Text.Trim()
+    '                Estado.RetenDetalle = d
+
+    '            Case ModConstantesApex.TipoEstadoTransitorioId.Sumario
+    '                Dim d = If(Estado.SumarioDetalle, New SumarioDetalle())
+    '                d.FechaDesde = dtpFechaDesde.Value.Date
+    '                d.FechaHasta = fechaHastaSel
+    '                d.Observaciones = txtObservaciones.Text.Trim()
+    '                d.Expediente = txtResolucion.Text.Trim()
+    '                ' d.FechaResolucion = fechaResolucionSel
+    '                Estado.SumarioDetalle = d
+
+    '            Case ModConstantesApex.TipoEstadoTransitorioId.Traslado
+    '                Dim d = If(Estado.TrasladoDetalle, New TrasladoDetalle())
+    '                d.FechaDesde = dtpFechaDesde.Value.Date
+    '                d.FechaHasta = fechaHastaSel
+    '                d.Observaciones = txtObservaciones.Text.Trim()
+    '                Estado.TrasladoDetalle = d
+
+    '            Case ModConstantesApex.TipoEstadoTransitorioId.BajaDeFuncionario
+    '                Dim d = If(Estado.BajaDeFuncionarioDetalle, New BajaDeFuncionarioDetalle())
+    '                d.FechaDesde = dtpFechaDesde.Value.Date
+    '                d.FechaHasta = fechaHastaSel
+    '                d.Observaciones = txtObservaciones.Text.Trim()
+    '                Estado.BajaDeFuncionarioDetalle = d
+
+    '            Case ModConstantesApex.TipoEstadoTransitorioId.CambioDeCargo
+    '                ' Validaciones específicas
+    '                If cboCargoNuevo.SelectedIndex = -1 Then
+    '                    Notifier.Warn(Me, "Debe seleccionar el nuevo cargo.")
+    '                    Return
+    '                End If
+
+    '                If Estado.Funcionario Is Nothing AndAlso Estado.Id > 0 Then
+    '                    Try : _unitOfWork.Context.Entry(Estado).Reference(Function(x) x.Funcionario).Load() : Catch : End Try
+    '                End If
+
+    '                Dim cargoActualId As Integer? = Estado.Funcionario?.CargoId
+    '                If Not cargoActualId.HasValue Then
+    '                    Notifier.Warn(Me, "El funcionario no tiene un cargo actual asignado.")
+    '                    Return
+    '                End If
+
+    '                Dim cargoNuevoId = CType(cboCargoNuevo.SelectedValue, Integer)
+    '                If cargoNuevoId = cargoActualId.Value Then
+    '                    Notifier.Warn(Me, "El nuevo cargo no puede ser igual al cargo actual.")
+    '                    Return
+    '                End If
+
+    '                Dim cargoNuevo = _listaCargos.FirstOrDefault(Function(c) c.Id = cargoNuevoId)
+    '                Dim cargoActual = _listaCargos.FirstOrDefault(Function(c) c.Id = cargoActualId.Value)
+    '                Dim gradoNuevo = cargoNuevo?.Grado.GetValueOrDefault(0)
+    '                Dim gradoActual = cargoActual?.Grado.GetValueOrDefault(0)
+
+    '                Dim mensajeConfirmacion As String
+    '                Dim tituloConfirmacion As String = "Confirmar Cambio de Cargo"
+    '                Dim icono As MessageBoxIcon = MessageBoxIcon.Question
+
+    '                If gradoNuevo > gradoActual Then
+    '                    mensajeConfirmacion = $"¿Está seguro de que desea aplicar el ASCENSO al funcionario al cargo '{cargoNuevo.Nombre}'?"
+    '                ElseIf gradoNuevo < gradoActual Then
+    '                    mensajeConfirmacion = $"¡ATENCIÓN! El nuevo cargo '{cargoNuevo.Nombre}' representa un DESCENSO." & vbCrLf &
+    '                                      "¿Desea continuar y aplicar el cambio de todas formas?"
+    '                    icono = MessageBoxIcon.Warning
+    '                Else
+    '                    mensajeConfirmacion = $"El nuevo cargo '{cargoNuevo.Nombre}' tiene el mismo grado que el actual (movimiento lateral)." & vbCrLf &
+    '                                      "¿Desea confirmar el cambio?"
+    '                End If
+
+    '                If MessageBox.Show(mensajeConfirmacion, tituloConfirmacion, MessageBoxButtons.YesNo, icono) = DialogResult.No Then
+    '                    btnGuardar.Enabled = True
+    '                    Me.Cursor = oldCursor
+    '                    Return
+    '                End If
+
+    '                Dim d = If(Estado.CambioDeCargoDetalle, New CambioDeCargoDetalle())
+    '                d.FechaDesde = dtpFechaDesde.Value.Date
+    '                d.FechaHasta = fechaHastaSel
+    '                d.Observaciones = txtObservaciones.Text.Trim()
+    '                d.Resolucion = txtResolucion.Text.Trim()
+    '                d.CargoAnteriorId = cargoActualId.Value
+    '                d.CargoNuevoId = cargoNuevoId
+    '                ' d.FechaResolucion = fechaResolucionSel
+    '                Estado.CambioDeCargoDetalle = d
+    '                Estado.Funcionario.CargoId = cargoNuevoId
+
+    '            Case ModConstantesApex.TipoEstadoTransitorioId.ReactivacionDeFuncionario
+    '                Dim d = If(Estado.ReactivacionDeFuncionarioDetalle, New ReactivacionDeFuncionarioDetalle())
+    '                d.FechaDesde = dtpFechaDesde.Value.Date
+    '                d.Observaciones = txtObservaciones.Text.Trim()
+    '                d.Resolucion = txtResolucion.Text.Trim()
+    '                ' d.FechaResolucion = fechaResolucionSel
+    '                Estado.ReactivacionDeFuncionarioDetalle = d
+
+    '            Case ModConstantesApex.TipoEstadoTransitorioId.SeparacionDelCargo
+    '                Dim d = If(Estado.SeparacionDelCargoDetalle, New SeparacionDelCargoDetalle())
+    '                d.FechaDesde = dtpFechaDesde.Value.Date
+    '                d.FechaHasta = fechaHastaSel
+    '                d.Observaciones = txtObservaciones.Text.Trim()
+    '                Estado.SeparacionDelCargoDetalle = d
+
+    '            Case ModConstantesApex.TipoEstadoTransitorioId.InicioDeProcesamiento
+    '                Dim d = If(Estado.InicioDeProcesamientoDetalle, New InicioDeProcesamientoDetalle())
+    '                d.FechaDesde = dtpFechaDesde.Value.Date
+    '                d.FechaHasta = fechaHastaSel
+    '                d.Observaciones = txtObservaciones.Text.Trim()
+    '                d.Expediente = txtResolucion.Text.Trim()
+    '                ' d.FechaResolucion = fechaResolucionSel
+    '                Estado.InicioDeProcesamientoDetalle = d
+
+    '            Case ModConstantesApex.TipoEstadoTransitorioId.Desarmado
+    '                Dim d = If(Estado.DesarmadoDetalle, New DesarmadoDetalle())
+    '                d.FechaDesde = dtpFechaDesde.Value.Date
+    '                d.FechaHasta = fechaHastaSel
+    '                d.Observaciones = txtObservaciones.Text.Trim()
+    '                Estado.DesarmadoDetalle = d
+    '        End Select
+
+    '        If Estado.Id = 0 Then
+    '            Estado.CreatedAt = DateTime.Now
+    '        Else
+    '            Estado.UpdatedAt = DateTime.Now
+    '        End If
+
+    '        ' Éxito (mostrar antes de cerrar)
+    '        Notifier.Success(Me, "Estado guardado correctamente.")
+    '        DialogResult = DialogResult.OK
+    '        Close()
+
+    '    Catch ex As Exception
+    '        Notifier.[Error](Me, $"Ocurrió un error al guardar: {ex.Message}")
+    '    Finally
+    '        Me.Cursor = oldCursor
+    '        btnGuardar.Enabled = True
+    '    End Try
+    'End Sub
 
 
 

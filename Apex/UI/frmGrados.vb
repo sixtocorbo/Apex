@@ -1,13 +1,13 @@
-﻿' Apex/UI/frmGestionCargos.vb
-Imports System.ComponentModel
+﻿Imports System.ComponentModel
+Imports System.Linq
+Imports System.Threading
 
 Public Class frmGrados
 
-    Private _cargoService As New CargoService()
     Private _listaCargos As BindingList(Of Cargo)
     Private _cargoSeleccionado As Cargo
+    Private _estaCargando As Boolean = False
 
-    ' --- LOAD: tema, KeyPreview para ESC, grilla, datos, limpiar ---
     Private Async Sub frmGestionCargos_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
         Me.KeyPreview = True
@@ -17,25 +17,31 @@ Public Class frmGrados
         Notifier.Info(Me, "Listado de cargos listo.")
     End Sub
 
-
-    ' --- Carga de datos ---
     Private Async Function CargarDatosAsync() As Task
+        If _estaCargando Then Return
+        _estaCargando = True
+
         Me.Cursor = Cursors.WaitCursor
+        dgvCargos.Enabled = False
+
         Try
-            Dim lista = Await _cargoService.GetAllAsync()
-            _listaCargos = New BindingList(Of Cargo)(lista.ToList())
+            Dim lista As List(Of Cargo)
+            Using svc As New CargoService()
+                lista = Await svc.GetAllAsync()
+            End Using
+            _listaCargos = New BindingList(Of Cargo)(lista)
             dgvCargos.DataSource = _listaCargos
             dgvCargos.ClearSelection()
         Catch ex As Exception
-            Notifier.[Error](Me, $"Ocurrió un error al cargar los datos: {ex.Message}")
+            Notifier.Error(Me, $"Ocurrió un error al cargar los datos: {ex.Message}")
             dgvCargos.DataSource = New BindingList(Of Cargo)()
         Finally
             Me.Cursor = Cursors.Default
+            dgvCargos.Enabled = True
+            _estaCargando = False
         End Try
     End Function
 
-
-    ' --- Configuración de grilla ---
     Private Sub ConfigurarGrilla()
         dgvCargos.AutoGenerateColumns = False
         dgvCargos.Columns.Clear()
@@ -56,11 +62,7 @@ Public Class frmGrados
     Private Sub MostrarDetalles()
         If _cargoSeleccionado IsNot Nothing Then
             txtNombre.Text = _cargoSeleccionado.Nombre
-            If _cargoSeleccionado.Grado.HasValue Then
-                txtGrado.Text = _cargoSeleccionado.Grado.Value.ToString()
-            Else
-                txtGrado.Text = String.Empty
-            End If
+            txtGrado.Text = _cargoSeleccionado.Grado?.ToString()
             btnEliminar.Enabled = True
         Else
             LimpiarCampos()
@@ -76,27 +78,15 @@ Public Class frmGrados
 
     Private Sub txtBuscar_TextChanged(sender As Object, e As EventArgs) Handles txtBuscar.TextChanged
         If _listaCargos Is Nothing Then Return
-
-        Dim filtro As String = If(txtBuscar.Text, String.Empty).Trim()
-        If filtro.Length = 0 Then
+        Dim filtro = txtBuscar.Text.Trim()
+        If String.IsNullOrWhiteSpace(filtro) Then
             dgvCargos.DataSource = _listaCargos
-            dgvCargos.ClearSelection()
-            Return
+        Else
+            Dim resultado = _listaCargos.Where(Function(c) c.Nombre.IndexOf(filtro, StringComparison.OrdinalIgnoreCase) >= 0).ToList()
+            dgvCargos.DataSource = New BindingList(Of Cargo)(resultado)
         End If
-
-        Dim upperFiltro As String = filtro.ToUpperInvariant()
-
-        ' Filtrado seguro ante Nothings (sin ?. ni ??)
-        Dim resultado As List(Of Cargo) =
-        _listaCargos.Where(Function(c)
-                               Dim nombre As String = If(c Is Nothing OrElse c.Nombre Is Nothing, String.Empty, c.Nombre)
-                               Return nombre.ToUpperInvariant().Contains(upperFiltro)
-                           End Function).ToList()
-
-        dgvCargos.DataSource = New BindingList(Of Cargo)(resultado)
         dgvCargos.ClearSelection()
     End Sub
-
 
     Private Sub btnNuevo_Click(sender As Object, e As EventArgs) Handles btnNuevo.Click
         LimpiarCampos()
@@ -109,74 +99,60 @@ Public Class frmGrados
         End If
 
         _cargoSeleccionado.Nombre = txtNombre.Text.Trim()
-
         Dim gradoTemp As Integer
-        If Integer.TryParse(txtGrado.Text.Trim(), gradoTemp) Then
-            _cargoSeleccionado.Grado = gradoTemp
-        Else
-            _cargoSeleccionado.Grado = Nothing
-        End If
+        _cargoSeleccionado.Grado = If(Integer.TryParse(txtGrado.Text.Trim(), gradoTemp), gradoTemp, CType(Nothing, Integer?))
 
-        Dim oldCursor = Me.Cursor
-        btnGuardar.Enabled = False
         Me.Cursor = Cursors.WaitCursor
-
+        btnGuardar.Enabled = False
         Try
-            If _cargoSeleccionado.Id = 0 Then
-                _cargoSeleccionado.CreatedAt = DateTime.Now
-                Await _cargoService.CreateAsync(_cargoSeleccionado)
-                Notifier.Success(Me, "Cargo creado correctamente.")
-            Else
-                _cargoSeleccionado.UpdatedAt = DateTime.Now
-                Await _cargoService.UpdateAsync(_cargoSeleccionado)
-                Notifier.Success(Me, "Cargo actualizado correctamente.")
-            End If
-
+            Using svc As New CargoService()
+                If _cargoSeleccionado.Id = 0 Then
+                    _cargoSeleccionado.CreatedAt = DateTime.Now
+                    Await svc.CreateAsync(_cargoSeleccionado)
+                    Notifier.Success(Me, "Cargo creado correctamente.")
+                Else
+                    _cargoSeleccionado.UpdatedAt = DateTime.Now
+                    Await svc.UpdateAsync(_cargoSeleccionado)
+                    Notifier.Success(Me, "Cargo actualizado correctamente.")
+                End If
+            End Using
             Await CargarDatosAsync()
             LimpiarCampos()
-
         Catch ex As Exception
-            Notifier.[Error](Me, $"Ocurrió un error al guardar el cargo: {ex.Message}")
+            Notifier.Error(Me, $"Ocurrió un error al guardar el cargo: {ex.Message}")
         Finally
-            Me.Cursor = oldCursor
+            Me.Cursor = Cursors.Default
             btnGuardar.Enabled = True
         End Try
     End Sub
-
 
     Private Async Sub btnEliminar_Click(sender As Object, e As EventArgs) Handles btnEliminar.Click
         If _cargoSeleccionado Is Nothing OrElse _cargoSeleccionado.Id = 0 Then
             Notifier.Warn(Me, "Debe seleccionar un cargo para eliminar.")
             Return
         End If
-
         Dim confirmacion = MessageBox.Show(
-        $"¿Está seguro de que desea eliminar el cargo '{_cargoSeleccionado.Nombre}'?",
-        "Confirmar eliminación",
-        MessageBoxButtons.YesNo,
-        MessageBoxIcon.Question)
-
+            $"¿Está seguro de que desea eliminar el cargo '{_cargoSeleccionado.Nombre}'?",
+            "Confirmar eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
         If confirmacion <> DialogResult.Yes Then Return
 
-        Dim oldCursor = Me.Cursor
-        btnEliminar.Enabled = False
         Me.Cursor = Cursors.WaitCursor
-
+        btnEliminar.Enabled = False
         Try
-            Await _cargoService.DeleteAsync(_cargoSeleccionado.Id)
+            Using svc As New CargoService()
+                Await svc.DeleteAsync(_cargoSeleccionado.Id)
+            End Using
             Notifier.Info(Me, "Cargo eliminado.")
             Await CargarDatosAsync()
             LimpiarCampos()
         Catch ex As Exception
-            Notifier.[Error](Me, $"Ocurrió un error al eliminar el cargo: {ex.Message}")
+            Notifier.Error(Me, $"Ocurrió un error al eliminar el cargo: {ex.Message}")
         Finally
-            Me.Cursor = oldCursor
+            Me.Cursor = Cursors.Default
             btnEliminar.Enabled = True
         End Try
     End Sub
 
-
-    ' --- Atajo ESC para volver/cerrar (la pila del Dashboard hace el resto) ---
     Private Sub Cerrando(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
         If e.KeyCode = Keys.Escape Then
             Close()

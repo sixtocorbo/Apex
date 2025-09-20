@@ -1,11 +1,12 @@
-﻿' Apex/UI/frmGestionSecciones.vb
-Imports System.ComponentModel
+﻿Imports System.ComponentModel
+Imports System.Linq
+Imports System.Threading
 
 Public Class frmSecciones
 
-    Private _seccionService As New SeccionService()
     Private _listaSecciones As BindingList(Of Seccion)
     Private _seccionSeleccionada As Seccion
+    Private _estaCargando As Boolean = False
 
     Private Async Sub frmGestionSecciones_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
@@ -13,23 +14,32 @@ Public Class frmSecciones
         Try
             AppTheme.SetCue(txtBuscar, "Buscar por nombre de sección...")
             AppTheme.SetCue(txtNombre, "Ingrese el nombre de la sección...")
-
         Catch
-            ' Ignorar si no existe SetCue
         End Try
         Await CargarDatosAsync()
         LimpiarCampos()
     End Sub
 
     Private Async Function CargarDatosAsync() As Task
+        If _estaCargando Then Return
+        _estaCargando = True
+
         Me.Cursor = Cursors.WaitCursor
+        dgvSecciones.Enabled = False
+
         Try
-            Dim lista = Await _seccionService.GetAllAsync()
-            _listaSecciones = New BindingList(Of Seccion)(lista.ToList())
+            Dim lista As List(Of Seccion)
+            Using svc As New SeccionService()
+                lista = Await svc.GetAllAsync()
+            End Using
+            _listaSecciones = New BindingList(Of Seccion)(lista)
             dgvSecciones.DataSource = _listaSecciones
-            ConfigurarGrilla()
+        Catch ex As Exception
+            Notifier.Error(Me, "No se pudieron cargar las secciones.")
         Finally
             Me.Cursor = Cursors.Default
+            dgvSecciones.Enabled = True
+            _estaCargando = False
         End Try
     End Function
 
@@ -69,7 +79,7 @@ Public Class frmSecciones
         If String.IsNullOrWhiteSpace(filtro) Then
             dgvSecciones.DataSource = _listaSecciones
         Else
-            Dim resultado = _listaSecciones.Where(Function(s) s.Nombre.ToUpper().Contains(filtro.ToUpper())).ToList()
+            Dim resultado = _listaSecciones.Where(Function(s) s.Nombre.IndexOf(filtro, StringComparison.OrdinalIgnoreCase) >= 0).ToList()
             dgvSecciones.DataSource = New BindingList(Of Seccion)(resultado)
         End If
     End Sub
@@ -80,31 +90,26 @@ Public Class frmSecciones
 
     Private Async Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
         If String.IsNullOrWhiteSpace(txtNombre.Text) Then
-            MessageBox.Show("El nombre de la sección no puede estar vacío.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Notifier.Warn(Me, "El nombre de la sección no puede estar vacío.")
             Return
         End If
 
         _seccionSeleccionada.Nombre = txtNombre.Text.Trim()
-
         Me.Cursor = Cursors.WaitCursor
         Try
-            If _seccionSeleccionada.Id = 0 Then
-                ' Para un nuevo registro, solo asignamos CreatedAt si existe en el modelo.
-                ' Si tu modelo 'Seccion' tampoco tiene 'CreatedAt', puedes eliminar la siguiente línea.
-                _seccionSeleccionada.CreatedAt = DateTime.Now
-                Await _seccionService.CreateAsync(_seccionSeleccionada)
-            Else
-                ' --- CORRECCIÓN ---
-                ' La siguiente línea ha sido eliminada porque 'UpdatedAt' no existe en 'Seccion'.
-                ' _seccionSeleccionada.UpdatedAt = DateTime.Now 
-                Await _seccionService.UpdateAsync(_seccionSeleccionada)
-            End If
-
-            MessageBox.Show("Sección guardada correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Using svc As New SeccionService()
+                If _seccionSeleccionada.Id = 0 Then
+                    _seccionSeleccionada.CreatedAt = DateTime.Now
+                    Await svc.CreateAsync(_seccionSeleccionada)
+                Else
+                    Await svc.UpdateAsync(_seccionSeleccionada)
+                End If
+            End Using
+            Notifier.Success(Me, "Sección guardada correctamente.")
             Await CargarDatosAsync()
             LimpiarCampos()
         Catch ex As Exception
-            MessageBox.Show("Ocurrió un error al guardar la sección: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Notifier.Error(Me, "Ocurrió un error al guardar la sección: " & ex.Message)
         Finally
             Me.Cursor = Cursors.Default
         End Try
@@ -112,28 +117,29 @@ Public Class frmSecciones
 
     Private Async Sub btnEliminar_Click(sender As Object, e As EventArgs) Handles btnEliminar.Click
         If _seccionSeleccionada Is Nothing OrElse _seccionSeleccionada.Id = 0 Then
-            MessageBox.Show("Debe seleccionar una sección para eliminar.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Notifier.Warn(Me, "Debe seleccionar una sección para eliminar.")
             Return
         End If
 
         Dim confirmacion = MessageBox.Show($"¿Está seguro de que desea eliminar la sección '{_seccionSeleccionada.Nombre}'?", "Confirmar eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
-
         If confirmacion = DialogResult.Yes Then
             Me.Cursor = Cursors.WaitCursor
             Try
-                Await _seccionService.DeleteAsync(_seccionSeleccionada.Id)
-                MessageBox.Show("Sección eliminada.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                Using svc As New SeccionService()
+                    Await svc.DeleteAsync(_seccionSeleccionada.Id)
+                End Using
+                Notifier.Info(Me, "Sección eliminada.")
                 Await CargarDatosAsync()
                 LimpiarCampos()
             Catch ex As Exception
-                MessageBox.Show("Ocurrió un error al eliminar la sección: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                Notifier.Error(Me, "Ocurrió un error al eliminar la sección: " & ex.Message)
             Finally
                 Me.Cursor = Cursors.Default
             End Try
         End If
     End Sub
+
     Private Sub Cerrando(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
-        ' Si la tecla presionada es Escape, se cierra el formulario.
         If e.KeyCode = Keys.Escape Then
             Me.Close()
         End If
