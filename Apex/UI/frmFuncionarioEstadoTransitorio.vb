@@ -214,23 +214,33 @@ Public Class frmFuncionarioEstadoTransitorio
 Fin:
         txtObservaciones.Text = observaciones
 
-        ' --- Fecha Hasta: usar helper para clarificar la regla ---
-        If RequiereFechaHasta(Estado.TipoEstadoTransitorioId) Then
-            If fechaHasta.HasValue Then
-                dtpFechaHasta.Value = fechaHasta.Value
-                dtpFechaHasta.Enabled = True
-                chkFechaHasta.Checked = False
-            Else
-                dtpFechaHasta.Enabled = False
-                chkFechaHasta.Checked = True
-            End If
+        ' --- SIEMPRE mostrar la sección "Hasta" (por si este método corre antes que TipoEstado_Changed)
+        Try
+            ToggleHastaSection(True)
+        Catch
+            ' Si no existe el método o no aplica, ignorar.
+        End Try
+
+        ' --- Fecha Hasta: opcional según checkbox ---
+        If fechaHasta.HasValue Then
+            ' El estado tiene fecha de fin → mostrarla y habilitar el DTP
+            chkFechaHasta.Checked = False
+            dtpFechaHasta.Enabled = True
+            dtpFechaHasta.Value = fechaHasta.Value
         Else
-            ' Retén y Reactivación: ocultar/deshabilitar si corresponde
-            dtpFechaHasta.Enabled = False
+            ' Sin fecha de fin → checkbox marcado y DTP deshabilitado
             chkFechaHasta.Checked = True
+            dtpFechaHasta.Enabled = False
+            ' Valor de conveniencia si el usuario destilda luego
+            dtpFechaHasta.Value = dtpFechaDesde.Value.Date
         End If
 
-        ' --- Fecha de Resolución si la agregás a tu modelo ---
+        ' Coherencia: si Hasta < Desde y el DTP está habilitado, alineamos
+        If dtpFechaHasta.Enabled AndAlso dtpFechaHasta.Value.Date < dtpFechaDesde.Value.Date Then
+            dtpFechaHasta.Value = dtpFechaDesde.Value.Date
+        End If
+
+        ' --- Fecha de Resolución (si la agregás a tu modelo) ---
         If fechaResolucion.HasValue Then
             dtpFechaResolucion.Value = fechaResolucion.Value
             dtpFechaResolucion.Enabled = True
@@ -243,11 +253,15 @@ Fin:
 
 
     Private Sub TipoEstado_Changed(sender As Object, e As EventArgs)
-        ' Reset UI
+        ' Reset base
         ShowExtra(False, False, False, False)
         lblResolucion.Text = "Resolución:"
         lblFechaDesde.Text = "Fecha Desde:"
+
+        ' ---> SIEMPRE mostramos la sección Hasta
         ToggleHastaSection(True)
+        ' Habilitación del DTP depende del checkbox (manejada en su CheckedChanged)
+        dtpFechaHasta.Enabled = Not chkFechaHasta.Checked
 
         If cboTipoEstado.SelectedIndex = -1 OrElse cboTipoEstado.SelectedValue Is Nothing Then Exit Sub
 
@@ -255,51 +269,102 @@ Fin:
         If Not Integer.TryParse(cboTipoEstado.SelectedValue.ToString(), tipoId) Then Exit Sub
 
         Select Case tipoId
-        ' Designación, Sanción, Sumario, Reactivación, Inicio de Procesamiento
             Case ModConstantesApex.TipoEstadoTransitorioId.Designacion,
              ModConstantesApex.TipoEstadoTransitorioId.Sancion,
              ModConstantesApex.TipoEstadoTransitorioId.Sumario,
-             ModConstantesApex.TipoEstadoTransitorioId.ReactivacionDeFuncionario,
              ModConstantesApex.TipoEstadoTransitorioId.InicioDeProcesamiento
-
                 ShowExtra(True, False, False, False)
                 If tipoId = ModConstantesApex.TipoEstadoTransitorioId.Designacion Then
                     lblResolucion.Text = "Doc. Resolución:"
-                End If
-                If tipoId = ModConstantesApex.TipoEstadoTransitorioId.Sumario _
-               OrElse tipoId = ModConstantesApex.TipoEstadoTransitorioId.InicioDeProcesamiento Then
+                ElseIf tipoId = ModConstantesApex.TipoEstadoTransitorioId.Sumario _
+                OrElse tipoId = ModConstantesApex.TipoEstadoTransitorioId.InicioDeProcesamiento Then
                     lblResolucion.Text = "Expediente:"
                 End If
 
-        ' Cambio de cargo
+            Case ModConstantesApex.TipoEstadoTransitorioId.Enfermedad
+                ShowExtra(False, True, False, False)
+
             Case ModConstantesApex.TipoEstadoTransitorioId.CambioDeCargo
                 ShowExtra(True, False, False, True)
                 lblResolucion.Text = "Resolución:"
                 SetCargoAnteriorDesdeFuncionario()
 
-        ' Enfermedad
-            Case ModConstantesApex.TipoEstadoTransitorioId.Enfermedad
-                ShowExtra(False, True, False, False)
-
-        ' Retén (sin fecha hasta)
             Case ModConstantesApex.TipoEstadoTransitorioId.Reten
+                lblFechaDesde.Text = "Fecha Retén:"    ' solo cambia el rótulo de "Desde"
                 ShowExtra(False, False, True, False)
-                lblFechaDesde.Text = "Fecha Retén:"
-                ToggleHastaSection(False)
 
-        ' Orden Cinco, Traslado, Baja, Separación del Cargo, Desarmado
+            Case ModConstantesApex.TipoEstadoTransitorioId.ReactivacionDeFuncionario
+                ShowExtra(True, False, False, False)
+                lblResolucion.Text = "Resolución:"
+
             Case ModConstantesApex.TipoEstadoTransitorioId.OrdenCinco,
              ModConstantesApex.TipoEstadoTransitorioId.Traslado,
              ModConstantesApex.TipoEstadoTransitorioId.BajaDeFuncionario,
              ModConstantesApex.TipoEstadoTransitorioId.SeparacionDelCargo,
              ModConstantesApex.TipoEstadoTransitorioId.Desarmado
-
-                ShowExtra(False, False, False, False)
-
-            Case Else
                 ShowExtra(False, False, False, False)
         End Select
     End Sub
+
+
+    'Private Sub TipoEstado_Changed(sender As Object, e As EventArgs)
+    '    ' Reset UI
+    '    ShowExtra(False, False, False, False)
+    '    lblResolucion.Text = "Resolución:"
+    '    lblFechaDesde.Text = "Fecha Desde:"
+    '    ToggleHastaSection(True)
+
+    '    If cboTipoEstado.SelectedIndex = -1 OrElse cboTipoEstado.SelectedValue Is Nothing Then Exit Sub
+
+    '    Dim tipoId As Integer
+    '    If Not Integer.TryParse(cboTipoEstado.SelectedValue.ToString(), tipoId) Then Exit Sub
+
+    '    Select Case tipoId
+    '    ' Designación, Sanción, Sumario, Reactivación, Inicio de Procesamiento
+    '        Case ModConstantesApex.TipoEstadoTransitorioId.Designacion,
+    '         ModConstantesApex.TipoEstadoTransitorioId.Sancion,
+    '         ModConstantesApex.TipoEstadoTransitorioId.Sumario,
+    '         ModConstantesApex.TipoEstadoTransitorioId.ReactivacionDeFuncionario,
+    '         ModConstantesApex.TipoEstadoTransitorioId.InicioDeProcesamiento
+
+    '            ShowExtra(True, False, False, False)
+    '            If tipoId = ModConstantesApex.TipoEstadoTransitorioId.Designacion Then
+    '                lblResolucion.Text = "Doc. Resolución:"
+    '            End If
+    '            If tipoId = ModConstantesApex.TipoEstadoTransitorioId.Sumario _
+    '           OrElse tipoId = ModConstantesApex.TipoEstadoTransitorioId.InicioDeProcesamiento Then
+    '                lblResolucion.Text = "Expediente:"
+    '            End If
+
+    '    ' Cambio de cargo
+    '        Case ModConstantesApex.TipoEstadoTransitorioId.CambioDeCargo
+    '            ShowExtra(True, False, False, True)
+    '            lblResolucion.Text = "Resolución:"
+    '            SetCargoAnteriorDesdeFuncionario()
+
+    '    ' Enfermedad
+    '        Case ModConstantesApex.TipoEstadoTransitorioId.Enfermedad
+    '            ShowExtra(False, True, False, False)
+
+    '    ' Retén (sin fecha hasta)
+    '        Case ModConstantesApex.TipoEstadoTransitorioId.Reten
+    '            ShowExtra(False, False, True, False)
+    '            lblFechaDesde.Text = "Fecha Retén:"
+    '            ToggleHastaSection(False)
+
+    '    ' Orden Cinco, Traslado, Baja, Separación del Cargo, Desarmado
+    '        Case ModConstantesApex.TipoEstadoTransitorioId.OrdenCinco,
+    '         ModConstantesApex.TipoEstadoTransitorioId.Traslado,
+    '         ModConstantesApex.TipoEstadoTransitorioId.BajaDeFuncionario,
+    '         ModConstantesApex.TipoEstadoTransitorioId.SeparacionDelCargo,
+    '         ModConstantesApex.TipoEstadoTransitorioId.Desarmado
+
+    '            ShowExtra(False, False, False, False)
+
+    '        Case Else
+    '            ShowExtra(False, False, False, False)
+    '    End Select
+    'End Sub
 
 
     ' >>> MODIFICADO: Se añade el manejo de visibilidad para los controles de Fecha Resolución
@@ -345,7 +410,18 @@ Fin:
 
     Private Sub chkFechaHasta_CheckedChanged(sender As Object, e As EventArgs) Handles chkFechaHasta.CheckedChanged
         dtpFechaHasta.Enabled = Not chkFechaHasta.Checked
+        ' Coherencia: si se habilita y Hasta < Desde, lo alineamos
+        If dtpFechaHasta.Enabled AndAlso dtpFechaHasta.Value.Date < dtpFechaDesde.Value.Date Then
+            dtpFechaHasta.Value = dtpFechaDesde.Value.Date
+        End If
     End Sub
+    Private Sub dtpFechaDesde_ValueChanged(sender As Object, e As EventArgs) Handles dtpFechaDesde.ValueChanged
+        If Not chkFechaHasta.Checked AndAlso dtpFechaHasta.Value.Date < dtpFechaDesde.Value.Date Then
+            dtpFechaHasta.Value = dtpFechaDesde.Value.Date
+        End If
+    End Sub
+
+
 
     ' >>> NOVEDAD: Evento para el nuevo CheckBox
     Private Sub chkSinFechaResolucion_CheckedChanged(sender As Object, e As EventArgs) Handles chkSinFechaResolucion.CheckedChanged
@@ -1116,5 +1192,15 @@ Fin:
 
         cboCargoAnterior.Enabled = False
     End Sub
+    ' --- Helpers de fechas ---
+    Private Function RequiereFechaHasta(tipoId As Integer) As Boolean
+        Select Case tipoId
+            Case ModConstantesApex.TipoEstadoTransitorioId.Reten,
+             ModConstantesApex.TipoEstadoTransitorioId.ReactivacionDeFuncionario
+                Return False
+            Case Else
+                Return True
+        End Select
+    End Function
 
 End Class
