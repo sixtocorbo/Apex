@@ -125,9 +125,7 @@ Public Class frmFuncionarioEstadoTransitorio
                 fechaHasta = d.FechaHasta
                 observaciones = d.Observaciones
                 txtDiagnostico.Text = d.Diagnostico
-                '(### CORRECCIÓN) Se carga el campo FechaResolucion que faltaba.
                 fechaResolucion = d.FechaResolucion
-
 
             Case TipoEstadoTransitorioId.Sancion
                 Dim d = Estado.SancionDetalle : If d Is Nothing Then GoTo Fin
@@ -136,7 +134,6 @@ Public Class frmFuncionarioEstadoTransitorio
                 observaciones = d.Observaciones
                 txtResolucion.Text = d.Resolucion
                 fechaResolucion = d.FechaResolucion
-                '(### CORRECCIÓN) Se carga el campo TipoSancion que faltaba.
                 txtTipoSancion.Text = d.TipoSancion
 
             Case TipoEstadoTransitorioId.OrdenCinco
@@ -166,12 +163,16 @@ Public Class frmFuncionarioEstadoTransitorio
                 dtpFechaDesde.Value = d.FechaDesde
                 fechaHasta = d.FechaHasta
                 observaciones = d.Observaciones
+                txtResolucion.Text = d.Resolucion
+                fechaResolucion = d.FechaResolucion
 
             Case TipoEstadoTransitorioId.BajaDeFuncionario
                 Dim d = Estado.BajaDeFuncionarioDetalle : If d Is Nothing Then GoTo Fin
                 dtpFechaDesde.Value = d.FechaDesde
                 fechaHasta = d.FechaHasta
                 observaciones = d.Observaciones
+                txtResolucion.Text = d.Resolucion
+                fechaResolucion = d.FechaResolucion
 
             Case TipoEstadoTransitorioId.CambioDeCargo
                 Dim d = Estado.CambioDeCargoDetalle : If d Is Nothing Then GoTo Fin
@@ -195,6 +196,8 @@ Public Class frmFuncionarioEstadoTransitorio
                 dtpFechaDesde.Value = d.FechaDesde
                 fechaHasta = d.FechaHasta
                 observaciones = d.Observaciones
+                txtResolucion.Text = d.Resolucion
+                fechaResolucion = d.FechaResolucion
 
             Case TipoEstadoTransitorioId.InicioDeProcesamiento
                 Dim d = Estado.InicioDeProcesamientoDetalle : If d Is Nothing Then GoTo Fin
@@ -209,6 +212,8 @@ Public Class frmFuncionarioEstadoTransitorio
                 dtpFechaDesde.Value = d.FechaDesde
                 fechaHasta = d.FechaHasta
                 observaciones = d.Observaciones
+                txtResolucion.Text = d.Resolucion
+                fechaResolucion = d.FechaResolucion
         End Select
 
 Fin:
@@ -267,7 +272,6 @@ Fin:
         cboCargoAnterior.Visible = False
         lblCargoNuevo.Visible = False
         cboCargoNuevo.Visible = False
-        '(### CORRECCIÓN) Se oculta el nuevo campo de Tipo Sanción por defecto.
         lblTipoSancion.Visible = False
         txtTipoSancion.Visible = False
 
@@ -280,25 +284,23 @@ Fin:
 
         Select Case tipoId
             Case ModConstantesApex.TipoEstadoTransitorioId.Sancion
-                '(### CORRECCIÓN) Se muestra el campo de texto y el nuevo campo TipoSancion
                 ShowResolucion(True)
                 lblTipoSancion.Visible = True
                 txtTipoSancion.Visible = True
 
             Case ModConstantesApex.TipoEstadoTransitorioId.Designacion,
-                 ModConstantesApex.TipoEstadoTransitorioId.Sumario,
-                 ModConstantesApex.TipoEstadoTransitorioId.InicioDeProcesamiento
+             ModConstantesApex.TipoEstadoTransitorioId.Sumario,
+             ModConstantesApex.TipoEstadoTransitorioId.InicioDeProcesamiento
                 ShowResolucion(True)
                 If tipoId = ModConstantesApex.TipoEstadoTransitorioId.Designacion Then
                     lblResolucion.Text = "Doc. Resolución:"
                 ElseIf tipoId = ModConstantesApex.TipoEstadoTransitorioId.Sumario OrElse
-                       tipoId = ModConstantesApex.TipoEstadoTransitorioId.InicioDeProcesamiento Then
+                   tipoId = ModConstantesApex.TipoEstadoTransitorioId.InicioDeProcesamiento Then
                     lblResolucion.Text = "Expediente:"
                 End If
 
             Case ModConstantesApex.TipoEstadoTransitorioId.Enfermedad
                 ShowDiagnostico(True)
-                '(### CORRECCIÓN) Se muestran los controles de Fecha Resolución pero se oculta el textbox.
                 ShowResolucion(True)
                 lblResolucion.Visible = False
                 txtResolucion.Visible = False
@@ -318,7 +320,6 @@ Fin:
                 ShowResolucion(True)
 
             Case ModConstantesApex.TipoEstadoTransitorioId.OrdenCinco
-                '(### CORRECCIÓN) Se muestran solo los controles de Fecha, no el textbox de resolución.
                 lblFechaResolucion.Visible = True
                 dtpFechaResolucion.Visible = True
                 chkSinFechaResolucion.Visible = True
@@ -326,10 +327,10 @@ Fin:
                 txtResolucion.Visible = False
 
             Case ModConstantesApex.TipoEstadoTransitorioId.Traslado,
-                 ModConstantesApex.TipoEstadoTransitorioId.BajaDeFuncionario,
-                 ModConstantesApex.TipoEstadoTransitorioId.SeparacionDelCargo,
-                 ModConstantesApex.TipoEstadoTransitorioId.Desarmado
-                ' No se muestran campos adicionales, solo los comunes.
+             ModConstantesApex.TipoEstadoTransitorioId.BajaDeFuncionario,
+             ModConstantesApex.TipoEstadoTransitorioId.SeparacionDelCargo,
+             ModConstantesApex.TipoEstadoTransitorioId.Desarmado
+                ShowResolucion(True)
 
             Case 0 ' Caso para cuando no hay nada seleccionado
                 ToggleHastaSection(False)
@@ -497,7 +498,6 @@ Fin:
                 d.FechaHasta = fechaHastaSel
                 d.Observaciones = txtObservaciones.Text.Trim()
                 d.Diagnostico = txtDiagnostico.Text.Trim()
-                '(### CORRECCIÓN) Se guarda el campo FechaResolucion que faltaba.
                 d.FechaResolucion = fechaResolucionSel
                 Estado.EnfermedadDetalle = d
 
@@ -508,7 +508,6 @@ Fin:
                 d.Observaciones = txtObservaciones.Text.Trim()
                 d.Resolucion = txtResolucion.Text.Trim()
                 d.FechaResolucion = fechaResolucionSel
-                '(### CORRECCIÓN) Se guarda el campo TipoSancion que faltaba.
                 d.TipoSancion = txtTipoSancion.Text.Trim()
                 Estado.SancionDetalle = d
 
@@ -542,6 +541,8 @@ Fin:
                 d.FechaDesde = dtpFechaDesde.Value.Date
                 d.FechaHasta = fechaHastaSel
                 d.Observaciones = txtObservaciones.Text.Trim()
+                d.Resolucion = txtResolucion.Text.Trim()
+                d.FechaResolucion = fechaResolucionSel
                 Estado.TrasladoDetalle = d
 
             Case ModConstantesApex.TipoEstadoTransitorioId.BajaDeFuncionario
@@ -549,6 +550,8 @@ Fin:
                 d.FechaDesde = dtpFechaDesde.Value.Date
                 d.FechaHasta = fechaHastaSel
                 d.Observaciones = txtObservaciones.Text.Trim()
+                d.Resolucion = txtResolucion.Text.Trim()
+                d.FechaResolucion = fechaResolucionSel
                 Estado.BajaDeFuncionarioDetalle = d
 
             Case ModConstantesApex.TipoEstadoTransitorioId.CambioDeCargo
@@ -578,6 +581,8 @@ Fin:
                 d.FechaDesde = dtpFechaDesde.Value.Date
                 d.FechaHasta = fechaHastaSel
                 d.Observaciones = txtObservaciones.Text.Trim()
+                d.Resolucion = txtResolucion.Text.Trim()
+                d.FechaResolucion = fechaResolucionSel
                 Estado.SeparacionDelCargoDetalle = d
 
             Case ModConstantesApex.TipoEstadoTransitorioId.InicioDeProcesamiento
@@ -594,6 +599,8 @@ Fin:
                 d.FechaDesde = dtpFechaDesde.Value.Date
                 d.FechaHasta = fechaHastaSel
                 d.Observaciones = txtObservaciones.Text.Trim()
+                d.Resolucion = txtResolucion.Text.Trim()
+                d.FechaResolucion = fechaResolucionSel
                 Estado.DesarmadoDetalle = d
         End Select
 

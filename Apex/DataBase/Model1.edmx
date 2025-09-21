@@ -44,6 +44,8 @@
           <Property Name="FechaDesde" Type="date" Nullable="false" />
           <Property Name="FechaHasta" Type="date" />
           <Property Name="Observaciones" Type="nvarchar(max)" />
+          <Property Name="Resolucion" Type="nvarchar" MaxLength="255" />
+          <Property Name="FechaResolucion" Type="date" />
         </EntityType>
         <EntityType Name="CambioDeCargoDetalle">
           <Key>
@@ -83,6 +85,8 @@
           <Property Name="FechaDesde" Type="date" Nullable="false" />
           <Property Name="FechaHasta" Type="date" />
           <Property Name="Observaciones" Type="nvarchar(max)" />
+          <Property Name="Resolucion" Type="nvarchar" MaxLength="255" />
+          <Property Name="FechaResolucion" Type="date" />
         </EntityType>
         <EntityType Name="DesignacionDetalle">
           <Key>
@@ -627,6 +631,8 @@
           <Property Name="FechaDesde" Type="date" Nullable="false" />
           <Property Name="FechaHasta" Type="date" />
           <Property Name="Observaciones" Type="nvarchar(max)" />
+          <Property Name="Resolucion" Type="nvarchar" MaxLength="255" />
+          <Property Name="FechaResolucion" Type="date" />
         </EntityType>
         <EntityType Name="SubDireccion">
           <Key>
@@ -724,6 +730,8 @@
           <Property Name="FechaDesde" Type="date" Nullable="false" />
           <Property Name="FechaHasta" Type="date" />
           <Property Name="Observaciones" Type="nvarchar(max)" />
+          <Property Name="Resolucion" Type="nvarchar" MaxLength="255" />
+          <Property Name="FechaResolucion" Type="date" />
         </EntityType>
         <EntityType Name="Turno">
           <Key>
@@ -2290,6 +2298,8 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <Property Name="FechaDesde" Type="DateTime" Nullable="false" Precision="0" />
           <Property Name="FechaHasta" Type="DateTime" Precision="0" />
           <Property Name="Observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Resolucion" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="FechaResolucion" Type="DateTime" Precision="0" />
           <NavigationProperty Name="EstadoTransitorio" Relationship="Self.FK_BajaDeFuncionarioDetalle_EstadoTransitorio" FromRole="BajaDeFuncionarioDetalle" ToRole="EstadoTransitorio" />
         </EntityType>
         <EntityType Name="CambioDeCargoDetalle">
@@ -2337,6 +2347,8 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <Property Name="FechaDesde" Type="DateTime" Nullable="false" Precision="0" />
           <Property Name="FechaHasta" Type="DateTime" Precision="0" />
           <Property Name="Observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Resolucion" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="FechaResolucion" Type="DateTime" Precision="0" />
           <NavigationProperty Name="EstadoTransitorio" Relationship="Self.FK_DesarmadoDetalle_EstadoTransitorio" FromRole="DesarmadoDetalle" ToRole="EstadoTransitorio" />
         </EntityType>
         <EntityType Name="DesignacionDetalle">
@@ -2983,6 +2995,8 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <Property Name="FechaDesde" Type="DateTime" Nullable="false" Precision="0" />
           <Property Name="FechaHasta" Type="DateTime" Precision="0" />
           <Property Name="Observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Resolucion" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="FechaResolucion" Type="DateTime" Precision="0" />
           <NavigationProperty Name="EstadoTransitorio" Relationship="Self.FK_SeparacionDelCargo_EstadoTransitorio" FromRole="SeparacionDelCargoDetalle" ToRole="EstadoTransitorio" />
         </EntityType>
         <EntityType Name="SubDireccion">
@@ -3090,6 +3104,8 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <Property Name="FechaDesde" Type="DateTime" Nullable="false" Precision="0" />
           <Property Name="FechaHasta" Type="DateTime" Precision="0" />
           <Property Name="Observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Resolucion" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="FechaResolucion" Type="DateTime" Precision="0" />
           <NavigationProperty Name="EstadoTransitorio" Relationship="Self.FK_TrasladoDetalle_EstadoTransitorio" FromRole="TrasladoDetalle" ToRole="EstadoTransitorio" />
         </EntityType>
         <EntityType Name="Turno">
@@ -4568,6 +4584,8 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
                 <ScalarProperty Name="FechaDesde" ColumnName="FechaDesde" />
                 <ScalarProperty Name="FechaHasta" ColumnName="FechaHasta" />
                 <ScalarProperty Name="Observaciones" ColumnName="Observaciones" />
+                <ScalarProperty Name="Resolucion" ColumnName="Resolucion" />
+                <ScalarProperty Name="FechaResolucion" ColumnName="FechaResolucion" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -4611,6 +4629,8 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
                 <ScalarProperty Name="FechaDesde" ColumnName="FechaDesde" />
                 <ScalarProperty Name="FechaHasta" ColumnName="FechaHasta" />
                 <ScalarProperty Name="Observaciones" ColumnName="Observaciones" />
+                <ScalarProperty Name="Resolucion" ColumnName="Resolucion" />
+                <ScalarProperty Name="FechaResolucion" ColumnName="FechaResolucion" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -5197,6 +5217,8 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
                 <ScalarProperty Name="FechaDesde" ColumnName="FechaDesde" />
                 <ScalarProperty Name="FechaHasta" ColumnName="FechaHasta" />
                 <ScalarProperty Name="Observaciones" ColumnName="Observaciones" />
+                <ScalarProperty Name="Resolucion" ColumnName="Resolucion" />
+                <ScalarProperty Name="FechaResolucion" ColumnName="FechaResolucion" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -5304,6 +5326,8 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
                 <ScalarProperty Name="FechaDesde" ColumnName="FechaDesde" />
                 <ScalarProperty Name="FechaHasta" ColumnName="FechaHasta" />
                 <ScalarProperty Name="Observaciones" ColumnName="Observaciones" />
+                <ScalarProperty Name="Resolucion" ColumnName="Resolucion" />
+                <ScalarProperty Name="FechaResolucion" ColumnName="FechaResolucion" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

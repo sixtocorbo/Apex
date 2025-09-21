@@ -63,11 +63,7 @@ Public Module EstadoTransitorioExtensions
                 End If
 
             Case TiposEstadoCatalog.BajaDeFuncionario
-                Dim fechaBaja = ReadDate(et.BajaDeFuncionarioDetalle, "Fecha")
-                If fechaBaja.HasValue Then
-                    desde = fechaBaja
-                    hasta = fechaBaja
-                End If
+                FillFromDetail(et.BajaDeFuncionarioDetalle, {"FechaDesde"}, {"FechaHasta"}, desde, hasta)
 
             Case TiposEstadoCatalog.ReactivacionDeFuncionario
                 Dim fechaReactivacion = ReadDate(et.ReactivacionDeFuncionarioDetalle, "Fecha")
