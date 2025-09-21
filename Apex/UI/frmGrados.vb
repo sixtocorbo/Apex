@@ -4,25 +4,65 @@ Imports System.Threading
 
 Public Class frmGrados
 
+    ' ------------------ CAMPOS ------------------
     Private _listaCargos As BindingList(Of Cargo)
     Private _cargoSeleccionado As Cargo
     Private _estaCargando As Boolean = False
 
-    Private Async Sub frmGestionCargos_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    ' UX helpers
+    Private _buscarTimer As System.Windows.Forms.Timer
+    Private _ultimoIdSeleccionado As Integer = 0
+
+    ' Placeholder del TextBox (cue banner)
+    <System.Runtime.InteropServices.DllImport("user32.dll", CharSet:=System.Runtime.InteropServices.CharSet.Unicode)>
+    Private Shared Function SendMessage(hWnd As IntPtr, msg As Integer, wParam As IntPtr, lParam As String) As IntPtr
+    End Function
+    Private Const EM_SETCUEBANNER As Integer = &H1501
+    Private Sub EstablecerPlaceholder(tb As TextBox, texto As String)
+        If tb Is Nothing Then Exit Sub
+        If tb.IsHandleCreated Then
+            SendMessage(tb.Handle, EM_SETCUEBANNER, CType(1, IntPtr), texto)
+        Else
+            AddHandler tb.HandleCreated, Sub() SendMessage(tb.Handle, EM_SETCUEBANNER, CType(1, IntPtr), texto)
+        End If
+    End Sub
+
+    ' ------------------ LOAD ------------------
+    Private Async Sub frmGrados_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
         Me.KeyPreview = True
         ConfigurarGrilla()
+
+        ' Placeholder y debounce
+        EstablecerPlaceholder(txtBuscar, "ESCRIBE PARA FILTRAR…")
+        _buscarTimer = New System.Windows.Forms.Timer() With {.Interval = 200}
+        AddHandler _buscarTimer.Tick, Sub()
+                                          _buscarTimer.Stop()
+                                          AplicarFiltro(txtBuscar.Text.Trim())
+                                      End Sub
+
+        ' Validación de entrada
+        AddHandler txtGrado.KeyPress, AddressOf SoloNumeros_KeyPress
+
+        ' Doble click para editar
+        AddHandler dgvCargos.CellDoubleClick, AddressOf dgvCargos_CellDoubleClick
+
+        ' Atajos
+        AddHandler Me.KeyDown, AddressOf Frm_KeyDown
+
         Await CargarDatosAsync()
         LimpiarCampos()
         Notifier.Info(Me, "Listado de cargos listo.")
     End Sub
 
+    ' ------------------ CARGA DE DATOS ------------------
     Private Async Function CargarDatosAsync() As Task
         If _estaCargando Then Return
         _estaCargando = True
 
         Me.Cursor = Cursors.WaitCursor
         dgvCargos.Enabled = False
+        RecordarSeleccion()
 
         Try
             Dim lista As List(Of Cargo)
@@ -32,6 +72,7 @@ Public Class frmGrados
             _listaCargos = New BindingList(Of Cargo)(lista)
             dgvCargos.DataSource = _listaCargos
             dgvCargos.ClearSelection()
+            RestaurarSeleccion()
         Catch ex As Exception
             Notifier.Error(Me, $"Ocurrió un error al cargar los datos: {ex.Message}")
             dgvCargos.DataSource = New BindingList(Of Cargo)()
@@ -42,12 +83,65 @@ Public Class frmGrados
         End Try
     End Function
 
+    Private Sub RecordarSeleccion()
+        If dgvCargos.CurrentRow IsNot Nothing AndAlso dgvCargos.CurrentRow.DataBoundItem IsNot Nothing Then
+            Dim c = CType(dgvCargos.CurrentRow.DataBoundItem, Cargo)
+            _ultimoIdSeleccionado = c.Id
+        Else
+            _ultimoIdSeleccionado = 0
+        End If
+    End Sub
+
+    Private Sub RestaurarSeleccion()
+        If _ultimoIdSeleccionado = 0 OrElse dgvCargos.Rows.Count = 0 Then
+            dgvCargos.ClearSelection()
+            Exit Sub
+        End If
+
+        For Each row As DataGridViewRow In dgvCargos.Rows
+            Dim c = TryCast(row.DataBoundItem, Cargo)
+            If c IsNot Nothing AndAlso c.Id = _ultimoIdSeleccionado Then
+                row.Selected = True
+
+                ' Primera columna visible del DGV (no de las celdas)
+                Dim firstVisibleCol = dgvCargos.Columns.GetFirstColumn(DataGridViewElementStates.Visible)
+                If firstVisibleCol IsNot Nothing Then
+                    dgvCargos.CurrentCell = row.Cells(firstVisibleCol.Index)
+                Else
+                    ' Fallback: primera celda de la fila si no hay columnas visibles (caso raro)
+                    If row.Cells.Count > 0 Then dgvCargos.CurrentCell = row.Cells(0)
+                End If
+
+                ' Opcional: desplazar scroll para asegurarse de que se vea
+                dgvCargos.FirstDisplayedScrollingRowIndex = Math.Max(0, row.Index)
+
+                Exit For
+            End If
+        Next
+    End Sub
+
+
+    ' ------------------ UI ------------------
     Private Sub ConfigurarGrilla()
-        dgvCargos.AutoGenerateColumns = False
-        dgvCargos.Columns.Clear()
-        dgvCargos.Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Id", .HeaderText = "Id", .Visible = False})
-        dgvCargos.Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Nombre", .HeaderText = "Nombre", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
-        dgvCargos.Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Grado", .HeaderText = "Grado", .Width = 80})
+        With dgvCargos
+            .AutoGenerateColumns = False
+            .Columns.Clear()
+            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Id", .HeaderText = "Id", .Visible = False})
+            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Nombre", .HeaderText = "Nombre", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
+            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Grado", .HeaderText = "Grado", .Width = 90})
+
+            .ReadOnly = True
+            .SelectionMode = DataGridViewSelectionMode.FullRowSelect
+            .MultiSelect = False
+            .RowHeadersVisible = False
+            .AllowUserToResizeRows = False
+            .AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells
+            .AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(245, 245, 245)
+            .EnableHeadersVisualStyles = False
+            .ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(230, 230, 230)
+            .ColumnHeadersDefaultCellStyle.Font = New Font(.Font, FontStyle.Bold)
+            .RowTemplate.Height = 28
+        End With
     End Sub
 
     Private Sub LimpiarCampos()
@@ -69,6 +163,7 @@ Public Class frmGrados
         End If
     End Sub
 
+    ' ------------------ EVENTOS CONTROLES ------------------
     Private Sub dgvCargos_SelectionChanged(sender As Object, e As EventArgs) Handles dgvCargos.SelectionChanged
         If dgvCargos.CurrentRow IsNot Nothing AndAlso dgvCargos.CurrentRow.DataBoundItem IsNot Nothing Then
             _cargoSeleccionado = CType(dgvCargos.CurrentRow.DataBoundItem, Cargo)
@@ -77,12 +172,19 @@ Public Class frmGrados
     End Sub
 
     Private Sub txtBuscar_TextChanged(sender As Object, e As EventArgs) Handles txtBuscar.TextChanged
+        If _buscarTimer Is Nothing Then Return
+        _buscarTimer.Stop()
+        _buscarTimer.Start()
+    End Sub
+
+    Private Sub AplicarFiltro(filtro As String)
         If _listaCargos Is Nothing Then Return
-        Dim filtro = txtBuscar.Text.Trim()
         If String.IsNullOrWhiteSpace(filtro) Then
             dgvCargos.DataSource = _listaCargos
         Else
-            Dim resultado = _listaCargos.Where(Function(c) c.Nombre.IndexOf(filtro, StringComparison.OrdinalIgnoreCase) >= 0).ToList()
+            Dim resultado = _listaCargos.
+                Where(Function(c) c.Nombre?.IndexOf(filtro, StringComparison.OrdinalIgnoreCase) >= 0).
+                ToList()
             dgvCargos.DataSource = New BindingList(Of Cargo)(resultado)
         End If
         dgvCargos.ClearSelection()
@@ -98,7 +200,10 @@ Public Class frmGrados
             Return
         End If
 
-        _cargoSeleccionado.Nombre = txtNombre.Text.Trim()
+        ' Normaliza espacios
+        _cargoSeleccionado.Nombre = System.Text.RegularExpressions.Regex.Replace(
+            txtNombre.Text.Trim(), "\s+", " ")
+
         Dim gradoTemp As Integer
         _cargoSeleccionado.Grado = If(Integer.TryParse(txtGrado.Text.Trim(), gradoTemp), gradoTemp, CType(Nothing, Integer?))
 
@@ -153,9 +258,31 @@ Public Class frmGrados
         End Try
     End Sub
 
-    Private Sub Cerrando(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
+    ' ------------------ UX EXTRA ------------------
+    Private Sub SoloNumeros_KeyPress(sender As Object, e As KeyPressEventArgs)
+        If Char.IsControl(e.KeyChar) Then Return
+        If Not Char.IsDigit(e.KeyChar) Then e.Handled = True
+    End Sub
+
+    Private Sub dgvCargos_CellDoubleClick(sender As Object, e As DataGridViewCellEventArgs)
+        If e.RowIndex < 0 Then Return
+        txtNombre.Focus()
+        txtNombre.SelectAll()
+    End Sub
+
+    Private Sub Frm_KeyDown(sender As Object, e As KeyEventArgs)
         If e.KeyCode = Keys.Escape Then
             Close()
+            e.Handled = True
+        ElseIf e.Control AndAlso e.KeyCode = Keys.N Then
+            btnNuevo.PerformClick() : e.Handled = True
+        ElseIf e.Control AndAlso e.KeyCode = Keys.S Then
+            btnGuardar.PerformClick() : e.Handled = True
+        ElseIf e.KeyCode = Keys.Delete AndAlso dgvCargos.Focused Then
+            If btnEliminar.Enabled Then btnEliminar.PerformClick()
+            e.Handled = True
+        ElseIf e.KeyCode = Keys.Enter AndAlso (txtNombre.Focused OrElse txtGrado.Focused) Then
+            btnGuardar.PerformClick() : e.Handled = True
         End If
     End Sub
 

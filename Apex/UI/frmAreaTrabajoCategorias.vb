@@ -1,128 +1,89 @@
-﻿' Apex/UI/frmGestionAreasTrabajo.vb
-Imports System.ComponentModel
+﻿Imports System.ComponentModel
+Imports System.Linq
+Imports System.Reflection
+Imports System.Threading
+Imports System.Threading.Tasks
 
 Public Class frmAreaTrabajoCategorias
 
-    Private _areaService As New AreaTrabajoService()
     Private _listaAreas As BindingList(Of AreaTrabajo)
     Private _areaSeleccionada As AreaTrabajo
+    Private _estaCargando As Boolean = False
+    Private _ultimoIdSeleccionado As Integer = 0
+    Private _ctsBusqueda As CancellationTokenSource
 
-    Private Async Sub frmGestionAreasTrabajo_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    ' ===== Ciclo de vida =====
+    Private Async Sub frmAreaTrabajoCategorias_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
-        ConfigurarLayoutResponsivoAreas()
-        ' <<< Clave para que el formulario reciba KeyDown aunque el foco esté en otro control >>>
+        Me.AcceptButton = btnGuardar
         Me.KeyPreview = True
 
         ConfigurarGrilla()
         Try
-            AppTheme.SetCue(txtBuscar, "Buscar por nombre de área de trabajo...")
-            AppTheme.SetCue(txtNombre, "Ingrese el nombre del área de trabajo...")
+            AppTheme.SetCue(txtBuscar, "Buscar por nombre...")
+            AppTheme.SetCue(txtNombre, "Nombre del área...")
         Catch
-            ' Ignorar si no existe SetCue
         End Try
 
         Await CargarDatosAsync()
         LimpiarCampos()
-    End Sub
-    ' Llamar después de InitializeComponent()
-    Private Sub ConfigurarLayoutResponsivoAreas()
-        ' ========= 1) SplitContainer: mínimos sensatos =========
-        With SplitContainer1
-            .Dock = DockStyle.Fill
-            .Panel1MinSize = 320   ' lista + búsqueda
-            .Panel2MinSize = 360   ' edición
-            If .SplitterDistance < .Panel1MinSize Then
-                .SplitterDistance = .Panel1MinSize
-            End If
-        End With
-
-        ' ========= 2) Panel izquierdo (búsqueda + grilla) =========
-        With Label8
-            .Dock = DockStyle.Top
-            .AutoSize = True
-            .Padding = New Padding(0, 0, 0, 2)
-        End With
-
-        With txtBuscar
-            .Dock = DockStyle.Top
-            .Margin = New Padding(0, 2, 0, 6)
-        End With
-
-        dgvAreas.Dock = DockStyle.Fill
-
-        ' ========= 3) Panel derecho (edición) =========
-        ' Estructura: [GroupBox = Auto] [Botonera = Auto] [Relleno = 100%]
-        With pnlEdicion
-            .Dock = DockStyle.Fill
-            If .RowStyles.Count >= 3 Then
-                .RowStyles(0).SizeType = SizeType.AutoSize   ' GroupBox
-                .RowStyles(1).SizeType = SizeType.AutoSize   ' Botonera
-                .RowStyles(2).SizeType = SizeType.Percent    ' Filler
-                .RowStyles(2).Height = 100
-            End If
-            .Padding = New Padding(0)
-        End With
-
-        ' GroupBox se estira al ancho
-        With GroupBox1
-            .Dock = DockStyle.Top
-            .AutoSize = True
-            .AutoSizeMode = AutoSizeMode.GrowAndShrink
-        End With
-
-        ' ========= 4) Reemplazar la TableLayout de botones por un FlowLayout con wrap =========
-        '   - Evita superposición y permite que "bajen de renglón" en anchos pequeños.
-        Dim flpBotones As New FlowLayoutPanel() With {
-        .Name = "flpBotones",
-        .Dock = DockStyle.Top,
-        .AutoSize = True,
-        .AutoSizeMode = AutoSizeMode.GrowAndShrink,
-        .FlowDirection = FlowDirection.RightToLeft,  ' alineados a la derecha
-        .WrapContents = True,
-        .Margin = New Padding(0, 6, 0, 6),
-        .Padding = New Padding(0)
-    }
-
-        ' Configurar botones y moverlos al FlowLayout (de derecha a izquierda visualmente)
-        Dim botones() As Button = {btnVolver, btnGuardar, btnEliminar, btnNuevo}
-        For Each b In botones
-            b.AutoSize = True
-            b.AutoSizeMode = AutoSizeMode.GrowAndShrink
-            b.MinimumSize = New Size(110, 36)
-            b.Margin = New Padding(6)
-            b.Dock = DockStyle.None
-            flpBotones.Controls.Add(b)
-        Next
-
-        ' Quitar la table original y poner el FlowLayout en su lugar (fila 1 de pnlEdicion)
-        If pnlEdicion.Controls.Contains(pnlBotones) Then
-            Dim fila As Integer = pnlEdicion.GetRow(pnlBotones)
-            pnlEdicion.Controls.Remove(pnlBotones)
-            pnlBotones.Dispose()
-            pnlEdicion.Controls.Add(flpBotones, 0, fila)
-        Else
-            ' Si no estaba, simplemente agregar debajo del GroupBox
-            pnlEdicion.Controls.Add(flpBotones, 0, 1)
-        End If
+        Notifier.Info(Me, "Listado de áreas de trabajo listo.")
     End Sub
 
+    ' ===== Datos =====
     Private Async Function CargarDatosAsync() As Task
-        Me.Cursor = Cursors.WaitCursor
+        If _estaCargando Then Return
+        _estaCargando = True
+
+        Cursor = Cursors.WaitCursor
+        dgvAreas.Enabled = False
+
         Try
-            Dim lista = Await _areaService.GetAllAsync()
-            _listaAreas = New BindingList(Of AreaTrabajo)(lista.ToList())
+            Dim lista As List(Of AreaTrabajo)
+            Using svc As New AreaTrabajoService()
+                lista = Await svc.GetAllAsync()
+            End Using
+
+            _listaAreas = New BindingList(Of AreaTrabajo)(lista)
             dgvAreas.DataSource = _listaAreas
-            ConfigurarGrilla()
+            RestaurarSeleccion()
+        Catch ex As Exception
+            Notifier.Error(Me, $"No se pudieron cargar las áreas de trabajo: {ex.Message}")
+            dgvAreas.DataSource = New BindingList(Of AreaTrabajo)()
         Finally
-            Me.Cursor = Cursors.Default
+            Cursor = Cursors.Default
+            dgvAreas.Enabled = True
+            _estaCargando = False
         End Try
     End Function
 
+    ' ===== UI =====
     Private Sub ConfigurarGrilla()
         dgvAreas.AutoGenerateColumns = False
         dgvAreas.Columns.Clear()
-        dgvAreas.Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Id", .HeaderText = "Id", .Visible = False})
-        dgvAreas.Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Nombre", .HeaderText = "Nombre", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
+
+        dgvAreas.Columns.Add(New DataGridViewTextBoxColumn With {
+            .DataPropertyName = "Id",
+            .HeaderText = "Id",
+            .Visible = False
+        })
+
+        dgvAreas.Columns.Add(New DataGridViewTextBoxColumn With {
+            .DataPropertyName = "Nombre",
+            .HeaderText = "Nombre",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+        })
+
+        HabilitarDoubleBuffering(dgvAreas)
+    End Sub
+
+    Private Sub HabilitarDoubleBuffering(dgv As DataGridView)
+        Try
+            dgv.GetType().InvokeMember("DoubleBuffered",
+                                       BindingFlags.NonPublic Or BindingFlags.Instance Or BindingFlags.SetProperty,
+                                       Nothing, dgv, New Object() {True})
+        Catch
+        End Try
     End Sub
 
     Private Sub LimpiarCampos()
@@ -134,29 +95,72 @@ Public Class frmAreaTrabajoCategorias
     End Sub
 
     Private Sub MostrarDetalles()
-        If _areaSeleccionada IsNot Nothing Then
-            txtNombre.Text = _areaSeleccionada.Nombre
-            btnEliminar.Enabled = True
-        Else
+        If _areaSeleccionada Is Nothing Then
             LimpiarCampos()
+            Return
         End If
+
+        txtNombre.Text = _areaSeleccionada.Nombre
+        btnEliminar.Enabled = (_areaSeleccionada.Id <> 0)
     End Sub
 
+    Private Sub RestaurarSeleccion()
+        If _ultimoIdSeleccionado = 0 OrElse dgvAreas.Rows.Count = 0 Then
+            dgvAreas.ClearSelection()
+            Return
+        End If
+
+        For Each row As DataGridViewRow In dgvAreas.Rows
+            Dim a = TryCast(row.DataBoundItem, AreaTrabajo)
+            If a IsNot Nothing AndAlso a.Id = _ultimoIdSeleccionado Then
+                row.Selected = True
+                Dim firstVisibleCol = dgvAreas.Columns.GetFirstColumn(DataGridViewElementStates.Visible)
+                If firstVisibleCol IsNot Nothing Then
+                    dgvAreas.CurrentCell = row.Cells(firstVisibleCol.Index)
+                ElseIf row.Cells.Count > 0 Then
+                    dgvAreas.CurrentCell = row.Cells(0)
+                End If
+                dgvAreas.FirstDisplayedScrollingRowIndex = Math.Max(0, row.Index)
+                Exit For
+            End If
+        Next
+    End Sub
+
+    ' ===== Eventos =====
     Private Sub dgvAreas_SelectionChanged(sender As Object, e As EventArgs) Handles dgvAreas.SelectionChanged
-        If dgvAreas.CurrentRow IsNot Nothing AndAlso dgvAreas.CurrentRow.DataBoundItem IsNot Nothing Then
-            _areaSeleccionada = CType(dgvAreas.CurrentRow.DataBoundItem, AreaTrabajo)
-            MostrarDetalles()
-        End If
+        If dgvAreas.CurrentRow Is Nothing OrElse dgvAreas.CurrentRow.DataBoundItem Is Nothing Then Return
+        _areaSeleccionada = CType(dgvAreas.CurrentRow.DataBoundItem, AreaTrabajo)
+        _ultimoIdSeleccionado = _areaSeleccionada.Id
+        MostrarDetalles()
     End Sub
 
-    Private Sub txtBuscar_TextChanged(sender As Object, e As EventArgs) Handles txtBuscar.TextChanged
+    ' Búsqueda con debounce
+    Private Async Sub txtBuscar_TextChanged(sender As Object, e As EventArgs) Handles txtBuscar.TextChanged
+        If _listaAreas Is Nothing Then Return
+
+        _ctsBusqueda?.Cancel()
+        _ctsBusqueda = New CancellationTokenSource()
+        Dim tk = _ctsBusqueda.Token
+
+        Try
+            Await Task.Delay(250, tk)
+        Catch ex As TaskCanceledException
+            Return
+        End Try
+        If tk.IsCancellationRequested Then Return
+
         Dim filtro = txtBuscar.Text.Trim()
         If String.IsNullOrWhiteSpace(filtro) Then
             dgvAreas.DataSource = _listaAreas
         Else
-            Dim resultado = _listaAreas.Where(Function(a) a.Nombre.ToUpper().Contains(filtro.ToUpper())).ToList()
+            Dim resultado = _listaAreas.
+                Where(Function(a) a IsNot Nothing AndAlso a.Nombre IsNot Nothing AndAlso
+                                  a.Nombre.IndexOf(filtro, StringComparison.OrdinalIgnoreCase) >= 0).
+                ToList()
             dgvAreas.DataSource = New BindingList(Of AreaTrabajo)(resultado)
         End If
+
+        dgvAreas.ClearSelection()
     End Sub
 
     Private Sub btnNuevo_Click(sender As Object, e As EventArgs) Handles btnNuevo.Click
@@ -165,61 +169,114 @@ Public Class frmAreaTrabajoCategorias
 
     Private Async Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
         If String.IsNullOrWhiteSpace(txtNombre.Text) Then
-            MessageBox.Show("El nombre del área de trabajo no puede estar vacío.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Notifier.Warn(Me, "El nombre del área no puede estar vacío.")
+            txtNombre.Focus()
             Return
         End If
 
-        _areaSeleccionada.Nombre = txtNombre.Text.Trim()
+        Dim nombre = txtNombre.Text.Trim()
+        Dim idActual As Integer = If(_areaSeleccionada Is Nothing, 0, _areaSeleccionada.Id)
 
-        Me.Cursor = Cursors.WaitCursor
+        ' Duplicados por nombre (case-insensitive), excluyendo el registro actual
+        Dim existeDuplicado = (_listaAreas IsNot Nothing AndAlso
+                               _listaAreas.Any(Function(x) x IsNot Nothing AndAlso
+                                                       x.Id <> idActual AndAlso
+                                                       String.Equals(x.Nombre, nombre, StringComparison.OrdinalIgnoreCase)))
+        If existeDuplicado Then
+            Notifier.Warn(Me, "Ya existe un área con ese nombre.")
+            txtNombre.SelectAll()
+            txtNombre.Focus()
+            Return
+        End If
+
+        _areaSeleccionada.Nombre = nombre
+
+        Cursor = Cursors.WaitCursor
+        btnGuardar.Enabled = False
         Try
-            If _areaSeleccionada.Id = 0 Then
-                Await _areaService.CreateAsync(_areaSeleccionada)
-            Else
-                Await _areaService.UpdateAsync(_areaSeleccionada)
-            End If
+            Using svc As New AreaTrabajoService()
+                If idActual = 0 Then
+                    ' Puede devolver Integer (Id) o no devolver nada
+                    Dim nuevoId As Integer = 0
+                    Try
+                        nuevoId = Await svc.CreateAsync(_areaSeleccionada)
+                    Catch
+                        ' Si no devuelve valor, seguimos
+                    End Try
+                    _ultimoIdSeleccionado = If(nuevoId > 0, nuevoId, 0)
+                    Notifier.Success(Me, "Área creada correctamente.")
+                Else
+                    Await svc.UpdateAsync(_areaSeleccionada)
+                    _ultimoIdSeleccionado = idActual
+                    Notifier.Success(Me, "Área actualizada correctamente.")
+                End If
+            End Using
 
-            MessageBox.Show("Área de trabajo guardada correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Await CargarDatosAsync()
-            LimpiarCampos()
+            If _ultimoIdSeleccionado = 0 Then
+                ' Si no conocemos el Id (método sin retorno), intentar seleccionar por nombre
+                Dim fila = _listaAreas.FirstOrDefault(Function(a) String.Equals(a.Nombre, nombre, StringComparison.OrdinalIgnoreCase))
+                If fila IsNot Nothing Then
+                    _ultimoIdSeleccionado = fila.Id
+                    RestaurarSeleccion()
+                End If
+            End If
+            MostrarDetalles()
         Catch ex As Exception
-            MessageBox.Show("Ocurrió un error al guardar el área de trabajo: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Notifier.Error(Me, "Ocurrió un error al guardar el área: " & ex.Message)
         Finally
-            Me.Cursor = Cursors.Default
+            Cursor = Cursors.Default
+            btnGuardar.Enabled = True
         End Try
     End Sub
 
     Private Async Sub btnEliminar_Click(sender As Object, e As EventArgs) Handles btnEliminar.Click
         If _areaSeleccionada Is Nothing OrElse _areaSeleccionada.Id = 0 Then
-            MessageBox.Show("Debe seleccionar un área para eliminar.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Notifier.Warn(Me, "Debe seleccionar un área para eliminar.")
             Return
         End If
 
-        Dim confirmacion = MessageBox.Show($"¿Está seguro de que desea eliminar el área '{_areaSeleccionada.Nombre}'?", "Confirmar eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
+        Dim confirmacion = MessageBox.Show(
+            $"¿Está seguro de que desea eliminar el área '{_areaSeleccionada.Nombre}'?",
+            "Confirmar eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
 
-        If confirmacion = DialogResult.Yes Then
-            Me.Cursor = Cursors.WaitCursor
-            Try
-                Await _areaService.DeleteAsync(_areaSeleccionada.Id)
-                MessageBox.Show("Área de trabajo eliminada.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
-                Await CargarDatosAsync()
-                LimpiarCampos()
-            Catch ex As Exception
-                MessageBox.Show("Ocurrió un error al eliminar el área: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            Finally
-                Me.Cursor = Cursors.Default
-            End Try
-        End If
+        If confirmacion <> DialogResult.Yes Then Return
+
+        Cursor = Cursors.WaitCursor
+        btnEliminar.Enabled = False
+        Try
+            Using svc As New AreaTrabajoService()
+                Await svc.DeleteAsync(_areaSeleccionada.Id)
+            End Using
+            Notifier.Info(Me, "Área eliminada.")
+            _ultimoIdSeleccionado = 0
+            Await CargarDatosAsync()
+            LimpiarCampos()
+        Catch ex As Exception
+            Notifier.Error(Me, "Ocurrió un error al eliminar el área: " & ex.Message)
+        Finally
+            Cursor = Cursors.Default
+            btnEliminar.Enabled = True
+        End Try
     End Sub
 
-    ' --- Atajo de teclado para volver/cerrar ---
-    Private Sub Cerrando(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
+    ' ===== Atajos teclado y navegación =====
+    Private Sub frmAreaTrabajoCategorias_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
         If e.KeyCode = Keys.Escape Then
-            Me.Close() ' con la pila, volverá al form anterior automáticamente
+            Close()
+        ElseIf e.Control AndAlso e.KeyCode = Keys.N Then
+            btnNuevo.PerformClick()
+        ElseIf e.Control AndAlso e.KeyCode = Keys.S Then
+            btnGuardar.PerformClick()
+        ElseIf e.KeyCode = Keys.Delete AndAlso btnEliminar.Enabled Then
+            btnEliminar.PerformClick()
         End If
     End Sub
 
     Private Sub btnVolver_Click(sender As Object, e As EventArgs) Handles btnVolver.Click
-        NavegacionHelper.AbrirFormUnicoEnDashboard(Of frmConfiguracion)(Me)
+        ' Si tienes un helper de navegación, úsalo aquí.
+        ' NavegacionHelper.AbrirFormUnicoEnDashboard(Of frmConfiguracion)(Me)
+        Close()
     End Sub
+
 End Class
