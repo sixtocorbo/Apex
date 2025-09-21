@@ -48,6 +48,7 @@ Public Class frmFuncionarioCrear
 
     Public Sub New()
         InitializeComponent()
+        ConfigurarLayoutResponsivo()
         _modo = ModoFormulario.Crear
         _uow = New UnitOfWork()
         _svc = New FuncionarioService(_uow)
@@ -126,6 +127,113 @@ Public Class frmFuncionarioCrear
         End If
 
     End Sub
+    ' Llamar después de InitializeComponent()
+    Private Sub ConfigurarLayoutResponsivo()
+        ' ===============================
+        ' 1) Botonera superior (Auditoría / Guardar / Cancelar)
+        ' ===============================
+        With flowlayoutPanelBotones
+            .AutoSize = True
+            .AutoSizeMode = AutoSizeMode.GrowAndShrink
+            .Dock = DockStyle.Top
+            .FlowDirection = FlowDirection.RightToLeft     ' Alinea a la derecha
+            .WrapContents = True                           ' Permite salto de línea en chico
+            .AutoScroll = False
+            .Padding = New Padding(0, 0, 12, 6)           ' Respiro a la derecha/abajo
+        End With
+
+        ' Botones: que crezcan en alto/coloquen márgenes consistentes
+        For Each b In New Button() {btnAuditoria, btnGuardar, btnCancelar}
+            b.AutoSize = True
+            b.AutoSizeMode = AutoSizeMode.GrowAndShrink
+            b.MinimumSize = New Size(100, 36)             ' Evita que queden demasiado chicos
+            b.Margin = New Padding(6)                     ' Espacio entre botones
+            b.Anchor = AnchorStyles.Top Or AnchorStyles.Right
+        Next
+
+        ' Si el orden visual no queda como querés con RightToLeft,
+        ' asegurá posiciones (de derecha a izquierda):
+        flowlayoutPanelBotones.Controls.SetChildIndex(btnCancelar, 0)
+        flowlayoutPanelBotones.Controls.SetChildIndex(btnGuardar, 1)
+        flowlayoutPanelBotones.Controls.SetChildIndex(btnAuditoria, 2)
+
+        ' ===============================
+        ' 2) Estados Transitorios (botones abajo)
+        ' ===============================
+        ' Asegurate que las últimas dos filas del TableLayout sean AutoSize (ya lo tenés),
+        ' y que el DataGrid esté en la fila Percent 100%.
+        With TableLayoutPanelEstados
+            .RowStyles(0).SizeType = SizeType.Percent
+            .RowStyles(0).Height = 100
+            .RowStyles(1).SizeType = SizeType.AutoSize     ' chkVerHistorial
+            .RowStyles(2).SizeType = SizeType.AutoSize     ' FlowLayoutPanelEstados
+            .Dock = DockStyle.Fill
+        End With
+
+        With FlowLayoutPanelEstados
+            .AutoSize = True
+            .AutoSizeMode = AutoSizeMode.GrowAndShrink
+            .Dock = DockStyle.Fill                         ' Toma el ancho disponible (importante para calcular wraps)
+            .FlowDirection = FlowDirection.RightToLeft     ' Botonera pegada a la derecha
+            .WrapContents = True                           ' En pantallas chicas, salta de línea
+            .AutoScroll = False                            ' No hace falta scroll si usamos AutoSize en fila
+            .Padding = New Padding(0, 4, 0, 0)
+            .Margin = New Padding(0, 6, 0, 0)
+        End With
+
+        For Each b In New Button() {btnQuitarEstado, btnEditarEstado, btnAñadirEstado}
+            b.AutoSize = True
+            b.AutoSizeMode = AutoSizeMode.GrowAndShrink
+            b.MinimumSize = New Size(96, 32)
+            b.Margin = New Padding(6)
+            b.Anchor = AnchorStyles.Top Or AnchorStyles.Right
+        Next
+
+        ' ===============================
+        ' 3) Dotación (botones abajo)
+        ' ===============================
+        With TableLayoutPanelDotacion
+            .RowStyles(0).SizeType = SizeType.Percent
+            .RowStyles(0).Height = 100                    ' Grilla: ocupa el resto
+            .RowStyles(1).SizeType = SizeType.AutoSize    ' Botonera: crece según contenido
+            .Dock = DockStyle.Fill
+        End With
+
+        With FlowLayoutPanelDotacion
+            .AutoSize = True
+            .AutoSizeMode = AutoSizeMode.GrowAndShrink
+            .Dock = DockStyle.Fill
+            .FlowDirection = FlowDirection.RightToLeft
+            .WrapContents = True
+            .AutoScroll = False
+            .Padding = New Padding(0, 4, 0, 0)
+            .Margin = New Padding(0, 6, 0, 0)
+        End With
+
+        For Each b In New Button() {btnQuitarDotacion, btnEditarDotacion, btnAñadirDotacion}
+            b.AutoSize = True
+            b.AutoSizeMode = AutoSizeMode.GrowAndShrink
+            b.MinimumSize = New Size(96, 30)
+            b.Margin = New Padding(6)
+            b.Anchor = AnchorStyles.Top Or AnchorStyles.Right
+        Next
+
+        ' ===============================
+        ' 4) Ajustes generales del Form
+        ' ===============================
+        ' Permití reducir un poco el tamaño mínimo si querés favorecer los wraps:
+        If Me.MinimumSize.Width > 900 Then
+            Me.MinimumSize = New Size(900, Math.Max(600, Me.MinimumSize.Height))
+        End If
+
+        ' El TabControl ocupa todo y recalcula correctamente los anchos
+        TabControlMain.Dock = DockStyle.Fill
+
+        ' La grilla siempre estirada
+        dgvEstadosTransitorios.Dock = DockStyle.Fill
+        dgvDotacion.Dock = DockStyle.Fill
+    End Sub
+
     Private Sub CargarDatosEnControles()
         If _funcionario Is Nothing Then Return
 

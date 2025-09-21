@@ -2242,7 +2242,7 @@ Partial Class frmFuncionarioCrear
         'btnGuardar
         '
         Me.btnGuardar.AutoSize = True
-        Me.btnGuardar.Location = New System.Drawing.Point(159, 5)
+        Me.btnGuardar.Location = New System.Drawing.Point(1013, 5)
         Me.btnGuardar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnGuardar.Name = "btnGuardar"
         Me.btnGuardar.Padding = New System.Windows.Forms.Padding(15, 3, 15, 3)
@@ -2255,7 +2255,7 @@ Partial Class frmFuncionarioCrear
         '
         Me.btnCancelar.AutoSize = True
         Me.btnCancelar.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancelar.Location = New System.Drawing.Point(314, 5)
+        Me.btnCancelar.Location = New System.Drawing.Point(703, 5)
         Me.btnCancelar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnCancelar.Name = "btnCancelar"
         Me.btnCancelar.Padding = New System.Windows.Forms.Padding(15, 3, 15, 3)
@@ -2267,7 +2267,7 @@ Partial Class frmFuncionarioCrear
         'btnAuditoria
         '
         Me.btnAuditoria.AutoSize = True
-        Me.btnAuditoria.Location = New System.Drawing.Point(4, 5)
+        Me.btnAuditoria.Location = New System.Drawing.Point(858, 5)
         Me.btnAuditoria.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnAuditoria.Name = "btnAuditoria"
         Me.btnAuditoria.Padding = New System.Windows.Forms.Padding(15, 3, 15, 3)
@@ -2279,11 +2279,12 @@ Partial Class frmFuncionarioCrear
         'flowlayoutPanelBotones
         '
         Me.flowlayoutPanelBotones.AutoSize = True
-        Me.flowlayoutPanelBotones.Controls.Add(Me.btnAuditoria)
         Me.flowlayoutPanelBotones.Controls.Add(Me.btnGuardar)
+        Me.flowlayoutPanelBotones.Controls.Add(Me.btnAuditoria)
         Me.flowlayoutPanelBotones.Controls.Add(Me.btnCancelar)
-        Me.flowlayoutPanelBotones.Dock = System.Windows.Forms.DockStyle.Top
-        Me.flowlayoutPanelBotones.Location = New System.Drawing.Point(0, 0)
+        Me.flowlayoutPanelBotones.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.flowlayoutPanelBotones.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
+        Me.flowlayoutPanelBotones.Location = New System.Drawing.Point(0, 640)
         Me.flowlayoutPanelBotones.Name = "flowlayoutPanelBotones"
         Me.flowlayoutPanelBotones.Padding = New System.Windows.Forms.Padding(0, 0, 12, 0)
         Me.flowlayoutPanelBotones.Size = New System.Drawing.Size(1176, 62)
@@ -3197,7 +3198,7 @@ Partial Class frmFuncionarioCrear
         Me.TabControlMain.Controls.Add(Me.TabPageDotacion)
         Me.TabControlMain.Controls.Add(Me.TabPageEstadosTransitorios)
         Me.TabControlMain.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.TabControlMain.Location = New System.Drawing.Point(0, 62)
+        Me.TabControlMain.Location = New System.Drawing.Point(0, 0)
         Me.TabControlMain.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.TabControlMain.Name = "TabControlMain"
         Me.TabControlMain.SelectedIndex = 0

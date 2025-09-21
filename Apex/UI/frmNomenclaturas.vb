@@ -4,6 +4,12 @@ Public Class frmNomenclaturas
     Private _unitOfWork As New UnitOfWork()
     Private _listaNomenclaturas As List(Of Nomenclatura)
     Private _nomenclaturaSeleccionada As Nomenclatura
+    Public Sub New()
+        InitializeComponent()
+        ConfigurarLayoutResponsivoNomenclaturas()
+    End Sub
+    ' —o al final de InitializeComponent():
+    ' ConfigurarLayoutResponsivoNomenclaturas()
 
     Private Async Sub frmGestionNomenclaturas_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Cursor = Cursors.WaitCursor
@@ -32,6 +38,111 @@ Public Class frmNomenclaturas
         Finally
             Me.Cursor = Cursors.Default
         End Try
+    End Sub
+    ' Llamar después de InitializeComponent()
+    Private Sub ConfigurarLayoutResponsivoNomenclaturas()
+        ' ===== 1) TableLayout raíz =====
+        With TableLayoutPanel1
+            .Dock = DockStyle.Fill
+            .ColumnCount = 1
+            .ColumnStyles.Clear()
+            .ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100.0!))
+            .RowStyles.Clear()
+            ' Fila 0: búsqueda (Auto)
+            .RowStyles.Add(New RowStyle(SizeType.AutoSize))
+            ' Fila 1: grilla (100%)
+            .RowStyles.Add(New RowStyle(SizeType.Percent, 100.0!))
+            ' Fila 2: GroupBox (Auto)
+            .RowStyles.Add(New RowStyle(SizeType.AutoSize))
+            ' Fila 3: Botonera (Auto)
+            .RowStyles.Add(New RowStyle(SizeType.AutoSize))
+            .AutoSize = False
+        End With
+
+        ' ===== 2) Área de búsqueda =====
+        ' Reemplazar el Panel1 por un TLP interno (Label + TextBox) para evitar solapamientos
+        Dim tlpBusqueda As New TableLayoutPanel() With {
+        .Dock = DockStyle.Fill,
+        .ColumnCount = 2,
+        .RowCount = 1,
+        .Padding = New Padding(0),
+        .Margin = New Padding(0)
+    }
+        tlpBusqueda.ColumnStyles.Add(New ColumnStyle(SizeType.AutoSize))         ' Label
+        tlpBusqueda.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100.0!))  ' TextBox
+
+        Label8.AutoSize = True
+        Label8.Margin = New Padding(4, 6, 8, 4)
+        Label8.Text = "Buscar:"
+
+        txtBuscar.Dock = DockStyle.Fill
+        txtBuscar.Margin = New Padding(0, 3, 0, 3)
+
+        tlpBusqueda.Controls.Add(Label8, 0, 0)
+        tlpBusqueda.Controls.Add(txtBuscar, 1, 0)
+
+        Panel1.Controls.Clear()
+        Panel1.Dock = DockStyle.Fill
+        Panel1.Padding = New Padding(4, 4, 4, 4)
+        Panel1.Controls.Add(tlpBusqueda)
+
+        ' ===== 3) Grilla =====
+        With dgvNomenclaturas
+            .Dock = DockStyle.Fill
+            .RowHeadersVisible = False
+            .SelectionMode = DataGridViewSelectionMode.FullRowSelect
+            .MultiSelect = False
+            .AllowUserToAddRows = False
+            .AllowUserToDeleteRows = False
+            .AllowUserToResizeColumns = False
+            .AllowUserToResizeRows = False
+            If .AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None Then
+                .AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+            End If
+        End With
+
+        ' ===== 4) GroupBox (auto alto, no “Fill” en fila Auto) =====
+        With GroupBox1
+            .Dock = DockStyle.Top
+            .AutoSize = True
+            .AutoSizeMode = AutoSizeMode.GrowAndShrink
+            .Margin = New Padding(4, 8, 4, 8)
+            .Padding = New Padding(8)
+        End With
+
+        ' Asegurar anclajes de controles largos dentro del GroupBox
+        For Each tb In New TextBox() {txtNombre, txtObservaciones}
+            tb.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
+        Next
+        For Each tb In New TextBox() {txtCodigo, txtArea, txtPatron, txtEjemplo, txtUbicacion}
+            tb.Anchor = AnchorStyles.Top Or AnchorStyles.Left
+        Next
+        For Each cb In New CheckBox() {chkUsaFecha, chkUsaNomenclaturaCodigo}
+            cb.Anchor = AnchorStyles.Top Or AnchorStyles.Right
+            cb.Margin = New Padding(6, cb.Margin.Top, 6, cb.Margin.Bottom)
+        Next
+
+        ' ===== 5) Botonera con FlowLayout (wrap + derecha) =====
+        With FlowLayoutPanel1
+            .Dock = DockStyle.Top
+            .AutoSize = True
+            .AutoSizeMode = AutoSizeMode.GrowAndShrink
+            .FlowDirection = FlowDirection.RightToLeft
+            .WrapContents = True
+            .Padding = New Padding(0)
+            .Margin = New Padding(4, 4, 4, 8)
+            .Anchor = AnchorStyles.Left Or AnchorStyles.Right Or AnchorStyles.Top
+        End With
+
+        ' Configurar botones (orden: derecha -> izquierda)
+        Dim botones() As Button = {btnVolver, btnGuardar, btnEliminar, btnNuevo}
+        For Each b In botones
+            b.AutoSize = True
+            b.AutoSizeMode = AutoSizeMode.GrowAndShrink
+            b.MinimumSize = New Size(120, 40)
+            b.Margin = New Padding(6)
+            b.Dock = DockStyle.None
+        Next
     End Sub
 
 

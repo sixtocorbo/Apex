@@ -2,6 +2,12 @@
 Imports System.ComponentModel
 
 Public Class frmIncidenciasCategorias
+    Public Sub New()
+        InitializeComponent()
+        ConfigurarLayoutResponsivoIncidencias()
+    End Sub
+    ' —o al final de InitializeComponent():
+    ' ConfigurarLayoutResponsivoIncidencias()
 
     Private _categoriaService As New CategoriaAusenciaService()
     Private _listaCategorias As BindingList(Of CategoriaAusencia)
@@ -14,6 +20,95 @@ Public Class frmIncidenciasCategorias
         Await CargarDatosAsync()
         LimpiarCampos()
         Notifier.Info(Me, "Listado de categorías listo.")
+    End Sub
+    ' Llamar después de InitializeComponent()
+    Private Sub ConfigurarLayoutResponsivoIncidencias()
+        ' ========= 1) SplitContainer: mínimos y docking =========
+        With SplitContainer1
+            .Dock = DockStyle.Fill
+            .Panel1MinSize = 320    ' lista + búsqueda
+            .Panel2MinSize = 360    ' edición + botones
+            If .SplitterDistance < .Panel1MinSize Then
+                .SplitterDistance = .Panel1MinSize
+            End If
+        End With
+
+        ' ========= 2) Panel izquierdo (búsqueda + grilla) =========
+        With Label8
+            .Dock = DockStyle.Top
+            .AutoSize = True
+            .Padding = New Padding(0, 0, 0, 2)
+        End With
+
+        With txtBuscar
+            .Dock = DockStyle.Top
+            .Margin = New Padding(0, 2, 0, 6)
+        End With
+
+        dgvCategorias.Dock = DockStyle.Fill
+
+        ' ========= 3) Panel derecho: crear un contenedor vertical =========
+        ' Estructura: fila0=GroupBox (Auto) | fila1=Botones (Auto) | fila2=Filler (100%)
+        Dim tlpDerecha As New TableLayoutPanel() With {
+        .Dock = DockStyle.Fill,
+        .ColumnCount = 1,
+        .RowCount = 3
+    }
+        tlpDerecha.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100.0!))
+        tlpDerecha.RowStyles.Add(New RowStyle(SizeType.AutoSize))
+        tlpDerecha.RowStyles.Add(New RowStyle(SizeType.AutoSize))
+        tlpDerecha.RowStyles.Add(New RowStyle(SizeType.Percent, 100.0!))
+
+        ' Preparar GroupBox (se estira a lo ancho, alto automático)
+        With GroupBox1
+            .Dock = DockStyle.Top
+            .AutoSize = True
+            .AutoSizeMode = AutoSizeMode.GrowAndShrink
+            .Margin = New Padding(12, 12, 12, 6)
+            ' Sus controles internos ya tienen Anchor; no es necesario cambiarlos.
+        End With
+
+        ' ========= 4) Botones: usar FlowLayoutPanel con Wrap =========
+        Dim flpBotones As New FlowLayoutPanel() With {
+        .Name = "flpBotones",
+        .Dock = DockStyle.Top,
+        .AutoSize = True,
+        .AutoSizeMode = AutoSizeMode.GrowAndShrink,
+        .FlowDirection = FlowDirection.RightToLeft, ' alineados a la derecha
+        .WrapContents = True,
+        .Margin = New Padding(12, 6, 12, 6),
+        .Padding = New Padding(0)
+    }
+
+        ' Configurar botones y moverlos al FlowLayout
+        Dim botones() As Button = {btnGuardar, btnEliminar, btnNuevo} ' derecha -> izquierda
+        For Each b In botones
+            b.AutoSize = True
+            b.AutoSizeMode = AutoSizeMode.GrowAndShrink
+            b.MinimumSize = New Size(110, 36)
+            b.Margin = New Padding(6)
+            b.Dock = DockStyle.None
+            flpBotones.Controls.Add(b)
+        Next
+
+        ' Limpiar Panel2 y montar nueva estructura
+        SplitContainer1.Panel2.SuspendLayout()
+        Try
+            ' Quitar los controles existentes (evita duplicados visuales)
+            For i As Integer = SplitContainer1.Panel2.Controls.Count - 1 To 0 Step -1
+                Dim ctl = SplitContainer1.Panel2.Controls(i)
+                If Not (ctl Is tlpDerecha) Then SplitContainer1.Panel2.Controls.Remove(ctl)
+            Next
+
+            ' Agregar GroupBox y botonera a la nueva tabla
+            tlpDerecha.Controls.Add(GroupBox1, 0, 0)
+            tlpDerecha.Controls.Add(flpBotones, 0, 1)
+
+            ' Agregar el TableLayout al Panel2
+            SplitContainer1.Panel2.Controls.Add(tlpDerecha)
+        Finally
+            SplitContainer1.Panel2.ResumeLayout()
+        End Try
     End Sub
 
 

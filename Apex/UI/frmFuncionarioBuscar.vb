@@ -42,6 +42,7 @@ Public Class frmFuncionarioBuscar
     ''=============
     Public Sub New()
         InitializeComponent()
+        ConfigurarLayoutResponsivoBuscar()
 
         _modo = ModoApertura.Navegacion
     End Sub
@@ -77,6 +78,129 @@ Public Class frmFuncionarioBuscar
         Dim tk = ReiniciarToken()
         Await BuscarAsync(tk)
         ' --- FIN DE CAMBIOS ---
+    End Sub
+
+    ' Llamar después de InitializeComponent()
+    Private Sub ConfigurarLayoutResponsivoBuscar()
+        ' ===============================
+        ' 1) SplitContainer: paneles con mínimo sensato
+        ' ===============================
+        With splitContenedor
+            .Dock = DockStyle.Fill
+            .Panel1MinSize = 240
+            .Panel2MinSize = 380
+            If .SplitterDistance < .Panel1MinSize Then
+                .SplitterDistance = .Panel1MinSize
+            End If
+        End With
+
+        ' ===============================
+        ' 2) Búsqueda (arriba a la izquierda)
+        ' ===============================
+        With PanelBusquedaLista
+            .Dock = DockStyle.Top
+            .Padding = New Padding(12)
+            .Height = 115
+        End With
+
+        With tlpBusqueda
+            .Dock = DockStyle.Fill
+            .AutoSize = True
+            .AutoSizeMode = AutoSizeMode.GrowAndShrink
+            .ColumnStyles(0).SizeType = SizeType.AutoSize
+            .ColumnStyles(1).SizeType = SizeType.Percent
+            .ColumnStyles(1).Width = 100
+            .RowStyles(0).SizeType = SizeType.AutoSize
+            .RowStyles(1).SizeType = SizeType.AutoSize
+        End With
+
+        txtBusqueda.Anchor = AnchorStyles.Left Or AnchorStyles.Right
+
+        ' ===============================
+        ' 3) Detalle (derecha)
+        '    - Reemplazamos tlpAcciones por un FlowLayoutPanel para permitir WRAP.
+        '    - Hacemos que el bloque de detalles (labels) llene con scroll vertical.
+        ' ===============================
+        ' --- RowStyles del contenedor vertical: [Acciones=Auto] [Foto=50%] [Botón=Auto] [Detalles=50%]
+        With tlpDetalleVertical
+            .Dock = DockStyle.Fill
+            If .RowStyles.Count >= 4 Then
+                .RowStyles(0).SizeType = SizeType.AutoSize     ' Acciones
+                .RowStyles(1).SizeType = SizeType.Percent      ' Foto
+                .RowStyles(1).Height = 50
+                .RowStyles(2).SizeType = SizeType.AutoSize     ' Botón "Situación"
+                .RowStyles(3).SizeType = SizeType.Percent      ' Detalles
+                .RowStyles(3).Height = 50
+            End If
+            .Padding = New Padding(0)
+        End With
+
+        ' --- Foto: que se estire bien
+        With pbFotoDetalle
+            .Dock = DockStyle.Fill
+            .SizeMode = PictureBoxSizeMode.Zoom
+            .Margin = New Padding(3, 3, 3, 12)
+            .MinimumSize = New Size(0, 160)
+        End With
+
+        ' --- Botón Ver Situación: ocupa ancho y se autoajusta
+        With btnVerSituacion
+            .Dock = DockStyle.Fill
+            .Margin = New Padding(3, 0, 3, 6)
+            .AutoSize = True
+            .AutoSizeMode = AutoSizeMode.GrowAndShrink
+        End With
+
+        ' --- Detalles: llenar con scroll vertical; no envolver horizontal
+        With flpDetalles
+            .Dock = DockStyle.Fill
+            .AutoScroll = True
+            .FlowDirection = FlowDirection.TopDown
+            .WrapContents = False
+            .Padding = New Padding(3)
+            .Margin = New Padding(3, 0, 3, 0)
+        End With
+
+        ' ===============================
+        ' 4) Botonera de acciones con WRAP (sustituye a tlpAcciones)
+        ' ===============================
+        ' Creamos un FlowLayoutPanel para acciones
+        Dim flpAcciones As New FlowLayoutPanel() With {
+        .Name = "flpAcciones",
+        .AutoSize = True,
+        .AutoSizeMode = AutoSizeMode.GrowAndShrink,
+        .Dock = DockStyle.Fill,
+        .FlowDirection = FlowDirection.RightToLeft,  ' alineado a la derecha
+        .WrapContents = True,                        ' clave para que “baje de renglón”
+        .Padding = New Padding(0, 0, 0, 6),
+        .Margin = New Padding(0, 0, 0, 6)
+    }
+
+        ' Movemos los botones existentes del TableLayout a este FlowLayout
+        ' (ordenados de derecha a izquierda para que visualmente queden [Notificar][Novedades][Sancionar][Ficha])
+        Dim botones() As Button = {btnNotificar, btnNovedades, btnSancionar, btnGenerarFicha}
+        For Each b In botones
+            b.AutoSize = True
+            b.AutoSizeMode = AutoSizeMode.GrowAndShrink
+            b.MinimumSize = New Size(96, 32)
+            b.Margin = New Padding(6)
+            b.Dock = DockStyle.None
+            flpAcciones.Controls.Add(b)
+        Next
+
+        ' Quitamos tlpAcciones del layout y lo destruimos
+        If tlpDetalleVertical.Controls.Contains(tlpAcciones) Then
+            tlpDetalleVertical.Controls.Remove(tlpAcciones)
+            tlpAcciones.Dispose()
+        End If
+
+        ' Insertamos flpAcciones en la fila 0, columna 0
+        tlpDetalleVertical.Controls.Add(flpAcciones, 0, 0)
+
+        ' ===============================
+        ' 5) DataGrid a la izquierda: que siempre llene
+        ' ===============================
+        dgvFuncionarios.Dock = DockStyle.Fill
     End Sub
 
     ' Implementación requerida por la base:

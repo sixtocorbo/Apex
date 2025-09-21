@@ -9,7 +9,7 @@ Public Class frmAreaTrabajoCategorias
 
     Private Async Sub frmGestionAreasTrabajo_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
-
+        ConfigurarLayoutResponsivoAreas()
         ' <<< Clave para que el formulario reciba KeyDown aunque el foco esté en otro control >>>
         Me.KeyPreview = True
 
@@ -23,6 +23,87 @@ Public Class frmAreaTrabajoCategorias
 
         Await CargarDatosAsync()
         LimpiarCampos()
+    End Sub
+    ' Llamar después de InitializeComponent()
+    Private Sub ConfigurarLayoutResponsivoAreas()
+        ' ========= 1) SplitContainer: mínimos sensatos =========
+        With SplitContainer1
+            .Dock = DockStyle.Fill
+            .Panel1MinSize = 320   ' lista + búsqueda
+            .Panel2MinSize = 360   ' edición
+            If .SplitterDistance < .Panel1MinSize Then
+                .SplitterDistance = .Panel1MinSize
+            End If
+        End With
+
+        ' ========= 2) Panel izquierdo (búsqueda + grilla) =========
+        With Label8
+            .Dock = DockStyle.Top
+            .AutoSize = True
+            .Padding = New Padding(0, 0, 0, 2)
+        End With
+
+        With txtBuscar
+            .Dock = DockStyle.Top
+            .Margin = New Padding(0, 2, 0, 6)
+        End With
+
+        dgvAreas.Dock = DockStyle.Fill
+
+        ' ========= 3) Panel derecho (edición) =========
+        ' Estructura: [GroupBox = Auto] [Botonera = Auto] [Relleno = 100%]
+        With pnlEdicion
+            .Dock = DockStyle.Fill
+            If .RowStyles.Count >= 3 Then
+                .RowStyles(0).SizeType = SizeType.AutoSize   ' GroupBox
+                .RowStyles(1).SizeType = SizeType.AutoSize   ' Botonera
+                .RowStyles(2).SizeType = SizeType.Percent    ' Filler
+                .RowStyles(2).Height = 100
+            End If
+            .Padding = New Padding(0)
+        End With
+
+        ' GroupBox se estira al ancho
+        With GroupBox1
+            .Dock = DockStyle.Top
+            .AutoSize = True
+            .AutoSizeMode = AutoSizeMode.GrowAndShrink
+        End With
+
+        ' ========= 4) Reemplazar la TableLayout de botones por un FlowLayout con wrap =========
+        '   - Evita superposición y permite que "bajen de renglón" en anchos pequeños.
+        Dim flpBotones As New FlowLayoutPanel() With {
+        .Name = "flpBotones",
+        .Dock = DockStyle.Top,
+        .AutoSize = True,
+        .AutoSizeMode = AutoSizeMode.GrowAndShrink,
+        .FlowDirection = FlowDirection.RightToLeft,  ' alineados a la derecha
+        .WrapContents = True,
+        .Margin = New Padding(0, 6, 0, 6),
+        .Padding = New Padding(0)
+    }
+
+        ' Configurar botones y moverlos al FlowLayout (de derecha a izquierda visualmente)
+        Dim botones() As Button = {btnVolver, btnGuardar, btnEliminar, btnNuevo}
+        For Each b In botones
+            b.AutoSize = True
+            b.AutoSizeMode = AutoSizeMode.GrowAndShrink
+            b.MinimumSize = New Size(110, 36)
+            b.Margin = New Padding(6)
+            b.Dock = DockStyle.None
+            flpBotones.Controls.Add(b)
+        Next
+
+        ' Quitar la table original y poner el FlowLayout en su lugar (fila 1 de pnlEdicion)
+        If pnlEdicion.Controls.Contains(pnlBotones) Then
+            Dim fila As Integer = pnlEdicion.GetRow(pnlBotones)
+            pnlEdicion.Controls.Remove(pnlBotones)
+            pnlBotones.Dispose()
+            pnlEdicion.Controls.Add(flpBotones, 0, fila)
+        Else
+            ' Si no estaba, simplemente agregar debajo del GroupBox
+            pnlEdicion.Controls.Add(flpBotones, 0, 1)
+        End If
     End Sub
 
     Private Async Function CargarDatosAsync() As Task
