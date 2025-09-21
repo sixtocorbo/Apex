@@ -536,12 +536,12 @@ Public Class frmFuncionarioBuscar
         panelDetalle.Visible = False
     End Sub
 
-    Private Sub lblEstadoTransitorio_DoubleClick(sender As Object, e As EventArgs)
-        If _detallesEstadoActual IsNot Nothing AndAlso _detallesEstadoActual.Any() Then
-            Dim detalleTexto = String.Join(Environment.NewLine, _detallesEstadoActual.Distinct())
-            MessageBox.Show(detalleTexto, "Detalle del Estado Actual", MessageBoxButtons.OK, MessageBoxIcon.Information)
-        End If
-    End Sub
+    'Private Sub lblEstadoTransitorio_DoubleClick(sender As Object, e As EventArgs)
+    '    If _detallesEstadoActual IsNot Nothing AndAlso _detallesEstadoActual.Any() Then
+    '        Dim detalleTexto = String.Join(Environment.NewLine, _detallesEstadoActual.Distinct())
+    '        MessageBox.Show(detalleTexto, "Detalle del Estado Actual", MessageBoxButtons.OK, MessageBoxIcon.Information)
+    '    End If
+    'End Sub
 
 #End Region
 
@@ -557,7 +557,7 @@ Public Class frmFuncionarioBuscar
         End If
     End Sub
 
-    Private Sub btnGenerarFicha_Click(sender As Object, e As EventArgs)
+    Private Sub btnGenerarFicha_Click(sender As Object, e As EventArgs) Handles btnGenerarFicha.Click
         If FuncionarioSeleccionado IsNot Nothing Then
             Dim frm As New frmFichaPersonalRPT(FuncionarioSeleccionado.Id)
             NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)

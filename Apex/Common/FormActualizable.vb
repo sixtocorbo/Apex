@@ -1,7 +1,7 @@
 ﻿' FormActualizable.vb
 Option Strict On
 Option Explicit On
-
+Imports System.ComponentModel
 Public MustInherit Class FormActualizable
     Inherits Form
 
