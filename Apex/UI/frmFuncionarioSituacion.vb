@@ -414,12 +414,42 @@ Public Class frmFuncionarioSituacion
             Dim novedadId = CInt(rowData.GetType().GetProperty("Id").GetValue(rowData, Nothing))
 
             If novedadId > 0 Then
-                Using frm As New frmNovedadCrear(novedadId)
-                    frm.ShowDialog(Me)
-                End Using
+                ' Abrimos en modo solo lectura (True) y usamos el helper del dashboard
+                Dim frm As New frmNovedadCrear(novedadId, True)
+                AbrirChildEnDashboard(frm)
             End If
         Catch ex As Exception
             MessageBox.Show("No se pudo abrir el detalle de la novedad.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+        End Try
+    End Sub
+    Private Function GetDashboard() As frmDashboard
+        Return Application.OpenForms.OfType(Of frmDashboard)().FirstOrDefault()
+    End Function
+    Private Sub AbrirChildEnDashboard(formHijo As Form)
+        If formHijo Is Nothing Then
+            Notifier.Warn(Me, "No hay formulario para abrir.")
+            Return
+        End If
+
+        Dim dash = GetDashboard()
+        If dash Is Nothing OrElse dash.IsDisposed Then
+            ' Fallback si el dashboard no está disponible
+            Notifier.Warn(Me, "No se encontró el Dashboard activo. Abriendo como diálogo.")
+            formHijo.ShowDialog(Me)
+            Return
+        End If
+
+        If dash.InvokeRequired Then
+            dash.BeginInvoke(CType(Sub() AbrirChildEnDashboard(formHijo), MethodInvoker))
+            Return
+        End If
+
+        Try
+            dash.Activate()
+            dash.BringToFront()
+            dash.AbrirChild(formHijo)
+        Catch ex As Exception
+            Notifier.[Error](dash, $"No se pudo abrir la ventana: {ex.Message}")
         End Try
     End Sub
 

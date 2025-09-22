@@ -413,16 +413,16 @@ Public Class frmFuncionarioCrear
         Dim parts As New List(Of String)()
 
         Dim addPart As Action(Of String, String) =
-            Sub(label As String, value As String)
-                If Not String.IsNullOrWhiteSpace(value) Then
-                    parts.Add($"{label}: {value.Trim()}")
-                End If
-            End Sub
+        Sub(label As String, value As String)
+            If Not String.IsNullOrWhiteSpace(value) Then
+                parts.Add($"{label}: {value.Trim()}")
+            End If
+        End Sub
 
         Dim addDate As Action(Of String, Date?) =
-            Sub(label As String, d As Date?)
-                If d.HasValue Then parts.Add($"{label}: {d.Value:dd/MM/yyyy}")
-            End Sub
+        Sub(label As String, d As Date?)
+            If d.HasValue Then parts.Add($"{label}: {d.Value:dd/MM/yyyy}")
+        End Sub
 
         Select Case e.TipoEstadoTransitorioId
             Case TiposEstadoCatalog.Designacion
@@ -474,12 +474,16 @@ Public Class frmFuncionarioCrear
                 Dim d = e.TrasladoDetalle
                 If d IsNot Nothing Then
                     obs = d.Observaciones
+                    addPart("Resolución", d.Resolucion)
+                    addDate("Fecha res.", d.FechaResolucion)
                 End If
 
             Case TiposEstadoCatalog.BajaDeFuncionario
                 Dim d = e.BajaDeFuncionarioDetalle
                 If d IsNot Nothing Then
                     obs = d.Observaciones
+                    addPart("Resolución", d.Resolucion)
+                    addDate("Fecha res.", d.FechaResolucion)
                 End If
 
             Case TiposEstadoCatalog.CambioDeCargo
@@ -504,6 +508,8 @@ Public Class frmFuncionarioCrear
                 Dim d = e.SeparacionDelCargoDetalle
                 If d IsNot Nothing Then
                     obs = d.Observaciones
+                    addPart("Resolución", d.Resolucion)
+                    addDate("Fecha res.", d.FechaResolucion)
                 End If
 
             Case TiposEstadoCatalog.InicioDeProcesamiento
@@ -517,6 +523,8 @@ Public Class frmFuncionarioCrear
                 Dim d = e.DesarmadoDetalle
                 If d IsNot Nothing Then
                     obs = d.Observaciones
+                    addPart("Resolución", d.Resolucion)
+                    addDate("Fecha res.", d.FechaResolucion)
                 End If
 
             Case Else
@@ -525,18 +533,18 @@ Public Class frmFuncionarioCrear
 
         Dim det As String = String.Join(" | ", parts)
         Dim obsFinal As String =
-            If(String.IsNullOrWhiteSpace(det), (If(obs, String.Empty)).Trim(),
-               If(String.IsNullOrWhiteSpace(obs), det, $"{det} | {obs.Trim()}"))
+        If(String.IsNullOrWhiteSpace(det), (If(obs, String.Empty)).Trim(),
+           If(String.IsNullOrWhiteSpace(obs), det, $"{det} | {obs.Trim()}"))
 
         Return New EstadoRow With {
-            .Id = e.Id,
-            .Origen = origen,
-            .TipoEstado = If(tipoNombre, String.Empty),
-            .FechaDesde = fd,
-            .FechaHasta = fh,
-            .Observaciones = obsFinal,
-            .EntityRef = e
-        }
+        .Id = e.Id,
+        .Origen = origen,
+        .TipoEstado = If(tipoNombre, String.Empty),
+        .FechaDesde = fd,
+        .FechaHasta = fh,
+        .Observaciones = obsFinal,
+        .EntityRef = e
+    }
     End Function
 
     Private Function GetCargoNombre(d As CambioDeCargoDetalle, anterior As Boolean) As String

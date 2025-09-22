@@ -144,46 +144,58 @@ Public Class NovedadService
 
     ''' <summary>Crea la novedad y sus relaciones (usa/crea NovedadGenerada del día).</summary>
     Public Async Function CrearNovedadCompletaAsync(fecha As Date, texto As String, funcionarioIds As List(Of Integer)) As Task(Of Novedad)
-        ' 1) Contenedor por fecha
-        Dim repoGenerada = _unitOfWork.Repository(Of NovedadGenerada)()
-        Dim novedadDelDia = Await repoGenerada.GetByPredicateAsync(Function(ng) ng.Fecha = fecha.Date)
+        Using uow As New UnitOfWork()
+            ' Usamos una transacción para garantizar que toda la operación sea atómica (o todo o nada)
+            Using transaction = uow.Context.Database.BeginTransaction()
+                Try
+                    ' 1. Busca o crea el contenedor NovedadGenerada sin guardarlo todavía
+                    Dim repoGenerada = uow.Repository(Of NovedadGenerada)()
+                    Dim novedadDelDia = Await repoGenerada.GetByPredicateAsync(Function(ng) ng.Fecha = fecha.Date)
 
-        Dim seCreoContenedor As Boolean = False
-        If novedadDelDia Is Nothing Then
-            novedadDelDia = New NovedadGenerada With {.Fecha = fecha.Date, .CreatedAt = DateTime.Now}
-            repoGenerada.Add(novedadDelDia)
-            Await _unitOfWork.CommitAsync()
-            seCreoContenedor = True
+                    If novedadDelDia Is Nothing Then
+                        novedadDelDia = New NovedadGenerada With {
+                        .Fecha = fecha.Date,
+                        .CreatedAt = DateTime.Now
+                    }
+                        repoGenerada.Add(novedadDelDia)
+                    End If
 
-            Await RegistrarAuditoriaSeguraAsync("CrearContenedor", "NovedadGenerada",
-                                                $"Se creó NovedadGenerada para la fecha {fecha:yyyy-MM-dd} con Id #{novedadDelDia.Id}.",
-                                                novedadDelDia.Id)
-        End If
+                    ' 2. Crea la Novedad y la asocia con su contenedor y funcionarios
+                    Dim nuevaNovedad = New Novedad With {
+                    .Fecha = fecha,
+                    .Texto = texto,
+                    .EstadoId = 1, ' Pendiente
+                    .CreatedAt = DateTime.Now,
+                    .NovedadGenerada = novedadDelDia ' Asignación directa de la entidad
+                }
 
-        ' 2) Novedad + funcionarios
-        Dim nuevaNovedad = New Novedad With {
-            .Fecha = fecha,
-            .Texto = texto,
-            .EstadoId = 1, ' Pendiente
-            .CreatedAt = DateTime.Now,
-            .NovedadGeneradaId = novedadDelDia.Id
-        }
+                    If funcionarioIds IsNot Nothing Then
+                        For Each funcId In funcionarioIds
+                            nuevaNovedad.NovedadFuncionario.Add(New NovedadFuncionario With {.FuncionarioId = funcId})
+                        Next
+                    End If
 
-        If funcionarioIds IsNot Nothing Then
-            For Each funcId In funcionarioIds
-                nuevaNovedad.NovedadFuncionario.Add(New NovedadFuncionario With {.FuncionarioId = funcId})
-            Next
-        End If
+                    uow.Repository(Of Novedad)().Add(nuevaNovedad)
 
-        _unitOfWork.Repository(Of Novedad)().Add(nuevaNovedad)
-        Await _unitOfWork.CommitAsync()
+                    ' 3. Guarda TODOS los cambios en una única y rápida transacción
+                    Await uow.CommitAsync()
 
-        Dim cant = If(funcionarioIds Is Nothing, 0, funcionarioIds.Count)
-        Await RegistrarAuditoriaSeguraAsync("Crear", "Novedad",
-            $"Se creó la novedad #{nuevaNovedad.Id} (fecha {fecha:yyyy-MM-dd}) con {cant} funcionario(s). Contenedor creado: {seCreoContenedor}.",
-            nuevaNovedad.Id)
+                    ' 4. Si todo salió bien, confirma la transacción
+                    transaction.Commit()
 
-        Return nuevaNovedad
+                    ' El registro de auditoría va después de confirmar que todo se guardó
+                    Await RegistrarAuditoriaSeguraAsync("Crear", "Novedad",
+                    $"Se creó la novedad #{nuevaNovedad.Id} para la fecha {fecha:yyyy-MM-dd}.",
+                    nuevaNovedad.Id)
+
+                    Return nuevaNovedad
+                Catch ex As Exception
+                    ' Si algo falla, se revierte toda la operación para no dejar datos corruptos
+                    transaction.Rollback()
+                    Throw ' Relanzamos la excepción para que el usuario sea notificado del error
+                End Try
+            End Using
+        End Using
     End Function
 
     ''' <summary>Elimina novedad + dependencias (funcionarios, fotos) de forma explícita/transaccional.</summary>
