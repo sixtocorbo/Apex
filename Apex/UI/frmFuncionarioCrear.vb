@@ -631,7 +631,22 @@ Public Class frmFuncionarioCrear
         _funcionario.Nombre = txtNombre.Text.Trim()
         _funcionario.FechaIngreso = dtpFechaIngreso.Value.Date
         _funcionario.TipoFuncionarioId = CInt(cboTipoFuncionario.SelectedValue)
-        _funcionario.CargoId = If(cboCargo.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboCargo.SelectedValue))
+        Dim cargoSeleccionado As Integer? = Nothing
+        If cboCargo.SelectedIndex <> -1 Then
+            Dim selectedValue = cboCargo.SelectedValue
+            If selectedValue IsNot Nothing Then
+                Dim valor As Integer
+                If TypeOf selectedValue Is Integer Then
+                    valor = CInt(selectedValue)
+                    cargoSeleccionado = valor
+                ElseIf Integer.TryParse(selectedValue.ToString(), valor) Then
+                    cargoSeleccionado = valor
+                End If
+            End If
+        End If
+        If cargoSeleccionado.HasValue Then
+            _funcionario.CargoId = cargoSeleccionado.Value
+        End If
         _funcionario.Activo = chkActivo.Checked
         _funcionario.EscalafonId = If(cboEscalafon.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboEscalafon.SelectedValue))
         _funcionario.FuncionId = If(cboFuncion.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboFuncion.SelectedValue))
@@ -805,6 +820,13 @@ Public Class frmFuncionarioCrear
         _estadoRows.Add(BuildEstadoRow(estado, "Nuevo"))
         bsEstados.ResetBindings(False)
 
+        If estado?.TipoEstadoTransitorioId = ModConstantesApex.TipoEstadoTransitorioId.CambioDeCargo Then
+            Dim detalle = estado.CambioDeCargoDetalle
+            If detalle IsNot Nothing AndAlso detalle.CargoNuevoId > 0 Then
+                cboCargo.SelectedValue = detalle.CargoNuevoId
+            End If
+        End If
+
         ' b) ¡NADA MÁS! El Dashboard se encargará de volver a este formulario.
     End Sub
 
@@ -818,6 +840,13 @@ Public Class frmFuncionarioCrear
                                               ' Esto ya está correcto
                                               UpdateRowFromEntity(row, estadoModificado)
                                               bsEstados.ResetBindings(False)
+
+                                              If estadoModificado?.TipoEstadoTransitorioId = ModConstantesApex.TipoEstadoTransitorioId.CambioDeCargo Then
+                                                  Dim detalle = estadoModificado.CambioDeCargoDetalle
+                                                  If detalle IsNot Nothing AndAlso detalle.CargoNuevoId > 0 Then
+                                                      cboCargo.SelectedValue = detalle.CargoNuevoId
+                                                  End If
+                                              End If
 
                                               AbrirChildEnDashboard(frm)
                                           End Sub
