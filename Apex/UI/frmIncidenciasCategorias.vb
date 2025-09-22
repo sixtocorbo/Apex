@@ -9,6 +9,9 @@ Partial Class frmIncidenciasCategorias
     Private _listaCategorias As BindingList(Of CategoriaAusencia)
     Private _categoriaSeleccionada As CategoriaAusencia
     Private _estaCargando As Boolean
+    ' --- Campo nuevo para bloquear el SelectionChanged mientras limpiamos ---
+    Private _suspendiendoSeleccion As Boolean = False
+
 
     Private Async Sub frmIncidenciasCategorias_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
@@ -73,12 +76,20 @@ Partial Class frmIncidenciasCategorias
 
     ' =================== UI STATE ===================
     Private Sub LimpiarCampos()
+        _suspendiendoSeleccion = True   ' << activar bloqueo
+
         _categoriaSeleccionada = New CategoriaAusencia()
         txtNombre.Clear()
         btnEliminar.Enabled = False
+
+        ' OJO: ClearSelection no quita la CurrentCell. Hay que anularla también:
         dgvCategorias.ClearSelection()
+        dgvCategorias.CurrentCell = Nothing
+
+        _suspendiendoSeleccion = False  ' << desactivar bloqueo
         txtNombre.Focus()
     End Sub
+
 
     Private Sub MostrarDetalles()
         If _categoriaSeleccionada IsNot Nothing Then
@@ -91,12 +102,19 @@ Partial Class frmIncidenciasCategorias
 
     ' =================== EVENTOS GRID / BUSCAR ===================
     Private Sub dgvCategorias_SelectionChanged(sender As Object, e As EventArgs) Handles dgvCategorias.SelectionChanged
-        If dgvCategorias.CurrentRow Is Nothing Then Return
+        ' Si estamos limpiando/creando, ignorar el rebote
+        If _suspendiendoSeleccion Then Return
+
+        ' Si no hay selección real, no hacer nada
+        If dgvCategorias.CurrentRow Is Nothing OrElse dgvCategorias.CurrentCell Is Nothing Then Return
+
         Dim item = TryCast(dgvCategorias.CurrentRow.DataBoundItem, CategoriaAusencia)
         If item Is Nothing Then Return
+
         _categoriaSeleccionada = item
         MostrarDetalles()
     End Sub
+
 
     Private Sub txtBuscar_TextChanged(sender As Object, e As EventArgs) Handles txtBuscar.TextChanged
         If _listaCategorias Is Nothing Then Return
@@ -115,8 +133,9 @@ Partial Class frmIncidenciasCategorias
 
     ' =================== BOTONES ===================
     Private Sub btnNuevo_Click(sender As Object, e As EventArgs) Handles btnNuevo.Click
-        LimpiarCampos()
+        LimpiarCampos()   ' con el bloqueo activo no se repoblarán los campos
     End Sub
+
 
     Private Async Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
         If String.IsNullOrWhiteSpace(txtNombre.Text) Then
@@ -155,28 +174,29 @@ Partial Class frmIncidenciasCategorias
             Return
         End If
 
-        Dim confirm = MessageBox.Show(
-            $"¿Eliminar la categoría '{_categoriaSeleccionada.Nombre}'?",
-            "Confirmar eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
+        If MessageBox.Show(
+        $"¿Eliminar la categoría '{_categoriaSeleccionada.Nombre}'?",
+        "Confirmar eliminación",
+        MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then Return
 
-        If confirm <> DialogResult.Yes Then Return
-
-        Cursor = Cursors.WaitCursor
-        btnEliminar.Enabled = False
+        Cursor = Cursors.WaitCursor : btnEliminar.Enabled = False
         Try
             Using svc As New CategoriaAusenciaService()
-                Await svc.DeleteAsync(_categoriaSeleccionada.Id)
+                Await svc.EliminarAsync(_categoriaSeleccionada.Id)
             End Using
             Notifier.Info(Me, "Categoría eliminada.")
             Await CargarDatosAsync()
+            LimpiarCampos()
+        Catch ex As InvalidOperationException
+            ' Mensaje ya “traducido” en el service
+            Notifier.Error(Me, ex.Message, 6000)
         Catch ex As Exception
-            Dim msg As String = MapearErrorRelacion(ex)
-            Notifier.[Error](Me, msg)
+            Notifier.Error(Me, "Ocurrió un error al eliminar: " & ex.Message, 6000)
         Finally
-            Cursor = Cursors.Default
-            btnEliminar.Enabled = True
+            Cursor = Cursors.Default : btnEliminar.Enabled = True
         End Try
     End Sub
+
 
     Private Sub Cerrando(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
         If e.KeyCode = Keys.Escape Then Close()
