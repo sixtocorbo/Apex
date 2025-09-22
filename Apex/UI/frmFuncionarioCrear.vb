@@ -799,20 +799,6 @@ Public Class frmFuncionarioCrear
 
         ' b) ¡NADA MÁS! El Dashboard se encargará de volver a este formulario.
     End Sub
-    'Private Sub btnAñadirEstado_Click(sender As Object, e As EventArgs) Handles btnAñadirEstado.Click
-    '    ' Vincular el funcionario evita NullReference en el form de estado (Case 30)
-    '    Dim nuevoEstado = New EstadoTransitorio() With {
-    '        .Funcionario = _funcionario
-    '    }
-
-    '    Using frm As New frmFuncionarioEstadoTransitorio(nuevoEstado, _tiposEstadoTransitorio, _uow)
-    '        If frm.ShowDialog(Me) = DialogResult.OK Then
-    '            _estadoRows.Add(BuildEstadoRow(frm.Estado, "Nuevo"))
-    '            bsEstados.ResetBindings(False)
-    '        End If
-    '    End Using
-    'End Sub
-    ' En frmFuncionarioCrear.vb
 
     Private Sub btnEditarEstado_Click(sender As Object, e As EventArgs) Handles btnEditarEstado.Click
         Dim row = TryCast(dgvEstadosTransitorios.CurrentRow?.DataBoundItem, EstadoRow)
@@ -825,26 +811,11 @@ Public Class frmFuncionarioCrear
                                               UpdateRowFromEntity(row, estadoModificado)
                                               bsEstados.ResetBindings(False)
 
-                                              ' ▼▼▼ REEMPLAZA ESTA LÍNEA ▼▼▼
-                                              ' Me.Activate()
-
-                                              ' ▼▼▼ POR ESTA LÍNEA ▼▼▼
                                               AbrirChildEnDashboard(frm)
                                           End Sub
 
-        ' Esto ya está correcto
         AbrirChildEnDashboard(frm)
     End Sub
-    'Private Sub btnEditarEstado_Click(sender As Object, e As EventArgs) Handles btnEditarEstado.Click
-    '    Dim row = TryCast(dgvEstadosTransitorios.CurrentRow?.DataBoundItem, EstadoRow)
-    '    If row?.EntityRef Is Nothing Then Return
-    '    Using frm As New frmFuncionarioEstadoTransitorio(row.EntityRef, _tiposEstadoTransitorio, _uow)
-    '        If frm.ShowDialog(Me) = DialogResult.OK Then
-    '            UpdateRowFromEntity(row, frm.Estado)
-    '            bsEstados.ResetBindings(False)
-    '        End If
-    '    End Using
-    'End Sub
 
     Private Sub btnQuitarEstado_Click(sender As Object, e As EventArgs) Handles btnQuitarEstado.Click
         ' 1) Validación de selección
@@ -949,7 +920,6 @@ Public Class frmFuncionarioCrear
         End If
     End Sub
 
-
     Private Sub ConfigurarGrillaDotacion()
         dgvDotacion.AutoGenerateColumns = False : dgvDotacion.Columns.Clear()
         dgvDotacion.Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Id", .Visible = False})
@@ -993,30 +963,21 @@ Public Class frmFuncionarioCrear
 
             Select Case result
                 Case DialogResult.Yes
-                    ' --- INICIO DE LA CORRECCIÓN ---
 
-                    ' 1. Llama al guardado de forma DIRECTA y SINCRÓNICA.
-                    '    Esto fuerza al programa a esperar que el guardado termine.
                     btnGuardar.PerformClick()
 
-                    ' 2. Ahora, la variable _seGuardo tendrá el valor correcto (True si se guardó, False si falló).
-                    '    Si el guardado falló (por ejemplo, por una validación), cancelamos el cierre
-                    '    para que el usuario pueda corregir el problema.
                     If Not _seGuardo Then
                         e.Cancel = True
                     End If
 
-                ' --- FIN DE LA CORRECCIÓN ---
-
                 Case DialogResult.No
-                    ' El usuario no quiere guardar. Descartamos los cambios explícitamente.
+
                     If _uow IsNot Nothing Then
                         _uow.Dispose()
                     End If
-                ' Dejamos que el formulario se cierre.
 
                 Case DialogResult.Cancel
-                    ' El usuario canceló la acción de cierre.
+
                     e.Cancel = True
             End Select
         End If

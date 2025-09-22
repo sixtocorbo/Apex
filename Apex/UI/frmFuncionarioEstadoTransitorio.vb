@@ -484,80 +484,81 @@ Fin:
 
         Select Case Estado.TipoEstadoTransitorioId
             Case ModConstantesApex.TipoEstadoTransitorioId.Designacion
-                Dim d = If(Estado.DesignacionDetalle, New DesignacionDetalle())
+                If Estado.DesignacionDetalle Is Nothing Then Estado.DesignacionDetalle = New DesignacionDetalle()
+                Dim d = Estado.DesignacionDetalle
                 d.FechaDesde = dtpFechaDesde.Value.Date
                 d.FechaHasta = fechaHastaSel
                 d.Observaciones = txtObservaciones.Text.Trim()
                 d.DocResolucion = txtResolucion.Text.Trim()
                 d.FechaResolucion = fechaResolucionSel
-                Estado.DesignacionDetalle = d
 
             Case ModConstantesApex.TipoEstadoTransitorioId.Enfermedad
-                Dim d = If(Estado.EnfermedadDetalle, New EnfermedadDetalle())
+                If Estado.EnfermedadDetalle Is Nothing Then Estado.EnfermedadDetalle = New EnfermedadDetalle()
+                Dim d = Estado.EnfermedadDetalle
                 d.FechaDesde = dtpFechaDesde.Value.Date
                 d.FechaHasta = fechaHastaSel
                 d.Observaciones = txtObservaciones.Text.Trim()
                 d.Diagnostico = txtDiagnostico.Text.Trim()
                 d.FechaResolucion = fechaResolucionSel
-                Estado.EnfermedadDetalle = d
 
             Case ModConstantesApex.TipoEstadoTransitorioId.Sancion
-                Dim d = If(Estado.SancionDetalle, New SancionDetalle())
+                If Estado.SancionDetalle Is Nothing Then Estado.SancionDetalle = New SancionDetalle()
+                Dim d = Estado.SancionDetalle
                 d.FechaDesde = dtpFechaDesde.Value.Date
                 d.FechaHasta = fechaHastaSel
                 d.Observaciones = txtObservaciones.Text.Trim()
                 d.Resolucion = txtResolucion.Text.Trim()
                 d.FechaResolucion = fechaResolucionSel
                 d.TipoSancion = txtTipoSancion.Text.Trim()
-                Estado.SancionDetalle = d
 
             Case ModConstantesApex.TipoEstadoTransitorioId.OrdenCinco
-                Dim d = If(Estado.OrdenCincoDetalle, New OrdenCincoDetalle())
+                If Estado.OrdenCincoDetalle Is Nothing Then Estado.OrdenCincoDetalle = New OrdenCincoDetalle()
+                Dim d = Estado.OrdenCincoDetalle
                 d.FechaDesde = dtpFechaDesde.Value.Date
                 d.FechaHasta = fechaHastaSel
                 d.Observaciones = txtObservaciones.Text.Trim()
                 d.FechaResolucion = fechaResolucionSel
-                Estado.OrdenCincoDetalle = d
 
             Case ModConstantesApex.TipoEstadoTransitorioId.Reten
-                Dim d = If(Estado.RetenDetalle, New RetenDetalle())
+                If Estado.RetenDetalle Is Nothing Then Estado.RetenDetalle = New RetenDetalle()
+                Dim d = Estado.RetenDetalle
                 d.FechaReten = dtpFechaDesde.Value.Date
                 d.Observaciones = txtObservaciones.Text.Trim()
                 d.Turno = txtTurnoReten.Text.Trim()
                 d.AsignadoPor = txtAsignadoPor.Text.Trim()
-                Estado.RetenDetalle = d
 
             Case ModConstantesApex.TipoEstadoTransitorioId.Sumario
-                Dim d = If(Estado.SumarioDetalle, New SumarioDetalle())
+                If Estado.SumarioDetalle Is Nothing Then Estado.SumarioDetalle = New SumarioDetalle()
+                Dim d = Estado.SumarioDetalle
                 d.FechaDesde = dtpFechaDesde.Value.Date
                 d.FechaHasta = fechaHastaSel
                 d.Observaciones = txtObservaciones.Text.Trim()
                 d.Expediente = txtResolucion.Text.Trim()
                 d.FechaResolucion = fechaResolucionSel
-                Estado.SumarioDetalle = d
 
             Case ModConstantesApex.TipoEstadoTransitorioId.Traslado
-                Dim d = If(Estado.TrasladoDetalle, New TrasladoDetalle())
+                If Estado.TrasladoDetalle Is Nothing Then Estado.TrasladoDetalle = New TrasladoDetalle()
+                Dim d = Estado.TrasladoDetalle
                 d.FechaDesde = dtpFechaDesde.Value.Date
                 d.FechaHasta = fechaHastaSel
                 d.Observaciones = txtObservaciones.Text.Trim()
                 d.Resolucion = txtResolucion.Text.Trim()
                 d.FechaResolucion = fechaResolucionSel
-                Estado.TrasladoDetalle = d
 
             Case ModConstantesApex.TipoEstadoTransitorioId.BajaDeFuncionario
-                Dim d = If(Estado.BajaDeFuncionarioDetalle, New BajaDeFuncionarioDetalle())
+                If Estado.BajaDeFuncionarioDetalle Is Nothing Then Estado.BajaDeFuncionarioDetalle = New BajaDeFuncionarioDetalle()
+                Dim d = Estado.BajaDeFuncionarioDetalle
                 d.FechaDesde = dtpFechaDesde.Value.Date
                 d.FechaHasta = fechaHastaSel
                 d.Observaciones = txtObservaciones.Text.Trim()
                 d.Resolucion = txtResolucion.Text.Trim()
                 d.FechaResolucion = fechaResolucionSel
-                Estado.BajaDeFuncionarioDetalle = d
 
             Case ModConstantesApex.TipoEstadoTransitorioId.CambioDeCargo
+                If Estado.CambioDeCargoDetalle Is Nothing Then Estado.CambioDeCargoDetalle = New CambioDeCargoDetalle()
+                Dim d = Estado.CambioDeCargoDetalle
                 Dim cargoNuevoId = CType(cboCargoNuevo.SelectedValue, Integer)
                 Dim cargoActualId = Estado.Funcionario.CargoId.Value
-                Dim d = If(Estado.CambioDeCargoDetalle, New CambioDeCargoDetalle())
                 d.FechaDesde = dtpFechaDesde.Value.Date
                 d.FechaHasta = fechaHastaSel
                 d.Observaciones = txtObservaciones.Text.Trim()
@@ -565,43 +566,42 @@ Fin:
                 d.CargoAnteriorId = cargoActualId
                 d.CargoNuevoId = cargoNuevoId
                 d.FechaResolucion = fechaResolucionSel
-                Estado.CambioDeCargoDetalle = d
                 Estado.Funcionario.CargoId = cargoNuevoId
 
             Case ModConstantesApex.TipoEstadoTransitorioId.ReactivacionDeFuncionario
-                Dim d = If(Estado.ReactivacionDeFuncionarioDetalle, New ReactivacionDeFuncionarioDetalle())
+                If Estado.ReactivacionDeFuncionarioDetalle Is Nothing Then Estado.ReactivacionDeFuncionarioDetalle = New ReactivacionDeFuncionarioDetalle()
+                Dim d = Estado.ReactivacionDeFuncionarioDetalle
                 d.FechaDesde = dtpFechaDesde.Value.Date
                 d.Observaciones = txtObservaciones.Text.Trim()
                 d.Resolucion = txtResolucion.Text.Trim()
                 d.FechaResolucion = fechaResolucionSel
-                Estado.ReactivacionDeFuncionarioDetalle = d
 
             Case ModConstantesApex.TipoEstadoTransitorioId.SeparacionDelCargo
-                Dim d = If(Estado.SeparacionDelCargoDetalle, New SeparacionDelCargoDetalle())
+                If Estado.SeparacionDelCargoDetalle Is Nothing Then Estado.SeparacionDelCargoDetalle = New SeparacionDelCargoDetalle()
+                Dim d = Estado.SeparacionDelCargoDetalle
                 d.FechaDesde = dtpFechaDesde.Value.Date
                 d.FechaHasta = fechaHastaSel
                 d.Observaciones = txtObservaciones.Text.Trim()
                 d.Resolucion = txtResolucion.Text.Trim()
                 d.FechaResolucion = fechaResolucionSel
-                Estado.SeparacionDelCargoDetalle = d
 
             Case ModConstantesApex.TipoEstadoTransitorioId.InicioDeProcesamiento
-                Dim d = If(Estado.InicioDeProcesamientoDetalle, New InicioDeProcesamientoDetalle())
+                If Estado.InicioDeProcesamientoDetalle Is Nothing Then Estado.InicioDeProcesamientoDetalle = New InicioDeProcesamientoDetalle()
+                Dim d = Estado.InicioDeProcesamientoDetalle
                 d.FechaDesde = dtpFechaDesde.Value.Date
                 d.FechaHasta = fechaHastaSel
                 d.Observaciones = txtObservaciones.Text.Trim()
                 d.Expediente = txtResolucion.Text.Trim()
                 d.FechaResolucion = fechaResolucionSel
-                Estado.InicioDeProcesamientoDetalle = d
 
             Case ModConstantesApex.TipoEstadoTransitorioId.Desarmado
-                Dim d = If(Estado.DesarmadoDetalle, New DesarmadoDetalle())
+                If Estado.DesarmadoDetalle Is Nothing Then Estado.DesarmadoDetalle = New DesarmadoDetalle()
+                Dim d = Estado.DesarmadoDetalle
                 d.FechaDesde = dtpFechaDesde.Value.Date
                 d.FechaHasta = fechaHastaSel
                 d.Observaciones = txtObservaciones.Text.Trim()
                 d.Resolucion = txtResolucion.Text.Trim()
                 d.FechaResolucion = fechaResolucionSel
-                Estado.DesarmadoDetalle = d
         End Select
 
         If Estado.Id = 0 Then
