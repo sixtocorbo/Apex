@@ -610,12 +610,12 @@ Public Class frmFuncionarioBuscar
             Return
         End If
 
-        If e.KeyCode = Keys.Escape Then
-            e.Handled = True
-            e.SuppressKeyPress = True
-            CancelarYCerrar()
-            Return
-        End If
+        'If e.KeyCode = Keys.Escape Then
+        '    e.Handled = True
+        '    e.SuppressKeyPress = True
+        '    CancelarYCerrar()
+        '    Return
+        'End If
     End Sub
     Private Sub CancelarYCerrar()
         ' Si te abrieron con ShowDialog, devolvés Cancel; si es dentro del dashboard igual cierra.

@@ -411,7 +411,6 @@ Partial Class frmFuncionarioBuscar
         Me.ClientSize = New System.Drawing.Size(944, 695)
         Me.Controls.Add(Me.splitContenedor)
         Me.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.KeyPreview = True
         Me.MinimumSize = New System.Drawing.Size(800, 600)
         Me.Name = "frmFuncionarioBuscar"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
