@@ -37,12 +37,9 @@ Public Interface IRepository(Of T As Class)
     Function Any(predicate As Expression(Of Func(Of T, Boolean))) As Boolean
     Function AnyAsync(predicate As Expression(Of Func(Of T, Boolean))) As Task(Of Boolean)
 
-    ' Versión mínima existente
     Function GetQueryable() As IQueryable(Of T)
 
-    ' Overload por string (para rutas anidadas dinámicas)
     Function GetQueryable(Optional includeProperties As String = "",
                           Optional tracking As Boolean = False) As IQueryable(Of T)
-
 
 End Interface
