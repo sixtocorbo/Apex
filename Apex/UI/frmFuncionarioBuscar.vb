@@ -318,6 +318,7 @@ Public Class frmFuncionarioBuscar
             .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Id", .DataPropertyName = "Id", .Visible = False})
             .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "CI", .DataPropertyName = "CI", .HeaderText = "CI", .Width = 90})
             .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Nombre", .DataPropertyName = "Nombre", .HeaderText = "Nombre", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
+            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Cargo", .DataPropertyName = "CargoNombre", .HeaderText = "Cargo", .Width = 150})
         End With
         AddHandler dgvFuncionarios.DataError, Sub(s, ev) ev.ThrowException = False
     End Sub
@@ -354,11 +355,14 @@ Public Class frmFuncionarioBuscar
                 Dim terminos = filtro.Split(" "c).Where(Function(w) Not String.IsNullOrWhiteSpace(w)).Select(Function(w) $"""{w}*""")
                 Dim expresionFts = String.Join(" AND ", terminos)
 
+                ' ▼▼▼ CÓDIGO A MODIFICAR ▼▼▼
                 Dim sb As New StringBuilder()
-                sb.AppendLine("SELECT TOP (@limite) Id, CI, Nombre")
-                sb.AppendLine("FROM dbo.Funcionario WITH (NOLOCK)")
-                sb.AppendLine("WHERE CONTAINS((CI, Nombre), @patron)")
-                sb.AppendLine("ORDER BY Nombre;")
+                sb.AppendLine("SELECT TOP (@limite) f.Id, f.CI, f.Nombre, ISNULL(c.Nombre, 'N/A') AS CargoNombre")
+                sb.AppendLine("FROM dbo.Funcionario f WITH (NOLOCK)")
+                sb.AppendLine("LEFT JOIN dbo.Cargo c ON f.CargoId = c.Id")
+                sb.AppendLine("WHERE CONTAINS((f.CI, f.Nombre), @patron)")
+                sb.AppendLine("ORDER BY f.Nombre;")
+                ' ▲▲▲ FIN DE LA MODIFICACIÓN ▲▲▲
 
                 Dim sql = sb.ToString()
                 Dim pLimite = New SqlParameter("@limite", LIMITE_FILAS)
@@ -720,6 +724,7 @@ Public Class frmFuncionarioBuscar
         Public Property Id As Integer
         Public Property CI As String
         Public Property Nombre As String
+        Public Property CargoNombre As String
     End Class
     Public Class PresenciaDTO
         Public Property FuncionarioId As Integer

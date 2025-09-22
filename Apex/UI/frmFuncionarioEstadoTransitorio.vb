@@ -568,6 +568,11 @@ Fin:
                 d.FechaResolucion = fechaResolucionSel
                 Estado.Funcionario.CargoId = cargoNuevoId
 
+                ' ▼▼▼ LÍNEA A AGREGAR ▼▼▼
+                ' Notificamos al UnitOfWork que la entidad Funcionario ha cambiado
+                ' para que guarde la modificación del CargoId.
+                _unitOfWork.Repository(Of Funcionario).Update(Estado.Funcionario)
+
             Case ModConstantesApex.TipoEstadoTransitorioId.ReactivacionDeFuncionario
                 If Estado.ReactivacionDeFuncionarioDetalle Is Nothing Then Estado.ReactivacionDeFuncionarioDetalle = New ReactivacionDeFuncionarioDetalle()
                 Dim d = Estado.ReactivacionDeFuncionarioDetalle
