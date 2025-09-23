@@ -7,11 +7,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{59EE7BEB-D6ED-42AE-9DBF-EB60471A43D6}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <StartupObject>Apex.My.MyApplication</StartupObject>
+    <StartupObject>Sub Main</StartupObject>
     <RootNamespace>Apex</RootNamespace>
     <AssemblyName>Apex</AssemblyName>
     <FileAlignment>512</FileAlignment>
-    <MyType>WindowsForms</MyType>
+    <MyType>WindowsFormsWithCustomSubMain</MyType>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
@@ -28,7 +28,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>224</ApplicationRevision>
+    <ApplicationRevision>225</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -189,6 +189,7 @@
     <Compile Include="Common\IRepository.vb" />
     <Compile Include="Common\NotificadorEventos.vb" />
     <Compile Include="Common\NotifierShim.vb" />
+    <Compile Include="Common\Program.vb" />
     <Compile Include="Common\StringExtensions.vb" />
     <Compile Include="Common\TaskExtensions.vb" />
     <Compile Include="Common\Toast.vb">

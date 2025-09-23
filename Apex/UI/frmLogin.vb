@@ -45,6 +45,17 @@ Public Class frmLogin
         End Try
     End Sub
 
+    ''' <summary>
+    ''' Maneja el clic en el botón para crear un nuevo usuario.
+    ''' </summary>
+    Private Sub btnCrearUsuario_Click(sender As Object, e As EventArgs) Handles btnCrearUsuario.Click
+        ' Creamos una instancia del formulario de creación y la mostramos.
+        ' Usamos ShowDialog para que el flujo se detenga hasta que se cierre el formulario de creación.
+        Using form As New frmUsuarioCrear()
+            form.ShowDialog(Me)
+        End Using
+    End Sub
+
     Private Sub frmLogin_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         ' Establecer el botón "Ingresar" como el botón por defecto para que se active con la tecla Enter
         Me.AcceptButton = btnLogin

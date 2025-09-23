@@ -18,13 +18,21 @@ Public Class UsuarioService
         Return Await _uow.Repository(Of Usuario)().GetAll().Include("Rols").FirstOrDefaultAsync(Function(u) u.Id = id)
     End Function
 
+    ' En /Services/UsuarioService.vb
+
     Public Async Function CreateAsync(usuario As Usuario, password As String) As Task
+        ' --- INICIO DE LA CORRECCIÓN ---
+        ' Asignamos la fecha y hora actual al campo de creación.
+        usuario.FechaCreacion = DateTime.Now
+        ' --- FIN DE LA CORRECCIÓN ---
+
         ' Generar Salt y Hash para la nueva contraseña
         Dim salt = GenerateSalt()
         usuario.PasswordSalt = salt
         usuario.PasswordHash = HashPassword(password, salt)
-        _uow.Repository(Of Usuario)().Add(usuario) ' Cambiado de Insert a Add
-        Await _uow.CommitAsync() ' Cambiado de SaveChangesAsync a CommitAsync
+
+        _uow.Repository(Of Usuario)().Add(usuario)
+        Await _uow.CommitAsync()
     End Function
 
     Public Async Function UpdateAsync(usuario As Usuario, Optional newPassword As String = Nothing) As Task
