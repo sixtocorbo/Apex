@@ -793,6 +793,7 @@
     <EmbeddedResource Include="Reportes\NovedadDetallada.rdlc">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\SituacionFuncionario.rdlc" />
     <EmbeddedResource Include="UI\frmAnalisisEstacionalidad.resx">
       <DependentUpon>frmAnalisisEstacionalidad.vb</DependentUpon>
     </EmbeddedResource>
@@ -852,6 +853,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmAreaTrabajoCategorias.resx">
       <DependentUpon>frmAreaTrabajoCategorias.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmFuncionarioSituacionRPT.resx">
+      <DependentUpon>frmFuncionarioSituacionRPT.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmGrados.resx">
       <DependentUpon>frmGrados.vb</DependentUpon>

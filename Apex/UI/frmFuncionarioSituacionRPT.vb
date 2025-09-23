@@ -33,7 +33,7 @@ Public Class frmFuncionarioSituacionRPT
             Me.ReportViewer1.LocalReport.DataSources.Add(rds)
 
             ' Asignar la ruta del reporte
-            Me.ReportViewer1.LocalReport.ReportEmbeddedResource = "Apex.Reportes.SituacionFuncionario.rdlc"
+            Me.ReportViewer1.LocalReport.ReportEmbeddedResource = "Apex.SituacionFuncionario.rdlc"
 
             ' Pasar parámetros al reporte (opcional pero recomendado)
             Dim pNombre As New ReportParameter("FuncionarioNombre", funcionario.Nombre)
@@ -47,4 +47,9 @@ Public Class frmFuncionarioSituacionRPT
             MessageBox.Show("Error al generar el reporte: " & ex.Message)
         End Try
     End Function
+    Private Sub Cerrando(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
+        If e.KeyCode = Keys.Escape Then
+            Me.Close()
+        End If
+    End Sub
 End Class

@@ -38,6 +38,7 @@ Partial Class frmFuncionarioSituacion
         Me.MainLayout = New System.Windows.Forms.TableLayoutPanel()
         Me.pnlHeader = New System.Windows.Forms.FlowLayoutPanel()
         Me.btnImprimir = New System.Windows.Forms.Button()
+        Me.btnCerrar = New System.Windows.Forms.Button()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -60,7 +61,7 @@ Partial Class frmFuncionarioSituacion
         Me.lblNombre.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.lblNombre.AutoSize = True
         Me.lblNombre.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Bold)
-        Me.lblNombre.Location = New System.Drawing.Point(4, 3)
+        Me.lblNombre.Location = New System.Drawing.Point(4, 12)
         Me.lblNombre.Margin = New System.Windows.Forms.Padding(4, 0, 20, 0)
         Me.lblNombre.Name = "lblNombre"
         Me.lblNombre.Size = New System.Drawing.Size(136, 29)
@@ -71,7 +72,7 @@ Partial Class frmFuncionarioSituacion
         '
         Me.dtpDesde.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.dtpDesde.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.dtpDesde.Location = New System.Drawing.Point(232, 5)
+        Me.dtpDesde.Location = New System.Drawing.Point(232, 13)
         Me.dtpDesde.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.dtpDesde.Name = "dtpDesde"
         Me.dtpDesde.Size = New System.Drawing.Size(152, 26)
@@ -81,7 +82,7 @@ Partial Class frmFuncionarioSituacion
         '
         Me.Label1.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(164, 8)
+        Me.Label1.Location = New System.Drawing.Point(164, 16)
         Me.Label1.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(60, 20)
@@ -92,7 +93,7 @@ Partial Class frmFuncionarioSituacion
         '
         Me.Label2.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(392, 8)
+        Me.Label2.Location = New System.Drawing.Point(392, 16)
         Me.Label2.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(56, 20)
@@ -103,7 +104,7 @@ Partial Class frmFuncionarioSituacion
         '
         Me.dtpHasta.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.dtpHasta.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.dtpHasta.Location = New System.Drawing.Point(456, 5)
+        Me.dtpHasta.Location = New System.Drawing.Point(456, 13)
         Me.dtpHasta.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.dtpHasta.Name = "dtpHasta"
         Me.dtpHasta.Size = New System.Drawing.Size(152, 26)
@@ -112,19 +113,18 @@ Partial Class frmFuncionarioSituacion
         'btnGenerar
         '
         Me.btnGenerar.Anchor = System.Windows.Forms.AnchorStyles.Left
-        Me.btnGenerar.Location = New System.Drawing.Point(4, 41)
-        Me.btnGenerar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnGenerar.Location = New System.Drawing.Point(616, 8)
+        Me.btnGenerar.Margin = New System.Windows.Forms.Padding(4, 3, 4, 5)
         Me.btnGenerar.Name = "btnGenerar"
         Me.btnGenerar.Size = New System.Drawing.Size(112, 35)
         Me.btnGenerar.TabIndex = 6
         Me.btnGenerar.Text = "Generar"
         Me.btnGenerar.UseVisualStyleBackColor = True
-        Me.btnGenerar.Visible = False
         '
         'SplitContainer1
         '
         Me.SplitContainer1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.SplitContainer1.Location = New System.Drawing.Point(4, 92)
+        Me.SplitContainer1.Location = New System.Drawing.Point(4, 107)
         Me.SplitContainer1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.SplitContainer1.Name = "SplitContainer1"
         '
@@ -135,8 +135,8 @@ Partial Class frmFuncionarioSituacion
         'SplitContainer1.Panel2
         '
         Me.SplitContainer1.Panel2.Controls.Add(Me.SplitContainerRight)
-        Me.SplitContainer1.Size = New System.Drawing.Size(682, 448)
-        Me.SplitContainer1.SplitterDistance = 388
+        Me.SplitContainer1.Size = New System.Drawing.Size(850, 433)
+        Me.SplitContainer1.SplitterDistance = 658
         Me.SplitContainer1.SplitterWidth = 6
         Me.SplitContainer1.TabIndex = 1
         '
@@ -147,7 +147,7 @@ Partial Class frmFuncionarioSituacion
         Me.grpEstados.Location = New System.Drawing.Point(0, 0)
         Me.grpEstados.Name = "grpEstados"
         Me.grpEstados.Padding = New System.Windows.Forms.Padding(8)
-        Me.grpEstados.Size = New System.Drawing.Size(388, 448)
+        Me.grpEstados.Size = New System.Drawing.Size(658, 433)
         Me.grpEstados.TabIndex = 0
         Me.grpEstados.TabStop = False
         Me.grpEstados.Text = "Estados en el período"
@@ -156,7 +156,6 @@ Partial Class frmFuncionarioSituacion
         '
         Me.dgvEstados.AllowUserToAddRows = False
         Me.dgvEstados.AllowUserToDeleteRows = False
-        Me.dgvEstados.AllowUserToResizeColumns = False
         Me.dgvEstados.AllowUserToResizeRows = False
         Me.dgvEstados.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill
         Me.dgvEstados.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells
@@ -177,7 +176,7 @@ Partial Class frmFuncionarioSituacion
         Me.dgvEstados.RowHeadersVisible = False
         Me.dgvEstados.RowHeadersWidth = 62
         Me.dgvEstados.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgvEstados.Size = New System.Drawing.Size(372, 413)
+        Me.dgvEstados.Size = New System.Drawing.Size(642, 398)
         Me.dgvEstados.TabIndex = 2
         '
         'SplitContainerRight
@@ -195,8 +194,8 @@ Partial Class frmFuncionarioSituacion
         'SplitContainerRight.Panel2
         '
         Me.SplitContainerRight.Panel2.Controls.Add(Me.grpFechas)
-        Me.SplitContainerRight.Size = New System.Drawing.Size(288, 448)
-        Me.SplitContainerRight.SplitterDistance = 209
+        Me.SplitContainerRight.Size = New System.Drawing.Size(186, 433)
+        Me.SplitContainerRight.SplitterDistance = 194
         Me.SplitContainerRight.SplitterWidth = 6
         Me.SplitContainerRight.TabIndex = 0
         '
@@ -207,7 +206,7 @@ Partial Class frmFuncionarioSituacion
         Me.grpNovedades.Location = New System.Drawing.Point(0, 0)
         Me.grpNovedades.Name = "grpNovedades"
         Me.grpNovedades.Padding = New System.Windows.Forms.Padding(8)
-        Me.grpNovedades.Size = New System.Drawing.Size(288, 209)
+        Me.grpNovedades.Size = New System.Drawing.Size(186, 194)
         Me.grpNovedades.TabIndex = 0
         Me.grpNovedades.TabStop = False
         Me.grpNovedades.Text = "Panel de Novedades"
@@ -216,7 +215,6 @@ Partial Class frmFuncionarioSituacion
         '
         Me.dgvNovedades.AllowUserToAddRows = False
         Me.dgvNovedades.AllowUserToDeleteRows = False
-        Me.dgvNovedades.AllowUserToResizeColumns = False
         Me.dgvNovedades.AllowUserToResizeRows = False
         Me.dgvNovedades.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill
         Me.dgvNovedades.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
@@ -236,7 +234,7 @@ Partial Class frmFuncionarioSituacion
         Me.dgvNovedades.RowHeadersVisible = False
         Me.dgvNovedades.RowHeadersWidth = 62
         Me.dgvNovedades.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgvNovedades.Size = New System.Drawing.Size(272, 174)
+        Me.dgvNovedades.Size = New System.Drawing.Size(170, 159)
         Me.dgvNovedades.TabIndex = 1
         '
         'grpFechas
@@ -246,7 +244,7 @@ Partial Class frmFuncionarioSituacion
         Me.grpFechas.Location = New System.Drawing.Point(0, 0)
         Me.grpFechas.Name = "grpFechas"
         Me.grpFechas.Padding = New System.Windows.Forms.Padding(8)
-        Me.grpFechas.Size = New System.Drawing.Size(288, 233)
+        Me.grpFechas.Size = New System.Drawing.Size(186, 233)
         Me.grpFechas.TabIndex = 1
         Me.grpFechas.TabStop = False
         Me.grpFechas.Text = "Fechas de Novedades"
@@ -261,7 +259,7 @@ Partial Class frmFuncionarioSituacion
         Me.flpTimeline.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.flpTimeline.Name = "flpTimeline"
         Me.flpTimeline.Padding = New System.Windows.Forms.Padding(8)
-        Me.flpTimeline.Size = New System.Drawing.Size(272, 198)
+        Me.flpTimeline.Size = New System.Drawing.Size(170, 198)
         Me.flpTimeline.TabIndex = 0
         Me.flpTimeline.WrapContents = False
         '
@@ -277,7 +275,7 @@ Partial Class frmFuncionarioSituacion
         Me.MainLayout.RowCount = 2
         Me.MainLayout.RowStyles.Add(New System.Windows.Forms.RowStyle())
         Me.MainLayout.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-        Me.MainLayout.Size = New System.Drawing.Size(690, 545)
+        Me.MainLayout.Size = New System.Drawing.Size(858, 545)
         Me.MainLayout.TabIndex = 7
         '
         'pnlHeader
@@ -290,32 +288,45 @@ Partial Class frmFuncionarioSituacion
         Me.pnlHeader.Controls.Add(Me.dtpHasta)
         Me.pnlHeader.Controls.Add(Me.btnGenerar)
         Me.pnlHeader.Controls.Add(Me.btnImprimir)
+        Me.pnlHeader.Controls.Add(Me.btnCerrar)
         Me.pnlHeader.Dock = System.Windows.Forms.DockStyle.Fill
         Me.pnlHeader.Location = New System.Drawing.Point(3, 3)
         Me.pnlHeader.Name = "pnlHeader"
-        Me.pnlHeader.Size = New System.Drawing.Size(684, 81)
+        Me.pnlHeader.Padding = New System.Windows.Forms.Padding(0, 5, 0, 5)
+        Me.pnlHeader.Size = New System.Drawing.Size(852, 96)
         Me.pnlHeader.TabIndex = 0
         '
         'btnImprimir
         '
         Me.btnImprimir.Anchor = System.Windows.Forms.AnchorStyles.Left
-        Me.btnImprimir.Location = New System.Drawing.Point(124, 41)
-        Me.btnImprimir.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnImprimir.Location = New System.Drawing.Point(736, 8)
+        Me.btnImprimir.Margin = New System.Windows.Forms.Padding(4, 3, 4, 5)
         Me.btnImprimir.Name = "btnImprimir"
         Me.btnImprimir.Size = New System.Drawing.Size(112, 35)
         Me.btnImprimir.TabIndex = 7
         Me.btnImprimir.Text = "Imprimir"
         Me.btnImprimir.UseVisualStyleBackColor = True
-        Me.btnImprimir.Visible = False
+        '
+        'btnCerrar
+        '
+        Me.btnCerrar.Anchor = System.Windows.Forms.AnchorStyles.Left
+        Me.btnCerrar.Location = New System.Drawing.Point(4, 51)
+        Me.btnCerrar.Margin = New System.Windows.Forms.Padding(4, 3, 4, 5)
+        Me.btnCerrar.Name = "btnCerrar"
+        Me.btnCerrar.Size = New System.Drawing.Size(112, 35)
+        Me.btnCerrar.TabIndex = 8
+        Me.btnCerrar.Text = "Cerrar"
+        Me.btnCerrar.UseVisualStyleBackColor = True
         '
         'frmFuncionarioSituacion
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(710, 565)
+        Me.ClientSize = New System.Drawing.Size(878, 565)
         Me.Controls.Add(Me.MainLayout)
         Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.MinimumSize = New System.Drawing.Size(900, 600)
         Me.Name = "frmFuncionarioSituacion"
         Me.Padding = New System.Windows.Forms.Padding(10)
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
@@ -359,4 +370,5 @@ Partial Class frmFuncionarioSituacion
     Friend WithEvents MainLayout As TableLayoutPanel
     Friend WithEvents pnlHeader As FlowLayoutPanel
     Friend WithEvents btnImprimir As Button
+    Friend WithEvents btnCerrar As Button
 End Class

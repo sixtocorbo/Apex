@@ -213,6 +213,15 @@ Public Class frmFuncionarioSituacion
                                     n.FechaProgramada < fechaFin) _
                 .AsNoTracking().ToListAsync()
 
+            ' 4) Cambios de Auditoría
+            Dim funcionarioIdStr = _funcionarioId.ToString()
+            Dim cambiosAuditados = Await _uow.Context.Set(Of AuditoriaCambios)() _
+    .Where(Function(a) a.TablaNombre = "Funcionario" AndAlso
+                            a.RegistroId = funcionarioIdStr AndAlso
+                            a.FechaHora >= fechaInicio AndAlso
+                            a.FechaHora < fechaFin) _
+    .AsNoTracking().ToListAsync()
+
             Dim eventosUnificados As New List(Of Object)
 
             ' Unificamos todos los eventos en un solo tipo de objeto para la grilla
@@ -239,10 +248,19 @@ Public Class frmFuncionarioSituacion
                 .Desde = CType(n.FechaProgramada, Date?),
                 .Hasta = CType(Nothing, Date?)
             }))
+            eventosUnificados.AddRange(cambiosAuditados.Select(Function(a) New With {
+    .Id = a.Id,
+    .TipoEvento = "Auditoria",
+    .Tipo = $"CAMBIO: El campo '{a.CampoNombre}' se modificó de '{If(String.IsNullOrWhiteSpace(a.ValorAnterior), "[vacío]", a.ValorAnterior)}' a '{If(String.IsNullOrWhiteSpace(a.ValorNuevo), "[vacío]", a.ValorNuevo)}'.",
+    .Desde = CType(a.FechaHora, Date?),
+    .Hasta = CType(Nothing, Date?)
+}))
 
             dgvEstados.DataSource = eventosUnificados _
-                .OrderByDescending(Function(x) x.Desde) _
-                .ToList()
+    .OrderByDescending(Function(x) GetPropValue(Of Date?)(x, "Desde", Nothing).Value.Date) _
+    .ThenByDescending(Function(x) ClasificarSeveridad(GetPropValue(Of String)(x, "Tipo", ""))) _
+    .ThenByDescending(Function(x) GetPropValue(Of Date?)(x, "Desde", Nothing)) _
+    .ToList()
 
         Catch ex As Exception
             MessageBox.Show($"Error al poblar la grilla de estados: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -497,7 +515,7 @@ Public Class frmFuncionarioSituacion
 
     Private Function ClasificarSeveridad(tipoTexto As String) As Severidad
         Dim t As String = If(tipoTexto, String.Empty).ToUpperInvariant()
-
+        If t.StartsWith("CAMBIO") Then Return Severidad.Info
         If t.StartsWith("NOTIFICACIÓN") Then Return Severidad.Media ' Simplificado
         If t.StartsWith("LICENCIA") Then Return Severidad.Info
         If t.Contains("INICIO DE PROCESAMIENTO") Then Return Severidad.Critica
@@ -557,12 +575,21 @@ Public Class frmFuncionarioSituacion
     End Function
 
     ' En frmFuncionarioSituacion.vb
+    ' En frmFuncionarioSituacion.vb
+
     Private Sub btnImprimir_Click(sender As Object, e As EventArgs) Handles btnImprimir.Click
         Dim fechaInicio = dtpDesde.Value.Date
-        Dim fechaFin = dtpHasta.Value.Date
+        ' --- CORRECCIÓN CLAVE AQUÍ ---
+        ' Agregamos .AddDays(1) para que el reporte use el mismo rango de fechas que el formulario
+        Dim fechaFin = dtpHasta.Value.Date.AddDays(1)
 
+        ' Creamos y abrimos el formulario del reporte con las fechas correctas
         Dim frm As New frmFuncionarioSituacionRPT(_funcionarioId, fechaInicio, fechaFin)
         NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
+    End Sub
+
+    Private Sub btnCerrar_Click(sender As Object, e As EventArgs) Handles btnCerrar.Click
+        Close()
     End Sub
 
 #End Region
