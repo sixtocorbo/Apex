@@ -365,6 +365,9 @@
     <Compile Include="DataBase\RetenDetalle.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
+    <Compile Include="DataBase\Rol.vb">
+      <DependentUpon>Model1.tt</DependentUpon>
+    </Compile>
     <Compile Include="DataBase\RolUsuario.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
@@ -476,6 +479,7 @@
     <Compile Include="Services\CargoService.vb" />
     <Compile Include="Services\CategoriaAusenciaService.vb" />
     <Compile Include="DTO\NovedadReporteDTO.vb" />
+    <Compile Include="Services\UsuarioService.vb" />
     <Compile Include="UI\ChipControl.vb">
       <SubType>UserControl</SubType>
     </Compile>
@@ -714,6 +718,18 @@
       <DependentUpon>frmNotificacionRPT.vb</DependentUpon>
     </Compile>
     <Compile Include="UI\frmNotificacionRPT.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\frmUsuarioCrear.Designer.vb">
+      <DependentUpon>frmUsuarioCrear.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmUsuarioCrear.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\frmUsuarios.Designer.vb">
+      <DependentUpon>frmUsuarios.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmUsuarios.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="UI\frmViaticosListas.Designer.vb">

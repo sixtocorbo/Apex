@@ -10,15 +10,11 @@
 Imports System
 Imports System.Collections.Generic
 
-Partial Public Class Usuario
+Partial Public Class Rol
     Public Property Id As Integer
-    Public Property NombreUsuario As String
-    Public Property PasswordHash As Byte()
-    Public Property PasswordSalt As Byte()
-    Public Property NombreCompleto As String
-    Public Property Activo As Boolean
-    Public Property FechaCreacion As Date
+    Public Property Nombre As String
+    Public Property Descripcion As String
 
-    Public Overridable Property Rol As ICollection(Of Rol) = New HashSet(Of Rol)
+    Public Overridable Property Usuario As ICollection(Of Usuario) = New HashSet(Of Usuario)
 
 End Class

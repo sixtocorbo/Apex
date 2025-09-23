@@ -15,6 +15,4 @@ Partial Public Class RolUsuario
     Public Property Nombre As String
     Public Property Orden As Byte
 
-    Public Overridable Property Usuario As ICollection(Of Usuario) = New HashSet(Of Usuario)
-
 End Class

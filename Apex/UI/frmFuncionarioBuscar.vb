@@ -33,6 +33,12 @@ Public Class frmFuncionarioBuscar
             Return Nothing
         End Get
     End Property
+    Private Function GetSelectedFuncionarioId() As Integer
+        If FuncionarioSeleccionado IsNot Nothing Then
+            Return FuncionarioSeleccionado.Id
+        End If
+        Return 0
+    End Function
 
     ''=============
     '' Variables para guardar el estado original
@@ -255,12 +261,14 @@ Public Class frmFuncionarioBuscar
     End Sub
 
     Private Sub btnSancionar_Click(sender As Object, e As EventArgs) Handles btnSancionar.Click
-        If FuncionarioSeleccionado IsNot Nothing Then
-            ' Abre el formulario para crear una nueva sanción.
-            Dim frm As New frmSancionCrear()
-            ' frm.FuncionarioId = FuncionarioSeleccionado.Id ' (Si el form lo soporta)
-            NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
+        Dim selectedId = GetSelectedFuncionarioId()
+        If selectedId <= 0 Then
+            Notifier.Warn(Me, "Por favor, seleccione un funcionario de la grilla.")
+            Return
         End If
+
+        Dim frm As New frmSancionCrear(selectedId)
+        NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
     End Sub
 
     Private Sub btnNovedades_Click(sender As Object, e As EventArgs) Handles btnNovedades.Click
@@ -414,8 +422,16 @@ Public Class frmFuncionarioBuscar
                 e.Handled = True
                 e.SuppressKeyPress = True
                 _searchTimer.Stop() ' Detenemos el timer para que no se dispare
-                Dim tk = ReiniciarToken()
-                Await BuscarAsync(tk)
+
+                ' --- LÓGICA MODIFICADA ---
+                ' Si estamos en modo de selección, Enter elige al funcionario.
+                ' Si estamos en modo de navegación, Enter ejecuta la búsqueda.
+                If _modo = ModoApertura.Seleccion Then
+                    AbrirOSeleccionarActual()
+                Else
+                    Dim tk = ReiniciarToken()
+                    Await BuscarAsync(tk)
+                End If
 
             Case Keys.Down
                 If dgvFuncionarios.Rows.Count > 0 Then

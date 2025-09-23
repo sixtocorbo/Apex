@@ -76,6 +76,7 @@ Partial Public Class ApexEntities
     Public Overridable Property RegimenTrabajo() As DbSet(Of RegimenTrabajo)
     Public Overridable Property RegistroActividad() As DbSet(Of RegistroActividad)
     Public Overridable Property RetenDetalle() As DbSet(Of RetenDetalle)
+    Public Overridable Property Rol() As DbSet(Of Rol)
     Public Overridable Property RolUsuario() As DbSet(Of RolUsuario)
     Public Overridable Property SancionDetalle() As DbSet(Of SancionDetalle)
     Public Overridable Property Seccion() As DbSet(Of Seccion)

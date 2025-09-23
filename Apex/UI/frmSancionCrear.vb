@@ -10,7 +10,7 @@ Public Class frmSancionCrear
 
     ' Propiedad pública para pasar el ID en modo edición
     Public SancionId As Integer? = Nothing
-
+    Private _funcionarioIdParaSancionar As Integer? = Nothing
     Public Enum ModoFormulario
         Crear
         Editar
@@ -18,6 +18,10 @@ Public Class frmSancionCrear
 
     Public Sub New()
         InitializeComponent()
+    End Sub
+    Public Sub New(funcionarioId As Integer)
+        Me.New() ' Llama al constructor por defecto para que se inicialicen los componentes
+        _funcionarioIdParaSancionar = funcionarioId
     End Sub
 
     Private Async Sub frmSancionCrear_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -39,6 +43,14 @@ Public Class frmSancionCrear
         End If
 
         Await CargarCombosAsync()
+
+        ' --- AÑADE ESTE BLOQUE DE CÓDIGO ---
+        ' Si se pasó un ID desde el buscador, lo seleccionamos
+        If _funcionarioIdParaSancionar.HasValue Then
+            cboFuncionario.SelectedValue = _funcionarioIdParaSancionar.Value
+            cboFuncionario.Enabled = False ' Opcional: deshabilita para que no se pueda cambiar
+        End If
+        ' --- FIN DEL BLOQUE AÑADIDO ---
 
         If _modo = ModoFormulario.Editar Then
             Await CargarDatosAsync()
