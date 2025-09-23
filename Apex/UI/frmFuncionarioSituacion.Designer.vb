@@ -37,6 +37,7 @@ Partial Class frmFuncionarioSituacion
         Me.flpTimeline = New System.Windows.Forms.FlowLayoutPanel()
         Me.MainLayout = New System.Windows.Forms.TableLayoutPanel()
         Me.pnlHeader = New System.Windows.Forms.FlowLayoutPanel()
+        Me.btnImprimir = New System.Windows.Forms.Button()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -59,7 +60,7 @@ Partial Class frmFuncionarioSituacion
         Me.lblNombre.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.lblNombre.AutoSize = True
         Me.lblNombre.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Bold)
-        Me.lblNombre.Location = New System.Drawing.Point(4, 8)
+        Me.lblNombre.Location = New System.Drawing.Point(4, 3)
         Me.lblNombre.Margin = New System.Windows.Forms.Padding(4, 0, 20, 0)
         Me.lblNombre.Name = "lblNombre"
         Me.lblNombre.Size = New System.Drawing.Size(136, 29)
@@ -69,8 +70,8 @@ Partial Class frmFuncionarioSituacion
         'dtpDesde
         '
         Me.dtpDesde.Anchor = System.Windows.Forms.AnchorStyles.Left
-        Me.dtpDesde.Format = System.Windows.Forms.DateTimePickerFormat.Short
-        Me.dtpDesde.Location = New System.Drawing.Point(232, 10)
+        Me.dtpDesde.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
+        Me.dtpDesde.Location = New System.Drawing.Point(232, 5)
         Me.dtpDesde.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.dtpDesde.Name = "dtpDesde"
         Me.dtpDesde.Size = New System.Drawing.Size(152, 26)
@@ -80,7 +81,7 @@ Partial Class frmFuncionarioSituacion
         '
         Me.Label1.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(164, 12)
+        Me.Label1.Location = New System.Drawing.Point(164, 8)
         Me.Label1.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(60, 20)
@@ -91,7 +92,7 @@ Partial Class frmFuncionarioSituacion
         '
         Me.Label2.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(392, 12)
+        Me.Label2.Location = New System.Drawing.Point(392, 8)
         Me.Label2.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(56, 20)
@@ -101,8 +102,8 @@ Partial Class frmFuncionarioSituacion
         'dtpHasta
         '
         Me.dtpHasta.Anchor = System.Windows.Forms.AnchorStyles.Left
-        Me.dtpHasta.Format = System.Windows.Forms.DateTimePickerFormat.Short
-        Me.dtpHasta.Location = New System.Drawing.Point(456, 10)
+        Me.dtpHasta.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
+        Me.dtpHasta.Location = New System.Drawing.Point(456, 5)
         Me.dtpHasta.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.dtpHasta.Name = "dtpHasta"
         Me.dtpHasta.Size = New System.Drawing.Size(152, 26)
@@ -111,7 +112,7 @@ Partial Class frmFuncionarioSituacion
         'btnGenerar
         '
         Me.btnGenerar.Anchor = System.Windows.Forms.AnchorStyles.Left
-        Me.btnGenerar.Location = New System.Drawing.Point(616, 5)
+        Me.btnGenerar.Location = New System.Drawing.Point(4, 41)
         Me.btnGenerar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnGenerar.Name = "btnGenerar"
         Me.btnGenerar.Size = New System.Drawing.Size(112, 35)
@@ -123,7 +124,7 @@ Partial Class frmFuncionarioSituacion
         'SplitContainer1
         '
         Me.SplitContainer1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.SplitContainer1.Location = New System.Drawing.Point(4, 56)
+        Me.SplitContainer1.Location = New System.Drawing.Point(4, 92)
         Me.SplitContainer1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.SplitContainer1.Name = "SplitContainer1"
         '
@@ -134,7 +135,7 @@ Partial Class frmFuncionarioSituacion
         'SplitContainer1.Panel2
         '
         Me.SplitContainer1.Panel2.Controls.Add(Me.SplitContainerRight)
-        Me.SplitContainer1.Size = New System.Drawing.Size(682, 484)
+        Me.SplitContainer1.Size = New System.Drawing.Size(682, 448)
         Me.SplitContainer1.SplitterDistance = 388
         Me.SplitContainer1.SplitterWidth = 6
         Me.SplitContainer1.TabIndex = 1
@@ -146,7 +147,7 @@ Partial Class frmFuncionarioSituacion
         Me.grpEstados.Location = New System.Drawing.Point(0, 0)
         Me.grpEstados.Name = "grpEstados"
         Me.grpEstados.Padding = New System.Windows.Forms.Padding(8)
-        Me.grpEstados.Size = New System.Drawing.Size(388, 484)
+        Me.grpEstados.Size = New System.Drawing.Size(388, 448)
         Me.grpEstados.TabIndex = 0
         Me.grpEstados.TabStop = False
         Me.grpEstados.Text = "Estados en el período"
@@ -166,7 +167,7 @@ Partial Class frmFuncionarioSituacion
         DataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.ControlText
         DataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight
         DataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True
+        DataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.[True]
         Me.dgvEstados.DefaultCellStyle = DataGridViewCellStyle1
         Me.dgvEstados.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgvEstados.Location = New System.Drawing.Point(8, 27)
@@ -176,7 +177,7 @@ Partial Class frmFuncionarioSituacion
         Me.dgvEstados.RowHeadersVisible = False
         Me.dgvEstados.RowHeadersWidth = 62
         Me.dgvEstados.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgvEstados.Size = New System.Drawing.Size(372, 449)
+        Me.dgvEstados.Size = New System.Drawing.Size(372, 413)
         Me.dgvEstados.TabIndex = 2
         '
         'SplitContainerRight
@@ -194,8 +195,8 @@ Partial Class frmFuncionarioSituacion
         'SplitContainerRight.Panel2
         '
         Me.SplitContainerRight.Panel2.Controls.Add(Me.grpFechas)
-        Me.SplitContainerRight.Size = New System.Drawing.Size(288, 484)
-        Me.SplitContainerRight.SplitterDistance = 226
+        Me.SplitContainerRight.Size = New System.Drawing.Size(288, 448)
+        Me.SplitContainerRight.SplitterDistance = 209
         Me.SplitContainerRight.SplitterWidth = 6
         Me.SplitContainerRight.TabIndex = 0
         '
@@ -206,7 +207,7 @@ Partial Class frmFuncionarioSituacion
         Me.grpNovedades.Location = New System.Drawing.Point(0, 0)
         Me.grpNovedades.Name = "grpNovedades"
         Me.grpNovedades.Padding = New System.Windows.Forms.Padding(8)
-        Me.grpNovedades.Size = New System.Drawing.Size(288, 226)
+        Me.grpNovedades.Size = New System.Drawing.Size(288, 209)
         Me.grpNovedades.TabIndex = 0
         Me.grpNovedades.TabStop = False
         Me.grpNovedades.Text = "Panel de Novedades"
@@ -225,7 +226,7 @@ Partial Class frmFuncionarioSituacion
         DataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText
         DataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight
         DataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False
+        DataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
         Me.dgvNovedades.DefaultCellStyle = DataGridViewCellStyle2
         Me.dgvNovedades.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgvNovedades.Location = New System.Drawing.Point(8, 27)
@@ -235,7 +236,7 @@ Partial Class frmFuncionarioSituacion
         Me.dgvNovedades.RowHeadersVisible = False
         Me.dgvNovedades.RowHeadersWidth = 62
         Me.dgvNovedades.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgvNovedades.Size = New System.Drawing.Size(272, 191)
+        Me.dgvNovedades.Size = New System.Drawing.Size(272, 174)
         Me.dgvNovedades.TabIndex = 1
         '
         'grpFechas
@@ -245,7 +246,7 @@ Partial Class frmFuncionarioSituacion
         Me.grpFechas.Location = New System.Drawing.Point(0, 0)
         Me.grpFechas.Name = "grpFechas"
         Me.grpFechas.Padding = New System.Windows.Forms.Padding(8)
-        Me.grpFechas.Size = New System.Drawing.Size(288, 252)
+        Me.grpFechas.Size = New System.Drawing.Size(288, 233)
         Me.grpFechas.TabIndex = 1
         Me.grpFechas.TabStop = False
         Me.grpFechas.Text = "Fechas de Novedades"
@@ -260,7 +261,7 @@ Partial Class frmFuncionarioSituacion
         Me.flpTimeline.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.flpTimeline.Name = "flpTimeline"
         Me.flpTimeline.Padding = New System.Windows.Forms.Padding(8)
-        Me.flpTimeline.Size = New System.Drawing.Size(272, 217)
+        Me.flpTimeline.Size = New System.Drawing.Size(272, 198)
         Me.flpTimeline.TabIndex = 0
         Me.flpTimeline.WrapContents = False
         '
@@ -288,11 +289,24 @@ Partial Class frmFuncionarioSituacion
         Me.pnlHeader.Controls.Add(Me.Label2)
         Me.pnlHeader.Controls.Add(Me.dtpHasta)
         Me.pnlHeader.Controls.Add(Me.btnGenerar)
+        Me.pnlHeader.Controls.Add(Me.btnImprimir)
         Me.pnlHeader.Dock = System.Windows.Forms.DockStyle.Fill
         Me.pnlHeader.Location = New System.Drawing.Point(3, 3)
         Me.pnlHeader.Name = "pnlHeader"
-        Me.pnlHeader.Size = New System.Drawing.Size(684, 45)
+        Me.pnlHeader.Size = New System.Drawing.Size(684, 81)
         Me.pnlHeader.TabIndex = 0
+        '
+        'btnImprimir
+        '
+        Me.btnImprimir.Anchor = System.Windows.Forms.AnchorStyles.Left
+        Me.btnImprimir.Location = New System.Drawing.Point(124, 41)
+        Me.btnImprimir.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnImprimir.Name = "btnImprimir"
+        Me.btnImprimir.Size = New System.Drawing.Size(112, 35)
+        Me.btnImprimir.TabIndex = 7
+        Me.btnImprimir.Text = "Imprimir"
+        Me.btnImprimir.UseVisualStyleBackColor = True
+        Me.btnImprimir.Visible = False
         '
         'frmFuncionarioSituacion
         '
@@ -344,4 +358,5 @@ Partial Class frmFuncionarioSituacion
     Friend WithEvents grpFechas As GroupBox
     Friend WithEvents MainLayout As TableLayoutPanel
     Friend WithEvents pnlHeader As FlowLayoutPanel
+    Friend WithEvents btnImprimir As Button
 End Class

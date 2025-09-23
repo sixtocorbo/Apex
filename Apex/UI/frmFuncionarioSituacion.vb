@@ -556,6 +556,15 @@ Public Class frmFuncionarioSituacion
         End Try
     End Function
 
+    ' En frmFuncionarioSituacion.vb
+    Private Sub btnImprimir_Click(sender As Object, e As EventArgs) Handles btnImprimir.Click
+        Dim fechaInicio = dtpDesde.Value.Date
+        Dim fechaFin = dtpHasta.Value.Date
+
+        Dim frm As New frmFuncionarioSituacionRPT(_funcionarioId, fechaInicio, fechaFin)
+        NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
+    End Sub
+
 #End Region
 
 End Class

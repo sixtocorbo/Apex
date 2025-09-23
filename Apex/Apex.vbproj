@@ -468,6 +468,7 @@
     <Compile Include="Data\TipoOrigenDatos.vb" />
     <Compile Include="Data\UnitOfWork.vb" />
     <Compile Include="DTO\NotificacionImprimirDTO.vb" />
+    <Compile Include="DTO\SituacionReporteDTO.vb" />
     <Compile Include="Helpers\NavegacionHelper.vb" />
     <Compile Include="Helpers\AppTheme.vb" />
     <Compile Include="Services\AreaTrabajoService.vb" />
@@ -528,6 +529,12 @@
       <DependentUpon>frmElegirDesignacion.vb</DependentUpon>
     </Compile>
     <Compile Include="UI\frmElegirDesignacion.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\frmFuncionarioSituacionRPT.Designer.vb">
+      <DependentUpon>frmFuncionarioSituacionRPT.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmFuncionarioSituacionRPT.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="UI\frmNotificacionCambiarEstado.Designer.vb">
