@@ -24,9 +24,10 @@ Public Class frmUsuarios
     End Function
 
     Private Async Sub btnNuevo_Click(sender As Object, e As EventArgs) Handles btnNuevo.Click
-        Using frm As New frmUsuarioCrear()
-            If frm.ShowDialog(Me) = DialogResult.OK Then
-                Await CargarDatosAsync()
+        Using form As New frmUsuarioCrear()
+            ' Si el usuario se creó correctamente (DialogResult.OK), recargamos la lista
+            If form.ShowDialog() = DialogResult.OK Then
+                Await CargarDatosAsync() ' Asegúrate de tener un método para cargar/refrescar los datos del grid
             End If
         End Using
     End Sub

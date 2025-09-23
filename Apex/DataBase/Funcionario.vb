@@ -74,5 +74,6 @@ Partial Public Class Funcionario
     Public Overridable Property HistoricoViatico As ICollection(Of HistoricoViatico) = New HashSet(Of HistoricoViatico)
     Public Overridable Property NotificacionPersonal As ICollection(Of NotificacionPersonal) = New HashSet(Of NotificacionPersonal)
     Public Overridable Property NovedadFuncionario As ICollection(Of NovedadFuncionario) = New HashSet(Of NovedadFuncionario)
+    Public Overridable Property Usuario As ICollection(Of Usuario) = New HashSet(Of Usuario)
 
 End Class

@@ -595,14 +595,6 @@
           <Property Name="Nombre" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="Descripcion" Type="nvarchar" MaxLength="255" />
         </EntityType>
-        <EntityType Name="RolUsuario">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="tinyint" Nullable="false" />
-          <Property Name="Nombre" Type="nvarchar" MaxLength="40" Nullable="false" />
-          <Property Name="Orden" Type="tinyint" Nullable="false" />
-        </EntityType>
         <EntityType Name="SancionDetalle">
           <Key>
             <PropertyRef Name="EstadoTransitorioId" />
@@ -760,6 +752,7 @@
           <Property Name="NombreCompleto" Type="nvarchar" MaxLength="150" Nullable="false" />
           <Property Name="Activo" Type="bit" Nullable="false" />
           <Property Name="FechaCreacion" Type="datetime" Nullable="false" />
+          <Property Name="FuncionarioId" Type="int" />
         </EntityType>
         <EntityType Name="UsuarioRol">
           <Key>
@@ -1763,6 +1756,18 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Usuario_Funcionario">
+          <End Role="Funcionario" Type="Self.Funcionario" Multiplicity="0..1" />
+          <End Role="Usuario" Type="Self.Usuario" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Funcionario">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Usuario">
+              <PropertyRef Name="FuncionarioId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Function Name="fn_diagramobjects" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="true" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" ReturnType="int" />
         <Function Name="RegimenActual" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="true" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" ReturnType="int">
           <Parameter Name="fecha" Type="date" Mode="In" />
@@ -1875,7 +1880,6 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <EntitySet Name="RegistroActividad" EntityType="Self.RegistroActividad" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="RetenDetalle" EntityType="Self.RetenDetalle" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Rol" EntityType="Self.Rol" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="RolUsuario" EntityType="Self.RolUsuario" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SancionDetalle" EntityType="Self.SancionDetalle" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Seccion" EntityType="Self.Seccion" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Semana" EntityType="Self.Semana" Schema="dbo" store:Type="Tables" />
@@ -2269,6 +2273,10 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             <End Role="EstadoTransitorio" EntitySet="EstadoTransitorio" />
             <End Role="TrasladoDetalle" EntitySet="TrasladoDetalle" />
           </AssociationSet>
+          <AssociationSet Name="FK_Usuario_Funcionario" Association="Self.FK_Usuario_Funcionario">
+            <End Role="Funcionario" EntitySet="Funcionario" />
+            <End Role="Usuario" EntitySet="Usuario" />
+          </AssociationSet>
         </EntityContainer>
       </Schema>
     </edmx:StorageModels>
@@ -2543,6 +2551,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <NavigationProperty Name="HistoricoViatico" Relationship="Self.FK_HistVia_Func" FromRole="Funcionario" ToRole="HistoricoViatico" />
           <NavigationProperty Name="NotificacionPersonal" Relationship="Self.FK_NotifPers_Func" FromRole="Funcionario" ToRole="NotificacionPersonal" />
           <NavigationProperty Name="NovedadFuncionario" Relationship="Self.FK_NovFunc_Func" FromRole="Funcionario" ToRole="NovedadFuncionario" />
+          <NavigationProperty Name="Usuario" Relationship="Self.FK_Usuario_Funcionario" FromRole="Funcionario" ToRole="Usuario" />
         </EntityType>
         <EntityType Name="FuncionarioArma">
           <Key>
@@ -2973,14 +2982,6 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <Property Name="Descripcion" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="Usuario" Relationship="Self.UsuarioRol" FromRole="Rol" ToRole="Usuario" />
         </EntityType>
-        <EntityType Name="RolUsuario">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Byte" Nullable="false" />
-          <Property Name="Nombre" Type="String" MaxLength="40" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="Orden" Type="Byte" Nullable="false" />
-        </EntityType>
         <EntityType Name="SancionDetalle">
           <Key>
             <PropertyRef Name="EstadoTransitorioId" />
@@ -3153,6 +3154,8 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <Property Name="NombreCompleto" Type="String" MaxLength="150" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Activo" Type="Boolean" Nullable="false" />
           <Property Name="FechaCreacion" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="FuncionarioId" Type="Int32" />
+          <NavigationProperty Name="Funcionario" Relationship="Self.FK_Usuario_Funcionario" FromRole="Usuario" ToRole="Funcionario" />
           <NavigationProperty Name="Rol" Relationship="Self.UsuarioRol" FromRole="Usuario" ToRole="Rol" />
         </EntityType>
         <EntityType Name="vw_EstadosTransitoriosCompletos">
@@ -3991,6 +3994,18 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Usuario_Funcionario">
+          <End Role="Funcionario" Type="Self.Funcionario" Multiplicity="0..1" />
+          <End Role="Usuario" Type="Self.Usuario" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Funcionario">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Usuario">
+              <PropertyRef Name="FuncionarioId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_HistLic_TipoLicencia">
           <End Role="TipoLicencia" Type="Self.TipoLicencia" Multiplicity="1" />
           <End Role="HistoricoLicencia" Type="Self.HistoricoLicencia" Multiplicity="*" />
@@ -4159,7 +4174,6 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <EntitySet Name="RegistroActividad" EntityType="Self.RegistroActividad" />
           <EntitySet Name="RetenDetalle" EntityType="Self.RetenDetalle" />
           <EntitySet Name="Rol" EntityType="Self.Rol" />
-          <EntitySet Name="RolUsuario" EntityType="Self.RolUsuario" />
           <EntitySet Name="SancionDetalle" EntityType="Self.SancionDetalle" />
           <EntitySet Name="Seccion" EntityType="Self.Seccion" />
           <EntitySet Name="Semana" EntityType="Self.Semana" />
@@ -4393,6 +4407,10 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <AssociationSet Name="FK_NovFunc_Func" Association="Self.FK_NovFunc_Func">
             <End Role="Funcionario" EntitySet="Funcionario" />
             <End Role="NovedadFuncionario" EntitySet="NovedadFuncionario" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Usuario_Funcionario" Association="Self.FK_Usuario_Funcionario">
+            <End Role="Funcionario" EntitySet="Funcionario" />
+            <End Role="Usuario" EntitySet="Usuario" />
           </AssociationSet>
           <AssociationSet Name="FK_HistLic_TipoLicencia" Association="Self.FK_HistLic_TipoLicencia">
             <End Role="TipoLicencia" EntitySet="TipoLicencia" />
@@ -5176,15 +5194,6 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="RolUsuario">
-            <EntityTypeMapping TypeName="ApexModel.RolUsuario">
-              <MappingFragment StoreEntitySet="RolUsuario">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
-                <ScalarProperty Name="Orden" ColumnName="Orden" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="SancionDetalle">
             <EntityTypeMapping TypeName="ApexModel.SancionDetalle">
               <MappingFragment StoreEntitySet="SancionDetalle">
@@ -5356,6 +5365,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
                 <ScalarProperty Name="NombreCompleto" ColumnName="NombreCompleto" />
                 <ScalarProperty Name="Activo" ColumnName="Activo" />
                 <ScalarProperty Name="FechaCreacion" ColumnName="FechaCreacion" />
+                <ScalarProperty Name="FuncionarioId" ColumnName="FuncionarioId" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

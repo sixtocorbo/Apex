@@ -1,7 +1,7 @@
-﻿' En: /Services/UsuarioService.vb
-Imports System.Data.Entity
+﻿Imports System.Data.Entity
 Imports System.Security.Cryptography
 Imports System.Text
+Imports System.Threading.Tasks
 
 Public Class UsuarioService
     Private ReadOnly _uow As IUnitOfWork
@@ -11,11 +11,11 @@ Public Class UsuarioService
     End Sub
 
     Public Async Function GetAllAsync() As Task(Of List(Of Usuario))
-        Return Await _uow.Repository(Of Usuario)().GetAll().Include(Function(u) u.Rols).ToListAsync()
+        Return Await _uow.Repository(Of Usuario)().GetAll().Include("Rols").ToListAsync()
     End Function
 
     Public Async Function GetByIdAsync(id As Integer) As Task(Of Usuario)
-        Return Await _uow.Repository(Of Usuario)().GetAll().Include(Function(u) u.Rols).FirstOrDefaultAsync(Function(u) u.Id = id)
+        Return Await _uow.Repository(Of Usuario)().GetAll().Include("Rols").FirstOrDefaultAsync(Function(u) u.Id = id)
     End Function
 
     Public Async Function CreateAsync(usuario As Usuario, password As String) As Task
@@ -23,13 +23,13 @@ Public Class UsuarioService
         Dim salt = GenerateSalt()
         usuario.PasswordSalt = salt
         usuario.PasswordHash = HashPassword(password, salt)
-        _uow.Repository(Of Usuario)().Insert(usuario)
-        Await _uow.SaveChangesAsync()
+        _uow.Repository(Of Usuario)().Add(usuario) ' Cambiado de Insert a Add
+        Await _uow.CommitAsync() ' Cambiado de SaveChangesAsync a CommitAsync
     End Function
 
     Public Async Function UpdateAsync(usuario As Usuario, Optional newPassword As String = Nothing) As Task
         Dim repo = _uow.Repository(Of Usuario)()
-        Dim dbUser = Await repo.GetAll().Include(Function(u) u.Rols).SingleOrDefaultAsync(Function(u) u.Id = usuario.Id)
+        Dim dbUser = Await repo.GetAll().Include("Rols").SingleOrDefaultAsync(Function(u) u.Id = usuario.Id)
 
         If dbUser Is Nothing Then Throw New Exception("Usuario no encontrado.")
 
@@ -44,23 +44,26 @@ Public Class UsuarioService
         End If
 
         ' Actualizar roles
-        dbUser.Rols.Clear()
-        For Each rol In usuario.Rols
-            dbUser.Rols.Add(_uow.Context.Set(Of Rol)().Find(rol.Id))
+        dbUser.Rol.Clear() ' Se asume que la propiedad se llama "Rol"
+        For Each rol In usuario.Rol
+            dbUser.Rol.Add(_uow.Context.Set(Of Rol)().Find(rol.Id))
         Next
 
-        Await _uow.SaveChangesAsync()
+        Await _uow.CommitAsync() ' Cambiado de SaveChangesAsync a CommitAsync
     End Function
 
     Public Async Function DeleteAsync(id As Integer) As Task
-        _uow.Repository(Of Usuario)().Delete(id)
-        Await _uow.SaveChangesAsync()
+        Dim user = Await GetByIdAsync(id)
+        If user IsNot Nothing Then
+            _uow.Repository(Of Usuario)().Remove(user) ' Cambiado de Delete a Remove
+            Await _uow.CommitAsync() ' Cambiado de SaveChangesAsync a CommitAsync
+        End If
     End Function
 
     ' --- Lógica de Seguridad ---
 
     Public Async Function ValidateCredentialsAsync(username As String, password As String) As Task(Of Usuario)
-        Dim user = Await _uow.Repository(Of Usuario)().FirstOrDefaultAsync(Function(u) u.NombreUsuario = username AndAlso u.Activo)
+        Dim user = Await _uow.Repository(Of Usuario)().GetAll().FirstOrDefaultAsync(Function(u) u.NombreUsuario = username AndAlso u.Activo)
         If user Is Nothing Then Return Nothing
 
         Dim passwordHash = HashPassword(password, user.PasswordSalt)

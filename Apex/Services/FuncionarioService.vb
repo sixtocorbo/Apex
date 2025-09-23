@@ -370,6 +370,7 @@ Public Class FuncionarioService
         End Using
     End Function
 
+
     Public Async Function ObtenerPresenciasParaFechaAsync(fecha As Date) As Task(Of List(Of PresenciaDTO))
         Using uow As New UnitOfWork()
             Dim ctx = uow.Context

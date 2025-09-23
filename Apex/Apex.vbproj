@@ -368,9 +368,6 @@
     <Compile Include="DataBase\Rol.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
-    <Compile Include="DataBase\RolUsuario.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
-    </Compile>
     <Compile Include="DataBase\SancionDetalle.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
@@ -539,6 +536,12 @@
       <DependentUpon>frmFuncionarioSituacionRPT.vb</DependentUpon>
     </Compile>
     <Compile Include="UI\frmFuncionarioSituacionRPT.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\frmLogin.Designer.vb">
+      <DependentUpon>frmLogin.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmLogin.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="UI\frmNotificacionCambiarEstado.Designer.vb">

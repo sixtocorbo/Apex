@@ -18,7 +18,9 @@ Partial Public Class Usuario
     Public Property NombreCompleto As String
     Public Property Activo As Boolean
     Public Property FechaCreacion As Date
+    Public Property FuncionarioId As Nullable(Of Integer)
 
+    Public Overridable Property Funcionario As Funcionario
     Public Overridable Property Rol As ICollection(Of Rol) = New HashSet(Of Rol)
 
 End Class
