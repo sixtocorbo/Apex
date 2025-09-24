@@ -58,8 +58,8 @@ Public Class frmFuncionarioSituacionRPT
                     New String() {"..\..\Reportes\SituacionFuncionario.rdlc"}
                 )
 
-                ' El nombre aquí (p. ej., "SituacionData") debe ser distinto al del DataSet del RDLC.
-                Dim rds As New ReportDataSource("SituacionData", datos)
+                ' El nombre del DataSource debe coincidir con el DataSet definido en el RDLC (DataSetSituacion).
+                Dim rds As New ReportDataSource("DataSetSituacion", datos)
                 ReportViewer1.LocalReport.DataSources.Add(rds)
 
                 ' Parámetros (solo si existen en el RDLC)
