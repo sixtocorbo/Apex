@@ -51,6 +51,15 @@ Public Class LicenciaService
         End Using
     End Function
 
+    ' READ (override para evitar entidades rastreadas)
+    Public Shadows Async Function GetByIdAsync(id As Integer) As Task(Of HistoricoLicencia)
+        Using uow As New UnitOfWork()
+            Return Await uow.Context.Set(Of HistoricoLicencia)().
+                AsNoTracking().
+                FirstOrDefaultAsync(Function(lic) lic.Id = id)
+        End Using
+    End Function
+
     ' UPDATE
     Public Shadows Async Function UpdateAsync(entity As HistoricoLicencia) As Task
         Using uow As New UnitOfWork()
