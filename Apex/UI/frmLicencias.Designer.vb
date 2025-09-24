@@ -24,6 +24,8 @@ Partial Class frmLicencias
         Me.btnEditarLicencia = New System.Windows.Forms.Button()
         Me.btnNuevaLicencia = New System.Windows.Forms.Button()
         Me.PanelBusquedaLicencias = New System.Windows.Forms.Panel()
+        Me.dtpFechaVigencia = New System.Windows.Forms.DateTimePicker()
+        Me.lblFechaVigencia = New System.Windows.Forms.Label()
         Me.chkSoloVigentes = New System.Windows.Forms.CheckBox()
         Me.txtBusquedaLicencia = New System.Windows.Forms.TextBox()
         Me.Label1 = New System.Windows.Forms.Label()
@@ -96,6 +98,8 @@ Partial Class frmLicencias
         '
         'PanelBusquedaLicencias
         '
+        Me.PanelBusquedaLicencias.Controls.Add(Me.dtpFechaVigencia)
+        Me.PanelBusquedaLicencias.Controls.Add(Me.lblFechaVigencia)
         Me.PanelBusquedaLicencias.Controls.Add(Me.chkSoloVigentes)
         Me.PanelBusquedaLicencias.Controls.Add(Me.txtBusquedaLicencia)
         Me.PanelBusquedaLicencias.Controls.Add(Me.Label1)
@@ -111,10 +115,29 @@ Partial Class frmLicencias
         Me.chkSoloVigentes.AutoSize = True
         Me.chkSoloVigentes.Location = New System.Drawing.Point(517, 16)
         Me.chkSoloVigentes.Name = "chkSoloVigentes"
-        Me.chkSoloVigentes.Size = New System.Drawing.Size(159, 24)
+        Me.chkSoloVigentes.Size = New System.Drawing.Size(133, 24)
         Me.chkSoloVigentes.TabIndex = 2
-        Me.chkSoloVigentes.Text = "Sólo vigentes hoy"
+        Me.chkSoloVigentes.Text = "Sólo vigentes"
         Me.chkSoloVigentes.UseVisualStyleBackColor = True
+        '
+        'lblFechaVigencia
+        '
+        Me.lblFechaVigencia.AutoSize = True
+        Me.lblFechaVigencia.Location = New System.Drawing.Point(656, 18)
+        Me.lblFechaVigencia.Name = "lblFechaVigencia"
+        Me.lblFechaVigencia.Size = New System.Drawing.Size(55, 20)
+        Me.lblFechaVigencia.TabIndex = 3
+        Me.lblFechaVigencia.Text = "Fecha:"
+        '
+        'dtpFechaVigencia
+        '
+        Me.dtpFechaVigencia.Enabled = False
+        Me.dtpFechaVigencia.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
+        Me.dtpFechaVigencia.Location = New System.Drawing.Point(717, 14)
+        Me.dtpFechaVigencia.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.dtpFechaVigencia.Name = "dtpFechaVigencia"
+        Me.dtpFechaVigencia.Size = New System.Drawing.Size(135, 26)
+        Me.dtpFechaVigencia.TabIndex = 4
         '
         'txtBusquedaLicencia
         '
@@ -163,4 +186,6 @@ Partial Class frmLicencias
     Friend WithEvents txtBusquedaLicencia As TextBox
     Friend WithEvents Label1 As Label
     Friend WithEvents chkSoloVigentes As CheckBox
+    Friend WithEvents lblFechaVigencia As Label
+    Friend WithEvents dtpFechaVigencia As DateTimePicker
 End Class
