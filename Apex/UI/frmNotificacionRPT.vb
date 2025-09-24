@@ -1,5 +1,8 @@
 ﻿Imports System.IO
 Imports System.Reflection
+Imports System.Collections.Generic
+Imports System.Linq
+Imports System.Deployment.Application
 Imports Microsoft.Reporting.WinForms
 
 ''' <summary>
@@ -86,21 +89,42 @@ Public Class frmNotificacionRPT
 
             ' Intentar cargar el reporte como recurso incrustado para evitar problemas de distribución.
             Dim executingAssembly As Assembly = GetType(frmNotificacionRPT).Assembly
-            Using reportStream As Stream = executingAssembly.GetManifestResourceStream(reportResourceName)
-                If reportStream IsNot Nothing Then
-                    ReportViewer1.LocalReport.LoadReportDefinition(reportStream)
-                    reportLoaded = True
-                End If
-            End Using
+            Dim resourceNames = executingAssembly.GetManifestResourceNames()
+            Dim matchingResourceName = resourceNames.FirstOrDefault(Function(name) name.Equals(reportResourceName, StringComparison.OrdinalIgnoreCase))
+
+            If matchingResourceName Is Nothing Then
+                matchingResourceName = resourceNames.FirstOrDefault(Function(name) name.EndsWith(".Reportes.NotificacionImprimir.rdlc", StringComparison.OrdinalIgnoreCase) OrElse name.EndsWith("NotificacionImprimir.rdlc", StringComparison.OrdinalIgnoreCase))
+            End If
+
+            If matchingResourceName IsNot Nothing Then
+                Using reportStream As Stream = executingAssembly.GetManifestResourceStream(matchingResourceName)
+                    If reportStream IsNot Nothing Then
+                        ReportViewer1.LocalReport.LoadReportDefinition(reportStream)
+                        reportLoaded = True
+                    End If
+                End Using
+            End If
 
             If Not reportLoaded Then
                 ' Si no se encontró como recurso, intentamos buscarlo en disco como respaldo.
-                Dim reportPath As String = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Reportes", "NotificacionImprimir.rdlc")
-                If Not File.Exists(reportPath) Then
-                    reportPath = Path.GetFullPath(Path.Combine(Application.StartupPath, "..\..\", "Reportes", "NotificacionImprimir.rdlc"))
+                Dim posiblesRutas As New List(Of String) From {
+                    Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Reportes", "NotificacionImprimir.rdlc"),
+                    Path.Combine(Application.StartupPath, "Reportes", "NotificacionImprimir.rdlc"),
+                    Path.GetFullPath(Path.Combine(Application.StartupPath, "..\..\", "Reportes", "NotificacionImprimir.rdlc"))
+                }
+
+                If ApplicationDeployment.IsNetworkDeployed Then
+                    posiblesRutas.Add(Path.Combine(ApplicationDeployment.CurrentDeployment.DataDirectory, "Reportes", "NotificacionImprimir.rdlc"))
                 End If
-                If Not File.Exists(reportPath) Then
-                    Throw New FileNotFoundException("No se encontró el recurso de reporte 'NotificacionImprimir.rdlc'.")
+
+                Dim reportPath As String = posiblesRutas.FirstOrDefault(Function(ruta) File.Exists(ruta))
+
+                If String.IsNullOrWhiteSpace(reportPath) Then
+                    Dim mensajeError As String = "No se encontró el recurso de reporte 'NotificacionImprimir.rdlc'."
+                    If resourceNames IsNot Nothing AndAlso resourceNames.Length > 0 Then
+                        mensajeError &= Environment.NewLine & "Recursos incrustados disponibles: " & String.Join(", ", resourceNames)
+                    End If
+                    Throw New FileNotFoundException(mensajeError)
                 End If
 
                 ReportViewer1.LocalReport.ReportPath = reportPath
@@ -158,7 +182,7 @@ Public Class frmNotificacionRPT
         If _notificacionId <= 0 Then Return ' Seguridad extra
 
         If MessageBox.Show("¿Confirmás que la notificación fue firmada y deseás archivarla?",
-                           "Confirmar Acción", MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then
+                            "Confirmar Acción", MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then
             Return
         End If
 
