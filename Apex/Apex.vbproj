@@ -807,9 +807,9 @@
     <EmbeddedResource Include="Reportes\DesignacionImprimir.rdlc">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <Content Include="Reportes\NotificacionImprimir.rdlc">
+    <EmbeddedResource Include="Reportes\NotificacionImprimir.rdlc">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </EmbeddedResource>
     <EmbeddedResource Include="Reportes\ReporteNovedades_Fotos.rdlc">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
