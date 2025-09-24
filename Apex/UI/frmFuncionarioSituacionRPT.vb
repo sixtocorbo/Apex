@@ -39,24 +39,34 @@ Public Class frmFuncionarioSituacionRPT
                 ReportViewer1.ProcessingMode = ProcessingMode.Local
                 ReportViewer1.LocalReport.DataSources.Clear()
 
-                ' RDLC: Embedded → BaseDirectory\Reportes → StartupPath\Reportes → ClickOnce
+                ' 1) Cargar SI o SI el RDLC (embedded + fallbacks)
                 ReportResourceLoader.LoadLocalReportDefinition(
-                    ReportViewer1.LocalReport,
-                    GetType(frmFuncionarioSituacionRPT),
-                    "Apex.Reportes.SituacionFuncionario.rdlc",
-                    "SituacionFuncionario.rdlc"
-                )
+                ReportViewer1.LocalReport,
+                GetType(frmFuncionarioSituacionRPT),
+                "Apex.Reportes.SituacionFuncionario.rdlc",   ' <-- revisá que el Build Action del .rdlc sea Embedded Resource con este nombre
+                "SituacionFuncionario.rdlc",
+                New String() {"..\..\Reportes\SituacionFuncionario.rdlc"} ' <-- fallback extra para debug
+            )
 
-                ' DataSource: debe coincidir con el nombre del DataSet en el RDLC
+                ' (opcional) assert útil para diagnosticar si el RDLC no cargó:
+                If String.IsNullOrEmpty(ReportViewer1.LocalReport.ReportPath) _
+               AndAlso ReportViewer1.LocalReport.ListRenderingExtensions() Is Nothing Then
+                    Throw New ApplicationException("El RDLC no se cargó. Verificá el nombre del recurso embebido y los fallbacks.")
+                End If
+
+                ' 2) DataSource (nombre EXACTO como en el RDLC)
                 Dim rds As New ReportDataSource("DataSetSituacion", datos)
                 ReportViewer1.LocalReport.DataSources.Add(rds)
 
-                ' Parámetros
-                Dim pNombre As New ReportParameter("FuncionarioNombre", funcionario?.Nombre)
-                Dim pPeriodo As New ReportParameter("Periodo", $"Desde: {_fechaDesde:dd/MM/yyyy} Hasta: {_fechaHasta:dd/MM/yyyy}")
+                ' 3) Parámetros (evitar Nothing)
+                Dim nombreFuncionario As String = If(funcionario?.Nombre, "N/A")
+                Dim periodo As String = $"Desde: {_fechaDesde:dd/MM/yyyy} Hasta: {_fechaHasta:dd/MM/yyyy}"
+
+                Dim pNombre As New ReportParameter("FuncionarioNombre", nombreFuncionario)
+                Dim pPeriodo As New ReportParameter("Periodo", periodo)
                 ReportViewer1.LocalReport.SetParameters({pNombre, pPeriodo})
 
-                ' Presentación
+                ' 4) Presentación
                 ReportViewer1.LocalReport.DisplayName = $"Situacion_{_funcionarioId:000000}"
                 ReportViewer1.SetDisplayMode(DisplayMode.PrintLayout)
                 ReportViewer1.ZoomMode = ZoomMode.Percent
@@ -66,10 +76,16 @@ Public Class frmFuncionarioSituacionRPT
                 Await Task.Yield()
             End Using
 
+        Catch ex As Microsoft.Reporting.WinForms.LocalProcessingException
+            Dim msg = ex.Message
+            If ex.InnerException IsNot Nothing Then msg &= Environment.NewLine & ex.InnerException.Message
+            MessageBox.Show("Error al generar el reporte: " & msg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Me.Close()
         Finally
             Me.Cursor = old
         End Try
     End Function
+
 
     Private Sub Cerrando(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
         If e.KeyCode = Keys.Escape Then
