@@ -160,7 +160,9 @@ Public Class frmNovedades
                 Me.Cursor = Cursors.Default
                 btnBuscar.Enabled = True
                 dgvNovedades.Enabled = True
-                txtBusqueda.Focus()
+                If Not _refrescandoPorNotificacion Then
+                    txtBusqueda.Focus()
+                End If
             End If
             _estaBuscando = False
         End Try

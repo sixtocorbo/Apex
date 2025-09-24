@@ -33,8 +33,9 @@ Public Class frmLicencias
         txtBusquedaLicencia.Focus()
         AddHandler NotificadorEventos.FuncionarioActualizado, AddressOf OnFuncionarioActualizado
 
+        dtpFechaVigencia.Value = Date.Today
         chkSoloVigentes.Checked = True
-        _isFirstLoad = False
+        dtpFechaVigencia.Enabled = chkSoloVigentes.Checked
 
         Try
             AppTheme.SetCue(txtBusquedaLicencia, "Buscar por funcionario…")
@@ -44,6 +45,7 @@ Public Class frmLicencias
         ' --- PRIMERA CARGA CON TOKEN ---
         Dim tk = ReiniciarToken()
         Await CargarDatosLicenciasAsync(tk)
+        _isFirstLoad = False
     End Sub
 
     Private Sub frmGestionLicencias_FormClosed(sender As Object, e As FormClosedEventArgs) Handles Me.FormClosed
@@ -172,7 +174,8 @@ Public Class frmLicencias
 
             Dim datos As List(Of LicenciaConFuncionarioExtendidoDto)
             If soloVigentes Then
-                datos = Await _licenciaSvc.GetVigentesHoyAsync(filtroNombre:=filtro).WaitAsync(token)
+                Dim fechaVigencia = If(dtpFechaVigencia IsNot Nothing, dtpFechaVigencia.Value.Date, Date.Today)
+                datos = Await _licenciaSvc.GetVigentesHoyAsync(filtroNombre:=filtro, fechaReferencia:=fechaVigencia).WaitAsync(token)
             Else
                 datos = Await _licenciaSvc.GetAllConDetallesAsync(filtroNombre:=filtro).WaitAsync(token)
             End If
@@ -299,6 +302,13 @@ Public Class frmLicencias
 
     Private Async Sub chkSoloVigentes_CheckedChanged(sender As Object, e As EventArgs) Handles chkSoloVigentes.CheckedChanged
         If _isFirstLoad Then Return
+        dtpFechaVigencia.Enabled = chkSoloVigentes.Checked
+        Dim tk = ReiniciarToken()
+        Await CargarDatosLicenciasAsync(tk)
+    End Sub
+
+    Private Async Sub dtpFechaVigencia_ValueChanged(sender As Object, e As EventArgs) Handles dtpFechaVigencia.ValueChanged
+        If _isFirstLoad OrElse Not chkSoloVigentes.Checked Then Return
         Dim tk = ReiniciarToken()
         Await CargarDatosLicenciasAsync(tk)
     End Sub
