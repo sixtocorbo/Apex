@@ -1,4 +1,7 @@
-﻿Public Class frmLicenciaCrear
+﻿Imports System.Globalization
+Imports System.Text.RegularExpressions
+
+Public Class frmLicenciaCrear
 
     Private _svc As LicenciaService
     Private _licencia As HistoricoLicencia
@@ -87,18 +90,37 @@
         ' Estados (cadena simple)
         Dim estadosExistentes = Await _svc.ObtenerEstadosDeLicenciaAsync()
 
-        cboEstado.DropDownStyle = ComboBoxStyle.DropDown
+        cboEstado.DropDownStyle = ComboBoxStyle.DropDownList
         cboEstado.DataSource = Nothing
         cboEstado.Items.Clear()
+
+        Dim listaEstados As New List(Of KeyValuePair(Of String, String))()
+
         If estadosExistentes IsNot Nothing AndAlso estadosExistentes.Any() Then
-            cboEstado.DataSource = estadosExistentes.ToList()
+            For Each raw In estadosExistentes
+                Dim visual = NormalizarEstadoVisual(raw)
+                listaEstados.Add(New KeyValuePair(Of String, String)(raw, visual))
+            Next
         Else
-            cboEstado.Items.AddRange(New Object() {"Autorizado", "Rechazada", "Anulada", "Pendiente"})
+            ' Fallback (keys=raw, values=visual)
+            Dim defaults = New String() {"Autorizado", "Rechazada", "Anulada", "Pendiente"}
+            For Each raw In defaults
+                listaEstados.Add(New KeyValuePair(Of String, String)(raw, NormalizarEstadoVisual(raw)))
+            Next
         End If
+        cboEstado.DisplayMember = "Value" ' lo que ve el usuario
+        cboEstado.ValueMember = "Key"     ' valor crudo que guardamos
+        cboEstado.DataSource = listaEstados
 
         If _modo = ModoFormulario.Crear Then
-            Dim idx = cboEstado.FindStringExact("Autorizado")
-            cboEstado.SelectedIndex = If(idx >= 0, idx, -1)
+            ' Intentar dejar "Autorizado" por visual
+            Dim idx = -1
+            For i = 0 To listaEstados.Count - 1
+                If EquivEstado(listaEstados(i).Value, "Autorizado") Then
+                    idx = i : Exit For
+                End If
+            Next
+            cboEstado.SelectedIndex = idx
             cboFuncionario.SelectedIndex = -1
             cboTipoLicencia.SelectedIndex = -1
         End If
@@ -239,5 +261,31 @@
             Notifier.Info(Me, "Recordá agregar una observación en Comentario.")
         End If
     End Sub
+    Private Function NormalizarEstadoVisual(s As String) As String
+        If String.IsNullOrWhiteSpace(s) Then Return String.Empty
+        Dim t = s.Trim()
 
+        ' (Opcional) reemplazar underscores/guiones por espacio visual
+        t = t.Replace("_", " ").Replace("-", " ")
+
+        ' Colapsar espacios internos
+        t = Regex.Replace(t, "\s+", " ")
+
+        ' Título (Autorizado, Rechazada, etc.)
+        Dim ti = CultureInfo.CurrentCulture.TextInfo
+        t = ti.ToTitleCase(t.ToLowerInvariant())
+
+        Return t
+    End Function
+
+    ' Para buscar equivalencias (por si _estadoInicial viene con espacios raros)
+    Private Function EquivEstado(a As String, b As String) As Boolean
+        Dim na As String = If(a, String.Empty)
+        Dim nb As String = If(b, String.Empty)
+
+        na = Regex.Replace(na.Trim().Replace("_", " ").Replace("-", " "), "\s+", " ").ToUpperInvariant()
+        nb = Regex.Replace(nb.Trim().Replace("_", " ").Replace("-", " "), "\s+", " ").ToUpperInvariant()
+
+        Return na = nb
+    End Function
 End Class
