@@ -535,6 +535,12 @@
     <Compile Include="UI\frmElegirDesignacion.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="UI\frmFiltrar.Designer.vb">
+      <DependentUpon>frmFiltrar.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmFiltrar.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="UI\frmFuncionarioSituacionRPT.Designer.vb">
       <DependentUpon>frmFuncionarioSituacionRPT.vb</DependentUpon>
     </Compile>

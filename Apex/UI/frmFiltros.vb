@@ -51,15 +51,6 @@ Partial Public Class frmFiltros
             Return $"'{EscapeStringLiteral(valor)}'"
         End Function
 
-        'Private Shared Function FormatearValor(valor As String) As String
-        '    If DateTime.TryParse(valor, CultureInfo.InvariantCulture, DateTimeStyles.None, Nothing) Then
-        '        Return $"#{Convert.ToDateTime(valor).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}#"
-        '    End If
-        '    If Double.TryParse(valor, NumberStyles.Any, CultureInfo.InvariantCulture, Nothing) Then
-        '        Return valor
-        '    End If
-        '    Return $"'{EscapeStringLiteral(valor)}'"
-        'End Function
         Public Function ToRowFilter() As String
             Dim colName = $"[{Columna}]"
             Select Case Operador
@@ -82,24 +73,6 @@ Partial Public Class frmFiltros
             End Select
         End Function
 
-        'Public Function ToRowFilter() As String
-        '    Dim colName = $"[{Columna}]"
-        '    Select Case Operador
-        '        Case OperadorComparacion.Igual
-        '            If DateTime.TryParse(Valor1, Nothing) Then
-        '                Dim fecha As Date = Convert.ToDateTime(Valor1).Date
-        '                Dim siguienteDia As Date = fecha.AddDays(1)
-        '                Return $"({colName} >= #{fecha:yyyy-MM-dd}# AND {colName} < #{siguienteDia:yyyy-MM-dd}#)"
-        '            Else
-        '                Return $"{colName} = {FormatearValor(Valor1)}"
-        '            End If
-        '        Case OperadorComparacion.EnLista
-        '            Dim items = Valor1.Split("|"c).Select(AddressOf FormatearValor)
-        '            Return $"{colName} IN ({String.Join(",", items)})"
-        '        Case Else
-        '            Throw New NotSupportedException($"Operador {Operador} aún no implementado.")
-        '    End Select
-        'End Function
     End Class
 
     Friend Class GestorFiltros
@@ -224,6 +197,7 @@ Partial Public Class frmFiltros
 
             LimpiarFiltrosYChips()
             ConfigurarGrilla(_dtOriginal)
+            AplicarFormatoAmigable(dgvDatos, _dtOriginal) ' <<--- AQUÍ
             ActualizarListaColumnas()
 
             dgvDatos.DataSource = _dvDatos
@@ -238,6 +212,7 @@ Partial Public Class frmFiltros
             UpdateUIState()
         End Try
     End Function
+
     Protected Overrides Async Function RefrescarSegunFuncionarioAsync(e As FuncionarioCambiadoEventArgs) As Task
         ' Si hay cualquier origen de datos seleccionado, lo recargamos,
         ' ya que un cambio en un funcionario puede afectar a licencias, sanciones, etc.
@@ -533,8 +508,6 @@ Partial Public Class frmFiltros
     Private Sub BeautifyGrid()
         dgvDatos.Dock = DockStyle.Fill
         dgvDatos.RowHeadersVisible = False
-        dgvDatos.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells
-        ' Última columna “fill” se setea al crear columnas
     End Sub
 
 #End Region
@@ -879,26 +852,6 @@ Partial Public Class frmFiltros
     )
     End Sub
 
-    'Private Sub CargarDefinicionRDLC(lr As Microsoft.Reporting.WinForms.LocalReport,
-    '                             nombreCorto As String,
-    '                             rutaRelativa As String)
-    '    Dim asm = Me.GetType().Assembly
-    '    Dim recurso = asm.GetManifestResourceNames().
-    '    FirstOrDefault(Function(n) n.EndsWith("." & nombreCorto, StringComparison.OrdinalIgnoreCase))
-    '    If Not String.IsNullOrEmpty(recurso) Then
-    '        Using s = asm.GetManifestResourceStream(recurso)
-    '            lr.LoadReportDefinition(s)
-    '        End Using
-    '        Exit Sub
-    '    End If
-
-    '    Dim fullPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, rutaRelativa)
-    '    If Not System.IO.File.Exists(fullPath) Then
-    '        Throw New ApplicationException($"No se encontró el RDLC embebido ('...{nombreCorto}') ni en disco: {fullPath}")
-    '    End If
-    '    lr.ReportPath = fullPath
-    'End Sub
-
 #Region "Exportacion fichas"
     Private Function ConstruirNombreArchivo(dto As FichaFuncionalDTO, id As Integer) As String
         Dim nombre As String = (If(dto?.NombreCompleto, "")).Trim()
@@ -1023,6 +976,46 @@ Partial Public Class frmFiltros
 
 #End Region
 #End Region
+    Private Sub AplicarFormatoAmigable(dgv As DataGridView, dt As DataTable)
+        If dgv Is Nothing OrElse dt Is Nothing Then Exit Sub
+
+        For Each col As DataGridViewColumn In dgv.Columns
+            If String.IsNullOrEmpty(col.DataPropertyName) Then Continue For
+            If Not dt.Columns.Contains(col.DataPropertyName) Then Continue For
+
+            Dim dc = dt.Columns(col.DataPropertyName)
+            ' Valor para nulos
+            col.DefaultCellStyle.NullValue = ""
+
+            ' Alineación por tipo
+            If dc.DataType Is GetType(Decimal) OrElse
+           dc.DataType Is GetType(Double) OrElse
+           dc.DataType Is GetType(Single) OrElse
+           dc.DataType Is GetType(Integer) OrElse
+           dc.DataType Is GetType(Long) Then
+                col.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
+            End If
+
+            ' Formatos por tipo
+            If dc.DataType Is GetType(Date) OrElse dc.DataType Is GetType(DateTime) Then
+                ' dd/MM/yyyy ya lo pones al crear columnas, pero fuerzo culture y nulos
+                col.DefaultCellStyle.Format = "dd/MM/yyyy"
+                col.DefaultCellStyle.FormatProvider = Globalization.CultureInfo.CurrentCulture
+            ElseIf dc.DataType Is GetType(Decimal) OrElse dc.DataType Is GetType(Double) OrElse dc.DataType Is GetType(Single) Then
+                ' 2 decimales
+                col.DefaultCellStyle.Format = "N2"
+                col.DefaultCellStyle.FormatProvider = Globalization.CultureInfo.CurrentCulture
+            ElseIf dc.DataType Is GetType(Integer) OrElse dc.DataType Is GetType(Long) Then
+                ' Enteros con miles
+                col.DefaultCellStyle.Format = "N0"
+                col.DefaultCellStyle.FormatProvider = Globalization.CultureInfo.CurrentCulture
+            ElseIf dc.DataType Is GetType(Boolean) Then
+                ' Centrar booleans
+                col.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
+            End If
+        Next
+    End Sub
+
 End Class
 
 Public Module ControlExtensions
