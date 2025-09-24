@@ -71,25 +71,47 @@ Public Class frmConceptoFuncionalRPT
             Dim executingAssembly As Assembly = GetType(frmConceptoFuncionalRPT).Assembly
             Dim resourceNames = executingAssembly.GetManifestResourceNames()
 
-            ' Opción A: Cargar como recurso incrustado (la mejor práctica)
-            Using reportStream As Stream = executingAssembly.GetManifestResourceStream(reportResourceName)
-                If reportStream IsNot Nothing Then
-                    ReportViewer1.LocalReport.LoadReportDefinition(reportStream)
-                    reportLoaded = True
+            ' Opción A: localizar cualquier recurso incrustado que termine en ConceptoFuncional.rdlc
+            Dim resourceMatch As String = Nothing
+            If resourceNames IsNot Nothing Then
+                resourceMatch = resourceNames.FirstOrDefault(Function(nombre) nombre.Equals(reportResourceName, StringComparison.OrdinalIgnoreCase))
+
+                If String.IsNullOrWhiteSpace(resourceMatch) Then
+                    resourceMatch = resourceNames.FirstOrDefault(Function(nombre) nombre.EndsWith(".ConceptoFuncional.rdlc", StringComparison.OrdinalIgnoreCase))
                 End If
-            End Using
+            End If
+
+            If Not String.IsNullOrWhiteSpace(resourceMatch) Then
+                Using reportStream As Stream = executingAssembly.GetManifestResourceStream(resourceMatch)
+                    If reportStream IsNot Nothing Then
+                        ReportViewer1.LocalReport.LoadReportDefinition(reportStream)
+                        reportLoaded = True
+                    End If
+                End Using
+            End If
 
             ' Opción B: Si falla, buscarlo en el disco como respaldo
             If Not reportLoaded Then
                 Dim posiblesRutas As New List(Of String) From {
                     Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Reportes", "ConceptoFuncional.rdlc"),
-                    Path.Combine(Application.StartupPath, "Reportes", "ConceptoFuncional.rdlc")
+                    Path.Combine(Application.StartupPath, "Reportes", "ConceptoFuncional.rdlc"),
+                    Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ConceptoFuncional.rdlc")
                 }
                 If ApplicationDeployment.IsNetworkDeployed Then
                     posiblesRutas.Add(Path.Combine(ApplicationDeployment.CurrentDeployment.DataDirectory, "Reportes", "ConceptoFuncional.rdlc"))
+                    posiblesRutas.Add(Path.Combine(ApplicationDeployment.CurrentDeployment.DataDirectory, "ConceptoFuncional.rdlc"))
                 End If
 
                 Dim reportPath As String = posiblesRutas.FirstOrDefault(Function(ruta) File.Exists(ruta))
+
+                If String.IsNullOrWhiteSpace(reportPath) Then
+                    ' Intentar una búsqueda recursiva como último recurso
+                    Try
+                        reportPath = Directory.EnumerateFiles(AppDomain.CurrentDomain.BaseDirectory, "ConceptoFuncional.rdlc", SearchOption.AllDirectories).FirstOrDefault()
+                    Catch ex As UnauthorizedAccessException
+                        ' Ignorar rutas sin permiso y continuar con el manejo de error estándar
+                    End Try
+                End If
 
                 If String.IsNullOrWhiteSpace(reportPath) Then
                     ' --- Manejo de error mejorado para facilitar la depuración ---
