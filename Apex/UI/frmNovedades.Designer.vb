@@ -334,6 +334,7 @@ Partial Class frmNovedades
         Me.SplitContenedor = New System.Windows.Forms.SplitContainer()
         Me.dgvNovedades = New System.Windows.Forms.DataGridView()
         Me.PanelEncabezadoLista = New System.Windows.Forms.Panel()
+        Me.btnImprimir = New System.Windows.Forms.Button()
         Me.GroupBoxFiltros = New System.Windows.Forms.GroupBox()
         Me.btnLimpiarFuncionarios = New System.Windows.Forms.Button()
         Me.btnQuitarFuncionario = New System.Windows.Forms.Button()
@@ -358,7 +359,6 @@ Partial Class frmNovedades
         Me.lstFuncionarios = New System.Windows.Forms.ListBox()
         Me.TabPageFotos = New System.Windows.Forms.TabPage()
         Me.flpFotos = New System.Windows.Forms.FlowLayoutPanel()
-        Me.btnImprimir = New System.Windows.Forms.Button()
         Me.PanelPrincipal.SuspendLayout()
         CType(Me.SplitContenedor, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContenedor.Panel1.SuspendLayout()
@@ -412,22 +412,19 @@ Partial Class frmNovedades
         Me.dgvNovedades.AllowUserToResizeRows = False
         Me.dgvNovedades.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvNovedades.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.dgvNovedades.Location = New System.Drawing.Point(0, 354)
+        Me.dgvNovedades.Location = New System.Drawing.Point(0, 479)
         Me.dgvNovedades.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.dgvNovedades.Name = "dgvNovedades"
         Me.dgvNovedades.ReadOnly = True
         Me.dgvNovedades.RowHeadersWidth = 51
         Me.dgvNovedades.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgvNovedades.Size = New System.Drawing.Size(898, 672)
+        Me.dgvNovedades.Size = New System.Drawing.Size(898, 547)
         Me.dgvNovedades.TabIndex = 1
         '
         'PanelEncabezadoLista
         '
         Me.PanelEncabezadoLista.Controls.Add(Me.btnImprimir)
         Me.PanelEncabezadoLista.Controls.Add(Me.GroupBoxFiltros)
-        Me.PanelEncabezadoLista.Controls.Add(Me.btnBuscar)
-        Me.PanelEncabezadoLista.Controls.Add(Me.txtBusqueda)
-        Me.PanelEncabezadoLista.Controls.Add(Me.lblBusqueda)
         Me.PanelEncabezadoLista.Controls.Add(Me.btnEliminarNovedad)
         Me.PanelEncabezadoLista.Controls.Add(Me.btnEditarNovedad)
         Me.PanelEncabezadoLista.Controls.Add(Me.btnNuevaNovedad)
@@ -435,33 +432,47 @@ Partial Class frmNovedades
         Me.PanelEncabezadoLista.Location = New System.Drawing.Point(0, 0)
         Me.PanelEncabezadoLista.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.PanelEncabezadoLista.Name = "PanelEncabezadoLista"
-        Me.PanelEncabezadoLista.Size = New System.Drawing.Size(898, 354)
+        Me.PanelEncabezadoLista.Size = New System.Drawing.Size(898, 479)
         Me.PanelEncabezadoLista.TabIndex = 0
+        '
+        'btnImprimir
+        '
+        Me.btnImprimir.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.btnImprimir.Location = New System.Drawing.Point(473, 435)
+        Me.btnImprimir.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnImprimir.Name = "btnImprimir"
+        Me.btnImprimir.Size = New System.Drawing.Size(135, 35)
+        Me.btnImprimir.TabIndex = 9
+        Me.btnImprimir.Text = "Imprimir"
+        Me.btnImprimir.UseVisualStyleBackColor = True
         '
         'GroupBoxFiltros
         '
         Me.GroupBoxFiltros.Controls.Add(Me.btnLimpiarFuncionarios)
         Me.GroupBoxFiltros.Controls.Add(Me.btnQuitarFuncionario)
+        Me.GroupBoxFiltros.Controls.Add(Me.btnBuscar)
         Me.GroupBoxFiltros.Controls.Add(Me.btnAgregarFuncionario)
+        Me.GroupBoxFiltros.Controls.Add(Me.txtBusqueda)
         Me.GroupBoxFiltros.Controls.Add(Me.lstFuncionariosFiltro)
+        Me.GroupBoxFiltros.Controls.Add(Me.lblBusqueda)
         Me.GroupBoxFiltros.Controls.Add(Me.Label3)
         Me.GroupBoxFiltros.Controls.Add(Me.chkFiltrarPorFecha)
         Me.GroupBoxFiltros.Controls.Add(Me.dtpFechaHasta)
         Me.GroupBoxFiltros.Controls.Add(Me.Label2)
         Me.GroupBoxFiltros.Controls.Add(Me.dtpFechaDesde)
         Me.GroupBoxFiltros.Controls.Add(Me.Label1)
-        Me.GroupBoxFiltros.Location = New System.Drawing.Point(4, 62)
+        Me.GroupBoxFiltros.Location = New System.Drawing.Point(4, 11)
         Me.GroupBoxFiltros.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.GroupBoxFiltros.Name = "GroupBoxFiltros"
         Me.GroupBoxFiltros.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.GroupBoxFiltros.Size = New System.Drawing.Size(636, 223)
+        Me.GroupBoxFiltros.Size = New System.Drawing.Size(880, 353)
         Me.GroupBoxFiltros.TabIndex = 8
         Me.GroupBoxFiltros.TabStop = False
-        Me.GroupBoxFiltros.Text = "Filtros Adicionales"
+        Me.GroupBoxFiltros.Text = "Filtros"
         '
         'btnLimpiarFuncionarios
         '
-        Me.btnLimpiarFuncionarios.Location = New System.Drawing.Point(512, 178)
+        Me.btnLimpiarFuncionarios.Location = New System.Drawing.Point(626, 305)
         Me.btnLimpiarFuncionarios.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnLimpiarFuncionarios.Name = "btnLimpiarFuncionarios"
         Me.btnLimpiarFuncionarios.Size = New System.Drawing.Size(112, 35)
@@ -471,7 +482,7 @@ Partial Class frmNovedades
         '
         'btnQuitarFuncionario
         '
-        Me.btnQuitarFuncionario.Location = New System.Drawing.Point(392, 178)
+        Me.btnQuitarFuncionario.Location = New System.Drawing.Point(506, 305)
         Me.btnQuitarFuncionario.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnQuitarFuncionario.Name = "btnQuitarFuncionario"
         Me.btnQuitarFuncionario.Size = New System.Drawing.Size(112, 35)
@@ -481,7 +492,7 @@ Partial Class frmNovedades
         '
         'btnAgregarFuncionario
         '
-        Me.btnAgregarFuncionario.Location = New System.Drawing.Point(272, 178)
+        Me.btnAgregarFuncionario.Location = New System.Drawing.Point(386, 305)
         Me.btnAgregarFuncionario.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnAgregarFuncionario.Name = "btnAgregarFuncionario"
         Me.btnAgregarFuncionario.Size = New System.Drawing.Size(112, 35)
@@ -493,16 +504,16 @@ Partial Class frmNovedades
         '
         Me.lstFuncionariosFiltro.FormattingEnabled = True
         Me.lstFuncionariosFiltro.ItemHeight = 20
-        Me.lstFuncionariosFiltro.Location = New System.Drawing.Point(272, 49)
+        Me.lstFuncionariosFiltro.Location = New System.Drawing.Point(14, 216)
         Me.lstFuncionariosFiltro.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.lstFuncionariosFiltro.Name = "lstFuncionariosFiltro"
-        Me.lstFuncionariosFiltro.Size = New System.Drawing.Size(352, 104)
+        Me.lstFuncionariosFiltro.Size = New System.Drawing.Size(352, 124)
         Me.lstFuncionariosFiltro.TabIndex = 6
         '
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(268, 24)
+        Me.Label3.Location = New System.Drawing.Point(14, 191)
         Me.Label3.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(104, 20)
@@ -514,7 +525,7 @@ Partial Class frmNovedades
         Me.chkFiltrarPorFecha.AutoSize = True
         Me.chkFiltrarPorFecha.Checked = True
         Me.chkFiltrarPorFecha.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkFiltrarPorFecha.Location = New System.Drawing.Point(15, 46)
+        Me.chkFiltrarPorFecha.Location = New System.Drawing.Point(386, 51)
         Me.chkFiltrarPorFecha.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.chkFiltrarPorFecha.Name = "chkFiltrarPorFecha"
         Me.chkFiltrarPorFecha.Size = New System.Drawing.Size(151, 24)
@@ -525,7 +536,7 @@ Partial Class frmNovedades
         'dtpFechaHasta
         '
         Me.dtpFechaHasta.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.dtpFechaHasta.Location = New System.Drawing.Point(82, 134)
+        Me.dtpFechaHasta.Location = New System.Drawing.Point(197, 49)
         Me.dtpFechaHasta.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.dtpFechaHasta.Name = "dtpFechaHasta"
         Me.dtpFechaHasta.Size = New System.Drawing.Size(169, 26)
@@ -534,7 +545,7 @@ Partial Class frmNovedades
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(10, 140)
+        Me.Label2.Location = New System.Drawing.Point(193, 24)
         Me.Label2.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(56, 20)
@@ -544,7 +555,7 @@ Partial Class frmNovedades
         'dtpFechaDesde
         '
         Me.dtpFechaDesde.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.dtpFechaDesde.Location = New System.Drawing.Point(82, 91)
+        Me.dtpFechaDesde.Location = New System.Drawing.Point(14, 49)
         Me.dtpFechaDesde.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.dtpFechaDesde.Name = "dtpFechaDesde"
         Me.dtpFechaDesde.Size = New System.Drawing.Size(169, 26)
@@ -553,7 +564,7 @@ Partial Class frmNovedades
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(10, 97)
+        Me.Label1.Location = New System.Drawing.Point(14, 24)
         Me.Label1.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(60, 20)
@@ -564,10 +575,10 @@ Partial Class frmNovedades
         '
         Me.btnBuscar.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnBuscar.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.btnBuscar.Location = New System.Drawing.Point(734, 11)
+        Me.btnBuscar.Location = New System.Drawing.Point(588, 120)
         Me.btnBuscar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnBuscar.Name = "btnBuscar"
-        Me.btnBuscar.Size = New System.Drawing.Size(159, 35)
+        Me.btnBuscar.Size = New System.Drawing.Size(159, 45)
         Me.btnBuscar.TabIndex = 7
         Me.btnBuscar.Text = "Buscar"
         Me.btnBuscar.UseVisualStyleBackColor = True
@@ -578,17 +589,17 @@ Partial Class frmNovedades
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtBusqueda.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtBusqueda.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.txtBusqueda.Location = New System.Drawing.Point(78, 12)
+        Me.txtBusqueda.Location = New System.Drawing.Point(14, 127)
         Me.txtBusqueda.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtBusqueda.Name = "txtBusqueda"
-        Me.txtBusqueda.Size = New System.Drawing.Size(646, 31)
+        Me.txtBusqueda.Size = New System.Drawing.Size(566, 31)
         Me.txtBusqueda.TabIndex = 6
         '
         'lblBusqueda
         '
         Me.lblBusqueda.AutoSize = True
         Me.lblBusqueda.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.lblBusqueda.Location = New System.Drawing.Point(4, 17)
+        Me.lblBusqueda.Location = New System.Drawing.Point(14, 97)
         Me.lblBusqueda.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblBusqueda.Name = "lblBusqueda"
         Me.lblBusqueda.Size = New System.Drawing.Size(67, 25)
@@ -598,7 +609,7 @@ Partial Class frmNovedades
         'btnEliminarNovedad
         '
         Me.btnEliminarNovedad.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.btnEliminarNovedad.Location = New System.Drawing.Point(330, 294)
+        Me.btnEliminarNovedad.Location = New System.Drawing.Point(330, 435)
         Me.btnEliminarNovedad.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnEliminarNovedad.Name = "btnEliminarNovedad"
         Me.btnEliminarNovedad.Size = New System.Drawing.Size(135, 35)
@@ -609,7 +620,7 @@ Partial Class frmNovedades
         'btnEditarNovedad
         '
         Me.btnEditarNovedad.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.btnEditarNovedad.Location = New System.Drawing.Point(172, 294)
+        Me.btnEditarNovedad.Location = New System.Drawing.Point(172, 435)
         Me.btnEditarNovedad.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnEditarNovedad.Name = "btnEditarNovedad"
         Me.btnEditarNovedad.Size = New System.Drawing.Size(148, 35)
@@ -620,7 +631,7 @@ Partial Class frmNovedades
         'btnNuevaNovedad
         '
         Me.btnNuevaNovedad.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.btnNuevaNovedad.Location = New System.Drawing.Point(4, 294)
+        Me.btnNuevaNovedad.Location = New System.Drawing.Point(4, 435)
         Me.btnNuevaNovedad.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnNuevaNovedad.Name = "btnNuevaNovedad"
         Me.btnNuevaNovedad.Size = New System.Drawing.Size(159, 35)
@@ -710,17 +721,6 @@ Partial Class frmNovedades
         Me.flpFotos.Size = New System.Drawing.Size(924, 983)
         Me.flpFotos.TabIndex = 0
         '
-        'btnImprimir
-        '
-        Me.btnImprimir.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.btnImprimir.Location = New System.Drawing.Point(473, 294)
-        Me.btnImprimir.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnImprimir.Name = "btnImprimir"
-        Me.btnImprimir.Size = New System.Drawing.Size(135, 35)
-        Me.btnImprimir.TabIndex = 9
-        Me.btnImprimir.Text = "Imprimir"
-        Me.btnImprimir.UseVisualStyleBackColor = True
-        '
         'frmNovedades
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -738,7 +738,6 @@ Partial Class frmNovedades
         Me.SplitContenedor.ResumeLayout(False)
         CType(Me.dgvNovedades, System.ComponentModel.ISupportInitialize).EndInit()
         Me.PanelEncabezadoLista.ResumeLayout(False)
-        Me.PanelEncabezadoLista.PerformLayout()
         Me.GroupBoxFiltros.ResumeLayout(False)
         Me.GroupBoxFiltros.PerformLayout()
         Me.TabControlDetalle.ResumeLayout(False)

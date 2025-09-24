@@ -521,6 +521,7 @@ Public Class frmNovedades
         })
         End With
     End Sub
+
 #End Region
 
 End Class
