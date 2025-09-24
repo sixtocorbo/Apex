@@ -47,7 +47,7 @@ Public Class frmLicenciaCrear
             If _modo = ModoFormulario.Editar Then
                 Await CargarDatosAsync()
                 If Not String.IsNullOrWhiteSpace(_estadoInicial) Then
-                    Dim idx = cboEstado.FindStringExact(_estadoInicial)
+                    Dim idx = BuscarIndiceEstadoPorEquivalencia(_estadoInicial)
                     If idx >= 0 Then cboEstado.SelectedIndex = idx
                 End If
                 Notifier.Info(Me, "Editá los datos y guardá los cambios.")
@@ -98,14 +98,23 @@ Public Class frmLicenciaCrear
 
         If estadosExistentes IsNot Nothing AndAlso estadosExistentes.Any() Then
             For Each raw In estadosExistentes
-                Dim visual = NormalizarEstadoVisual(raw)
-                listaEstados.Add(New KeyValuePair(Of String, String)(raw, visual))
+                Dim claveLimpia = If(raw, String.Empty).Trim()
+                If claveLimpia = String.Empty Then Continue For
+
+                Dim visual = NormalizarEstadoVisual(claveLimpia)
+
+                If Not listaEstados.Any(Function(kvp) EquivEstado(kvp.Key, claveLimpia)) Then
+                    listaEstados.Add(New KeyValuePair(Of String, String)(claveLimpia, visual))
+                End If
             Next
         Else
             ' Fallback (keys=raw, values=visual)
             Dim defaults = New String() {"Autorizado", "Rechazada", "Anulada", "Pendiente"}
             For Each raw In defaults
-                listaEstados.Add(New KeyValuePair(Of String, String)(raw, NormalizarEstadoVisual(raw)))
+                Dim claveLimpia = raw.Trim()
+                If Not listaEstados.Any(Function(kvp) EquivEstado(kvp.Key, claveLimpia)) Then
+                    listaEstados.Add(New KeyValuePair(Of String, String)(claveLimpia, NormalizarEstadoVisual(claveLimpia)))
+                End If
             Next
         End If
         cboEstado.DisplayMember = "Value" ' lo que ve el usuario
@@ -163,12 +172,17 @@ Public Class frmLicenciaCrear
         dtpFechaInicio.Value = _licencia.inicio
         dtpFechaFin.Value = _licencia.finaliza
 
-        Dim est = If(_licencia.estado, String.Empty).Trim()
-        Dim idxEstado = cboEstado.FindStringExact(est)
+        Dim est = If(_licencia.estado, String.Empty)
+        Dim idxEstado = BuscarIndiceEstadoPorEquivalencia(est)
         If idxEstado >= 0 Then
             cboEstado.SelectedIndex = idxEstado
         Else
-            cboEstado.Text = est
+            cboEstado.SelectedIndex = -1
+            If Not String.IsNullOrWhiteSpace(est) Then
+                cboEstado.Text = NormalizarEstadoVisual(est)
+            Else
+                cboEstado.Text = String.Empty
+            End If
         End If
 
         txtComentario.Text = _licencia.Comentario
@@ -205,9 +219,7 @@ Public Class frmLicenciaCrear
         _licencia.TipoLicenciaId = CInt(cboTipoLicencia.SelectedValue)
         _licencia.inicio = dtpFechaInicio.Value.Date
         _licencia.finaliza = dtpFechaFin.Value.Date
-        _licencia.estado = If(cboEstado.SelectedIndex >= 0,
-                          cboEstado.SelectedItem.ToString(),
-                          cboEstado.Text.Trim())
+        _licencia.estado = ObtenerEstadoSeleccionado()
         _licencia.Comentario = txtComentario.Text.Trim()
         _licencia.usuario = "SISTEMA"
 
@@ -287,5 +299,56 @@ Public Class frmLicenciaCrear
         nb = Regex.Replace(nb.Trim().Replace("_", " ").Replace("-", " "), "\s+", " ").ToUpperInvariant()
 
         Return na = nb
+    End Function
+
+    Private Function BuscarIndiceEstadoPorEquivalencia(estado As String) As Integer
+        If cboEstado Is Nothing OrElse cboEstado.Items Is Nothing Then Return -1
+
+        Dim objetivo As String = If(estado, String.Empty)
+
+        For i = 0 To cboEstado.Items.Count - 1
+            Dim item = cboEstado.Items(i)
+            Dim clave As String = String.Empty
+            Dim valor As String = String.Empty
+
+            If TypeOf item Is KeyValuePair(Of String, String) Then
+                Dim kvp = DirectCast(item, KeyValuePair(Of String, String))
+                clave = kvp.Key
+                valor = kvp.Value
+            ElseIf item IsNot Nothing Then
+                clave = item.ToString()
+                valor = clave
+            End If
+
+            If EquivEstado(clave, objetivo) OrElse EquivEstado(valor, objetivo) Then
+                Return i
+            End If
+        Next
+
+        Return -1
+    End Function
+
+    Private Function ObtenerEstadoSeleccionado() As String
+        If cboEstado.SelectedIndex >= 0 Then
+            Dim seleccionado As Object = cboEstado.SelectedValue
+
+            If seleccionado Is Nothing AndAlso cboEstado.SelectedItem IsNot Nothing Then
+                If TypeOf cboEstado.SelectedItem Is KeyValuePair(Of String, String) Then
+                    Dim kvp = DirectCast(cboEstado.SelectedItem, KeyValuePair(Of String, String))
+                    seleccionado = kvp.Key
+                Else
+                    seleccionado = cboEstado.SelectedItem.ToString()
+                End If
+            End If
+
+            Dim textoSeleccionado = TryCast(seleccionado, String)
+            If textoSeleccionado Is Nothing Then
+                textoSeleccionado = cboEstado.Text
+            End If
+
+            Return If(textoSeleccionado, String.Empty).Trim()
+        End If
+
+        Return cboEstado.Text.Trim()
     End Function
 End Class
