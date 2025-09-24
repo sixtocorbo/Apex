@@ -1,4 +1,5 @@
-﻿Imports Microsoft.Reporting.WinForms
+﻿Imports System.Collections.Generic
+Imports Microsoft.Reporting.WinForms
 
 Public Class frmFuncionarioSituacionRPT
 
@@ -46,11 +47,13 @@ Public Class frmFuncionarioSituacionRPT
                 Dim datos = Await repo.ObtenerDatosSituacionAsync(_funcionarioId, _fechaDesde, _fechaHasta)
                 Dim funcionario = Await uow.Context.Set(Of Funcionario).FindAsync(_funcionarioId)
 
+                ' Reiniciamos el visor para evitar estados previos
+                ReportViewer1.Reset()
                 ReportViewer1.ProcessingMode = ProcessingMode.Local
                 ReportViewer1.LocalReport.DataSources.Clear()
 
                 ' RDLC: Embedded → BaseDirectory\Reportes → StartupPath\Reportes → ClickOnce → extra (..\..)
-                ReportResourceLoader.LoadLocalReportDefinition(
+                Dim definition = ReportResourceLoader.LoadLocalReportDefinition(
                     ReportViewer1.LocalReport,
                     GetType(frmFuncionarioSituacionRPT),
                     "Apex.Reportes.SituacionFuncionario.rdlc",
@@ -58,8 +61,21 @@ Public Class frmFuncionarioSituacionRPT
                     New String() {"..\..\Reportes\SituacionFuncionario.rdlc"}
                 )
 
+                ' Aseguramos que el visor apunte al origen correcto del RDLC.
+                Select Case definition.Source
+                    Case ReportDefinitionSource.Embedded
+                        ReportViewer1.LocalReport.ReportEmbeddedResource = definition.ResourceName
+                        ReportViewer1.LocalReport.ReportPath = Nothing
+                    Case ReportDefinitionSource.File
+                        ReportViewer1.LocalReport.ReportEmbeddedResource = Nothing
+                        ReportViewer1.LocalReport.ReportPath = definition.FilePath
+                End Select
+
+                ' Si datos es Nothing, usamos una lista vacía para evitar NullReference
+                Dim datosLista = If(datos, New List(Of SituacionReporteDTO)())
+
                 ' El nombre del DataSource debe coincidir con el DataSet definido en el RDLC (DataSetSituacion).
-                Dim rds As New ReportDataSource("DataSetSituacion", datos)
+                Dim rds As New ReportDataSource("DataSetSituacion", datosLista)
                 ReportViewer1.LocalReport.DataSources.Add(rds)
 
                 ' Parámetros (solo si existen en el RDLC)
