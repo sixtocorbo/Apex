@@ -19,35 +19,56 @@ Public Class frmFuncionarioSituacionRPT
     End Sub
 
     Private Async Function CargarReporte() As Task
-        Try
-            Dim uow As New UnitOfWork()
-            Dim repo As New ReportesService(uow)
-            Dim datos = Await repo.ObtenerDatosSituacionAsync(_funcionarioId, _fechaDesde, _fechaHasta)
-            Dim funcionario = Await uow.Context.Set(Of Funcionario).FindAsync(_funcionarioId)
+        Dim previousCursor = Me.Cursor
 
-            ' Limpiar orígenes de datos previos
-            Me.ReportViewer1.LocalReport.DataSources.Clear()
+        Try
+            Me.Cursor = Cursors.WaitCursor
+
+            ReportViewer1.ProcessingMode = ProcessingMode.Local
+            ReportViewer1.LocalReport.DataSources.Clear()
 
             ReportResourceLoader.LoadLocalReportDefinition(
                 Me.ReportViewer1.LocalReport,
                 GetType(frmFuncionarioSituacionRPT),
                 "Apex.Reportes.SituacionFuncionario.rdlc",
-                "SituacionFuncionario.rdlc")
+                "SituacionFuncionario.rdlc",
+                New String() {"..\..\Reportes\SituacionFuncionario.rdlc"})
 
-            ' Asignar el nuevo origen de datos
-            Dim rds As New ReportDataSource("DataSetSituacion", datos) ' El nombre debe coincidir con el del RDLC
-            Me.ReportViewer1.LocalReport.DataSources.Add(rds)
+            Using uow As New UnitOfWork()
+                Using repo As New ReportesService(uow)
+                    Dim datos = Await repo.ObtenerDatosSituacionAsync(_funcionarioId, _fechaDesde, _fechaHasta)
+                    Dim funcionario = Await uow.Context.Set(Of Funcionario).FindAsync(_funcionarioId)
 
-            ' Pasar parámetros al reporte (opcional pero recomendado)
-            Dim pNombre As New ReportParameter("FuncionarioNombre", funcionario.Nombre)
-            Dim pPeriodo As New ReportParameter("Periodo", $"Desde: {_fechaDesde:dd/MM/yyyy} Hasta: {_fechaHasta:dd/MM/yyyy}")
-            Me.ReportViewer1.LocalReport.SetParameters({pNombre, pPeriodo})
+                    If funcionario Is Nothing Then
+                        MessageBox.Show("No se encontró la información del funcionario solicitada.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                        Me.Close()
+                        Return
+                    End If
 
-            ' Actualizar y mostrar el reporte
+                    If datos Is Nothing OrElse datos.Count = 0 Then
+                        MessageBox.Show("No se registran eventos en el período indicado.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                        Me.Close()
+                        Return
+                    End If
+
+                    Dim rds As New ReportDataSource("DataSetSituacion", datos)
+                    Me.ReportViewer1.LocalReport.DataSources.Add(rds)
+
+                    Dim pNombre As New ReportParameter("FuncionarioNombre", funcionario.Nombre)
+                    Dim pPeriodo As New ReportParameter("Periodo", $"Desde: {_fechaDesde:dd/MM/yyyy} Hasta: {_fechaHasta:dd/MM/yyyy}")
+                    Me.ReportViewer1.LocalReport.SetParameters({pNombre, pPeriodo})
+                End Using
+            End Using
+
+            Me.ReportViewer1.SetDisplayMode(DisplayMode.PrintLayout)
+            Me.ReportViewer1.ZoomMode = ZoomMode.Percent
+            Me.ReportViewer1.ZoomPercent = 100
             Me.ReportViewer1.RefreshReport()
 
         Catch ex As Exception
-            MessageBox.Show("Error al generar el reporte: " & ex.Message)
+            MessageBox.Show("Error al generar el reporte: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        Finally
+            Me.Cursor = previousCursor
         End Try
     End Function
     Private Sub Cerrando(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
