@@ -28,12 +28,15 @@ Public Class frmFuncionarioSituacionRPT
             ' Limpiar orígenes de datos previos
             Me.ReportViewer1.LocalReport.DataSources.Clear()
 
+            ReportResourceLoader.LoadLocalReportDefinition(
+                Me.ReportViewer1.LocalReport,
+                GetType(frmFuncionarioSituacionRPT),
+                "Apex.Reportes.SituacionFuncionario.rdlc",
+                "SituacionFuncionario.rdlc")
+
             ' Asignar el nuevo origen de datos
             Dim rds As New ReportDataSource("DataSetSituacion", datos) ' El nombre debe coincidir con el del RDLC
             Me.ReportViewer1.LocalReport.DataSources.Add(rds)
-
-            ' Asignar la ruta del reporte
-            Me.ReportViewer1.LocalReport.ReportEmbeddedResource = "Apex.SituacionFuncionario.rdlc"
 
             ' Pasar parámetros al reporte (opcional pero recomendado)
             Dim pNombre As New ReportParameter("FuncionarioNombre", funcionario.Nombre)

@@ -822,21 +822,17 @@ Partial Public Class frmFiltros
     Private Sub CargarDefinicionRDLC(lr As Microsoft.Reporting.WinForms.LocalReport,
                                  nombreCorto As String,
                                  rutaRelativa As String)
-        Dim asm = Me.GetType().Assembly
-        Dim recurso = asm.GetManifestResourceNames().
-        FirstOrDefault(Function(n) n.EndsWith("." & nombreCorto, StringComparison.OrdinalIgnoreCase))
-        If Not String.IsNullOrEmpty(recurso) Then
-            Using s = asm.GetManifestResourceStream(recurso)
-                lr.LoadReportDefinition(s)
-            End Using
-            Exit Sub
+        Dim rutasAdicionales As IEnumerable(Of String) = Nothing
+        If Not String.IsNullOrWhiteSpace(rutaRelativa) Then
+            rutasAdicionales = New String() {rutaRelativa}
         End If
 
-        Dim fullPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, rutaRelativa)
-        If Not System.IO.File.Exists(fullPath) Then
-            Throw New ApplicationException($"No se encontró el RDLC embebido ('...{nombreCorto}') ni en disco: {fullPath}")
-        End If
-        lr.ReportPath = fullPath
+        ReportResourceLoader.LoadLocalReportDefinition(
+            lr,
+            Me.GetType(),
+            Nothing,
+            nombreCorto,
+            rutasAdicionales)
     End Sub
 
 #Region "Exportacion fichas"

@@ -1,8 +1,4 @@
 ﻿Imports Microsoft.Reporting.WinForms
-Imports System.IO
-Imports System.Reflection
-Imports System.Deployment.Application
-Imports System.Linq
 
 Public Class frmConceptoFuncionalRPT
 
@@ -66,44 +62,11 @@ Public Class frmConceptoFuncionalRPT
             ReportViewer1.LocalReport.DataSources.Clear()
 
             ' --- 1. Localizar el archivo .rdlc de forma robusta ---
-            Dim reportResourceName As String = "Apex.Reportes.ConceptoFuncional.rdlc"
-            Dim reportLoaded As Boolean = False
-            Dim executingAssembly As Assembly = GetType(frmConceptoFuncionalRPT).Assembly
-            Dim resourceNames = executingAssembly.GetManifestResourceNames()
-
-            ' Opción A: Cargar como recurso incrustado (la mejor práctica)
-            Using reportStream As Stream = executingAssembly.GetManifestResourceStream(reportResourceName)
-                If reportStream IsNot Nothing Then
-                    ReportViewer1.LocalReport.LoadReportDefinition(reportStream)
-                    reportLoaded = True
-                End If
-            End Using
-
-            ' Opción B: Si falla, buscarlo en el disco como respaldo
-            If Not reportLoaded Then
-                Dim posiblesRutas As New List(Of String) From {
-                    Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Reportes", "ConceptoFuncional.rdlc"),
-                    Path.Combine(Application.StartupPath, "Reportes", "ConceptoFuncional.rdlc")
-                }
-                If ApplicationDeployment.IsNetworkDeployed Then
-                    posiblesRutas.Add(Path.Combine(ApplicationDeployment.CurrentDeployment.DataDirectory, "Reportes", "ConceptoFuncional.rdlc"))
-                End If
-
-                Dim reportPath As String = posiblesRutas.FirstOrDefault(Function(ruta) File.Exists(ruta))
-
-                If String.IsNullOrWhiteSpace(reportPath) Then
-                    ' --- Manejo de error mejorado para facilitar la depuración ---
-                    Dim mensajeError As String = $"No se encontró el recurso de reporte '{reportResourceName}'." & Environment.NewLine & Environment.NewLine
-                    mensajeError &= "Rutas de archivo verificadas: " & String.Join(", ", posiblesRutas) & Environment.NewLine
-                    If resourceNames IsNot Nothing AndAlso resourceNames.Any() Then
-                        mensajeError &= "Recursos incrustados disponibles: " & String.Join(", ", resourceNames)
-                    Else
-                        mensajeError &= "No se encontraron recursos incrustados en el ensamblado. Verifica que la 'Build Action' del archivo .rdlc sea 'Embedded Resource'."
-                    End If
-                    Throw New FileNotFoundException(mensajeError)
-                End If
-                ReportViewer1.LocalReport.ReportPath = reportPath
-            End If
+            ReportResourceLoader.LoadLocalReportDefinition(
+                ReportViewer1.LocalReport,
+                GetType(frmConceptoFuncionalRPT),
+                "Apex.Reportes.ConceptoFuncional.rdlc",
+                "ConceptoFuncional.rdlc")
 
             ' --- 2. Configurar los parámetros del informe ---
             Dim pNombre As New ReportParameter("pNombreCompleto", _funcionario.Nombre)

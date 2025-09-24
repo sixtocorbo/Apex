@@ -1,5 +1,4 @@
-﻿Imports System.IO
-Imports Microsoft.Reporting.WinForms
+﻿Imports Microsoft.Reporting.WinForms
 
 Public Class frmDesignacionRPT
     Private ReadOnly _reportesService As New ReportesService()
@@ -22,14 +21,12 @@ Public Class frmDesignacionRPT
             Me.Cursor = Cursors.WaitCursor
             ReportViewer1.ProcessingMode = ProcessingMode.Local
             ReportViewer1.LocalReport.DataSources.Clear()
-
-            Dim reportPath As String = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Reportes", "DesignacionImprimir.rdlc")
-            If Not File.Exists(reportPath) Then
-                reportPath = Path.GetFullPath(Path.Combine(Application.StartupPath, "..\..\", "Reportes", "DesignacionImprimir.rdlc"))
-            End If
-            If Not File.Exists(reportPath) Then Throw New FileNotFoundException("No se encontró el RDLC en: " & reportPath)
-
-            ReportViewer1.LocalReport.ReportPath = reportPath
+            ReportResourceLoader.LoadLocalReportDefinition(
+                ReportViewer1.LocalReport,
+                GetType(frmDesignacionRPT),
+                "Apex.Reportes.DesignacionImprimir.rdlc",
+                "DesignacionImprimir.rdlc",
+                New String() {"..\..\Reportes\DesignacionImprimir.rdlc"})
             ReportViewer1.LocalReport.DisplayName = $"Designacion_{_estadoTransitorioId:000000}"
 
             Dim designacionData = Await _reportesService.GetDatosDesignacionAsync(_estadoTransitorioId)

@@ -27,6 +27,12 @@ Public Class frmFichaPersonalRPT
 
             ReportViewer1.LocalReport.DataSources.Clear()
 
+            ReportResourceLoader.LoadLocalReportDefinition(
+                ReportViewer1.LocalReport,
+                GetType(frmFichaPersonalRPT),
+                "Apex.Reportes.FichaFuncional.rdlc",
+                "FichaFuncional.rdlc")
+
             ' --- INICIO DE LA CORRECCIÓN ---
             ' Se eliminan las referencias a los DataSets de licencias y sanciones que ya no existen en el reporte.
             Dim rdsFicha = New ReportDataSource("FichaFuncionalDataSet", New List(Of FichaFuncionalDTO) From {datosFicha})

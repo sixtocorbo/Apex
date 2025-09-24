@@ -1,5 +1,4 @@
-﻿Imports System.IO
-Imports Microsoft.Reporting.WinForms
+﻿Imports Microsoft.Reporting.WinForms
 
 Public Class frmNovedadesRPT
 
@@ -17,22 +16,33 @@ Public Class frmNovedadesRPT
 
     Private Sub CargarReporte()
         Try
-            ' --- Rutas verificadas ---
-            Dim basePath As String = Path.Combine(Application.StartupPath, "Reportes")
-            Dim mainReportPath As String = Path.Combine(basePath, "NovedadDetallada.rdlc")
-            Dim funcSubreportPath As String = Path.Combine(basePath, "ReporteNovedades_Funcionarios.rdlc")
-            Dim fotoSubreportPath As String = Path.Combine(basePath, "ReporteNovedades_Fotos.rdlc")
-
-            If Not File.Exists(mainReportPath) Then Throw New FileNotFoundException("Falta el reporte principal.", mainReportPath)
-            If Not File.Exists(funcSubreportPath) Then Throw New FileNotFoundException("Falta el subreporte de funcionarios.", funcSubreportPath)
-            If Not File.Exists(fotoSubreportPath) Then Throw New FileNotFoundException("Falta el subreporte de fotos.", fotoSubreportPath)
-
-            ' --- ReportViewer base ---
             ReportViewer1.Reset()
             ReportViewer1.ProcessingMode = ProcessingMode.Local
             ReportViewer1.LocalReport.DataSources.Clear()
             ReportViewer1.LocalReport.EnableExternalImages = False ' Las fotos vienen como byte[], no externas.
-            ReportViewer1.LocalReport.ReportPath = mainReportPath
+
+            ReportResourceLoader.LoadLocalReportDefinition(
+                ReportViewer1.LocalReport,
+                GetType(frmNovedadesRPT),
+                "Apex.Reportes.NovedadDetallada.rdlc",
+                "NovedadDetallada.rdlc",
+                New String() {"..\..\Reportes\NovedadDetallada.rdlc"})
+
+            ReportResourceLoader.LoadSubreportDefinition(
+                ReportViewer1.LocalReport,
+                "ReporteNovedades_Funcionarios",
+                GetType(frmNovedadesRPT),
+                "Apex.Reportes.ReporteNovedades_Funcionarios.rdlc",
+                "ReporteNovedades_Funcionarios.rdlc",
+                New String() {"..\..\Reportes\ReporteNovedades_Funcionarios.rdlc"})
+
+            ReportResourceLoader.LoadSubreportDefinition(
+                ReportViewer1.LocalReport,
+                "ReporteNovedades_Fotos",
+                GetType(frmNovedadesRPT),
+                "Apex.Reportes.ReporteNovedades_Fotos.rdlc",
+                "ReporteNovedades_Fotos.rdlc",
+                New String() {"..\..\Reportes\ReporteNovedades_Fotos.rdlc"})
 
             ' Dataset principal (el RDLC debe definir DataSetNovedades con campos: Id, Fecha, Texto, etc.)
             ReportViewer1.LocalReport.DataSources.Add(New ReportDataSource("DataSetNovedades", _items))
