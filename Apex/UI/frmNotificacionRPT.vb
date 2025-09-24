@@ -1,4 +1,5 @@
 ﻿Imports System.IO
+Imports System.Reflection
 Imports Microsoft.Reporting.WinForms
 
 ''' <summary>
@@ -80,15 +81,31 @@ Public Class frmNotificacionRPT
             ReportViewer1.LocalReport.DataSources.Clear()
 
             ' --- 1. Localizar el archivo .rdlc ---
-            Dim reportPath As String = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Reportes", "NotificacionImprimir.rdlc")
-            If Not File.Exists(reportPath) Then
-                reportPath = Path.GetFullPath(Path.Combine(Application.StartupPath, "..\..\", "Reportes", "NotificacionImprimir.rdlc"))
-            End If
-            If Not File.Exists(reportPath) Then
-                Throw New FileNotFoundException("No se encontró el archivo de reporte 'NotificacionImprimir.rdlc'.")
+            Dim reportResourceName As String = "Apex.Reportes.NotificacionImprimir.rdlc"
+            Dim reportLoaded As Boolean = False
+
+            ' Intentar cargar el reporte como recurso incrustado para evitar problemas de distribución.
+            Dim executingAssembly As Assembly = GetType(frmNotificacionRPT).Assembly
+            Using reportStream As Stream = executingAssembly.GetManifestResourceStream(reportResourceName)
+                If reportStream IsNot Nothing Then
+                    ReportViewer1.LocalReport.LoadReportDefinition(reportStream)
+                    reportLoaded = True
+                End If
+            End Using
+
+            If Not reportLoaded Then
+                ' Si no se encontró como recurso, intentamos buscarlo en disco como respaldo.
+                Dim reportPath As String = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Reportes", "NotificacionImprimir.rdlc")
+                If Not File.Exists(reportPath) Then
+                    reportPath = Path.GetFullPath(Path.Combine(Application.StartupPath, "..\..\", "Reportes", "NotificacionImprimir.rdlc"))
+                End If
+                If Not File.Exists(reportPath) Then
+                    Throw New FileNotFoundException("No se encontró el recurso de reporte 'NotificacionImprimir.rdlc'.")
+                End If
+
+                ReportViewer1.LocalReport.ReportPath = reportPath
             End If
 
-            ReportViewer1.LocalReport.ReportPath = reportPath
             ReportViewer1.LocalReport.DisplayName = $"Notificaciones_{Date.Now:yyyyMMdd_HHmm}"
 
             ' --- 2. Obtener los datos según el constructor utilizado ---
