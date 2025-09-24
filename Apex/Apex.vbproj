@@ -28,7 +28,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>234</ApplicationRevision>
+    <ApplicationRevision>236</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -470,8 +470,10 @@
     <Compile Include="Data\UnitOfWork.vb" />
     <Compile Include="DTO\NotificacionImprimirDTO.vb" />
     <Compile Include="DTO\SituacionReporteDTO.vb" />
+    <Compile Include="Helpers\Class1.vb" />
     <Compile Include="Helpers\NavegacionHelper.vb" />
     <Compile Include="Helpers\AppTheme.vb" />
+    <Compile Include="Helpers\ReportResourceLoader.vb" />
     <Compile Include="Services\AreaTrabajoService.vb" />
     <Compile Include="Services\AuditoriaService.vb" />
     <Compile Include="Services\CargoService.vb" />

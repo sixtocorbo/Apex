@@ -1,48 +1,56 @@
-﻿Imports System.IO
-Imports Microsoft.Reporting.WinForms
+﻿Imports Microsoft.Reporting.WinForms
 
 Public Class frmDesignacionRPT
     Private ReadOnly _reportesService As New ReportesService()
-    ' --- CAMBIO 1: Renombrar la variable para mayor claridad ---
     Private ReadOnly _estadoTransitorioId As Integer
 
-    ' --- CAMBIO 2: Actualizar el constructor ---
     Public Sub New(estadoTransitorioId As Integer)
         InitializeComponent()
         _estadoTransitorioId = estadoTransitorioId
+        Me.KeyPreview = True
     End Sub
 
     Private Async Sub frmDesignacionRPT_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Await CargarReporteAsync()
-        AppTheme.Aplicar(Me)
+        Try
+            Await CargarReporteAsync()
+            AppTheme.Aplicar(Me)
+        Catch ex As Exception
+            MessageBox.Show($"Error al cargar el reporte: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Me.Close()
+        End Try
     End Sub
 
     Private Async Function CargarReporteAsync() As Task
+        Dim old = Me.Cursor
+        Me.Cursor = Cursors.WaitCursor
+
         Try
-            Me.Cursor = Cursors.WaitCursor
             ReportViewer1.ProcessingMode = ProcessingMode.Local
             ReportViewer1.LocalReport.DataSources.Clear()
 
-            Dim reportPath As String = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Reportes", "DesignacionImprimir.rdlc")
-            If Not File.Exists(reportPath) Then
-                reportPath = Path.GetFullPath(Path.Combine(Application.StartupPath, "..\..\", "Reportes", "DesignacionImprimir.rdlc"))
-            End If
-            If Not File.Exists(reportPath) Then Throw New FileNotFoundException("No se encontró el RDLC en: " & reportPath)
+            ' RDLC: recurso embebido con fallbacks a disco (incluye tu ..\..\ para debug)
+            ReportResourceLoader.LoadLocalReportDefinition(
+                ReportViewer1.LocalReport,
+                GetType(frmDesignacionRPT),
+                "Apex.Reportes.DesignacionImprimir.rdlc",
+                "DesignacionImprimir.rdlc",
+                New String() {"..\..\Reportes\DesignacionImprimir.rdlc"}
+            )
 
-            ReportViewer1.LocalReport.ReportPath = reportPath
             ReportViewer1.LocalReport.DisplayName = $"Designacion_{_estadoTransitorioId:000000}"
 
             Dim designacionData = Await _reportesService.GetDatosDesignacionAsync(_estadoTransitorioId)
-
             If designacionData Is Nothing Then
                 MessageBox.Show("No se encontraron datos para el reporte de la designación.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 Me.Close()
                 Return
             End If
 
-            ' --- CAMBIO CLAVE: El nombre del DataSource ahora es "DataSetDesignaciones" ---
-            Dim rds As New ReportDataSource("DataSetDesignaciones",
-                                        New List(Of DesignacionReporteDTO) From {designacionData})
+            ' Nombre del DataSet en el RDLC: DataSetDesignaciones
+            Dim rds As New ReportDataSource(
+                "DataSetDesignaciones",
+                New List(Of DesignacionReporteDTO) From {designacionData}
+            )
             ReportViewer1.LocalReport.DataSources.Add(rds)
 
             ReportViewer1.SetDisplayMode(DisplayMode.PrintLayout)
@@ -50,16 +58,16 @@ Public Class frmDesignacionRPT
             ReportViewer1.ZoomPercent = 100
             ReportViewer1.RefreshReport()
 
-        Catch ex As Exception
-            MessageBox.Show($"Error al cargar el reporte: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Await Task.Yield()
         Finally
-            Me.Cursor = Cursors.Default
+            Me.Cursor = old
         End Try
     End Function
 
     Private Sub Cerrando(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
         If e.KeyCode = Keys.Escape Then
             Me.Close()
+            e.Handled = True
         End If
     End Sub
 End Class

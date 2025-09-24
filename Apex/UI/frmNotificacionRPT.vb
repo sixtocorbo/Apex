@@ -1,8 +1,5 @@
-﻿Imports System.IO
-Imports System.Reflection
-Imports System.Collections.Generic
+﻿Imports System.Collections.Generic
 Imports System.Linq
-Imports System.Deployment.Application
 Imports Microsoft.Reporting.WinForms
 
 ''' <summary>
@@ -10,42 +7,37 @@ Imports Microsoft.Reporting.WinForms
 ''' </summary>
 Public Class frmNotificacionRPT
 
-#Region " Campos y Constructores "
+#Region "Campos y Constructores"
 
-    ' --- Servicios y IDs ---
     Private ReadOnly _reportesService As New ReportesService()
     Private ReadOnly _notificacionId As Integer
     Private ReadOnly _notificacionIds As List(Of Integer)
 
-    ''' <summary>
-    ''' Constructor para mostrar un único reporte de notificación.
-    ''' </summary>
-    ''' <param name="notificacionId">El ID de la notificación a mostrar.</param>
+    ' Única notificación
     Public Sub New(notificacionId As Integer)
         InitializeComponent()
         _notificacionId = notificacionId
-        ' El botón de confirmar firma solo tiene sentido para una única notificación
         btnConfirmarFirma.Visible = True
+        Me.KeyPreview = True
     End Sub
 
-    ''' <summary>
-    ''' Constructor para mostrar múltiples notificaciones en un solo reporte (impresión masiva).
-    ''' </summary>
-    ''' <param name="ids">Lista de IDs de las notificaciones a mostrar.</param>
+    ' Impresión masiva
     Public Sub New(ids As List(Of Integer))
         InitializeComponent()
         _notificacionIds = ids
-        ' No se puede confirmar la firma en modo masivo
         btnConfirmarFirma.Visible = False
+        Me.KeyPreview = True
     End Sub
 
 #End Region
 
-#Region " Ciclo de Vida del Formulario "
+#Region "Ciclo de Vida"
 
     Private Async Sub frmNotificacionRPT_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        AppTheme.Aplicar(Me)
-        Me.KeyPreview = True
+        Try
+            AppTheme.Aplicar(Me)
+        Catch
+        End Try
 
         Try
             Await CargarReporteAsync()
@@ -56,7 +48,7 @@ Public Class frmNotificacionRPT
         End Try
     End Sub
 
-    Private Sub Cerrando(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
+    Private Sub frmNotificacionRPT_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
         If e.KeyCode = Keys.Escape Then
             Me.Close()
             e.Handled = True
@@ -72,7 +64,7 @@ Public Class frmNotificacionRPT
 
 #End Region
 
-#Region " Lógica Principal del Reporte "
+#Region "Carga del Reporte"
 
     Private Async Function CargarReporteAsync() As Task
         Dim oldCursor = Me.Cursor
@@ -83,64 +75,22 @@ Public Class frmNotificacionRPT
             ReportViewer1.ProcessingMode = ProcessingMode.Local
             ReportViewer1.LocalReport.DataSources.Clear()
 
-            ' --- 1. Localizar el archivo .rdlc ---
-            Dim reportResourceName As String = "Apex.Reportes.NotificacionImprimir.rdlc"
-            Dim reportLoaded As Boolean = False
-
-            ' Intentar cargar el reporte como recurso incrustado para evitar problemas de distribución.
-            Dim executingAssembly As Assembly = GetType(frmNotificacionRPT).Assembly
-            Dim resourceNames = executingAssembly.GetManifestResourceNames()
-            Dim matchingResourceName = resourceNames.FirstOrDefault(Function(name) name.Equals(reportResourceName, StringComparison.OrdinalIgnoreCase))
-
-            If matchingResourceName Is Nothing Then
-                matchingResourceName = resourceNames.FirstOrDefault(Function(name) name.EndsWith(".Reportes.NotificacionImprimir.rdlc", StringComparison.OrdinalIgnoreCase) OrElse name.EndsWith("NotificacionImprimir.rdlc", StringComparison.OrdinalIgnoreCase))
-            End If
-
-            If matchingResourceName IsNot Nothing Then
-                Using reportStream As Stream = executingAssembly.GetManifestResourceStream(matchingResourceName)
-                    If reportStream IsNot Nothing Then
-                        ReportViewer1.LocalReport.LoadReportDefinition(reportStream)
-                        reportLoaded = True
-                    End If
-                End Using
-            End If
-
-            If Not reportLoaded Then
-                ' Si no se encontró como recurso, intentamos buscarlo en disco como respaldo.
-                Dim posiblesRutas As New List(Of String) From {
-                    Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Reportes", "NotificacionImprimir.rdlc"),
-                    Path.Combine(Application.StartupPath, "Reportes", "NotificacionImprimir.rdlc"),
-                    Path.GetFullPath(Path.Combine(Application.StartupPath, "..\..\", "Reportes", "NotificacionImprimir.rdlc"))
-                }
-
-                If ApplicationDeployment.IsNetworkDeployed Then
-                    posiblesRutas.Add(Path.Combine(ApplicationDeployment.CurrentDeployment.DataDirectory, "Reportes", "NotificacionImprimir.rdlc"))
-                End If
-
-                Dim reportPath As String = posiblesRutas.FirstOrDefault(Function(ruta) File.Exists(ruta))
-
-                If String.IsNullOrWhiteSpace(reportPath) Then
-                    Dim mensajeError As String = "No se encontró el recurso de reporte 'NotificacionImprimir.rdlc'."
-                    If resourceNames IsNot Nothing AndAlso resourceNames.Length > 0 Then
-                        mensajeError &= Environment.NewLine & "Recursos incrustados disponibles: " & String.Join(", ", resourceNames)
-                    End If
-                    Throw New FileNotFoundException(mensajeError)
-                End If
-
-                ReportViewer1.LocalReport.ReportPath = reportPath
-            End If
+            ' RDLC: Embedded → BaseDirectory\Reportes → StartupPath\Reportes → ClickOnce → extra (..\..)
+            ReportResourceLoader.LoadLocalReportDefinition(
+                ReportViewer1.LocalReport,
+                GetType(frmNotificacionRPT),
+                "Apex.Reportes.NotificacionImprimir.rdlc",
+                "NotificacionImprimir.rdlc",
+                New String() {"..\..\Reportes\NotificacionImprimir.rdlc"}
+            )
 
             ReportViewer1.LocalReport.DisplayName = $"Notificaciones_{Date.Now:yyyyMMdd_HHmm}"
 
-            ' --- 2. Obtener los datos según el constructor utilizado ---
-            Dim datosParaReporte As Object
+            ' IDs según el constructor
             Dim idsParaBuscar As New List(Of Integer)
-
             If _notificacionIds IsNot Nothing AndAlso _notificacionIds.Any() Then
-                ' Caso 1: Se recibió una lista de IDs para impresión masiva
                 idsParaBuscar.AddRange(_notificacionIds)
             ElseIf _notificacionId > 0 Then
-                ' Caso 2: Se recibió un único ID
                 idsParaBuscar.Add(_notificacionId)
             Else
                 Notifier.Warn(Me, "No se proporcionaron notificaciones para generar el reporte.")
@@ -148,26 +98,26 @@ Public Class frmNotificacionRPT
                 Return
             End If
 
-            ' (Asumimos que tu ReportesService tiene un método que acepta una colección de IDs)
-            datosParaReporte = Await _reportesService.GetDatosParaNotificacionesAsync(idsParaBuscar)
-
+            ' Datos
+            Dim datosParaReporte = Await _reportesService.GetDatosParaNotificacionesAsync(idsParaBuscar)
             If datosParaReporte Is Nothing OrElse Not CType(datosParaReporte, IEnumerable(Of Object)).Any() Then
                 Notifier.Info(Me, "No se encontraron datos para las notificaciones seleccionadas.")
                 Close()
                 Return
             End If
 
-            ' --- 3. Cargar los datos y refrescar el visor ---
+            ' DataSource (nombre debe coincidir con el RDLC)
             Dim rds As New ReportDataSource("DataSetNotificaciones", datosParaReporte)
             ReportViewer1.LocalReport.DataSources.Add(rds)
 
+            ' Presentación
             ReportViewer1.SetDisplayMode(DisplayMode.PrintLayout)
             ReportViewer1.ZoomMode = ZoomMode.Percent
             ReportViewer1.ZoomPercent = 100
-            ReportViewer1.RefreshReport()
 
-        Catch
-            Throw ' Relanza la excepción para que sea capturada en el evento Load
+            ReportViewer1.RefreshReport()
+            Await Task.Yield()
+
         Finally
             Me.Cursor = oldCursor
             LoadingHelper.OcultarCargando(Me)
@@ -176,13 +126,13 @@ Public Class frmNotificacionRPT
 
 #End Region
 
-#Region " Lógica para Confirmar Firma "
+#Region "Confirmar Firma"
 
     Private Async Sub btnConfirmarFirma_Click(sender As Object, e As EventArgs) Handles btnConfirmarFirma.Click
-        If _notificacionId <= 0 Then Return ' Seguridad extra
+        If _notificacionId <= 0 Then Return
 
         If MessageBox.Show("¿Confirmás que la notificación fue firmada y deseás archivarla?",
-                            "Confirmar Acción", MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then
+                           "Confirmar Acción", MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then
             Return
         End If
 
@@ -200,10 +150,10 @@ Public Class frmNotificacionRPT
                 End If
 
                 notificacion.EstadoId = CByte(ModConstantesApex.EstadoNotificacionPersonal.Firmada)
-                notificacion.UpdatedAt = Date.Now ' Actualizamos la fecha de modificación
+                notificacion.UpdatedAt = Date.Now
 
                 Await uow.CommitAsync()
-                NotificadorEventos.NotificarCambiosEnFuncionario(notificacion.FuncionarioId) ' Notificamos el cambio
+                NotificadorEventos.NotificarCambiosEnFuncionario(notificacion.FuncionarioId)
                 Notifier.Success(Me, "Notificación archivada correctamente.")
                 Close()
             End Using
@@ -212,7 +162,7 @@ Public Class frmNotificacionRPT
         Finally
             LoadingHelper.OcultarCargando(Me)
             Me.Cursor = oldCursor
-            btnConfirmarFirma.Enabled = True ' Habilitamos de nuevo en caso de error
+            btnConfirmarFirma.Enabled = True
         End Try
     End Sub
 

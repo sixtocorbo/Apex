@@ -37,35 +37,69 @@ Partial Public Class frmFiltros
         Private Shared Function EscapeStringLiteral(s As String) As String
             Return s.Replace("'", "''")
         End Function
-
         Private Shared Function FormatearValor(valor As String) As String
-            If DateTime.TryParse(valor, CultureInfo.InvariantCulture, DateTimeStyles.None, Nothing) Then
-                Return $"#{Convert.ToDateTime(valor).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}#"
+            Dim dt As DateTime
+            If DateTime.TryParse(valor, CultureInfo.InvariantCulture, DateTimeStyles.None, dt) Then
+                Return $"#{dt:yyyy-MM-dd}#"
             End If
-            If Double.TryParse(valor, NumberStyles.Any, CultureInfo.InvariantCulture, Nothing) Then
-                Return valor
+
+            Dim dbl As Double
+            If Double.TryParse(valor, NumberStyles.Any, CultureInfo.InvariantCulture, dbl) Then
+                Return dbl.ToString(CultureInfo.InvariantCulture)
             End If
+
             Return $"'{EscapeStringLiteral(valor)}'"
         End Function
 
+        'Private Shared Function FormatearValor(valor As String) As String
+        '    If DateTime.TryParse(valor, CultureInfo.InvariantCulture, DateTimeStyles.None, Nothing) Then
+        '        Return $"#{Convert.ToDateTime(valor).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}#"
+        '    End If
+        '    If Double.TryParse(valor, NumberStyles.Any, CultureInfo.InvariantCulture, Nothing) Then
+        '        Return valor
+        '    End If
+        '    Return $"'{EscapeStringLiteral(valor)}'"
+        'End Function
         Public Function ToRowFilter() As String
             Dim colName = $"[{Columna}]"
             Select Case Operador
                 Case OperadorComparacion.Igual
-                    If DateTime.TryParse(Valor1, Nothing) Then
-                        Dim fecha As Date = Convert.ToDateTime(Valor1).Date
+                    Dim fecha As Date
+                    If DateTime.TryParse(Valor1, fecha) Then
+                        fecha = fecha.Date
                         Dim siguienteDia As Date = fecha.AddDays(1)
                         Return $"({colName} >= #{fecha:yyyy-MM-dd}# AND {colName} < #{siguienteDia:yyyy-MM-dd}#)"
                     Else
                         Return $"{colName} = {FormatearValor(Valor1)}"
                     End If
+
                 Case OperadorComparacion.EnLista
                     Dim items = Valor1.Split("|"c).Select(AddressOf FormatearValor)
                     Return $"{colName} IN ({String.Join(",", items)})"
+
                 Case Else
                     Throw New NotSupportedException($"Operador {Operador} aún no implementado.")
             End Select
         End Function
+
+        'Public Function ToRowFilter() As String
+        '    Dim colName = $"[{Columna}]"
+        '    Select Case Operador
+        '        Case OperadorComparacion.Igual
+        '            If DateTime.TryParse(Valor1, Nothing) Then
+        '                Dim fecha As Date = Convert.ToDateTime(Valor1).Date
+        '                Dim siguienteDia As Date = fecha.AddDays(1)
+        '                Return $"({colName} >= #{fecha:yyyy-MM-dd}# AND {colName} < #{siguienteDia:yyyy-MM-dd}#)"
+        '            Else
+        '                Return $"{colName} = {FormatearValor(Valor1)}"
+        '            End If
+        '        Case OperadorComparacion.EnLista
+        '            Dim items = Valor1.Split("|"c).Select(AddressOf FormatearValor)
+        '            Return $"{colName} IN ({String.Join(",", items)})"
+        '        Case Else
+        '            Throw New NotSupportedException($"Operador {Operador} aún no implementado.")
+        '    End Select
+        'End Function
     End Class
 
     Friend Class GestorFiltros
@@ -682,9 +716,8 @@ Partial Public Class frmFiltros
 #Region "Lógica de Exportación"
 
     ' 2. AGREGA ESTE NUEVO MÉTODO COMPLETO A TU FORMULARIO
-    Private Async Sub btnExportarFichasPDF_Click(sender As Object, e As EventArgs) _
-    Handles btnExportarFichasPDF.Click
-
+    ' --- Exportar un PDF por funcionario filtrado ---
+    Private Async Sub btnExportarFichasPDF_Click(sender As Object, e As EventArgs) Handles btnExportarFichasPDF.Click
         Try
             ' 1) Validaciones básicas
             If cmbOrigenDatos.SelectedItem Is Nothing OrElse
@@ -740,7 +773,7 @@ Partial Public Class frmFiltros
                     Me.Text = $"Exportando fichas... {i + 1}/{totalAExportar}"
                     Application.DoEvents()
 
-                    ' Filtrar el DTO del funcionario actual (requiere FichaFuncionalDTO.FuncionarioId)
+                    ' Filtrar el/los DTO del funcionario actual (requiere FichaFuncionalDTO.FuncionarioId)
                     Dim datosUno = todosLosDatos.Where(Function(d) d.FuncionarioId = id).ToList()
                     If datosUno.Count = 0 Then
                         noEncontrados.Add(id)
@@ -761,12 +794,13 @@ Partial Public Class frmFiltros
                         Await Task.Run(
                         Sub()
                             Dim lr As New Microsoft.Reporting.WinForms.LocalReport()
-                            ' Carga RDLC embebido (p.ej. "Apex.FichaFuncional.rdlc") o, si no está,
-                            ' cae al archivo físico "Reportes\FichaFuncional.rdlc"
-                            CargarDefinicionRDLC(lr, "FichaFuncional.rdlc", "Reportes\FichaFuncional.rdlc")
+
+                            ' RDLC: Embedded → BaseDirectory\Reportes → StartupPath\Reportes → ClickOnce → extra (..\..)
+                            CargarDefinicionRDLC(lr, "FichaFuncional.rdlc", "..\..\Reportes\FichaFuncional.rdlc")
 
                             lr.DataSources.Clear()
-                            lr.DataSources.Add(New Microsoft.Reporting.WinForms.ReportDataSource("FichaFuncionalDataSet", datosUno))
+                            lr.DataSources.Add(New Microsoft.Reporting.WinForms.ReportDataSource(
+                                "FichaFuncionalDataSet", datosUno))
 
                             Dim bytes = lr.Render("PDF")
                             If bytes Is Nothing OrElse bytes.Length = 0 Then
@@ -803,7 +837,7 @@ Partial Public Class frmFiltros
 
                 ' (Opcional) también mostrar MessageBox resumen
                 MessageBox.Show(resumen.ToString(), "Apex",
-                            If(fallos.Any(), MessageBoxButtons.OK, MessageBoxButtons.OK),
+                            MessageBoxButtons.OK,
                             If(fallos.Any(), MessageBoxIcon.Warning, MessageBoxIcon.Information))
 
                 ' (Opcional) abrir la carpeta al terminar
@@ -822,22 +856,48 @@ Partial Public Class frmFiltros
     Private Sub CargarDefinicionRDLC(lr As Microsoft.Reporting.WinForms.LocalReport,
                                  nombreCorto As String,
                                  rutaRelativa As String)
-        Dim asm = Me.GetType().Assembly
-        Dim recurso = asm.GetManifestResourceNames().
-        FirstOrDefault(Function(n) n.EndsWith("." & nombreCorto, StringComparison.OrdinalIgnoreCase))
-        If Not String.IsNullOrEmpty(recurso) Then
-            Using s = asm.GetManifestResourceStream(recurso)
-                lr.LoadReportDefinition(s)
-            End Using
-            Exit Sub
+
+        If lr Is Nothing Then Throw New ArgumentNullException(NameOf(lr))
+        If String.IsNullOrWhiteSpace(nombreCorto) Then Throw New ArgumentNullException(NameOf(nombreCorto))
+
+        ' armar nombre de recurso embebido: Apex.Reportes.<archivo>.rdlc
+        Dim asmName As String = Me.GetType().Assembly.GetName().Name ' "Apex"
+        Dim embeddedResourceName As String = $"{asmName}.Reportes.{nombreCorto}"
+
+        ' rutas extra (debug o alternativa)
+        Dim extras As String() = Nothing
+        If Not String.IsNullOrWhiteSpace(rutaRelativa) Then
+            extras = New String() {rutaRelativa} ' ej: "..\..\Reportes\FichaFuncional.rdlc" o "Reportes\FichaFuncional.rdlc"
         End If
 
-        Dim fullPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, rutaRelativa)
-        If Not System.IO.File.Exists(fullPath) Then
-            Throw New ApplicationException($"No se encontró el RDLC embebido ('...{nombreCorto}') ni en disco: {fullPath}")
-        End If
-        lr.ReportPath = fullPath
+        ReportResourceLoader.LoadLocalReportDefinition(
+        lr,
+        Me.GetType(),
+        embeddedResourceName,   ' <<-- NO Nothing
+        nombreCorto,            ' <<-- solo el filename, p.ej. "FichaFuncional.rdlc"
+        extras
+    )
     End Sub
+
+    'Private Sub CargarDefinicionRDLC(lr As Microsoft.Reporting.WinForms.LocalReport,
+    '                             nombreCorto As String,
+    '                             rutaRelativa As String)
+    '    Dim asm = Me.GetType().Assembly
+    '    Dim recurso = asm.GetManifestResourceNames().
+    '    FirstOrDefault(Function(n) n.EndsWith("." & nombreCorto, StringComparison.OrdinalIgnoreCase))
+    '    If Not String.IsNullOrEmpty(recurso) Then
+    '        Using s = asm.GetManifestResourceStream(recurso)
+    '            lr.LoadReportDefinition(s)
+    '        End Using
+    '        Exit Sub
+    '    End If
+
+    '    Dim fullPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, rutaRelativa)
+    '    If Not System.IO.File.Exists(fullPath) Then
+    '        Throw New ApplicationException($"No se encontró el RDLC embebido ('...{nombreCorto}') ni en disco: {fullPath}")
+    '    End If
+    '    lr.ReportPath = fullPath
+    'End Sub
 
 #Region "Exportacion fichas"
     Private Function ConstruirNombreArchivo(dto As FichaFuncionalDTO, id As Integer) As String
