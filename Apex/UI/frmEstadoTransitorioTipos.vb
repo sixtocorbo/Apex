@@ -54,15 +54,16 @@ Partial Class frmEstadoTransitorioTipos
         dgvTiposEstado.Columns.Clear()
 
         dgvTiposEstado.Columns.Add(New DataGridViewTextBoxColumn With {
-            .DataPropertyName = "Id",
-            .HeaderText = "Id",
-            .Visible = False
-        })
+        .DataPropertyName = "Id",
+        .HeaderText = "Id",
+        .Visible = False
+    })
         dgvTiposEstado.Columns.Add(New DataGridViewTextBoxColumn With {
-            .DataPropertyName = "Nombre",
-            .HeaderText = "Nombre",
-            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-        })
+        .DataPropertyName = "Nombre",
+        .HeaderText = "Nombre del Tipo de Estado", ' <-- Título más descriptivo
+        .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+    })
+
         ' Estilo moderno y doble buffer
         AplicarEstiloGrilla(dgvTiposEstado)
     End Sub
@@ -218,23 +219,41 @@ Partial Class frmEstadoTransitorioTipos
     End Function
 
     Private Sub AplicarEstiloGrilla(dgv As DataGridView)
+        ' --- CONFIGURACIÓN GENERAL (Estilo moderno) ---
+        dgv.BorderStyle = BorderStyle.None
+        dgv.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal
+        dgv.GridColor = Color.FromArgb(230, 230, 230)
+        dgv.RowHeadersVisible = False
+        dgv.SelectionMode = DataGridViewSelectionMode.FullRowSelect
+        dgv.MultiSelect = False
+        dgv.ReadOnly = True
+        dgv.AllowUserToAddRows = False
+        dgv.AllowUserToDeleteRows = False
+        dgv.AllowUserToResizeRows = False
+        dgv.BackgroundColor = Color.White
+
+        ' --- ESTILO DE ENCABEZADOS (Headers) ---
         dgv.EnableHeadersVisualStyles = False
-        dgv.ColumnHeadersDefaultCellStyle.BackColor = Color.WhiteSmoke
-        dgv.ColumnHeadersDefaultCellStyle.ForeColor = Color.Black
-        dgv.ColumnHeadersDefaultCellStyle.Font = New Font("Segoe UI", 9.5!, FontStyle.Bold)
-        dgv.ColumnHeadersHeight = 36
         dgv.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None
+        dgv.ColumnHeadersHeight = 40
+        dgv.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(28, 41, 56)
+        dgv.ColumnHeadersDefaultCellStyle.ForeColor = Color.White
+        dgv.ColumnHeadersDefaultCellStyle.Font = New Font("Segoe UI", 9.75F, FontStyle.Bold)
+        dgv.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft
+        dgv.ColumnHeadersDefaultCellStyle.Padding = New Padding(5, 0, 0, 0)
 
-        dgv.DefaultCellStyle.Font = New Font("Segoe UI", 9.0!, FontStyle.Regular)
-        dgv.DefaultCellStyle.SelectionBackColor = Color.Gainsboro
-        dgv.DefaultCellStyle.SelectionForeColor = Color.Black
-        dgv.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(248, 248, 248)
-        dgv.RowTemplate.Height = 28
+        ' --- ESTILO DE FILAS (Rows) ---
+        dgv.DefaultCellStyle.Font = New Font("Segoe UI", 9.5F)
+        dgv.DefaultCellStyle.Padding = New Padding(5, 0, 5, 0)
+        dgv.DefaultCellStyle.SelectionBackColor = Color.FromArgb(51, 153, 255)
+        dgv.DefaultCellStyle.SelectionForeColor = Color.White
+        dgv.RowsDefaultCellStyle.BackColor = Color.White
+        dgv.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(242, 245, 247)
 
-        ' Doble buffer (reflexión, propiedad interna)
+        ' Doble buffer (se mantiene tu lógica original)
         Try
             Dim pi = GetType(DataGridView).GetProperty("DoubleBuffered",
-                        Reflection.BindingFlags.Instance Or Reflection.BindingFlags.NonPublic)
+            Reflection.BindingFlags.Instance Or Reflection.BindingFlags.NonPublic)
             If pi IsNot Nothing Then pi.SetValue(dgv, True, Nothing)
         Catch
         End Try

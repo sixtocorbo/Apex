@@ -66,7 +66,7 @@ Partial Class frmAreaTrabajoCategorias
         Me.dgvAreas.AllowUserToResizeRows = False
         Me.dgvAreas.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvAreas.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.dgvAreas.Location = New System.Drawing.Point(0, 46)
+        Me.dgvAreas.Location = New System.Drawing.Point(0, 56)
         Me.dgvAreas.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.dgvAreas.MultiSelect = False
         Me.dgvAreas.Name = "dgvAreas"
@@ -74,16 +74,16 @@ Partial Class frmAreaTrabajoCategorias
         Me.dgvAreas.RowHeadersVisible = False
         Me.dgvAreas.RowHeadersWidth = 62
         Me.dgvAreas.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgvAreas.Size = New System.Drawing.Size(580, 509)
+        Me.dgvAreas.Size = New System.Drawing.Size(580, 499)
         Me.dgvAreas.TabIndex = 2
         '
         'txtBuscar
         '
         Me.txtBuscar.Dock = System.Windows.Forms.DockStyle.Top
-        Me.txtBuscar.Location = New System.Drawing.Point(0, 20)
+        Me.txtBuscar.Location = New System.Drawing.Point(0, 25)
         Me.txtBuscar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtBuscar.Name = "txtBuscar"
-        Me.txtBuscar.Size = New System.Drawing.Size(580, 26)
+        Me.txtBuscar.Size = New System.Drawing.Size(580, 31)
         Me.txtBuscar.TabIndex = 1
         '
         'Label8
@@ -93,7 +93,7 @@ Partial Class frmAreaTrabajoCategorias
         Me.Label8.Location = New System.Drawing.Point(0, 0)
         Me.Label8.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label8.Name = "Label8"
-        Me.Label8.Size = New System.Drawing.Size(63, 20)
+        Me.Label8.Size = New System.Drawing.Size(67, 25)
         Me.Label8.TabIndex = 0
         Me.Label8.Text = "Buscar:"
         '
@@ -136,7 +136,7 @@ Partial Class frmAreaTrabajoCategorias
         Me.txtNombre.Location = New System.Drawing.Point(96, 40)
         Me.txtNombre.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtNombre.Name = "txtNombre"
-        Me.txtNombre.Size = New System.Drawing.Size(317, 26)
+        Me.txtNombre.Size = New System.Drawing.Size(317, 31)
         Me.txtNombre.TabIndex = 1
         '
         'Label1
@@ -145,7 +145,7 @@ Partial Class frmAreaTrabajoCategorias
         Me.Label1.Location = New System.Drawing.Point(18, 45)
         Me.Label1.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(69, 20)
+        Me.Label1.Size = New System.Drawing.Size(82, 25)
         Me.Label1.TabIndex = 0
         Me.Label1.Text = "Nombre:"
         '
@@ -214,7 +214,7 @@ Partial Class frmAreaTrabajoCategorias
         '
         'frmAreaTrabajoCategorias
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 25.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1034, 575)
         Me.Controls.Add(Me.SplitContainer1)

@@ -75,6 +75,8 @@ Public Class frmFuncionarioCrear
 
     Private Async Sub frmFuncionarioCrear_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
+        dgvDotacion.ActivarDobleBuffer(True)          ' <-- LÍNEA AÑADIDA
+        dgvEstadosTransitorios.ActivarDobleBuffer(True) ' <-- LÍNEA AÑADIDA
         Try
             AppTheme.SetCue(txtCI, "Cédula de Identidad")
             AppTheme.SetCue(txtNombre, "Nombre completo")
@@ -123,7 +125,7 @@ Public Class frmFuncionarioCrear
         Else
             Me.Text = "Nuevo Funcionario"
             btnGuardar.Text = "Guardar"
-            pbFoto.Image = My.Resources.Police
+            pbFoto.Image = My.Resources.Police.ToBitmap
         End If
 
     End Sub
@@ -279,7 +281,7 @@ Public Class frmFuncionarioCrear
                 pbFoto.Image = New Bitmap(ms)
             End Using
         Else
-            pbFoto.Image = My.Resources.Police
+            pbFoto.Image = My.Resources.Police.ToBitmap()
         End If
     End Sub
 
@@ -958,22 +960,63 @@ Public Class frmFuncionarioCrear
     End Sub
 
     Private Sub ConfigurarGrillaDotacion()
-        dgvDotacion.AutoGenerateColumns = False : dgvDotacion.Columns.Clear()
+        ' Aplicamos el estilo base moderno
+        AplicarEstiloModernoGrilla(dgvDotacion)
+
+        ' Definición de columnas
+        dgvDotacion.AutoGenerateColumns = False
+        dgvDotacion.Columns.Clear()
+
         dgvDotacion.Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Id", .Visible = False})
-        dgvDotacion.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "colItem", .HeaderText = "Ítem", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
-        dgvDotacion.Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Talla", .HeaderText = "Talla"})
-        dgvDotacion.Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Observaciones", .HeaderText = "Observaciones", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
-        dgvDotacion.Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "FechaAsign", .Name = "FechaAsign", .HeaderText = "Fecha Asignación"})
+        dgvDotacion.Columns.Add(New DataGridViewTextBoxColumn With {
+        .Name = "colItem", .HeaderText = "Ítem",
+        .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, .FillWeight = 40
+    })
+        dgvDotacion.Columns.Add(New DataGridViewTextBoxColumn With {
+        .DataPropertyName = "Talla", .HeaderText = "Talla",
+        .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells, .MinimumWidth = 80
+    })
+        dgvDotacion.Columns.Add(New DataGridViewTextBoxColumn With {
+        .DataPropertyName = "Observaciones", .HeaderText = "Observaciones",
+        .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, .FillWeight = 60
+    })
+        dgvDotacion.Columns.Add(New DataGridViewTextBoxColumn With {
+        .DataPropertyName = "FechaAsign", .Name = "FechaAsign", .HeaderText = "Fecha Asignación",
+        .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells, .MinimumWidth = 120
+    })
     End Sub
 
     Private Sub ConfigurarGrillaEstados()
-        dgvEstadosTransitorios.AutoGenerateColumns = False : dgvEstadosTransitorios.Columns.Clear()
-        dgvEstadosTransitorios.Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "TipoEstado", .HeaderText = "Tipo de Estado", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells})
-        Dim colDesde As New DataGridViewTextBoxColumn With {.DataPropertyName = "FechaDesde", .HeaderText = "Desde", .Width = 100} : colDesde.DefaultCellStyle.Format = "dd/MM/yyyy"
+        ' Aplicamos el estilo base moderno
+        AplicarEstiloModernoGrilla(dgvEstadosTransitorios)
+
+        ' Definición de columnas
+        dgvEstadosTransitorios.AutoGenerateColumns = False
+        dgvEstadosTransitorios.Columns.Clear()
+
+        dgvEstadosTransitorios.Columns.Add(New DataGridViewTextBoxColumn With {
+        .DataPropertyName = "TipoEstado", .HeaderText = "Tipo de Estado",
+        .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells, .MinimumWidth = 200
+    })
+
+        Dim colDesde As New DataGridViewTextBoxColumn With {
+        .DataPropertyName = "FechaDesde", .HeaderText = "Desde",
+        .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells, .MinimumWidth = 110
+    }
+        colDesde.DefaultCellStyle.Format = "dd/MM/yyyy"
         dgvEstadosTransitorios.Columns.Add(colDesde)
-        Dim colHasta As New DataGridViewTextBoxColumn With {.DataPropertyName = "FechaHasta", .HeaderText = "Hasta", .Width = 100} : colHasta.DefaultCellStyle.Format = "dd/MM/yyyy"
+
+        Dim colHasta As New DataGridViewTextBoxColumn With {
+        .DataPropertyName = "FechaHasta", .HeaderText = "Hasta",
+        .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells, .MinimumWidth = 110
+    }
+        colHasta.DefaultCellStyle.Format = "dd/MM/yyyy"
         dgvEstadosTransitorios.Columns.Add(colHasta)
-        dgvEstadosTransitorios.Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Observaciones", .HeaderText = "Observaciones / Detalles", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
+
+        dgvEstadosTransitorios.Columns.Add(New DataGridViewTextBoxColumn With {
+        .DataPropertyName = "Observaciones", .HeaderText = "Observaciones / Detalles",
+        .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+    })
     End Sub
 
     Private Sub btnSeleccionarFoto_Click(sender As Object, e As EventArgs) Handles btnSeleccionarFoto.Click
@@ -1278,6 +1321,38 @@ Public Class frmFuncionarioCrear
             Notifier.[Error](dash, $"No se pudo abrir la ventana: {ex.Message}")
         End Try
     End Sub
+    ' Agrega este nuevo método en cualquier lugar dentro de la clase del formulario
+    Private Sub AplicarEstiloModernoGrilla(dgv As DataGridView)
+        ' --- CONFIGURACIÓN GENERAL ---
+        dgv.BorderStyle = BorderStyle.None
+        dgv.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal
+        dgv.GridColor = Color.FromArgb(230, 230, 230)
+        dgv.RowHeadersVisible = False
+        dgv.SelectionMode = DataGridViewSelectionMode.FullRowSelect
+        dgv.MultiSelect = False
+        dgv.ReadOnly = True
+        dgv.AllowUserToAddRows = False
+        dgv.AllowUserToDeleteRows = False
+        dgv.AllowUserToResizeRows = False
+        dgv.BackgroundColor = Color.White
 
+        ' --- ESTILO DE ENCABEZADOS (Headers) ---
+        dgv.EnableHeadersVisualStyles = False
+        dgv.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None
+        dgv.ColumnHeadersHeight = 40
+        dgv.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(28, 41, 56)
+        dgv.ColumnHeadersDefaultCellStyle.ForeColor = Color.White
+        dgv.ColumnHeadersDefaultCellStyle.Font = New Font("Segoe UI", 9.75F, FontStyle.Bold)
+        dgv.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft
+        dgv.ColumnHeadersDefaultCellStyle.Padding = New Padding(5, 0, 0, 0)
+
+        ' --- ESTILO DE FILAS (Rows) ---
+        dgv.DefaultCellStyle.Font = New Font("Segoe UI", 9.0F)
+        dgv.DefaultCellStyle.Padding = New Padding(5, 0, 5, 0)
+        dgv.DefaultCellStyle.SelectionBackColor = Color.FromArgb(51, 153, 255)
+        dgv.DefaultCellStyle.SelectionForeColor = Color.White
+        dgv.RowsDefaultCellStyle.BackColor = Color.White
+        dgv.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(242, 245, 247)
+    End Sub
 
 End Class

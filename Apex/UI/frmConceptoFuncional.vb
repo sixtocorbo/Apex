@@ -15,6 +15,11 @@ Public Class frmConceptoFuncional
     End Sub
 
     Private Sub InicializarFormulario()
+        ' --- APLICAR MEJORAS DE RENDIMIENTO ---
+        dgvLicenciasMedicas.ActivarDobleBuffer(True)
+        dgvSanciones.ActivarDobleBuffer(True)
+        dgvObservaciones.ActivarDobleBuffer(True)
+
         ConfigurarDataGridViews()
         dtpFechaInicio.Value = DateTime.Now.AddMonths(-6)
         dtpFechaFin.Value = DateTime.Now
@@ -94,27 +99,71 @@ Public Class frmConceptoFuncional
     End Sub
 
     Private Sub ConfigurarGridConcepto(ByVal dgv As DataGridView)
+        ' --- CONFIGURACIÓN GENERAL (Estilo moderno) ---
+        dgv.BorderStyle = BorderStyle.None
+        dgv.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal
+        dgv.GridColor = Color.FromArgb(230, 230, 230)
+        dgv.RowHeadersVisible = False
+        dgv.SelectionMode = DataGridViewSelectionMode.FullRowSelect
+        dgv.MultiSelect = False
+        dgv.ReadOnly = True
+        dgv.AllowUserToAddRows = False
+        dgv.AllowUserToDeleteRows = False
+        dgv.AllowUserToResizeRows = False
         dgv.AutoGenerateColumns = False
+        dgv.BackgroundColor = Color.White
+
+        ' --- ESTILO DE ENCABEZADOS (Headers) ---
+        dgv.EnableHeadersVisualStyles = False
+        dgv.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None
+        dgv.ColumnHeadersHeight = 40
+        dgv.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(28, 41, 56)
+        dgv.ColumnHeadersDefaultCellStyle.ForeColor = Color.White
+        dgv.ColumnHeadersDefaultCellStyle.Font = New Font("Segoe UI", 9.75F, FontStyle.Bold)
+        dgv.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft
+        dgv.ColumnHeadersDefaultCellStyle.Padding = New Padding(5, 0, 0, 0)
+
+        ' --- ESTILO DE FILAS (Rows) ---
+        dgv.DefaultCellStyle.Font = New Font("Segoe UI", 9.0F)
+        dgv.DefaultCellStyle.Padding = New Padding(5, 0, 5, 0)
+        dgv.DefaultCellStyle.SelectionBackColor = Color.FromArgb(51, 153, 255)
+        dgv.DefaultCellStyle.SelectionForeColor = Color.White
+        dgv.RowsDefaultCellStyle.BackColor = Color.White
+        dgv.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(242, 245, 247)
+
+        ' --- DEFINICIÓN DE COLUMNAS (Mantenemos las tuyas con formato y anchos mínimos) ---
         dgv.Columns.Clear()
+
+        Dim colInicio As New DataGridViewTextBoxColumn With {
+        .DataPropertyName = "FechaInicio", .HeaderText = "Inicio",
+        .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells, .MinimumWidth = 110
+    }
+        colInicio.DefaultCellStyle.Format = "dd/MM/yyyy"
+
+        Dim colFin As New DataGridViewTextBoxColumn With {
+        .DataPropertyName = "FechaFinal", .HeaderText = "Fin",
+        .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells, .MinimumWidth = 110
+    }
+        colFin.DefaultCellStyle.Format = "dd/MM/yyyy"
+
         dgv.Columns.AddRange(
-            New DataGridViewTextBoxColumn With {.DataPropertyName = "FechaInicio", .HeaderText = "Inicio", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells},
-            New DataGridViewTextBoxColumn With {.DataPropertyName = "FechaFinal", .HeaderText = "Fin", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells},
-            New DataGridViewTextBoxColumn With {.DataPropertyName = "Tipo", .HeaderText = "Tipo", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells},
-            New DataGridViewTextBoxColumn With {.DataPropertyName = "Observaciones", .HeaderText = "Detalle/Observaciones", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill},
-            New DataGridViewTextBoxColumn With {.DataPropertyName = "Origen", .HeaderText = "Origen", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells}
-        )
+        colInicio,
+        colFin,
+        New DataGridViewTextBoxColumn With {.DataPropertyName = "Tipo", .HeaderText = "Tipo", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells, .MinimumWidth = 150},
+        New DataGridViewTextBoxColumn With {.DataPropertyName = "Observaciones", .HeaderText = "Detalle/Observaciones", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill},
+        New DataGridViewTextBoxColumn With {.DataPropertyName = "Origen", .HeaderText = "Origen", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells, .MinimumWidth = 120}
+    )
     End Sub
 
+    ' Reemplaza tus dos métodos frmConceptoFuncional_Load con este único método
     Private Sub frmConceptoFuncional_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-
+        ' Código del segundo Load
         AddHandler NotificadorEventos.FuncionarioActualizado, AddressOf ManejarCambiosEnFuncionario
-
-
         AppTheme.Aplicar(Me)
 
         Try
+            ' Código del primer Load
             AppTheme.SetCue(txtFuncionarioSeleccionado, "Seleccione un funcionario...")
-
         Catch
             ' Ignorar si no existe SetCue
         End Try

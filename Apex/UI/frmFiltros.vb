@@ -506,8 +506,35 @@ Partial Public Class frmFiltros
     End Class
 
     Private Sub BeautifyGrid()
-        dgvDatos.Dock = DockStyle.Fill
-        dgvDatos.RowHeadersVisible = False
+        With dgvDatos
+            ' --- CONFIGURACIÓN GENERAL ---
+            .BorderStyle = BorderStyle.None ' Sin borde exterior.
+            .CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal ' Solo líneas horizontales.
+            .GridColor = Color.FromArgb(230, 230, 230) ' Gris claro para las líneas.
+            .RowHeadersVisible = False ' Correcto, ya lo tenías.
+            .SelectionMode = DataGridViewSelectionMode.FullRowSelect
+            .AllowUserToResizeRows = False ' Evita que el usuario desajuste las alturas.
+            .BackgroundColor = Color.White ' Fondo limpio.
+            .Dock = DockStyle.Fill ' Correcto.
+
+            ' --- ESTILO DE ENCABEZADOS (Headers) ---
+            .EnableHeadersVisualStyles = False ' Permite usar nuestros estilos personalizados.
+            .ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None
+            .ColumnHeadersHeight = 40 ' Más altura para un look espaciado.
+            .ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(28, 41, 56) ' Color oscuro profesional.
+            .ColumnHeadersDefaultCellStyle.ForeColor = Color.White
+            .ColumnHeadersDefaultCellStyle.Font = New Font("Segoe UI", 9.75F, FontStyle.Bold)
+            .ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft
+            .ColumnHeadersDefaultCellStyle.Padding = New Padding(5, 0, 0, 0) ' Pequeño margen izquierdo.
+
+            ' --- ESTILO DE FILAS (Rows) ---
+            .DefaultCellStyle.Font = New Font("Segoe UI", 9.0F)
+            .DefaultCellStyle.Padding = New Padding(5, 0, 5, 0) ' Espaciado interno en celdas.
+            .DefaultCellStyle.SelectionBackColor = Color.FromArgb(51, 153, 255)
+            .DefaultCellStyle.SelectionForeColor = Color.White
+            .RowsDefaultCellStyle.BackColor = Color.White
+            .AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(242, 245, 247) ' "Efecto Cebra".
+        End With
     End Sub
 
 #End Region
@@ -1023,5 +1050,17 @@ Public Module ControlExtensions
     Public Sub DoubleBuffered(ByVal control As System.Windows.Forms.Control, ByVal enable As Boolean)
         Dim prop = control.GetType().GetProperty("DoubleBuffered", System.Reflection.BindingFlags.Instance Or System.Reflection.BindingFlags.NonPublic)
         prop.SetValue(control, enable, Nothing)
+    End Sub
+
+    <System.Runtime.CompilerServices.Extension()>
+    Public Sub ActivarDobleBuffer(ByVal dgv As DataGridView, ByVal setting As Boolean)
+        Try
+            Dim dgvType As Type = dgv.GetType()
+            Dim pi As System.Reflection.PropertyInfo = dgvType.GetProperty("DoubleBuffered",
+                System.Reflection.BindingFlags.Instance Or System.Reflection.BindingFlags.NonPublic)
+            pi.SetValue(dgv, setting, Nothing)
+        Catch ex As Exception
+            ' Manejar el error silenciosamente si es necesario
+        End Try
     End Sub
 End Module

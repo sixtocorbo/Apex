@@ -12,7 +12,7 @@ Public Class frmSanciones
     Private Async Sub frmSanciones_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
         Me.KeyPreview = True
-
+        dgvSanciones.ActivarDobleBuffer(True)
         ConfigurarGrillaSanciones()
         CargarComboTipoSancion()
 
@@ -180,28 +180,85 @@ Public Class frmSanciones
 #Region "UI y Navegación"
     Private Sub ConfigurarGrillaSanciones()
         With dgvSanciones
-            .AutoGenerateColumns = False
-            .Columns.Clear()
+            ' --- CONFIGURACIÓN GENERAL ---
+            .BorderStyle = BorderStyle.None
+            .CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal
+            .GridColor = Color.FromArgb(230, 230, 230)
             .RowHeadersVisible = False
             .SelectionMode = DataGridViewSelectionMode.FullRowSelect
             .MultiSelect = False
             .ReadOnly = True
             .AllowUserToAddRows = False
             .AllowUserToDeleteRows = False
+            .AllowUserToResizeRows = False
+            .AutoGenerateColumns = False
+            .BackgroundColor = Color.White
+
+            ' --- ESTILO DE ENCABEZADOS (Headers) ---
+            .EnableHeadersVisualStyles = False
+            .ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None
+            .ColumnHeadersHeight = 40
+            .ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(28, 41, 56)
+            .ColumnHeadersDefaultCellStyle.ForeColor = Color.White
+            .ColumnHeadersDefaultCellStyle.Font = New Font("Segoe UI", 9.75F, FontStyle.Bold)
+            .ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft
+            .ColumnHeadersDefaultCellStyle.Padding = New Padding(5, 0, 0, 0)
+
+            ' --- ESTILO DE FILAS (Rows) ---
+            .DefaultCellStyle.Font = New Font("Segoe UI", 9.0F)
+            .DefaultCellStyle.Padding = New Padding(5, 0, 5, 0)
+            .DefaultCellStyle.SelectionBackColor = Color.FromArgb(51, 153, 255)
+            .DefaultCellStyle.SelectionForeColor = Color.White
+            .RowsDefaultCellStyle.BackColor = Color.White
+            .AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(242, 245, 247) ' Efecto Cebra
+
+            ' --- DEFINICIÓN DE COLUMNAS ---
+            .Columns.Clear()
 
             .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Id", .DataPropertyName = "Id", .Visible = False})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "NombreFuncionario", .DataPropertyName = "NombreFuncionario", .HeaderText = "Funcionario", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
-            Dim colDesde As New DataGridViewTextBoxColumn With {.Name = "FechaDesde", .DataPropertyName = "FechaDesde", .HeaderText = "Desde", .Width = 100}
+
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "NombreFuncionario", .DataPropertyName = "NombreFuncionario", .HeaderText = "Funcionario",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
+            .FillWeight = 40 ' Ocupa el 40% del espacio sobrante
+        })
+
+            Dim colDesde As New DataGridViewTextBoxColumn With {
+            .Name = "FechaDesde", .DataPropertyName = "FechaDesde", .HeaderText = "Desde",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
+            .MinimumWidth = 100
+        }
             colDesde.DefaultCellStyle.Format = "dd/MM/yyyy"
             .Columns.Add(colDesde)
-            Dim colHasta As New DataGridViewTextBoxColumn With {.Name = "FechaHasta", .DataPropertyName = "FechaHasta", .HeaderText = "Hasta", .Width = 100}
+
+            Dim colHasta As New DataGridViewTextBoxColumn With {
+            .Name = "FechaHasta", .DataPropertyName = "FechaHasta", .HeaderText = "Hasta",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
+            .MinimumWidth = 100
+        }
             colHasta.DefaultCellStyle.Format = "dd/MM/yyyy"
             .Columns.Add(colHasta)
-            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "TipoSancion", .DataPropertyName = "TipoSancion", .HeaderText = "Tipo", .Width = 150})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Estado", .DataPropertyName = "Estado", .Width = 130})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Comentario", .DataPropertyName = "Comentario", .HeaderText = "Observaciones", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
+
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "TipoSancion", .DataPropertyName = "TipoSancion", .HeaderText = "Tipo",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
+            .MinimumWidth = 150
+        })
+
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "Estado", .DataPropertyName = "Estado", .HeaderText = "Estado",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
+            .MinimumWidth = 130
+        })
+
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "Comentario", .DataPropertyName = "Comentario", .HeaderText = "Observaciones",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
+            .FillWeight = 60 ' Ocupa el 60% del espacio sobrante
+        })
         End With
 
+        ' Se mantiene tu manejador de eventos original
         AddHandler dgvSanciones.CellDoubleClick, Sub(sender As Object, e As DataGridViewCellEventArgs)
                                                      btnEditarSancion.PerformClick()
                                                  End Sub

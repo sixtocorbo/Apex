@@ -26,8 +26,6 @@ Partial Class frmConfiguracion
         Me.btnAreasTrabajo = New System.Windows.Forms.Button()
         Me.btnSecciones = New System.Windows.Forms.Button()
         Me.btnCargos = New System.Windows.Forms.Button()
-        Me.btnCategoriasAusencia = New System.Windows.Forms.Button()
-        Me.btnTiposEstadoTransitorio = New System.Windows.Forms.Button()
         Me.btnGestionarIncidencias = New System.Windows.Forms.Button()
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
         Me.btnNomenclaturas = New System.Windows.Forms.Button()
@@ -74,26 +72,6 @@ Partial Class frmConfiguracion
         Me.btnCargos.Text = "Gestionar Cargos"
         Me.btnCargos.UseVisualStyleBackColor = True
         '
-        'btnCategoriasAusencia
-        '
-        Me.btnCategoriasAusencia.Location = New System.Drawing.Point(4, 140)
-        Me.btnCategoriasAusencia.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnCategoriasAusencia.Name = "btnCategoriasAusencia"
-        Me.btnCategoriasAusencia.Size = New System.Drawing.Size(285, 35)
-        Me.btnCategoriasAusencia.TabIndex = 7
-        Me.btnCategoriasAusencia.Text = "Gestionar Categorías de Ausencia"
-        Me.btnCategoriasAusencia.UseVisualStyleBackColor = True
-        '
-        'btnTiposEstadoTransitorio
-        '
-        Me.btnTiposEstadoTransitorio.Location = New System.Drawing.Point(297, 95)
-        Me.btnTiposEstadoTransitorio.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnTiposEstadoTransitorio.Name = "btnTiposEstadoTransitorio"
-        Me.btnTiposEstadoTransitorio.Size = New System.Drawing.Size(285, 35)
-        Me.btnTiposEstadoTransitorio.TabIndex = 6
-        Me.btnTiposEstadoTransitorio.Text = "Gestionar Tipos de Estado"
-        Me.btnTiposEstadoTransitorio.UseVisualStyleBackColor = True
-        '
         'btnGestionarIncidencias
         '
         Me.btnGestionarIncidencias.Location = New System.Drawing.Point(4, 95)
@@ -111,8 +89,6 @@ Partial Class frmConfiguracion
         Me.FlowLayoutPanel1.Controls.Add(Me.btnAreasTrabajo)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnTurnos)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnGestionarIncidencias)
-        Me.FlowLayoutPanel1.Controls.Add(Me.btnTiposEstadoTransitorio)
-        Me.FlowLayoutPanel1.Controls.Add(Me.btnCategoriasAusencia)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnNomenclaturas)
         Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.FlowLayoutPanel1.Location = New System.Drawing.Point(0, 0)
@@ -122,7 +98,7 @@ Partial Class frmConfiguracion
         '
         'btnNomenclaturas
         '
-        Me.btnNomenclaturas.Location = New System.Drawing.Point(297, 140)
+        Me.btnNomenclaturas.Location = New System.Drawing.Point(297, 95)
         Me.btnNomenclaturas.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnNomenclaturas.Name = "btnNomenclaturas"
         Me.btnNomenclaturas.Size = New System.Drawing.Size(285, 35)
@@ -149,8 +125,6 @@ Partial Class frmConfiguracion
     Friend WithEvents btnAreasTrabajo As Button
     Friend WithEvents btnSecciones As Button
     Friend WithEvents btnCargos As Button
-    Friend WithEvents btnCategoriasAusencia As Button
-    Friend WithEvents btnTiposEstadoTransitorio As Button
     Friend WithEvents btnGestionarIncidencias As Button
     Friend WithEvents FlowLayoutPanel1 As FlowLayoutPanel
     Friend WithEvents btnNomenclaturas As Button

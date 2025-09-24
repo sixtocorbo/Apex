@@ -20,6 +20,7 @@ Public Class frmLicencias
 
     Private Async Sub frmGestionLicencias_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
+        dgvLicencias.ActivarDobleBuffer(True)
         ConfigurarGrillaLicencias()
 
         ' MEJORA: Aumentamos el intervalo para que no se active tan rápido
@@ -77,24 +78,75 @@ Public Class frmLicencias
 
     Private Sub ConfigurarGrillaLicencias()
         With dgvLicencias
-            .AutoGenerateColumns = False
-            .Columns.Clear()
+            ' --- CONFIGURACIÓN GENERAL ---
+            .BorderStyle = BorderStyle.None
+            .CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal
+            .GridColor = Color.FromArgb(230, 230, 230)
             .RowHeadersVisible = False
             .SelectionMode = DataGridViewSelectionMode.FullRowSelect
             .MultiSelect = False
             .ReadOnly = True
             .AllowUserToAddRows = False
             .AllowUserToDeleteRows = False
+            .AllowUserToResizeRows = False
+            .AutoGenerateColumns = False
+            .BackgroundColor = Color.White
+
+            ' --- ESTILO DE ENCABEZADOS (Headers) ---
+            .EnableHeadersVisualStyles = False
+            .ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None
+            .ColumnHeadersHeight = 40
+            .ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(28, 41, 56)
+            .ColumnHeadersDefaultCellStyle.ForeColor = Color.White
+            .ColumnHeadersDefaultCellStyle.Font = New Font("Segoe UI", 9.75F, FontStyle.Bold)
+            .ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft
+            .ColumnHeadersDefaultCellStyle.Padding = New Padding(5, 0, 0, 0)
+
+            ' --- ESTILO DE FILAS (Rows) ---
+            .DefaultCellStyle.Font = New Font("Segoe UI", 9.0F)
+            .DefaultCellStyle.Padding = New Padding(5, 0, 5, 0)
+            .DefaultCellStyle.SelectionBackColor = Color.FromArgb(51, 153, 255)
+            .DefaultCellStyle.SelectionForeColor = Color.White
+            .RowsDefaultCellStyle.BackColor = Color.White
+            .AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(242, 245, 247) ' Efecto Cebra
+
+            ' --- DEFINICIÓN DE COLUMNAS ---
+            .Columns.Clear()
+
             .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "LicenciaId", .DataPropertyName = "LicenciaId", .Visible = False})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "NombreFuncionario", .DataPropertyName = "NombreFuncionario", .HeaderText = "Funcionario", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "TipoLicencia", .DataPropertyName = "TipoLicencia", .HeaderText = "Tipo", .Width = 180})
-            Dim colInicio As New DataGridViewTextBoxColumn With {.Name = "FechaInicio", .DataPropertyName = "FechaInicio", .HeaderText = "Desde", .Width = 100}
+
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "NombreFuncionario", .DataPropertyName = "NombreFuncionario", .HeaderText = "Funcionario",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+        })
+
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "TipoLicencia", .DataPropertyName = "TipoLicencia", .HeaderText = "Tipo",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
+            .MinimumWidth = 180
+        })
+
+            Dim colInicio As New DataGridViewTextBoxColumn With {
+            .Name = "FechaInicio", .DataPropertyName = "FechaInicio", .HeaderText = "Desde",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
+            .MinimumWidth = 100
+        }
             colInicio.DefaultCellStyle.Format = "dd/MM/yyyy"
             .Columns.Add(colInicio)
-            Dim colFin As New DataGridViewTextBoxColumn With {.Name = "FechaFin", .DataPropertyName = "FechaFin", .HeaderText = "Hasta", .Width = 100}
+
+            Dim colFin As New DataGridViewTextBoxColumn With {
+            .Name = "FechaFin", .DataPropertyName = "FechaFin", .HeaderText = "Hasta",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
+            .MinimumWidth = 100
+        }
             colFin.DefaultCellStyle.Format = "dd/MM/yyyy"
             .Columns.Add(colFin)
-            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "EstadoLicencia", .DataPropertyName = "EstadoLicencia", .HeaderText = "Estado", .Width = 120})
+
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "EstadoLicencia", .DataPropertyName = "EstadoLicencia", .HeaderText = "Estado",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
+            .MinimumWidth = 120
+        })
         End With
     End Sub
 
@@ -154,17 +206,24 @@ Public Class frmLicencias
 
     Private Sub dgvLicencias_RowPrePaint(sender As Object, e As DataGridViewRowPrePaintEventArgs) Handles dgvLicencias.RowPrePaint
         If e.RowIndex < 0 Then Return
+
         Dim row = Me.dgvLicencias.Rows(e.RowIndex)
         Dim dto = TryCast(row.DataBoundItem, LicenciaConFuncionarioExtendidoDto)
+        If dto Is Nothing Then Return
 
-        If dto IsNot Nothing Then
-            If Not dto.Activo Then
-                row.DefaultCellStyle.BackColor = Color.MistyRose
-                row.DefaultCellStyle.ForeColor = Color.DarkRed
+        If Not dto.Activo Then
+            ' Si está inactivo, siempre pintamos de rojo, sin importar si es par o impar.
+            row.DefaultCellStyle.BackColor = Color.MistyRose
+            row.DefaultCellStyle.ForeColor = Color.DarkRed
+        Else
+            ' Si está activo, restauramos el color que le corresponde por defecto (blanco o gris claro).
+            ' Esto asegura que el efecto cebra se mantenga.
+            If e.RowIndex Mod 2 = 0 Then
+                row.DefaultCellStyle.BackColor = dgvLicencias.RowsDefaultCellStyle.BackColor ' Generalmente Blanco
             Else
-                row.DefaultCellStyle.BackColor = dgvLicencias.DefaultCellStyle.BackColor
-                row.DefaultCellStyle.ForeColor = dgvLicencias.DefaultCellStyle.ForeColor
+                row.DefaultCellStyle.BackColor = dgvLicencias.AlternatingRowsDefaultCellStyle.BackColor ' Gris claro
             End If
+            row.DefaultCellStyle.ForeColor = dgvLicencias.DefaultCellStyle.ForeColor ' Color de texto normal
         End If
     End Sub
 

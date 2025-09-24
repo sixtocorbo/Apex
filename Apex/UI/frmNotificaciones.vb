@@ -22,6 +22,7 @@ Public Class frmNotificaciones
     Private Sub frmGestionNotificaciones_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.KeyPreview = True
         AppTheme.Aplicar(Me)
+        dgvNotificaciones.ActivarDobleBuffer(True)
         ConfigurarGrilla()
 
         ' Configuración de la nueva búsqueda
@@ -287,23 +288,78 @@ Public Class frmNotificaciones
 
 #Region "Configuración de Grilla y Helpers"
 
+    ' Reemplaza este método en la región "Configuración de Grilla y Helpers"
     Private Sub ConfigurarGrilla()
         With dgvNotificaciones
             .SuspendLayout()
-            .AutoGenerateColumns = False
-            .Columns.Clear()
-            .MultiSelect = True
+
+            ' --- CONFIGURACIÓN GENERAL ---
+            .BorderStyle = BorderStyle.None
+            .CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal
+            .GridColor = Color.FromArgb(230, 230, 230)
+            .RowHeadersVisible = False
+            .SelectionMode = DataGridViewSelectionMode.FullRowSelect
+            .MultiSelect = True ' Se mantiene de tu configuración original
             .ReadOnly = True
             .AllowUserToAddRows = False
-            .SelectionMode = DataGridViewSelectionMode.FullRowSelect
-            .RowHeadersVisible = False
+            .AllowUserToResizeRows = False
+            .AutoGenerateColumns = False
+            .BackgroundColor = Color.White
+
+            ' --- ESTILO DE ENCABEZADOS (Headers) ---
+            .EnableHeadersVisualStyles = False
+            .ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None
+            .ColumnHeadersHeight = 40
+            .ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(28, 41, 56)
+            .ColumnHeadersDefaultCellStyle.ForeColor = Color.White
+            .ColumnHeadersDefaultCellStyle.Font = New Font("Segoe UI", 9.75F, FontStyle.Bold)
+            .ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft
+            .ColumnHeadersDefaultCellStyle.Padding = New Padding(5, 0, 0, 0)
+
+            ' --- ESTILO DE FILAS (Rows) ---
+            .DefaultCellStyle.Font = New Font("Segoe UI", 9.0F)
+            .DefaultCellStyle.Padding = New Padding(5, 0, 5, 0)
+            .DefaultCellStyle.SelectionBackColor = Color.FromArgb(51, 153, 255)
+            .DefaultCellStyle.SelectionForeColor = Color.White
+            .RowsDefaultCellStyle.BackColor = Color.White
+            .AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(242, 245, 247) ' Efecto Cebra
+
+            ' --- DEFINICIÓN DE COLUMNAS (Mantiene tu lógica original con estilo mejorado) ---
+            .Columns.Clear()
 
             .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Id", .DataPropertyName = "Id", .Visible = False})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "NombreFuncionario", .DataPropertyName = "NombreFuncionario", .HeaderText = "Funcionario", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "CI", .DataPropertyName = "CI", .HeaderText = "Cédula", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "FechaProgramada", .DataPropertyName = "FechaProgramada", .HeaderText = "Fecha Programada", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells, .DefaultCellStyle = New DataGridViewCellStyle With {.Format = "yyyy-MM-dd HH:mm"}})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "TipoNotificacion", .DataPropertyName = "TipoNotificacion", .HeaderText = "Tipo", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Estado", .DataPropertyName = "Estado", .HeaderText = "Estado", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells})
+
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "NombreFuncionario", .DataPropertyName = "NombreFuncionario", .HeaderText = "Funcionario",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, ' Ocupa el espacio restante
+            .MinimumWidth = 200
+        })
+
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "CI", .DataPropertyName = "CI", .HeaderText = "Cédula",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells, ' Se ajusta al contenido
+            .MinimumWidth = 90
+        })
+
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "FechaProgramada", .DataPropertyName = "FechaProgramada", .HeaderText = "Fecha Programada",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
+            .MinimumWidth = 150,
+            .DefaultCellStyle = New DataGridViewCellStyle With {.Format = "yyyy-MM-dd HH:mm"} ' Se mantiene tu formato
+        })
+
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "TipoNotificacion", .DataPropertyName = "TipoNotificacion", .HeaderText = "Tipo",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
+            .MinimumWidth = 120
+        })
+
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "Estado", .DataPropertyName = "Estado", .HeaderText = "Estado",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
+            .MinimumWidth = 100
+        })
+
             .ResumeLayout()
         End With
     End Sub

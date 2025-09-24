@@ -31,6 +31,7 @@ Public Class frmGrados
     Private Async Sub frmGrados_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
         Me.KeyPreview = True
+        dgvCargos.ActivarDobleBuffer(True)
         ConfigurarGrilla()
 
         ' Placeholder y debounce
@@ -124,23 +125,55 @@ Public Class frmGrados
     ' ------------------ UI ------------------
     Private Sub ConfigurarGrilla()
         With dgvCargos
-            .AutoGenerateColumns = False
-            .Columns.Clear()
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Id", .HeaderText = "Id", .Visible = False})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Nombre", .HeaderText = "Nombre", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Grado", .HeaderText = "Grado", .Width = 90})
-
-            .ReadOnly = True
+            ' --- CONFIGURACIÓN GENERAL (Unificamos con el estilo moderno) ---
+            .BorderStyle = BorderStyle.None
+            .CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal
+            .GridColor = Color.FromArgb(230, 230, 230)
+            .RowHeadersVisible = False
             .SelectionMode = DataGridViewSelectionMode.FullRowSelect
             .MultiSelect = False
-            .RowHeadersVisible = False
+            .ReadOnly = True
+            .AllowUserToAddRows = False
+            .AllowUserToDeleteRows = False
             .AllowUserToResizeRows = False
-            .AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells
-            .AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(245, 245, 245)
+            .AutoGenerateColumns = False
+            .BackgroundColor = Color.White
+
+            ' --- ESTILO DE ENCABEZADOS (Headers) ---
             .EnableHeadersVisualStyles = False
-            .ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(230, 230, 230)
-            .ColumnHeadersDefaultCellStyle.Font = New Font(.Font, FontStyle.Bold)
-            .RowTemplate.Height = 28
+            .ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None
+            .ColumnHeadersHeight = 40
+            .ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(28, 41, 56)
+            .ColumnHeadersDefaultCellStyle.ForeColor = Color.White
+            .ColumnHeadersDefaultCellStyle.Font = New Font("Segoe UI", 9.75F, FontStyle.Bold)
+            .ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft
+            .ColumnHeadersDefaultCellStyle.Padding = New Padding(5, 0, 0, 0)
+
+            ' --- ESTILO DE FILAS (Rows) ---
+            .DefaultCellStyle.Font = New Font("Segoe UI", 9.0F)
+            .DefaultCellStyle.Padding = New Padding(5, 0, 5, 0)
+            .DefaultCellStyle.SelectionBackColor = Color.FromArgb(51, 153, 255)
+            .DefaultCellStyle.SelectionForeColor = Color.White
+            .RowsDefaultCellStyle.BackColor = Color.White
+            .AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(242, 245, 247) ' Efecto Cebra
+
+            ' --- DEFINICIÓN DE COLUMNAS (Mantenemos las tuyas con mejoras) ---
+            .Columns.Clear()
+
+            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Id", .HeaderText = "Id", .Visible = False})
+
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .DataPropertyName = "Nombre", .HeaderText = "Nombre",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
+            .MinimumWidth = 200
+        })
+
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .DataPropertyName = "Grado", .HeaderText = "Grado",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells, ' Más flexible que un ancho fijo
+            .MinimumWidth = 90,
+            .DefaultCellStyle = New DataGridViewCellStyle With {.Alignment = DataGridViewContentAlignment.MiddleCenter} ' Centrado
+        })
         End With
     End Sub
 

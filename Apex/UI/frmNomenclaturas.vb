@@ -15,8 +15,10 @@ Public Class frmNomenclaturas
         Me.Cursor = Cursors.WaitCursor
         Try
             AppTheme.Aplicar(Me)
-            Await CargarDatosAsync()
+            dgvNomenclaturas.ActivarDobleBuffer(True)
             ConfigurarGrilla()
+            Await CargarDatosAsync()
+
             LimpiarCampos()
 
             Try
@@ -164,34 +166,80 @@ Public Class frmNomenclaturas
 
 
     Private Sub ConfigurarGrilla()
-        If dgvNomenclaturas.Columns.Count = 0 Then Return
+        With dgvNomenclaturas
+            ' --- CONFIGURACIÓN GENERAL (Aplicamos los estilos modernos) ---
+            .BorderStyle = BorderStyle.None
+            .CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal
+            .GridColor = Color.FromArgb(230, 230, 230)
+            .RowHeadersVisible = False
+            .SelectionMode = DataGridViewSelectionMode.FullRowSelect
+            .MultiSelect = False
+            .ReadOnly = True
+            .AllowUserToAddRows = False
+            .AllowUserToDeleteRows = False
+            .AllowUserToResizeRows = False
+            .AutoGenerateColumns = False ' <-- Clave: Desactivamos la autogeneración
+            .BackgroundColor = Color.White
 
-        dgvNomenclaturas.RowHeadersVisible = False
-        dgvNomenclaturas.SelectionMode = DataGridViewSelectionMode.FullRowSelect
-        dgvNomenclaturas.MultiSelect = False
-        dgvNomenclaturas.ReadOnly = True
-        dgvNomenclaturas.AllowUserToAddRows = False
-        dgvNomenclaturas.AllowUserToDeleteRows = False
+            ' --- ESTILO DE ENCABEZADOS (Headers) ---
+            .EnableHeadersVisualStyles = False
+            .ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None
+            .ColumnHeadersHeight = 40
+            .ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(28, 41, 56)
+            .ColumnHeadersDefaultCellStyle.ForeColor = Color.White
+            .ColumnHeadersDefaultCellStyle.Font = New Font("Segoe UI", 9.75F, FontStyle.Bold)
+            .ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft
+            .ColumnHeadersDefaultCellStyle.Padding = New Padding(5, 0, 0, 0)
 
-        ' Ocultas
-        If dgvNomenclaturas.Columns.Contains("Id") Then dgvNomenclaturas.Columns("Id").Visible = False
-        If dgvNomenclaturas.Columns.Contains("Patron") Then dgvNomenclaturas.Columns("Patron").Visible = False
-        If dgvNomenclaturas.Columns.Contains("Ejemplo") Then dgvNomenclaturas.Columns("Ejemplo").Visible = False
-        If dgvNomenclaturas.Columns.Contains("UbicacionArchivo") Then dgvNomenclaturas.Columns("UbicacionArchivo").Visible = False
-        If dgvNomenclaturas.Columns.Contains("Observaciones") Then dgvNomenclaturas.Columns("Observaciones").Visible = False
+            ' --- ESTILO DE FILAS (Rows) ---
+            .DefaultCellStyle.Font = New Font("Segoe UI", 9.0F)
+            .DefaultCellStyle.Padding = New Padding(5, 0, 5, 0)
+            .DefaultCellStyle.SelectionBackColor = Color.FromArgb(51, 153, 255)
+            .DefaultCellStyle.SelectionForeColor = Color.White
+            .RowsDefaultCellStyle.BackColor = Color.White
+            .AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(242, 245, 247)
 
-        ' Ajustes
-        If dgvNomenclaturas.Columns.Contains("Nombre") Then dgvNomenclaturas.Columns("Nombre").AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-        If dgvNomenclaturas.Columns.Contains("Codigo") Then dgvNomenclaturas.Columns("Codigo").Width = 120
-        If dgvNomenclaturas.Columns.Contains("AreaResponsable") Then
-            dgvNomenclaturas.Columns("AreaResponsable").HeaderText = "Área Resp."
-            dgvNomenclaturas.Columns("AreaResponsable").Width = 120
-        End If
-        If dgvNomenclaturas.Columns.Contains("UsaFecha") Then dgvNomenclaturas.Columns("UsaFecha").Width = 90
-        If dgvNomenclaturas.Columns.Contains("UsaNomenclaturaCodigo") Then
-            dgvNomenclaturas.Columns("UsaNomenclaturaCodigo").HeaderText = "Usa Código"
-            dgvNomenclaturas.Columns("UsaNomenclaturaCodigo").Width = 90
-        End If
+            ' --- DEFINICIÓN MANUAL DE COLUMNAS (Más robusto) ---
+            .Columns.Clear()
+
+            ' Columnas Ocultas
+            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Id", .Visible = False})
+            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Patron", .Visible = False})
+            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Ejemplo", .Visible = False})
+            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "UbicacionArchivo", .Visible = False})
+            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Observaciones", .Visible = False})
+
+            ' Columnas Visibles
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .DataPropertyName = "Nombre", .HeaderText = "Nombre",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+        })
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .DataPropertyName = "Codigo", .HeaderText = "Código",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells, .MinimumWidth = 120
+        })
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .DataPropertyName = "AreaResponsable", .HeaderText = "Área Resp.",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells, .MinimumWidth = 120
+        })
+
+            ' Columnas de tipo CheckBox para los booleanos
+            Dim chkUsaFecha As New DataGridViewCheckBoxColumn With {
+            .DataPropertyName = "UsaFecha", .HeaderText = "Usa Fecha",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells, .MinimumWidth = 90
+        }
+            chkUsaFecha.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter
+            chkUsaFecha.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
+            .Columns.Add(chkUsaFecha)
+
+            Dim chkUsaCodigo As New DataGridViewCheckBoxColumn With {
+            .DataPropertyName = "UsaNomenclaturaCodigo", .HeaderText = "Usa Código",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells, .MinimumWidth = 90
+        }
+            chkUsaCodigo.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter
+            chkUsaCodigo.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
+            .Columns.Add(chkUsaCodigo)
+        End With
     End Sub
 
 

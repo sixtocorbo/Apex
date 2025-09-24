@@ -65,9 +65,13 @@ Public Class frmFuncionarioBuscar
         btnVerSituacion.Tag = "KeepBackColor"
         panelDetalle.Visible = False
         AppTheme.Aplicar(Me)
+
+        ' --- APLICAR MEJORAS ---
+        dgvFuncionarios.ActivarDobleBuffer(True) ' <-- LÍNEA AÑADIDA
         ConfigurarGrilla()
 
         ' --- INICIO DE CAMBIOS: Configuración de la nueva búsqueda ---
+        ' (El resto de tu código sigue igual)
         _searchTimer.Interval = 700 ' Aumentamos el intervalo
         _searchTimer.Enabled = False
         _colorOriginalBusqueda = txtBusqueda.BackColor
@@ -317,19 +321,80 @@ Public Class frmFuncionarioBuscar
     'End Sub
 
 #Region "Diseño de grilla"
+    ' Reemplaza este método en la región "Diseño de grilla"
     Private Sub ConfigurarGrilla()
         With dgvFuncionarios
+            ' --- CONFIGURACIÓN GENERAL ---
+            .BorderStyle = BorderStyle.None
+            .CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal
+            .GridColor = Color.FromArgb(230, 230, 230)
+            .RowHeadersVisible = False
+            .SelectionMode = DataGridViewSelectionMode.FullRowSelect
+            .MultiSelect = False
+            .AllowUserToResizeRows = False
             .AutoGenerateColumns = False
-            .RowTemplate.Height = 40
-            .RowTemplate.MinimumHeight = 40
+            .BackgroundColor = Color.White
+
+            ' --- ESTILO DE ENCABEZADOS (Headers) ---
+            .EnableHeadersVisualStyles = False
+            .ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None
+            .ColumnHeadersHeight = 40
+            .ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(28, 41, 56)
+            .ColumnHeadersDefaultCellStyle.ForeColor = Color.White
+            .ColumnHeadersDefaultCellStyle.Font = New Font("Segoe UI", 9.75F, FontStyle.Bold)
+            .ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft
+            .ColumnHeadersDefaultCellStyle.Padding = New Padding(5, 0, 0, 0)
+
+            ' --- ESTILO DE FILAS (Rows) ---
+            .DefaultCellStyle.Font = New Font("Segoe UI", 9.5F)
+            .DefaultCellStyle.Padding = New Padding(5, 0, 5, 0)
+            .DefaultCellStyle.SelectionBackColor = Color.FromArgb(51, 153, 255)
+            .DefaultCellStyle.SelectionForeColor = Color.White
+            .RowsDefaultCellStyle.BackColor = Color.White
+            .AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(242, 245, 247)
+
+            ' --- DEFINICIÓN DE COLUMNAS ---
             .Columns.Clear()
-            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Id", .DataPropertyName = "Id", .Visible = False})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "CI", .DataPropertyName = "CI", .HeaderText = "CI", .Width = 90})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Nombre", .DataPropertyName = "Nombre", .HeaderText = "Nombre", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Cargo", .DataPropertyName = "CargoNombre", .HeaderText = "Cargo", .Width = 150})
+
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "Id", .DataPropertyName = "Id", .Visible = False
+        })
+
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "CI", .DataPropertyName = "CI", .HeaderText = "Cédula",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells, ' Se ajusta al contenido
+            .MinimumWidth = 90
+        })
+
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "Nombre", .DataPropertyName = "Nombre", .HeaderText = "Nombre",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, ' Ocupa el espacio restante
+            .MinimumWidth = 200
+        })
+
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "Cargo", .DataPropertyName = "CargoNombre", .HeaderText = "Cargo",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells, ' Se ajusta al contenido
+            .MinimumWidth = 150
+        })
         End With
+
+        ' Manejador de errores para evitar que la app crashee si hay un problema al bindear datos
         AddHandler dgvFuncionarios.DataError, Sub(s, ev) ev.ThrowException = False
     End Sub
+    'Private Sub ConfigurarGrilla()
+    '    With dgvFuncionarios
+    '        .AutoGenerateColumns = False
+    '        .RowTemplate.Height = 40
+    '        .RowTemplate.MinimumHeight = 40
+    '        .Columns.Clear()
+    '        .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Id", .DataPropertyName = "Id", .Visible = False})
+    '        .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "CI", .DataPropertyName = "CI", .HeaderText = "CI", .Width = 90})
+    '        .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Nombre", .DataPropertyName = "Nombre", .HeaderText = "Nombre", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
+    '        .Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Cargo", .DataPropertyName = "CargoNombre", .HeaderText = "Cargo", .Width = 150})
+    '    End With
+    '    AddHandler dgvFuncionarios.DataError, Sub(s, ev) ev.ThrowException = False
+    'End Sub
 #End Region
 
 #Region "Búsqueda con Full-Text y CONTAINS"
@@ -554,7 +619,7 @@ Public Class frmFuncionarioBuscar
             End If
 
             If f.Foto Is Nothing OrElse f.Foto.Length = 0 Then
-                pbFotoDetalle.Image = My.Resources.Police
+                pbFotoDetalle.Image = My.Resources.Police.ToBitmap
             Else
                 Using ms As New MemoryStream(f.Foto)
                     pbFotoDetalle.Image = Image.FromStream(ms)

@@ -29,7 +29,8 @@ Public Class frmFuncionarioSituacion
 
     Private Async Sub frmFuncionarioSituacion_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
-
+        dgvNovedades.ActivarDobleBuffer(True) ' <-- LÍNEA AÑADIDA
+        dgvEstados.ActivarDobleBuffer(True)   ' <-- LÍNEA AÑADIDA
         ' Suscripciones a eventos
         AddHandler dgvNovedades.CellDoubleClick, AddressOf dgvNovedades_CellDoubleClick
         AddHandler dgvNovedades.DataBindingComplete, AddressOf DgvNovedades_DataBindingComplete
@@ -386,41 +387,58 @@ Public Class frmFuncionarioSituacion
 #Region " Configuración y Eventos de Grillas "
     ' --- SIN CAMBIOS EN ESTA REGIÓN ---
     Private Sub ConfigurarGrillaNovedades()
-        If dgvNovedades.Columns.Count > 0 Then Return
+        ' Aplicamos el estilo base moderno
+        AplicarEstiloModernoGrilla(dgvNovedades)
+
+        ' Si ya están creadas, no las volvemos a crear
+        If dgvNovedades.Columns.Contains("Fecha") Then Return
+
         dgvNovedades.AutoGenerateColumns = False
         dgvNovedades.Columns.Clear()
 
         Dim colFecha As New DataGridViewTextBoxColumn With {
-            .Name = "Fecha", .DataPropertyName = "Fecha", .HeaderText = "Fecha",
-            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-        }
+        .Name = "Fecha", .DataPropertyName = "Fecha", .HeaderText = "Fecha",
+        .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
+        .MinimumWidth = 120
+    }
         colFecha.DefaultCellStyle.Format = "dd/MM/yyyy"
         dgvNovedades.Columns.Add(colFecha)
 
         dgvNovedades.Columns.Add(New DataGridViewTextBoxColumn With {
-            .Name = "Texto", .DataPropertyName = "Texto", .HeaderText = "Novedad",
-            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-        })
+        .Name = "Texto", .DataPropertyName = "Texto", .HeaderText = "Novedad",
+        .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+    })
     End Sub
 
     Private Sub ConfigurarGrillaEstados()
-        If dgvEstados.Columns.Count > 0 Then Return
+        ' Aplicamos el estilo base moderno
+        AplicarEstiloModernoGrilla(dgvEstados)
+
+        ' Si ya están creadas, no las volvemos a crear
+        If dgvEstados.Columns.Contains("Tipo") Then Return
+
         dgvEstados.AutoGenerateColumns = False
         dgvEstados.Columns.Clear()
+
         dgvEstados.Columns.Add(New DataGridViewTextBoxColumn With {
-            .Name = "Tipo", .DataPropertyName = "Tipo", .HeaderText = "Tipo",
-            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-        })
+        .Name = "Tipo", .DataPropertyName = "Tipo", .HeaderText = "Tipo",
+        .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
+        .MinimumWidth = 300
+    })
+
         Dim colDesde As New DataGridViewTextBoxColumn With {
-            .Name = "Desde", .DataPropertyName = "Desde", .HeaderText = "Desde",
-            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-        }
+        .Name = "Desde", .DataPropertyName = "Desde", .HeaderText = "Desde",
+        .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
+        .MinimumWidth = 110
+    }
         colDesde.DefaultCellStyle.Format = "dd/MM/yyyy"
         dgvEstados.Columns.Add(colDesde)
+
         Dim colHasta As New DataGridViewTextBoxColumn With {
-            .Name = "Hasta", .DataPropertyName = "Hasta", .HeaderText = "Hasta",
-            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-        }
+        .Name = "Hasta", .DataPropertyName = "Hasta", .HeaderText = "Hasta",
+        .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
+        .MinimumWidth = 110
+    }
         colHasta.DefaultCellStyle.Format = "dd/MM/yyyy"
         dgvEstados.Columns.Add(colHasta)
     End Sub
@@ -593,7 +611,39 @@ Public Class frmFuncionarioSituacion
     End Sub
 
 #End Region
+    ' Agrega este nuevo método en cualquier lugar dentro de la clase del formulario
+    Private Sub AplicarEstiloModernoGrilla(dgv As DataGridView)
+        ' --- CONFIGURACIÓN GENERAL ---
+        dgv.BorderStyle = BorderStyle.None
+        dgv.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal
+        dgv.GridColor = Color.FromArgb(230, 230, 230)
+        dgv.RowHeadersVisible = False
+        dgv.SelectionMode = DataGridViewSelectionMode.FullRowSelect
+        dgv.MultiSelect = False
+        dgv.ReadOnly = True
+        dgv.AllowUserToAddRows = False
+        dgv.AllowUserToDeleteRows = False
+        dgv.AllowUserToResizeRows = False
+        dgv.BackgroundColor = Color.White
 
+        ' --- ESTILO DE ENCABEZADOS (Headers) ---
+        dgv.EnableHeadersVisualStyles = False
+        dgv.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None
+        dgv.ColumnHeadersHeight = 40
+        dgv.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(28, 41, 56)
+        dgv.ColumnHeadersDefaultCellStyle.ForeColor = Color.White
+        dgv.ColumnHeadersDefaultCellStyle.Font = New Font("Segoe UI", 9.75F, FontStyle.Bold)
+        dgv.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft
+        dgv.ColumnHeadersDefaultCellStyle.Padding = New Padding(5, 0, 0, 0)
+
+        ' --- ESTILO DE FILAS (Rows) ---
+        dgv.DefaultCellStyle.Font = New Font("Segoe UI", 9.0F)
+        dgv.DefaultCellStyle.Padding = New Padding(5, 0, 5, 0)
+        dgv.DefaultCellStyle.SelectionBackColor = Color.FromArgb(51, 153, 255)
+        dgv.DefaultCellStyle.SelectionForeColor = Color.White
+        dgv.RowsDefaultCellStyle.BackColor = Color.White
+        dgv.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(242, 245, 247)
+    End Sub
 End Class
 
 Public Class DesignacionSeleccionDTO

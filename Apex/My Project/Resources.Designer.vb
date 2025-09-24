@@ -71,12 +71,12 @@ Namespace My.Resources
         End Property
         
         '''<summary>
-        '''  Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        '''  Busca un recurso adaptado de tipo System.Drawing.Icon similar a (Icono).
         '''</summary>
-        Friend ReadOnly Property Police() As System.Drawing.Bitmap
+        Friend ReadOnly Property Police() As System.Drawing.Icon
             Get
                 Dim obj As Object = ResourceManager.GetObject("Police", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
+                Return CType(obj,System.Drawing.Icon)
             End Get
         End Property
     End Module

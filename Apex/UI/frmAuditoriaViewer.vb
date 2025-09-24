@@ -19,6 +19,10 @@ Public Class frmAuditoriaViewer
     Private Async Sub frmAuditoriaViewer_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Text = $"Historial de Cambios para Registro: {_idRegistro}"
         AppTheme.Aplicar(Me)
+
+        ' --- APLICAR MEJORAS DE RENDIMIENTO ---
+        dgvAuditoria.ActivarDobleBuffer(True) ' <-- LÍNEA AÑADIDA
+
         ConfigurarGrilla()
         Await CargarDatosAsync()
     End Sub
@@ -46,18 +50,65 @@ Public Class frmAuditoriaViewer
     Private Sub ConfigurarGrilla()
         With dgvAuditoria
             .SuspendLayout()
-            .AutoGenerateColumns = False
-            .Columns.Clear()
+
+            ' --- CONFIGURACIÓN GENERAL (Estilo moderno) ---
+            .BorderStyle = BorderStyle.None
+            .CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal
+            .GridColor = Color.FromArgb(230, 230, 230)
+            .RowHeadersVisible = False
+            .SelectionMode = DataGridViewSelectionMode.FullRowSelect
+            .MultiSelect = False
             .ReadOnly = True
             .AllowUserToAddRows = False
-            .SelectionMode = DataGridViewSelectionMode.FullRowSelect
-            .RowHeadersVisible = False
+            .AllowUserToDeleteRows = False
+            .AllowUserToResizeRows = False
+            .AutoGenerateColumns = False
+            .BackgroundColor = Color.White
 
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "FechaHora", .HeaderText = "Fecha y Hora", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "UsuarioAccion", .HeaderText = "Usuario", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "CampoNombre", .HeaderText = "Campo Modificado", .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "ValorAnterior", .HeaderText = "Valor Anterior", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "ValorNuevo", .HeaderText = "Valor Nuevo", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
+            ' --- ESTILO DE ENCABEZADOS (Headers) ---
+            .EnableHeadersVisualStyles = False
+            .ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None
+            .ColumnHeadersHeight = 40
+            .ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(28, 41, 56)
+            .ColumnHeadersDefaultCellStyle.ForeColor = Color.White
+            .ColumnHeadersDefaultCellStyle.Font = New Font("Segoe UI", 9.75F, FontStyle.Bold)
+            .ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft
+            .ColumnHeadersDefaultCellStyle.Padding = New Padding(5, 0, 0, 0)
+
+            ' --- ESTILO DE FILAS (Rows) ---
+            .DefaultCellStyle.Font = New Font("Segoe UI", 9.0F)
+            .DefaultCellStyle.Padding = New Padding(5, 0, 5, 0)
+            .DefaultCellStyle.SelectionBackColor = Color.FromArgb(51, 153, 255)
+            .DefaultCellStyle.SelectionForeColor = Color.White
+            .RowsDefaultCellStyle.BackColor = Color.White
+            .AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(242, 245, 247)
+
+            ' --- DEFINICIÓN DE COLUMNAS (Mantenemos las tuyas con mejoras) ---
+            .Columns.Clear()
+
+            Dim colFecha As New DataGridViewTextBoxColumn With {
+            .DataPropertyName = "FechaHora", .HeaderText = "Fecha y Hora",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells, .MinimumWidth = 140
+        }
+            colFecha.DefaultCellStyle.Format = "dd/MM/yyyy HH:mm:ss" ' Formato con hora
+            .Columns.Add(colFecha)
+
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .DataPropertyName = "UsuarioAccion", .HeaderText = "Usuario",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells, .MinimumWidth = 120
+        })
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .DataPropertyName = "CampoNombre", .HeaderText = "Campo Modificado",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells, .MinimumWidth = 150
+        })
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .DataPropertyName = "ValorAnterior", .HeaderText = "Valor Anterior",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, .FillWeight = 50 ' 50% del espacio
+        })
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .DataPropertyName = "ValorNuevo", .HeaderText = "Valor Nuevo",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, .FillWeight = 50 ' 50% del espacio
+        })
 
             .ResumeLayout()
         End With

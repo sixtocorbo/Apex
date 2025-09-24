@@ -60,22 +60,57 @@ Public Class frmTurnos
 
     ' ===== UI =====
     Private Sub ConfigurarGrilla()
-        dgvTurnos.AutoGenerateColumns = False
+        ' --- APLICAR ESTILOS MODERNOS ---
+        With dgvTurnos
+            ' --- Configuración General ---
+            .BorderStyle = BorderStyle.None
+            .CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal
+            .GridColor = Color.FromArgb(230, 230, 230)
+            .RowHeadersVisible = False
+            .SelectionMode = DataGridViewSelectionMode.FullRowSelect
+            .MultiSelect = False
+            .ReadOnly = True
+            .AllowUserToAddRows = False
+            .AllowUserToDeleteRows = False
+            .AllowUserToResizeRows = False
+            .AutoGenerateColumns = False
+            .BackgroundColor = Color.White
+
+            ' --- Estilo de Encabezados (Headers) ---
+            .EnableHeadersVisualStyles = False
+            .ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None
+            .ColumnHeadersHeight = 40
+            .ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(28, 41, 56)
+            .ColumnHeadersDefaultCellStyle.ForeColor = Color.White
+            .ColumnHeadersDefaultCellStyle.Font = New Font("Segoe UI", 9.75F, FontStyle.Bold)
+            .ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft
+            .ColumnHeadersDefaultCellStyle.Padding = New Padding(5, 0, 0, 0)
+
+            ' --- Estilo de Filas (Rows) ---
+            .DefaultCellStyle.Font = New Font("Segoe UI", 9.5F) ' Fuente legible
+            .DefaultCellStyle.Padding = New Padding(5, 0, 5, 0)
+            .DefaultCellStyle.SelectionBackColor = Color.FromArgb(51, 153, 255)
+            .DefaultCellStyle.SelectionForeColor = Color.White
+            .RowsDefaultCellStyle.BackColor = Color.White
+            .AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(242, 245, 247) ' Efecto Cebra
+        End With
+
+        ' --- DEFINICIÓN DE COLUMNAS (Se mantiene tu lógica original) ---
         dgvTurnos.Columns.Clear()
 
         dgvTurnos.Columns.Add(New DataGridViewTextBoxColumn With {
-            .DataPropertyName = "Id",
-            .HeaderText = "Id",
-            .Visible = False
-        })
+        .DataPropertyName = "Id",
+        .HeaderText = "Id",
+        .Visible = False
+    })
 
         dgvTurnos.Columns.Add(New DataGridViewTextBoxColumn With {
-            .DataPropertyName = "Nombre",
-            .HeaderText = "Nombre",
-            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-        })
+        .DataPropertyName = "Nombre",
+        .HeaderText = "Nombre del Turno", ' Título más descriptivo
+        .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+    })
 
-        ' Si quisieras mostrar fechas u otras columnas, agrégalas aquí
+        ' --- RENDIMIENTO (Ya lo tenías, se mantiene) ---
         HabilitarDoubleBuffering(dgvTurnos)
     End Sub
 

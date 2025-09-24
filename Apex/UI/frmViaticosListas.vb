@@ -28,22 +28,97 @@ Public Class frmViaticosListas
         _ctsBusqueda?.Dispose()
     End Sub
 
+    'Private Sub ConfigurarGrilla()
+    '    With dgvResultados
+    '        .AutoGenerateColumns = False
+    '        .Columns.Clear()
+    '        .RowHeadersVisible = False
+    '        .SelectionMode = DataGridViewSelectionMode.FullRowSelect
+    '        .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Grado", .HeaderText = "Grado", .Width = 60})
+    '        .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Cedula", .HeaderText = "Cédula", .Width = 90})
+    '        .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "NombreFuncionario", .HeaderText = "Funcionario", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
+    '        .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Seccion", .HeaderText = "Sección", .Width = 80})
+    '        .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "DiasAPagar", .HeaderText = "Días a Pagar", .Width = 80})
+    '        .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Motivo", .HeaderText = "Motivo", .Width = 150})
+    '        .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Observaciones", .HeaderText = "Obs.", .Width = 150})
+    '    End With
+    'End Sub
     Private Sub ConfigurarGrilla()
         With dgvResultados
-            .AutoGenerateColumns = False
+            ' --- CONFIGURACIÓN GENERAL ---
+            .BorderStyle = BorderStyle.None ' Sin borde exterior 3D.
+            .CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal ' Solo líneas horizontales, estilo moderno.
+            .GridColor = Color.FromArgb(230, 230, 230) ' Un gris claro para las líneas.
+            .RowHeadersVisible = False ' Ya lo tenías, es una buena práctica.
+            .SelectionMode = DataGridViewSelectionMode.FullRowSelect ' También correcto.
+            .AllowUserToResizeRows = False ' Evita que el usuario desajuste las alturas.
+            .AutoGenerateColumns = False ' Fundamental.
+            .BackgroundColor = Color.White ' Fondo blanco si no hay suficientes filas.
+
+            ' --- ESTILO DE ENCABEZADOS (Headers) ---
+            .EnableHeadersVisualStyles = False ' Permite usar nuestros estilos personalizados.
+            .ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None ' Sin borde en el encabezado.
+            .ColumnHeadersHeight = 40 ' Más altura para un look más espaciado.
+            .ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(28, 41, 56) ' Un color oscuro y profesional.
+            .ColumnHeadersDefaultCellStyle.ForeColor = Color.White ' Texto blanco para contraste.
+            .ColumnHeadersDefaultCellStyle.Font = New Font("Segoe UI", 9.75F, FontStyle.Bold) ' Fuente legible y en negrita.
+            .ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft ' Alineación a la izquierda.
+
+            ' --- ESTILO DE FILAS (Rows) ---
+            .DefaultCellStyle.Font = New Font("Segoe UI", 9.0F) ' Fuente estándar para las celdas.
+            .DefaultCellStyle.Padding = New Padding(5, 0, 5, 0) ' Espaciado interno en las celdas.
+            .DefaultCellStyle.SelectionBackColor = Color.FromArgb(51, 153, 255) ' Color de selección moderno.
+            .DefaultCellStyle.SelectionForeColor = Color.White ' Texto blanco al seleccionar.
+            .RowsDefaultCellStyle.BackColor = Color.White ' Fondo de filas.
+            .AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(242, 245, 247) ' "Efecto Cebra" para fácil lectura.
+
+            ' --- DEFINICIÓN DE COLUMNAS (Ajustadas para mejor tamaño y alineación) ---
             .Columns.Clear()
-            .RowHeadersVisible = False
-            .SelectionMode = DataGridViewSelectionMode.FullRowSelect
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Grado", .HeaderText = "Grado", .Width = 60})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Cedula", .HeaderText = "Cédula", .Width = 90})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "NombreFuncionario", .HeaderText = "Funcionario", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Seccion", .HeaderText = "Sección", .Width = 80})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "DiasAPagar", .HeaderText = "Días a Pagar", .Width = 80})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Motivo", .HeaderText = "Motivo", .Width = 150})
-            .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Observaciones", .HeaderText = "Obs.", .Width = 150})
+
+            ' Grado (corto)
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .DataPropertyName = "Grado", .HeaderText = "Grado",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
+            .DefaultCellStyle = New DataGridViewCellStyle With {.Alignment = DataGridViewContentAlignment.MiddleLeft}
+        })
+            ' Cédula (numérico, pero puede tratarse como texto)
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .DataPropertyName = "Cedula", .HeaderText = "Cédula",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
+            .DefaultCellStyle = New DataGridViewCellStyle With {.Alignment = DataGridViewContentAlignment.MiddleLeft}
+        })
+            ' Funcionario (ocupa el espacio restante)
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .DataPropertyName = "NombreFuncionario", .HeaderText = "Funcionario",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, ' Correcto para ocupar el resto.
+            .MinimumWidth = 200 ' Ancho mínimo para que no se comprima demasiado.
+        })
+            ' Sección
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .DataPropertyName = "Seccion", .HeaderText = "Sección",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+        })
+            ' Días a Pagar (numérico, alineado al centro)
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .DataPropertyName = "DiasAPagar", .HeaderText = "Días",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
+            .DefaultCellStyle = New DataGridViewCellStyle With {.Alignment = DataGridViewContentAlignment.MiddleCenter}
+        })
+            ' Motivo (ancho mínimo para que no se corte de inmediato)
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .DataPropertyName = "Motivo", .HeaderText = "Motivo",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.None, ' Usaremos ancho fijo pero con un mínimo.
+            .Width = 200
+        })
+            ' Observaciones
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+            .DataPropertyName = "Observaciones", .HeaderText = "Observaciones",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.None,
+            .Width = 250
+        })
+
         End With
     End Sub
-
 #Region "Lógica de Carga Asíncrona"
 
     Private Function ReiniciarToken() As CancellationToken

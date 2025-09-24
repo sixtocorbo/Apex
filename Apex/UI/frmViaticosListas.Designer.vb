@@ -107,6 +107,7 @@ Partial Class frmViaticosListas
         Me.dgvResultados.AllowUserToDeleteRows = False
         Me.dgvResultados.AllowUserToResizeColumns = False
         Me.dgvResultados.AllowUserToResizeRows = False
+        Me.dgvResultados.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells
         Me.dgvResultados.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvResultados.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgvResultados.Location = New System.Drawing.Point(0, 100)
