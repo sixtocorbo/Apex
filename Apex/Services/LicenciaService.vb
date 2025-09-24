@@ -287,14 +287,15 @@ Public Class LicenciaService
     ''' Este método ahora es mucho más rápido porque depende del GetAllConDetallesAsync refactorizado.
     ''' </summary>
     Public Async Function GetVigentesHoyAsync(
-    Optional filtroNombre As String = "",
-    Optional tiposLicenciaIds As List(Of Integer) = Nothing,
-    Optional soloActivos As Boolean? = True
-) As Task(Of List(Of LicenciaConFuncionarioExtendidoDto))
-        Dim hoy As Date = Date.Today
+        Optional filtroNombre As String = "",
+        Optional tiposLicenciaIds As List(Of Integer) = Nothing,
+        Optional soloActivos As Boolean? = True,
+        Optional fechaReferencia As Date? = Nothing
+    ) As Task(Of List(Of LicenciaConFuncionarioExtendidoDto))
+        Dim fechaConsulta As Date = If(fechaReferencia.HasValue, fechaReferencia.Value.Date, Date.Today)
 
         Using uow As New UnitOfWork()
-            Dim query = uow.Repository(Of HistoricoLicencia)().GetAll().AsNoTracking().Where(Function(l) l.inicio <= hoy AndAlso l.finaliza >= hoy)
+            Dim query = uow.Repository(Of HistoricoLicencia)().GetAll().AsNoTracking().Where(Function(l) l.inicio <= fechaConsulta AndAlso l.finaliza >= fechaConsulta)
 
             If Not String.IsNullOrWhiteSpace(filtroNombre) Then
                 query = query.Where(Function(h) h.Funcionario.Nombre.Contains(filtroNombre) OrElse h.Funcionario.CI.Contains(filtroNombre))
