@@ -361,7 +361,7 @@ Public Class frmNovedades
             Using svc As New NovedadService()
                 Await svc.DeleteNovedadCompletaAsync(nov.Id)
             End Using
-            Notifier.Info(Me, "Novedad eliminada.")
+            Notifier.Success(Me, "Novedad eliminada.")
             NotificadorEventos.NotificarCambioEnNovedad()
             Dim tk = ReiniciarToken()
             Await BuscarAsync(tk)

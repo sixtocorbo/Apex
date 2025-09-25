@@ -319,14 +319,14 @@ Public Class frmNovedadCrear
 
     Private Sub btnQuitarFuncionario_Click(sender As Object, e As EventArgs) Handles btnQuitarFuncionario.Click
         If lstFuncionariosSeleccionados.SelectedItems.Count = 0 Then
-            Notifier.Info(Me, "Seleccioná al menos un funcionario para quitar.")
+            Notifier.Warn(Me, "Seleccioná al menos un funcionario para quitar.")
             Return
         End If
         Dim itemsAQuitar = lstFuncionariosSeleccionados.SelectedItems.Cast(Of Funcionario).ToList()
         For Each item In itemsAQuitar
             _funcionariosSeleccionados.Remove(item)
         Next
-        Notifier.Info(Me, "Funcionario/s quitado/s del listado.")
+        Notifier.Success(Me, "Funcionario/s quitado/s del listado.")
     End Sub
 #End Region
 
@@ -437,7 +437,7 @@ Public Class frmNovedadCrear
 
     Private Sub btnEliminarFoto_Click(sender As Object, e As EventArgs) Handles btnEliminarFoto.Click
         If _pictureBoxSeleccionado Is Nothing Then
-            Notifier.Info(Me, "Seleccioná una foto para eliminar.")
+            Notifier.Warn(Me, "Seleccioná una foto para eliminar.")
             Return
         End If
         If MessageBox.Show("¿Eliminar la foto seleccionada?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then
@@ -451,7 +451,7 @@ Public Class frmNovedadCrear
             _rutasFotosNuevas.Remove(rutaAEliminar)
         End If
         DisposePictureBox(_pictureBoxSeleccionado)
-        Notifier.Info(Me, "Foto eliminada de la selección.")
+        Notifier.Success(Me, "Foto eliminada de la selección.")
     End Sub
 #End Region
 

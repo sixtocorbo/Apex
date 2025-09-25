@@ -283,7 +283,7 @@ Public Class frmSecciones
             Using svc As New SeccionService()
                 Await svc.DeleteAsync(_seccionSeleccionada.Id)
             End Using
-            Notifier.Info(Me, "Sección eliminada.")
+            Notifier.Success(Me, "Sección eliminada.")
             _ultimoIdSeleccionado = 0
             Await CargarDatosAsync()
             LimpiarCampos()
