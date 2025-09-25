@@ -140,7 +140,7 @@ Public Class frmSanciones
 
     Private Sub btnEditarSancion_Click(sender As Object, e As EventArgs) Handles btnEditarSancion.Click
         If dgvSanciones.CurrentRow Is Nothing Then
-            Notifier.Info(Me, "Seleccioná una sanción para editar.", 2000)
+            Notifier.Warn(Me, "Seleccioná una sanción para editar.", 2000)
             Return
         End If
         Dim fila = TryCast(dgvSanciones.CurrentRow.DataBoundItem, SancionListadoItem)
@@ -152,7 +152,7 @@ Public Class frmSanciones
 
     Private Async Sub btnEliminarSancion_Click(sender As Object, e As EventArgs) Handles btnEliminarSancion.Click
         If dgvSanciones.CurrentRow Is Nothing Then
-            Notifier.Info(Me, "Seleccioná una sanción para eliminar.", 2000)
+            Notifier.Warn(Me, "Seleccioná una sanción para eliminar.", 2000)
             Return
         End If
         Dim fila = TryCast(dgvSanciones.CurrentRow.DataBoundItem, SancionListadoItem)

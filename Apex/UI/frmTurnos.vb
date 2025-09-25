@@ -285,7 +285,7 @@ Public Class frmTurnos
             Using svc As New TurnoService()
                 Await svc.DeleteAsync(_turnoSeleccionado.Id)
             End Using
-            Notifier.Info(Me, "Turno eliminado.")
+            Notifier.Success(Me, "Turno eliminado.")
             _ultimoIdSeleccionado = 0
             Await CargarDatosAsync()
             LimpiarCampos()
