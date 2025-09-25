@@ -42,8 +42,12 @@ Public Class EventDebounceHandler(Of TEventArgs As Class)
 
         Try
             If _form.InvokeRequired Then
-                _form.BeginInvoke(CType(Sub()
-                                            Dim _ = EjecutarRefrescoSeguroAsync(_lastArgs)
+                _form.BeginInvoke(CType(Async Sub()
+                                            Try
+                                                Await EjecutarRefrescoSeguroAsync(_lastArgs)
+                                            Catch
+                                                ' Opcional: registrar el error si la acción falla.
+                                            End Try
                                         End Sub, MethodInvoker))
             Else
                 Await EjecutarRefrescoSeguroAsync(_lastArgs)
@@ -52,6 +56,7 @@ Public Class EventDebounceHandler(Of TEventArgs As Class)
             ' Opcional: Registrar el error si la acción falla.
         End Try
     End Sub
+
 
     Private Async Function EjecutarRefrescoSeguroAsync(args As TEventArgs) As Task
         Try
