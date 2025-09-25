@@ -798,6 +798,12 @@
     <Compile Include="UI\frmNovedadesRPT.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="UI\frmVisorReporte.Designer.vb">
+      <DependentUpon>frmVisorReporte.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmVisorReporte.vb">
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Reportes\ConceptoFuncional.rdlc">
@@ -810,6 +816,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Reportes\NotificacionImprimir.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reportes\ReporteFiltros.rdlc">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Reportes\ReporteNovedades_Fotos.rdlc">

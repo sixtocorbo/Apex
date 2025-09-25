@@ -1043,6 +1043,61 @@ Partial Public Class frmFiltros
         Next
     End Sub
 
+    Private Sub btnImprimir_Click(sender As Object, e As EventArgs) Handles btnImprimir.Click
+        If _dvDatos Is Nothing OrElse _dvDatos.Count = 0 Then
+            MessageBox.Show("No hay datos para imprimir.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return
+        End If
+
+        ' 1. Obtener la lista de filtros aplicados
+        Dim sbFiltros As New System.Text.StringBuilder()
+        sbFiltros.AppendLine("Filtros Aplicados:")
+        If _filtros.Reglas.Any() Then
+            For Each regla In _filtros.Reglas
+                sbFiltros.AppendLine("- " & regla.ToString())
+            Next
+        Else
+            sbFiltros.AppendLine("Ninguno")
+        End If
+        If Not String.IsNullOrWhiteSpace(txtBusquedaGlobal.Text) Then
+            sbFiltros.AppendLine($"- Búsqueda global: ""{txtBusquedaGlobal.Text}""")
+        End If
+
+        ' 2. Obtener las cantidades de todos los ítems disponibles para filtrar
+        Dim sbCantidades As New System.Text.StringBuilder()
+        sbCantidades.AppendLine("Recuento de Ítems Disponibles (sobre el total de datos):")
+        If _dtOriginal IsNot Nothing AndAlso _dtOriginal.Rows.Count > 0 Then
+            For Each col As DataColumn In _dtOriginal.Columns
+                If col.ColumnName.ToLower().EndsWith("id") OrElse col.ColumnName = "GlobalSearch" Then Continue For
+
+                Dim conteo = _dtOriginal.AsEnumerable().
+                            Where(Function(r) r(col) IsNot DBNull.Value AndAlso Not String.IsNullOrWhiteSpace(r(col).ToString())).
+                            GroupBy(Function(r) r(col).ToString().Trim()).
+                            Select(Function(g) New With {.Valor = g.Key, .Cantidad = g.Count()}).
+                            OrderByDescending(Function(x) x.Cantidad).Take(20) ' Limitar a los 20 más comunes para no saturar
+
+                If conteo.Any() Then
+                    sbCantidades.AppendLine($"--- {col.ColumnName} ---")
+                    For Each item In conteo
+                        sbCantidades.AppendLine($"    {item.Valor}: {item.Cantidad}")
+                    Next
+                End If
+            Next
+        End If
+
+        ' 3. Obtener los resultados y limpiar nombres de columnas para el reporte
+        Dim dtResultados As DataTable = _dvDatos.ToTable()
+        For Each col As DataColumn In dtResultados.Columns
+            ' RDLC no permite espacios ni caracteres especiales en los nombres de campo
+            col.ColumnName = System.Text.RegularExpressions.Regex.Replace(col.ColumnName, "[^a-zA-Z0-9_]", "")
+        Next
+
+        ' 4. Abrir el formulario del reporte
+        Dim tituloReporte As String = $"Reporte de {cmbOrigenDatos.Text}"
+        Using frm As New frmVisorReporte(tituloReporte, sbFiltros.ToString(), sbCantidades.ToString(), dtResultados)
+            frm.ShowDialog(Me)
+        End Using
+    End Sub
 End Class
 
 Public Module ControlExtensions
