@@ -887,7 +887,7 @@ Public Class frmFuncionarioCrear
                 If entry IsNot Nothing AndAlso entry.State <> EntityState.Detached Then
                     entry.State = EntityState.Detached
                 End If
-                Notifier.Success(Me, "Estado quitado de la lista.")
+                Notifier.Info(Me, "Estado quitado de la lista.")
             End If
 
             ' 3) Actualizar solo UI (lista y binding)
@@ -1221,9 +1221,9 @@ Public Class frmFuncionarioCrear
                 Dim repo = _uow.Repository(Of FuncionarioDotacion)()
                 repo.Remove(dotacionSeleccionada)
                 Await _uow.CommitAsync()
-                Notifier.Info(Me, "Dotación eliminada de la base de datos.")
+                Notifier.Success(Me, "Dotación eliminada de la base de datos.")
             Else
-                Notifier.Success(Me, "Dotación quitada de la lista (aún no persistida).")
+                Notifier.Info(Me, "Dotación quitada de la lista (aún no persistida).")
             End If
 
         Catch ex As Exception
@@ -1343,7 +1343,7 @@ Public Class frmFuncionarioCrear
             dash.AbrirChild(formHijo) ' ← usa la pila (Opción A)
 
             ' Toast de éxito anclado al Dashboard
-            Notifier.Success(dash, $"Abierto: {formHijo.Text}")
+            Notifier.Info(dash, $"Abierto: {formHijo.Text}")
         Catch ex As Exception
             Notifier.[Error](dash, $"No se pudo abrir la ventana: {ex.Message}")
         End Try

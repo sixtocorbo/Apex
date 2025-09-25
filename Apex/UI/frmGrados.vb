@@ -53,7 +53,7 @@ Public Class frmGrados
 
         Await CargarDatosAsync()
         LimpiarCampos()
-        Notifier.Info(Me, "Listado de cargos listo.")
+        Notifier.Success(Me, "Listado de cargos listo.")
     End Sub
 
     ' ------------------ CARGA DE DATOS ------------------
@@ -280,7 +280,7 @@ Public Class frmGrados
             Using svc As New CargoService()
                 Await svc.DeleteAsync(_cargoSeleccionado.Id)
             End Using
-            Notifier.Info(Me, "Cargo eliminado.")
+            Notifier.Success(Me, "Cargo eliminado.")
             Await CargarDatosAsync()
             LimpiarCampos()
         Catch ex As Exception

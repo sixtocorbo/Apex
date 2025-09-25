@@ -34,7 +34,7 @@ Public Class frmNomenclaturas
                 ' Ignorar si SetCue no está disponible
             End Try
 
-            Notifier.Info(Me, "Listado de nomenclaturas listo.")
+            Notifier.Success(Me, "Listado de nomenclaturas listo.")
         Catch ex As Exception
             Notifier.[Error](Me, $"Error al inicializar: {ex.Message}")
         Finally
@@ -359,7 +359,7 @@ Public Class frmNomenclaturas
             repo.Remove(_nomenclaturaSeleccionada)
             Await _unitOfWork.CommitAsync()
 
-            Notifier.Info(Me, "Nomenclatura eliminada.")
+            Notifier.Success(Me, "Nomenclatura eliminada.")
             Await CargarDatosAsync()
             LimpiarCampos()
 

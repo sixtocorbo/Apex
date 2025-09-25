@@ -184,7 +184,7 @@ Partial Class frmIncidenciasCategorias
             Using svc As New CategoriaAusenciaService()
                 Await svc.EliminarAsync(_categoriaSeleccionada.Id)
             End Using
-            Notifier.Info(Me, "Categoría eliminada.")
+            Notifier.Success(Me, "Categoría eliminada.")
             Await CargarDatosAsync()
             LimpiarCampos()
         Catch ex As InvalidOperationException

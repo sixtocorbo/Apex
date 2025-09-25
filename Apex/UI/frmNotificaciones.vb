@@ -249,7 +249,7 @@ Public Class frmNotificaciones
                 Await svc.DeleteNotificacionAsync(idSeleccionado)
             End Using
 
-            Notifier.Info(Me, "Notificación eliminada.")
+            Notifier.Success(Me, "Notificación eliminada.")
             Dim tk = ReiniciarToken()
             Await BuscarAsync(tk)
         Catch ex As Exception

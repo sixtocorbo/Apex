@@ -188,7 +188,7 @@ Public Class frmConceptoFuncional
         Dim refrescar As Action = Sub()
                                       If Me.IsDisposed Then Return
                                       ActualizarDatos()
-                                      Notifier.Info(Me, "Los datos del funcionario se han actualizado.")
+                                      Notifier.Success(Me, "Los datos del funcionario se han actualizado.")
                                   End Sub
 
         If Me.InvokeRequired Then

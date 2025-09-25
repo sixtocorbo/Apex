@@ -99,7 +99,7 @@ Public Class frmNotificacionCambiarEstado
         End If
     End Sub
     Private Sub btnCancelar_Click(sender As Object, e As EventArgs) Handles btnCancelar.Click
-        Notifier.Info(Me, "Acción cancelada.")
+        Notifier.Success(Me, "Acción cancelada.")
         Me.DialogResult = DialogResult.Cancel
         Me.Close()
     End Sub

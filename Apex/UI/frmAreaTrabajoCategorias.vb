@@ -27,7 +27,7 @@ Public Class frmAreaTrabajoCategorias
 
         Await CargarDatosAsync()
         LimpiarCampos()
-        Notifier.Info(Me, "Listado de áreas de trabajo listo.")
+        Notifier.Success(Me, "Listado de áreas de trabajo listo.")
     End Sub
 
     ' ===== Datos =====
@@ -284,7 +284,7 @@ Public Class frmAreaTrabajoCategorias
             Using svc As New AreaTrabajoService()
                 Await svc.DeleteAsync(_areaSeleccionada.Id)
             End Using
-            Notifier.Info(Me, "Área eliminada.")
+            Notifier.Success(Me, "Área eliminada.")
             _ultimoIdSeleccionado = 0
             Await CargarDatosAsync()
             LimpiarCampos()

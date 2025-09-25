@@ -22,7 +22,7 @@ Partial Class frmEstadoTransitorioTipos
 
         Await CargarDatosAsync()
         LimpiarCampos()
-        Notifier.Info(Me, "Tipos de estado listos.")
+        Notifier.Success(Me, "Tipos de estado listos.")
     End Sub
 
     ' =================== DATOS ===================
@@ -166,7 +166,7 @@ Partial Class frmEstadoTransitorioTipos
             Using svc As New TipoEstadoTransitorioService()
                 Await svc.DeleteAsync(_tipoEstadoSeleccionado.Id)
             End Using
-            Notifier.Info(Me, "Tipo de estado eliminado.")
+            Notifier.Success(Me, "Tipo de estado eliminado.")
             Await CargarDatosAsync()
             LimpiarCampos()
         Catch ex As Exception
