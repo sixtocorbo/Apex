@@ -9,19 +9,20 @@ Public Module TaskExtensions
     <Extension>
     Public Async Function WaitAsync(Of T)(_task As Task(Of T), ct As CancellationToken) As Task(Of T)
         If _task Is Nothing Then Throw New ArgumentNullException(NameOf(_task))
-        If _task.IsCompleted Then Return Await _task
+        If _task.IsCompleted Then Return Await _task.ConfigureAwait(False)
 
-        ' Short-circuit si ya viene cancelado
-        ct.ThrowIfCancellationRequested()
+        If ct.IsCancellationRequested Then
+            Return Await Task.FromCanceled(Of T)(ct).ConfigureAwait(False)
+        End If
 
-        Dim tcs As New TaskCompletionSource(Of Boolean)(TaskCreationOptions.RunContinuationsAsynchronously)
-        Using ctr = ct.Register(Sub() tcs.TrySetResult(True))
-            If _task Is Await Task.WhenAny(_task, tcs.Task).ConfigureAwait(False) Then
-                Return Await _task.ConfigureAwait(False)
-            Else
-                Throw New OperationCanceledException(ct)
-            End If
-        End Using
+        Dim cancellationTask = Task.Delay(Timeout.Infinite, ct)
+        Dim completed = Await Task.WhenAny(_task, cancellationTask).ConfigureAwait(False)
+
+        If completed Is _task Then
+            Return Await _task.ConfigureAwait(False)
+        End If
+
+        Return Await Task.FromCanceled(Of T)(ct).ConfigureAwait(False)
     End Function
 
     <Extension>
@@ -32,16 +33,20 @@ Public Module TaskExtensions
             Return
         End If
 
-        ct.ThrowIfCancellationRequested()
+        If ct.IsCancellationRequested Then
+            Await Task.FromCanceled(ct).ConfigureAwait(False)
+            Return
+        End If
 
-        Dim tcs As New TaskCompletionSource(Of Boolean)(TaskCreationOptions.RunContinuationsAsynchronously)
-        Using ctr = ct.Register(Sub() tcs.TrySetResult(True))
-            If task Is Await Task.WhenAny(task, tcs.Task).ConfigureAwait(False) Then
-                Await task.ConfigureAwait(False)
-            Else
-                Throw New OperationCanceledException(ct)
-            End If
-        End Using
+        Dim cancellationTask = Task.Delay(Timeout.Infinite, ct)
+        Dim completed = Await Task.WhenAny(task, cancellationTask).ConfigureAwait(False)
+
+        If completed Is task Then
+            Await task.ConfigureAwait(False)
+            Return
+        End If
+
+        Await Task.FromCanceled(ct).ConfigureAwait(False)
     End Function
 
 End Module
