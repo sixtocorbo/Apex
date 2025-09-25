@@ -229,31 +229,97 @@ Public Class frmFuncionarioBuscar
     End Function
 
     Private Sub dgvFuncionarios_SelectionChanged(sender As Object, e As EventArgs) Handles dgvFuncionarios.SelectionChanged
-        ' Hacemos visible el botón si hay al menos una celda seleccionada
-        If dgvFuncionarios.GetCellCount(DataGridViewElementStates.Selected) > 0 Then
-            btnCopiarContenido.Visible = True
-        Else
-            btnCopiarContenido.Visible = False
-        End If
+        btnCopiarContenido.Visible = (FuncionarioSeleccionado IsNot Nothing)
     End Sub
-    Private Sub btnCopiarContenido_Click(sender As Object, e As EventArgs) Handles btnCopiarContenido.Click
-        If dgvFuncionarios.SelectedCells.Count > 0 Then
-            Try
-                ' 1. Se realiza la operación de copiar al portapapeles
-                Dim clipboardContent = dgvFuncionarios.GetClipboardContent()
-                If clipboardContent IsNot Nothing Then
-                    Clipboard.SetDataObject(clipboardContent)
 
-                    ' 2. ¡Aquí llamas a la notificación de éxito!
-                    Notifier.Success(Me, "¡Contenido copiado al portapapeles!")
+    Private Sub btnCopiarContenido_Click(sender As Object, e As EventArgs) Handles btnCopiarContenido.Click
+        Dim funcionario = FuncionarioSeleccionado
+        If funcionario Is Nothing Then
+            Notifier.Warn(Me, "Seleccione un funcionario de la lista.")
+            Return
+        End If
+
+        Dim opcion = SolicitarOpcionDeCopia()
+        If opcion Is Nothing Then
+            Return ' el usuario canceló la operación
+        End If
+
+        Dim copioCedula As Boolean = False
+        Dim copioNombre As Boolean = False
+
+        Select Case opcion.Value
+            Case OpcionCopiado.Cedula
+                copioCedula = True
+            Case OpcionCopiado.Nombre
+                copioNombre = True
+            Case OpcionCopiado.Ambos
+                copioCedula = Not String.IsNullOrWhiteSpace(funcionario.CI)
+                copioNombre = Not String.IsNullOrWhiteSpace(funcionario.Nombre)
+        End Select
+
+        Dim textoACopiar As String = ObtenerTextoACopiar(funcionario, opcion.Value)
+        If String.IsNullOrWhiteSpace(textoACopiar) Then
+            Notifier.Warn(Me, "No hay datos disponibles para copiar en la selección actual.")
+            Return
+        End If
+
+        Try
+            Dim data As New DataObject()
+            data.SetText(textoACopiar, TextDataFormat.UnicodeText)
+            data.SetText(textoACopiar, TextDataFormat.Text)
+            Clipboard.SetDataObject(data, True)
+
+            Dim mensaje As String
+            If copioCedula AndAlso copioNombre Then
+                mensaje = "Cédula y nombre copiados al portapapeles."
+            ElseIf copioCedula Then
+                mensaje = "Cédula copiada al portapapeles."
+            ElseIf copioNombre Then
+                mensaje = "Nombre copiado al portapapeles."
+            Else
+                mensaje = "Datos copiados al portapapeles."
+            End If
+
+            Notifier.Success(Me, mensaje)
+        Catch ex As Exception
+            Notifier.Error(Me, "No se pudo copiar el contenido.")
+        End Try
+    End Sub
+
+    Private Function ObtenerTextoACopiar(funcionario As FuncionarioMin, opcion As OpcionCopiado) As String
+        Select Case opcion
+            Case OpcionCopiado.Cedula
+                Return funcionario.CI?.Trim()
+            Case OpcionCopiado.Nombre
+                Return funcionario.Nombre?.Trim()
+            Case OpcionCopiado.Ambos
+                Dim partes As New List(Of String)
+
+                If Not String.IsNullOrWhiteSpace(funcionario.CI) Then
+                    partes.Add(funcionario.CI.Trim())
                 End If
 
-            Catch ex As Exception
-                ' En caso de un error, puedes notificarlo también
-                Notifier.Error(Me, "No se pudo copiar el contenido.")
-            End Try
-        End If
-    End Sub
+                If Not String.IsNullOrWhiteSpace(funcionario.Nombre) Then
+                    partes.Add(funcionario.Nombre.Trim())
+                End If
+
+                Return String.Join(" - ", partes)
+            Case Else
+                Return String.Empty
+        End Select
+    End Function
+
+    Private Function SolicitarOpcionDeCopia() As OpcionCopiado?
+        Using dialogo As New CopiarSeleccionDialog()
+            Dim resultado = dialogo.ShowDialog(Me)
+            If resultado = DialogResult.OK Then
+                Return dialogo.OpcionSeleccionada
+            End If
+        End Using
+
+        Return Nothing
+    End Function
+
 #Region "Atajos de Acciones"
 
     Private Sub btnNotificar_Click(sender As Object, e As EventArgs) Handles btnNotificar.Click
@@ -796,6 +862,115 @@ Public Class frmFuncionarioBuscar
         pb.BackColor = colorOriginal
         pb.Enabled = True
     End Function
+
+    Private Enum OpcionCopiado
+        Cedula
+        Nombre
+        Ambos
+    End Enum
+
+    Private Class CopiarSeleccionDialog
+        Inherits Form
+
+        Private _opcionSeleccionada As OpcionCopiado?
+
+        Public ReadOnly Property OpcionSeleccionada As OpcionCopiado?
+            Get
+                Return _opcionSeleccionada
+            End Get
+        End Property
+
+        Public Sub New()
+            Me.Text = "Copiar selección"
+            Me.FormBorderStyle = FormBorderStyle.FixedDialog
+            Me.StartPosition = FormStartPosition.CenterParent
+            Me.MaximizeBox = False
+            Me.MinimizeBox = False
+            Me.ShowInTaskbar = False
+            Me.AutoSize = True
+            Me.AutoSizeMode = AutoSizeMode.GrowAndShrink
+            Me.Padding = New Padding(16)
+
+            Dim layout As New TableLayoutPanel() With {
+                .ColumnCount = 1,
+                .RowCount = 3,
+                .Dock = DockStyle.Fill,
+                .AutoSize = True,
+                .AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                .Padding = New Padding(0),
+                .Margin = New Padding(0)
+            }
+
+            Dim lblMensaje As New Label() With {
+                .Text = "¿Qué desea copiar al portapapeles?",
+                .AutoSize = True,
+                .Dock = DockStyle.Fill,
+                .Margin = New Padding(0, 0, 0, 8)
+            }
+
+            Dim lblDetalle As New Label() With {
+                .Text = "Elija una de las opciones para continuar:",
+                .AutoSize = True,
+                .Dock = DockStyle.Fill,
+                .Margin = New Padding(0, 0, 0, 16)
+            }
+
+            Dim panelBotones As New FlowLayoutPanel() With {
+                .Dock = DockStyle.Fill,
+                .FlowDirection = FlowDirection.LeftToRight,
+                .AutoSize = True,
+                .AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                .WrapContents = True
+            }
+
+            Dim btnCedula As New Button() With {
+                .Text = "Copiar cédula",
+                .AutoSize = True,
+                .AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                .Margin = New Padding(0, 0, 8, 0)
+            }
+            AddHandler btnCedula.Click, Sub() Seleccionar(OpcionCopiado.Cedula)
+
+            Dim btnNombre As New Button() With {
+                .Text = "Copiar nombre",
+                .AutoSize = True,
+                .AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                .Margin = New Padding(0, 0, 8, 0)
+            }
+            AddHandler btnNombre.Click, Sub() Seleccionar(OpcionCopiado.Nombre)
+
+            Dim btnAmbos As New Button() With {
+                .Text = "Copiar ambos",
+                .AutoSize = True,
+                .AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                .Margin = New Padding(0, 0, 8, 0)
+            }
+            AddHandler btnAmbos.Click, Sub() Seleccionar(OpcionCopiado.Ambos)
+
+            Dim btnCancelar As New Button() With {
+                .Text = "Cancelar",
+                .AutoSize = True,
+                .AutoSizeMode = AutoSizeMode.GrowAndShrink
+            }
+            btnCancelar.DialogResult = DialogResult.Cancel
+
+            panelBotones.Controls.AddRange(New Control() {btnCedula, btnNombre, btnAmbos, btnCancelar})
+
+            layout.Controls.Add(lblMensaje, 0, 0)
+            layout.Controls.Add(lblDetalle, 0, 1)
+            layout.Controls.Add(panelBotones, 0, 2)
+
+            Me.Controls.Add(layout)
+
+            Me.CancelButton = btnCancelar
+        End Sub
+
+        Private Sub Seleccionar(opcion As OpcionCopiado)
+            _opcionSeleccionada = opcion
+            DialogResult = DialogResult.OK
+        End Sub
+    End Class
+
 
 #End Region
     ' --- FIN DE NUEVA REGIÓN ---
