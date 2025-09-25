@@ -1113,36 +1113,66 @@ Public Class frmFuncionarioCrear
         Return New BindingList(Of EstadoRow)(source.Select(Function(et) BuildEstadoRow(et, "Historial")).ToList())
     End Function
 
-    Private Async Sub btnAñadirDotacion_Click(sender As Object, e As EventArgs) Handles btnAñadirDotacion.Click
-        Dim nuevaDotacion = New FuncionarioDotacion()
-        Using frm As New frmFuncionarioDotacion(nuevaDotacion)
-            If frm.ShowDialog() = DialogResult.OK Then
-                Try
-                    _funcionario.FuncionarioDotacion.Add(frm.Dotacion)
-                    Await _uow.CommitAsync()
-                    _dotaciones.Add(frm.Dotacion)
-                Catch ex As Exception
-                    MessageBox.Show("Error al añadir la dotación: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                End Try
-            End If
-        End Using
+    Private Sub btnAñadirDotacion_Click(sender As Object, e As EventArgs) Handles btnAñadirDotacion.Click
+        Dim nuevaDotacion = New FuncionarioDotacion() With {.Funcionario = _funcionario}
+        Dim frm = New frmFuncionarioDotacion(nuevaDotacion)
+
+        AddHandler frm.DotacionConfigurada,
+            Async Sub(dotacion As FuncionarioDotacion)
+                Await ProcesarDotacionDesdeChildAsync(dotacion, True)
+            End Sub
+
+        AbrirChildEnDashboard(frm)
     End Sub
 
-    Private Async Sub btnEditarDotacion_Click(sender As Object, e As EventArgs) Handles btnEditarDotacion.Click
+    Private Sub btnEditarDotacion_Click(sender As Object, e As EventArgs) Handles btnEditarDotacion.Click
         If dgvDotacion.CurrentRow Is Nothing Then Return
         Dim dotacionSeleccionada = CType(dgvDotacion.CurrentRow.DataBoundItem, FuncionarioDotacion)
-        Using frm As New frmFuncionarioDotacion(dotacionSeleccionada)
-            If frm.ShowDialog() = DialogResult.OK Then
-                Try
-                    _uow.Context.Entry(dotacionSeleccionada).State = EntityState.Modified
-                    Await _uow.CommitAsync()
-                    bsDotacion.ResetBindings(False)
-                Catch ex As Exception
-                    MessageBox.Show("Error al actualizar la dotación: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                End Try
-            End If
-        End Using
+        Dim frm = New frmFuncionarioDotacion(dotacionSeleccionada)
+
+        AddHandler frm.DotacionConfigurada,
+            Async Sub(dotacion As FuncionarioDotacion)
+                Await ProcesarDotacionDesdeChildAsync(dotacion, False)
+            End Sub
+
+        AbrirChildEnDashboard(frm)
     End Sub
+
+    Private Async Function ProcesarDotacionDesdeChildAsync(dotacion As FuncionarioDotacion, esNueva As Boolean) As Task
+        If dotacion Is Nothing Then Return
+
+        Try
+            dotacion.Funcionario = _funcionario
+
+            If dotacion.FuncionarioId = 0 AndAlso _funcionario IsNot Nothing AndAlso _funcionario.Id > 0 Then
+                dotacion.FuncionarioId = _funcionario.Id
+            End If
+
+            If esNueva AndAlso _funcionario IsNot Nothing AndAlso Not _funcionario.FuncionarioDotacion.Contains(dotacion) Then
+                _funcionario.FuncionarioDotacion.Add(dotacion)
+            End If
+
+            If Not esNueva Then
+                _uow.Context.Entry(dotacion).State = EntityState.Modified
+            End If
+
+            Await _uow.CommitAsync()
+
+            If esNueva Then
+                If Not _dotaciones.Contains(dotacion) Then
+                    _dotaciones.Add(dotacion)
+                Else
+                    bsDotacion.ResetBindings(False)
+                End If
+            Else
+                bsDotacion.ResetBindings(False)
+            End If
+
+        Catch ex As Exception
+            Dim mensaje = If(esNueva, "Error al añadir la dotación: ", "Error al actualizar la dotación: ") & ex.Message
+            Notifier.Error(Me, mensaje)
+        End Try
+    End Function
 
     Private Async Sub btnQuitarDotacion_Click(sender As Object, e As EventArgs) Handles btnQuitarDotacion.Click
         ' 1) Validación de selección

@@ -1,6 +1,8 @@
 ﻿' Apex/UI/frmFuncionarioDotacion.vb
 Public Class frmFuncionarioDotacion
 
+    Public Event DotacionConfigurada(dotacion As FuncionarioDotacion)
+
     Public Dotacion As FuncionarioDotacion
     Private _svc As New FuncionarioService()
 
@@ -66,6 +68,7 @@ Public Class frmFuncionarioDotacion
             ' Éxito (mostrar antes de cerrar)
             Notifier.Success(Me, "Dotación guardada correctamente.")
             DialogResult = DialogResult.OK
+            RaiseEvent DotacionConfigurada(Dotacion)
             Close()
 
         Catch ex As Exception
