@@ -69,7 +69,9 @@ Public Class frmVisorReporte
         nsManager.AddNamespace("df", "http://schemas.microsoft.com/sqlserver/reporting/2008/01/reportdefinition")
 
         Dim dataSetNode = rdlcXml.SelectSingleNode("/df:Report/df:DataSets/df:DataSet[@Name='ResultadosDataSet']", nsManager)
-        If dataSetNode Is Nothing Then Return
+        If dataSetNode Is Nothing Then
+            Throw New Exception("No se pudo encontrar el nodo 'DataSet' en la definición del reporte.")
+        End If
 
         ' 1. Crear campos del DataSet
         Dim fieldsNode = rdlcXml.CreateElement("Fields", nsManager.LookupNamespace("df"))
@@ -83,9 +85,21 @@ Public Class frmVisorReporte
         Next
         dataSetNode.AppendChild(fieldsNode)
 
-        ' 2. Crear el Tablix
-        Dim bodyNode = rdlcXml.SelectSingleNode("/df:Report/df:ReportSections/df:ReportSection/df:Body/df:ReportItems", nsManager)
-        If bodyNode Is Nothing Then Return
+        ' 2. Crear el Tablix (Tabla de resultados)
+        ' -- INICIO DE LA CORRECCIÓN --
+        ' Primero, intenta buscar el nodo 'ReportItems' en la estructura más nueva (con ReportSections)
+        Dim bodyNode As XmlNode = rdlcXml.SelectSingleNode("/df:Report/df:ReportSections/df:ReportSection/df:Body/df:ReportItems", nsManager)
+
+        ' Si no lo encuentra, busca en la estructura más antigua (la que estamos usando)
+        If bodyNode Is Nothing Then
+            bodyNode = rdlcXml.SelectSingleNode("/df:Report/df:Body/df:ReportItems", nsManager)
+        End If
+
+        ' Si después de ambos intentos no se encuentra el nodo, es un error.
+        If bodyNode Is Nothing Then
+            Throw New Exception("No se pudo encontrar el nodo 'ReportItems' en la definición del reporte. La estructura del RDLC puede ser inválida.")
+        End If
+        ' -- FIN DE LA CORRECCIÓN --
 
         Dim tablixXml As String = GenerarTablixXml(dt.Columns, nsManager)
         Dim tablixDoc As New XmlDocument()
