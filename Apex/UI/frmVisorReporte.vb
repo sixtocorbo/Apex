@@ -27,14 +27,20 @@ Public Class frmVisorReporte
         Try
             ReportViewer1.ProcessingMode = ProcessingMode.Local
             Dim lr = ReportViewer1.LocalReport
-            lr.ReportEmbeddedResource = "Apex.Reportes.ReporteFiltros.rdlc"
+
+            Dim definitionContent = ReportResourceLoader.GetReportDefinitionContent(Me.GetType(),
+                                                                                     "Apex.Reportes.ReporteFiltros.rdlc",
+                                                                                     "ReporteFiltros.rdlc")
+
+            If definitionContent.Definition.Source = ReportDefinitionSource.Embedded AndAlso Not String.IsNullOrWhiteSpace(definitionContent.Definition.ResourceName) Then
+                lr.ReportEmbeddedResource = definitionContent.Definition.ResourceName
+            Else
+                lr.ReportEmbeddedResource = Nothing
+            End If
 
             ' Cargar el XML del RDLC base en un documento para manipularlo
             Dim rdlcXml As New XmlDocument()
-            Using stream = Me.GetType().Assembly.GetManifestResourceStream("Apex.Reportes.ReporteFiltros.rdlc")
-                If stream Is Nothing Then
-                    Throw New Exception("No se pudo encontrar el recurso incrustado 'Apex.Reportes.ReporteFiltros.rdlc'. Asegúrate de que la acción de compilación sea 'Recurso incrustado'.")
-                End If
+            Using stream As New IO.MemoryStream(definitionContent.Content)
                 rdlcXml.Load(stream)
             End Using
 
