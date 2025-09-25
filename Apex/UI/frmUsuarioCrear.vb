@@ -9,9 +9,6 @@ Public Class frmUsuarioCrear
     ' --- Propiedades ---
     Private _id As Integer? ' Guarda el ID del usuario. Si es Nothing, es un nuevo usuario.
 
-    ' ==========================================================================
-    ' CONSTRUCTORES
-    ' ==========================================================================
 
     Public Sub New(id As Integer)
         Me.New()
@@ -22,9 +19,6 @@ Public Class frmUsuarioCrear
         InitializeComponent()
     End Sub
 
-    ' ==========================================================================
-    ' EVENTOS DEL FORMULARIO
-    ' ==========================================================================
 
     Private Async Sub frmUsuarioCrear_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         If _id.HasValue Then

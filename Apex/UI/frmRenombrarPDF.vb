@@ -33,10 +33,6 @@ Public Class frmRenombrarPDF
                         "Error de Carga", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
 
-        ' === AJUSTES PARA RESOLUCIONES PEQUEÑAS ===
-        ' Las propiedades AutoScroll de los FlowLayoutPanel ya gestionan las barras de desplazamiento.
-        ' Ya no se necesita el código para ajustar las columnas del TableLayoutPanel.
-
         ' Ajustar el tamaño mínimo si deseas permitir ventanas más pequeñas (opcional)
         Me.MinimumSize = New Size(600, 400)
 

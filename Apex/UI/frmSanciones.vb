@@ -21,11 +21,6 @@ Public Class frmSanciones
         _searchTimer.Enabled = False
         _colorOriginalBusqueda = txtBusquedaSancion.BackColor
 
-        ' Los eventos ahora se manejan directamente en la firma de los métodos
-        ' AddHandler txtBusquedaSancion.TextChanged, AddressOf IniciarTemporizador ' Eliminado
-        ' AddHandler cmbTipoSancion.SelectedIndexChanged, AddressOf IniciarTemporizador ' Eliminado
-        ' AddHandler SearchTimer.Tick, AddressOf Temporizador_Tick ' Eliminado
-
         Try
             AppTheme.SetCue(txtBusquedaSancion, "Buscar por nombre o CI…")
         Catch

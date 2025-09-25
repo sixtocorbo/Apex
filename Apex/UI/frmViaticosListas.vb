@@ -28,21 +28,6 @@ Public Class frmViaticosListas
         _ctsBusqueda?.Dispose()
     End Sub
 
-    'Private Sub ConfigurarGrilla()
-    '    With dgvResultados
-    '        .AutoGenerateColumns = False
-    '        .Columns.Clear()
-    '        .RowHeadersVisible = False
-    '        .SelectionMode = DataGridViewSelectionMode.FullRowSelect
-    '        .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Grado", .HeaderText = "Grado", .Width = 60})
-    '        .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Cedula", .HeaderText = "Cédula", .Width = 90})
-    '        .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "NombreFuncionario", .HeaderText = "Funcionario", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
-    '        .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Seccion", .HeaderText = "Sección", .Width = 80})
-    '        .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "DiasAPagar", .HeaderText = "Días a Pagar", .Width = 80})
-    '        .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Motivo", .HeaderText = "Motivo", .Width = 150})
-    '        .Columns.Add(New DataGridViewTextBoxColumn With {.DataPropertyName = "Observaciones", .HeaderText = "Obs.", .Width = 150})
-    '    End With
-    'End Sub
     Private Sub ConfigurarGrilla()
         With dgvResultados
             ' --- CONFIGURACIÓN GENERAL ---
