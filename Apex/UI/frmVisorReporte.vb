@@ -80,6 +80,11 @@ Public Class frmVisorReporte
         End If
 
         ' 1. Crear campos del DataSet
+        Dim existingFieldsNode = dataSetNode.SelectSingleNode("df:Fields", nsManager)
+        If existingFieldsNode IsNot Nothing Then
+            dataSetNode.RemoveChild(existingFieldsNode)
+        End If
+
         Dim fieldsNode = rdlcXml.CreateElement("Fields", nsManager.LookupNamespace("df"))
         For Each col As DataColumn In dt.Columns
             Dim fieldNode = rdlcXml.CreateElement("Field", nsManager.LookupNamespace("df"))
@@ -106,6 +111,11 @@ Public Class frmVisorReporte
             Throw New Exception("No se pudo encontrar el nodo 'ReportItems' en la definición del reporte. La estructura del RDLC puede ser inválida.")
         End If
         ' -- FIN DE LA CORRECCIÓN --
+
+        Dim existingTablix = bodyNode.SelectSingleNode("df:Tablix[@Name='TablixResultados']", nsManager)
+        If existingTablix IsNot Nothing Then
+            bodyNode.RemoveChild(existingTablix)
+        End If
 
         Dim tablixXml As String = GenerarTablixXml(dt.Columns, nsManager)
         Dim tablixDoc As New XmlDocument()
