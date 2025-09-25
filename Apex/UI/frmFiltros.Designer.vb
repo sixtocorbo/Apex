@@ -59,6 +59,7 @@ Partial Class frmFiltros
         Me.PanelChips = New System.Windows.Forms.Panel()
         Me.flpChips = New System.Windows.Forms.FlowLayoutPanel()
         Me.pnlContenedor = New System.Windows.Forms.Panel()
+        Me.btnImprimir = New System.Windows.Forms.Button()
         CType(Me.splitContenedorPrincipal, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.splitContenedorPrincipal.Panel1.SuspendLayout()
         Me.splitContenedorPrincipal.Panel2.SuspendLayout()
@@ -398,6 +399,7 @@ Partial Class frmFiltros
         'flpAcciones
         '
         Me.flpAcciones.AutoSize = True
+        Me.flpAcciones.Controls.Add(Me.btnImprimir)
         Me.flpAcciones.Controls.Add(Me.btnExportarExcel)
         Me.flpAcciones.Controls.Add(Me.btnCopiarCorreos)
         Me.flpAcciones.Controls.Add(Me.btnExportarFichasPDF)
@@ -413,7 +415,7 @@ Partial Class frmFiltros
         '
         'btnExportarExcel
         '
-        Me.btnExportarExcel.Location = New System.Drawing.Point(516, 8)
+        Me.btnExportarExcel.Location = New System.Drawing.Point(374, 8)
         Me.btnExportarExcel.Name = "btnExportarExcel"
         Me.btnExportarExcel.Size = New System.Drawing.Size(136, 33)
         Me.btnExportarExcel.TabIndex = 0
@@ -422,7 +424,7 @@ Partial Class frmFiltros
         '
         'btnCopiarCorreos
         '
-        Me.btnCopiarCorreos.Location = New System.Drawing.Point(374, 8)
+        Me.btnCopiarCorreos.Location = New System.Drawing.Point(232, 8)
         Me.btnCopiarCorreos.Name = "btnCopiarCorreos"
         Me.btnCopiarCorreos.Size = New System.Drawing.Size(136, 33)
         Me.btnCopiarCorreos.TabIndex = 1
@@ -431,7 +433,7 @@ Partial Class frmFiltros
         '
         'btnExportarFichasPDF
         '
-        Me.btnExportarFichasPDF.Location = New System.Drawing.Point(232, 8)
+        Me.btnExportarFichasPDF.Location = New System.Drawing.Point(90, 8)
         Me.btnExportarFichasPDF.Name = "btnExportarFichasPDF"
         Me.btnExportarFichasPDF.Size = New System.Drawing.Size(136, 33)
         Me.btnExportarFichasPDF.TabIndex = 2
@@ -443,7 +445,7 @@ Partial Class frmFiltros
         Me.lblConteoRegistros.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.lblConteoRegistros.AutoSize = True
         Me.lblConteoRegistros.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold)
-        Me.lblConteoRegistros.Location = New System.Drawing.Point(120, 14)
+        Me.lblConteoRegistros.Location = New System.Drawing.Point(546, 50)
         Me.lblConteoRegistros.Margin = New System.Windows.Forms.Padding(10, 0, 3, 0)
         Me.lblConteoRegistros.Name = "lblConteoRegistros"
         Me.lblConteoRegistros.Size = New System.Drawing.Size(106, 20)
@@ -454,7 +456,7 @@ Partial Class frmFiltros
         '
         Me.Separator1.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.Separator1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
-        Me.Separator1.Location = New System.Drawing.Point(104, 8)
+        Me.Separator1.Location = New System.Drawing.Point(530, 44)
         Me.Separator1.Name = "Separator1"
         Me.Separator1.Size = New System.Drawing.Size(3, 33)
         Me.Separator1.TabIndex = 4
@@ -512,6 +514,15 @@ Partial Class frmFiltros
         Me.pnlContenedor.Name = "pnlContenedor"
         Me.pnlContenedor.Size = New System.Drawing.Size(978, 544)
         Me.pnlContenedor.TabIndex = 1
+        '
+        'btnImprimir
+        '
+        Me.btnImprimir.Location = New System.Drawing.Point(516, 8)
+        Me.btnImprimir.Name = "btnImprimir"
+        Me.btnImprimir.Size = New System.Drawing.Size(136, 33)
+        Me.btnImprimir.TabIndex = 5
+        Me.btnImprimir.Text = "Imprimir"
+        Me.btnImprimir.UseVisualStyleBackColor = True
         '
         'frmFiltros
         '
@@ -590,5 +601,6 @@ Partial Class frmFiltros
     Friend WithEvents dgvDatos As DataGridView
     Friend WithEvents PanelChips As Panel
     Friend WithEvents flpChips As FlowLayoutPanel
+    Friend WithEvents btnImprimir As Button
 End Class
 
