@@ -839,7 +839,6 @@ Public Class frmFuncionarioCrear
         Dim frm As New frmFuncionarioEstadoTransitorio(row.EntityRef, _tiposEstadoTransitorio, _uow)
 
         AddHandler frm.EstadoConfigurado, Sub(estadoModificado As EstadoTransitorio)
-                                              ' Esto ya está correcto
                                               UpdateRowFromEntity(row, estadoModificado)
                                               bsEstados.ResetBindings(False)
 
@@ -849,8 +848,6 @@ Public Class frmFuncionarioCrear
                                                       cboCargo.SelectedValue = detalle.CargoNuevoId
                                                   End If
                                               End If
-
-                                              AbrirChildEnDashboard(frm)
                                           End Sub
 
         AbrirChildEnDashboard(frm)
