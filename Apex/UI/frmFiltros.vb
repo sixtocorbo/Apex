@@ -1098,16 +1098,11 @@ Partial Public Class frmFiltros
     End Sub
 
     Private Shared Function ConstruirTablaDesdeDataView(view As DataView) As DataTable
-        If view Is Nothing Then Return New DataTable()
-
-        Dim tableClone As DataTable = view.Table.Clone()
-
-        For Each rowView As DataRowView In view
-            tableClone.ImportRow(rowView.Row)
-        Next
-
-        tableClone.AcceptChanges()
-        Return tableClone
+        If view Is Nothing Then
+            Return New DataTable()
+        Else
+            Return view.ToTable()
+        End If
     End Function
 
     Private Shared Sub SanitizarNombresDeColumnas(table As DataTable)

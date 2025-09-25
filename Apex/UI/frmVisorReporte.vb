@@ -10,6 +10,7 @@ Public Class frmVisorReporte
     Private ReadOnly _cantidades As String
     Private ReadOnly _dtResultados As DataTable
 
+
     Public Sub New(titulo As String, filtrosAplicados As String, cantidadesDisponibles As String, dtResultados As DataTable)
         InitializeComponent()
         _titulo = titulo
