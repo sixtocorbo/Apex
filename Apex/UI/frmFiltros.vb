@@ -1,6 +1,7 @@
 ﻿Option Strict On
 Option Explicit On
 
+Imports System.Collections.Generic
 Imports System.ComponentModel
 Imports System.Globalization
 Imports System.Text
@@ -1086,17 +1087,53 @@ Partial Public Class frmFiltros
         End If
 
         ' 3. Obtener los resultados y limpiar nombres de columnas para el reporte
-        Dim dtResultados As DataTable = _dvDatos.ToTable()
-        For Each col As DataColumn In dtResultados.Columns
-            ' RDLC no permite espacios ni caracteres especiales en los nombres de campo
-            col.ColumnName = System.Text.RegularExpressions.Regex.Replace(col.ColumnName, "[^a-zA-Z0-9_]", "")
-        Next
+        Dim dtResultados As DataTable = ConstruirTablaDesdeDataView(_dvDatos)
+        SanitizarNombresDeColumnas(dtResultados)
 
         ' 4. Abrir el formulario del reporte
         Dim tituloReporte As String = $"Reporte de {cmbOrigenDatos.Text}"
         Using frm As New frmVisorReporte(tituloReporte, sbFiltros.ToString(), sbCantidades.ToString(), dtResultados)
             frm.ShowDialog(Me)
         End Using
+    End Sub
+
+    Private Shared Function ConstruirTablaDesdeDataView(view As DataView) As DataTable
+        If view Is Nothing Then Return New DataTable()
+
+        Dim tableClone As DataTable = view.Table.Clone()
+
+        For Each rowView As DataRowView In view
+            tableClone.ImportRow(rowView.Row)
+        Next
+
+        tableClone.AcceptChanges()
+        Return tableClone
+    End Function
+
+    Private Shared Sub SanitizarNombresDeColumnas(table As DataTable)
+        If table Is Nothing Then Return
+
+        Dim utilizados As New HashSet(Of String)(StringComparer.OrdinalIgnoreCase)
+        Dim indice As Integer = 1
+
+        For Each col As DataColumn In table.Columns
+            Dim nombre As String = System.Text.RegularExpressions.Regex.Replace(col.ColumnName, "[^a-zA-Z0-9_]", "")
+
+            If String.IsNullOrWhiteSpace(nombre) Then
+                nombre = $"Campo{indice}"
+                indice += 1
+            End If
+
+            Dim baseNombre As String = nombre
+            Dim sufijo As Integer = 1
+            While utilizados.Contains(nombre)
+                nombre = $"{baseNombre}_{sufijo}"
+                sufijo += 1
+            End While
+
+            utilizados.Add(nombre)
+            col.ColumnName = nombre
+        Next
     End Sub
 End Class
 

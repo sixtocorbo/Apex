@@ -22,6 +22,11 @@ Public Module ReportResourceLoader
         Public Property FilePath As String
     End Structure
 
+    Public Structure ReportDefinitionContentResult
+        Public Property Definition As ReportDefinitionResult
+        Public Property Content As Byte()
+    End Structure
+
     Public Function LoadLocalReportDefinition(localReport As LocalReport,
                                               ownerType As Type,
                                               expectedResourceName As String,
@@ -57,6 +62,54 @@ Public Module ReportResourceLoader
             Return New ReportDefinitionResult With {
                 .Source = ReportDefinitionSource.File,
                 .FilePath = searchResult.FilePath
+            }
+        End If
+
+        Throw BuildMissingReportException(reportFileName,
+                                          expectedResourceName,
+                                          searchResult.AvailableResourceNames,
+                                          searchResult.SearchedFilePaths)
+    End Function
+
+    Public Function GetReportDefinitionContent(ownerType As Type,
+                                               expectedResourceName As String,
+                                               reportFileName As String,
+                                               Optional additionalRelativeSearchPaths As IEnumerable(Of String) = Nothing) As ReportDefinitionContentResult
+
+        If ownerType Is Nothing Then Throw New ArgumentNullException(NameOf(ownerType))
+        If String.IsNullOrWhiteSpace(reportFileName) Then Throw New ArgumentException("Se requiere el nombre del archivo del reporte.", NameOf(reportFileName))
+
+        Dim searchResult = LocateReportDefinition(ownerType,
+                                                  expectedResourceName,
+                                                  reportFileName,
+                                                  additionalRelativeSearchPaths)
+
+        If Not String.IsNullOrEmpty(searchResult.ResourceName) Then
+            Using reportStream As Stream = searchResult.Assembly.GetManifestResourceStream(searchResult.ResourceName)
+                If reportStream Is Nothing Then
+                    Throw New FileNotFoundException($"No se pudo abrir el recurso incrustado '{searchResult.ResourceName}'.")
+                End If
+                Using ms As New MemoryStream()
+                    reportStream.CopyTo(ms)
+                    Return New ReportDefinitionContentResult With {
+                        .Definition = New ReportDefinitionResult With {
+                            .Source = ReportDefinitionSource.Embedded,
+                            .ResourceName = searchResult.ResourceName
+                        },
+                        .Content = ms.ToArray()
+                    }
+                End Using
+            End Using
+        End If
+
+        If Not String.IsNullOrEmpty(searchResult.FilePath) Then
+            Dim bytes As Byte() = File.ReadAllBytes(searchResult.FilePath)
+            Return New ReportDefinitionContentResult With {
+                .Definition = New ReportDefinitionResult With {
+                    .Source = ReportDefinitionSource.File,
+                    .FilePath = searchResult.FilePath
+                },
+                .Content = bytes
             }
         End If
 

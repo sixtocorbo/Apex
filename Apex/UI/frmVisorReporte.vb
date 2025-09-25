@@ -27,14 +27,20 @@ Public Class frmVisorReporte
         Try
             ReportViewer1.ProcessingMode = ProcessingMode.Local
             Dim lr = ReportViewer1.LocalReport
-            lr.ReportEmbeddedResource = "Apex.Reportes.ReporteFiltros.rdlc"
+
+            Dim definitionContent = ReportResourceLoader.GetReportDefinitionContent(Me.GetType(),
+                                                                                     "Apex.Reportes.ReporteFiltros.rdlc",
+                                                                                     "ReporteFiltros.rdlc")
+
+            If definitionContent.Definition.Source = ReportDefinitionSource.Embedded AndAlso Not String.IsNullOrWhiteSpace(definitionContent.Definition.ResourceName) Then
+                lr.ReportEmbeddedResource = definitionContent.Definition.ResourceName
+            Else
+                lr.ReportEmbeddedResource = Nothing
+            End If
 
             ' Cargar el XML del RDLC base en un documento para manipularlo
             Dim rdlcXml As New XmlDocument()
-            Using stream = Me.GetType().Assembly.GetManifestResourceStream("Apex.Reportes.ReporteFiltros.rdlc")
-                If stream Is Nothing Then
-                    Throw New Exception("No se pudo encontrar el recurso incrustado 'Apex.Reportes.ReporteFiltros.rdlc'. Asegúrate de que la acción de compilación sea 'Recurso incrustado'.")
-                End If
+            Using stream As New IO.MemoryStream(definitionContent.Content)
                 rdlcXml.Load(stream)
             End Using
 
@@ -74,6 +80,11 @@ Public Class frmVisorReporte
         End If
 
         ' 1. Crear campos del DataSet
+        Dim existingFieldsNode = dataSetNode.SelectSingleNode("df:Fields", nsManager)
+        If existingFieldsNode IsNot Nothing Then
+            dataSetNode.RemoveChild(existingFieldsNode)
+        End If
+
         Dim fieldsNode = rdlcXml.CreateElement("Fields", nsManager.LookupNamespace("df"))
         For Each col As DataColumn In dt.Columns
             Dim fieldNode = rdlcXml.CreateElement("Field", nsManager.LookupNamespace("df"))
@@ -100,6 +111,11 @@ Public Class frmVisorReporte
             Throw New Exception("No se pudo encontrar el nodo 'ReportItems' en la definición del reporte. La estructura del RDLC puede ser inválida.")
         End If
         ' -- FIN DE LA CORRECCIÓN --
+
+        Dim existingTablix = bodyNode.SelectSingleNode("df:Tablix[@Name='TablixResultados']", nsManager)
+        If existingTablix IsNot Nothing Then
+            bodyNode.RemoveChild(existingTablix)
+        End If
 
         Dim tablixXml As String = GenerarTablixXml(dt.Columns, nsManager)
         Dim tablixDoc As New XmlDocument()
