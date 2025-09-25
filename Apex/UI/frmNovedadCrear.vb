@@ -27,7 +27,6 @@ Public Class frmNovedadCrear
     ' --- Fin Controles Paso 4 ---
 #End Region
 
-    Private _svc As New NovedadService()
     Private _novedad As Novedad
     Private _modo As ModoFormulario
     Private _novedadId As Integer
@@ -278,19 +277,23 @@ Public Class frmNovedadCrear
     End Sub
 
     Private Async Function CargarDatosParaEdicion() As Task
-        _novedad = Await _svc.GetByIdAsync(_novedadId)
-        If _novedad Is Nothing Then
-            Notifier.[Error](Me, "No se encontró la novedad para editar.")
-            Close()
-            Return
-        End If
-        dtpFecha.Value = _novedad.Fecha
-        txtTexto.Text = _novedad.Texto
-        _funcionariosSeleccionados.Clear()
-        Dim funcionariosAsociados = Await _svc.GetFuncionariosPorNovedadAsync(_novedad.Id)
-        For Each func In funcionariosAsociados
-            _funcionariosSeleccionados.Add(func)
-        Next
+        Using svc As New NovedadService()
+            _novedad = Await svc.GetByIdAsync(_novedadId)
+            If _novedad Is Nothing Then
+                Notifier.[Error](Me, "No se encontró la novedad para editar.")
+                Close()
+                Return
+            End If
+
+            dtpFecha.Value = _novedad.Fecha
+            txtTexto.Text = _novedad.Texto
+
+            _funcionariosSeleccionados.Clear()
+            Dim funcionariosAsociados = Await svc.GetFuncionariosPorNovedadAsync(_novedad.Id)
+            For Each func In funcionariosAsociados
+                _funcionariosSeleccionados.Add(func)
+            Next
+        End Using
         Await CargarFotosAsync()
     End Function
 
@@ -365,11 +368,13 @@ Public Class frmNovedadCrear
         _fotosExistentes.Clear()
         _pictureBoxSeleccionado = Nothing
         If _modo = ModoFormulario.Editar Then
-            Dim fotosDb = Await _svc.GetFotosPorNovedadAsync(_novedadId)
-            For Each foto In fotosDb
-                _fotosExistentes.Add(foto)
-                AgregarPictureBox(foto.Foto, foto)
-            Next
+            Using svc As New NovedadService()
+                Dim fotosDb = Await svc.GetFotosPorNovedadAsync(_novedadId)
+                For Each foto In fotosDb
+                    _fotosExistentes.Add(foto)
+                    AgregarPictureBox(foto.Foto, foto)
+                Next
+            End Using
         End If
     End Function
 
@@ -482,38 +487,41 @@ Public Class frmNovedadCrear
         Me.Cursor = Cursors.WaitCursor
         Try
             Dim funcionarioIds = _funcionariosSeleccionados.Select(Function(f) f.Id).ToList()
-            If _modo = ModoFormulario.Crear Then
-                Dim nuevaNovedad = Await _svc.CrearNovedadCompletaAsync(dtpFecha.Value.Date, txtTexto.Text.Trim(), funcionarioIds)
-                If nuevaNovedad IsNot Nothing AndAlso _rutasFotosNuevas.Any() Then
-                    For Each ruta In _rutasFotosNuevas
-                        Await _svc.AddFotoAsync(nuevaNovedad.Id, ruta)
+
+            Using svc As New NovedadService()
+                If _modo = ModoFormulario.Crear Then
+                    Dim nuevaNovedad = Await svc.CrearNovedadCompletaAsync(dtpFecha.Value.Date, txtTexto.Text.Trim(), funcionarioIds)
+                    If nuevaNovedad IsNot Nothing AndAlso _rutasFotosNuevas.Any() Then
+                        For Each ruta In _rutasFotosNuevas
+                            Await svc.AddFotoAsync(nuevaNovedad.Id, ruta)
+                        Next
+                    End If
+                    Notifier.Success(Me, "Novedad creada correctamente.")
+                    NotificadorEventos.NotificarCambioEnNovedad(nuevaNovedad.Id)
+                    For Each id In funcionarioIds
+                        NotificadorEventos.NotificarCambiosEnFuncionario(id)
+                    Next
+                Else
+                    If _fotosParaEliminar.Any() Then
+                        For Each foto In _fotosParaEliminar
+                            Await svc.DeleteFotoAsync(foto.Id)
+                        Next
+                    End If
+                    If _rutasFotosNuevas.Any() Then
+                        For Each ruta In _rutasFotosNuevas
+                            Await svc.AddFotoAsync(_novedadId, ruta)
+                        Next
+                    End If
+                    _novedad.Fecha = dtpFecha.Value.Date
+                    _novedad.Texto = txtTexto.Text.Trim()
+                    Await svc.ActualizarNovedadCompletaAsync(_novedad, funcionarioIds)
+                    Notifier.Success(Me, "Novedad actualizada.")
+                    NotificadorEventos.NotificarCambioEnNovedad(_novedadId)
+                    For Each id In funcionarioIds
+                        NotificadorEventos.NotificarCambiosEnFuncionario(id)
                     Next
                 End If
-                Notifier.Success(Me, "Novedad creada correctamente.")
-                NotificadorEventos.NotificarCambioEnNovedad(nuevaNovedad.Id)
-                For Each id In funcionarioIds
-                    NotificadorEventos.NotificarCambiosEnFuncionario(id)
-                Next
-            Else
-                If _fotosParaEliminar.Any() Then
-                    For Each foto In _fotosParaEliminar
-                        Await _svc.DeleteFotoAsync(foto.Id)
-                    Next
-                End If
-                If _rutasFotosNuevas.Any() Then
-                    For Each ruta In _rutasFotosNuevas
-                        Await _svc.AddFotoAsync(_novedadId, ruta)
-                    Next
-                End If
-                _novedad.Fecha = dtpFecha.Value.Date
-                _novedad.Texto = txtTexto.Text.Trim()
-                Await _svc.ActualizarNovedadCompletaAsync(_novedad, funcionarioIds)
-                Notifier.Success(Me, "Novedad actualizada.")
-                NotificadorEventos.NotificarCambioEnNovedad(_novedadId)
-                For Each id In funcionarioIds
-                    NotificadorEventos.NotificarCambiosEnFuncionario(id)
-                Next
-            End If
+            End Using
             Me.DialogResult = DialogResult.OK
             Me.Close()
             Return True
