@@ -1053,6 +1053,11 @@ Partial Public Class frmFiltros
         ' 1. Obtener la lista de filtros aplicados
         Dim sbFiltros As New System.Text.StringBuilder()
         sbFiltros.AppendLine("Filtros Aplicados:")
+
+        Dim fechaInicioSeleccionada = dtpFechaInicio.Value.Date
+        Dim fechaFinSeleccionada = dtpFechaFin.Value.Date
+        sbFiltros.AppendLine($"- Rango de fechas: {fechaInicioSeleccionada.ToString("d", CultureInfo.CurrentCulture)} a {fechaFinSeleccionada.ToString("d", CultureInfo.CurrentCulture)}")
+
         If _filtros.Reglas.Any() Then
             For Each regla In _filtros.Reglas
                 sbFiltros.AppendLine("- " & regla.ToString())
