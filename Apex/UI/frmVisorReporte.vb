@@ -175,16 +175,21 @@ Public Class frmVisorReporte
     End Function
 
     Private Shared Function ObtenerSubtituloCantidades(cantidadesDisponibles As String) As String
+        Const subtituloPredeterminado As String = "Cantidades no disponibles"
+
         If String.IsNullOrWhiteSpace(cantidadesDisponibles) Then
-            Return String.Empty
+            Return subtituloPredeterminado
         End If
 
         Dim lineas = cantidadesDisponibles.Split(New String() {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries)
-        If lineas.Length = 0 Then
-            Return String.Empty
-        End If
+        For Each linea In lineas
+            Dim lineaLimpia = linea.Trim()
+            If Not String.IsNullOrEmpty(lineaLimpia) Then
+                Return lineaLimpia
+            End If
+        Next
 
-        Return lineas(0).Trim()
+        Return subtituloPredeterminado
     End Function
 
 End Class
