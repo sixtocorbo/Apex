@@ -9,6 +9,7 @@ Public Class frmVisorReporte
     Private ReadOnly _filtros As String
     Private ReadOnly _cantidades As String
     Private ReadOnly _dtResultados As DataTable
+    Private ReadOnly _subtitulo As String
 
 
     Public Sub New(titulo As String, filtrosAplicados As String, cantidadesDisponibles As String, dtResultados As DataTable)
@@ -17,6 +18,7 @@ Public Class frmVisorReporte
         _filtros = filtrosAplicados
         _cantidades = cantidadesDisponibles
         _dtResultados = dtResultados
+        _subtitulo = ObtenerSubtituloCantidades(cantidadesDisponibles)
     End Sub
 
     Private Sub frmVisorReporte_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -61,6 +63,7 @@ Public Class frmVisorReporte
             lr.SetParameters(New ReportParameter("ReportTitle", _titulo))
             lr.SetParameters(New ReportParameter("FiltrosAplicados", _filtros))
             lr.SetParameters(New ReportParameter("CantidadesDisponibles", _cantidades))
+            lr.SetParameters(New ReportParameter("ReportSubTitle", _subtitulo))
 
             ReportViewer1.SetDisplayMode(DisplayMode.PrintLayout)
             ReportViewer1.ZoomMode = ZoomMode.PageWidth
@@ -169,6 +172,19 @@ Public Class frmVisorReporte
         sb.AppendLine("</Tablix>")
 
         Return sb.ToString()
+    End Function
+
+    Private Shared Function ObtenerSubtituloCantidades(cantidadesDisponibles As String) As String
+        If String.IsNullOrWhiteSpace(cantidadesDisponibles) Then
+            Return String.Empty
+        End If
+
+        Dim lineas = cantidadesDisponibles.Split(New String() {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries)
+        If lineas.Length = 0 Then
+            Return String.Empty
+        End If
+
+        Return lineas(0).Trim()
     End Function
 
 End Class
