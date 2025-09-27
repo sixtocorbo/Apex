@@ -580,9 +580,9 @@ Public Class frmFuncionarioSituacion
             Dim colorAplicado As Boolean = False
 
             If Not String.IsNullOrWhiteSpace(evento.ColorIndicador) Then
-                Dim color = Color.FromName(evento.ColorIndicador)
-                If color.IsKnownColor OrElse color.IsNamedColor OrElse color.A > 0 Then
-                    AplicarColorDeFila(row, color)
+                Dim colorr = Color.FromName(evento.ColorIndicador)
+                If colorr.IsKnownColor OrElse colorr.IsNamedColor OrElse colorr.A > 0 Then
+                    AplicarColorDeFila(row, colorr)
                     colorAplicado = True
                 End If
             End If
