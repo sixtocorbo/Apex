@@ -49,6 +49,7 @@ Partial Class frmFiltros
         Me.txtBusquedaGlobal = New System.Windows.Forms.TextBox()
         Me.pnlAcciones = New System.Windows.Forms.Panel()
         Me.flpAcciones = New System.Windows.Forms.FlowLayoutPanel()
+        Me.btnImprimir = New System.Windows.Forms.Button()
         Me.btnExportarExcel = New System.Windows.Forms.Button()
         Me.btnCopiarCorreos = New System.Windows.Forms.Button()
         Me.btnExportarFichasPDF = New System.Windows.Forms.Button()
@@ -59,7 +60,6 @@ Partial Class frmFiltros
         Me.PanelChips = New System.Windows.Forms.Panel()
         Me.flpChips = New System.Windows.Forms.FlowLayoutPanel()
         Me.pnlContenedor = New System.Windows.Forms.Panel()
-        Me.btnImprimir = New System.Windows.Forms.Button()
         CType(Me.splitContenedorPrincipal, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.splitContenedorPrincipal.Panel1.SuspendLayout()
         Me.splitContenedorPrincipal.Panel2.SuspendLayout()
@@ -413,6 +413,15 @@ Partial Class frmFiltros
         Me.flpAcciones.Size = New System.Drawing.Size(665, 49)
         Me.flpAcciones.TabIndex = 0
         '
+        'btnImprimir
+        '
+        Me.btnImprimir.Location = New System.Drawing.Point(516, 8)
+        Me.btnImprimir.Name = "btnImprimir"
+        Me.btnImprimir.Size = New System.Drawing.Size(136, 33)
+        Me.btnImprimir.TabIndex = 5
+        Me.btnImprimir.Text = "Imprimir"
+        Me.btnImprimir.UseVisualStyleBackColor = True
+        '
         'btnExportarExcel
         '
         Me.btnExportarExcel.Location = New System.Drawing.Point(374, 8)
@@ -514,15 +523,6 @@ Partial Class frmFiltros
         Me.pnlContenedor.Name = "pnlContenedor"
         Me.pnlContenedor.Size = New System.Drawing.Size(978, 544)
         Me.pnlContenedor.TabIndex = 1
-        '
-        'btnImprimir
-        '
-        Me.btnImprimir.Location = New System.Drawing.Point(516, 8)
-        Me.btnImprimir.Name = "btnImprimir"
-        Me.btnImprimir.Size = New System.Drawing.Size(136, 33)
-        Me.btnImprimir.TabIndex = 5
-        Me.btnImprimir.Text = "Imprimir"
-        Me.btnImprimir.UseVisualStyleBackColor = True
         '
         'frmFiltros
         '
