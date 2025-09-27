@@ -4,7 +4,6 @@ Imports System.Data
 Imports System.Text
 Imports System.Xml
 Imports Microsoft.Reporting.WinForms
-Imports System.Text.RegularExpressions ' <--- ASEGÚRATE DE AGREGAR ESTA LÍNEA
 
 Public Class frmVisorReporte
 
@@ -80,6 +79,7 @@ Public Class frmVisorReporte
     Private Sub GenerarContenidoDinamico(rdlcXml As XmlDocument, dt As DataTable)
         Dim nsManager As New XmlNamespaceManager(rdlcXml.NameTable)
         nsManager.AddNamespace("df", "http://schemas.microsoft.com/sqlserver/reporting/2008/01/reportdefinition")
+        nsManager.AddNamespace("rd", "http://schemas.microsoft.com/SQLServer/reporting/reportdesigner")
 
         Dim dataSetNode = rdlcXml.SelectSingleNode("/df:Report/df:DataSets/df:DataSet[@Name='ResultadosDataSet']", nsManager)
         If dataSetNode Is Nothing Then
@@ -92,13 +92,25 @@ Public Class frmVisorReporte
             dataSetNode.RemoveChild(existingFieldsNode)
         End If
 
+        Dim columnasAIgnorar As New HashSet(Of String)(StringComparer.OrdinalIgnoreCase) From {"GlobalSearch"}
+        Dim columnasDisponibles = dt.Columns.Cast(Of DataColumn)().
+                                   Where(Function(c) Not columnasAIgnorar.Contains(c.ColumnName)).
+                                   ToList()
+
         Dim fieldsNode = rdlcXml.CreateElement("Fields", nsManager.LookupNamespace("df"))
-        For Each col As DataColumn In dt.Columns
+        For Each col As DataColumn In columnasDisponibles
             Dim fieldNode = rdlcXml.CreateElement("Field", nsManager.LookupNamespace("df"))
-            fieldNode.SetAttribute("Name", col.ColumnName)
+            Dim safeFieldName = XmlConvert.EncodeName(col.ColumnName)
+            fieldNode.SetAttribute("Name", safeFieldName)
+
             Dim dataFieldNode = rdlcXml.CreateElement("DataField", nsManager.LookupNamespace("df"))
             dataFieldNode.InnerText = col.ColumnName
             fieldNode.AppendChild(dataFieldNode)
+
+            Dim typeNameNode = rdlcXml.CreateElement("rd", "TypeName", nsManager.LookupNamespace("rd"))
+            typeNameNode.InnerText = GetType(String).FullName
+            fieldNode.AppendChild(typeNameNode)
+
             fieldsNode.AppendChild(fieldNode)
         Next
         dataSetNode.AppendChild(fieldsNode)
@@ -118,21 +130,20 @@ Public Class frmVisorReporte
             bodyNode.RemoveChild(existingTablix)
         End If
 
-        Dim tablixXml As String = GenerarTablixXml(dt.Columns, nsManager)
-        Dim tablixDoc As New XmlDocument()
-        tablixDoc.LoadXml(tablixXml)
-        Dim tablixNode = rdlcXml.ImportNode(tablixDoc.DocumentElement, True)
-        bodyNode.AppendChild(tablixNode)
+        Dim tablixXml As String = GenerarTablixXml(columnasDisponibles, nsManager)
+        If Not String.IsNullOrWhiteSpace(tablixXml) Then
+            Dim tablixDoc As New XmlDocument()
+            tablixDoc.LoadXml(tablixXml)
+            Dim tablixNode = rdlcXml.ImportNode(tablixDoc.DocumentElement, True)
+            bodyNode.AppendChild(tablixNode)
+        End If
     End Sub
 
-    Private Function GenerarTablixXml(columns As DataColumnCollection, nsManager As XmlNamespaceManager) As String
+    Private Function GenerarTablixXml(columns As IEnumerable(Of DataColumn), nsManager As XmlNamespaceManager) As String
         Dim sb As New StringBuilder()
         Dim ns As String = nsManager.LookupNamespace("df")
 
-        Dim columnasAIgnorar As New HashSet(Of String)(StringComparer.OrdinalIgnoreCase) From {"GlobalSearch"}
-        Dim columnasAMostrar = columns.Cast(Of DataColumn)().
-                               Where(Function(c) Not columnasAIgnorar.Contains(c.ColumnName)).
-                               ToList()
+        Dim columnasAMostrar = columns.ToList()
 
         If columnasAMostrar.Count = 0 Then
             Return String.Empty ' No generar tabla si no hay nada que mostrar
@@ -143,9 +154,11 @@ Public Class frmVisorReporte
             {"Cedula", "1.2in"}, {"CI", "1.2in"}, {"Resumen", "3.5in"}, {"Texto", "3.5in"},
             {"Observaciones", "3.7in"}, {"Descripcion", "3.2in"}, {"Detalle", "3.2in"},
             {"Motivo", "2.5in"}, {"PuestoDeTrabajo", "2.5in"}, {"Cargo", "2.0in"},
-            {"Seccion", "2.0in"}, {"Seccin", "2.0in"}, {"TipoDeFuncionario", "2.2in"},
+            {"Seccion", "2.0in"}, {"Sección", "2.0in"}, {"Seccin", "2.0in"}, {"TipoDeFuncionario", "2.2in"},
+            {"TipoFuncionario", "2.2in"}, {"Escalafon", "2.2in"}, {"Escalafón", "2.2in"},
             {"Estado", "1.5in"}, {"Tipo", "1.6in"}, {"Oficina", "1.8in"}, {"Rango", "2.2in"},
-            {"Documento", "2.2in"}, {"ExpMinisterial", "2.2in"}, {"ExpINR", "2.2in"}
+            {"Documento", "2.2in"}, {"ExpMinisterial", "2.2in"}, {"ExpINR", "2.2in"},
+            {"Dependencia", "2.5in"}, {"Unidad", "2.0in"}
         }
 
         sb.AppendLine($"<Tablix Name='TablixResultados' xmlns='{ns}'>")
@@ -172,31 +185,33 @@ Public Class frmVisorReporte
         sb.AppendLine("<TablixRow><Height>0.25in</Height><TablixCells>")
         For Each col As DataColumn In columnasAMostrar
             ' --- CORRECCIÓN ERROR DESERIALIZACIÓN ---
-            Dim sanitizedName = SanitizeForRdlcName(col.ColumnName)
+            Dim safeFieldName = XmlConvert.EncodeName(col.ColumnName)
+            Dim headerName = XmlConvert.EncodeName("Header" & col.ColumnName)
             Dim headerText = If(String.IsNullOrWhiteSpace(col.Caption), col.ColumnName, col.Caption)
-            sb.AppendLine($"<TablixCell><CellContents><Textbox Name='Header{sanitizedName}'><CanGrow>true</CanGrow><KeepTogether>true</KeepTogether><Paragraphs><Paragraph><TextRuns><TextRun><Value>{EscapeXml(headerText)}</Value><Style><FontWeight>Bold</FontWeight><Color>White</Color></Style></TextRun></TextRuns><Style><TextAlign>Left</TextAlign></Style></Paragraph></Paragraphs><Style><Border><Color>LightGrey</Color><Style>Solid</Style></Border><BackgroundColor>#4682B4</BackgroundColor><PaddingLeft>4pt</PaddingLeft><PaddingRight>4pt</PaddingRight><PaddingTop>4pt</PaddingTop><PaddingBottom>4pt</PaddingBottom></Style></Textbox></CellContents></TablixCell>")
+            sb.AppendLine($"<TablixCell><CellContents><Textbox Name='{headerName}'><CanGrow>true</CanGrow><KeepTogether>true</KeepTogether><Paragraphs><Paragraph><TextRuns><TextRun><Value>{EscapeXml(headerText)}</Value><Style><FontWeight>Bold</FontWeight><Color>White</Color></Style></TextRun></TextRuns><Style><TextAlign>Left</TextAlign></Style></Paragraph></Paragraphs><Style><Border><Color>LightGrey</Color><Style>Solid</Style></Border><BackgroundColor>#4682B4</BackgroundColor><PaddingLeft>4pt</PaddingLeft><PaddingRight>4pt</PaddingRight><PaddingTop>4pt</PaddingTop><PaddingBottom>4pt</PaddingBottom></Style></Textbox></CellContents></TablixCell>")
         Next
         sb.AppendLine("</TablixCells></TablixRow>")
 
         ' Fila de datos
         sb.AppendLine("<TablixRow><Height>0.25in</Height><TablixCells>")
         For Each col As DataColumn In columnasAMostrar
-            Dim sanitizedName = SanitizeForRdlcName(col.ColumnName)
+            Dim safeFieldName = XmlConvert.EncodeName(col.ColumnName)
+            Dim dataName = XmlConvert.EncodeName("Data" & col.ColumnName)
             Dim valueExpression As String
             Dim textAlign As String = "Left"
 
             ' --- MEJORA: Formatear fechas y alinear tipos de datos ---
             If col.DataType Is GetType(DateTime) Then
-                valueExpression = $"=IIF(IsNothing(Fields!{col.ColumnName}.Value), """", Format(Fields!{col.ColumnName}.Value, ""dd/MM/yyyy""))"
+                valueExpression = $"=IIF(IsNothing(Fields!{safeFieldName}.Value), """", Format(Fields!{safeFieldName}.Value, ""dd/MM/yyyy""))"
                 textAlign = "Center"
             ElseIf GetType(ValueType).IsAssignableFrom(col.DataType) AndAlso col.DataType IsNot GetType(Boolean) Then
-                valueExpression = $"=Fields!{col.ColumnName}.Value"
+                valueExpression = $"=Fields!{safeFieldName}.Value"
                 textAlign = "Right"
             Else
-                valueExpression = $"=Fields!{col.ColumnName}.Value"
+                valueExpression = $"=Fields!{safeFieldName}.Value"
             End If
 
-            sb.AppendLine($"<TablixCell><CellContents><Textbox Name='Data{sanitizedName}'><CanGrow>true</CanGrow><KeepTogether>true</KeepTogether><Paragraphs><Paragraph><TextRuns><TextRun><Value>{valueExpression}</Value><Style /></TextRun></TextRuns><Style><TextAlign>{textAlign}</TextAlign></Style></Paragraph></Paragraphs><Style><Border><Color>LightGrey</Color><Style>Solid</Style></Border><PaddingLeft>4pt</PaddingLeft><PaddingRight>4pt</PaddingRight><PaddingTop>4pt</PaddingTop><PaddingBottom>4pt</PaddingBottom></Style></Textbox></CellContents></TablixCell>")
+            sb.AppendLine($"<TablixCell><CellContents><Textbox Name='{dataName}'><CanGrow>true</CanGrow><KeepTogether>true</KeepTogether><Paragraphs><Paragraph><TextRuns><TextRun><Value>{valueExpression}</Value><Style /></TextRun></TextRuns><Style><TextAlign>{textAlign}</TextAlign></Style></Paragraph></Paragraphs><Style><Border><Color>LightGrey</Color><Style>Solid</Style></Border><PaddingLeft>4pt</PaddingLeft><PaddingRight>4pt</PaddingRight><PaddingTop>4pt</PaddingTop><PaddingBottom>4pt</PaddingBottom></Style></Textbox></CellContents></TablixCell>")
         Next
         sb.AppendLine("</TablixCells></TablixRow>")
         sb.AppendLine("</TablixRows>")
@@ -219,19 +234,6 @@ Public Class frmVisorReporte
         sb.AppendLine("</Tablix>")
 
         Return sb.ToString()
-    End Function
-
-    ' --- NUEVA FUNCIÓN AUXILIAR ---
-    ' Limpia un string para que sea un nombre válido para un control en RDLC (CLS-compliant)
-    Private Shared Function SanitizeForRdlcName(name As String) As String
-        If String.IsNullOrWhiteSpace(name) Then Return "InvalidName"
-        ' Reemplaza cualquier caracter que no sea letra, número o guion bajo
-        Dim sanitized = Regex.Replace(name, "[^\w]", "_")
-        ' Un identificador no puede empezar con un número
-        If sanitized.Length > 0 AndAlso Char.IsDigit(sanitized(0)) Then
-            sanitized = "_" & sanitized
-        End If
-        Return sanitized
     End Function
 
     Private Shared Function EscapeXml(texto As String) As String
