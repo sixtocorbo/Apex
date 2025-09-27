@@ -236,12 +236,13 @@ Public Class frmVisorReporte
     Private Shared Function EscapeXml(texto As String) As String
         If String.IsNullOrEmpty(texto) Then Return String.Empty
 
-        Return texto.Replace("&", "&amp;").
-                     Replace("<", "&lt;").
-                     Replace(">", "&gt;").
-                     Replace("\"", "&quot;").
-                     Replace("'", "&apos;")
+        Return texto.Replace("&", "&amp;") _
+                .Replace("<", "&lt;") _
+                .Replace(">", "&gt;") _
+                .Replace("""", "&quot;") _
+                .Replace("'", "&apos;")
     End Function
+
 
     Private Shared Function ObtenerSubtituloCantidades(cantidadesDisponibles As String) As String
         Const subtituloPredeterminado As String = "Cantidades no disponibles"
