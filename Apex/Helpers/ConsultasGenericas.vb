@@ -113,8 +113,29 @@ Public Module ConsultasGenericas
                         Throw New ArgumentNullException("Las fechas de inicio y fin son requeridas para Notificaciones.")
                     End If
                     Dim notificacionService = New NotificacionService(uow)
-                    Dim notificaciones = Await notificacionService.GetAllConDetallesAsync()
-                    dt = notificaciones.Where(Function(n) n.FechaProgramada.Date >= fechaInicio.Value AndAlso n.FechaProgramada.Date <= fechaFin.Value).ToList().ToDataTable()
+                    Dim notificaciones = Await notificacionService.GetAllConDetallesAsync(
+                        fechaDesde:=fechaInicio,
+                        fechaHasta:=fechaFin
+                    )
+
+                    If Not notificaciones.Any() Then
+                        Return CrearTablaNotificacionesVacia()
+                    End If
+
+                    Dim resultadoNotificaciones = notificaciones.Select(Function(n) New With {
+                        .NombreCompleto = n.NombreFuncionario,
+                        .Cedula = n.CI,
+                        .TipoNotificacion = n.TipoNotificacion,
+                        .Estado = n.Estado,
+                        .FechaProgramada = n.FechaProgramada,
+                        .Texto = n.Texto,
+                        .Documento = n.Documento,
+                        .ExpMinisterial = n.ExpMinisterial,
+                        .ExpINR = n.ExpINR,
+                        .Oficina = n.Oficina
+                    }).ToList()
+
+                    dt = resultadoNotificaciones.ToDataTable()
                 Case TipoOrigenDatos.Licencias
                     Dim licenciaService = New LicenciaService(uow)
                     Dim licencias = Await licenciaService.GetAllConDetallesAsync(fechaDesde:=fechaInicio, fechaHasta:=fechaFin)
@@ -507,5 +528,22 @@ Public Module ConsultasGenericas
 
         ' Construye el DataTable con todas las columnas (FuncionarioId, Cedula, NombreCompleto, Tipo, Anio, Mes, Fecha, Minutos, Dias, Incidencia, Observaciones, Motivo, Area)
         Return ModuloExtensions.ToDataTable(datos)
+    End Function
+
+    Private Function CrearTablaNotificacionesVacia() As DataTable
+        Dim table As New DataTable()
+
+        table.Columns.Add("NombreCompleto", GetType(String))
+        table.Columns.Add("Cedula", GetType(String))
+        table.Columns.Add("TipoNotificacion", GetType(String))
+        table.Columns.Add("Estado", GetType(String))
+        table.Columns.Add("FechaProgramada", GetType(Date))
+        table.Columns.Add("Texto", GetType(String))
+        table.Columns.Add("Documento", GetType(String))
+        table.Columns.Add("ExpMinisterial", GetType(String))
+        table.Columns.Add("ExpINR", GetType(String))
+        table.Columns.Add("Oficina", GetType(String))
+
+        Return table
     End Function
 End Module
