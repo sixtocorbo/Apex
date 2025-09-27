@@ -1,5 +1,7 @@
 ﻿' Apex/Services/ConsultasGenericas.vb
+Imports System.Collections.Generic
 Imports System.Data.Entity
+Imports System.Linq
 Imports System.Linq.Expressions
 Public Module ConsultasGenericas
 
@@ -113,8 +115,90 @@ Public Module ConsultasGenericas
                         Throw New ArgumentNullException("Las fechas de inicio y fin son requeridas para Notificaciones.")
                     End If
                     Dim notificacionService = New NotificacionService(uow)
-                    Dim notificaciones = Await notificacionService.GetAllConDetallesAsync()
-                    dt = notificaciones.Where(Function(n) n.FechaProgramada.Date >= fechaInicio.Value AndAlso n.FechaProgramada.Date <= fechaFin.Value).ToList().ToDataTable()
+                    Dim notificaciones = Await notificacionService.GetAllConDetallesAsync(
+                        fechaDesde:=fechaInicio,
+                        fechaHasta:=fechaFin
+                    )
+
+                    If Not notificaciones.Any() Then
+                        Return CrearTablaNotificacionesVacia()
+                    End If
+
+                    Dim funcionarioIds = notificaciones.
+                        Select(Function(n) n.FuncionarioId).
+                        Distinct().
+                        ToList()
+
+                    Dim funcionariosInfo As Dictionary(Of Integer, FuncionarioFiltrosDetalle) =
+                        New Dictionary(Of Integer, FuncionarioFiltrosDetalle)()
+
+                    If funcionarioIds.Count > 0 Then
+                        Dim infoQuery = uow.Repository(Of Funcionario)().
+                            GetQueryable(includeProperties: "Cargo,TipoFuncionario,Escalafon,SubEscalafon,SubDireccion,PrestadorSalud,Funcion,Seccion,PuestoTrabajo,Turno,Semana,Horario,Genero,EstadoCivil,NivelEstudio").
+                            Where(Function(f) funcionarioIds.Contains(f.Id)).
+                            Select(Function(f) New FuncionarioFiltrosDetalle With {
+                                .Id = f.Id,
+                                .Activo = f.Activo,
+                                .TipoDeFuncionario = If(f.TipoFuncionario IsNot Nothing, f.TipoFuncionario.Nombre, "N/A"),
+                                .Cargo = If(f.Cargo IsNot Nothing, f.Cargo.Nombre, "N/A"),
+                                .Seccion = If(f.Seccion IsNot Nothing, f.Seccion.Nombre, "N/A"),
+                                .Escalafon = If(f.Escalafon IsNot Nothing, f.Escalafon.Nombre, "N/A"),
+                                .SubEscalafon = If(f.SubEscalafon IsNot Nothing, f.SubEscalafon.Nombre, "N/A"),
+                                .SubDireccion = If(f.SubDireccion IsNot Nothing, f.SubDireccion.Nombre, "N/A"),
+                                .PrestadorSalud = If(f.PrestadorSalud IsNot Nothing, f.PrestadorSalud.Nombre, "N/A"),
+                                .Funcion = If(f.Funcion IsNot Nothing, f.Funcion.Nombre, "N/A"),
+                                .PuestoDeTrabajo = If(f.PuestoTrabajo IsNot Nothing, f.PuestoTrabajo.Nombre, "N/A"),
+                                .Turno = If(f.Turno IsNot Nothing, f.Turno.Nombre, "N/A"),
+                                .Semana = If(f.Semana IsNot Nothing, f.Semana.Nombre, "N/A"),
+                                .Horario = If(f.Horario IsNot Nothing, f.Horario.Nombre, "N/A"),
+                                .Genero = If(f.Genero IsNot Nothing, f.Genero.Nombre, "N/A"),
+                                .EstadoCivil = If(f.EstadoCivil IsNot Nothing, f.EstadoCivil.Nombre, "N/A"),
+                                .NivelDeEstudio = If(f.NivelEstudio IsNot Nothing, f.NivelEstudio.Nombre, "N/A")
+                            })
+
+                        Dim listaInfo = Await infoQuery.ToListAsync()
+                        If listaInfo IsNot Nothing AndAlso listaInfo.Count > 0 Then
+                            funcionariosInfo = listaInfo.ToDictionary(Function(f) f.Id)
+                        End If
+                    End If
+
+                    Dim resultadoNotificaciones = notificaciones.Select(Function(n) New With {
+                        .Id = n.Id,
+                        .FuncionarioId = n.FuncionarioId,
+                        .TipoNotificacionId = n.TipoNotificacionId,
+                        .EstadoId = n.EstadoId,
+                        .NombreCompleto = n.NombreFuncionario,
+                        .Cedula = n.CI,
+                        .TipoNotificacion = n.TipoNotificacion,
+                        .Estado = n.Estado,
+                        .FechaProgramada = n.FechaProgramada,
+                        .Texto = n.Texto,
+                        .Documento = n.Documento,
+                        .ExpMinisterial = n.ExpMinisterial,
+                        .ExpINR = n.ExpINR,
+                        .Oficina = n.Oficina,
+                        .Activo = ObtenerValorActivo(funcionariosInfo, n.FuncionarioId),
+                        .EstadoActual = ObtenerEstadoActual(funcionariosInfo, n.FuncionarioId),
+                        .TipoDeFuncionario = ObtenerValorSeguro(funcionariosInfo, n.FuncionarioId, Function(info) info.TipoDeFuncionario),
+                        .TipoFuncionario = ObtenerValorSeguro(funcionariosInfo, n.FuncionarioId, Function(info) info.TipoDeFuncionario),
+                        .Cargo = ObtenerValorSeguro(funcionariosInfo, n.FuncionarioId, Function(info) info.Cargo),
+                        .Seccion = ObtenerValorSeguro(funcionariosInfo, n.FuncionarioId, Function(info) info.Seccion),
+                        .Escalafon = ObtenerValorSeguro(funcionariosInfo, n.FuncionarioId, Function(info) info.Escalafon),
+                        .SubEscalafon = ObtenerValorSeguro(funcionariosInfo, n.FuncionarioId, Function(info) info.SubEscalafon),
+                        .SubDireccion = ObtenerValorSeguro(funcionariosInfo, n.FuncionarioId, Function(info) info.SubDireccion),
+                        .PrestadorSalud = ObtenerValorSeguro(funcionariosInfo, n.FuncionarioId, Function(info) info.PrestadorSalud),
+                        .Funcion = ObtenerValorSeguro(funcionariosInfo, n.FuncionarioId, Function(info) info.Funcion),
+                        .PuestoDeTrabajo = ObtenerValorSeguro(funcionariosInfo, n.FuncionarioId, Function(info) info.PuestoDeTrabajo),
+                        .Turno = ObtenerValorSeguro(funcionariosInfo, n.FuncionarioId, Function(info) info.Turno),
+                        .Semana = ObtenerValorSeguro(funcionariosInfo, n.FuncionarioId, Function(info) info.Semana),
+                        .Horario = ObtenerValorSeguro(funcionariosInfo, n.FuncionarioId, Function(info) info.Horario),
+                        .Genero = ObtenerValorSeguro(funcionariosInfo, n.FuncionarioId, Function(info) info.Genero),
+                        .EstadoCivil = ObtenerValorSeguro(funcionariosInfo, n.FuncionarioId, Function(info) info.EstadoCivil),
+                        .NivelDeEstudio = ObtenerValorSeguro(funcionariosInfo, n.FuncionarioId, Function(info) info.NivelDeEstudio),
+                        .Presencia = "-"
+                    }).ToList()
+
+                    dt = resultadoNotificaciones.ToDataTable()
                 Case TipoOrigenDatos.Licencias
                     Dim licenciaService = New LicenciaService(uow)
                     Dim licencias = Await licenciaService.GetAllConDetallesAsync(fechaDesde:=fechaInicio, fechaHasta:=fechaFin)
@@ -126,39 +210,26 @@ Public Module ConsultasGenericas
 
                     ' --- INICIO DE LA MODIFICACIÓN ---
 
-                    ' 1. Obtenemos una lista de todos los IDs de funcionario únicos de las licencias.
-                    Dim funcionarioIds = licencias.Select(Function(l) l.FuncionarioId).Distinct().ToList()
+                    ' Proyectamos los datos de las licencias usando la información ya enriquecida
+                    ' que devuelve el procedimiento almacenado. De esta manera evitamos incluir
+                    ' objetos complejos (entidades de EF) en el resultado, lo que generaba que
+                    ' en pantalla se mostraran los nombres de tipo (por ejemplo "Data_Entity…").
+                    Dim resultadoEnriquecido = licencias.Select(Function(lic) New With {
+                        .NombreCompleto = lic.NombreFuncionario,
+                        .Cedula = lic.CI,
+                        .TipoLicencia = lic.TipoLicencia,
+                        .FechaInicio = lic.FechaInicio,
+                        .FechaFin = lic.FechaFin,
+                        .Dias = lic.DuracionDias,
+                        .Observaciones = lic.Observaciones,
+                        .Activo = lic.Activo,
+                        .TipoDeFuncionario = lic.TipoDeFuncionario,
+                        .Cargo = lic.Cargo,
+                        .Seccion = lic.Seccion,
+                        .Escalafon = lic.Escalafon
+                    }).ToList()
 
-                    ' 2. Hacemos UNA SOLA consulta a la base de datos para traer todos los funcionarios necesarios.
-                    Dim funcionarios = Await uow.Repository(Of Funcionario)().
-                        GetAllByPredicateAsync(Function(f) funcionarioIds.Contains(f.Id))
-
-                    ' 3. Creamos un diccionario para buscar funcionarios por su ID de forma ultra-rápida.
-                    Dim funcionariosMap = funcionarios.ToDictionary(Function(f) f.Id)
-
-                    ' 4. Proyectamos los datos de las licencias a un nuevo objeto que SÍ incluye Nombre y Cédula.
-                    Dim resultadoEnriquecido = licencias.Select(Function(lic)
-                                                                    Dim func As Funcionario = Nothing
-                                                                    ' Buscamos el funcionario en nuestro mapa.
-                                                                    funcionariosMap.TryGetValue(lic.FuncionarioId, func)
-
-                                                                    Return New With {
-                                                        .NombreCompleto = func.Nombre,
-                                                        .Cedula = func.CI,
-                                                        .TipoLicencia = lic.TipoLicencia,
-                                                        .FechaInicio = lic.FechaInicio,
-                                                        .FechaFin = lic.FechaFin,
-                                                        .Dias = lic.DuracionDias,
-                                                        .Observaciones = lic.Observaciones,
-                                                        .Activo = func.Activo,
-                                                        .TipoDeFuncionario = func.TipoFuncionario,
-                                                        .Cargo = func.Cargo,
-                                                        .Seccion = func.Seccion,
-                                                        .Escalafon = func.Escalafon
-                                                    }
-                                                                End Function).ToList()
-
-                    ' 5. Convertimos la lista ENRIQUECIDA a un DataTable.
+                    ' Convertimos la lista enriquecida a un DataTable.
                     dt = resultadoEnriquecido.ToDataTable()
 
     ' --- FIN DE LA MODIFICACIÓN ---
@@ -521,4 +592,116 @@ Public Module ConsultasGenericas
         ' Construye el DataTable con todas las columnas (FuncionarioId, Cedula, NombreCompleto, Tipo, Anio, Mes, Fecha, Minutos, Dias, Incidencia, Observaciones, Motivo, Area)
         Return ModuloExtensions.ToDataTable(datos)
     End Function
+
+    Private Function CrearTablaNotificacionesVacia() As DataTable
+        Dim table As New DataTable()
+
+        table.Columns.Add("Id", GetType(Integer))
+        table.Columns.Add("FuncionarioId", GetType(Integer))
+        table.Columns.Add("TipoNotificacionId", GetType(Byte))
+        table.Columns.Add("EstadoId", GetType(Byte))
+        table.Columns.Add("NombreCompleto", GetType(String))
+        table.Columns.Add("Cedula", GetType(String))
+        table.Columns.Add("TipoNotificacion", GetType(String))
+        table.Columns.Add("Estado", GetType(String))
+        table.Columns.Add("FechaProgramada", GetType(Date))
+        table.Columns.Add("Texto", GetType(String))
+        table.Columns.Add("Documento", GetType(String))
+        table.Columns.Add("ExpMinisterial", GetType(String))
+        table.Columns.Add("ExpINR", GetType(String))
+        table.Columns.Add("Oficina", GetType(String))
+        table.Columns.Add("Activo", GetType(Boolean))
+        table.Columns.Add("EstadoActual", GetType(String))
+        table.Columns.Add("TipoDeFuncionario", GetType(String))
+        table.Columns.Add("TipoFuncionario", GetType(String))
+        table.Columns.Add("Cargo", GetType(String))
+        table.Columns.Add("Seccion", GetType(String))
+        table.Columns.Add("Escalafon", GetType(String))
+        table.Columns.Add("SubEscalafon", GetType(String))
+        table.Columns.Add("SubDireccion", GetType(String))
+        table.Columns.Add("PrestadorSalud", GetType(String))
+        table.Columns.Add("Funcion", GetType(String))
+        table.Columns.Add("PuestoDeTrabajo", GetType(String))
+        table.Columns.Add("Turno", GetType(String))
+        table.Columns.Add("Semana", GetType(String))
+        table.Columns.Add("Horario", GetType(String))
+        table.Columns.Add("Genero", GetType(String))
+        table.Columns.Add("EstadoCivil", GetType(String))
+        table.Columns.Add("NivelDeEstudio", GetType(String))
+        table.Columns.Add("Presencia", GetType(String))
+
+        Return table
+    End Function
+
+    Private Function ObtenerValorActivo(
+        infoDict As IDictionary(Of Integer, FuncionarioFiltrosDetalle),
+        funcionarioId As Integer) As Boolean
+
+        If infoDict Is Nothing Then
+            Return False
+        End If
+
+        Dim info As FuncionarioFiltrosDetalle = Nothing
+        If infoDict.TryGetValue(funcionarioId, info) AndAlso info IsNot Nothing Then
+            Return info.Activo
+        End If
+
+        Return False
+    End Function
+
+    Private Function ObtenerEstadoActual(
+        infoDict As IDictionary(Of Integer, FuncionarioFiltrosDetalle),
+        funcionarioId As Integer) As String
+
+        If infoDict Is Nothing Then
+            Return "N/A"
+        End If
+
+        Dim info As FuncionarioFiltrosDetalle = Nothing
+        If infoDict.TryGetValue(funcionarioId, info) AndAlso info IsNot Nothing Then
+            Return If(info.Activo, "Activo", "Inactivo")
+        End If
+
+        Return "N/A"
+    End Function
+
+    Private Function ObtenerValorSeguro(
+        infoDict As IDictionary(Of Integer, FuncionarioFiltrosDetalle),
+        funcionarioId As Integer,
+        selector As Func(Of FuncionarioFiltrosDetalle, String)) As String
+
+        If infoDict Is Nothing OrElse selector Is Nothing Then
+            Return "N/A"
+        End If
+
+        Dim info As FuncionarioFiltrosDetalle = Nothing
+        If infoDict.TryGetValue(funcionarioId, info) AndAlso info IsNot Nothing Then
+            Dim valor = selector(info)
+            If Not String.IsNullOrWhiteSpace(valor) Then
+                Return valor
+            End If
+        End If
+
+        Return "N/A"
+    End Function
+
+    Private Class FuncionarioFiltrosDetalle
+        Public Property Id As Integer
+        Public Property Activo As Boolean
+        Public Property TipoDeFuncionario As String
+        Public Property Cargo As String
+        Public Property Seccion As String
+        Public Property Escalafon As String
+        Public Property SubEscalafon As String
+        Public Property SubDireccion As String
+        Public Property PrestadorSalud As String
+        Public Property Funcion As String
+        Public Property PuestoDeTrabajo As String
+        Public Property Turno As String
+        Public Property Semana As String
+        Public Property Horario As String
+        Public Property Genero As String
+        Public Property EstadoCivil As String
+        Public Property NivelDeEstudio As String
+    End Class
 End Module
