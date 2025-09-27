@@ -126,9 +126,9 @@ Public Module ConsultasGenericas
                     Dim metadatosPorFuncionario = Await CargarMetadatosNotificacionesAsync(uow, notificaciones)
 
                     Dim resultadoNotificaciones = notificaciones.Select(Function(n)
-                        Dim meta = ObtenerMetadatosNotificacion(metadatosPorFuncionario, n.FuncionarioId)
+                                                                            Dim meta = ObtenerMetadatosNotificacion(metadatosPorFuncionario, n.FuncionarioId)
 
-                        Return New With {
+                                                                            Return New With {
                             .NombreCompleto = ValorNotificacionTexto(n.NombreFuncionario),
                             .Cedula = ValorNotificacionTexto(n.CI),
                             .TipoNotificacion = ValorNotificacionTexto(n.TipoNotificacion),
@@ -154,7 +154,7 @@ Public Module ConsultasGenericas
                             .EstadoFuncionario = meta.EstadoFuncionario,
                             .Activo = meta.Activo
                         }
-                    End Function).ToList()
+                                                                        End Function).ToList()
 
                     dt = resultadoNotificaciones.ToDataTable()
                 Case TipoOrigenDatos.Licencias
