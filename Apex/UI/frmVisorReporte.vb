@@ -4,6 +4,7 @@ Imports System.Data
 Imports System.Text
 Imports System.Xml
 Imports Microsoft.Reporting.WinForms
+Imports System.Text.RegularExpressions ' <--- ASEGÚRATE DE AGREGAR ESTA LÍNEA
 
 Public Class frmVisorReporte
 
@@ -34,8 +35,8 @@ Public Class frmVisorReporte
             Dim lr = ReportViewer1.LocalReport
 
             Dim definitionContent = ReportResourceLoader.GetReportDefinitionContent(Me.GetType(),
-                                                                                     "Apex.Reportes.ReporteFiltros.rdlc",
-                                                                                     "ReporteFiltros.rdlc")
+                                                                                 "Apex.Reportes.ReporteFiltros.rdlc",
+                                                                                 "ReporteFiltros.rdlc")
 
             If definitionContent.Definition.Source = ReportDefinitionSource.Embedded AndAlso Not String.IsNullOrWhiteSpace(definitionContent.Definition.ResourceName) Then
                 lr.ReportEmbeddedResource = definitionContent.Definition.ResourceName
@@ -103,20 +104,14 @@ Public Class frmVisorReporte
         dataSetNode.AppendChild(fieldsNode)
 
         ' 2. Crear el Tablix (Tabla de resultados)
-        ' -- INICIO DE LA CORRECCIÓN --
-        ' Primero, intenta buscar el nodo 'ReportItems' en la estructura más nueva (con ReportSections)
-        Dim bodyNode As XmlNode = rdlcXml.SelectSingleNode("/df:Report/df:ReportSections/df:ReportSection/df:Body/df:ReportItems", nsManager)
-
-        ' Si no lo encuentra, busca en la estructura más antigua (la que estamos usando)
+        Dim bodyNode As XmlNode = rdlcXml.SelectSingleNode("/df:Report/df:Body/df:ReportItems", nsManager)
         If bodyNode Is Nothing Then
-            bodyNode = rdlcXml.SelectSingleNode("/df:Report/df:Body/df:ReportItems", nsManager)
+            bodyNode = rdlcXml.SelectSingleNode("/df:Report/df:ReportSections/df:ReportSection/df:Body/df:ReportItems", nsManager)
         End If
 
-        ' Si después de ambos intentos no se encuentra el nodo, es un error.
         If bodyNode Is Nothing Then
-            Throw New Exception("No se pudo encontrar el nodo 'ReportItems' en la definición del reporte. La estructura del RDLC puede ser inválida.")
+            Throw New Exception("No se pudo encontrar el nodo 'ReportItems' en la definición del reporte.")
         End If
-        ' -- FIN DE LA CORRECCIÓN --
 
         Dim existingTablix = bodyNode.SelectSingleNode("df:Tablix[@Name='TablixResultados']", nsManager)
         If existingTablix IsNot Nothing Then
@@ -134,57 +129,39 @@ Public Class frmVisorReporte
         Dim sb As New StringBuilder()
         Dim ns As String = nsManager.LookupNamespace("df")
 
-        ' --- INICIO DE LA MODIFICACIÓN ---
-        ' 1. Lista de columnas a ignorar en la tabla principal
         Dim columnasAIgnorar As New HashSet(Of String)(StringComparer.OrdinalIgnoreCase) From {"GlobalSearch"}
-
-        ' 2. Filtramos las columnas que sí queremos mostrar
         Dim columnasAMostrar = columns.Cast(Of DataColumn)().
-                                Where(Function(c) Not columnasAIgnorar.Contains(c.ColumnName)).
-                                ToList()
+                               Where(Function(c) Not columnasAIgnorar.Contains(c.ColumnName)).
+                               ToList()
 
         If columnasAMostrar.Count = 0 Then
-            Throw New InvalidOperationException("No se encontraron columnas para construir el reporte.")
+            Return String.Empty ' No generar tabla si no hay nada que mostrar
         End If
 
         Dim widthOverrides As New Dictionary(Of String, String)(StringComparer.OrdinalIgnoreCase) From {
-            {"NombreCompleto", "2.8in"},
-            {"NombreFuncionario", "2.8in"},
-            {"Nombre", "2.5in"},
-            {"Cedula", "1.2in"},
-            {"CI", "1.2in"},
-            {"Resumen", "3.5in"},
-            {"Texto", "3.5in"},
-            {"Observaciones", "3.7in"},
-            {"Descripcion", "3.2in"},
-            {"Detalle", "3.2in"},
-            {"Motivo", "2.5in"},
-            {"PuestoDeTrabajo", "2.5in"},
-            {"Cargo", "2.0in"},
-            {"Seccion", "2.0in"},
-            {"Seccin", "2.0in"},
-            {"TipoDeFuncionario", "2.2in"},
-            {"Estado", "1.5in"},
-            {"Tipo", "1.6in"},
-            {"Oficina", "1.8in"},
-            {"Rango", "2.2in"},
-            {"Documento", "2.2in"},
-            {"ExpMinisterial", "2.2in"},
-            {"ExpINR", "2.2in"}
+            {"NombreCompleto", "2.8in"}, {"NombreFuncionario", "2.8in"}, {"Nombre", "2.5in"},
+            {"Cedula", "1.2in"}, {"CI", "1.2in"}, {"Resumen", "3.5in"}, {"Texto", "3.5in"},
+            {"Observaciones", "3.7in"}, {"Descripcion", "3.2in"}, {"Detalle", "3.2in"},
+            {"Motivo", "2.5in"}, {"PuestoDeTrabajo", "2.5in"}, {"Cargo", "2.0in"},
+            {"Seccion", "2.0in"}, {"Seccin", "2.0in"}, {"TipoDeFuncionario", "2.2in"},
+            {"Estado", "1.5in"}, {"Tipo", "1.6in"}, {"Oficina", "1.8in"}, {"Rango", "2.2in"},
+            {"Documento", "2.2in"}, {"ExpMinisterial", "2.2in"}, {"ExpINR", "2.2in"}
         }
-        ' --- FIN DE LA MODIFICACIÓN ---
 
         sb.AppendLine($"<Tablix Name='TablixResultados' xmlns='{ns}'>")
         sb.AppendLine("<TablixBody>")
         sb.AppendLine("<TablixColumns>")
 
-        ' --- MODIFICADO: Usar la lista filtrada y anchos específicos ---
         For Each col As DataColumn In columnasAMostrar
-            Dim width As String
+            ' --- CORRECCIÓN ADVERTENCIA BC42030 ---
+            Dim width As String = "1.2in" ' Valor por defecto
+            Dim tempWidth As String = Nothing
             Dim headerKey = If(String.IsNullOrWhiteSpace(col.Caption), col.ColumnName, col.Caption)
-            If Not widthOverrides.TryGetValue(col.ColumnName, width) AndAlso
-               Not widthOverrides.TryGetValue(headerKey, width) Then
-                width = "1.2in"
+
+            If widthOverrides.TryGetValue(col.ColumnName, tempWidth) Then
+                width = tempWidth
+            ElseIf widthOverrides.TryGetValue(headerKey, tempWidth) Then
+                width = tempWidth
             End If
             sb.AppendLine($"<TablixColumn><Width>{width}</Width></TablixColumn>")
         Next
@@ -193,27 +170,39 @@ Public Class frmVisorReporte
         sb.AppendLine("<TablixRows>")
         ' Fila de encabezado
         sb.AppendLine("<TablixRow><Height>0.25in</Height><TablixCells>")
-        ' --- MODIFICADO: Usar la lista filtrada ---
         For Each col As DataColumn In columnasAMostrar
+            ' --- CORRECCIÓN ERROR DESERIALIZACIÓN ---
+            Dim sanitizedName = SanitizeForRdlcName(col.ColumnName)
             Dim headerText = If(String.IsNullOrWhiteSpace(col.Caption), col.ColumnName, col.Caption)
-            sb.AppendLine("<TablixCell><CellContents><Textbox Name='Header" & col.ColumnName & "'><CanGrow>true</CanGrow><KeepTogether>true</KeepTogether><Paragraphs><Paragraph><TextRuns><TextRun><Value>" & EscapeXml(headerText) & "</Value><Style><FontWeight>Bold</FontWeight><Color>White</Color></Style></TextRun></TextRuns><Style /></Paragraph></Paragraphs><Style><Border><Color>LightGrey</Color><Style>Solid</Style></Border><BackgroundColor>#4682B4</BackgroundColor><PaddingLeft>2pt</PaddingLeft><PaddingRight>2pt</PaddingRight><PaddingTop>2pt</PaddingTop><PaddingBottom>2pt</PaddingBottom></Style></Textbox></CellContents></TablixCell>")
+            sb.AppendLine($"<TablixCell><CellContents><Textbox Name='Header{sanitizedName}'><CanGrow>true</CanGrow><KeepTogether>true</KeepTogether><Paragraphs><Paragraph><TextRuns><TextRun><Value>{EscapeXml(headerText)}</Value><Style><FontWeight>Bold</FontWeight><Color>White</Color></Style></TextRun></TextRuns><Style><TextAlign>Left</TextAlign></Style></Paragraph></Paragraphs><Style><Border><Color>LightGrey</Color><Style>Solid</Style></Border><BackgroundColor>#4682B4</BackgroundColor><PaddingLeft>4pt</PaddingLeft><PaddingRight>4pt</PaddingRight><PaddingTop>4pt</PaddingTop><PaddingBottom>4pt</PaddingBottom></Style></Textbox></CellContents></TablixCell>")
         Next
         sb.AppendLine("</TablixCells></TablixRow>")
 
         ' Fila de datos
         sb.AppendLine("<TablixRow><Height>0.25in</Height><TablixCells>")
-        ' --- MODIFICADO: Usar la lista filtrada y formatear fechas ---
         For Each col As DataColumn In columnasAMostrar
-            Dim valueExpression As String = $"=Fields!{col.ColumnName}.Value"
+            Dim sanitizedName = SanitizeForRdlcName(col.ColumnName)
+            Dim valueExpression As String
+            Dim textAlign As String = "Left"
 
-            sb.AppendLine($"<TablixCell><CellContents><Textbox Name='Data{col.ColumnName}'><CanGrow>true</CanGrow><KeepTogether>true</KeepTogether><Paragraphs><Paragraph><TextRuns><TextRun><Value>{valueExpression}</Value><Style /></TextRun></TextRuns><Style /></Paragraph></Paragraphs><Style><Border><Color>LightGrey</Color><Style>Solid</Style></Border><PaddingLeft>2pt</PaddingLeft><PaddingRight>2pt</PaddingRight><PaddingTop>2pt</PaddingTop><PaddingBottom>2pt</PaddingBottom></Style></Textbox></CellContents></TablixCell>")
+            ' --- MEJORA: Formatear fechas y alinear tipos de datos ---
+            If col.DataType Is GetType(DateTime) Then
+                valueExpression = $"=IIF(IsNothing(Fields!{col.ColumnName}.Value), """", Format(Fields!{col.ColumnName}.Value, ""dd/MM/yyyy""))"
+                textAlign = "Center"
+            ElseIf GetType(ValueType).IsAssignableFrom(col.DataType) AndAlso col.DataType IsNot GetType(Boolean) Then
+                valueExpression = $"=Fields!{col.ColumnName}.Value"
+                textAlign = "Right"
+            Else
+                valueExpression = $"=Fields!{col.ColumnName}.Value"
+            End If
+
+            sb.AppendLine($"<TablixCell><CellContents><Textbox Name='Data{sanitizedName}'><CanGrow>true</CanGrow><KeepTogether>true</KeepTogether><Paragraphs><Paragraph><TextRuns><TextRun><Value>{valueExpression}</Value><Style /></TextRun></TextRuns><Style><TextAlign>{textAlign}</TextAlign></Style></Paragraph></Paragraphs><Style><Border><Color>LightGrey</Color><Style>Solid</Style></Border><PaddingLeft>4pt</PaddingLeft><PaddingRight>4pt</PaddingRight><PaddingTop>4pt</PaddingTop><PaddingBottom>4pt</PaddingBottom></Style></Textbox></CellContents></TablixCell>")
         Next
         sb.AppendLine("</TablixCells></TablixRow>")
         sb.AppendLine("</TablixRows>")
 
         sb.AppendLine("</TablixBody>")
         sb.AppendLine("<TablixColumnHierarchy><TablixMembers>")
-        ' --- MODIFICADO: Usar la lista filtrada ---
         For i = 0 To columnasAMostrar.Count - 1
             sb.AppendLine("<TablixMember />")
         Next
@@ -221,11 +210,10 @@ Public Class frmVisorReporte
         sb.AppendLine("<TablixRowHierarchy><TablixMembers><TablixMember><KeepWithGroup>After</KeepWithGroup></TablixMember><TablixMember><Group Name='Details' /><TablixMembers><TablixMember /></TablixMembers></TablixMember></TablixMembers></TablixRowHierarchy>")
 
         sb.AppendLine("<DataSetName>ResultadosDataSet</DataSetName>")
-        ' --- MODIFICADO: Ajustar propiedades para coincidir con el original ---
         sb.AppendLine("<Top>3.2in</Top>")
         sb.AppendLine("<Left>0in</Left>")
         sb.AppendLine("<Height>0.5in</Height>")
-        sb.AppendLine("<Width>7.5in</Width>") ' Ancho total fijo
+        sb.AppendLine("<Width>7.5in</Width>")
         sb.AppendLine("<ZIndex>3</ZIndex>")
         sb.AppendLine("<Style><Border><Style>None</Style></Border></Style>")
         sb.AppendLine("</Tablix>")
@@ -233,16 +221,27 @@ Public Class frmVisorReporte
         Return sb.ToString()
     End Function
 
-    Private Shared Function EscapeXml(texto As String) As String
-        If String.IsNullOrEmpty(texto) Then Return String.Empty
-
-        Return texto.Replace("&", "&amp;") _
-                .Replace("<", "&lt;") _
-                .Replace(">", "&gt;") _
-                .Replace("""", "&quot;") _
-                .Replace("'", "&apos;")
+    ' --- NUEVA FUNCIÓN AUXILIAR ---
+    ' Limpia un string para que sea un nombre válido para un control en RDLC (CLS-compliant)
+    Private Shared Function SanitizeForRdlcName(name As String) As String
+        If String.IsNullOrWhiteSpace(name) Then Return "InvalidName"
+        ' Reemplaza cualquier caracter que no sea letra, número o guion bajo
+        Dim sanitized = Regex.Replace(name, "[^\w]", "_")
+        ' Un identificador no puede empezar con un número
+        If sanitized.Length > 0 AndAlso Char.IsDigit(sanitized(0)) Then
+            sanitized = "_" & sanitized
+        End If
+        Return sanitized
     End Function
 
+    Private Shared Function EscapeXml(texto As String) As String
+        If String.IsNullOrEmpty(texto) Then Return String.Empty
+        Return texto.Replace("&", "&amp;") _
+                    .Replace("<", "&lt;") _
+                    .Replace(">", "&gt;") _
+                    .Replace("""", "&quot;") _
+                    .Replace("'", "&apos;")
+    End Function
 
     Private Shared Function ObtenerSubtituloCantidades(cantidadesDisponibles As String) As String
         Const subtituloPredeterminado As String = "Cantidades no disponibles"
@@ -261,8 +260,8 @@ Public Class frmVisorReporte
 
         Return subtituloPredeterminado
     End Function
+
     Private Sub Cerrando(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
-        ' Si la tecla presionada es Escape, se cierra el formulario.
         If e.KeyCode = Keys.Escape Then
             Close()
         End If
