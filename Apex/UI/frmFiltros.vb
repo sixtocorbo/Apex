@@ -1075,8 +1075,27 @@ Partial Public Class frmFiltros
         sbCantidades.AppendLine("Recuento de Ítems Disponibles (sobre el total de datos):")
         If _dtOriginal IsNot Nothing AndAlso _dtOriginal.Rows.Count > 0 Then
             Dim columnasPrioritarias As String() = {
-                "Cargo", "Seccion", "Sección", "TipoDeFuncionario", "TipoFuncionario",
-                "Escalafon", "Escalafón", "Oficina", "Dependencia", "Unidad"
+                "Activo",
+                "Cargo",
+                "TipoDeFuncionario", "TipoFuncionario",
+                "Escalafon", "Escalafón",
+                "SubEscalafon", "SubEscalafón",
+                "SubDireccion", "SubDirección",
+                "PrestadorSalud",
+                "Funcion", "Función",
+                "EstadoActual",
+                "Seccion", "Sección",
+                "PuestoDeTrabajo",
+                "Turno",
+                "Semana",
+                "Horario",
+                "Genero", "Género",
+                "EstadoCivil",
+                "NivelDeEstudio",
+                "Presencia",
+                "Oficina",
+                "Dependencia",
+                "Unidad"
             }
 
             Dim procesadas As New HashSet(Of String)(StringComparer.OrdinalIgnoreCase)
