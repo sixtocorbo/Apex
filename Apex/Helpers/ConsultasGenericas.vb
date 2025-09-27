@@ -259,7 +259,7 @@ Public Module ConsultasGenericas
                         Next
                     End If
 
-                    Dim idsConDetalle = If(novedadesDetalladas Is Not Nothing, novedadesDetalladas.Select(Function(n) n.Id).Distinct().ToList(), New List(Of Integer)())
+                    Dim idsConDetalle = If(novedadesDetalladas IsNot Nothing, novedadesDetalladas.Select(Function(n) n.Id).Distinct().ToList(), New List(Of Integer)())
                     For Each agrupada In novedadesAgrupadas
                         If idsConDetalle.Contains(agrupada.Id) Then Continue For
 
