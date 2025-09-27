@@ -126,39 +126,26 @@ Public Module ConsultasGenericas
 
                     ' --- INICIO DE LA MODIFICACIÓN ---
 
-                    ' 1. Obtenemos una lista de todos los IDs de funcionario únicos de las licencias.
-                    Dim funcionarioIds = licencias.Select(Function(l) l.FuncionarioId).Distinct().ToList()
+                    ' Proyectamos los datos de las licencias usando la información ya enriquecida
+                    ' que devuelve el procedimiento almacenado. De esta manera evitamos incluir
+                    ' objetos complejos (entidades de EF) en el resultado, lo que generaba que
+                    ' en pantalla se mostraran los nombres de tipo (por ejemplo "Data_Entity…").
+                    Dim resultadoEnriquecido = licencias.Select(Function(lic) New With {
+                        .NombreCompleto = lic.NombreFuncionario,
+                        .Cedula = lic.CI,
+                        .TipoLicencia = lic.TipoLicencia,
+                        .FechaInicio = lic.FechaInicio,
+                        .FechaFin = lic.FechaFin,
+                        .Dias = lic.DuracionDias,
+                        .Observaciones = lic.Observaciones,
+                        .Activo = lic.Activo,
+                        .TipoDeFuncionario = lic.TipoDeFuncionario,
+                        .Cargo = lic.Cargo,
+                        .Seccion = lic.Seccion,
+                        .Escalafon = lic.Escalafon
+                    }).ToList()
 
-                    ' 2. Hacemos UNA SOLA consulta a la base de datos para traer todos los funcionarios necesarios.
-                    Dim funcionarios = Await uow.Repository(Of Funcionario)().
-                        GetAllByPredicateAsync(Function(f) funcionarioIds.Contains(f.Id))
-
-                    ' 3. Creamos un diccionario para buscar funcionarios por su ID de forma ultra-rápida.
-                    Dim funcionariosMap = funcionarios.ToDictionary(Function(f) f.Id)
-
-                    ' 4. Proyectamos los datos de las licencias a un nuevo objeto que SÍ incluye Nombre y Cédula.
-                    Dim resultadoEnriquecido = licencias.Select(Function(lic)
-                                                                    Dim func As Funcionario = Nothing
-                                                                    ' Buscamos el funcionario en nuestro mapa.
-                                                                    funcionariosMap.TryGetValue(lic.FuncionarioId, func)
-
-                                                                    Return New With {
-                                                        .NombreCompleto = func.Nombre,
-                                                        .Cedula = func.CI,
-                                                        .TipoLicencia = lic.TipoLicencia,
-                                                        .FechaInicio = lic.FechaInicio,
-                                                        .FechaFin = lic.FechaFin,
-                                                        .Dias = lic.DuracionDias,
-                                                        .Observaciones = lic.Observaciones,
-                                                        .Activo = func.Activo,
-                                                        .TipoDeFuncionario = func.TipoFuncionario,
-                                                        .Cargo = func.Cargo,
-                                                        .Seccion = func.Seccion,
-                                                        .Escalafon = func.Escalafon
-                                                    }
-                                                                End Function).ToList()
-
-                    ' 5. Convertimos la lista ENRIQUECIDA a un DataTable.
+                    ' Convertimos la lista enriquecida a un DataTable.
                     dt = resultadoEnriquecido.ToDataTable()
 
     ' --- FIN DE LA MODIFICACIÓN ---
