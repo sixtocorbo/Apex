@@ -967,6 +967,9 @@
     <EmbeddedResource Include="UI\frmFotografiaNovedades.resx">
       <DependentUpon>frmFotografiaNovedades.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmVisorReporte.resx">
+      <DependentUpon>frmVisorReporte.vb</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <EntityDeploy Include="DataBase\Model1.edmx">

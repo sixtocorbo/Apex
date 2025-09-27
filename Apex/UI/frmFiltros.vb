@@ -1080,7 +1080,7 @@ Partial Public Class frmFiltros
                             Where(Function(r) r(col) IsNot DBNull.Value AndAlso Not String.IsNullOrWhiteSpace(r(col).ToString())).
                             GroupBy(Function(r) r(col).ToString().Trim()).
                             Select(Function(g) New With {.Valor = g.Key, .Cantidad = g.Count()}).
-                            OrderByDescending(Function(x) x.Cantidad).Take(20) ' Limitar a los 20 más comunes para no saturar
+                            OrderByDescending(Function(x) x.Cantidad).Take(20)
 
                 If conteo.Any() Then
                     sbCantidades.AppendLine($"--- {col.ColumnName} ---")
@@ -1098,22 +1098,23 @@ Partial Public Class frmFiltros
         ' 4. Abrir el formulario del reporte
         Dim tituloReporte As String = $"Reporte de {cmbOrigenDatos.Text}"
 
-        ' --- CÓDIGO MODIFICADO ---
-        ' Se crea la instancia del visor de reportes.
+        ' --- INICIO DEL CÓDIGO CORREGIDO Y ROBUSTO ---
+
         Dim frm As New frmVisorReporte(tituloReporte, sbFiltros.ToString(), sbCantidades.ToString(), dtResultados)
 
-        ' Se busca el formulario principal (Dashboard) para poder llamar a su método de navegación.
-        Dim dashboard = TryCast(Me.FindForm(), frmDashboard)
+        ' Buscamos el Dashboard entre TODOS los formularios abiertos de la aplicación.
+        ' Este método es más seguro y es el que usa tu NavegacionHelper.
+        Dim dashboard = Application.OpenForms.OfType(Of frmDashboard).FirstOrDefault()
 
         If dashboard IsNot Nothing Then
-            ' Se le pide al Dashboard que abra el reporte como un "hijo" del formulario de filtros.
-            ' Al cerrar el reporte, el Dashboard mostrará nuevamente este formulario.
+            ' Le pedimos al Dashboard que abra el reporte como un "hijo".
             dashboard.AbrirChild(frm)
         Else
-            ' Si, por alguna razón, no se encuentra el Dashboard, se muestra el reporte
-            ' en una ventana nueva para evitar que la aplicación falle.
+            ' Fallback por si el Dashboard no se encuentra (muy improbable).
             frm.ShowDialog(Me)
         End If
+
+        ' --- FIN DEL CÓDIGO CORREGIDO ---
     End Sub
 
     Private Shared Function ConstruirTablaDesdeDataView(view As DataView) As DataTable
