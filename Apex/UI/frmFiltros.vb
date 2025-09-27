@@ -4,6 +4,7 @@ Option Explicit On
 Imports System.Collections.Generic
 Imports System.ComponentModel
 Imports System.Globalization
+Imports System.Linq
 Imports System.Text
 
 Partial Public Class frmFiltros
@@ -1092,7 +1093,37 @@ Partial Public Class frmFiltros
         End If
 
         ' 3. Obtener los resultados y limpiar nombres de columnas para el reporte
-        Dim dtResultados As DataTable = ConstruirTablaDesdeDataView(_dvDatos)
+        Dim columnasVisibles = dgvDatos.Columns.Cast(Of DataGridViewColumn)().
+                                Where(Function(col) col.Visible AndAlso Not String.IsNullOrWhiteSpace(col.DataPropertyName)).
+                                Select(Function(col) col.DataPropertyName).
+                                ToList()
+
+        Dim encabezadosPorColumna As New Dictionary(Of String, String)(StringComparer.OrdinalIgnoreCase)
+        For Each col As DataGridViewColumn In dgvDatos.Columns
+            If col.Visible AndAlso Not String.IsNullOrWhiteSpace(col.DataPropertyName) Then
+                encabezadosPorColumna(col.DataPropertyName) = col.HeaderText
+            End If
+        Next
+
+        If (columnasVisibles Is Nothing OrElse columnasVisibles.Count = 0) AndAlso _dtOriginal IsNot Nothing Then
+            columnasVisibles = _dtOriginal.Columns.Cast(Of DataColumn)().
+                               Where(Function(c) Not c.ColumnName.EndsWith("id", StringComparison.OrdinalIgnoreCase) AndAlso
+                                                 Not c.ColumnName.Equals("GlobalSearch", StringComparison.OrdinalIgnoreCase)).
+                               Select(Function(c) c.ColumnName).
+                               ToList()
+        End If
+
+        If encabezadosPorColumna.Count = 0 AndAlso _dtOriginal IsNot Nothing Then
+            For Each col As DataColumn In _dtOriginal.Columns
+                If col.ColumnName.EndsWith("id", StringComparison.OrdinalIgnoreCase) OrElse
+                   col.ColumnName.Equals("GlobalSearch", StringComparison.OrdinalIgnoreCase) Then
+                    Continue For
+                End If
+                encabezadosPorColumna(col.ColumnName) = col.ColumnName
+            Next
+        End If
+
+        Dim dtResultados As DataTable = ConstruirTablaDesdeDataView(_dvDatos, columnasVisibles, encabezadosPorColumna)
         SanitizarNombresDeColumnas(dtResultados)
 
         ' 4. Abrir el formulario del reporte
@@ -1117,12 +1148,93 @@ Partial Public Class frmFiltros
         ' --- FIN DEL CÓDIGO CORREGIDO ---
     End Sub
 
-    Private Shared Function ConstruirTablaDesdeDataView(view As DataView) As DataTable
-        If view Is Nothing Then
-            Return New DataTable()
-        Else
-            Return view.ToTable()
+    Private Shared Function ConstruirTablaDesdeDataView(view As DataView,
+                                                        Optional columnsToInclude As IEnumerable(Of String) = Nothing,
+                                                        Optional headers As IDictionary(Of String, String) = Nothing) As DataTable
+        If view Is Nothing Then Return New DataTable()
+
+        Dim selectedColumns As String() = Nothing
+
+        If columnsToInclude IsNot Nothing Then
+            selectedColumns = columnsToInclude.
+                               Where(Function(name) Not String.IsNullOrWhiteSpace(name)).
+                               Distinct(StringComparer.OrdinalIgnoreCase).
+                               ToArray()
         End If
+
+        Dim table As DataTable
+
+        If selectedColumns IsNot Nothing AndAlso selectedColumns.Length > 0 Then
+            table = view.ToTable(False, selectedColumns)
+        Else
+            table = view.ToTable()
+        End If
+
+        Return PrepararTablaParaReporte(table, headers)
+    End Function
+
+    Private Shared Function PrepararTablaParaReporte(table As DataTable,
+                                                     headers As IDictionary(Of String, String)) As DataTable
+        If table Is Nothing Then Return New DataTable()
+
+        Dim resultado As New DataTable(table.TableName)
+
+        For Each col As DataColumn In table.Columns
+            Dim nuevaColumna = resultado.Columns.Add(col.ColumnName, GetType(String))
+
+            If headers IsNot Nothing Then
+                Dim headerText As String = Nothing
+                If headers.TryGetValue(col.ColumnName, headerText) AndAlso Not String.IsNullOrWhiteSpace(headerText) Then
+                    nuevaColumna.Caption = headerText
+                End If
+            End If
+        Next
+
+        For Each row As DataRow In table.Rows
+            Dim nuevaFila = resultado.NewRow()
+            For Each col As DataColumn In table.Columns
+                nuevaFila(col.ColumnName) = FormatearValorParaReporte(row(col), col.DataType)
+            Next
+            resultado.Rows.Add(nuevaFila)
+        Next
+
+        Return resultado
+    End Function
+
+    Private Shared Function FormatearValorParaReporte(valor As Object, tipo As Type) As String
+        If valor Is Nothing OrElse valor Is DBNull.Value Then Return String.Empty
+
+        Dim tipoReal = Nullable.GetUnderlyingType(tipo)
+        If tipoReal Is Nothing Then tipoReal = tipo
+
+        Select Case Type.GetTypeCode(tipoReal)
+            Case TypeCode.DateTime
+                Dim fecha = CType(valor, DateTime)
+                Return fecha.ToString("dd/MM/yyyy", CultureInfo.CurrentCulture)
+            Case TypeCode.Boolean
+                Return If(CBool(valor), "Sí", "No")
+            Case TypeCode.Decimal
+                Return Convert.ToDecimal(valor).ToString("N2", CultureInfo.CurrentCulture)
+            Case TypeCode.Double, TypeCode.Single
+                Return Convert.ToDouble(valor).ToString("N2", CultureInfo.CurrentCulture)
+            Case TypeCode.Byte, TypeCode.Int16, TypeCode.Int32, TypeCode.Int64
+                Return Convert.ToInt64(valor).ToString("N0", CultureInfo.CurrentCulture)
+            Case Else
+                If TypeOf valor Is Byte() Then
+                    Dim bytes = DirectCast(valor, Byte())
+                    Return $"[{bytes.Length} bytes]"
+                ElseIf TypeOf valor Is TimeSpan Then
+                    Dim intervalo = DirectCast(valor, TimeSpan)
+                    Return intervalo.ToString()
+                End If
+
+                Dim formateable = TryCast(valor, IFormattable)
+                If formateable IsNot Nothing Then
+                    Return formateable.ToString(Nothing, CultureInfo.CurrentCulture)
+                End If
+
+                Return valor.ToString()
+        End Select
     End Function
 
     Private Shared Sub SanitizarNombresDeColumnas(table As DataTable)
