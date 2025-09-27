@@ -1,5 +1,6 @@
 ﻿' Apex/Services/ConsultasGenericas.vb
 Imports System.Data.Entity
+Imports System.Collections.Generic
 Imports System.Linq
 Imports System.Linq.Expressions
 Public Module ConsultasGenericas
@@ -123,22 +124,22 @@ Public Module ConsultasGenericas
                         Return CrearTablaNotificacionesVacia()
                     End If
 
-                    Dim metadatosPorFuncionario = Await CargarMetadatosNotificacionesAsync(uow, notificaciones)
+                    Dim metadatosPorFuncionario = Await CargarMetadatosFuncionariosAsync(uow, notificaciones.Select(Function(n) CType(n.FuncionarioId, Integer?)))
 
                     Dim resultadoNotificaciones = notificaciones.Select(Function(n)
-                                                                            Dim meta = ObtenerMetadatosNotificacion(metadatosPorFuncionario, n.FuncionarioId)
+                                                                            Dim meta = ObtenerMetadatosFuncionario(metadatosPorFuncionario, CType(n.FuncionarioId, Integer?))
 
                                                                             Return New With {
-                            .NombreCompleto = ValorNotificacionTexto(n.NombreFuncionario),
-                            .Cedula = ValorNotificacionTexto(n.CI),
-                            .TipoNotificacion = ValorNotificacionTexto(n.TipoNotificacion),
-                            .Estado = ValorNotificacionTexto(n.Estado),
+                            .NombreCompleto = NormalizarValorReporte(n.NombreFuncionario),
+                            .Cedula = NormalizarValorReporte(n.CI),
+                            .TipoNotificacion = NormalizarValorReporte(n.TipoNotificacion),
+                            .Estado = NormalizarValorReporte(n.Estado),
                             .FechaProgramada = n.FechaProgramada,
-                            .Texto = ValorNotificacionTexto(n.Texto, String.Empty),
-                            .Documento = ValorNotificacionTexto(n.Documento),
-                            .ExpMinisterial = ValorNotificacionTexto(n.ExpMinisterial),
-                            .ExpINR = ValorNotificacionTexto(n.ExpINR),
-                            .Oficina = ValorNotificacionTexto(n.Oficina),
+                            .Texto = NormalizarValorReporte(n.Texto, String.Empty),
+                            .Documento = NormalizarValorReporte(n.Documento),
+                            .ExpMinisterial = NormalizarValorReporte(n.ExpMinisterial),
+                            .ExpINR = NormalizarValorReporte(n.ExpINR),
+                            .Oficina = NormalizarValorReporte(n.Oficina),
                             .TipoDeFuncionario = meta.TipoDeFuncionario,
                             .Cargo = meta.Cargo,
                             .Seccion = meta.Seccion,
@@ -198,9 +199,106 @@ Public Module ConsultasGenericas
 
                 Case TipoOrigenDatos.Novedades
                     Dim novedadService = New NovedadService(uow)
-                    Dim novedades = Await novedadService.GetAllAgrupadasAsync(fechaInicio, fechaFin)
-                    dt = novedades.ToDataTable()
+                    Dim novedadesAgrupadas = Await novedadService.GetAllAgrupadasAsync(fechaInicio, fechaFin)
 
+                    If novedadesAgrupadas Is Nothing OrElse Not novedadesAgrupadas.Any() Then
+                        Return CrearTablaNovedadesVacia()
+                    End If
+
+                    Dim novedadIds = novedadesAgrupadas.Select(Function(n) n.Id).Distinct().ToList()
+                    Dim novedadesDetalladas = Await novedadService.GetNovedadesCompletasByIds(novedadIds)
+                    If novedadesDetalladas Is Nothing Then
+                        novedadesDetalladas = New List(Of vw_NovedadesCompletas)()
+                    End If
+                    Dim metadatosPorFuncionario = Await CargarMetadatosFuncionariosAsync(uow, novedadesDetalladas.Select(Function(n) n.FuncionarioId))
+
+                    Dim resumenPorNovedad = novedadesAgrupadas.ToDictionary(Function(n) n.Id,
+                                                                          Function(n) New With {
+                                                                              .Resumen = NormalizarValorReporte(n.Resumen, String.Empty),
+                                                                              .Funcionarios = NormalizarValorReporte(n.Funcionarios, String.Empty),
+                                                                              .Estado = NormalizarValorReporte(n.Estado)
+                                                                          })
+
+                    Dim resultadoNovedades As New List(Of Object)()
+
+                    If novedadesDetalladas IsNot Nothing AndAlso novedadesDetalladas.Any() Then
+                        For Each detalle In novedadesDetalladas
+                            Dim infoResumen = Nothing
+                            resumenPorNovedad.TryGetValue(detalle.Id, infoResumen)
+
+                            Dim listaFuncionarios = If(infoResumen IsNot Nothing, infoResumen.Funcionarios, NormalizarValorReporte(detalle.NombreFuncionario, String.Empty))
+                            Dim cantidadFuncionarios = CalcularCantidadFuncionarios(listaFuncionarios)
+                            Dim meta = ObtenerMetadatosFuncionario(metadatosPorFuncionario, detalle.FuncionarioId)
+
+                            resultadoNovedades.Add(New With {
+                                .NovedadId = detalle.Id,
+                                .Fecha = detalle.Fecha,
+                                .Resumen = If(infoResumen IsNot Nothing, infoResumen.Resumen, NormalizarValorReporte(detalle.Texto, String.Empty)),
+                                .Texto = NormalizarValorReporte(detalle.Texto, String.Empty),
+                                .Estado = If(infoResumen IsNot Nothing AndAlso Not String.IsNullOrWhiteSpace(infoResumen.Estado), infoResumen.Estado, NormalizarValorReporte(detalle.Estado)),
+                                .FuncionariosLista = listaFuncionarios,
+                                .CantidadFuncionarios = cantidadFuncionarios,
+                                .FuncionarioId = detalle.FuncionarioId,
+                                .FuncionarioNombre = NormalizarValorReporte(detalle.NombreFuncionario, "Sin Asignar"),
+                                .FuncionarioCedula = NormalizarValorReporte(detalle.CI),
+                                .TipoDeFuncionario = meta.TipoDeFuncionario,
+                                .Cargo = meta.Cargo,
+                                .Seccion = meta.Seccion,
+                                .Escalafon = meta.Escalafon,
+                                .SubEscalafon = meta.SubEscalafon,
+                                .SubDireccion = meta.SubDireccion,
+                                .Funcion = meta.Funcion,
+                                .PuestoDeTrabajo = meta.PuestoDeTrabajo,
+                                .Turno = meta.Turno,
+                                .Semana = meta.Semana,
+                                .Horario = meta.Horario,
+                                .PrestadorSalud = meta.PrestadorSalud,
+                                .EstadoFuncionario = meta.EstadoFuncionario,
+                                .Activo = meta.Activo
+                            })
+                        Next
+                    End If
+
+                    Dim idsConDetalle = If(novedadesDetalladas Is Not Nothing, novedadesDetalladas.Select(Function(n) n.Id).Distinct().ToList(), New List(Of Integer)())
+                    For Each agrupada In novedadesAgrupadas
+                        If idsConDetalle.Contains(agrupada.Id) Then Continue For
+
+                        Dim metaVacio = CrearMetadatosFuncionarioVacios()
+                        Dim listaFuncionarios = NormalizarValorReporte(agrupada.Funcionarios, String.Empty)
+
+                        resultadoNovedades.Add(New With {
+                            .NovedadId = agrupada.Id,
+                            .Fecha = agrupada.Fecha,
+                            .Resumen = NormalizarValorReporte(agrupada.Resumen, String.Empty),
+                            .Texto = NormalizarValorReporte(Nothing, String.Empty),
+                            .Estado = NormalizarValorReporte(agrupada.Estado),
+                            .FuncionariosLista = listaFuncionarios,
+                            .CantidadFuncionarios = CalcularCantidadFuncionarios(listaFuncionarios),
+                            .FuncionarioId = CType(Nothing, Integer?),
+                            .FuncionarioNombre = NormalizarValorReporte(Nothing, "Sin Asignar"),
+                            .FuncionarioCedula = NormalizarValorReporte(Nothing),
+                            .TipoDeFuncionario = metaVacio.TipoDeFuncionario,
+                            .Cargo = metaVacio.Cargo,
+                            .Seccion = metaVacio.Seccion,
+                            .Escalafon = metaVacio.Escalafon,
+                            .SubEscalafon = metaVacio.SubEscalafon,
+                            .SubDireccion = metaVacio.SubDireccion,
+                            .Funcion = metaVacio.Funcion,
+                            .PuestoDeTrabajo = metaVacio.PuestoDeTrabajo,
+                            .Turno = metaVacio.Turno,
+                            .Semana = metaVacio.Semana,
+                            .Horario = metaVacio.Horario,
+                            .PrestadorSalud = metaVacio.PrestadorSalud,
+                            .EstadoFuncionario = metaVacio.EstadoFuncionario,
+                            .Activo = metaVacio.Activo
+                        })
+                    Next
+
+                    If resultadoNovedades.Count = 0 Then
+                        Return CrearTablaNovedadesVacia()
+                    End If
+
+                    dt = resultadoNovedades.ToDataTable()
                 Case TipoOrigenDatos.Funcionarios
                     Dim funcionarioService = New FuncionarioService(uow)
                     Dim funcionarios = Await funcionarioService.GetFuncionariosParaVistaAsync()
@@ -551,19 +649,19 @@ Public Module ConsultasGenericas
         Return ModuloExtensions.ToDataTable(datos)
     End Function
 
-    Private Async Function CargarMetadatosNotificacionesAsync(uow As UnitOfWork, notificaciones As IEnumerable(Of vw_NotificacionesCompletas)) As Task(Of Dictionary(Of Integer, NotificacionFuncionarioMetadata))
-        If notificaciones Is Nothing Then
-            Return New Dictionary(Of Integer, NotificacionFuncionarioMetadata)()
+    Private Async Function CargarMetadatosFuncionariosAsync(uow As UnitOfWork, funcionarioIds As IEnumerable(Of Integer?)) As Task(Of Dictionary(Of Integer, FuncionarioReporteMetadata))
+        If funcionarioIds Is Nothing Then
+            Return New Dictionary(Of Integer, FuncionarioReporteMetadata)()
         End If
 
-        Dim ids = notificaciones.
-            Select(Function(n) n.FuncionarioId).
-            Where(Function(id) id > 0).
+        Dim ids = funcionarioIds.
+            Where(Function(id) id.HasValue AndAlso id.Value > 0).
+            Select(Function(id) id.Value).
             Distinct().
             ToList()
 
         If ids.Count = 0 Then
-            Return New Dictionary(Of Integer, NotificacionFuncionarioMetadata)()
+            Return New Dictionary(Of Integer, FuncionarioReporteMetadata)()
         End If
 
         Dim query = uow.Context.Set(Of Funcionario)().AsNoTracking() _
@@ -583,65 +681,65 @@ Public Module ConsultasGenericas
 
         Dim funcionarios = Await query.ToListAsync()
 
-        Return funcionarios.ToDictionary(Function(f) f.Id, Function(f) ConstruirMetadatosNotificacion(f))
+        Return funcionarios.ToDictionary(Function(f) f.Id, Function(f) ConstruirMetadatosFuncionario(f))
     End Function
 
-    Private Function ObtenerMetadatosNotificacion(metadata As IDictionary(Of Integer, NotificacionFuncionarioMetadata), funcionarioId As Integer) As NotificacionFuncionarioMetadata
-        If metadata Is Nothing Then
-            Return CrearMetadatosNotificacionVacios()
+    Private Function ObtenerMetadatosFuncionario(metadata As IDictionary(Of Integer, FuncionarioReporteMetadata), funcionarioId As Integer?) As FuncionarioReporteMetadata
+        If metadata Is Nothing OrElse Not funcionarioId.HasValue Then
+            Return CrearMetadatosFuncionarioVacios()
         End If
 
-        Dim result As NotificacionFuncionarioMetadata = Nothing
-        If metadata.TryGetValue(funcionarioId, result) Then
+        Dim result As FuncionarioReporteMetadata = Nothing
+        If metadata.TryGetValue(funcionarioId.Value, result) Then
             Return result
         End If
 
-        Return CrearMetadatosNotificacionVacios()
+        Return CrearMetadatosFuncionarioVacios()
     End Function
 
-    Private Function ConstruirMetadatosNotificacion(funcionario As Funcionario) As NotificacionFuncionarioMetadata
+    Private Function ConstruirMetadatosFuncionario(funcionario As Funcionario) As FuncionarioReporteMetadata
         If funcionario Is Nothing Then
-            Return CrearMetadatosNotificacionVacios()
+            Return CrearMetadatosFuncionarioVacios()
         End If
 
-        Return New NotificacionFuncionarioMetadata With {
-            .TipoDeFuncionario = ValorNotificacionTexto(If(funcionario.TipoFuncionario IsNot Nothing, funcionario.TipoFuncionario.Nombre, Nothing)),
-            .Cargo = ValorNotificacionTexto(If(funcionario.Cargo IsNot Nothing, funcionario.Cargo.Nombre, Nothing)),
-            .Seccion = ValorNotificacionTexto(If(funcionario.Seccion IsNot Nothing, funcionario.Seccion.Nombre, Nothing)),
-            .Escalafon = ValorNotificacionTexto(If(funcionario.Escalafon IsNot Nothing, funcionario.Escalafon.Nombre, Nothing)),
-            .SubEscalafon = ValorNotificacionTexto(If(funcionario.SubEscalafon IsNot Nothing, funcionario.SubEscalafon.Nombre, Nothing)),
-            .SubDireccion = ValorNotificacionTexto(If(funcionario.SubDireccion IsNot Nothing, funcionario.SubDireccion.Nombre, Nothing)),
-            .Funcion = ValorNotificacionTexto(If(funcionario.Funcion IsNot Nothing, funcionario.Funcion.Nombre, Nothing)),
-            .PuestoDeTrabajo = ValorNotificacionTexto(If(funcionario.PuestoTrabajo IsNot Nothing, funcionario.PuestoTrabajo.Nombre, Nothing)),
-            .Turno = ValorNotificacionTexto(If(funcionario.Turno IsNot Nothing, funcionario.Turno.Nombre, Nothing)),
-            .Semana = ValorNotificacionTexto(If(funcionario.Semana IsNot Nothing, funcionario.Semana.Nombre, Nothing)),
-            .Horario = ValorNotificacionTexto(If(funcionario.Horario IsNot Nothing, funcionario.Horario.Nombre, Nothing)),
-            .PrestadorSalud = ValorNotificacionTexto(If(funcionario.PrestadorSalud IsNot Nothing, funcionario.PrestadorSalud.Nombre, Nothing)),
+        Return New FuncionarioReporteMetadata With {
+            .TipoDeFuncionario = NormalizarValorReporte(If(funcionario.TipoFuncionario IsNot Nothing, funcionario.TipoFuncionario.Nombre, Nothing)),
+            .Cargo = NormalizarValorReporte(If(funcionario.Cargo IsNot Nothing, funcionario.Cargo.Nombre, Nothing)),
+            .Seccion = NormalizarValorReporte(If(funcionario.Seccion IsNot Nothing, funcionario.Seccion.Nombre, Nothing)),
+            .Escalafon = NormalizarValorReporte(If(funcionario.Escalafon IsNot Nothing, funcionario.Escalafon.Nombre, Nothing)),
+            .SubEscalafon = NormalizarValorReporte(If(funcionario.SubEscalafon IsNot Nothing, funcionario.SubEscalafon.Nombre, Nothing)),
+            .SubDireccion = NormalizarValorReporte(If(funcionario.SubDireccion IsNot Nothing, funcionario.SubDireccion.Nombre, Nothing)),
+            .Funcion = NormalizarValorReporte(If(funcionario.Funcion IsNot Nothing, funcionario.Funcion.Nombre, Nothing)),
+            .PuestoDeTrabajo = NormalizarValorReporte(If(funcionario.PuestoTrabajo IsNot Nothing, funcionario.PuestoTrabajo.Nombre, Nothing)),
+            .Turno = NormalizarValorReporte(If(funcionario.Turno IsNot Nothing, funcionario.Turno.Nombre, Nothing)),
+            .Semana = NormalizarValorReporte(If(funcionario.Semana IsNot Nothing, funcionario.Semana.Nombre, Nothing)),
+            .Horario = NormalizarValorReporte(If(funcionario.Horario IsNot Nothing, funcionario.Horario.Nombre, Nothing)),
+            .PrestadorSalud = NormalizarValorReporte(If(funcionario.PrestadorSalud IsNot Nothing, funcionario.PrestadorSalud.Nombre, Nothing)),
             .EstadoFuncionario = If(funcionario.Activo, "Activo", "Inactivo"),
             .Activo = funcionario.Activo
         }
     End Function
 
-    Private Function CrearMetadatosNotificacionVacios() As NotificacionFuncionarioMetadata
-        Return New NotificacionFuncionarioMetadata With {
-            .TipoDeFuncionario = ValorNotificacionTexto(Nothing),
-            .Cargo = ValorNotificacionTexto(Nothing),
-            .Seccion = ValorNotificacionTexto(Nothing),
-            .Escalafon = ValorNotificacionTexto(Nothing),
-            .SubEscalafon = ValorNotificacionTexto(Nothing),
-            .SubDireccion = ValorNotificacionTexto(Nothing),
-            .Funcion = ValorNotificacionTexto(Nothing),
-            .PuestoDeTrabajo = ValorNotificacionTexto(Nothing),
-            .Turno = ValorNotificacionTexto(Nothing),
-            .Semana = ValorNotificacionTexto(Nothing),
-            .Horario = ValorNotificacionTexto(Nothing),
-            .PrestadorSalud = ValorNotificacionTexto(Nothing),
-            .EstadoFuncionario = ValorNotificacionTexto("Sin Estado"),
+    Private Function CrearMetadatosFuncionarioVacios() As FuncionarioReporteMetadata
+        Return New FuncionarioReporteMetadata With {
+            .TipoDeFuncionario = NormalizarValorReporte(Nothing),
+            .Cargo = NormalizarValorReporte(Nothing),
+            .Seccion = NormalizarValorReporte(Nothing),
+            .Escalafon = NormalizarValorReporte(Nothing),
+            .SubEscalafon = NormalizarValorReporte(Nothing),
+            .SubDireccion = NormalizarValorReporte(Nothing),
+            .Funcion = NormalizarValorReporte(Nothing),
+            .PuestoDeTrabajo = NormalizarValorReporte(Nothing),
+            .Turno = NormalizarValorReporte(Nothing),
+            .Semana = NormalizarValorReporte(Nothing),
+            .Horario = NormalizarValorReporte(Nothing),
+            .PrestadorSalud = NormalizarValorReporte(Nothing),
+            .EstadoFuncionario = NormalizarValorReporte("Sin Estado"),
             .Activo = False
         }
     End Function
 
-    Private Function ValorNotificacionTexto(value As String, Optional valorDefecto As String = "N/A") As String
+    Private Function NormalizarValorReporte(value As String, Optional valorDefecto As String = "N/A") As String
         If String.IsNullOrWhiteSpace(value) Then
             Return valorDefecto
         End If
@@ -649,7 +747,48 @@ Public Module ConsultasGenericas
         Return value.Trim()
     End Function
 
-    Private Class NotificacionFuncionarioMetadata
+    Private Function CalcularCantidadFuncionarios(funcionariosCadena As String) As Integer
+        If String.IsNullOrWhiteSpace(funcionariosCadena) Then
+            Return 0
+        End If
+
+        Dim tokens = funcionariosCadena.Split(New Char() {","c, ";"c, ControlChars.Lf, ControlChars.Cr, "|"c}, StringSplitOptions.RemoveEmptyEntries)
+
+        Return tokens.Select(Function(t) t.Trim()).Count(Function(t) Not String.IsNullOrWhiteSpace(t))
+    End Function
+
+    Private Function CrearTablaNovedadesVacia() As DataTable
+        Dim table As New DataTable()
+
+        table.Columns.Add("NovedadId", GetType(Integer))
+        table.Columns.Add("Fecha", GetType(Date))
+        table.Columns.Add("Resumen", GetType(String))
+        table.Columns.Add("Texto", GetType(String))
+        table.Columns.Add("Estado", GetType(String))
+        table.Columns.Add("FuncionariosLista", GetType(String))
+        table.Columns.Add("CantidadFuncionarios", GetType(Integer))
+        table.Columns.Add("FuncionarioId", GetType(Integer))
+        table.Columns.Add("FuncionarioNombre", GetType(String))
+        table.Columns.Add("FuncionarioCedula", GetType(String))
+        table.Columns.Add("TipoDeFuncionario", GetType(String))
+        table.Columns.Add("Cargo", GetType(String))
+        table.Columns.Add("Seccion", GetType(String))
+        table.Columns.Add("Escalafon", GetType(String))
+        table.Columns.Add("SubEscalafon", GetType(String))
+        table.Columns.Add("SubDireccion", GetType(String))
+        table.Columns.Add("Funcion", GetType(String))
+        table.Columns.Add("PuestoDeTrabajo", GetType(String))
+        table.Columns.Add("Turno", GetType(String))
+        table.Columns.Add("Semana", GetType(String))
+        table.Columns.Add("Horario", GetType(String))
+        table.Columns.Add("PrestadorSalud", GetType(String))
+        table.Columns.Add("EstadoFuncionario", GetType(String))
+        table.Columns.Add("Activo", GetType(Boolean))
+
+        Return table
+    End Function
+
+    Private Class FuncionarioReporteMetadata
         Public Property TipoDeFuncionario As String
         Public Property Cargo As String
         Public Property Seccion As String
