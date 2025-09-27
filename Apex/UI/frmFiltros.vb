@@ -1085,7 +1085,7 @@ Partial Public Class frmFiltros
                 If conteo.Any() Then
                     sbCantidades.AppendLine($"--- {col.ColumnName} ---")
                     For Each item In conteo
-                        sbCantidades.AppendLine($"    {item.Valor}: {item.Cantidad}")
+                        sbCantidades.AppendLine($"     {item.Valor}: {item.Cantidad}")
                     Next
                 End If
             Next
@@ -1097,9 +1097,23 @@ Partial Public Class frmFiltros
 
         ' 4. Abrir el formulario del reporte
         Dim tituloReporte As String = $"Reporte de {cmbOrigenDatos.Text}"
-        Using frm As New frmVisorReporte(tituloReporte, sbFiltros.ToString(), sbCantidades.ToString(), dtResultados)
+
+        ' --- CÓDIGO MODIFICADO ---
+        ' Se crea la instancia del visor de reportes.
+        Dim frm As New frmVisorReporte(tituloReporte, sbFiltros.ToString(), sbCantidades.ToString(), dtResultados)
+
+        ' Se busca el formulario principal (Dashboard) para poder llamar a su método de navegación.
+        Dim dashboard = TryCast(Me.FindForm(), frmDashboard)
+
+        If dashboard IsNot Nothing Then
+            ' Se le pide al Dashboard que abra el reporte como un "hijo" del formulario de filtros.
+            ' Al cerrar el reporte, el Dashboard mostrará nuevamente este formulario.
+            dashboard.AbrirChild(frm)
+        Else
+            ' Si, por alguna razón, no se encuentra el Dashboard, se muestra el reporte
+            ' en una ventana nueva para evitar que la aplicación falle.
             frm.ShowDialog(Me)
-        End Using
+        End If
     End Sub
 
     Private Shared Function ConstruirTablaDesdeDataView(view As DataView) As DataTable
