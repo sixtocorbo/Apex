@@ -108,7 +108,47 @@ Public Module ConsultasGenericas
                                                       Union(ordenCinco).
                                                       Union(retenes).
                                                       Union(enfermedades).ToListAsync()
-                    dt = resultadoUnion.ToDataTable()
+
+                    If Not resultadoUnion.Any() Then
+                        Return New DataTable()
+                    End If
+
+                    Dim metadatosPorFuncionario = Await CargarMetadatosFuncionariosAsync(
+                        uow,
+                        resultadoUnion.Select(Function(r) CType(r.FuncionarioId, Integer?))
+                    )
+
+                    Dim resultadoEnriquecido = resultadoUnion.Select(
+                        Function(r)
+                            Dim meta = ObtenerMetadatosFuncionario(metadatosPorFuncionario, CType(r.FuncionarioId, Integer?))
+
+                            Return New With {
+                                .FuncionarioId = r.FuncionarioId,
+                                .NombreCompleto = NormalizarValorReporte(r.NombreCompleto),
+                                .Cedula = NormalizarValorReporte(r.Cedula),
+                                .Tipo = NormalizarValorReporte(r.Tipo),
+                                .FechaInicio = r.FechaInicio,
+                                .FechaFin = r.FechaFin,
+                                .Observaciones = NormalizarValorReporte(r.Observaciones, String.Empty),
+                                .TipoDeFuncionario = meta.TipoDeFuncionario,
+                                .Cargo = meta.Cargo,
+                                .Seccion = meta.Seccion,
+                                .Escalafon = meta.Escalafon,
+                                .SubEscalafon = meta.SubEscalafon,
+                                .SubDireccion = meta.SubDireccion,
+                                .Funcion = meta.Funcion,
+                                .PuestoDeTrabajo = meta.PuestoDeTrabajo,
+                                .Turno = meta.Turno,
+                                .Semana = meta.Semana,
+                                .Horario = meta.Horario,
+                                .PrestadorSalud = meta.PrestadorSalud,
+                                .EstadoFuncionario = meta.EstadoFuncionario,
+                                .Activo = meta.Activo
+                            }
+                        End Function
+                    ).ToList()
+
+                    dt = resultadoEnriquecido.ToDataTable()
 
                 Case TipoOrigenDatos.Notificaciones
                     If Not fechaInicio.HasValue OrElse Not fechaFin.HasValue Then
