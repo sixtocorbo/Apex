@@ -1,4 +1,5 @@
 ﻿Imports System.Data.Entity
+Imports System.Drawing
 Imports System.Text
 
 Public Class frmFuncionarioSituacion
@@ -223,45 +224,96 @@ Public Class frmFuncionarioSituacion
                             a.FechaHora < fechaFin) _
     .AsNoTracking().ToListAsync()
 
-            Dim eventosUnificados As New List(Of Object)
+            Dim estadosActivos = Await _uow.Context.Set(Of vw_FuncionarioEstadosActivos)() _
+                .Where(Function(ea) ea.FuncionarioId = _funcionarioId) _
+                .AsNoTracking().ToListAsync()
+
+            Dim estadosActivosDict = estadosActivos _
+                .GroupBy(Function(ea) NormalizarTexto(ea.Tipo)) _
+                .ToDictionary(Function(g) g.Key, Function(g) g.OrderBy(Function(x) x.Prioridad).First())
+
+            Dim eventosUnificados As New List(Of EventoSituacionDTO)
 
             ' Unificamos todos los eventos en un solo tipo de objeto para la grilla
-            eventosUnificados.AddRange(estadosEnPeriodo.Select(Function(s) New With {
-                .Id = s.Id,
-                .TipoEvento = "Estado",
-                .Tipo = s.TipoEstadoNombre,
-                .Desde = s.FechaDesde,
-                .Hasta = s.FechaHasta
-            }))
+            eventosUnificados.AddRange(estadosEnPeriodo.Select(Function(s)
+                                                                  Dim tipo = s.TipoEstadoNombre
+                                                                  Dim activo = BuscarEstadoActivo(estadosActivosDict, tipo)
+                                                                  Dim prioridad = If(activo?.Prioridad, CType(Nothing, Integer?))
+                                                                  Dim colorIndicador = If(activo?.ColorIndicador, Nothing)
+                                                                  Dim severidadCalculada = If(prioridad.HasValue, _
+                                                                                              MapearPrioridadASeveridad(prioridad.Value), _
+                                                                                              ClasificarSeveridad(tipo))
 
-            eventosUnificados.AddRange(licenciasEnPeriodo.Select(Function(l) New With {
-                .Id = l.Id,
-                .TipoEvento = "Licencia",
-                .Tipo = $"LICENCIA: {l.TipoLicencia.Nombre}",
-                .Desde = CType(l.inicio, Date?),
-                .Hasta = CType(l.finaliza, Date?)
-            }))
+                                                                  Return New EventoSituacionDTO With {
+                                                                      .Id = s.Id,
+                                                                      .TipoEvento = "Estado",
+                                                                      .Tipo = tipo,
+                                                                      .Desde = s.FechaDesde,
+                                                                      .Hasta = s.FechaHasta,
+                                                                      .Severidad = severidadCalculada,
+                                                                      .Prioridad = prioridad,
+                                                                      .ColorIndicador = colorIndicador
+                                                                  }
+                                                              End Function))
 
-            eventosUnificados.AddRange(notificacionesEnPeriodo.Select(Function(n) New With {
-                .Id = n.Id,
-                .TipoEvento = "Notificacion",
-                .Tipo = $"NOTIFICACIÓN PENDIENTE: {n.TipoNotificacion.Nombre}",
-                .Desde = CType(n.FechaProgramada, Date?),
-                .Hasta = CType(Nothing, Date?)
-            }))
-            eventosUnificados.AddRange(cambiosAuditados.Select(Function(a) New With {
-    .Id = a.Id,
-    .TipoEvento = "Auditoria",
-    .Tipo = $"CAMBIO: El campo '{a.CampoNombre}' se modificó de '{If(String.IsNullOrWhiteSpace(a.ValorAnterior), "[vacío]", a.ValorAnterior)}' a '{If(String.IsNullOrWhiteSpace(a.ValorNuevo), "[vacío]", a.ValorNuevo)}'.",
-    .Desde = CType(a.FechaHora, Date?),
-    .Hasta = CType(Nothing, Date?)
-}))
+            eventosUnificados.AddRange(licenciasEnPeriodo.Select(Function(l)
+                                                                     Dim tipo = $"LICENCIA: {l.TipoLicencia.Nombre}"
+                                                                     Dim activo = BuscarEstadoActivo(estadosActivosDict, tipo, l.TipoLicencia.Nombre)
+                                                                     Dim prioridad = If(activo?.Prioridad, CType(Nothing, Integer?))
+                                                                     Dim colorIndicador = If(activo?.ColorIndicador, Nothing)
+                                                                     Dim severidadCalculada = If(prioridad.HasValue, _
+                                                                                                 MapearPrioridadASeveridad(prioridad.Value), _
+                                                                                                 ClasificarSeveridad(tipo))
 
-            dgvEstados.DataSource = eventosUnificados _
-    .OrderByDescending(Function(x) GetPropValue(Of Date?)(x, "Desde", Nothing).Value.Date) _
-    .ThenByDescending(Function(x) ClasificarSeveridad(GetPropValue(Of String)(x, "Tipo", ""))) _
-    .ThenByDescending(Function(x) GetPropValue(Of Date?)(x, "Desde", Nothing)) _
-    .ToList()
+                                                                     Return New EventoSituacionDTO With {
+                                                                         .Id = l.Id,
+                                                                         .TipoEvento = "Licencia",
+                                                                         .Tipo = tipo,
+                                                                         .Desde = CType(l.inicio, Date?),
+                                                                         .Hasta = CType(l.finaliza, Date?),
+                                                                         .Severidad = severidadCalculada,
+                                                                         .Prioridad = prioridad,
+                                                                         .ColorIndicador = colorIndicador
+                                                                     }
+                                                                 End Function))
+
+            eventosUnificados.AddRange(notificacionesEnPeriodo.Select(Function(n)
+                                                                          Dim tipo = $"NOTIFICACIÓN PENDIENTE: {n.TipoNotificacion.Nombre}"
+                                                                          Return New EventoSituacionDTO With {
+                                                                              .Id = n.Id,
+                                                                              .TipoEvento = "Notificacion",
+                                                                              .Tipo = tipo,
+                                                                              .Desde = CType(n.FechaProgramada, Date?),
+                                                                              .Hasta = Nothing,
+                                                                              .Severidad = ClasificarSeveridad(tipo),
+                                                                              .Prioridad = Nothing,
+                                                                              .ColorIndicador = Nothing
+                                                                          }
+                                                                      End Function))
+
+            eventosUnificados.AddRange(cambiosAuditados.Select(Function(a)
+                                                                   Dim tipo = $"CAMBIO: El campo '{a.CampoNombre}' se modificó de '{If(String.IsNullOrWhiteSpace(a.ValorAnterior), "[vacío]", a.ValorAnterior)}' a '{If(String.IsNullOrWhiteSpace(a.ValorNuevo), "[vacío]", a.ValorNuevo)}'."
+                                                                   Return New EventoSituacionDTO With {
+                                                                       .Id = a.Id,
+                                                                       .TipoEvento = "Auditoria",
+                                                                       .Tipo = tipo,
+                                                                       .Desde = CType(a.FechaHora, Date?),
+                                                                       .Hasta = Nothing,
+                                                                       .Severidad = ClasificarSeveridad(tipo),
+                                                                       .Prioridad = Nothing,
+                                                                       .ColorIndicador = Nothing
+                                                                   }
+                                                               End Function))
+
+            Dim eventosOrdenados = eventosUnificados _
+                .OrderBy(Function(ev) If(ev.Prioridad.HasValue, 0, 1)) _
+                .ThenBy(Function(ev) ev.Prioridad.GetValueOrDefault(Integer.MaxValue)) _
+                .ThenByDescending(Function(ev) ev.Severidad) _
+                .ThenByDescending(Function(ev) ev.Desde.GetValueOrDefault(Date.MinValue)) _
+                .ThenBy(Function(ev) ev.Tipo) _
+                .ToList()
+
+            dgvEstados.DataSource = eventosOrdenados
 
         Catch ex As Exception
             MessageBox.Show($"Error al poblar la grilla de estados: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -522,31 +574,41 @@ Public Class frmFuncionarioSituacion
 
     Private Sub AplicarColoresEstados(dgv As DataGridView)
         For Each row As DataGridViewRow In dgv.Rows
-            Dim data As Object = row.DataBoundItem
-            If data Is Nothing Then Continue For
+            Dim evento = TryCast(row.DataBoundItem, EventoSituacionDTO)
+            If evento Is Nothing Then Continue For
 
-            Dim tipoTxt As String = GetPropValue(Of String)(data, "Tipo", "")
-            Dim sev As Severidad = ClasificarSeveridad(tipoTxt)
-            PintarFilaPorSeveridad(row, sev)
+            Dim colorAplicado As Boolean = False
+
+            If Not String.IsNullOrWhiteSpace(evento.ColorIndicador) Then
+                Dim color = Color.FromName(evento.ColorIndicador)
+                If color.IsKnownColor OrElse color.IsNamedColor OrElse color.A > 0 Then
+                    AplicarColorDeFila(row, color)
+                    colorAplicado = True
+                End If
+            End If
+
+            If Not colorAplicado Then
+                PintarFilaPorSeveridad(row, evento.Severidad)
+            End If
         Next
     End Sub
 
     Private Function ClasificarSeveridad(tipoTexto As String) As Severidad
-        Dim t As String = If(tipoTexto, String.Empty).ToUpperInvariant()
+        Dim t As String = NormalizarTexto(tipoTexto)
         If t.StartsWith("CAMBIO") Then Return Severidad.Info
-        If t.StartsWith("NOTIFICACIÓN") Then Return Severidad.Media ' Simplificado
+        If t.StartsWith("NOTIFICACION") Then Return Severidad.Media ' Simplificado
         If t.StartsWith("LICENCIA") Then Return Severidad.Info
         If t.Contains("INICIO DE PROCESAMIENTO") Then Return Severidad.Critica
-        If t.Contains("SEPARACION") OrElse t.Contains("SEPARACIÓN") Then Return Severidad.Critica
+        If t.Contains("SEPARACION") Then Return Severidad.Critica
         If t.Contains("BAJA") Then Return Severidad.Critica
         If t.Contains("SUMARIO") Then Return Severidad.Alta
         If t.Contains("SANCI") Then Return Severidad.Alta
         If t.Contains("ENFERMEDAD") Then Return Severidad.Media
-        If t.Contains("ORDEN CINCO") OrElse t.Contains("ORDEN 5") Then Return Severidad.Media
+        If t.Contains("ORDEN CINCO") OrElse t.Contains("ORDEN 5") Then Return Severidad.Alta
         If t.Contains("TRASLADO") Then Return Severidad.Media
-        If t.Contains("RETEN") OrElse t.Contains("RETÉN") Then Return Severidad.Baja
-        If t.Contains("DESIGNACION") OrElse t.Contains("DESIGNACIÓN") Then Return Severidad.Baja
-        If t.Contains("REACTIVACION") OrElse t.Contains("REACTIVACIÓN") Then Return Severidad.Baja
+        If t.Contains("RETEN") Then Return Severidad.Baja
+        If t.Contains("DESIGNACION") Then Return Severidad.Baja
+        If t.Contains("REACTIVACION") Then Return Severidad.Baja
         If t.Contains("CAMBIO DE CARGO") Then Return Severidad.Baja
 
         Return Severidad.Baja
@@ -574,6 +636,53 @@ Public Class frmFuncionarioSituacion
         row.DefaultCellStyle.SelectionBackColor = strong
         row.DefaultCellStyle.SelectionForeColor = text
     End Sub
+
+    Private Sub AplicarColorDeFila(row As DataGridViewRow, color As Color)
+        row.DefaultCellStyle.BackColor = color
+        row.DefaultCellStyle.ForeColor = Color.White
+        row.DefaultCellStyle.SelectionBackColor = color
+        row.DefaultCellStyle.SelectionForeColor = Color.White
+    End Sub
+
+    Private Function MapearPrioridadASeveridad(prioridad As Integer) As Severidad
+        Select Case prioridad
+            Case 1, 2
+                Return Severidad.Critica
+            Case 3, 4, 5
+                Return Severidad.Alta
+            Case 6, 7
+                Return Severidad.Media
+            Case Else
+                Return Severidad.Baja
+        End Select
+    End Function
+
+    Private Function BuscarEstadoActivo(estadosActivosDict As Dictionary(Of String, vw_FuncionarioEstadosActivos), tipoPrincipal As String, Optional tipoAlternativo As String = Nothing) As vw_FuncionarioEstadosActivos
+        If estadosActivosDict Is Nothing OrElse estadosActivosDict.Count = 0 Then Return Nothing
+
+        Dim clavePrincipal = NormalizarTexto(tipoPrincipal)
+        Dim resultado As vw_FuncionarioEstadosActivos = Nothing
+
+        If estadosActivosDict.TryGetValue(clavePrincipal, resultado) Then
+            Return resultado
+        End If
+
+        If Not String.IsNullOrWhiteSpace(tipoAlternativo) Then
+            Dim claveAlternativa = NormalizarTexto(tipoAlternativo)
+            If estadosActivosDict.TryGetValue(claveAlternativa, resultado) Then
+                Return resultado
+            End If
+        End If
+
+        If clavePrincipal.StartsWith("LICENCIA:") Then
+            Dim claveSinPrefijo = clavePrincipal.Replace("LICENCIA:", String.Empty).Trim()
+            If estadosActivosDict.TryGetValue(claveSinPrefijo, resultado) Then
+                Return resultado
+            End If
+        End If
+
+        Return Nothing
+    End Function
 
     Private Function GetPropValue(Of T)(obj As Object, propName As String, defaultValue As T) As T
         If obj Is Nothing Then Return defaultValue
@@ -644,6 +753,17 @@ Public Class frmFuncionarioSituacion
         dgv.RowsDefaultCellStyle.BackColor = Color.White
         dgv.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(242, 245, 247)
     End Sub
+    Private Class EventoSituacionDTO
+        Public Property Id As Integer
+        Public Property TipoEvento As String
+        Public Property Tipo As String
+        Public Property Desde As Date?
+        Public Property Hasta As Date?
+        Public Property Severidad As Severidad
+        Public Property Prioridad As Integer?
+        Public Property ColorIndicador As String
+    End Class
+
 End Class
 
 Public Class DesignacionSeleccionDTO
