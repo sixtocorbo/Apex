@@ -245,9 +245,12 @@ Partial Public Class frmFiltros
         If dt Is Nothing Then Return
 
         Dim columnDefinitions As New Dictionary(Of String, String) From {
-            {"NombreCompleto", "Nombre"}, {"Cedula", "Cédula"}, {"Cargo", "Cargo"},
-            {"Escalafon", "Escalafón"}, {"Seccion", "Sección"}, {"Turno", "Turno"},
-            {"Semana", "Semana"}, {"PuestoDeTrabajo", "Puesto de Trabajo"}
+             {"NombreCompleto", "Nombre"}, {"Cedula", "Cédula"},
+        {"Cargo", "Cargo"}, {"Escalafon", "Escalafón"},
+        {"Seccion", "Sección"}, {"Turno", "Turno"},
+        {"Semana", "Semana"}, {"PuestoDeTrabajo", "Puesto de Trabajo"},
+        {"Activo", "Activo"}, ' <-- AÑADIR ESTA LÍNEA
+        {"TipoDeFuncionario", "Tipo de Funcionario"}
         }
 
         Dim origen = CType(cmbOrigenDatos.SelectedItem, TipoOrigenDatos)

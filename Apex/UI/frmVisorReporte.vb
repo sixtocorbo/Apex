@@ -78,7 +78,11 @@ Public Class frmVisorReporte
 
     Private Sub GenerarContenidoDinamico(rdlcXml As XmlDocument, dt As DataTable)
         Dim nsManager As New XmlNamespaceManager(rdlcXml.NameTable)
-        nsManager.AddNamespace("df", "http://schemas.microsoft.com/sqlserver/reporting/2008/01/reportdefinition")
+
+        ' ** LA CORRECCIÓN ESTÁ AQUÍ **
+        ' Se extrae dinámicamente el namespace del reporte en lugar de usar uno fijo.
+        Dim reportNamespace As String = rdlcXml.DocumentElement.NamespaceURI
+        nsManager.AddNamespace("df", reportNamespace)
         nsManager.AddNamespace("rd", "http://schemas.microsoft.com/SQLServer/reporting/reportdesigner")
 
         Dim dataSetNode = rdlcXml.SelectSingleNode("/df:Report/df:DataSets/df:DataSet[@Name='ResultadosDataSet']", nsManager)
@@ -94,8 +98,8 @@ Public Class frmVisorReporte
 
         Dim columnasAIgnorar As New HashSet(Of String)(StringComparer.OrdinalIgnoreCase) From {"GlobalSearch"}
         Dim columnasDisponibles = dt.Columns.Cast(Of DataColumn)().
-                                   Where(Function(c) Not columnasAIgnorar.Contains(c.ColumnName)).
-                                   ToList()
+                                Where(Function(c) Not columnasAIgnorar.Contains(c.ColumnName)).
+                                ToList()
 
         Dim fieldsNode = rdlcXml.CreateElement("Fields", nsManager.LookupNamespace("df"))
         For Each col As DataColumn In columnasDisponibles
