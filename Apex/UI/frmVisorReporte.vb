@@ -132,42 +132,76 @@ Public Class frmVisorReporte
         Dim sb As New StringBuilder()
         Dim ns As String = nsManager.LookupNamespace("df")
 
+        ' --- INICIO DE LA MODIFICACIÓN ---
+        ' 1. Lista de columnas a ignorar en la tabla principal
+        Dim columnasAIgnorar As New List(Of String) From {"FechaInicio", "FechaFin"}
+
+        ' 2. Filtramos las columnas que sí queremos mostrar
+        Dim columnasAMostrar = columns.Cast(Of DataColumn)().
+                                Where(Function(c) Not columnasAIgnorar.Contains(c.ColumnName)).
+                                ToList()
+        ' --- FIN DE LA MODIFICACIÓN ---
+
         sb.AppendLine($"<Tablix Name='TablixResultados' xmlns='{ns}'>")
         sb.AppendLine("<TablixBody>")
         sb.AppendLine("<TablixColumns>")
-        For i = 0 To columns.Count - 1
-            sb.AppendLine("<TablixColumn><Width>1in</Width></TablixColumn>") ' Ancho por defecto
+
+        ' --- MODIFICADO: Usar la lista filtrada y anchos específicos ---
+        For Each col As DataColumn In columnasAMostrar
+            ' Asignamos anchos específicos para un mejor layout
+            Dim width As String = "1.5in" ' Ancho por defecto para columnas no especificadas
+            Select Case col.ColumnName
+                Case "NombreCompleto"
+                    width = "2.8in"
+                Case "Cedula"
+                    width = "1in"
+                Case "Observaciones"
+                    width = "3.7in"
+            End Select
+            sb.AppendLine($"<TablixColumn><Width>{width}</Width></TablixColumn>")
         Next
         sb.AppendLine("</TablixColumns>")
 
         sb.AppendLine("<TablixRows>")
         ' Fila de encabezado
         sb.AppendLine("<TablixRow><Height>0.25in</Height><TablixCells>")
-        For Each col As DataColumn In columns
-            sb.AppendLine("<TablixCell><CellContents><Textbox Name='Header" & col.ColumnName & "'><CanGrow>true</CanGrow><KeepTogether>true</KeepTogether><Paragraphs><Paragraph><TextRuns><TextRun><Value>" & col.ColumnName & "</Value><Style><FontWeight>Bold</FontWeight><Color>White</Color></Style></TextRun></TextRuns><Style /></Paragraph></Paragraphs><Style><Border><Color>LightGrey</Color><Style>Solid</Style></Border><BackgroundColor>#4E5865</BackgroundColor><PaddingLeft>2pt</PaddingLeft><PaddingRight>2pt</PaddingRight><PaddingTop>2pt</PaddingTop><PaddingBottom>2pt</PaddingBottom></Style></Textbox></CellContents></TablixCell>")
+        ' --- MODIFICADO: Usar la lista filtrada ---
+        For Each col As DataColumn In columnasAMostrar
+            sb.AppendLine("<TablixCell><CellContents><Textbox Name='Header" & col.ColumnName & "'><CanGrow>true</CanGrow><KeepTogether>true</KeepTogether><Paragraphs><Paragraph><TextRuns><TextRun><Value>" & col.ColumnName & "</Value><Style><FontWeight>Bold</FontWeight><Color>White</Color></Style></TextRun></TextRuns><Style /></Paragraph></Paragraphs><Style><Border><Color>LightGrey</Color><Style>Solid</Style></Border><BackgroundColor>#4682B4</BackgroundColor><PaddingLeft>2pt</PaddingLeft><PaddingRight>2pt</PaddingRight><PaddingTop>2pt</PaddingTop><PaddingBottom>2pt</PaddingBottom></Style></Textbox></CellContents></TablixCell>")
         Next
         sb.AppendLine("</TablixCells></TablixRow>")
 
         ' Fila de datos
         sb.AppendLine("<TablixRow><Height>0.25in</Height><TablixCells>")
-        For Each col As DataColumn In columns
-            sb.AppendLine("<TablixCell><CellContents><Textbox Name='Data" & col.ColumnName & "'><CanGrow>true</CanGrow><KeepTogether>true</KeepTogether><Paragraphs><Paragraph><TextRuns><TextRun><Value>=Fields!" & col.ColumnName & ".Value</Value><Style /></TextRun></TextRuns><Style /></Paragraph></Paragraphs><Style><Border><Color>LightGrey</Color><Style>Solid</Style></Border><PaddingLeft>2pt</PaddingLeft><PaddingRight>2pt</PaddingRight><PaddingTop>2pt</PaddingTop><PaddingBottom>2pt</PaddingBottom></Style></Textbox></CellContents></TablixCell>")
+        ' --- MODIFICADO: Usar la lista filtrada y formatear fechas ---
+        For Each col As DataColumn In columnasAMostrar
+            Dim valueExpression As String = $"=Fields!{col.ColumnName}.Value"
+            ' Mejora: Si cualquier otra columna es fecha, le damos formato
+            If col.DataType Is GetType(DateTime) Then
+                valueExpression = $"=Format(Fields!{col.ColumnName}.Value, ""dd/MM/yyyy"")"
+            End If
+
+            sb.AppendLine($"<TablixCell><CellContents><Textbox Name='Data{col.ColumnName}'><CanGrow>true</CanGrow><KeepTogether>true</KeepTogether><Paragraphs><Paragraph><TextRuns><TextRun><Value>{valueExpression}</Value><Style /></TextRun></TextRuns><Style /></Paragraph></Paragraphs><Style><Border><Color>LightGrey</Color><Style>Solid</Style></Border><PaddingLeft>2pt</PaddingLeft><PaddingRight>2pt</PaddingRight><PaddingTop>2pt</PaddingTop><PaddingBottom>2pt</PaddingBottom></Style></Textbox></CellContents></TablixCell>")
         Next
         sb.AppendLine("</TablixCells></TablixRow>")
         sb.AppendLine("</TablixRows>")
 
         sb.AppendLine("</TablixBody>")
         sb.AppendLine("<TablixColumnHierarchy><TablixMembers>")
-        For i = 0 To columns.Count - 1
+        ' --- MODIFICADO: Usar la lista filtrada ---
+        For i = 0 To columnasAMostrar.Count - 1
             sb.AppendLine("<TablixMember />")
         Next
         sb.AppendLine("</TablixMembers></TablixColumnHierarchy>")
         sb.AppendLine("<TablixRowHierarchy><TablixMembers><TablixMember><KeepWithGroup>After</KeepWithGroup></TablixMember><TablixMember><Group Name='Details' /><TablixMembers><TablixMember /></TablixMembers></TablixMember></TablixMembers></TablixRowHierarchy>")
 
         sb.AppendLine("<DataSetName>ResultadosDataSet</DataSetName>")
-        sb.AppendLine("<Top>1.3in</Top>")
+        ' --- MODIFICADO: Ajustar propiedades para coincidir con el original ---
+        sb.AppendLine("<Top>3.2in</Top>")
+        sb.AppendLine("<Left>0in</Left>")
         sb.AppendLine("<Height>0.5in</Height>")
-        sb.AppendLine($"<Width>{columns.Count}in</Width>")
+        sb.AppendLine("<Width>7.5in</Width>") ' Ancho total fijo
+        sb.AppendLine("<ZIndex>3</ZIndex>")
         sb.AppendLine("<Style><Border><Style>None</Style></Border></Style>")
         sb.AppendLine("</Tablix>")
 
