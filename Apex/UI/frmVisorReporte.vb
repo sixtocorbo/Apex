@@ -1,4 +1,6 @@
-﻿Imports System.Data
+﻿Imports System.Collections.Generic
+Imports System.Linq
+Imports System.Data
 Imports System.Text
 Imports System.Xml
 Imports Microsoft.Reporting.WinForms
@@ -134,12 +136,42 @@ Public Class frmVisorReporte
 
         ' --- INICIO DE LA MODIFICACIÓN ---
         ' 1. Lista de columnas a ignorar en la tabla principal
-        Dim columnasAIgnorar As New List(Of String) From {"FechaInicio", "FechaFin"}
+        Dim columnasAIgnorar As New HashSet(Of String)(StringComparer.OrdinalIgnoreCase) From {"GlobalSearch"}
 
         ' 2. Filtramos las columnas que sí queremos mostrar
         Dim columnasAMostrar = columns.Cast(Of DataColumn)().
                                 Where(Function(c) Not columnasAIgnorar.Contains(c.ColumnName)).
                                 ToList()
+
+        If columnasAMostrar.Count = 0 Then
+            Throw New InvalidOperationException("No se encontraron columnas para construir el reporte.")
+        End If
+
+        Dim widthOverrides As New Dictionary(Of String, String)(StringComparer.OrdinalIgnoreCase) From {
+            {"NombreCompleto", "2.8in"},
+            {"NombreFuncionario", "2.8in"},
+            {"Nombre", "2.5in"},
+            {"Cedula", "1.2in"},
+            {"CI", "1.2in"},
+            {"Resumen", "3.5in"},
+            {"Texto", "3.5in"},
+            {"Observaciones", "3.7in"},
+            {"Descripcion", "3.2in"},
+            {"Detalle", "3.2in"},
+            {"Motivo", "2.5in"},
+            {"PuestoDeTrabajo", "2.5in"},
+            {"Cargo", "2.0in"},
+            {"Seccion", "2.0in"},
+            {"Seccin", "2.0in"},
+            {"TipoDeFuncionario", "2.2in"},
+            {"Estado", "1.5in"},
+            {"Tipo", "1.6in"},
+            {"Oficina", "1.8in"},
+            {"Rango", "2.2in"},
+            {"Documento", "2.2in"},
+            {"ExpMinisterial", "2.2in"},
+            {"ExpINR", "2.2in"}
+        }
         ' --- FIN DE LA MODIFICACIÓN ---
 
         sb.AppendLine($"<Tablix Name='TablixResultados' xmlns='{ns}'>")
@@ -148,16 +180,12 @@ Public Class frmVisorReporte
 
         ' --- MODIFICADO: Usar la lista filtrada y anchos específicos ---
         For Each col As DataColumn In columnasAMostrar
-            ' Asignamos anchos específicos para un mejor layout
-            Dim width As String = "1.5in" ' Ancho por defecto para columnas no especificadas
-            Select Case col.ColumnName
-                Case "NombreCompleto"
-                    width = "2.8in"
-                Case "Cedula"
-                    width = "1in"
-                Case "Observaciones"
-                    width = "3.7in"
-            End Select
+            Dim width As String
+            Dim headerKey = If(String.IsNullOrWhiteSpace(col.Caption), col.ColumnName, col.Caption)
+            If Not widthOverrides.TryGetValue(col.ColumnName, width) AndAlso
+               Not widthOverrides.TryGetValue(headerKey, width) Then
+                width = "1.2in"
+            End If
             sb.AppendLine($"<TablixColumn><Width>{width}</Width></TablixColumn>")
         Next
         sb.AppendLine("</TablixColumns>")
@@ -167,7 +195,8 @@ Public Class frmVisorReporte
         sb.AppendLine("<TablixRow><Height>0.25in</Height><TablixCells>")
         ' --- MODIFICADO: Usar la lista filtrada ---
         For Each col As DataColumn In columnasAMostrar
-            sb.AppendLine("<TablixCell><CellContents><Textbox Name='Header" & col.ColumnName & "'><CanGrow>true</CanGrow><KeepTogether>true</KeepTogether><Paragraphs><Paragraph><TextRuns><TextRun><Value>" & col.ColumnName & "</Value><Style><FontWeight>Bold</FontWeight><Color>White</Color></Style></TextRun></TextRuns><Style /></Paragraph></Paragraphs><Style><Border><Color>LightGrey</Color><Style>Solid</Style></Border><BackgroundColor>#4682B4</BackgroundColor><PaddingLeft>2pt</PaddingLeft><PaddingRight>2pt</PaddingRight><PaddingTop>2pt</PaddingTop><PaddingBottom>2pt</PaddingBottom></Style></Textbox></CellContents></TablixCell>")
+            Dim headerText = If(String.IsNullOrWhiteSpace(col.Caption), col.ColumnName, col.Caption)
+            sb.AppendLine("<TablixCell><CellContents><Textbox Name='Header" & col.ColumnName & "'><CanGrow>true</CanGrow><KeepTogether>true</KeepTogether><Paragraphs><Paragraph><TextRuns><TextRun><Value>" & EscapeXml(headerText) & "</Value><Style><FontWeight>Bold</FontWeight><Color>White</Color></Style></TextRun></TextRuns><Style /></Paragraph></Paragraphs><Style><Border><Color>LightGrey</Color><Style>Solid</Style></Border><BackgroundColor>#4682B4</BackgroundColor><PaddingLeft>2pt</PaddingLeft><PaddingRight>2pt</PaddingRight><PaddingTop>2pt</PaddingTop><PaddingBottom>2pt</PaddingBottom></Style></Textbox></CellContents></TablixCell>")
         Next
         sb.AppendLine("</TablixCells></TablixRow>")
 
@@ -176,10 +205,6 @@ Public Class frmVisorReporte
         ' --- MODIFICADO: Usar la lista filtrada y formatear fechas ---
         For Each col As DataColumn In columnasAMostrar
             Dim valueExpression As String = $"=Fields!{col.ColumnName}.Value"
-            ' Mejora: Si cualquier otra columna es fecha, le damos formato
-            If col.DataType Is GetType(DateTime) Then
-                valueExpression = $"=Format(Fields!{col.ColumnName}.Value, ""dd/MM/yyyy"")"
-            End If
 
             sb.AppendLine($"<TablixCell><CellContents><Textbox Name='Data{col.ColumnName}'><CanGrow>true</CanGrow><KeepTogether>true</KeepTogether><Paragraphs><Paragraph><TextRuns><TextRun><Value>{valueExpression}</Value><Style /></TextRun></TextRuns><Style /></Paragraph></Paragraphs><Style><Border><Color>LightGrey</Color><Style>Solid</Style></Border><PaddingLeft>2pt</PaddingLeft><PaddingRight>2pt</PaddingRight><PaddingTop>2pt</PaddingTop><PaddingBottom>2pt</PaddingBottom></Style></Textbox></CellContents></TablixCell>")
         Next
@@ -206,6 +231,16 @@ Public Class frmVisorReporte
         sb.AppendLine("</Tablix>")
 
         Return sb.ToString()
+    End Function
+
+    Private Shared Function EscapeXml(texto As String) As String
+        If String.IsNullOrEmpty(texto) Then Return String.Empty
+
+        Return texto.Replace("&", "&amp;").
+                     Replace("<", "&lt;").
+                     Replace(">", "&gt;").
+                     Replace("\"", "&quot;").
+                     Replace("'", "&apos;")
     End Function
 
     Private Shared Function ObtenerSubtituloCantidades(cantidadesDisponibles As String) As String
