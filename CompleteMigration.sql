@@ -132,6 +132,7 @@ BEGIN
         DELETE FROM [dbo].[FuncionarioSalud];
         DELETE FROM [dbo].[NotificacionPersonal];
         DELETE FROM [dbo].[EstadoTransitorio];
+        DELETE FROM [dbo].[UsuarioRol];
         DELETE FROM [dbo].[Usuario];
         DELETE FROM [dbo].[MapPoliciaFunc];
 
@@ -336,7 +337,52 @@ BEGIN TRY
     ;WITH VA AS (SELECT hv.id_policia,hv.año,hv.mes,MIN(hv.incidencia) AS incidencia,MIN(hv.motivo) AS motivo FROM Personal.dbo.tblHistoricoViaticos hv GROUP BY hv.id_policia,hv.año,hv.mes) INSERT INTO dbo.HistoricoViatico (FuncionarioId,Anio,Mes,Incidencia,Motivo) SELECT m.FuncionarioId,va.año,va.mes,va.incidencia,va.motivo FROM VA va JOIN dbo.MapPoliciaFunc m ON m.id_policia = va.id_policia WHERE NOT EXISTS (SELECT 1 FROM dbo.HistoricoViatico hv WHERE hv.FuncionarioId = m.FuncionarioId AND hv.Anio = va.año AND hv.Mes = va.mes);
 
     -- Usuarios
-    ;WITH S AS (SELECT u.id_usuario, LOWER(LTRIM(RTRIM(u.usuario))) COLLATE DATABASE_DEFAULT AS UserName, HASHBYTES('SHA2_256',CAST(u.clave AS NVARCHAR(4000))) AS PwdHash, mp.FuncionarioId FROM Personal.dbo.tblUsuarios u LEFT JOIN dbo.MapPoliciaFunc mp ON mp.id_policia = u.id_policia) MERGE dbo.Usuario AS T USING S ON T.UserName = S.UserName WHEN NOT MATCHED BY TARGET THEN INSERT (UserName,PasswordHash,FuncionarioId,RolId,CreatedAt) VALUES(S.UserName,S.PwdHash,S.FuncionarioId,2,GETDATE());
+    ;WITH SourceUsuarios AS (
+        SELECT
+            LOWER(LTRIM(RTRIM(u.usuario))) COLLATE DATABASE_DEFAULT AS NombreUsuario,
+            HASHBYTES('SHA2_256', CAST(u.clave AS NVARCHAR(4000))) AS PasswordHash,
+            mp.FuncionarioId,
+            LTRIM(RTRIM(p.nom_policia)) COLLATE DATABASE_DEFAULT AS NombreCompleto
+        FROM Personal.dbo.tblUsuarios u
+        LEFT JOIN dbo.MapPoliciaFunc mp ON mp.id_policia = u.id_policia
+        LEFT JOIN Personal.dbo.tblPolicias p ON p.id_policia = u.id_policia
+    )
+    MERGE dbo.Usuario AS T
+    USING SourceUsuarios AS S
+        ON T.NombreUsuario = S.NombreUsuario
+    WHEN NOT MATCHED BY TARGET THEN
+        INSERT (NombreUsuario, PasswordHash, PasswordSalt, NombreCompleto, Activo, FechaCreacion, FuncionarioId)
+        VALUES (
+            S.NombreUsuario,
+            S.PasswordHash,
+            0x,
+            ISNULL(NULLIF(S.NombreCompleto, ''), S.NombreUsuario),
+            1,
+            GETDATE(),
+            S.FuncionarioId
+        );
+
+    ;WITH SourceUsuarioRol AS (
+        SELECT
+            LOWER(LTRIM(RTRIM(u.usuario))) COLLATE DATABASE_DEFAULT AS NombreUsuario,
+            CASE UPPER(LTRIM(RTRIM(u.rol)))
+                WHEN 'ADMIN' THEN 1
+                WHEN 'SUPERADMIN' THEN 1
+                WHEN 'USUARIO' THEN 2
+                ELSE 2
+            END AS RolId
+        FROM Personal.dbo.tblUsuarios u
+    )
+    INSERT INTO dbo.UsuarioRol (UsuarioId, RolId)
+    SELECT u.Id, sur.RolId
+    FROM SourceUsuarioRol sur
+    JOIN dbo.Usuario u ON u.NombreUsuario = sur.NombreUsuario
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM dbo.UsuarioRol ur
+        WHERE ur.UsuarioId = u.Id
+          AND ur.RolId = sur.RolId
+    );
     PRINT '✔ Datos relacionados migrados.';
 
     /*================================================================
