@@ -206,6 +206,20 @@ BEGIN TRY
     MERGE INTO dbo.TipoFuncionario AS T USING (VALUES (1, 'Policia'), (2, 'Operador Penitenciario'), (3, 'Profesional Universitario'),(4, 'Técnico'), (5, 'Administrativo')) AS S (Id, Nombre) ON T.Id = S.Id WHEN NOT MATCHED THEN INSERT (Id, Nombre, CreatedAt) VALUES (S.Id, S.Nombre, GETDATE());
     SET IDENTITY_INSERT dbo.TipoFuncionario OFF;
 
+    SET IDENTITY_INSERT dbo.Rol ON;
+    MERGE dbo.Rol AS T
+    USING (VALUES
+        (1, 'Admin', 'Administrador del sistema'),
+        (2, 'Usuario', 'Usuario estándar')
+    ) AS S(Id, Nombre, Descripcion)
+        ON T.Id = S.Id
+    WHEN MATCHED THEN
+        UPDATE SET Nombre = S.Nombre, Descripcion = S.Descripcion
+    WHEN NOT MATCHED THEN
+        INSERT (Id, Nombre, Descripcion)
+        VALUES (S.Id, S.Nombre, S.Descripcion);
+    SET IDENTITY_INSERT dbo.Rol OFF;
+
     MERGE dbo.RolUsuario AS T USING (VALUES (1,'Admin',1), (2,'Usuario',2)) AS S(Id,Nombre,Orden) ON T.Id = S.Id WHEN NOT MATCHED THEN INSERT (Id,Nombre,Orden) VALUES (S.Id,S.Nombre,S.Orden);
 
     SET IDENTITY_INSERT dbo.CategoriaAusencia ON;
