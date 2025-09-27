@@ -138,6 +138,40 @@
 					<PaddingBottom>5pt</PaddingBottom>
 				</Style>
 			</Textbox>
+			<Textbox Name="txtSubtituloCantidades">
+				<CanGrow>true</CanGrow>
+				<KeepTogether>true</KeepTogether>
+				<Paragraphs>
+					<Paragraph>
+						<TextRuns>
+							<TextRun>
+								<Value>=Parameters!ReportSubTitle.Value</Value>
+								<Style>
+									<FontSize>12pt</FontSize>
+									<FontWeight>Bold</FontWeight>
+								</Style>
+							</TextRun>
+						</TextRuns>
+						<Style>
+							<TextAlign>Left</TextAlign>
+						</Style>
+					</Paragraph>
+				</Paragraphs>
+				<rd:DefaultName>txtSubtituloCantidades</rd:DefaultName>
+				<Top>1in</Top>
+				<Height>0.25in</Height>
+				<Width>7.5in</Width>
+				<ZIndex>2</ZIndex>
+				<Style>
+					<Border>
+						<Style>None</Style>
+					</Border>
+					<PaddingLeft>2pt</PaddingLeft>
+					<PaddingRight>2pt</PaddingRight>
+					<PaddingTop>2pt</PaddingTop>
+					<PaddingBottom>2pt</PaddingBottom>
+				</Style>
+			</Textbox>
 			<Tablix Name="TablixResultados">
 				<TablixBody>
 					<TablixColumns>
@@ -508,52 +542,18 @@
 					</TablixMembers>
 				</TablixRowHierarchy>
 				<DataSetName>ResultadosDataSet</DataSetName>
-				<Top>1in</Top>
+				<Top>3.2in</Top>
 				<Left>0in</Left>
 				<Height>0.5in</Height>
-				<Width>7.5in</Width>
-				<ZIndex>2</ZIndex>
-				<Style>
-					<Border>
-						<Style>None</Style>
-					</Border>
-				</Style>
-			</Tablix>
-			<Textbox Name="txtSubtituloCantidades">
-				<CanGrow>true</CanGrow>
-				<KeepTogether>true</KeepTogether>
-				<Paragraphs>
-					<Paragraph>
-						<TextRuns>
-							<TextRun>
-								<Value>=Parameters!ReportSubTitle.Value</Value>
-								<Style>
-									<FontSize>12pt</FontSize>
-									<FontWeight>Bold</FontWeight>
-								</Style>
-							</TextRun>
-						</TextRuns>
-						<Style>
-							<TextAlign>Left</TextAlign>
-						</Style>
-					</Paragraph>
-				</Paragraphs>
-				<rd:DefaultName>txtSubtituloCantidades</rd:DefaultName>
-				<Top>1.7in</Top>
-				<Height>0.25in</Height>
 				<Width>7.5in</Width>
 				<ZIndex>3</ZIndex>
 				<Style>
 					<Border>
 						<Style>None</Style>
 					</Border>
-					<PaddingLeft>2pt</PaddingLeft>
-					<PaddingRight>2pt</PaddingRight>
-					<PaddingTop>2pt</PaddingTop>
-					<PaddingBottom>2pt</PaddingBottom>
 				</Style>
-			</Textbox>
-			<Tablix Name="TablixCantidades">
+			</Tablix>
+			<Tablix Name="TablixTotalFuncionarios">
 				<TablixBody>
 					<TablixColumns>
 						<TablixColumn>
@@ -569,7 +569,7 @@
 							<TablixCells>
 								<TablixCell>
 									<CellContents>
-										<Textbox Name="HeaderCampo">
+										<Textbox Name="HeaderCampoTotal">
 											<CanGrow>true</CanGrow>
 											<KeepTogether>true</KeepTogether>
 											<Paragraphs>
@@ -602,7 +602,7 @@
 								</TablixCell>
 								<TablixCell>
 									<CellContents>
-										<Textbox Name="HeaderCantidad">
+										<Textbox Name="HeaderCantidadTotal">
 											<CanGrow>true</CanGrow>
 											<KeepTogether>true</KeepTogether>
 											<Paragraphs>
@@ -642,21 +642,20 @@
 							<TablixCells>
 								<TablixCell>
 									<CellContents>
-										<Textbox Name="Textbox1">
+										<Textbox Name="CampoTotal">
 											<CanGrow>true</CanGrow>
 											<KeepTogether>true</KeepTogether>
 											<Paragraphs>
 												<Paragraph>
 													<TextRuns>
 														<TextRun>
-															<Value>Nombre Completo</Value>
+															<Value>Total de Funcionarios</Value>
 															<Style />
 														</TextRun>
 													</TextRuns>
 													<Style />
 												</Paragraph>
 											</Paragraphs>
-											<rd:DefaultName>Textbox1</rd:DefaultName>
 											<Style>
 												<Border>
 													<Color>LightGrey</Color>
@@ -672,7 +671,7 @@
 								</TablixCell>
 								<TablixCell>
 									<CellContents>
-										<Textbox Name="Textbox2">
+										<Textbox Name="CantidadTotal">
 											<CanGrow>true</CanGrow>
 											<KeepTogether>true</KeepTogether>
 											<Paragraphs>
@@ -688,275 +687,6 @@
 													</Style>
 												</Paragraph>
 											</Paragraphs>
-											<rd:DefaultName>Textbox2</rd:DefaultName>
-											<Style>
-												<Border>
-													<Color>LightGrey</Color>
-													<Style>Solid</Style>
-												</Border>
-												<PaddingLeft>2pt</PaddingLeft>
-												<PaddingRight>2pt</PaddingRight>
-												<PaddingTop>2pt</PaddingTop>
-												<PaddingBottom>2pt</PaddingBottom>
-											</Style>
-										</Textbox>
-									</CellContents>
-								</TablixCell>
-							</TablixCells>
-						</TablixRow>
-						<TablixRow>
-							<Height>0.25in</Height>
-							<TablixCells>
-								<TablixCell>
-									<CellContents>
-										<Textbox Name="Textbox3">
-											<CanGrow>true</CanGrow>
-											<KeepTogether>true</KeepTogether>
-											<Paragraphs>
-												<Paragraph>
-													<TextRuns>
-														<TextRun>
-															<Value>Cédula</Value>
-															<Style />
-														</TextRun>
-													</TextRuns>
-													<Style />
-												</Paragraph>
-											</Paragraphs>
-											<rd:DefaultName>Textbox3</rd:DefaultName>
-											<Style>
-												<Border>
-													<Color>LightGrey</Color>
-													<Style>Solid</Style>
-												</Border>
-												<PaddingLeft>2pt</PaddingLeft>
-												<PaddingRight>2pt</PaddingRight>
-												<PaddingTop>2pt</PaddingTop>
-												<PaddingBottom>2pt</PaddingBottom>
-											</Style>
-										</Textbox>
-									</CellContents>
-								</TablixCell>
-								<TablixCell>
-									<CellContents>
-										<Textbox Name="Textbox4">
-											<CanGrow>true</CanGrow>
-											<KeepTogether>true</KeepTogether>
-											<Paragraphs>
-												<Paragraph>
-													<TextRuns>
-														<TextRun>
-															<Value>=Count(Fields!Cedula.Value)</Value>
-															<Style />
-														</TextRun>
-													</TextRuns>
-													<Style>
-														<TextAlign>Center</TextAlign>
-													</Style>
-												</Paragraph>
-											</Paragraphs>
-											<rd:DefaultName>Textbox4</rd:DefaultName>
-											<Style>
-												<Border>
-													<Color>LightGrey</Color>
-													<Style>Solid</Style>
-												</Border>
-												<PaddingLeft>2pt</PaddingLeft>
-												<PaddingRight>2pt</PaddingRight>
-												<PaddingTop>2pt</PaddingTop>
-												<PaddingBottom>2pt</PaddingBottom>
-											</Style>
-										</Textbox>
-									</CellContents>
-								</TablixCell>
-							</TablixCells>
-						</TablixRow>
-						<TablixRow>
-							<Height>0.25in</Height>
-							<TablixCells>
-								<TablixCell>
-									<CellContents>
-										<Textbox Name="Textbox5">
-											<CanGrow>true</CanGrow>
-											<KeepTogether>true</KeepTogether>
-											<Paragraphs>
-												<Paragraph>
-													<TextRuns>
-														<TextRun>
-															<Value>Tipo</Value>
-															<Style />
-														</TextRun>
-													</TextRuns>
-													<Style />
-												</Paragraph>
-											</Paragraphs>
-											<rd:DefaultName>Textbox5</rd:DefaultName>
-											<Style>
-												<Border>
-													<Color>LightGrey</Color>
-													<Style>Solid</Style>
-												</Border>
-												<PaddingLeft>2pt</PaddingLeft>
-												<PaddingRight>2pt</PaddingRight>
-												<PaddingTop>2pt</PaddingTop>
-												<PaddingBottom>2pt</PaddingBottom>
-											</Style>
-										</Textbox>
-									</CellContents>
-								</TablixCell>
-								<TablixCell>
-									<CellContents>
-										<Textbox Name="Textbox6">
-											<CanGrow>true</CanGrow>
-											<KeepTogether>true</KeepTogether>
-											<Paragraphs>
-												<Paragraph>
-													<TextRuns>
-														<TextRun>
-															<Value>=Count(Fields!Tipo.Value)</Value>
-															<Style />
-														</TextRun>
-													</TextRuns>
-													<Style>
-														<TextAlign>Center</TextAlign>
-													</Style>
-												</Paragraph>
-											</Paragraphs>
-											<rd:DefaultName>Textbox6</rd:DefaultName>
-											<Style>
-												<Border>
-													<Color>LightGrey</Color>
-													<Style>Solid</Style>
-												</Border>
-												<PaddingLeft>2pt</PaddingLeft>
-												<PaddingRight>2pt</PaddingRight>
-												<PaddingTop>2pt</PaddingTop>
-												<PaddingBottom>2pt</PaddingBottom>
-											</Style>
-										</Textbox>
-									</CellContents>
-								</TablixCell>
-							</TablixCells>
-						</TablixRow>
-						<TablixRow>
-							<Height>0.25in</Height>
-							<TablixCells>
-								<TablixCell>
-									<CellContents>
-										<Textbox Name="Textbox7">
-											<CanGrow>true</CanGrow>
-											<KeepTogether>true</KeepTogether>
-											<Paragraphs>
-												<Paragraph>
-													<TextRuns>
-														<TextRun>
-															<Value>Cargo</Value>
-															<Style />
-														</TextRun>
-													</TextRuns>
-													<Style />
-												</Paragraph>
-											</Paragraphs>
-											<rd:DefaultName>Textbox7</rd:DefaultName>
-											<Style>
-												<Border>
-													<Color>LightGrey</Color>
-													<Style>Solid</Style>
-												</Border>
-												<PaddingLeft>2pt</PaddingLeft>
-												<PaddingRight>2pt</PaddingRight>
-												<PaddingTop>2pt</PaddingTop>
-												<PaddingBottom>2pt</PaddingBottom>
-											</Style>
-										</Textbox>
-									</CellContents>
-								</TablixCell>
-								<TablixCell>
-									<CellContents>
-										<Textbox Name="Textbox8">
-											<CanGrow>true</CanGrow>
-											<KeepTogether>true</KeepTogether>
-											<Paragraphs>
-												<Paragraph>
-													<TextRuns>
-														<TextRun>
-															<Value>=Count(Fields!Cargo.Value)</Value>
-															<Style />
-														</TextRun>
-													</TextRuns>
-													<Style>
-														<TextAlign>Center</TextAlign>
-													</Style>
-												</Paragraph>
-											</Paragraphs>
-											<rd:DefaultName>Textbox8</rd:DefaultName>
-											<Style>
-												<Border>
-													<Color>LightGrey</Color>
-													<Style>Solid</Style>
-												</Border>
-												<PaddingLeft>2pt</PaddingLeft>
-												<PaddingRight>2pt</PaddingRight>
-												<PaddingTop>2pt</PaddingTop>
-												<PaddingBottom>2pt</PaddingBottom>
-											</Style>
-										</Textbox>
-									</CellContents>
-								</TablixCell>
-							</TablixCells>
-						</TablixRow>
-						<TablixRow>
-							<Height>0.25in</Height>
-							<TablixCells>
-								<TablixCell>
-									<CellContents>
-										<Textbox Name="Textbox9">
-											<CanGrow>true</CanGrow>
-											<KeepTogether>true</KeepTogether>
-											<Paragraphs>
-												<Paragraph>
-													<TextRuns>
-														<TextRun>
-															<Value>Sección</Value>
-															<Style />
-														</TextRun>
-													</TextRuns>
-													<Style />
-												</Paragraph>
-											</Paragraphs>
-											<rd:DefaultName>Textbox9</rd:DefaultName>
-											<Style>
-												<Border>
-													<Color>LightGrey</Color>
-													<Style>Solid</Style>
-												</Border>
-												<PaddingLeft>2pt</PaddingLeft>
-												<PaddingRight>2pt</PaddingRight>
-												<PaddingTop>2pt</PaddingTop>
-												<PaddingBottom>2pt</PaddingBottom>
-											</Style>
-										</Textbox>
-									</CellContents>
-								</TablixCell>
-								<TablixCell>
-									<CellContents>
-										<Textbox Name="Textbox10">
-											<CanGrow>true</CanGrow>
-											<KeepTogether>true</KeepTogether>
-											<Paragraphs>
-												<Paragraph>
-													<TextRuns>
-														<TextRun>
-															<Value>=Count(Fields!Seccion.Value)</Value>
-															<Style />
-														</TextRun>
-													</TextRuns>
-													<Style>
-														<TextAlign>Center</TextAlign>
-													</Style>
-												</Paragraph>
-											</Paragraphs>
-											<rd:DefaultName>Textbox10</rd:DefaultName>
 											<Style>
 												<Border>
 													<Color>LightGrey</Color>
@@ -985,17 +715,14 @@
 						<TablixMember>
 							<KeepWithGroup>After</KeepWithGroup>
 						</TablixMember>
-						<TablixMember />
-						<TablixMember />
-						<TablixMember />
-						<TablixMember />
-						<TablixMember />
+						<TablixMember>
+							<KeepWithGroup>After</KeepWithGroup>
+						</TablixMember>
 					</TablixMembers>
 				</TablixRowHierarchy>
 				<DataSetName>ResultadosDataSet</DataSetName>
-				<Top>2in</Top>
-				<Left>0in</Left>
-				<Height>1.5in</Height>
+				<Top>1.3in</Top>
+				<Height>0.5in</Height>
 				<Width>2.8in</Width>
 				<ZIndex>4</ZIndex>
 				<Style>
@@ -1004,8 +731,384 @@
 					</Border>
 				</Style>
 			</Tablix>
+			<Tablix Name="TablixCargos">
+				<TablixBody>
+					<TablixColumns>
+						<TablixColumn>
+							<Width>1.8in</Width>
+						</TablixColumn>
+						<TablixColumn>
+							<Width>1in</Width>
+						</TablixColumn>
+					</TablixColumns>
+					<TablixRows>
+						<TablixRow>
+							<Height>0.25in</Height>
+							<TablixCells>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="HeaderCargo">
+											<CanGrow>true</CanGrow>
+											<KeepTogether>true</KeepTogether>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>Cargo</Value>
+															<Style>
+																<FontWeight>Bold</FontWeight>
+																<Color>White</Color>
+															</Style>
+														</TextRun>
+													</TextRuns>
+													<Style />
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<Border>
+													<Color>LightGrey</Color>
+													<Style>Solid</Style>
+												</Border>
+												<BackgroundColor>#4682B4</BackgroundColor>
+												<PaddingLeft>2pt</PaddingLeft>
+												<PaddingRight>2pt</PaddingRight>
+												<PaddingTop>2pt</PaddingTop>
+												<PaddingBottom>2pt</PaddingBottom>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="HeaderCantidadCargo">
+											<CanGrow>true</CanGrow>
+											<KeepTogether>true</KeepTogether>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>Cantidad</Value>
+															<Style>
+																<FontWeight>Bold</FontWeight>
+																<Color>White</Color>
+															</Style>
+														</TextRun>
+													</TextRuns>
+													<Style>
+														<TextAlign>Center</TextAlign>
+													</Style>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<Border>
+													<Color>LightGrey</Color>
+													<Style>Solid</Style>
+												</Border>
+												<BackgroundColor>#4682B4</BackgroundColor>
+												<PaddingLeft>2pt</PaddingLeft>
+												<PaddingRight>2pt</PaddingRight>
+												<PaddingTop>2pt</PaddingTop>
+												<PaddingBottom>2pt</PaddingBottom>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+							</TablixCells>
+						</TablixRow>
+						<TablixRow>
+							<Height>0.25in</Height>
+							<TablixCells>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="Cargo">
+											<CanGrow>true</CanGrow>
+											<KeepTogether>true</KeepTogether>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>=Fields!Cargo.Value</Value>
+															<Style />
+														</TextRun>
+													</TextRuns>
+													<Style />
+												</Paragraph>
+											</Paragraphs>
+											<rd:DefaultName>Cargo</rd:DefaultName>
+											<Style>
+												<Border>
+													<Color>LightGrey</Color>
+													<Style>Solid</Style>
+												</Border>
+												<PaddingLeft>2pt</PaddingLeft>
+												<PaddingRight>2pt</PaddingRight>
+												<PaddingTop>2pt</PaddingTop>
+												<PaddingBottom>2pt</PaddingBottom>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="CantidadCargo">
+											<CanGrow>true</CanGrow>
+											<KeepTogether>true</KeepTogether>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>=Count(Fields!NombreCompleto.Value)</Value>
+															<Style />
+														</TextRun>
+													</TextRuns>
+													<Style>
+														<TextAlign>Center</TextAlign>
+													</Style>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<Border>
+													<Color>LightGrey</Color>
+													<Style>Solid</Style>
+												</Border>
+												<PaddingLeft>2pt</PaddingLeft>
+												<PaddingRight>2pt</PaddingRight>
+												<PaddingTop>2pt</PaddingTop>
+												<PaddingBottom>2pt</PaddingBottom>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+							</TablixCells>
+						</TablixRow>
+					</TablixRows>
+				</TablixBody>
+				<TablixColumnHierarchy>
+					<TablixMembers>
+						<TablixMember />
+						<TablixMember />
+					</TablixMembers>
+				</TablixColumnHierarchy>
+				<TablixRowHierarchy>
+					<TablixMembers>
+						<TablixMember>
+							<KeepWithGroup>After</KeepWithGroup>
+						</TablixMember>
+						<TablixMember>
+							<Group Name="Cargo">
+								<GroupExpressions>
+									<GroupExpression>=Fields!Cargo.Value</GroupExpression>
+								</GroupExpressions>
+							</Group>
+							<SortExpressions>
+								<SortExpression>
+									<Value>=Fields!Cargo.Value</Value>
+								</SortExpression>
+							</SortExpressions>
+						</TablixMember>
+					</TablixMembers>
+				</TablixRowHierarchy>
+				<DataSetName>ResultadosDataSet</DataSetName>
+				<Top>1.9in</Top>
+				<Height>0.5in</Height>
+				<Width>2.8in</Width>
+				<ZIndex>5</ZIndex>
+				<Style>
+					<Border>
+						<Style>None</Style>
+					</Border>
+				</Style>
+			</Tablix>
+			<Tablix Name="TablixSecciones">
+				<TablixBody>
+					<TablixColumns>
+						<TablixColumn>
+							<Width>1.8in</Width>
+						</TablixColumn>
+						<TablixColumn>
+							<Width>1in</Width>
+						</TablixColumn>
+					</TablixColumns>
+					<TablixRows>
+						<TablixRow>
+							<Height>0.25in</Height>
+							<TablixCells>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="HeaderSeccion">
+											<CanGrow>true</CanGrow>
+											<KeepTogether>true</KeepTogether>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>Sección</Value>
+															<Style>
+																<FontWeight>Bold</FontWeight>
+																<Color>White</Color>
+															</Style>
+														</TextRun>
+													</TextRuns>
+													<Style />
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<Border>
+													<Color>LightGrey</Color>
+													<Style>Solid</Style>
+												</Border>
+												<BackgroundColor>#4682B4</BackgroundColor>
+												<PaddingLeft>2pt</PaddingLeft>
+												<PaddingRight>2pt</PaddingRight>
+												<PaddingTop>2pt</PaddingTop>
+												<PaddingBottom>2pt</PaddingBottom>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="HeaderCantidadSeccion">
+											<CanGrow>true</CanGrow>
+											<KeepTogether>true</KeepTogether>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>Cantidad</Value>
+															<Style>
+																<FontWeight>Bold</FontWeight>
+																<Color>White</Color>
+															</Style>
+														</TextRun>
+													</TextRuns>
+													<Style>
+														<TextAlign>Center</TextAlign>
+													</Style>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<Border>
+													<Color>LightGrey</Color>
+													<Style>Solid</Style>
+												</Border>
+												<BackgroundColor>#4682B4</BackgroundColor>
+												<PaddingLeft>2pt</PaddingLeft>
+												<PaddingRight>2pt</PaddingRight>
+												<PaddingTop>2pt</PaddingTop>
+												<PaddingBottom>2pt</PaddingBottom>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+							</TablixCells>
+						</TablixRow>
+						<TablixRow>
+							<Height>0.25in</Height>
+							<TablixCells>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="Seccion">
+											<CanGrow>true</CanGrow>
+											<KeepTogether>true</KeepTogether>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>=Fields!Seccion.Value</Value>
+															<Style />
+														</TextRun>
+													</TextRuns>
+													<Style />
+												</Paragraph>
+											</Paragraphs>
+											<rd:DefaultName>Seccion</rd:DefaultName>
+											<Style>
+												<Border>
+													<Color>LightGrey</Color>
+													<Style>Solid</Style>
+												</Border>
+												<PaddingLeft>2pt</PaddingLeft>
+												<PaddingRight>2pt</PaddingRight>
+												<PaddingTop>2pt</PaddingTop>
+												<PaddingBottom>2pt</PaddingBottom>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="CantidadSeccion">
+											<CanGrow>true</CanGrow>
+											<KeepTogether>true</KeepTogether>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>=Count(Fields!NombreCompleto.Value)</Value>
+															<Style />
+														</TextRun>
+													</TextRuns>
+													<Style>
+														<TextAlign>Center</TextAlign>
+													</Style>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<Border>
+													<Color>LightGrey</Color>
+													<Style>Solid</Style>
+												</Border>
+												<PaddingLeft>2pt</PaddingLeft>
+												<PaddingRight>2pt</PaddingRight>
+												<PaddingTop>2pt</PaddingTop>
+												<PaddingBottom>2pt</PaddingBottom>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+							</TablixCells>
+						</TablixRow>
+					</TablixRows>
+				</TablixBody>
+				<TablixColumnHierarchy>
+					<TablixMembers>
+						<TablixMember />
+						<TablixMember />
+					</TablixMembers>
+				</TablixColumnHierarchy>
+				<TablixRowHierarchy>
+					<TablixMembers>
+						<TablixMember>
+							<KeepWithGroup>After</KeepWithGroup>
+						</TablixMember>
+						<TablixMember>
+							<Group Name="Seccion">
+								<GroupExpressions>
+									<GroupExpression>=Fields!Seccion.Value</GroupExpression>
+								</GroupExpressions>
+							</Group>
+							<SortExpressions>
+								<SortExpression>
+									<Value>=Fields!Seccion.Value</Value>
+								</SortExpression>
+							</SortExpressions>
+						</TablixMember>
+					</TablixMembers>
+				</TablixRowHierarchy>
+				<DataSetName>ResultadosDataSet</DataSetName>
+				<Top>2.5in</Top>
+				<Height>0.5in</Height>
+				<Width>2.8in</Width>
+				<ZIndex>6</ZIndex>
+				<Style>
+					<Border>
+						<Style>None</Style>
+					</Border>
+				</Style>
+			</Tablix>
 		</ReportItems>
-		<Height>3.7in</Height>
+		<Height>3.9in</Height>
 		<Style />
 	</Body>
 	<Width>7.5in</Width>

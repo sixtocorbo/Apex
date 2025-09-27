@@ -470,7 +470,6 @@
     <Compile Include="Data\UnitOfWork.vb" />
     <Compile Include="DTO\NotificacionImprimirDTO.vb" />
     <Compile Include="DTO\SituacionReporteDTO.vb" />
-    <Compile Include="Helpers\Class1.vb" />
     <Compile Include="Helpers\NavegacionHelper.vb" />
     <Compile Include="Helpers\AppTheme.vb" />
     <Compile Include="Helpers\ReportResourceLoader.vb" />
