@@ -1,5 +1,6 @@
 ﻿' Apex/Services/ConsultasGenericas.vb
 Imports System.Data.Entity
+Imports System.Linq
 Imports System.Linq.Expressions
 Public Module ConsultasGenericas
 
@@ -122,18 +123,38 @@ Public Module ConsultasGenericas
                         Return CrearTablaNotificacionesVacia()
                     End If
 
-                    Dim resultadoNotificaciones = notificaciones.Select(Function(n) New With {
-                        .NombreCompleto = n.NombreFuncionario,
-                        .Cedula = n.CI,
-                        .TipoNotificacion = n.TipoNotificacion,
-                        .Estado = n.Estado,
-                        .FechaProgramada = n.FechaProgramada,
-                        .Texto = n.Texto,
-                        .Documento = n.Documento,
-                        .ExpMinisterial = n.ExpMinisterial,
-                        .ExpINR = n.ExpINR,
-                        .Oficina = n.Oficina
-                    }).ToList()
+                    Dim metadatosPorFuncionario = Await CargarMetadatosNotificacionesAsync(uow, notificaciones)
+
+                    Dim resultadoNotificaciones = notificaciones.Select(Function(n)
+                        Dim meta = ObtenerMetadatosNotificacion(metadatosPorFuncionario, n.FuncionarioId)
+
+                        Return New With {
+                            .NombreCompleto = ValorNotificacionTexto(n.NombreFuncionario),
+                            .Cedula = ValorNotificacionTexto(n.CI),
+                            .TipoNotificacion = ValorNotificacionTexto(n.TipoNotificacion),
+                            .Estado = ValorNotificacionTexto(n.Estado),
+                            .FechaProgramada = n.FechaProgramada,
+                            .Texto = ValorNotificacionTexto(n.Texto, String.Empty),
+                            .Documento = ValorNotificacionTexto(n.Documento),
+                            .ExpMinisterial = ValorNotificacionTexto(n.ExpMinisterial),
+                            .ExpINR = ValorNotificacionTexto(n.ExpINR),
+                            .Oficina = ValorNotificacionTexto(n.Oficina),
+                            .TipoDeFuncionario = meta.TipoDeFuncionario,
+                            .Cargo = meta.Cargo,
+                            .Seccion = meta.Seccion,
+                            .Escalafon = meta.Escalafon,
+                            .SubEscalafon = meta.SubEscalafon,
+                            .SubDireccion = meta.SubDireccion,
+                            .Funcion = meta.Funcion,
+                            .PuestoDeTrabajo = meta.PuestoDeTrabajo,
+                            .Turno = meta.Turno,
+                            .Semana = meta.Semana,
+                            .Horario = meta.Horario,
+                            .PrestadorSalud = meta.PrestadorSalud,
+                            .EstadoFuncionario = meta.EstadoFuncionario,
+                            .Activo = meta.Activo
+                        }
+                    End Function).ToList()
 
                     dt = resultadoNotificaciones.ToDataTable()
                 Case TipoOrigenDatos.Licencias
@@ -530,6 +551,121 @@ Public Module ConsultasGenericas
         Return ModuloExtensions.ToDataTable(datos)
     End Function
 
+    Private Async Function CargarMetadatosNotificacionesAsync(uow As UnitOfWork, notificaciones As IEnumerable(Of vw_NotificacionesCompletas)) As Task(Of Dictionary(Of Integer, NotificacionFuncionarioMetadata))
+        If notificaciones Is Nothing Then
+            Return New Dictionary(Of Integer, NotificacionFuncionarioMetadata)()
+        End If
+
+        Dim ids = notificaciones.
+            Select(Function(n) n.FuncionarioId).
+            Where(Function(id) id > 0).
+            Distinct().
+            ToList()
+
+        If ids.Count = 0 Then
+            Return New Dictionary(Of Integer, NotificacionFuncionarioMetadata)()
+        End If
+
+        Dim query = uow.Context.Set(Of Funcionario)().AsNoTracking() _
+            .Where(Function(f) ids.Contains(f.Id)) _
+            .Include(Function(f) f.Cargo) _
+            .Include(Function(f) f.TipoFuncionario) _
+            .Include(Function(f) f.Seccion) _
+            .Include(Function(f) f.Escalafon) _
+            .Include(Function(f) f.SubEscalafon) _
+            .Include(Function(f) f.SubDireccion) _
+            .Include(Function(f) f.Funcion) _
+            .Include(Function(f) f.PuestoTrabajo) _
+            .Include(Function(f) f.Turno) _
+            .Include(Function(f) f.Semana) _
+            .Include(Function(f) f.Horario) _
+            .Include(Function(f) f.PrestadorSalud)
+
+        Dim funcionarios = Await query.ToListAsync()
+
+        Return funcionarios.ToDictionary(Function(f) f.Id, Function(f) ConstruirMetadatosNotificacion(f))
+    End Function
+
+    Private Function ObtenerMetadatosNotificacion(metadata As IDictionary(Of Integer, NotificacionFuncionarioMetadata), funcionarioId As Integer) As NotificacionFuncionarioMetadata
+        If metadata Is Nothing Then
+            Return CrearMetadatosNotificacionVacios()
+        End If
+
+        Dim result As NotificacionFuncionarioMetadata = Nothing
+        If metadata.TryGetValue(funcionarioId, result) Then
+            Return result
+        End If
+
+        Return CrearMetadatosNotificacionVacios()
+    End Function
+
+    Private Function ConstruirMetadatosNotificacion(funcionario As Funcionario) As NotificacionFuncionarioMetadata
+        If funcionario Is Nothing Then
+            Return CrearMetadatosNotificacionVacios()
+        End If
+
+        Return New NotificacionFuncionarioMetadata With {
+            .TipoDeFuncionario = ValorNotificacionTexto(If(funcionario.TipoFuncionario IsNot Nothing, funcionario.TipoFuncionario.Nombre, Nothing)),
+            .Cargo = ValorNotificacionTexto(If(funcionario.Cargo IsNot Nothing, funcionario.Cargo.Nombre, Nothing)),
+            .Seccion = ValorNotificacionTexto(If(funcionario.Seccion IsNot Nothing, funcionario.Seccion.Nombre, Nothing)),
+            .Escalafon = ValorNotificacionTexto(If(funcionario.Escalafon IsNot Nothing, funcionario.Escalafon.Nombre, Nothing)),
+            .SubEscalafon = ValorNotificacionTexto(If(funcionario.SubEscalafon IsNot Nothing, funcionario.SubEscalafon.Nombre, Nothing)),
+            .SubDireccion = ValorNotificacionTexto(If(funcionario.SubDireccion IsNot Nothing, funcionario.SubDireccion.Nombre, Nothing)),
+            .Funcion = ValorNotificacionTexto(If(funcionario.Funcion IsNot Nothing, funcionario.Funcion.Nombre, Nothing)),
+            .PuestoDeTrabajo = ValorNotificacionTexto(If(funcionario.PuestoTrabajo IsNot Nothing, funcionario.PuestoTrabajo.Nombre, Nothing)),
+            .Turno = ValorNotificacionTexto(If(funcionario.Turno IsNot Nothing, funcionario.Turno.Nombre, Nothing)),
+            .Semana = ValorNotificacionTexto(If(funcionario.Semana IsNot Nothing, funcionario.Semana.Nombre, Nothing)),
+            .Horario = ValorNotificacionTexto(If(funcionario.Horario IsNot Nothing, funcionario.Horario.Nombre, Nothing)),
+            .PrestadorSalud = ValorNotificacionTexto(If(funcionario.PrestadorSalud IsNot Nothing, funcionario.PrestadorSalud.Nombre, Nothing)),
+            .EstadoFuncionario = If(funcionario.Activo, "Activo", "Inactivo"),
+            .Activo = funcionario.Activo
+        }
+    End Function
+
+    Private Function CrearMetadatosNotificacionVacios() As NotificacionFuncionarioMetadata
+        Return New NotificacionFuncionarioMetadata With {
+            .TipoDeFuncionario = ValorNotificacionTexto(Nothing),
+            .Cargo = ValorNotificacionTexto(Nothing),
+            .Seccion = ValorNotificacionTexto(Nothing),
+            .Escalafon = ValorNotificacionTexto(Nothing),
+            .SubEscalafon = ValorNotificacionTexto(Nothing),
+            .SubDireccion = ValorNotificacionTexto(Nothing),
+            .Funcion = ValorNotificacionTexto(Nothing),
+            .PuestoDeTrabajo = ValorNotificacionTexto(Nothing),
+            .Turno = ValorNotificacionTexto(Nothing),
+            .Semana = ValorNotificacionTexto(Nothing),
+            .Horario = ValorNotificacionTexto(Nothing),
+            .PrestadorSalud = ValorNotificacionTexto(Nothing),
+            .EstadoFuncionario = ValorNotificacionTexto("Sin Estado"),
+            .Activo = False
+        }
+    End Function
+
+    Private Function ValorNotificacionTexto(value As String, Optional valorDefecto As String = "N/A") As String
+        If String.IsNullOrWhiteSpace(value) Then
+            Return valorDefecto
+        End If
+
+        Return value.Trim()
+    End Function
+
+    Private Class NotificacionFuncionarioMetadata
+        Public Property TipoDeFuncionario As String
+        Public Property Cargo As String
+        Public Property Seccion As String
+        Public Property Escalafon As String
+        Public Property SubEscalafon As String
+        Public Property SubDireccion As String
+        Public Property Funcion As String
+        Public Property PuestoDeTrabajo As String
+        Public Property Turno As String
+        Public Property Semana As String
+        Public Property Horario As String
+        Public Property PrestadorSalud As String
+        Public Property EstadoFuncionario As String
+        Public Property Activo As Boolean
+    End Class
+
     Private Function CrearTablaNotificacionesVacia() As DataTable
         Dim table As New DataTable()
 
@@ -543,6 +679,20 @@ Public Module ConsultasGenericas
         table.Columns.Add("ExpMinisterial", GetType(String))
         table.Columns.Add("ExpINR", GetType(String))
         table.Columns.Add("Oficina", GetType(String))
+        table.Columns.Add("TipoDeFuncionario", GetType(String))
+        table.Columns.Add("Cargo", GetType(String))
+        table.Columns.Add("Seccion", GetType(String))
+        table.Columns.Add("Escalafon", GetType(String))
+        table.Columns.Add("SubEscalafon", GetType(String))
+        table.Columns.Add("SubDireccion", GetType(String))
+        table.Columns.Add("Funcion", GetType(String))
+        table.Columns.Add("PuestoDeTrabajo", GetType(String))
+        table.Columns.Add("Turno", GetType(String))
+        table.Columns.Add("Semana", GetType(String))
+        table.Columns.Add("Horario", GetType(String))
+        table.Columns.Add("PrestadorSalud", GetType(String))
+        table.Columns.Add("EstadoFuncionario", GetType(String))
+        table.Columns.Add("Activo", GetType(Boolean))
 
         Return table
     End Function
