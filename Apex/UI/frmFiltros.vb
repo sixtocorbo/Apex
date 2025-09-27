@@ -1074,21 +1074,45 @@ Partial Public Class frmFiltros
         Dim sbCantidades As New System.Text.StringBuilder()
         sbCantidades.AppendLine("Recuento de Ítems Disponibles (sobre el total de datos):")
         If _dtOriginal IsNot Nothing AndAlso _dtOriginal.Rows.Count > 0 Then
-            For Each col As DataColumn In _dtOriginal.Columns
-                If col.ColumnName.ToLower().EndsWith("id") OrElse col.ColumnName = "GlobalSearch" Then Continue For
+            Dim columnasPrioritarias As String() = {
+                "Activo",
+                "Cargo",
+                "Seccion", "Sección",
+                "TipoDeFuncionario", "TipoFuncionario",
+                "Escalafon", "Escalafón",
+                "SubEscalafon", "SubEscalafón",
+                "SubDireccion", "SubDirección",
+                "PrestadorSalud",
+                "Funcion", "Función",
+                "EstadoActual",
+                "PuestoDeTrabajo",
+                "Turno",
+                "Semana",
+                "Horario",
+                "Genero", "Género",
+                "EstadoCivil",
+                "NivelDeEstudio",
+                "Presencia",
+                "Oficina",
+                "Dependencia",
+                "Unidad"
+            }
 
-                Dim conteo = _dtOriginal.AsEnumerable().
-                            Where(Function(r) r(col) IsNot DBNull.Value AndAlso Not String.IsNullOrWhiteSpace(r(col).ToString())).
-                            GroupBy(Function(r) r(col).ToString().Trim()).
-                            Select(Function(g) New With {.Valor = g.Key, .Cantidad = g.Count()}).
-                            OrderByDescending(Function(x) x.Cantidad).Take(20)
+            Dim procesadas As New HashSet(Of String)(StringComparer.OrdinalIgnoreCase)
 
-                If conteo.Any() Then
-                    sbCantidades.AppendLine($"--- {col.ColumnName} ---")
-                    For Each item In conteo
-                        sbCantidades.AppendLine($"     {item.Valor}: {item.Cantidad}")
-                    Next
+            For Each nombre In columnasPrioritarias
+                Dim columna = _dtOriginal.Columns.Cast(Of DataColumn)().
+                               FirstOrDefault(Function(c) c.ColumnName.Equals(nombre, StringComparison.OrdinalIgnoreCase))
+
+                If columna Is Nothing Then Continue For
+                If AppendConteosPorColumna(sbCantidades, _dtOriginal, columna) Then
+                    procesadas.Add(columna.ColumnName)
                 End If
+            Next
+
+            For Each col As DataColumn In _dtOriginal.Columns
+                If procesadas.Contains(col.ColumnName) Then Continue For
+                AppendConteosPorColumna(sbCantidades, _dtOriginal, col)
             Next
         End If
 
@@ -1124,7 +1148,6 @@ Partial Public Class frmFiltros
         End If
 
         Dim dtResultados As DataTable = ConstruirTablaDesdeDataView(_dvDatos, columnasVisibles, encabezadosPorColumna)
-        SanitizarNombresDeColumnas(dtResultados)
 
         ' 4. Abrir el formulario del reporte
         Dim tituloReporte As String = $"Reporte de {cmbOrigenDatos.Text}"
@@ -1237,31 +1260,34 @@ Partial Public Class frmFiltros
         End Select
     End Function
 
-    Private Shared Sub SanitizarNombresDeColumnas(table As DataTable)
-        If table Is Nothing Then Return
+    Private Shared Function AppendConteosPorColumna(sb As System.Text.StringBuilder,
+                                                    tabla As DataTable,
+                                                    columna As DataColumn) As Boolean
+        If sb Is Nothing OrElse tabla Is Nothing OrElse columna Is Nothing Then Return False
 
-        Dim utilizados As New HashSet(Of String)(StringComparer.OrdinalIgnoreCase)
-        Dim indice As Integer = 1
+        If columna.ColumnName.EndsWith("id", StringComparison.OrdinalIgnoreCase) Then Return False
+        If columna.ColumnName.Equals("GlobalSearch", StringComparison.OrdinalIgnoreCase) Then Return False
 
-        For Each col As DataColumn In table.Columns
-            Dim nombre As String = System.Text.RegularExpressions.Regex.Replace(col.ColumnName, "[^a-zA-Z0-9_]", "")
+        Dim conteo = tabla.AsEnumerable().
+                     Where(Function(r)
+                               Dim valor = Convert.ToString(r(columna))
+                               Return Not r.IsNull(columna) AndAlso Not String.IsNullOrWhiteSpace(valor)
+                           End Function).
+                     GroupBy(Function(r) Convert.ToString(r(columna)).Trim()).
+                     Select(Function(g) New With {.Valor = g.Key, .Cantidad = g.Count()}).
+                     OrderByDescending(Function(x) x.Cantidad).
+                     Take(20).
+                     ToList()
 
-            If String.IsNullOrWhiteSpace(nombre) Then
-                nombre = $"Campo{indice}"
-                indice += 1
-            End If
+        If conteo.Count = 0 Then Return False
 
-            Dim baseNombre As String = nombre
-            Dim sufijo As Integer = 1
-            While utilizados.Contains(nombre)
-                nombre = $"{baseNombre}_{sufijo}"
-                sufijo += 1
-            End While
-
-            utilizados.Add(nombre)
-            col.ColumnName = nombre
+        sb.AppendLine($"--- {columna.ColumnName} ---")
+        For Each item In conteo
+            sb.AppendLine($"     {item.Valor}: {item.Cantidad}")
         Next
-    End Sub
+
+        Return True
+    End Function
 End Class
 
 Public Module ControlExtensions
