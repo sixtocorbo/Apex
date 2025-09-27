@@ -79,6 +79,7 @@ Public Class frmVisorReporte
     Private Sub GenerarContenidoDinamico(rdlcXml As XmlDocument, dt As DataTable)
         Dim nsManager As New XmlNamespaceManager(rdlcXml.NameTable)
         nsManager.AddNamespace("df", "http://schemas.microsoft.com/sqlserver/reporting/2008/01/reportdefinition")
+        nsManager.AddNamespace("rd", "http://schemas.microsoft.com/rd/2001/10/reportdefinition")
 
         Dim dataSetNode = rdlcXml.SelectSingleNode("/df:Report/df:DataSets/df:DataSet[@Name='ResultadosDataSet']", nsManager)
         If dataSetNode Is Nothing Then
@@ -91,13 +92,31 @@ Public Class frmVisorReporte
             dataSetNode.RemoveChild(existingFieldsNode)
         End If
 
+        Dim columnasAIgnorar As New HashSet(Of String)(StringComparer.OrdinalIgnoreCase) From {"GlobalSearch"}
+        Dim columnasAMostrar = dt.Columns.Cast(Of DataColumn)().
+                                Where(Function(c) Not columnasAIgnorar.Contains(c.ColumnName)).
+                                ToList()
+
+        If columnasAMostrar.Count = 0 Then
+            Throw New InvalidOperationException("No se encontraron columnas para construir el reporte.")
+        End If
+
+        Dim mapaCampos = CrearMapaCampos(columnasAMostrar)
+
         Dim fieldsNode = rdlcXml.CreateElement("Fields", nsManager.LookupNamespace("df"))
-        For Each col As DataColumn In dt.Columns
+        For Each col As DataColumn In columnasAMostrar
             Dim fieldNode = rdlcXml.CreateElement("Field", nsManager.LookupNamespace("df"))
-            fieldNode.SetAttribute("Name", col.ColumnName)
+            Dim nombreSeguro = mapaCampos(col.ColumnName)
+            fieldNode.SetAttribute("Name", nombreSeguro)
+
             Dim dataFieldNode = rdlcXml.CreateElement("DataField", nsManager.LookupNamespace("df"))
             dataFieldNode.InnerText = col.ColumnName
             fieldNode.AppendChild(dataFieldNode)
+
+            Dim typeNode = rdlcXml.CreateElement("rd", "TypeName", nsManager.LookupNamespace("rd"))
+            typeNode.InnerText = "System.String"
+            fieldNode.AppendChild(typeNode)
+
             fieldsNode.AppendChild(fieldNode)
         Next
         dataSetNode.AppendChild(fieldsNode)
@@ -123,54 +142,97 @@ Public Class frmVisorReporte
             bodyNode.RemoveChild(existingTablix)
         End If
 
-        Dim tablixXml As String = GenerarTablixXml(dt.Columns, nsManager)
+        Dim tablixXml As String = GenerarTablixXml(columnasAMostrar, mapaCampos, nsManager)
         Dim tablixDoc As New XmlDocument()
         tablixDoc.LoadXml(tablixXml)
         Dim tablixNode = rdlcXml.ImportNode(tablixDoc.DocumentElement, True)
         bodyNode.AppendChild(tablixNode)
     End Sub
 
-    Private Function GenerarTablixXml(columns As DataColumnCollection, nsManager As XmlNamespaceManager) As String
+    Private Shared Function CrearMapaCampos(columnas As IEnumerable(Of DataColumn)) As Dictionary(Of String, String)
+        Dim mapa As New Dictionary(Of String, String)(StringComparer.OrdinalIgnoreCase)
+        Dim usados As New HashSet(Of String)(StringComparer.OrdinalIgnoreCase)
+
+        For Each col As DataColumn In columnas
+            Dim nombreOriginal = col.ColumnName
+            Dim nombreSeguro = GenerarNombreCampoSeguro(nombreOriginal, usados)
+            mapa(nombreOriginal) = nombreSeguro
+            usados.Add(nombreSeguro)
+        Next
+
+        Return mapa
+    End Function
+
+    Private Shared Function GenerarNombreCampoSeguro(nombreOriginal As String, existentes As ISet(Of String)) As String
+        Dim baseName = If(String.IsNullOrWhiteSpace(nombreOriginal), "Campo", nombreOriginal.Trim())
+        Dim nombreSeguro = XmlConvert.EncodeName(baseName)
+
+        If String.IsNullOrWhiteSpace(nombreSeguro) Then
+            nombreSeguro = "Campo"
+        End If
+
+        Dim sufijo As Integer = 1
+        Dim candidato As String = nombreSeguro
+
+        While existentes.Contains(candidato)
+            candidato = $"{nombreSeguro}_{sufijo}"
+            sufijo += 1
+        End While
+
+        Return candidato
+    End Function
+
+    Private Function GenerarTablixXml(columns As IEnumerable(Of DataColumn),
+                                      fieldNameMap As IDictionary(Of String, String),
+                                      nsManager As XmlNamespaceManager) As String
         Dim sb As New StringBuilder()
         Dim ns As String = nsManager.LookupNamespace("df")
 
-        ' --- INICIO DE LA MODIFICACIÓN ---
-        ' 1. Lista de columnas a ignorar en la tabla principal
-        Dim columnasAIgnorar As New HashSet(Of String)(StringComparer.OrdinalIgnoreCase) From {"GlobalSearch"}
-
-        ' 2. Filtramos las columnas que sí queremos mostrar
-        Dim columnasAMostrar = columns.Cast(Of DataColumn)().
-                                Where(Function(c) Not columnasAIgnorar.Contains(c.ColumnName)).
-                                ToList()
-
-        If columnasAMostrar.Count = 0 Then
-            Throw New InvalidOperationException("No se encontraron columnas para construir el reporte.")
-        End If
+        Dim columnasAMostrar = columns.ToList()
 
         Dim widthOverrides As New Dictionary(Of String, String)(StringComparer.OrdinalIgnoreCase) From {
-            {"NombreCompleto", "2.8in"},
-            {"NombreFuncionario", "2.8in"},
-            {"Nombre", "2.5in"},
-            {"Cedula", "1.2in"},
-            {"CI", "1.2in"},
-            {"Resumen", "3.5in"},
-            {"Texto", "3.5in"},
-            {"Observaciones", "3.7in"},
-            {"Descripcion", "3.2in"},
-            {"Detalle", "3.2in"},
-            {"Motivo", "2.5in"},
-            {"PuestoDeTrabajo", "2.5in"},
-            {"Cargo", "2.0in"},
-            {"Seccion", "2.0in"},
-            {"Seccin", "2.0in"},
-            {"TipoDeFuncionario", "2.2in"},
-            {"Estado", "1.5in"},
-            {"Tipo", "1.6in"},
-            {"Oficina", "1.8in"},
-            {"Rango", "2.2in"},
-            {"Documento", "2.2in"},
-            {"ExpMinisterial", "2.2in"},
-            {"ExpINR", "2.2in"}
+            {"NombreCompleto", "3.2in"},
+            {"NombreFuncionario", "3.2in"},
+            {"Nombre", "2.7in"},
+            {"Cedula", "1.4in"},
+            {"CI", "1.4in"},
+            {"Resumen", "3.8in"},
+            {"Texto", "3.8in"},
+            {"Observaciones", "4.0in"},
+            {"Descripcion", "3.5in"},
+            {"Detalle", "3.5in"},
+            {"Motivo", "2.8in"},
+            {"PuestoDeTrabajo", "3.0in"},
+            {"Cargo", "2.8in"},
+            {"Seccion", "2.6in"},
+            {"Sección", "2.6in"},
+            {"Seccin", "2.6in"},
+            {"TipoDeFuncionario", "2.6in"},
+            {"Escalafon", "2.2in"},
+            {"Escalafón", "2.2in"},
+            {"SubEscalafon", "2.4in"},
+            {"SubEscalafón", "2.4in"},
+            {"SubDireccion", "2.4in"},
+            {"SubDirección", "2.4in"},
+            {"PrestadorSalud", "3.2in"},
+            {"Funcion", "2.8in"},
+            {"Función", "2.8in"},
+            {"EstadoActual", "2.0in"},
+            {"Estado", "1.8in"},
+            {"Tipo", "1.8in"},
+            {"Oficina", "2.0in"},
+            {"Rango", "2.4in"},
+            {"Documento", "2.4in"},
+            {"ExpMinisterial", "2.4in"},
+            {"ExpINR", "2.4in"},
+            {"Turno", "1.6in"},
+            {"Semana", "1.6in"},
+            {"Horario", "2.0in"},
+            {"Genero", "1.4in"},
+            {"Género", "1.4in"},
+            {"EstadoCivil", "2.2in"},
+            {"NivelDeEstudio", "3.0in"},
+            {"Presencia", "1.6in"}
         }
         ' --- FIN DE LA MODIFICACIÓN ---
 
@@ -184,7 +246,7 @@ Public Class frmVisorReporte
             Dim headerKey = If(String.IsNullOrWhiteSpace(col.Caption), col.ColumnName, col.Caption)
             If Not widthOverrides.TryGetValue(col.ColumnName, width) AndAlso
                Not widthOverrides.TryGetValue(headerKey, width) Then
-                width = "1.2in"
+                width = "1.5in"
             End If
             sb.AppendLine($"<TablixColumn><Width>{width}</Width></TablixColumn>")
         Next
@@ -196,7 +258,8 @@ Public Class frmVisorReporte
         ' --- MODIFICADO: Usar la lista filtrada ---
         For Each col As DataColumn In columnasAMostrar
             Dim headerText = If(String.IsNullOrWhiteSpace(col.Caption), col.ColumnName, col.Caption)
-            sb.AppendLine("<TablixCell><CellContents><Textbox Name='Header" & col.ColumnName & "'><CanGrow>true</CanGrow><KeepTogether>true</KeepTogether><Paragraphs><Paragraph><TextRuns><TextRun><Value>" & EscapeXml(headerText) & "</Value><Style><FontWeight>Bold</FontWeight><Color>White</Color></Style></TextRun></TextRuns><Style /></Paragraph></Paragraphs><Style><Border><Color>LightGrey</Color><Style>Solid</Style></Border><BackgroundColor>#4682B4</BackgroundColor><PaddingLeft>2pt</PaddingLeft><PaddingRight>2pt</PaddingRight><PaddingTop>2pt</PaddingTop><PaddingBottom>2pt</PaddingBottom></Style></Textbox></CellContents></TablixCell>")
+            Dim safeName = fieldNameMap(col.ColumnName)
+            sb.AppendLine("<TablixCell><CellContents><Textbox Name='Header" & safeName & "'><CanGrow>true</CanGrow><KeepTogether>true</KeepTogether><Paragraphs><Paragraph><TextRuns><TextRun><Value>" & EscapeXml(headerText) & "</Value><Style><FontWeight>Bold</FontWeight><Color>White</Color></Style></TextRun></TextRuns><Style /></Paragraph></Paragraphs><Style><Border><Color>LightGrey</Color><Style>Solid</Style></Border><BackgroundColor>#4682B4</BackgroundColor><PaddingLeft>2pt</PaddingLeft><PaddingRight>2pt</PaddingRight><PaddingTop>2pt</PaddingTop><PaddingBottom>2pt</PaddingBottom></Style></Textbox></CellContents></TablixCell>")
         Next
         sb.AppendLine("</TablixCells></TablixRow>")
 
@@ -204,9 +267,10 @@ Public Class frmVisorReporte
         sb.AppendLine("<TablixRow><Height>0.25in</Height><TablixCells>")
         ' --- MODIFICADO: Usar la lista filtrada y formatear fechas ---
         For Each col As DataColumn In columnasAMostrar
-            Dim valueExpression As String = $"=Fields!{col.ColumnName}.Value"
+            Dim safeName = fieldNameMap(col.ColumnName)
+            Dim valueExpression As String = $"=Fields!{safeName}.Value"
 
-            sb.AppendLine($"<TablixCell><CellContents><Textbox Name='Data{col.ColumnName}'><CanGrow>true</CanGrow><KeepTogether>true</KeepTogether><Paragraphs><Paragraph><TextRuns><TextRun><Value>{valueExpression}</Value><Style /></TextRun></TextRuns><Style /></Paragraph></Paragraphs><Style><Border><Color>LightGrey</Color><Style>Solid</Style></Border><PaddingLeft>2pt</PaddingLeft><PaddingRight>2pt</PaddingRight><PaddingTop>2pt</PaddingTop><PaddingBottom>2pt</PaddingBottom></Style></Textbox></CellContents></TablixCell>")
+            sb.AppendLine($"<TablixCell><CellContents><Textbox Name='Data{safeName}'><CanGrow>true</CanGrow><KeepTogether>true</KeepTogether><Paragraphs><Paragraph><TextRuns><TextRun><Value>{valueExpression}</Value><Style /></TextRun></TextRuns><Style /></Paragraph></Paragraphs><Style><Border><Color>LightGrey</Color><Style>Solid</Style></Border><PaddingLeft>2pt</PaddingLeft><PaddingRight>2pt</PaddingRight><PaddingTop>2pt</PaddingTop><PaddingBottom>2pt</PaddingBottom></Style></Textbox></CellContents></TablixCell>")
         Next
         sb.AppendLine("</TablixCells></TablixRow>")
         sb.AppendLine("</TablixRows>")

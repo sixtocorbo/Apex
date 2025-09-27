@@ -1143,7 +1143,6 @@ Partial Public Class frmFiltros
         End If
 
         Dim dtResultados As DataTable = ConstruirTablaDesdeDataView(_dvDatos, columnasVisibles, encabezadosPorColumna)
-        SanitizarNombresDeColumnas(dtResultados)
 
         ' 4. Abrir el formulario del reporte
         Dim tituloReporte As String = $"Reporte de {cmbOrigenDatos.Text}"
@@ -1273,31 +1272,6 @@ Partial Public Class frmFiltros
         End Select
     End Function
 
-    Private Shared Sub SanitizarNombresDeColumnas(table As DataTable)
-        If table Is Nothing Then Return
-
-        Dim utilizados As New HashSet(Of String)(StringComparer.OrdinalIgnoreCase)
-        Dim indice As Integer = 1
-
-        For Each col As DataColumn In table.Columns
-            Dim nombre As String = System.Text.RegularExpressions.Regex.Replace(col.ColumnName, "[^a-zA-Z0-9_]", "")
-
-            If String.IsNullOrWhiteSpace(nombre) Then
-                nombre = $"Campo{indice}"
-                indice += 1
-            End If
-
-            Dim baseNombre As String = nombre
-            Dim sufijo As Integer = 1
-            While utilizados.Contains(nombre)
-                nombre = $"{baseNombre}_{sufijo}"
-                sufijo += 1
-            End While
-
-            utilizados.Add(nombre)
-            col.ColumnName = nombre
-        Next
-    End Sub
 End Class
 
 Public Module ControlExtensions
