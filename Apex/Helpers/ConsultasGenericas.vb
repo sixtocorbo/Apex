@@ -259,6 +259,8 @@ Public Module ConsultasGenericas
                                                                               .Estado = NormalizarValorReporte(n.Estado)
                                                                           })
 
+                    Dim funcionariosDetalladosPorNovedad = ConstruirMapaFuncionariosPorNovedad(novedadesDetalladas)
+
                     Dim resultadoNovedades As New List(Of Object)()
 
                     If novedadesDetalladas IsNot Nothing AndAlso novedadesDetalladas.Any() Then
@@ -266,21 +268,38 @@ Public Module ConsultasGenericas
                             Dim infoResumen = Nothing
                             resumenPorNovedad.TryGetValue(detalle.Id, infoResumen)
 
-                            Dim listaFuncionarios = If(infoResumen IsNot Nothing, infoResumen.Funcionarios, NormalizarValorReporte(detalle.NombreFuncionario, String.Empty))
+                            Dim listaFuncionariosDetallada = ObtenerFuncionariosDetallados(funcionariosDetalladosPorNovedad, detalle.Id)
+                            Dim listaFuncionarios = If(String.IsNullOrWhiteSpace(listaFuncionariosDetallada),
+                                                       If(infoResumen IsNot Nothing, infoResumen.Funcionarios, NormalizarValorReporte(detalle.NombreFuncionario, String.Empty)),
+                                                       listaFuncionariosDetallada)
                             Dim cantidadFuncionarios = CalcularCantidadFuncionarios(listaFuncionarios)
                             Dim meta = ObtenerMetadatosFuncionario(metadatosPorFuncionario, detalle.FuncionarioId)
+                            Dim estadoDetallado = If(infoResumen IsNot Nothing AndAlso Not String.IsNullOrWhiteSpace(infoResumen.Estado),
+                                                     infoResumen.Estado,
+                                                     NormalizarValorReporte(detalle.Estado))
+                            Dim estadoParaObservacion = If(infoResumen IsNot Nothing AndAlso Not String.IsNullOrWhiteSpace(infoResumen.Estado),
+                                                           NormalizarValorReporte(infoResumen.Estado, String.Empty),
+                                                           NormalizarValorReporte(detalle.Estado, String.Empty))
+                            Dim nombreNormalizado = NormalizarValorReporte(detalle.NombreFuncionario, "Sin Asignar")
+                            Dim cedulaNormalizada = NormalizarValorReporte(detalle.CI, String.Empty)
+                            Dim observaciones = ConstruirObservacionesNovedad(
+                                If(infoResumen IsNot Nothing, infoResumen.Resumen, detalle.Texto),
+                                detalle.Texto,
+                                estadoParaObservacion
+                            )
 
                             resultadoNovedades.Add(New With {
                                 .NovedadId = detalle.Id,
                                 .Fecha = detalle.Fecha,
                                 .Resumen = If(infoResumen IsNot Nothing, infoResumen.Resumen, NormalizarValorReporte(detalle.Texto, String.Empty)),
                                 .Texto = NormalizarValorReporte(detalle.Texto, String.Empty),
-                                .Estado = If(infoResumen IsNot Nothing AndAlso Not String.IsNullOrWhiteSpace(infoResumen.Estado), infoResumen.Estado, NormalizarValorReporte(detalle.Estado)),
+                                .Estado = estadoDetallado,
                                 .FuncionariosLista = listaFuncionarios,
                                 .CantidadFuncionarios = cantidadFuncionarios,
                                 .FuncionarioId = detalle.FuncionarioId,
-                                .FuncionarioNombre = NormalizarValorReporte(detalle.NombreFuncionario, "Sin Asignar"),
-                                .FuncionarioCedula = NormalizarValorReporte(detalle.CI),
+                                .NombreCompleto = nombreNormalizado,
+                                .Cedula = cedulaNormalizada,
+                                .Observaciones = observaciones,
                                 .TipoDeFuncionario = meta.TipoDeFuncionario,
                                 .Cargo = meta.Cargo,
                                 .Seccion = meta.Seccion,
@@ -304,19 +323,33 @@ Public Module ConsultasGenericas
                         If idsConDetalle.Contains(agrupada.Id) Then Continue For
 
                         Dim metaVacio = CrearMetadatosFuncionarioVacios()
-                        Dim listaFuncionarios = NormalizarValorReporte(agrupada.Funcionarios, String.Empty)
+                        Dim listaFuncionariosDetallada = ObtenerFuncionariosDetallados(funcionariosDetalladosPorNovedad, agrupada.Id)
+                        Dim listaFuncionarios = If(String.IsNullOrWhiteSpace(listaFuncionariosDetallada),
+                                                   NormalizarValorReporte(agrupada.Funcionarios, String.Empty),
+                                                   listaFuncionariosDetallada)
+                        Dim estadoAgrupado = NormalizarValorReporte(agrupada.Estado)
+                        Dim estadoAgrupadoObservacion = NormalizarValorReporte(agrupada.Estado, String.Empty)
+                        Dim observacionesAgrupado = ConstruirObservacionesNovedad(
+                            agrupada.Resumen,
+                            Nothing,
+                            estadoAgrupadoObservacion
+                        )
+                        Dim nombreAgrupado = If(String.IsNullOrWhiteSpace(listaFuncionarios),
+                                                "Sin funcionarios asignados",
+                                                listaFuncionarios)
 
                         resultadoNovedades.Add(New With {
                             .NovedadId = agrupada.Id,
                             .Fecha = agrupada.Fecha,
                             .Resumen = NormalizarValorReporte(agrupada.Resumen, String.Empty),
                             .Texto = NormalizarValorReporte(Nothing, String.Empty),
-                            .Estado = NormalizarValorReporte(agrupada.Estado),
+                            .Estado = estadoAgrupado,
                             .FuncionariosLista = listaFuncionarios,
                             .CantidadFuncionarios = CalcularCantidadFuncionarios(listaFuncionarios),
                             .FuncionarioId = CType(Nothing, Integer?),
-                            .FuncionarioNombre = NormalizarValorReporte(Nothing, "Sin Asignar"),
-                            .FuncionarioCedula = NormalizarValorReporte(Nothing),
+                            .NombreCompleto = nombreAgrupado,
+                            .Cedula = NormalizarValorReporte(Nothing, String.Empty),
+                            .Observaciones = observacionesAgrupado,
                             .TipoDeFuncionario = metaVacio.TipoDeFuncionario,
                             .Cargo = metaVacio.Cargo,
                             .Seccion = metaVacio.Seccion,
@@ -797,6 +830,67 @@ Public Module ConsultasGenericas
         Return tokens.Select(Function(t) t.Trim()).Count(Function(t) Not String.IsNullOrWhiteSpace(t))
     End Function
 
+    Private Function ConstruirMapaFuncionariosPorNovedad(detalles As IEnumerable(Of vw_NovedadesCompletas)) As IDictionary(Of Integer, String)
+        Dim resultado As New Dictionary(Of Integer, String)()
+
+        If detalles Is Nothing Then
+            Return resultado
+        End If
+
+        For Each grupo In detalles.Where(Function(d) d IsNot Nothing).GroupBy(Function(d) d.Id)
+            Dim etiquetas As New List(Of String)()
+            Dim yaIncluidos As New HashSet(Of String)(StringComparer.OrdinalIgnoreCase)
+
+            For Each detalle In grupo
+                Dim etiqueta = FormatearFuncionarioParaLista(detalle.NombreFuncionario, detalle.CI)
+                If String.IsNullOrWhiteSpace(etiqueta) Then Continue For
+                If yaIncluidos.Add(etiqueta) Then
+                    etiquetas.Add(etiqueta)
+                End If
+            Next
+
+            If etiquetas.Count > 0 Then
+                resultado(grupo.Key) = String.Join("; ", etiquetas)
+            End If
+        Next
+
+        Return resultado
+    End Function
+
+    Private Function ObtenerFuncionariosDetallados(mapa As IDictionary(Of Integer, String), novedadId As Integer) As String
+        If mapa Is Nothing Then
+            Return String.Empty
+        End If
+
+        Dim valor As String = Nothing
+        If mapa.TryGetValue(novedadId, valor) Then
+            Return valor
+        End If
+
+        Return String.Empty
+    End Function
+
+    Private Function FormatearFuncionarioParaLista(nombre As String, cedula As String) As String
+        Dim nombreLimpio = NormalizarValorReporte(nombre, String.Empty)
+        Dim cedulaLimpia = NormalizarValorReporte(cedula, String.Empty)
+
+        Dim partes As New List(Of String)()
+
+        If Not String.IsNullOrWhiteSpace(nombreLimpio) Then
+            partes.Add(nombreLimpio)
+        End If
+
+        If Not String.IsNullOrWhiteSpace(cedulaLimpia) Then
+            If partes.Count > 0 Then
+                partes.Add($"({cedulaLimpia})")
+            Else
+                partes.Add(cedulaLimpia)
+            End If
+        End If
+
+        Return String.Join(" ", partes).Trim()
+    End Function
+
     Private Function CrearTablaNovedadesVacia() As DataTable
         Dim table As New DataTable()
 
@@ -808,8 +902,9 @@ Public Module ConsultasGenericas
         table.Columns.Add("FuncionariosLista", GetType(String))
         table.Columns.Add("CantidadFuncionarios", GetType(Integer))
         table.Columns.Add("FuncionarioId", GetType(Integer))
-        table.Columns.Add("FuncionarioNombre", GetType(String))
-        table.Columns.Add("FuncionarioCedula", GetType(String))
+        table.Columns.Add("NombreCompleto", GetType(String))
+        table.Columns.Add("Cedula", GetType(String))
+        table.Columns.Add("Observaciones", GetType(String))
         table.Columns.Add("TipoDeFuncionario", GetType(String))
         table.Columns.Add("Cargo", GetType(String))
         table.Columns.Add("Seccion", GetType(String))
@@ -826,6 +921,47 @@ Public Module ConsultasGenericas
         table.Columns.Add("Activo", GetType(Boolean))
 
         Return table
+    End Function
+
+    Private Function ConstruirObservacionesNovedad(resumen As String, texto As String, estado As String) As String
+        Dim partes As New List(Of String)()
+
+        Dim resumenNormalizado = NormalizarValorReporte(resumen, String.Empty)
+        Dim textoNormalizado = NormalizarValorReporte(texto, String.Empty)
+        Dim estadoNormalizado = NormalizarValorReporte(estado, String.Empty)
+
+        If Not String.IsNullOrWhiteSpace(resumenNormalizado) Then
+            partes.Add(resumenNormalizado)
+        End If
+
+        If Not String.IsNullOrWhiteSpace(textoNormalizado) Then
+            partes.Add(textoNormalizado)
+        End If
+
+        If Not String.IsNullOrWhiteSpace(estadoNormalizado) Then
+            partes.Add($"Estado: {estadoNormalizado}")
+        End If
+
+        If partes.Count = 0 Then
+            Return "Sin observaciones"
+        End If
+
+        Dim vistaUnica = New List(Of String)()
+        Dim existentes = New HashSet(Of String)(StringComparer.OrdinalIgnoreCase)
+
+        For Each item In partes
+            Dim valor = item.Trim()
+            If valor.Length = 0 Then Continue For
+            If existentes.Add(valor) Then
+                vistaUnica.Add(valor)
+            End If
+        Next
+
+        If vistaUnica.Count = 0 Then
+            Return "Sin observaciones"
+        End If
+
+        Return String.Join(" | ", vistaUnica)
     End Function
 
     Private Class FuncionarioReporteMetadata
