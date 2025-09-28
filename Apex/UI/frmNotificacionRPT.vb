@@ -65,7 +65,6 @@ Public Class frmNotificacionRPT
 #End Region
 
 #Region "Carga del Reporte"
-
     Private Async Function CargarReporteAsync() As Task
         Dim oldCursor = Me.Cursor
         Me.Cursor = Cursors.WaitCursor
@@ -75,14 +74,14 @@ Public Class frmNotificacionRPT
             ReportViewer1.ProcessingMode = ProcessingMode.Local
             ReportViewer1.LocalReport.DataSources.Clear()
 
-            ' RDLC: Embedded → BaseDirectory\Reportes → StartupPath\Reportes → ClickOnce → extra (..\..)
+            ' RDLC: Cambiamos al nuevo diseño "Notificacion.rdlc"
             ReportResourceLoader.LoadLocalReportDefinition(
-                ReportViewer1.LocalReport,
-                GetType(frmNotificacionRPT),
-                "Apex.Reportes.NotificacionImprimir.rdlc",
-                "NotificacionImprimir.rdlc",
-                New String() {"..\..\Reportes\NotificacionImprimir.rdlc"}
-            )
+            ReportViewer1.LocalReport,
+            GetType(frmNotificacionRPT),
+            "Apex.Reportes.Notificacion.rdlc",  ' <-- CAMBIO AQUÍ
+            "Notificacion.rdlc",               ' <-- CAMBIO AQUÍ
+            New String() {"..\..\Reportes\Notificacion.rdlc"} ' <-- CAMBIO AQUÍ
+        )
 
             ReportViewer1.LocalReport.DisplayName = $"Notificaciones_{Date.Now:yyyyMMdd_HHmm}"
 
@@ -106,7 +105,7 @@ Public Class frmNotificacionRPT
                 Return
             End If
 
-            ' DataSource (nombre debe coincidir con el RDLC)
+            ' DataSource (el nombre "DataSetNotificaciones" debe coincidir con el del nuevo RDLC)
             Dim rds As New ReportDataSource("DataSetNotificaciones", datosParaReporte)
             ReportViewer1.LocalReport.DataSources.Add(rds)
 
@@ -123,6 +122,63 @@ Public Class frmNotificacionRPT
             LoadingHelper.OcultarCargando(Me)
         End Try
     End Function
+    'Private Async Function CargarReporteAsync() As Task
+    '    Dim oldCursor = Me.Cursor
+    '    Me.Cursor = Cursors.WaitCursor
+    '    LoadingHelper.MostrarCargando(Me)
+
+    '    Try
+    '        ReportViewer1.ProcessingMode = ProcessingMode.Local
+    '        ReportViewer1.LocalReport.DataSources.Clear()
+
+    '        ' RDLC: Embedded → BaseDirectory\Reportes → StartupPath\Reportes → ClickOnce → extra (..\..)
+    '        ReportResourceLoader.LoadLocalReportDefinition(
+    '            ReportViewer1.LocalReport,
+    '            GetType(frmNotificacionRPT),
+    '            "Apex.Reportes.NotificacionImprimir.rdlc",
+    '            "NotificacionImprimir.rdlc",
+    '            New String() {"..\..\Reportes\NotificacionImprimir.rdlc"}
+    '        )
+
+    '        ReportViewer1.LocalReport.DisplayName = $"Notificaciones_{Date.Now:yyyyMMdd_HHmm}"
+
+    '        ' IDs según el constructor
+    '        Dim idsParaBuscar As New List(Of Integer)
+    '        If _notificacionIds IsNot Nothing AndAlso _notificacionIds.Any() Then
+    '            idsParaBuscar.AddRange(_notificacionIds)
+    '        ElseIf _notificacionId > 0 Then
+    '            idsParaBuscar.Add(_notificacionId)
+    '        Else
+    '            Notifier.Warn(Me, "No se proporcionaron notificaciones para generar el reporte.")
+    '            Close()
+    '            Return
+    '        End If
+
+    '        ' Datos
+    '        Dim datosParaReporte = Await _reportesService.GetDatosParaNotificacionesAsync(idsParaBuscar)
+    '        If datosParaReporte Is Nothing OrElse Not CType(datosParaReporte, IEnumerable(Of Object)).Any() Then
+    '            Notifier.Info(Me, "No se encontraron datos para las notificaciones seleccionadas.")
+    '            Close()
+    '            Return
+    '        End If
+
+    '        ' DataSource (nombre debe coincidir con el RDLC)
+    '        Dim rds As New ReportDataSource("DataSetNotificaciones", datosParaReporte)
+    '        ReportViewer1.LocalReport.DataSources.Add(rds)
+
+    '        ' Presentación
+    '        ReportViewer1.SetDisplayMode(DisplayMode.PrintLayout)
+    '        ReportViewer1.ZoomMode = ZoomMode.Percent
+    '        ReportViewer1.ZoomPercent = 100
+
+    '        ReportViewer1.RefreshReport()
+    '        Await Task.Yield()
+
+    '    Finally
+    '        Me.Cursor = oldCursor
+    '        LoadingHelper.OcultarCargando(Me)
+    '    End Try
+    'End Function
 
 #End Region
 

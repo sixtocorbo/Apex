@@ -170,27 +170,30 @@ Public Class ReportesService
             Return New List(Of NotificacionImprimirDTO)()
         End If
 
-        ' <<< SOLUCIÓN: Creamos un UnitOfWork local para esta operación >>>
-        ' Esto asegura que el contexto de la base de datos solo se use aquí y se libere correctamente.
         Using uow As New UnitOfWork()
             ' Realiza una única consulta a la base de datos para obtener todas las notificaciones necesarias.
-            Dim datos = Await uow.Context.Set(Of NotificacionPersonal).AsNoTracking().
-                Where(Function(n) notificacionIds.Contains(n.Id)).
-                Select(Function(n) New NotificacionImprimirDTO With {
-                    .FuncionarioId = n.Funcionario.Id,
-                    .NombreFuncionario = n.Funcionario.Nombre,
-                    .CI = n.Funcionario.CI,
-                    .Cargo = If(n.Funcionario.Cargo IsNot Nothing, n.Funcionario.Cargo.Nombre, "N/A"),
-                    .Seccion = If(n.Funcionario.Seccion IsNot Nothing, n.Funcionario.Seccion.Nombre, "N/A"),
-                    .FechaProgramada = n.FechaProgramada,
-                    .Texto = n.Medio, ' 'Medio' contiene el texto principal de la notificación
-                    .TipoNotificacion = n.TipoNotificacion.Nombre,
-                    .Documento = n.Documento,
-                    .ExpMinisterial = n.ExpMinisterial,
-                    .ExpINR = n.ExpINR,
-                    .Oficina = n.Oficina
-                }).
-                ToListAsync()
+            Dim datos = Await uow.Context.Set(Of NotificacionPersonal).AsNoTracking().Where(Function(n) notificacionIds.Contains(n.Id)).
+            Select(Function(n) New NotificacionImprimirDTO With {                ' --- Datos existentes ---
+            .FuncionarioId = n.Funcionario.Id,
+                .NombreFuncionario = n.Funcionario.Nombre,
+                .CI = n.Funcionario.CI,
+                .Cargo = If(n.Funcionario.Cargo IsNot Nothing, n.Funcionario.Cargo.Nombre, "N/A"),
+                .Seccion = If(n.Funcionario.Seccion IsNot Nothing, n.Funcionario.Seccion.Nombre, "N/A"),
+                .FechaProgramada = n.FechaProgramada,
+                .Texto = n.Medio, ' 'Medio' contiene el texto principal de la notificación
+                .TipoNotificacion = n.TipoNotificacion.Nombre,
+                .Documento = n.Documento,
+                .ExpMinisterial = n.ExpMinisterial,
+                .ExpINR = n.ExpINR,
+                .Oficina = n.Oficina,                ' --- AQUÍ AGREGAMOS LOS NUEVOS DATOS DEL FUNCIONARIO ---
+            .Domicilio = n.Funcionario.Domicilio,
+                .Telefono = n.Funcionario.Telefono, ' o .Telefono, según el campo que prefieras
+                .GradoNumero = n.Funcionario.Cargo.Grado, ' Asumiendo que GradoId es el número
+                .GradoDenominacion = n.Funcionario.Cargo.Nombre,
+                .Escalafon = If(n.Funcionario.Escalafon IsNot Nothing, n.Funcionario.Escalafon.Nombre, ""),
+                .SubEscalafon = If(n.Funcionario.SubEscalafon IsNot Nothing, n.Funcionario.SubEscalafon.Nombre, "")
+            }).
+            ToListAsync()
 
             Return datos
         End Using
