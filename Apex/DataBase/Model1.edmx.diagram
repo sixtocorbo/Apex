@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="31b65f4c251f4cd79cbc912f9c10843a" Name="Diagram1">
+      <Diagram DiagramId="ff5052ffa8ad40f2959b16c7bf3fd334" Name="Diagram1">
         <EntityTypeShape EntityType="ApexModel.AreaTrabajo" Width="1.5" PointX="1.5" PointY="57.375" IsExpanded="true" />
         <EntityTypeShape EntityType="ApexModel.Arma" Width="1.5" PointX="9" PointY="27" IsExpanded="true" />
         <EntityTypeShape EntityType="ApexModel.AuditoriaCambios" Width="1.5" PointX="5.75" PointY="0.75" IsExpanded="true" />
@@ -76,15 +76,12 @@
         <EntityTypeShape EntityType="ApexModel.Turno" Width="1.5" PointX="3.75" PointY="75.625" IsExpanded="true" />
         <EntityTypeShape EntityType="ApexModel.Usuario" Width="1.5" PointX="14.25" PointY="53.5" IsExpanded="true" />
         <EntityTypeShape EntityType="ApexModel.vw_EstadosTransitoriosCompletos" Width="1.5" PointX="2.75" PointY="8.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.vw_FuncionarioEstadosActivos" Width="1.5" PointX="4.75" PointY="8.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.vw_FuncionarioEstadosConsolidados" Width="1.5" PointX="9.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.vw_FuncionarioSituacionActual" Width="1.5" PointX="9.75" PointY="4.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.vw_LicenciasCompletas" Width="1.5" PointX="9.75" PointY="7.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.vw_LicenciasConFuncionario" Width="1.5" PointX="6.75" PointY="10.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.vw_NotificacionesCompletas" Width="1.5" PointX="11.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.vw_NovedadesAgrupadas" Width="1.5" PointX="11.75" PointY="5.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.vw_NovedadesCompletas" Width="1.5" PointX="11.75" PointY="8.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="ApexModel.vw_SancionesCompletas" Width="1.5" PointX="8.75" PointY="11.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.vw_FuncionarioSituacionActual" Width="1.5" PointX="4.75" PointY="8.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.vw_LicenciasConFuncionario" Width="1.5" PointX="9.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.vw_NotificacionesCompletas" Width="1.5" PointX="9.75" PointY="4.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.vw_NovedadesAgrupadas" Width="1.5" PointX="9.75" PointY="9.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.vw_NovedadesCompletas" Width="1.5" PointX="6.75" PointY="10.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ApexModel.vw_SancionesCompletas" Width="1.5" PointX="11.75" PointY="0.75" IsExpanded="true" />
         <AssociationConnector Association="ApexModel.FK_PuestoTrabajo_AreaTrabajo" ManuallyRouted="false" />
         <AssociationConnector Association="ApexModel.FK_FuncionarioArma_Arma" ManuallyRouted="false" />
         <AssociationConnector Association="ApexModel.FK_BajaDeFuncionarioDetalle_EstadoTransitorio" ManuallyRouted="false" />

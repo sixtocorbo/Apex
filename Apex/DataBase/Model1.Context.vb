@@ -95,10 +95,7 @@ Partial Public Class ApexEntities
     Public Overridable Property Turno() As DbSet(Of Turno)
     Public Overridable Property Usuario() As DbSet(Of Usuario)
     Public Overridable Property vw_EstadosTransitoriosCompletos() As DbSet(Of vw_EstadosTransitoriosCompletos)
-    Public Overridable Property vw_FuncionarioEstadosActivos() As DbSet(Of vw_FuncionarioEstadosActivos)
-    Public Overridable Property vw_FuncionarioEstadosConsolidados() As DbSet(Of vw_FuncionarioEstadosConsolidados)
     Public Overridable Property vw_FuncionarioSituacionActual() As DbSet(Of vw_FuncionarioSituacionActual)
-    Public Overridable Property vw_LicenciasCompletas() As DbSet(Of vw_LicenciasCompletas)
     Public Overridable Property vw_LicenciasConFuncionario() As DbSet(Of vw_LicenciasConFuncionario)
     Public Overridable Property vw_NotificacionesCompletas() As DbSet(Of vw_NotificacionesCompletas)
     Public Overridable Property vw_NovedadesAgrupadas() As DbSet(Of vw_NovedadesAgrupadas)
@@ -210,14 +207,6 @@ Partial Public Class ApexEntities
         Dim soloActivosParameter As ObjectParameter = If(soloActivos.HasValue, New ObjectParameter("SoloActivos", soloActivos), New ObjectParameter("SoloActivos", GetType(Boolean)))
 
         Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction(Of usp_Filtros_ObtenerLicenciasPorFecha_Result)("usp_Filtros_ObtenerLicenciasPorFecha", fechaInicioParameter, fechaFinParameter, filtroNombreParameter, tiposLicenciaIdsParameter, soloActivosParameter)
-    End Function
-
-    Public Overridable Function usp_LimpiarDatosDeApex() As Integer
-        Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_LimpiarDatosDeApex")
-    End Function
-
-    Public Overridable Function usp_MigrarDotacionesCompletas() As Integer
-        Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_MigrarDotacionesCompletas")
     End Function
 
     Public Overridable Function usp_PresenciaFecha_Apex(fecha As Nullable(Of Date)) As ObjectResult(Of usp_PresenciaFecha_Apex_Result)
