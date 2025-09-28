@@ -701,13 +701,9 @@ Public Class frmFuncionarioSituacion
         End Try
     End Function
 
-    ' En frmFuncionarioSituacion.vb
-    ' En frmFuncionarioSituacion.vb
 
     Private Sub btnImprimir_Click(sender As Object, e As EventArgs) Handles btnImprimir.Click
         Dim fechaInicio = dtpDesde.Value.Date
-        ' --- CORRECCIÓN CLAVE AQUÍ ---
-        ' Agregamos .AddDays(1) para que el reporte use el mismo rango de fechas que el formulario
         Dim fechaFin = dtpHasta.Value.Date.AddDays(1)
 
         ' Creamos y abrimos el formulario del reporte con las fechas correctas
