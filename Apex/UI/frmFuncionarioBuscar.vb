@@ -668,13 +668,13 @@ Public Class frmFuncionarioBuscar
                     btnVerSituacion.Text = primeraSituacion.Tipo
                 End If
 
-                Try
-                    btnVerSituacion.BackColor = Color.FromName(primeraSituacion.ColorIndicador)
-                    btnVerSituacion.ForeColor = Color.White
-                Catch ex As Exception
-                    btnVerSituacion.BackColor = SystemColors.Control
-                    btnVerSituacion.ForeColor = SystemColors.ControlText
-                End Try
+                Dim severidadSituacion = EstadoVisualHelper.DeterminarSeveridad(primeraSituacion.Tipo)
+                Dim colorSituacion = EstadoVisualHelper.ObtenerColor(severidadSituacion)
+                Dim colorTexto = EstadoVisualHelper.ObtenerColorTexto(severidadSituacion)
+
+                btnVerSituacion.BackColor = colorSituacion
+                btnVerSituacion.ForeColor = colorTexto
+                btnVerSituacion.UseVisualStyleBackColor = False
             Else
                 btnVerSituacion.Visible = False
             End If

@@ -489,6 +489,7 @@
     </Compile>
     <Compile Include="Services\ConceptoFuncionalService.vb" />
     <Compile Include="Helpers\ConsultasGenericas.vb" />
+    <Compile Include="Helpers\EstadoVisualHelper.vb" />
     <Compile Include="DTO\DesignacionReporteDTO.vb" />
     <Compile Include="Services\LicenciaService.vb" />
     <Compile Include="Helpers\LoadingHelper.vb" />

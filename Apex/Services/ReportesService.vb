@@ -335,7 +335,7 @@ Public Class ReportesService
             .Tipo = s.TipoEstadoNombre,
             .FechaDesde = s.FechaDesde,
             .FechaHasta = s.FechaHasta,
-            .Severidad = ClasificarSeveridad(s.TipoEstadoNombre).ToString()
+            .Severidad = EstadoVisualHelper.DeterminarSeveridad(s.TipoEstadoNombre).ToString()
         }))
 
         eventosUnificados.AddRange(licenciasEnPeriodo.Select(Function(l) New SituacionReporteDTO With {
@@ -343,7 +343,7 @@ Public Class ReportesService
             .Tipo = $"LICENCIA: {l.TipoLicencia.Nombre}",
             .FechaDesde = l.inicio,
             .FechaHasta = l.finaliza,
-            .Severidad = ClasificarSeveridad($"LICENCIA: {l.TipoLicencia.Nombre}").ToString()
+            .Severidad = EstadoVisualHelper.DeterminarSeveridad($"LICENCIA: {l.TipoLicencia.Nombre}").ToString()
         }))
 
         eventosUnificados.AddRange(notificacionesEnPeriodo.Select(Function(n) New SituacionReporteDTO With {
@@ -351,7 +351,7 @@ Public Class ReportesService
             .Tipo = $"NOTIFICACIÓN PENDIENTE: {n.TipoNotificacion.Nombre}",
             .FechaDesde = n.FechaProgramada,
             .FechaHasta = Nothing,
-            .Severidad = ClasificarSeveridad($"NOTIFICACIÓN PENDIENTE: {n.TipoNotificacion.Nombre}").ToString()
+            .Severidad = EstadoVisualHelper.DeterminarSeveridad($"NOTIFICACIÓN PENDIENTE: {n.TipoNotificacion.Nombre}").ToString()
         }))
 
         ' Unificamos los cambios de auditoría
@@ -360,47 +360,16 @@ Public Class ReportesService
     .Tipo = $"CAMBIO: El campo '{a.CampoNombre}' se modificó de '{If(String.IsNullOrWhiteSpace(a.ValorAnterior), "[vacío]", a.ValorAnterior)}' a '{If(String.IsNullOrWhiteSpace(a.ValorNuevo), "[vacío]", a.ValorNuevo)}'.",
     .FechaDesde = a.FechaHora,
     .FechaHasta = Nothing,
-    .Severidad = ClasificarSeveridad("AUDITORIA").ToString()
+    .Severidad = EstadoVisualHelper.DeterminarSeveridad("AUDITORIA").ToString()
 }))
 
         Return eventosUnificados _
     .OrderByDescending(Function(x) x.FechaDesde.Value.Date) _
-    .ThenByDescending(Function(x) ClasificarSeveridad(x.Tipo)) _
+    .ThenByDescending(Function(x) EstadoVisualHelper.DeterminarSeveridad(x.Tipo)) _
     .ThenByDescending(Function(x) x.FechaDesde) _
     .ToList()
     End Function
 
-    ' Lógica para clasificar la severidad de cada evento
-    Private Function ClasificarSeveridad(tipoTexto As String) As Severidad
-        Dim t As String = If(tipoTexto, String.Empty).ToUpperInvariant()
-        If t.StartsWith("CAMBIO") OrElse t.StartsWith("AUDITORIA") Then Return Severidad.Info
-        If t.StartsWith("AUDITORIA") Then Return Severidad.Info
-        If t.StartsWith("NOTIFICACIÓN") Then Return Severidad.Media
-        If t.StartsWith("LICENCIA") Then Return Severidad.Info
-        If t.Contains("INICIO DE PROCESAMIENTO") Then Return Severidad.Critica
-        If t.Contains("SEPARACION") OrElse t.Contains("SEPARACIÓN") Then Return Severidad.Critica
-        If t.Contains("BAJA") Then Return Severidad.Critica
-        If t.Contains("SUMARIO") Then Return Severidad.Alta
-        If t.Contains("SANCI") Then Return Severidad.Alta
-        If t.Contains("ENFERMEDAD") Then Return Severidad.Media
-        If t.Contains("ORDEN CINCO") OrElse t.Contains("ORDEN 5") Then Return Severidad.Media
-        If t.Contains("TRASLADO") Then Return Severidad.Media
-        If t.Contains("RETEN") OrElse t.Contains("RETÉN") Then Return Severidad.Baja
-        If t.Contains("DESIGNACION") OrElse t.Contains("DESIGNACIÓN") Then Return Severidad.Baja
-        If t.Contains("REACTIVACION") OrElse t.Contains("REACTIVACIÓN") Then Return Severidad.Baja
-        If t.Contains("CAMBIO DE CARGO") Then Return Severidad.Baja
-
-        Return Severidad.Baja
-    End Function
-
-    ' Enum para los niveles de severidad
-    Private Enum Severidad
-        Info = 0
-        Baja = 1
-        Media = 2
-        Alta = 3
-        Critica = 4
-    End Enum
 End Class
 
 ' --- DTOs para la Ficha Funcional (versión simplificada) ---
