@@ -428,13 +428,6 @@ Public Class FuncionarioService
             Return lista.Select(Function(se) New KeyValuePair(Of Integer, String)(se.Id, se.Nombre)).ToList()
         End Using
     End Function
-
-    ' DTOs
-    Public Class PresenciaDTO
-        Public Property FuncionarioId As Integer
-        Public Property Resultado As String
-    End Class
-
 End Class
 
 Public Class FuncionarioVistaDTO

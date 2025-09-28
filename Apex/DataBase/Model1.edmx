@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="ApexModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="ApexModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="AreaTrabajo">
           <Key>
             <PropertyRef Name="Id" />
@@ -793,6 +793,21 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_EstadosTransitoriosCompletos' no
           <Property Name="Observaciones" Type="nvarchar(max)" />
           <Property Name="CreatedAt" Type="datetime2" Precision="7" Nullable="false" />
           <Property Name="UpdatedAt" Type="datetime2" Precision="7" />
+        </EntityType>
+        <!--Errores durante la generación:
+advertencia 6002: La tabla o vista 'Apex.dbo.vw_FuncionarioEstadosActivos' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
+        <EntityType Name="vw_FuncionarioEstadosActivos">
+          <Key>
+            <PropertyRef Name="FuncionarioId" />
+            <PropertyRef Name="Prioridad" />
+            <PropertyRef Name="Tipo" />
+            <PropertyRef Name="ColorIndicador" />
+          </Key>
+          <Property Name="FuncionarioId" Type="int" Nullable="false" />
+          <Property Name="Prioridad" Type="int" Nullable="false" />
+          <Property Name="Tipo" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="Detalles" Type="nvarchar(max)" />
+          <Property Name="ColorIndicador" Type="varchar" MaxLength="14" Nullable="false" />
         </EntityType>
         <!--Errores durante la generación:
 advertencia 6002: La tabla o vista 'Apex.dbo.vw_FuncionarioSituacionActual' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
@@ -1878,6 +1893,15 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
     [vw_EstadosTransitoriosCompletos].[UpdatedAt] AS [UpdatedAt]
     FROM [dbo].[vw_EstadosTransitoriosCompletos] AS [vw_EstadosTransitoriosCompletos]</DefiningQuery>
           </EntitySet>
+          <EntitySet Name="vw_FuncionarioEstadosActivos" EntityType="Self.vw_FuncionarioEstadosActivos" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [vw_FuncionarioEstadosActivos].[FuncionarioId] AS [FuncionarioId], 
+    [vw_FuncionarioEstadosActivos].[Prioridad] AS [Prioridad], 
+    [vw_FuncionarioEstadosActivos].[Tipo] AS [Tipo], 
+    [vw_FuncionarioEstadosActivos].[Detalles] AS [Detalles], 
+    [vw_FuncionarioEstadosActivos].[ColorIndicador] AS [ColorIndicador]
+    FROM [dbo].[vw_FuncionarioEstadosActivos] AS [vw_FuncionarioEstadosActivos]</DefiningQuery>
+          </EntitySet>
           <EntitySet Name="vw_FuncionarioSituacionActual" EntityType="Self.vw_FuncionarioSituacionActual" store:Type="Views" store:Schema="dbo">
             <DefiningQuery>SELECT 
     [vw_FuncionarioSituacionActual].[FuncionarioId] AS [FuncionarioId], 
@@ -2209,8 +2233,7 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             <End Role="Usuario" EntitySet="Usuario" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="ApexModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -4386,10 +4409,10 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           </FunctionImport>
           <FunctionImport Name="usp_Apex_ImportarDotacionFuncionario" />
           <FunctionImport Name="usp_Apex_ImportarLicenciasMasivas">
-            <Parameter Name="RegistrosAfectados" Mode="InOut" Type="Int32" />
+          <Parameter Name="RegistrosAfectados" Mode="InOut" Type="Int32" />
           </FunctionImport>
           <FunctionImport Name="usp_DeleteFuncionario">
-            <Parameter Name="FuncionarioId" Mode="In" Type="Int32" />
+          <Parameter Name="FuncionarioId" Mode="In" Type="Int32" />
           </FunctionImport>
           <FunctionImport Name="usp_Filtros_ObtenerLicenciasPorFecha" ReturnType="Collection(ApexModel.usp_Filtros_ObtenerLicenciasPorFecha_Result)">
             <Parameter Name="FechaInicio" Mode="In" Type="DateTime" />
@@ -4399,9 +4422,10 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             <Parameter Name="SoloActivos" Mode="In" Type="Boolean" />
           </FunctionImport>
           <FunctionImport Name="usp_PresenciaFecha_Apex" ReturnType="Collection(ApexModel.usp_PresenciaFecha_Apex_Result)">
-            <Parameter Name="Fecha" Mode="In" Type="DateTime" />
+          <Parameter Name="Fecha" Mode="In" Type="DateTime" />
           </FunctionImport>
           <FunctionImport Name="usp_ProcesarEstadoNotificaciones" />
+          <EntitySet Name="vw_FuncionarioEstadosActivos" EntityType="ApexModel.vw_FuncionarioEstadosActivos" />
         </EntityContainer>
         <ComplexType Name="sp_helpdiagramdefinition_Result">
           <Property Type="Int32" Name="version" Nullable="true" />
@@ -4448,6 +4472,19 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <Property Type="Int32" Name="FuncionarioId" Nullable="false" />
           <Property Type="String" Name="Resultado" Nullable="true" />
         </ComplexType>
+        <EntityType Name="vw_FuncionarioEstadosActivos">
+          <Key>
+            <PropertyRef Name="FuncionarioId" />
+            <PropertyRef Name="Prioridad" />
+            <PropertyRef Name="Tipo" />
+            <PropertyRef Name="ColorIndicador" />
+          </Key>
+          <Property Name="FuncionarioId" Type="Int32" Nullable="false" />
+          <Property Name="Prioridad" Type="Int32" Nullable="false" />
+          <Property Name="Tipo" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Detalles" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="ColorIndicador" Type="String" Nullable="false" MaxLength="14" FixedLength="false" Unicode="false" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -5467,6 +5504,17 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             </ResultMapping>
           </FunctionImportMapping>
           <FunctionImportMapping FunctionImportName="usp_ProcesarEstadoNotificaciones" FunctionName="ApexModel.Store.usp_ProcesarEstadoNotificaciones" />
+          <EntitySetMapping Name="vw_FuncionarioEstadosActivos">
+            <EntityTypeMapping TypeName="ApexModel.vw_FuncionarioEstadosActivos">
+              <MappingFragment StoreEntitySet="vw_FuncionarioEstadosActivos">
+                <ScalarProperty Name="ColorIndicador" ColumnName="ColorIndicador" />
+                <ScalarProperty Name="Detalles" ColumnName="Detalles" />
+                <ScalarProperty Name="Tipo" ColumnName="Tipo" />
+                <ScalarProperty Name="Prioridad" ColumnName="Prioridad" />
+                <ScalarProperty Name="FuncionarioId" ColumnName="FuncionarioId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

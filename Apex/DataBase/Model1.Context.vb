@@ -101,6 +101,7 @@ Partial Public Class ApexEntities
     Public Overridable Property vw_NovedadesAgrupadas() As DbSet(Of vw_NovedadesAgrupadas)
     Public Overridable Property vw_NovedadesCompletas() As DbSet(Of vw_NovedadesCompletas)
     Public Overridable Property vw_SancionesCompletas() As DbSet(Of vw_SancionesCompletas)
+    Public Overridable Property vw_FuncionarioEstadosActivos() As DbSet(Of vw_FuncionarioEstadosActivos)
 
     <DbFunction("ApexEntities", "fn_FuncionarioEstadosEnRango")>
     Public Overridable Function fn_FuncionarioEstadosEnRango(funcionarioId As Nullable(Of Integer), desde As Nullable(Of Date), hasta As Nullable(Of Date)) As IQueryable(Of fn_FuncionarioEstadosEnRango_Result)
