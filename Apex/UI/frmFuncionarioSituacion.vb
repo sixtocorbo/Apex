@@ -411,36 +411,19 @@ Public Class frmFuncionarioSituacion
 
 #Region " Severidad y Colores "
 
-    Private Enum Severidad
-        Info = 0
-        Baja = 1
-        Media = 2
-        Alta = 3
-        Critica = 4
-    End Enum
-
     Private Sub AplicarColoresEstados(dgv As DataGridView)
         For Each row As DataGridViewRow In dgv.Rows
             Dim evento = TryCast(row.DataBoundItem, EventoSituacionDTO)
-            If evento IsNot Nothing Then
-                PintarFilaPorSeveridad(row, evento.Severidad)
-            End If
-        Next
-    End Sub
+            If evento Is Nothing Then Continue For
 
-    Private Sub PintarFilaPorSeveridad(row As DataGridViewRow, sev As Severidad)
-        Dim colorFondo As Color
-        Select Case sev
-            Case Severidad.Critica : colorFondo = Color.FromArgb(229, 57, 53)
-            Case Severidad.Alta : colorFondo = Color.FromArgb(245, 124, 0)
-            Case Severidad.Media : colorFondo = Color.FromArgb(255, 179, 0)
-            Case Severidad.Baja : colorFondo = Color.FromArgb(56, 142, 60)
-            Case Else : colorFondo = Color.FromArgb(30, 136, 229)
-        End Select
-        row.DefaultCellStyle.BackColor = colorFondo
-        row.DefaultCellStyle.ForeColor = Color.White
-        row.DefaultCellStyle.SelectionBackColor = colorFondo
-        row.DefaultCellStyle.SelectionForeColor = Color.White
+            Dim colorFondo = EstadoVisualHelper.ObtenerColor(evento.Severidad)
+            Dim colorTexto = EstadoVisualHelper.ObtenerColorTexto(evento.Severidad)
+
+            row.DefaultCellStyle.BackColor = colorFondo
+            row.DefaultCellStyle.ForeColor = colorTexto
+            row.DefaultCellStyle.SelectionBackColor = colorFondo
+            row.DefaultCellStyle.SelectionForeColor = colorTexto
+        Next
     End Sub
 
 #End Region
@@ -494,13 +477,13 @@ Public Class frmFuncionarioSituacion
         Public Property Detalles As String
         Public Property Desde As Date?
         Public Property Hasta As Date?
-        Public Property Severidad As Severidad
+        Public Property Severidad As EstadoVisualHelper.EventoSeveridad
 
         Public Sub New(estado As EstadoTransitorio)
             Me.Id = estado.Id
             Me.TipoEvento = "Estado"
             Me.Tipo = estado.TipoEstadoTransitorio.Nombre
-            Me.Severidad = ClasificarSeveridad(Me.Tipo)
+            Me.Severidad = EstadoVisualHelper.DeterminarSeveridad(Me.Tipo)
 
             Dim sb As New StringBuilder()
 
@@ -626,7 +609,7 @@ Public Class frmFuncionarioSituacion
             Me.Desde = licencia.inicio
             Me.Hasta = licencia.finaliza
             Me.Detalles = licencia.Comentario?.Trim()
-            Me.Severidad = ClasificarSeveridad(Me.Tipo)
+            Me.Severidad = EstadoVisualHelper.DeterminarSeveridad(Me.Tipo)
         End Sub
 
         Public Sub New(notificacion As NotificacionPersonal)
@@ -644,7 +627,7 @@ Public Class frmFuncionarioSituacion
             If Not String.IsNullOrWhiteSpace(notificacion.Oficina) Then sb.AppendLine($"Oficina: {notificacion.Oficina.Trim()}")
 
             Me.Detalles = sb.ToString().Trim()
-            Me.Severidad = Severidad.Media
+            Me.Severidad = EstadoVisualHelper.EventoSeveridad.Media
         End Sub
 
         Public Sub New(auditoria As AuditoriaCambios)
@@ -656,24 +639,10 @@ Public Class frmFuncionarioSituacion
             Dim valAnt = If(String.IsNullOrWhiteSpace(auditoria.ValorAnterior), "[vacío]", auditoria.ValorAnterior)
             Dim valNue = If(String.IsNullOrWhiteSpace(auditoria.ValorNuevo), "[vacío]", auditoria.ValorNuevo)
             Me.Detalles = $"El campo '{auditoria.CampoNombre}' cambió de '{valAnt}' a '{valNue}'."
-            Me.Severidad = Severidad.Info
+            Me.Severidad = EstadoVisualHelper.EventoSeveridad.Info
         End Sub
 
-        Private Function ClasificarSeveridad(tipoTexto As String) As Severidad
-            Dim t As String = tipoTexto.ToUpper().Trim()
-            Select Case t
-                Case "BAJA DE FUNCIONARIO", "SEPARACIÓN DEL CARGO", "INICIO DE PROCESAMIENTO"
-                    Return Severidad.Critica
-                Case "SUMARIO", "SANCIÓN", "ORDEN CINCO"
-                    Return Severidad.Alta
-                Case "ENFERMEDAD", "TRASLADO"
-                    Return Severidad.Media
-                Case "DESARMADO", "RETÉN", "DESIGNACIÓN", "REACTIVACIÓN DE FUNCIONARIO", "CAMBIO DE CARGO"
-                    Return Severidad.Baja
-                Case Else
-                    Return Severidad.Info
-            End Select
-        End Function
+        ' La lógica de severidad se centraliza en EstadoVisualHelper.
     End Class
 
 #End Region
