@@ -243,6 +243,9 @@
     <Compile Include="DataBase\EstadoTransitorioAdjunto.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
+    <Compile Include="DataBase\fn_FuncionarioEstadosEnRango_Result.vb">
+      <DependentUpon>Model1.tt</DependentUpon>
+    </Compile>
     <Compile Include="DataBase\Funcion.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
@@ -367,6 +370,9 @@
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="DataBase\Rol.vb">
+      <DependentUpon>Model1.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataBase\RolUsuario.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="DataBase\SancionDetalle.vb">
@@ -1010,6 +1016,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\copy_icon.ico" />
+    <None Include="Resources\Police.ico" />
     <Content Include="DataBase\Model1.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>Model1.edmx</DependentUpon>
@@ -1020,7 +1027,6 @@
       <DependentUpon>Model1.edmx</DependentUpon>
       <LastGenOutput>Model1.vb</LastGenOutput>
     </Content>
-    <None Include="Resources\Police.ico" />
     <Content Include="SqlServerTypes\Loader.cs" />
     <Content Include="SqlServerTypes\readme.htm" />
     <Content Include="SqlServerTypes\x64\msvcr120.dll">
