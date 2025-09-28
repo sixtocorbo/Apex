@@ -685,7 +685,7 @@ Public Class frmFuncionarioBuscar
             End If
 
             If f.Foto Is Nothing OrElse f.Foto.Length = 0 Then
-                pbFotoDetalle.Image = My.Resources.Police.ToBitmap
+                pbFotoDetalle.Image = My.Resources.Police
             Else
                 Using ms As New MemoryStream(f.Foto)
                     pbFotoDetalle.Image = Image.FromStream(ms)

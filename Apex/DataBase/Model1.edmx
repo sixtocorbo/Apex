@@ -1735,22 +1735,6 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           </ReferentialConstraint>
         </Association>
         <Function Name="fn_diagramobjects" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="true" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" ReturnType="int" />
-        <Function Name="fn_FuncionarioEstadosEnRango" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="true" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
-          <Parameter Name="FuncionarioId" Type="int" Mode="In" />
-          <Parameter Name="Desde" Type="date" Mode="In" />
-          <Parameter Name="Hasta" Type="date" Mode="In" />
-          <ReturnType>
-            <CollectionType>
-              <RowType>
-                <Property Name="FuncionarioId" Type="int" Nullable="false" />
-                <Property Name="Prioridad" Type="int" Nullable="false" />
-                <Property Name="Tipo" Type="nvarchar" MaxLength="100" Nullable="false" />
-                <Property Name="Detalles" Type="nvarchar(max)" />
-                <Property Name="ColorIndicador" Type="varchar" MaxLength="14" Nullable="false" />
-              </RowType>
-            </CollectionType>
-          </ReturnType>
-        </Function>
         <Function Name="RegimenActual" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="true" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" ReturnType="int">
           <Parameter Name="fecha" Type="date" Mode="In" />
         </Function>
@@ -5422,17 +5406,6 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
               <ScalarProperty Name="Id" ColumnName="UsuarioId" />
             </EndProperty>
           </AssociationSetMapping>
-          <FunctionImportMapping FunctionName="ApexModel.Store.fn_FuncionarioEstadosEnRango" FunctionImportName="fn_FuncionarioEstadosEnRango">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="ApexModel.fn_FuncionarioEstadosEnRango_Result">
-                <ScalarProperty Name="FuncionarioId" ColumnName="FuncionarioId" />
-                <ScalarProperty Name="Prioridad" ColumnName="Prioridad" />
-                <ScalarProperty Name="Tipo" ColumnName="Tipo" />
-                <ScalarProperty Name="Detalles" ColumnName="Detalles" />
-                <ScalarProperty Name="ColorIndicador" ColumnName="ColorIndicador" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
           <FunctionImportMapping FunctionImportName="sp_alterdiagram" FunctionName="ApexModel.Store.sp_alterdiagram" />
           <FunctionImportMapping FunctionImportName="sp_creatediagram" FunctionName="ApexModel.Store.sp_creatediagram" />
           <FunctionImportMapping FunctionImportName="sp_dropdiagram" FunctionName="ApexModel.Store.sp_dropdiagram" />

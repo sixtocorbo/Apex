@@ -303,17 +303,207 @@ Public Class frmFuncionarioSituacion
     End Function
 
     Private Async Function CargarEstadosActivosEnRangoAsync(funcionarioId As Integer, desde As Date, hasta As Date) As Task(Of List(Of FuncionarioEstadoActivoDTO))
-        ' Consulta directa a la iTVF con parámetros
-        Dim sql As String = "SELECT FuncionarioId, Prioridad, Tipo, Detalles, ColorIndicador " &
-                            "FROM dbo.fn_FuncionarioEstadosEnRango(@FuncionarioId, @Desde, @Hasta);"
+        ' Consultas a la base de datos en paralelo para máxima eficiencia
+        Dim tareaEstados = _uow.Context.Set(Of EstadoTransitorio)() _
+        .Include(Function(et) et.TipoEstadoTransitorio) _
+        .Include(Function(et) et.BajaDeFuncionarioDetalle) _
+        .Include(Function(et) et.EnfermedadDetalle) _
+        .Include(Function(et) et.InicioDeProcesamientoDetalle) _
+        .Include(Function(et) et.SeparacionDelCargoDetalle) _
+        .Include(Function(et) et.SumarioDetalle) _
+        .Include(Function(et) et.OrdenCincoDetalle) _
+        .Include(Function(et) et.TrasladoDetalle) _
+        .Include(Function(et) et.SancionDetalle) _
+        .Include(Function(et) et.DesignacionDetalle) _
+        .Include(Function(et) et.ReactivacionDeFuncionarioDetalle) _
+        .Include(Function(et) et.DesarmadoDetalle) _
+        .Include(Function(et) et.RetenDetalle) _
+        .Include(Function(et) et.CambioDeCargoDetalle.Cargo) _
+        .Include(Function(et) et.CambioDeCargoDetalle.Cargo1) _
+        .Where(Function(et) et.FuncionarioId = funcionarioId) _
+        .AsNoTracking() _
+        .ToListAsync()
 
-        Dim p1 As New SqlParameter("@FuncionarioId", funcionarioId)
-        Dim p2 As New SqlParameter("@Desde", desde)
-        Dim p3 As New SqlParameter("@Hasta", hasta)
+        Dim tareaLicencias = _uow.Context.Set(Of HistoricoLicencia)() _
+        .Include(Function(l) l.TipoLicencia.CategoriaAusencia) _
+        .Where(Function(l) l.FuncionarioId = funcionarioId AndAlso
+                           l.inicio < hasta AndAlso
+                           l.finaliza >= desde AndAlso
+                           l.estado <> "Rechazado" AndAlso
+                           l.estado <> "Anulado") _
+        .AsNoTracking() _
+        .ToListAsync()
 
-        ' Nota: EF6 usa Database.SqlQuery para tipos no-mapeados (DTO)
-        Dim lista = Await _uow.Context.Database.SqlQuery(Of FuncionarioEstadoActivoDTO)(sql, p1, p2, p3).ToListAsync()
-        Return lista
+        ' Esperar a que ambas consultas terminen
+        Await Task.WhenAll(tareaEstados, tareaLicencias)
+
+        ' Procesar los resultados en memoria
+        Dim estadosTransistorios = Await tareaEstados
+        Dim licencias = Await tareaLicencias
+        Dim resultados As New List(Of FuncionarioEstadoActivoDTO)
+
+        ' Mapeo de Licencias
+        resultados.AddRange(licencias.Select(Function(l)
+                                                 Dim prioridad As Integer
+                                                 Dim color As String
+                                                 Dim categoria = l.TipoLicencia.CategoriaAusencia.Nombre
+                                                 Select Case categoria
+                                                     Case "Salud"
+                                                         prioridad = 2
+                                                         color = "SteelBlue"
+                                                     Case "Sanción Grave", "Sanción Leve"
+                                                         prioridad = 8
+                                                         color = "Crimson"
+                                                     Case Else 'Otras licencias
+                                                         prioridad = 13
+                                                         color = "SeaGreen"
+                                                 End Select
+                                                 Return New FuncionarioEstadoActivoDTO With {
+                                                  .FuncionarioId = l.FuncionarioId, .Prioridad = prioridad, .Tipo = l.TipoLicencia.Nombre,
+                                                  .Detalles = $"Desde {l.inicio:dd/MM/yyyy} hasta {l.finaliza:dd/MM/yyyy}. {l.Comentario}",
+                                                  .ColorIndicador = color
+                                              }
+                                             End Function))
+
+        ' Mapeo de Estados Transitorios
+        For Each et In estadosTransistorios
+            Select Case et.TipoEstadoTransitorio.Nombre
+                Case "Baja de Funcionario"
+                    If et.BajaDeFuncionarioDetalle IsNot Nothing AndAlso et.BajaDeFuncionarioDetalle.FechaDesde < hasta Then
+                        resultados.Add(New FuncionarioEstadoActivoDTO With {
+                        .FuncionarioId = et.FuncionarioId, .Prioridad = 1, .Tipo = "Baja de Funcionario",
+                        .Detalles = $"Fecha: {et.BajaDeFuncionarioDetalle.FechaDesde:dd/MM/yyyy}. {et.BajaDeFuncionarioDetalle.Observaciones}",
+                        .ColorIndicador = "Maroon"
+                    })
+                    End If
+
+                Case "Enfermedad"
+                    Dim d = et.EnfermedadDetalle
+                    If d IsNot Nothing AndAlso d.FechaDesde < hasta AndAlso (Not d.FechaHasta.HasValue OrElse d.FechaHasta.Value >= desde) Then
+                        resultados.Add(New FuncionarioEstadoActivoDTO With {
+                        .FuncionarioId = et.FuncionarioId, .Prioridad = 2, .Tipo = "Enfermedad",
+                        .Detalles = $"Diagnóstico: {If(String.IsNullOrWhiteSpace(d.Diagnostico), "N/A", d.Diagnostico)}. {d.Observaciones}",
+                        .ColorIndicador = "SteelBlue"
+                    })
+                    End If
+
+                Case "Inicio de Procesamiento"
+                    Dim d = et.InicioDeProcesamientoDetalle
+                    If d IsNot Nothing AndAlso d.FechaDesde < hasta AndAlso (Not d.FechaHasta.HasValue OrElse d.FechaHasta.Value >= desde) Then
+                        resultados.Add(New FuncionarioEstadoActivoDTO With {
+                        .FuncionarioId = et.FuncionarioId, .Prioridad = 3, .Tipo = "Inicio de Procesamiento",
+                        .Detalles = $"Desde {d.FechaDesde:dd/MM/yyyy}. {d.Observaciones}",
+                        .ColorIndicador = "Red"
+                    })
+                    End If
+
+                Case "Separación del Cargo"
+                    Dim d = et.SeparacionDelCargoDetalle
+                    If d IsNot Nothing AndAlso d.FechaDesde < hasta AndAlso (Not d.FechaHasta.HasValue OrElse d.FechaHasta.Value >= desde) Then
+                        resultados.Add(New FuncionarioEstadoActivoDTO With {
+                        .FuncionarioId = et.FuncionarioId, .Prioridad = 4, .Tipo = "Separación del Cargo",
+                        .Detalles = $"Desde {d.FechaDesde:dd/MM/yyyy}. {d.Observaciones}",
+                        .ColorIndicador = "Maroon"
+                    })
+                    End If
+
+                Case "Sumario"
+                    Dim d = et.SumarioDetalle
+                    If d IsNot Nothing AndAlso d.FechaDesde < hasta AndAlso (Not d.FechaHasta.HasValue OrElse d.FechaHasta.Value >= desde) Then
+                        resultados.Add(New FuncionarioEstadoActivoDTO With {
+                        .FuncionarioId = et.FuncionarioId, .Prioridad = 5, .Tipo = "Sumario",
+                        .Detalles = $"Expediente: {If(String.IsNullOrWhiteSpace(d.Expediente), "N/A", d.Expediente)}. {d.Observaciones}",
+                        .ColorIndicador = "DarkOrange"
+                    })
+                    End If
+
+                Case "Orden Cinco"
+                    Dim d = et.OrdenCincoDetalle
+                    If d IsNot Nothing AndAlso d.FechaDesde < hasta AndAlso (Not d.FechaHasta.HasValue OrElse d.FechaHasta.Value >= desde) Then
+                        resultados.Add(New FuncionarioEstadoActivoDTO With {
+                        .FuncionarioId = et.FuncionarioId, .Prioridad = 6, .Tipo = "Orden Cinco",
+                        .Detalles = d.Observaciones,
+                        .ColorIndicador = "DarkOrange"
+                    })
+                    End If
+
+                Case "Traslado"
+                    Dim d = et.TrasladoDetalle
+                    If d IsNot Nothing AndAlso d.FechaDesde < hasta AndAlso (Not d.FechaHasta.HasValue OrElse d.FechaHasta.Value >= desde) Then
+                        Dim hastaStr = If(d.FechaHasta.HasValue, $" hasta {d.FechaHasta.Value:dd/MM/yyyy}", "")
+                        resultados.Add(New FuncionarioEstadoActivoDTO With {
+                        .FuncionarioId = et.FuncionarioId, .Prioridad = 7, .Tipo = "Traslado",
+                        .Detalles = $"Desde {d.FechaDesde:dd/MM/yyyy}{hastaStr}. {d.Observaciones}",
+                        .ColorIndicador = "SeaGreen"
+                    })
+                    End If
+
+                Case "Sanción"
+                    Dim d = et.SancionDetalle
+                    If d IsNot Nothing AndAlso d.FechaDesde < hasta AndAlso (Not d.FechaHasta.HasValue OrElse d.FechaHasta.Value >= desde) Then
+                        Dim hastaStr = If(d.FechaHasta.HasValue, $" hasta {d.FechaHasta.Value:dd/MM/yyyy}", "")
+                        resultados.Add(New FuncionarioEstadoActivoDTO With {
+                        .FuncionarioId = et.FuncionarioId, .Prioridad = 8, .Tipo = "Sanción",
+                        .Detalles = $"Desde {d.FechaDesde:dd/MM/yyyy}{hastaStr}. {d.Observaciones}",
+                        .ColorIndicador = "Crimson"
+                    })
+                    End If
+
+                Case "Designación"
+                    Dim d = et.DesignacionDetalle
+                    If d IsNot Nothing AndAlso d.FechaDesde < hasta AndAlso (Not d.FechaHasta.HasValue OrElse d.FechaHasta.Value >= desde) Then
+                        resultados.Add(New FuncionarioEstadoActivoDTO With {
+                        .FuncionarioId = et.FuncionarioId, .Prioridad = 9, .Tipo = "Designación",
+                        .Detalles = d.Observaciones,
+                        .ColorIndicador = "MediumSeaGreen"
+                    })
+                    End If
+
+                Case "Reactivación de Funcionario"
+                    Dim d = et.ReactivacionDeFuncionarioDetalle
+                    If d IsNot Nothing AndAlso d.FechaDesde < hasta Then
+                        resultados.Add(New FuncionarioEstadoActivoDTO With {
+                        .FuncionarioId = et.FuncionarioId, .Prioridad = 10, .Tipo = "Reactivación de Funcionario",
+                        .Detalles = d.Observaciones,
+                        .ColorIndicador = "MediumSeaGreen"
+                    })
+                    End If
+
+                Case "Desarmado"
+                    Dim d = et.DesarmadoDetalle
+                    If d IsNot Nothing AndAlso d.FechaDesde < hasta AndAlso (Not d.FechaHasta.HasValue OrElse d.FechaHasta.Value >= desde) Then
+                        resultados.Add(New FuncionarioEstadoActivoDTO With {
+                        .FuncionarioId = et.FuncionarioId, .Prioridad = 11, .Tipo = "Desarmado",
+                        .Detalles = $"Desde {d.FechaDesde:dd/MM/yyyy}. {d.Observaciones}",
+                        .ColorIndicador = "OrangeRed"
+                    })
+                    End If
+
+                Case "Retén"
+                    Dim d = et.RetenDetalle
+                    If d IsNot Nothing AndAlso d.FechaReten >= desde AndAlso d.FechaReten < hasta Then
+                        resultados.Add(New FuncionarioEstadoActivoDTO With {
+                        .FuncionarioId = et.FuncionarioId, .Prioridad = 12, .Tipo = "Retén",
+                        .Detalles = $"Turno: {If(String.IsNullOrWhiteSpace(d.Turno), "N/A", d.Turno)}. {d.Observaciones}",
+                        .ColorIndicador = "SlateGray"
+                    })
+                    End If
+
+                Case "Cambio de Cargo"
+                    Dim d = et.CambioDeCargoDetalle
+                    If d IsNot Nothing AndAlso d.FechaDesde < hasta AndAlso (Not d.FechaHasta.HasValue OrElse d.FechaHasta.Value >= desde) Then
+                        Dim cargoAnt = If(d.Cargo IsNot Nothing, d.Cargo.Nombre, "N/A")
+                        Dim cargoNue = If(d.Cargo1 IsNot Nothing, d.Cargo1.Nombre, "N/A")
+                        resultados.Add(New FuncionarioEstadoActivoDTO With {
+                        .FuncionarioId = et.FuncionarioId, .Prioridad = 14, .Tipo = "Cambio de Cargo",
+                        .Detalles = $"De {cargoAnt} a {cargoNue} desde {d.FechaDesde:dd/MM/yyyy}. {d.Observaciones}",
+                        .ColorIndicador = "SeaGreen"
+                    })
+                    End If
+            End Select
+        Next
+
+        Return resultados
     End Function
 
 #End Region

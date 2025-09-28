@@ -76,7 +76,7 @@ Partial Class frmLogin
         '
         'PictureBox1
         '
-        Me.PictureBox1.Image = Global.Apex.My.Resources.Resources.Police.ToBitmap
+        Me.PictureBox1.Image = Global.Apex.My.Resources.Resources.Police
         Me.PictureBox1.Location = New System.Drawing.Point(92, 33)
         Me.PictureBox1.Name = "PictureBox1"
         Me.PictureBox1.Size = New System.Drawing.Size(120, 101)

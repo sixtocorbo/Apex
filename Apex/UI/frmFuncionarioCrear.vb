@@ -125,7 +125,7 @@ Public Class frmFuncionarioCrear
         Else
             Me.Text = "Nuevo Funcionario"
             btnGuardar.Text = "Guardar"
-            pbFoto.Image = My.Resources.Police.ToBitmap
+            pbFoto.Image = My.Resources.Police
         End If
 
     End Sub
@@ -281,7 +281,7 @@ Public Class frmFuncionarioCrear
                 pbFoto.Image = New Bitmap(ms)
             End Using
         Else
-            pbFoto.Image = My.Resources.Police.ToBitmap()
+            pbFoto.Image = My.Resources.Police
         End If
     End Sub
 
