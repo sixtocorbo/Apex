@@ -3,6 +3,7 @@ Option Explicit On
 
 Imports System.Data.Entity
 Imports System.Data.SqlClient
+Imports System.Linq
 Imports Microsoft.VisualBasic
 
 Public Class ResultadoMasivo
@@ -284,6 +285,17 @@ Public Class NotificacionService
     Public Async Function UpdateEstadoAsync(notificacionId As Integer, nuevoEstadoId As Byte) As Task(Of Boolean)
         Using tx = _unitOfWork.Context.Database.BeginTransaction()
             Try
+                Dim info = Await _unitOfWork.Repository(Of NotificacionPersonal)().GetAll().
+                    AsNoTracking().
+                    Where(Function(n) n.Id = notificacionId).
+                    Select(Function(n) New With {n.Id, n.FuncionarioId}).
+                    FirstOrDefaultAsync()
+
+                If info Is Nothing Then
+                    tx.Rollback()
+                    Return False
+                End If
+
                 Dim sql As String = "UPDATE NotificacionPersonal SET EstadoId = @p1, UpdatedAt = @p2 WHERE Id = @p0"
                 Dim afectadas = Await _unitOfWork.Context.Database.ExecuteSqlCommandAsync(
                     sql,
@@ -297,6 +309,12 @@ Public Class NotificacionService
                     _auditoria.EncolarActividad("ActualizarEstado", "NotificacionPersonal", desc, notificacionId)
                     Await _unitOfWork.CommitAsync()
                     tx.Commit()
+
+                    If info.FuncionarioId > 0 Then
+                        NotificadorEventos.NotificarCambioEnEstado(info.FuncionarioId)
+                        NotificadorEventos.NotificarCambiosEnFuncionario(info.FuncionarioId)
+                    End If
+
                     Return True
                 Else
                     tx.Rollback()
