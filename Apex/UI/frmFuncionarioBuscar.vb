@@ -679,7 +679,11 @@ Public Class frmFuncionarioBuscar
     Private Sub AplicarSituacionesAlBoton(situaciones As List(Of SituacionParaBoton))
         If situaciones IsNot Nothing AndAlso situaciones.Any() Then
             btnVerSituacion.Visible = True
-            Dim primeraSituacion = situaciones.First()
+
+            ' --- INICIO DE LA CORRECCIÓN ---
+            ' 1. Aseguramos encontrar la situación de MÁXIMA severidad, sin depender del orden previo.
+            Dim situacionMasGrave = situaciones.OrderByDescending(Function(s) s.Severidad).First()
+            ' --- FIN DE LA CORRECCIÓN ---
 
             If _modo = ModoApertura.Seleccion Then
                 btnVerSituacion.Enabled = False
@@ -690,14 +694,17 @@ Public Class frmFuncionarioBuscar
                 btnGenerarFicha.Enabled = True
             End If
 
+            ' El texto SÍ depende de la cantidad total de situaciones.
             If situaciones.Count > 1 Then
                 btnVerSituacion.Text = "Situación Múltiple"
             Else
-                btnVerSituacion.Text = primeraSituacion.Tipo
+                ' Si solo hay una, mostramos su tipo.
+                btnVerSituacion.Text = situacionMasGrave.Tipo
             End If
 
-            Dim colorSituacion = EstadoVisualHelper.ObtenerColor(primeraSituacion.Severidad)
-            Dim colorTexto = EstadoVisualHelper.ObtenerColorTexto(primeraSituacion.Severidad)
+            ' El color y el estilo se basan en la situación MÁS GRAVE encontrada.
+            Dim colorSituacion = EstadoVisualHelper.ObtenerColor(situacionMasGrave.Severidad)
+            Dim colorTexto = EstadoVisualHelper.ObtenerColorTexto(situacionMasGrave.Severidad)
 
             btnVerSituacion.BackColor = colorSituacion
             btnVerSituacion.ForeColor = colorTexto
