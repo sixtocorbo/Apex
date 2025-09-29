@@ -3,6 +3,7 @@ Option Explicit On
 
 Imports System.Data.Entity
 Imports System.Data.SqlClient
+Imports Microsoft.VisualBasic
 
 Public Class ResultadoMasivo
     Public Property Creadas As Integer
@@ -127,11 +128,22 @@ Public Class NotificacionService
         End If
 
         If Not String.IsNullOrWhiteSpace(funcionarioFiltro) Then
-            If Not baseSql.Contains("dbo.Funcionario") Then
-                baseSql &= " INNER JOIN dbo.Funcionario AS f ON vwn.FuncionarioId = f.Id"
+            Dim terminos = funcionarioFiltro.Split({" "c, vbTab, ControlChars.Lf, ControlChars.Cr}, StringSplitOptions.RemoveEmptyEntries).
+                Select(Function(t) t.Trim()).
+                Where(Function(t) t.Length > 0).
+                ToArray()
+
+            If terminos.Any() Then
+                If Not baseSql.Contains("dbo.Funcionario") Then
+                    baseSql &= " INNER JOIN dbo.Funcionario AS f ON vwn.FuncionarioId = f.Id"
+                End If
+
+                For i = 0 To terminos.Length - 1
+                    Dim pname = "@p_func" & i
+                    conditions.Add($"(f.Nombre LIKE {pname} OR ISNULL(vwn.Texto, '') LIKE {pname})")
+                    parameters.Add(New SqlParameter(pname, $"%{terminos(i)}%"))
+                Next
             End If
-            conditions.Add("f.Nombre LIKE @p_func")
-            parameters.Add(New SqlParameter("@p_func", $"%{funcionarioFiltro}%"))
         End If
 
         If fechaDesde.HasValue Then
