@@ -2,8 +2,10 @@
 Imports System.Data.SqlClient
 Imports System.Drawing
 Imports System.IO
+Imports System.Linq
 Imports System.Text
 Imports System.Threading
+Imports ApexModel
 
 Public Class frmFuncionarioBuscar
     Inherits FormActualizable
@@ -16,7 +18,17 @@ Public Class frmFuncionarioBuscar
     Private ReadOnly _modo As ModoApertura
     Private Const LIMITE_FILAS As Integer = 500
     Private _detallesEstadoActual As New List(Of String)
-    Private Const CONSULTA_SITUACION_ACTUAL_SQL As String = "SELECT Prioridad, Tipo, ColorIndicador FROM dbo.vw_FuncionarioSituacionActual WHERE FuncionarioId = @p0 ORDER BY Prioridad"
+    Private Shared ReadOnly Property RangoSituacionInicio As Date
+        Get
+            Return Date.Today
+        End Get
+    End Property
+
+    Private Shared ReadOnly Property RangoSituacionFin As Date
+        Get
+            Return Date.Today.AddDays(1)
+        End Get
+    End Property
 
     ' --- INICIO DE CAMBIOS: Variables para la búsqueda mejorada ---
     Private WithEvents _searchTimer As New System.Windows.Forms.Timer()
@@ -644,7 +656,7 @@ Public Class frmFuncionarioBuscar
             End If
 
             Dim situaciones = Await ObtenerSituacionesAsync(uow, id)
-
+            
             AplicarSituacionesAlBoton(situaciones)
 
             lblPresencia.Text = Await ObtenerPresenciaAsync(id, Date.Today)
@@ -685,23 +697,8 @@ Public Class frmFuncionarioBuscar
                 btnVerSituacion.Text = primeraSituacion.Tipo
             End If
 
-            'Dim severidadSituacion = EstadoVisualHelper.DeterminarSeveridad(primeraSituacion.Tipo)
-            'Dim colorSituacion = EstadoVisualHelper.ObtenerColor(severidadSituacion)
-            'Dim colorTexto = EstadoVisualHelper.ObtenerColorTexto(severidadSituacion)
-            Dim colorSituacionPersonalizado = ObtenerColorIndicador(primeraSituacion.ColorIndicador)
-
-            Dim colorSituacion As Color
-            Dim colorTexto As Color
-
-            If colorSituacionPersonalizado.HasValue Then
-                colorSituacion = colorSituacionPersonalizado.Value
-                colorTexto = CalcularColorTexto(colorSituacion)
-            Else
-                Dim severidadSituacion = EstadoVisualHelper.DeterminarSeveridad(primeraSituacion.Tipo)
-                colorSituacion = EstadoVisualHelper.ObtenerColor(severidadSituacion)
-                colorTexto = EstadoVisualHelper.ObtenerColorTexto(severidadSituacion)
-            End If
-
+            Dim colorSituacion = EstadoVisualHelper.ObtenerColor(primeraSituacion.Severidad)
+            Dim colorTexto = EstadoVisualHelper.ObtenerColorTexto(primeraSituacion.Severidad)
 
             btnVerSituacion.BackColor = colorSituacion
             btnVerSituacion.ForeColor = colorTexto
@@ -711,43 +708,73 @@ Public Class frmFuncionarioBuscar
         End If
     End Sub
 
-    Private Shared Function ObtenerColorIndicador(colorTexto As String) As Color?
-        If String.IsNullOrWhiteSpace(colorTexto) Then Return Nothing
-
-        Dim valor = colorTexto.Trim()
-
-        Try
-            Dim color = ColorTranslator.FromHtml(valor)
-
-            If EsColorVacio(color) AndAlso Not valor.StartsWith("#") Then
-                color = Color.FromName(valor)
-            End If
-
-            If EsColorVacio(color) Then
-                Return Nothing
-            End If
-
-            Return color
-        Catch ex As Exception
-            Dim _Color_ = Color.FromName(valor)
-            If EsColorVacio(_Color_) Then
-                Return Nothing
-            End If
-            Return _Color_
-        End Try
-    End Function
-
-    Private Shared Function EsColorVacio(color As Color) As Boolean
-        Return color.A = 0 AndAlso color.R = 0 AndAlso color.G = 0 AndAlso color.B = 0
-    End Function
-
-    Private Shared Function CalcularColorTexto(colorFondo As Color) As Color
-        Dim luminancia = (0.299 * colorFondo.R) + (0.587 * colorFondo.G) + (0.114 * colorFondo.B)
-        Return If(luminancia < 140, Color.White, Color.Black)
-    End Function
-
     Private Shared Async Function ObtenerSituacionesAsync(uow As UnitOfWork, funcionarioId As Integer) As Task(Of List(Of SituacionParaBoton))
-        Return Await uow.Context.Database.SqlQuery(Of SituacionParaBoton)(CONSULTA_SITUACION_ACTUAL_SQL, funcionarioId).ToListAsync()
+        Dim fechaInicio = RangoSituacionInicio
+        Dim fechaFin = RangoSituacionFin
+
+        Dim situaciones As New List(Of SituacionParaBoton)()
+
+        Dim estados = Await uow.Context.Set(Of vw_EstadosTransitoriosCompletos)() _
+            .Where(Function(e) e.FuncionarioId = funcionarioId AndAlso
+                                e.FechaDesde.HasValue AndAlso
+                                e.FechaDesde.Value < fechaFin AndAlso
+                                (Not e.FechaHasta.HasValue OrElse e.FechaHasta.Value >= fechaInicio)) _
+            .AsNoTracking() _
+            .ToListAsync()
+
+        situaciones.AddRange(estados.Select(Function(e)
+                                                Dim severidad = EstadoVisualHelper.DeterminarSeveridad(e.TipoEstadoNombre)
+                                                Return New SituacionParaBoton With {
+                                                    .Tipo = e.TipoEstadoNombre,
+                                                    .Desde = e.FechaDesde,
+                                                    .Hasta = e.FechaHasta,
+                                                    .Severidad = severidad
+                                                }
+                                            End Function))
+
+        Dim licencias = Await uow.Context.Set(Of HistoricoLicencia)() _
+            .Include(Function(l) l.TipoLicencia) _
+            .Where(Function(l) l.FuncionarioId = funcionarioId AndAlso
+                                l.inicio < fechaFin AndAlso
+                                l.finaliza >= fechaInicio) _
+            .AsNoTracking() _
+            .ToListAsync()
+
+        situaciones.AddRange(licencias.Select(Function(l)
+                                                   Dim tipo = $"LICENCIA: {l.TipoLicencia.Nombre}"
+                                                   Dim severidad = EstadoVisualHelper.DeterminarSeveridad(tipo)
+                                                   Return New SituacionParaBoton With {
+                                                       .Tipo = tipo,
+                                                       .Desde = l.inicio,
+                                                       .Hasta = l.finaliza,
+                                                       .Severidad = severidad
+                                                   }
+                                               End Function))
+
+        Dim notificaciones = Await uow.Context.Set(Of NotificacionPersonal)() _
+            .Include(Function(n) n.TipoNotificacion) _
+            .Where(Function(n) n.FuncionarioId = funcionarioId AndAlso
+                                n.FechaProgramada >= fechaInicio AndAlso
+                                n.FechaProgramada < fechaFin) _
+            .AsNoTracking() _
+            .ToListAsync()
+
+        situaciones.AddRange(notificaciones.Select(Function(n)
+                                                        Dim tipo = $"NOTIFICACIÓN PENDIENTE: {n.TipoNotificacion.Nombre}"
+                                                        Dim severidad = EstadoVisualHelper.DeterminarSeveridad(tipo)
+                                                        Return New SituacionParaBoton With {
+                                                            .Tipo = tipo,
+                                                            .Desde = n.FechaProgramada,
+                                                            .Hasta = Nothing,
+                                                            .Severidad = severidad
+                                                        }
+                                                    End Function))
+
+        Return situaciones _
+            .OrderByDescending(Function(s) s.Severidad) _
+            .ThenByDescending(Function(s) s.Desde.GetValueOrDefault(fechaInicio)) _
+            .ThenBy(Function(s) s.Tipo) _
+            .ToList()
     End Function
 
     Private Async Function RefrescarBotonSituacionAsync(funcionarioId As Integer) As Task
@@ -801,9 +828,10 @@ Public Class frmFuncionarioBuscar
     End Function
 
     Private Class SituacionParaBoton
-        Public Property Prioridad As Integer
         Public Property Tipo As String
-        Public Property ColorIndicador As String
+        Public Property Desde As Date?
+        Public Property Hasta As Date?
+        Public Property Severidad As EstadoVisualHelper.EventoSeveridad
     End Class
     ' Ejecuta la acción sobre la fila actual según el modo
     Private Sub AbrirOSeleccionarActual()
