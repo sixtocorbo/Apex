@@ -95,24 +95,13 @@ Partial Public Class ApexEntities
     Public Overridable Property Turno() As DbSet(Of Turno)
     Public Overridable Property Usuario() As DbSet(Of Usuario)
     Public Overridable Property vw_EstadosTransitoriosCompletos() As DbSet(Of vw_EstadosTransitoriosCompletos)
+    Public Overridable Property vw_FuncionarioEstadosActivos() As DbSet(Of vw_FuncionarioEstadosActivos)
     Public Overridable Property vw_FuncionarioSituacionActual() As DbSet(Of vw_FuncionarioSituacionActual)
     Public Overridable Property vw_LicenciasConFuncionario() As DbSet(Of vw_LicenciasConFuncionario)
     Public Overridable Property vw_NotificacionesCompletas() As DbSet(Of vw_NotificacionesCompletas)
     Public Overridable Property vw_NovedadesAgrupadas() As DbSet(Of vw_NovedadesAgrupadas)
     Public Overridable Property vw_NovedadesCompletas() As DbSet(Of vw_NovedadesCompletas)
     Public Overridable Property vw_SancionesCompletas() As DbSet(Of vw_SancionesCompletas)
-    Public Overridable Property vw_FuncionarioEstadosActivos() As DbSet(Of vw_FuncionarioEstadosActivos)
-
-    <DbFunction("ApexEntities", "fn_FuncionarioEstadosEnRango")>
-    Public Overridable Function fn_FuncionarioEstadosEnRango(funcionarioId As Nullable(Of Integer), desde As Nullable(Of Date), hasta As Nullable(Of Date)) As IQueryable(Of fn_FuncionarioEstadosEnRango_Result)
-        Dim funcionarioIdParameter As ObjectParameter = If(funcionarioId.HasValue, New ObjectParameter("FuncionarioId", funcionarioId), New ObjectParameter("FuncionarioId", GetType(Integer)))
-
-        Dim desdeParameter As ObjectParameter = If(desde.HasValue, New ObjectParameter("Desde", desde), New ObjectParameter("Desde", GetType(Date)))
-
-        Dim hastaParameter As ObjectParameter = If(hasta.HasValue, New ObjectParameter("Hasta", hasta), New ObjectParameter("Hasta", GetType(Date)))
-
-         Return DirectCast(Me, IObjectContextAdapter).ObjectContext.CreateQuery(Of fn_FuncionarioEstadosEnRango_Result)("[ApexEntities].[fn_FuncionarioEstadosEnRango](@FuncionarioId, @Desde, @Hasta)", funcionarioIdParameter, desdeParameter, hastaParameter)
-    End Function
 
     Public Overridable Function sp_alterdiagram(diagramname As String, owner_id As Nullable(Of Integer), version As Nullable(Of Integer), definition As Byte()) As Integer
         Dim diagramnameParameter As ObjectParameter = If(diagramname IsNot Nothing, New ObjectParameter("diagramname", diagramname), New ObjectParameter("diagramname", GetType(String)))

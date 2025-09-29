@@ -43,6 +43,12 @@ Partial Public Class Funcionario
     Public Property SubDireccionId As Nullable(Of Integer)
     Public Property SubEscalafonId As Nullable(Of Integer)
     Public Property PrestadorSaludId As Nullable(Of Integer)
+    Public Property Baja As Nullable(Of Date)
+    Public Property ResAlta As String
+    Public Property ResBaja As String
+    Public Property Descripcion As String
+    Public Property SituacionEspecial As String
+    Public Property Imei As String
 
     Public Overridable Property Cargo As Cargo
     Public Overridable Property Escalafon As Escalafon
