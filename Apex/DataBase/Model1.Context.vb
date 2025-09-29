@@ -199,6 +199,14 @@ Partial Public Class ApexEntities
         Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction(Of usp_Filtros_ObtenerLicenciasPorFecha_Result)("usp_Filtros_ObtenerLicenciasPorFecha", fechaInicioParameter, fechaFinParameter, filtroNombreParameter, tiposLicenciaIdsParameter, soloActivosParameter)
     End Function
 
+    Public Overridable Function usp_LimpiarDatosDeApex() As Integer
+        Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_LimpiarDatosDeApex")
+    End Function
+
+    Public Overridable Function usp_MigrarDotacionesCompletas() As Integer
+        Return DirectCast(Me, IObjectContextAdapter).ObjectContext.ExecuteFunction("usp_MigrarDotacionesCompletas")
+    End Function
+
     Public Overridable Function usp_PresenciaFecha_Apex(fecha As Nullable(Of Date)) As ObjectResult(Of usp_PresenciaFecha_Apex_Result)
         Dim fechaParameter As ObjectParameter = If(fecha.HasValue, New ObjectParameter("Fecha", fecha), New ObjectParameter("Fecha", GetType(Date)))
 

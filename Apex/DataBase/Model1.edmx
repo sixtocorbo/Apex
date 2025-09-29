@@ -806,12 +806,11 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_FuncionarioEstadosActivos' no ti
           <Key>
             <PropertyRef Name="FuncionarioId" />
             <PropertyRef Name="Prioridad" />
-            <PropertyRef Name="Tipo" />
             <PropertyRef Name="ColorIndicador" />
           </Key>
           <Property Name="FuncionarioId" Type="int" Nullable="false" />
           <Property Name="Prioridad" Type="int" Nullable="false" />
-          <Property Name="Tipo" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="Tipo" Type="nvarchar" MaxLength="100" />
           <Property Name="Detalles" Type="nvarchar(max)" />
           <Property Name="ColorIndicador" Type="varchar" MaxLength="14" Nullable="false" />
         </EntityType>
@@ -1792,6 +1791,8 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <Parameter Name="TiposLicenciaIds" Type="varchar(max)" Mode="In" />
           <Parameter Name="SoloActivos" Type="bit" Mode="In" />
         </Function>
+        <Function Name="usp_LimpiarDatosDeApex" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <Function Name="usp_MigrarDotacionesCompletas" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="usp_PresenciaFecha_Apex" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="Fecha" Type="date" Mode="In" />
         </Function>
@@ -3143,12 +3144,11 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <Key>
             <PropertyRef Name="FuncionarioId" />
             <PropertyRef Name="Prioridad" />
-            <PropertyRef Name="Tipo" />
             <PropertyRef Name="ColorIndicador" />
           </Key>
           <Property Name="FuncionarioId" Type="Int32" Nullable="false" />
           <Property Name="Prioridad" Type="Int32" Nullable="false" />
-          <Property Name="Tipo" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Tipo" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
           <Property Name="Detalles" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="ColorIndicador" Type="String" MaxLength="14" FixedLength="false" Unicode="false" Nullable="false" />
         </EntityType>
@@ -4420,6 +4420,8 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
             <Parameter Name="TiposLicenciaIds" Mode="In" Type="String" />
             <Parameter Name="SoloActivos" Mode="In" Type="Boolean" />
           </FunctionImport>
+          <FunctionImport Name="usp_LimpiarDatosDeApex" />
+          <FunctionImport Name="usp_MigrarDotacionesCompletas" />
           <FunctionImport Name="usp_PresenciaFecha_Apex" ReturnType="Collection(ApexModel.usp_PresenciaFecha_Apex_Result)">
             <Parameter Name="Fecha" Mode="In" Type="DateTime" />
           </FunctionImport>
@@ -5486,6 +5488,8 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="usp_LimpiarDatosDeApex" FunctionName="ApexModel.Store.usp_LimpiarDatosDeApex" />
+          <FunctionImportMapping FunctionImportName="usp_MigrarDotacionesCompletas" FunctionName="ApexModel.Store.usp_MigrarDotacionesCompletas" />
           <FunctionImportMapping FunctionImportName="usp_PresenciaFecha_Apex" FunctionName="ApexModel.Store.usp_PresenciaFecha_Apex">
             <ResultMapping>
               <ComplexTypeMapping TypeName="ApexModel.usp_PresenciaFecha_Apex_Result">
