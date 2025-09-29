@@ -1,5 +1,6 @@
 ﻿Imports System.Data.Entity
 Imports System.Data.SqlClient
+Imports System.Drawing
 Imports System.IO
 Imports System.Text
 Imports System.Threading
@@ -684,9 +685,23 @@ Public Class frmFuncionarioBuscar
                 btnVerSituacion.Text = primeraSituacion.Tipo
             End If
 
-            Dim severidadSituacion = EstadoVisualHelper.DeterminarSeveridad(primeraSituacion.Tipo)
-            Dim colorSituacion = EstadoVisualHelper.ObtenerColor(severidadSituacion)
-            Dim colorTexto = EstadoVisualHelper.ObtenerColorTexto(severidadSituacion)
+            'Dim severidadSituacion = EstadoVisualHelper.DeterminarSeveridad(primeraSituacion.Tipo)
+            'Dim colorSituacion = EstadoVisualHelper.ObtenerColor(severidadSituacion)
+            'Dim colorTexto = EstadoVisualHelper.ObtenerColorTexto(severidadSituacion)
+            Dim colorSituacionPersonalizado = ObtenerColorIndicador(primeraSituacion.ColorIndicador)
+
+            Dim colorSituacion As Color
+            Dim colorTexto As Color
+
+            If colorSituacionPersonalizado.HasValue Then
+                colorSituacion = colorSituacionPersonalizado.Value
+                colorTexto = CalcularColorTexto(colorSituacion)
+            Else
+                Dim severidadSituacion = EstadoVisualHelper.DeterminarSeveridad(primeraSituacion.Tipo)
+                colorSituacion = EstadoVisualHelper.ObtenerColor(severidadSituacion)
+                colorTexto = EstadoVisualHelper.ObtenerColorTexto(severidadSituacion)
+            End If
+
 
             btnVerSituacion.BackColor = colorSituacion
             btnVerSituacion.ForeColor = colorTexto
@@ -695,6 +710,41 @@ Public Class frmFuncionarioBuscar
             btnVerSituacion.Visible = False
         End If
     End Sub
+
+    Private Shared Function ObtenerColorIndicador(colorTexto As String) As Color?
+        If String.IsNullOrWhiteSpace(colorTexto) Then Return Nothing
+
+        Dim valor = colorTexto.Trim()
+
+        Try
+            Dim color = ColorTranslator.FromHtml(valor)
+
+            If EsColorVacio(color) AndAlso Not valor.StartsWith("#") Then
+                color = Color.FromName(valor)
+            End If
+
+            If EsColorVacio(color) Then
+                Return Nothing
+            End If
+
+            Return color
+        Catch ex As Exception
+            Dim _Color_ = Color.FromName(valor)
+            If EsColorVacio(_Color_) Then
+                Return Nothing
+            End If
+            Return _Color_
+        End Try
+    End Function
+
+    Private Shared Function EsColorVacio(color As Color) As Boolean
+        Return color.A = 0 AndAlso color.R = 0 AndAlso color.G = 0 AndAlso color.B = 0
+    End Function
+
+    Private Shared Function CalcularColorTexto(colorFondo As Color) As Color
+        Dim luminancia = (0.299 * colorFondo.R) + (0.587 * colorFondo.G) + (0.114 * colorFondo.B)
+        Return If(luminancia < 140, Color.White, Color.Black)
+    End Function
 
     Private Shared Async Function ObtenerSituacionesAsync(uow As UnitOfWork, funcionarioId As Integer) As Task(Of List(Of SituacionParaBoton))
         Return Await uow.Context.Database.SqlQuery(Of SituacionParaBoton)(CONSULTA_SITUACION_ACTUAL_SQL, funcionarioId).ToListAsync()
