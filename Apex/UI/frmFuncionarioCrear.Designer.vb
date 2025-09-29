@@ -3277,7 +3277,7 @@ Partial Class frmFuncionarioCrear
         '
         Me.lblResAlta.Anchor = System.Windows.Forms.AnchorStyles.Right
         Me.lblResAlta.AutoSize = True
-        Me.lblResAlta.Location = New System.Drawing.Point(25, 55)
+        Me.lblResAlta.Location = New System.Drawing.Point(25, 45)
         Me.lblResAlta.Margin = New System.Windows.Forms.Padding(3, 6, 10, 6)
         Me.lblResAlta.Name = "lblResAlta"
         Me.lblResAlta.Size = New System.Drawing.Size(76, 20)
@@ -3292,14 +3292,14 @@ Partial Class frmFuncionarioCrear
         Me.txtResAlta.Multiline = True
         Me.txtResAlta.Name = "txtResAlta"
         Me.txtResAlta.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.txtResAlta.Size = New System.Drawing.Size(687, 60)
+        Me.txtResAlta.Size = New System.Drawing.Size(687, 40)
         Me.txtResAlta.TabIndex = 33
         '
         'lblResBaja
         '
         Me.lblResBaja.Anchor = System.Windows.Forms.AnchorStyles.Right
         Me.lblResBaja.AutoSize = True
-        Me.lblResBaja.Location = New System.Drawing.Point(21, 121)
+        Me.lblResBaja.Location = New System.Drawing.Point(21, 91)
         Me.lblResBaja.Margin = New System.Windows.Forms.Padding(3, 6, 10, 6)
         Me.lblResBaja.Name = "lblResBaja"
         Me.lblResBaja.Size = New System.Drawing.Size(80, 20)
@@ -3310,18 +3310,18 @@ Partial Class frmFuncionarioCrear
         '
         Me.txtResBaja.AcceptsReturn = True
         Me.txtResBaja.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.txtResBaja.Location = New System.Drawing.Point(114, 101)
+        Me.txtResBaja.Location = New System.Drawing.Point(114, 81)
         Me.txtResBaja.Multiline = True
         Me.txtResBaja.Name = "txtResBaja"
         Me.txtResBaja.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.txtResBaja.Size = New System.Drawing.Size(687, 60)
+        Me.txtResBaja.Size = New System.Drawing.Size(687, 40)
         Me.txtResBaja.TabIndex = 34
         '
         'lblDescripcionAdicional
         '
         Me.lblDescripcionAdicional.Anchor = System.Windows.Forms.AnchorStyles.Right
         Me.lblDescripcionAdicional.AutoSize = True
-        Me.lblDescripcionAdicional.Location = New System.Drawing.Point(5, 197)
+        Me.lblDescripcionAdicional.Location = New System.Drawing.Point(5, 157)
         Me.lblDescripcionAdicional.Margin = New System.Windows.Forms.Padding(3, 6, 10, 6)
         Me.lblDescripcionAdicional.Name = "lblDescripcionAdicional"
         Me.lblDescripcionAdicional.Size = New System.Drawing.Size(96, 20)
@@ -3332,7 +3332,7 @@ Partial Class frmFuncionarioCrear
         '
         Me.txtDescripcion.AcceptsReturn = True
         Me.txtDescripcion.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.txtDescripcion.Location = New System.Drawing.Point(114, 167)
+        Me.txtDescripcion.Location = New System.Drawing.Point(114, 127)
         Me.txtDescripcion.Multiline = True
         Me.txtDescripcion.Name = "txtDescripcion"
         Me.txtDescripcion.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
@@ -3343,7 +3343,7 @@ Partial Class frmFuncionarioCrear
         '
         Me.lblSituacionEspecial.Anchor = System.Windows.Forms.AnchorStyles.Right
         Me.lblSituacionEspecial.AutoSize = True
-        Me.lblSituacionEspecial.Location = New System.Drawing.Point(3, 256)
+        Me.lblSituacionEspecial.Location = New System.Drawing.Point(3, 216)
         Me.lblSituacionEspecial.Margin = New System.Windows.Forms.Padding(3, 6, 10, 6)
         Me.lblSituacionEspecial.Name = "lblSituacionEspecial"
         Me.lblSituacionEspecial.Size = New System.Drawing.Size(98, 20)
@@ -3353,7 +3353,7 @@ Partial Class frmFuncionarioCrear
         'txtSituacionEspecial
         '
         Me.txtSituacionEspecial.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.txtSituacionEspecial.Location = New System.Drawing.Point(114, 253)
+        Me.txtSituacionEspecial.Location = New System.Drawing.Point(114, 213)
         Me.txtSituacionEspecial.MaxLength = 500
         Me.txtSituacionEspecial.Name = "txtSituacionEspecial"
         Me.txtSituacionEspecial.Size = New System.Drawing.Size(687, 26)
@@ -3363,7 +3363,7 @@ Partial Class frmFuncionarioCrear
         '
         Me.lblImei.Anchor = System.Windows.Forms.AnchorStyles.Right
         Me.lblImei.AutoSize = True
-        Me.lblImei.Location = New System.Drawing.Point(54, 288)
+        Me.lblImei.Location = New System.Drawing.Point(54, 268)
         Me.lblImei.Margin = New System.Windows.Forms.Padding(3, 6, 10, 6)
         Me.lblImei.Name = "lblImei"
         Me.lblImei.Size = New System.Drawing.Size(47, 20)
@@ -3373,7 +3373,7 @@ Partial Class frmFuncionarioCrear
         'txtImei
         '
         Me.txtImei.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.txtImei.Location = New System.Drawing.Point(114, 285)
+        Me.txtImei.Location = New System.Drawing.Point(114, 245)
         Me.txtImei.MaxLength = 500
         Me.txtImei.Name = "txtImei"
         Me.txtImei.Size = New System.Drawing.Size(687, 26)
