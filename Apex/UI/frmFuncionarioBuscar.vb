@@ -5,7 +5,6 @@ Imports System.IO
 Imports System.Linq
 Imports System.Text
 Imports System.Threading
-Imports ApexModel
 
 Public Class frmFuncionarioBuscar
     Inherits FormActualizable
@@ -707,41 +706,62 @@ Public Class frmFuncionarioBuscar
             btnVerSituacion.Visible = False
         End If
     End Sub
-
     Private Shared Async Function ObtenerSituacionesAsync(uow As UnitOfWork, funcionarioId As Integer) As Task(Of List(Of SituacionParaBoton))
         Dim fechaInicio = RangoSituacionInicio
         Dim fechaFin = RangoSituacionFin
-
         Dim situaciones As New List(Of SituacionParaBoton)()
 
-        Dim estados = Await uow.Context.Set(Of vw_EstadosTransitoriosCompletos)() _
-            .Where(Function(e) e.FuncionarioId = funcionarioId AndAlso
-                                e.FechaDesde.HasValue AndAlso
-                                e.FechaDesde.Value < fechaFin AndAlso
-                                (Not e.FechaHasta.HasValue OrElse e.FechaHasta.Value >= fechaInicio)) _
+        ' 1. OBTENER ESTADOS TRANSITORIOS (Lógica replicada de frmFuncionarioSituacion)
+        Dim estadosTransitorios = Await uow.Context.Set(Of EstadoTransitorio)() _
+            .Include("TipoEstadoTransitorio") _
+            .Include("BajaDeFuncionarioDetalle") _
+            .Include("CambioDeCargoDetalle") _
+            .Include("DesarmadoDetalle") _
+            .Include("DesignacionDetalle") _
+            .Include("EnfermedadDetalle") _
+            .Include("InicioDeProcesamientoDetalle") _
+            .Include("OrdenCincoDetalle") _
+            .Include("ReactivacionDeFuncionarioDetalle") _
+            .Include("RetenDetalle") _
+            .Include("SancionDetalle") _
+            .Include("SeparacionDelCargoDetalle") _
+            .Include("SumarioDetalle") _
+            .Include("TrasladoDetalle") _
+            .Where(Function(et) et.FuncionarioId = funcionarioId) _
             .AsNoTracking() _
             .ToListAsync()
 
-        situaciones.AddRange(estados.Select(Function(e)
-                                                Dim severidad = EstadoVisualHelper.DeterminarSeveridad(e.TipoEstadoNombre)
-                                                Return New SituacionParaBoton With {
-                                                    .Tipo = e.TipoEstadoNombre,
-                                                    .Desde = e.FechaDesde,
-                                                    .Hasta = e.FechaHasta,
-                                                    .Severidad = severidad
-                                                }
-                                            End Function))
+        ' Procesar cada estado para encontrar los activos y extraer sus fechas
+        For Each et In estadosTransitorios
+            Dim desde As Date? = Nothing
+            Dim hasta As Date? = Nothing
+            Dim tipoNombre As String = et.TipoEstadoTransitorio.Nombre
 
+            ' Extraer fechas de la tabla de detalle correspondiente
+            et.GetFechas(desde, hasta) ' Usamos la extensión que SÍ existe
+
+            ' Comprobar si el estado está activo en el rango de fechas actual
+            If desde.HasValue AndAlso desde.Value < fechaFin AndAlso (Not hasta.HasValue OrElse hasta.Value >= fechaInicio) Then
+                situaciones.Add(New SituacionParaBoton With {
+                    .Tipo = tipoNombre,
+                    .Desde = desde,
+                    .Hasta = hasta,
+                    .Severidad = EstadoVisualHelper.DeterminarSeveridad(tipoNombre)
+                })
+            End If
+        Next
+
+        ' 2. OBTENER LICENCIAS (Lógica ya corregida)
         Dim licencias = Await uow.Context.Set(Of HistoricoLicencia)() _
             .Include(Function(l) l.TipoLicencia) _
             .Where(Function(l) l.FuncionarioId = funcionarioId AndAlso
-                                l.inicio < fechaFin AndAlso
-                                l.finaliza >= fechaInicio) _
+                                 l.inicio < fechaFin AndAlso
+                                 l.finaliza >= fechaInicio) _
             .AsNoTracking() _
             .ToListAsync()
 
         situaciones.AddRange(licencias.Select(Function(l)
-                                                  Dim tipo = $"LICENCIA: {l.TipoLicencia.Nombre}"
+                                                  Dim tipo = l.TipoLicencia.Nombre
                                                   Dim severidad = EstadoVisualHelper.DeterminarSeveridad(tipo)
                                                   Return New SituacionParaBoton With {
                                                        .Tipo = tipo,
@@ -751,31 +771,81 @@ Public Class frmFuncionarioBuscar
                                                    }
                                               End Function))
 
-        Dim notificaciones = Await uow.Context.Set(Of NotificacionPersonal)() _
-            .Include(Function(n) n.TipoNotificacion) _
-            .Where(Function(n) n.FuncionarioId = funcionarioId AndAlso
-                                n.FechaProgramada >= fechaInicio AndAlso
-                                n.FechaProgramada < fechaFin) _
-            .AsNoTracking() _
-            .ToListAsync()
-
-        situaciones.AddRange(notificaciones.Select(Function(n)
-                                                       Dim tipo = $"NOTIFICACIÓN PENDIENTE: {n.TipoNotificacion.Nombre}"
-                                                       Dim severidad = EstadoVisualHelper.DeterminarSeveridad(tipo)
-                                                       Return New SituacionParaBoton With {
-                                                            .Tipo = tipo,
-                                                            .Desde = n.FechaProgramada,
-                                                            .Hasta = Nothing,
-                                                            .Severidad = severidad
-                                                        }
-                                                   End Function))
-
+        ' 3. ORDENAR CORRECTAMENTE
         Return situaciones _
             .OrderByDescending(Function(s) s.Severidad) _
             .ThenByDescending(Function(s) s.Desde.GetValueOrDefault(fechaInicio)) _
             .ThenBy(Function(s) s.Tipo) _
             .ToList()
     End Function
+    'Private Shared Async Function ObtenerSituacionesAsync(uow As UnitOfWork, funcionarioId As Integer) As Task(Of List(Of SituacionParaBoton))
+    '    Dim fechaInicio = RangoSituacionInicio
+    '    Dim fechaFin = RangoSituacionFin
+
+    '    Dim situaciones As New List(Of SituacionParaBoton)()
+
+    '    Dim estados = Await uow.Context.Set(Of vw_EstadosTransitoriosCompletos)() _
+    '        .Where(Function(e) e.FuncionarioId = funcionarioId AndAlso
+    '                            e.FechaDesde.HasValue AndAlso
+    '                            e.FechaDesde.Value < fechaFin AndAlso
+    '                            (Not e.FechaHasta.HasValue OrElse e.FechaHasta.Value >= fechaInicio)) _
+    '        .AsNoTracking() _
+    '        .ToListAsync()
+
+    '    situaciones.AddRange(estados.Select(Function(e)
+    '                                            Dim severidad = EstadoVisualHelper.DeterminarSeveridad(e.TipoEstadoNombre)
+    '                                            Return New SituacionParaBoton With {
+    '                                                .Tipo = e.TipoEstadoNombre,
+    '                                                .Desde = e.FechaDesde,
+    '                                                .Hasta = e.FechaHasta,
+    '                                                .Severidad = severidad
+    '                                            }
+    '                                        End Function))
+
+    '    Dim licencias = Await uow.Context.Set(Of HistoricoLicencia)() _
+    '        .Include(Function(l) l.TipoLicencia) _
+    '        .Where(Function(l) l.FuncionarioId = funcionarioId AndAlso
+    '                            l.inicio < fechaFin AndAlso
+    '                            l.finaliza >= fechaInicio) _
+    '        .AsNoTracking() _
+    '        .ToListAsync()
+
+    '    situaciones.AddRange(licencias.Select(Function(l)
+    '                                              Dim tipo = l.TipoLicencia.Nombre
+    '                                              Dim severidad = EstadoVisualHelper.DeterminarSeveridad(tipo)
+    '                                              Return New SituacionParaBoton With {
+    '                                                   .Tipo = tipo,
+    '                                                   .Desde = l.inicio,
+    '                                                   .Hasta = l.finaliza,
+    '                                                   .Severidad = severidad
+    '                                               }
+    '                                          End Function))
+
+    '    Dim notificaciones = Await uow.Context.Set(Of NotificacionPersonal)() _
+    '        .Include(Function(n) n.TipoNotificacion) _
+    '        .Where(Function(n) n.FuncionarioId = funcionarioId AndAlso
+    '                            n.FechaProgramada >= fechaInicio AndAlso
+    '                            n.FechaProgramada < fechaFin) _
+    '        .AsNoTracking() _
+    '        .ToListAsync()
+
+    '    situaciones.AddRange(notificaciones.Select(Function(n)
+    '                                                   Dim tipo = $"NOTIFICACIÓN PENDIENTE: {n.TipoNotificacion.Nombre}"
+    '                                                   Dim severidad = EstadoVisualHelper.DeterminarSeveridad(tipo)
+    '                                                   Return New SituacionParaBoton With {
+    '                                                        .Tipo = tipo,
+    '                                                        .Desde = n.FechaProgramada,
+    '                                                        .Hasta = Nothing,
+    '                                                        .Severidad = severidad
+    '                                                    }
+    '                                               End Function))
+
+    '    Return situaciones _
+    '        .OrderByDescending(Function(s) s.Severidad) _
+    '        .ThenByDescending(Function(s) s.Desde.GetValueOrDefault(fechaInicio)) _
+    '        .ThenBy(Function(s) s.Tipo) _
+    '        .ToList()
+    'End Function
 
     Private Async Function RefrescarBotonSituacionAsync(funcionarioId As Integer) As Task
         Try

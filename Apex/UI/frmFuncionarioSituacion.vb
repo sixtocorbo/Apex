@@ -607,7 +607,7 @@ Public Class frmFuncionarioSituacion
         Public Sub New(licencia As HistoricoLicencia)
             Me.Id = licencia.Id
             Me.TipoEvento = "Licencia"
-            Me.Tipo = licencia.TipoLicencia.Nombre
+            Me.Tipo = licencia.TipoLicencia.Nombre ' <--- CORRECTO
             Me.Desde = licencia.inicio
             Me.Hasta = licencia.finaliza
             Me.Detalles = licencia.Comentario?.Trim()
