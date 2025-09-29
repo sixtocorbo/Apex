@@ -210,7 +210,7 @@ Public Class frmFuncionarioSituacion
                 .Include(Function(n) n.NotificacionEstado) _
                 .Where(Function(n) n.FuncionarioId = _funcionarioId AndAlso
                                      (n.EstadoId = estadoPendienteId OrElse n.EstadoId = estadoVencidaId) AndAlso
-                                     n.FechaProgramada >= fechaInicio AndAlso
+                                     (n.FechaProgramada >= fechaInicio OrElse n.EstadoId = estadoVencidaId) AndAlso
                                      n.FechaProgramada < fechaFin) _
                 .AsNoTracking().ToListAsync()
 
