@@ -656,7 +656,7 @@ Public Class frmFuncionarioBuscar
             End If
 
             Dim situaciones = Await ObtenerSituacionesAsync(uow, id)
-            
+
             AplicarSituacionesAlBoton(situaciones)
 
             lblPresencia.Text = Await ObtenerPresenciaAsync(id, Date.Today)
@@ -741,15 +741,15 @@ Public Class frmFuncionarioBuscar
             .ToListAsync()
 
         situaciones.AddRange(licencias.Select(Function(l)
-                                                   Dim tipo = $"LICENCIA: {l.TipoLicencia.Nombre}"
-                                                   Dim severidad = EstadoVisualHelper.DeterminarSeveridad(tipo)
-                                                   Return New SituacionParaBoton With {
+                                                  Dim tipo = $"LICENCIA: {l.TipoLicencia.Nombre}"
+                                                  Dim severidad = EstadoVisualHelper.DeterminarSeveridad(tipo)
+                                                  Return New SituacionParaBoton With {
                                                        .Tipo = tipo,
                                                        .Desde = l.inicio,
                                                        .Hasta = l.finaliza,
                                                        .Severidad = severidad
                                                    }
-                                               End Function))
+                                              End Function))
 
         Dim notificaciones = Await uow.Context.Set(Of NotificacionPersonal)() _
             .Include(Function(n) n.TipoNotificacion) _
@@ -760,15 +760,15 @@ Public Class frmFuncionarioBuscar
             .ToListAsync()
 
         situaciones.AddRange(notificaciones.Select(Function(n)
-                                                        Dim tipo = $"NOTIFICACIÓN PENDIENTE: {n.TipoNotificacion.Nombre}"
-                                                        Dim severidad = EstadoVisualHelper.DeterminarSeveridad(tipo)
-                                                        Return New SituacionParaBoton With {
+                                                       Dim tipo = $"NOTIFICACIÓN PENDIENTE: {n.TipoNotificacion.Nombre}"
+                                                       Dim severidad = EstadoVisualHelper.DeterminarSeveridad(tipo)
+                                                       Return New SituacionParaBoton With {
                                                             .Tipo = tipo,
                                                             .Desde = n.FechaProgramada,
                                                             .Hasta = Nothing,
                                                             .Severidad = severidad
                                                         }
-                                                    End Function))
+                                                   End Function))
 
         Return situaciones _
             .OrderByDescending(Function(s) s.Severidad) _
