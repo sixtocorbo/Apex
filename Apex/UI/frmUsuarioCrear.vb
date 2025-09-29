@@ -1,13 +1,16 @@
 ﻿Imports System.Data.Entity
 Imports System.Windows.Forms
 
+''' <summary>
+''' Formulario para crear o editar usuarios del sistema.
+''' </summary>
 Public Class frmUsuarioCrear
-    ' --- Servicios ---
+    ' Servicios utilizados para recuperar y persistir datos relacionados al usuario.
     Private ReadOnly _usuarioService As New UsuarioService()
     Private ReadOnly _funcionarioService As New FuncionarioService()
 
-    ' --- Propiedades ---
-    Private _id As Integer? ' Guarda el ID del usuario. Si es Nothing, es un nuevo usuario.
+    ' Identificador del usuario que se está editando; Nothing indica modo creación.
+    Private _id As Integer?
 
 
     Public Sub New(id As Integer)
@@ -22,18 +25,18 @@ Public Class frmUsuarioCrear
 
     Private Async Sub frmUsuarioCrear_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         If _id.HasValue Then
-            ' --- MODO EDICIÓN ---
+            ' Configura el formulario para editar un usuario existente.
             Me.Text = "Editar Usuario"
             Await CargarDatosParaEdicion()
         Else
-            ' --- MODO CREACIÓN ---
+            ' Configura el formulario para crear un nuevo usuario.
             Me.Text = "Crear Nuevo Usuario"
             Await CargarFuncionariosDisponibles()
         End If
     End Sub
 
     Private Async Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
-        ' --- Validaciones (el código que ya tenías está bien) ---
+        ' Validaciones básicas antes de intentar guardar.
         If cmbFuncionario.SelectedItem Is Nothing Then
             MessageBox.Show("Debe seleccionar un funcionario.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             Return
@@ -50,17 +53,17 @@ Public Class frmUsuarioCrear
 
         Try
             If _id.HasValue Then
-                ' --- LÓGICA PARA ACTUALIZAR ---
+                ' Actualiza el usuario existente con los datos del formulario.
                 Dim usuarioExistente = Await _usuarioService.GetByIdAsync(_id.Value)
                 If usuarioExistente IsNot Nothing Then
                     usuarioExistente.NombreUsuario = txtNombreUsuario.Text.Trim()
-                    ' Solo actualiza la contraseña si se escribió algo en el TextBox
+                    ' Actualiza la contraseña únicamente si se proporcionó un nuevo valor.
                     Dim nuevaPassword = If(String.IsNullOrWhiteSpace(txtPassword.Text), Nothing, txtPassword.Text)
                     Await _usuarioService.UpdateAsync(usuarioExistente, nuevaPassword)
                     MessageBox.Show("Usuario actualizado con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 End If
             Else
-                ' --- LÓGICA PARA CREAR ---
+                ' Crea un nuevo usuario asociado al funcionario seleccionado.
                 Dim funcionarioSeleccionado = CType(cmbFuncionario.SelectedItem, Funcionario)
                 Dim nuevoUsuario As New Usuario With {
                     .NombreUsuario = txtNombreUsuario.Text.Trim(),
@@ -80,12 +83,8 @@ Public Class frmUsuarioCrear
         End Try
     End Sub
 
-    ' ==========================================================================
-    ' MÉTODOS PRIVADOS DE AYUDA
-    ' ==========================================================================
-
     ''' <summary>
-    ''' MODO EDICIÓN: Carga los datos del usuario y bloquea el ComboBox con el funcionario correspondiente.
+    ''' Carga los datos del usuario a editar y bloquea la selección del funcionario asociado.
     ''' </summary>
     Private Async Function CargarDatosParaEdicion() As Task
         Try
@@ -99,13 +98,13 @@ Public Class frmUsuarioCrear
             txtNombreUsuario.Text = usuario.NombreUsuario
 
 
-            ' Cargar solo el funcionario asociado al usuario
+            ' Carga únicamente el funcionario asociado al usuario en edición.
             Dim funcionarioActual = Await _funcionarioService.GetByIdAsync(usuario.FuncionarioId)
             If funcionarioActual IsNot Nothing Then
                 cmbFuncionario.DataSource = New List(Of Funcionario) From {funcionarioActual}
                 cmbFuncionario.DisplayMember = "Nombre"
                 cmbFuncionario.ValueMember = "Id"
-                cmbFuncionario.Enabled = False ' Bloqueamos el control
+                cmbFuncionario.Enabled = False ' Evita cambiar el funcionario durante la edición.
             End If
 
         Catch ex As Exception
@@ -114,23 +113,23 @@ Public Class frmUsuarioCrear
     End Function
 
     ''' <summary>
-    ''' MODO CREACIÓN: Carga en el ComboBox a TODOS los funcionarios del sistema para asociar uno.
+    ''' Carga el listado de funcionarios disponibles para vincular a un nuevo usuario.
     ''' </summary>
     Private Async Function CargarFuncionariosDisponibles() As Task
         Try
-            ' 1. Cargamos TODOS los funcionarios del sistema, sin ningún filtro.
+            ' Obtiene todos los funcionarios registrados en el sistema.
             Dim todosLosFuncionarios = Await _funcionarioService.GetAllAsync()
 
-            ' 2. Verificamos si la lista tiene elementos.
+            ' Configura el ComboBox únicamente si hay resultados disponibles.
             If todosLosFuncionarios.Any() Then
                 cmbFuncionario.DataSource = todosLosFuncionarios.OrderBy(Of String)(Function(f) f.Nombre).ToList()
                 cmbFuncionario.DisplayMember = "Nombre"
                 cmbFuncionario.ValueMember = "Id"
-                cmbFuncionario.SelectedIndex = -1 ' Para que no aparezca ninguno seleccionado por defecto
+                cmbFuncionario.SelectedIndex = -1 ' Evita selección predeterminada.
                 cmbFuncionario.Text = "Seleccione un funcionario"
             Else
                 MessageBox.Show("No hay funcionarios registrados en el sistema. Debe crear un funcionario antes de poder asignarle un usuario.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-                btnGuardar.Enabled = False ' Deshabilitamos el botón si no hay opciones
+                btnGuardar.Enabled = False ' Deshabilita el guardado hasta que exista un funcionario disponible.
             End If
 
         Catch ex As Exception
