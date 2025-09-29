@@ -208,6 +208,12 @@
           <Property Name="SubDireccionId" Type="int" />
           <Property Name="SubEscalafonId" Type="int" />
           <Property Name="PrestadorSaludId" Type="int" />
+          <Property Name="Baja" Type="date" />
+          <Property Name="ResAlta" Type="nvarchar(max)" />
+          <Property Name="ResBaja" Type="nvarchar(max)" />
+          <Property Name="Descripcion" Type="nvarchar(max)" />
+          <Property Name="SituacionEspecial" Type="nvarchar" MaxLength="500" />
+          <Property Name="Imei" Type="nvarchar" MaxLength="500" />
         </EntityType>
         <EntityType Name="FuncionarioArma">
           <Key>
@@ -2466,6 +2472,12 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
           <Property Name="SubDireccionId" Type="Int32" />
           <Property Name="SubEscalafonId" Type="Int32" />
           <Property Name="PrestadorSaludId" Type="Int32" />
+          <Property Name="Baja" Type="DateTime" Precision="0" />
+          <Property Name="ResAlta" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="ResBaja" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Descripcion" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="SituacionEspecial" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="Imei" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="Cargo" Relationship="Self.FK_Funcionario_Cargo" FromRole="Funcionario" ToRole="Cargo" />
           <NavigationProperty Name="Escalafon" Relationship="Self.FK_Funcionario_Escalafon" FromRole="Funcionario" ToRole="Escalafon" />
           <NavigationProperty Name="EstadoCivil" Relationship="Self.FK__Funcionar__Estad__282DF8C2" FromRole="Funcionario" ToRole="EstadoCivil" />
@@ -4694,6 +4706,12 @@ advertencia 6002: La tabla o vista 'Apex.dbo.vw_SancionesCompletas' no tiene def
                 <ScalarProperty Name="SubDireccionId" ColumnName="SubDireccionId" />
                 <ScalarProperty Name="SubEscalafonId" ColumnName="SubEscalafonId" />
                 <ScalarProperty Name="PrestadorSaludId" ColumnName="PrestadorSaludId" />
+                <ScalarProperty Name="Baja" ColumnName="Baja" />
+                <ScalarProperty Name="ResAlta" ColumnName="ResAlta" />
+                <ScalarProperty Name="ResBaja" ColumnName="ResBaja" />
+                <ScalarProperty Name="Descripcion" ColumnName="Descripcion" />
+                <ScalarProperty Name="SituacionEspecial" ColumnName="SituacionEspecial" />
+                <ScalarProperty Name="Imei" ColumnName="Imei" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

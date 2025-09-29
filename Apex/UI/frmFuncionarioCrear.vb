@@ -126,6 +126,8 @@ Public Class frmFuncionarioCrear
             Me.Text = "Nuevo Funcionario"
             btnGuardar.Text = "Guardar"
             pbFoto.Image = My.Resources.Police
+            dtpBaja.Checked = False
+            dtpBaja.Value = SafePickerDate(dtpBaja, Date.Today)
         End If
 
     End Sub
@@ -248,6 +250,18 @@ Public Class frmFuncionarioCrear
         txtCiudad.Text = If(_funcionario.Ciudad, String.Empty).Trim()
         txtSeccional.Text = If(_funcionario.Seccional, String.Empty).Trim()
         txtCredencial.Text = If(_funcionario.Credencial, String.Empty).Trim()
+        If _funcionario.Baja.HasValue Then
+            dtpBaja.Value = SafePickerDate(dtpBaja, _funcionario.Baja)
+            dtpBaja.Checked = True
+        Else
+            dtpBaja.Value = SafePickerDate(dtpBaja, Date.Today)
+            dtpBaja.Checked = False
+        End If
+        txtResAlta.Text = If(_funcionario.ResAlta, String.Empty).Trim()
+        txtResBaja.Text = If(_funcionario.ResBaja, String.Empty).Trim()
+        txtDescripcion.Text = If(_funcionario.Descripcion, String.Empty).Trim()
+        txtSituacionEspecial.Text = If(_funcionario.SituacionEspecial, String.Empty).Trim()
+        txtImei.Text = If(_funcionario.Imei, String.Empty).Trim()
 
         ' Checkboxes
         chkActivo.Checked = _funcionario.Activo
@@ -322,6 +336,12 @@ Public Class frmFuncionarioCrear
             cbo.SelectedIndex = -1
         End Try
     End Sub
+
+    Private Function TextOrNothing(txt As TextBox) As String
+        If txt Is Nothing Then Return Nothing
+        Dim contenido = txt.Text.Trim()
+        Return If(String.IsNullOrWhiteSpace(contenido), Nothing, contenido)
+    End Function
 
 #End Region
 
@@ -671,6 +691,16 @@ Public Class frmFuncionarioCrear
         _funcionario.SubDireccionId = If(cboSubDireccion.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboSubDireccion.SelectedValue))
         _funcionario.SubEscalafonId = If(cboSubEscalafon.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboSubEscalafon.SelectedValue))
         _funcionario.PrestadorSaludId = If(cboPrestadorSalud.SelectedIndex = -1, CType(Nothing, Integer?), CInt(cboPrestadorSalud.SelectedValue))
+        If dtpBaja.Checked Then
+            _funcionario.Baja = dtpBaja.Value.Date
+        Else
+            _funcionario.Baja = Nothing
+        End If
+        _funcionario.ResAlta = TextOrNothing(txtResAlta)
+        _funcionario.ResBaja = TextOrNothing(txtResBaja)
+        _funcionario.Descripcion = TextOrNothing(txtDescripcion)
+        _funcionario.SituacionEspecial = TextOrNothing(txtSituacionEspecial)
+        _funcionario.Imei = TextOrNothing(txtImei)
         If Not String.IsNullOrWhiteSpace(_rutaFotoSeleccionada) Then _funcionario.Foto = File.ReadAllBytes(_rutaFotoSeleccionada)
     End Sub
 

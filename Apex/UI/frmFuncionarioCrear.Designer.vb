@@ -2195,6 +2195,8 @@ Partial Class frmFuncionarioCrear
         Me.pbFoto = New System.Windows.Forms.PictureBox()
         Me.btnSeleccionarFoto = New System.Windows.Forms.Button()
         Me.TableLayoutPanelDatosGenerales = New System.Windows.Forms.TableLayoutPanel()
+        Me.grpDatosAdicionales = New System.Windows.Forms.GroupBox()
+        Me.TableLayoutPanelCamposAdicionales = New System.Windows.Forms.TableLayoutPanel()
         Me.lblTurno = New System.Windows.Forms.Label()
         Me.chkActivo = New System.Windows.Forms.CheckBox()
         Me.lblFechaIngreso = New System.Windows.Forms.Label()
@@ -2220,6 +2222,18 @@ Partial Class frmFuncionarioCrear
         Me.cboSemana = New System.Windows.Forms.ComboBox()
         Me.lblHorario = New System.Windows.Forms.Label()
         Me.cboHorario = New System.Windows.Forms.ComboBox()
+        Me.lblFechaBaja = New System.Windows.Forms.Label()
+        Me.dtpBaja = New System.Windows.Forms.DateTimePicker()
+        Me.lblResAlta = New System.Windows.Forms.Label()
+        Me.txtResAlta = New System.Windows.Forms.TextBox()
+        Me.lblResBaja = New System.Windows.Forms.Label()
+        Me.txtResBaja = New System.Windows.Forms.TextBox()
+        Me.lblDescripcionAdicional = New System.Windows.Forms.Label()
+        Me.txtDescripcion = New System.Windows.Forms.TextBox()
+        Me.lblSituacionEspecial = New System.Windows.Forms.Label()
+        Me.txtSituacionEspecial = New System.Windows.Forms.TextBox()
+        Me.lblImei = New System.Windows.Forms.Label()
+        Me.txtImei = New System.Windows.Forms.TextBox()
         Me.TabControlMain = New System.Windows.Forms.TabControl()
         Me.flowlayoutPanelBotones.SuspendLayout()
         Me.TabPageEstadosTransitorios.SuspendLayout()
@@ -2236,6 +2250,8 @@ Partial Class frmFuncionarioCrear
         Me.TableLayoutPanelGeneral.SuspendLayout()
         CType(Me.pbFoto, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TableLayoutPanelDatosGenerales.SuspendLayout()
+        Me.grpDatosAdicionales.SuspendLayout()
+        Me.TableLayoutPanelCamposAdicionales.SuspendLayout()
         Me.TabControlMain.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -2906,11 +2922,12 @@ Partial Class frmFuncionarioCrear
         Me.TableLayoutPanelDatosGenerales.Controls.Add(Me.cboSemana, 3, 2)
         Me.TableLayoutPanelDatosGenerales.Controls.Add(Me.lblHorario, 2, 4)
         Me.TableLayoutPanelDatosGenerales.Controls.Add(Me.cboHorario, 3, 4)
+        Me.TableLayoutPanelDatosGenerales.Controls.Add(Me.grpDatosAdicionales, 0, 9)
         Me.TableLayoutPanelDatosGenerales.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TableLayoutPanelDatosGenerales.Location = New System.Drawing.Point(304, 5)
         Me.TableLayoutPanelDatosGenerales.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.TableLayoutPanelDatosGenerales.Name = "TableLayoutPanelDatosGenerales"
-        Me.TableLayoutPanelDatosGenerales.RowCount = 9
+        Me.TableLayoutPanelDatosGenerales.RowCount = 10
         Me.TableLayoutPanelGeneral.SetRowSpan(Me.TableLayoutPanelDatosGenerales, 2)
         Me.TableLayoutPanelDatosGenerales.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 12.5!))
         Me.TableLayoutPanelDatosGenerales.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 12.5!))
@@ -2921,8 +2938,183 @@ Partial Class frmFuncionarioCrear
         Me.TableLayoutPanelDatosGenerales.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 12.5!))
         Me.TableLayoutPanelDatosGenerales.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 12.5!))
         Me.TableLayoutPanelDatosGenerales.RowStyles.Add(New System.Windows.Forms.RowStyle())
+        Me.TableLayoutPanelDatosGenerales.RowStyles.Add(New System.Windows.Forms.RowStyle())
         Me.TableLayoutPanelDatosGenerales.Size = New System.Drawing.Size(830, 537)
         Me.TableLayoutPanelDatosGenerales.TabIndex = 2
+        Me.TableLayoutPanelDatosGenerales.SetColumnSpan(Me.grpDatosAdicionales, 4)
+        '
+        'grpDatosAdicionales
+        '
+        Me.grpDatosAdicionales.Controls.Add(Me.TableLayoutPanelCamposAdicionales)
+        Me.grpDatosAdicionales.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.grpDatosAdicionales.Location = New System.Drawing.Point(3, 537)
+        Me.grpDatosAdicionales.Margin = New System.Windows.Forms.Padding(3, 3, 3, 3)
+        Me.grpDatosAdicionales.Name = "grpDatosAdicionales"
+        Me.grpDatosAdicionales.Padding = New System.Windows.Forms.Padding(10)
+        Me.grpDatosAdicionales.Size = New System.Drawing.Size(824, 348)
+        Me.grpDatosAdicionales.TabIndex = 31
+        Me.grpDatosAdicionales.TabStop = False
+        Me.grpDatosAdicionales.Text = "Datos adicionales"
+        '
+        'TableLayoutPanelCamposAdicionales
+        '
+        Me.TableLayoutPanelCamposAdicionales.ColumnCount = 2
+        Me.TableLayoutPanelCamposAdicionales.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+        Me.TableLayoutPanelCamposAdicionales.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+        Me.TableLayoutPanelCamposAdicionales.Controls.Add(Me.lblFechaBaja, 0, 0)
+        Me.TableLayoutPanelCamposAdicionales.Controls.Add(Me.dtpBaja, 1, 0)
+        Me.TableLayoutPanelCamposAdicionales.Controls.Add(Me.lblResAlta, 0, 1)
+        Me.TableLayoutPanelCamposAdicionales.Controls.Add(Me.txtResAlta, 1, 1)
+        Me.TableLayoutPanelCamposAdicionales.Controls.Add(Me.lblResBaja, 0, 2)
+        Me.TableLayoutPanelCamposAdicionales.Controls.Add(Me.txtResBaja, 1, 2)
+        Me.TableLayoutPanelCamposAdicionales.Controls.Add(Me.lblDescripcionAdicional, 0, 3)
+        Me.TableLayoutPanelCamposAdicionales.Controls.Add(Me.txtDescripcion, 1, 3)
+        Me.TableLayoutPanelCamposAdicionales.Controls.Add(Me.lblSituacionEspecial, 0, 4)
+        Me.TableLayoutPanelCamposAdicionales.Controls.Add(Me.txtSituacionEspecial, 1, 4)
+        Me.TableLayoutPanelCamposAdicionales.Controls.Add(Me.lblImei, 0, 5)
+        Me.TableLayoutPanelCamposAdicionales.Controls.Add(Me.txtImei, 1, 5)
+        Me.TableLayoutPanelCamposAdicionales.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.TableLayoutPanelCamposAdicionales.Location = New System.Drawing.Point(10, 29)
+        Me.TableLayoutPanelCamposAdicionales.Name = "TableLayoutPanelCamposAdicionales"
+        Me.TableLayoutPanelCamposAdicionales.RowCount = 6
+        Me.TableLayoutPanelCamposAdicionales.RowStyles.Add(New System.Windows.Forms.RowStyle())
+        Me.TableLayoutPanelCamposAdicionales.RowStyles.Add(New System.Windows.Forms.RowStyle())
+        Me.TableLayoutPanelCamposAdicionales.RowStyles.Add(New System.Windows.Forms.RowStyle())
+        Me.TableLayoutPanelCamposAdicionales.RowStyles.Add(New System.Windows.Forms.RowStyle())
+        Me.TableLayoutPanelCamposAdicionales.RowStyles.Add(New System.Windows.Forms.RowStyle())
+        Me.TableLayoutPanelCamposAdicionales.RowStyles.Add(New System.Windows.Forms.RowStyle())
+        Me.TableLayoutPanelCamposAdicionales.Size = New System.Drawing.Size(804, 308)
+        Me.TableLayoutPanelCamposAdicionales.TabIndex = 0
+        '
+        'lblFechaBaja
+        '
+        Me.lblFechaBaja.Anchor = System.Windows.Forms.AnchorStyles.Right
+        Me.lblFechaBaja.AutoSize = True
+        Me.lblFechaBaja.Location = New System.Drawing.Point(19, 6)
+        Me.lblFechaBaja.Margin = New System.Windows.Forms.Padding(3, 6, 10, 6)
+        Me.lblFechaBaja.Name = "lblFechaBaja"
+        Me.lblFechaBaja.Size = New System.Drawing.Size(93, 20)
+        Me.lblFechaBaja.TabIndex = 0
+        Me.lblFechaBaja.Text = "Fecha baja:"
+        '
+        'dtpBaja
+        '
+        Me.dtpBaja.Anchor = System.Windows.Forms.AnchorStyles.Left
+        Me.dtpBaja.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
+        Me.dtpBaja.Location = New System.Drawing.Point(125, 3)
+        Me.dtpBaja.Margin = New System.Windows.Forms.Padding(3, 3, 3, 3)
+        Me.dtpBaja.Name = "dtpBaja"
+        Me.dtpBaja.ShowCheckBox = True
+        Me.dtpBaja.Size = New System.Drawing.Size(200, 26)
+        Me.dtpBaja.TabIndex = 32
+        '
+        'lblResAlta
+        '
+        Me.lblResAlta.Anchor = System.Windows.Forms.AnchorStyles.Right
+        Me.lblResAlta.AutoSize = True
+        Me.lblResAlta.Location = New System.Drawing.Point(29, 45)
+        Me.lblResAlta.Margin = New System.Windows.Forms.Padding(3, 6, 10, 6)
+        Me.lblResAlta.Name = "lblResAlta"
+        Me.lblResAlta.Size = New System.Drawing.Size(83, 20)
+        Me.lblResAlta.TabIndex = 2
+        Me.lblResAlta.Text = "Res. alta:"
+        '
+        'txtResAlta
+        '
+        Me.txtResAlta.AcceptsReturn = True
+        Me.txtResAlta.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.txtResAlta.Location = New System.Drawing.Point(125, 35)
+        Me.txtResAlta.Margin = New System.Windows.Forms.Padding(3, 3, 3, 3)
+        Me.txtResAlta.Multiline = True
+        Me.txtResAlta.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
+        Me.txtResAlta.Size = New System.Drawing.Size(676, 60)
+        Me.txtResAlta.TabIndex = 33
+        '
+        'lblResBaja
+        '
+        Me.lblResBaja.Anchor = System.Windows.Forms.AnchorStyles.Right
+        Me.lblResBaja.AutoSize = True
+        Me.lblResBaja.Location = New System.Drawing.Point(25, 111)
+        Me.lblResBaja.Margin = New System.Windows.Forms.Padding(3, 6, 10, 6)
+        Me.lblResBaja.Name = "lblResBaja"
+        Me.lblResBaja.Size = New System.Drawing.Size(87, 20)
+        Me.lblResBaja.TabIndex = 4
+        Me.lblResBaja.Text = "Res. baja:"
+        '
+        'txtResBaja
+        '
+        Me.txtResBaja.AcceptsReturn = True
+        Me.txtResBaja.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.txtResBaja.Location = New System.Drawing.Point(125, 101)
+        Me.txtResBaja.Margin = New System.Windows.Forms.Padding(3, 3, 3, 3)
+        Me.txtResBaja.Multiline = True
+        Me.txtResBaja.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
+        Me.txtResBaja.Size = New System.Drawing.Size(676, 60)
+        Me.txtResBaja.TabIndex = 34
+        '
+        'lblDescripcionAdicional
+        '
+        Me.lblDescripcionAdicional.Anchor = System.Windows.Forms.AnchorStyles.Right
+        Me.lblDescripcionAdicional.AutoSize = True
+        Me.lblDescripcionAdicional.Location = New System.Drawing.Point(21, 177)
+        Me.lblDescripcionAdicional.Margin = New System.Windows.Forms.Padding(3, 6, 10, 6)
+        Me.lblDescripcionAdicional.Name = "lblDescripcionAdicional"
+        Me.lblDescripcionAdicional.Size = New System.Drawing.Size(91, 20)
+        Me.lblDescripcionAdicional.TabIndex = 6
+        Me.lblDescripcionAdicional.Text = "Descripción:"
+        '
+        'txtDescripcion
+        '
+        Me.txtDescripcion.AcceptsReturn = True
+        Me.txtDescripcion.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.txtDescripcion.Location = New System.Drawing.Point(125, 167)
+        Me.txtDescripcion.Margin = New System.Windows.Forms.Padding(3, 3, 3, 3)
+        Me.txtDescripcion.Multiline = True
+        Me.txtDescripcion.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
+        Me.txtDescripcion.Size = New System.Drawing.Size(676, 80)
+        Me.txtDescripcion.TabIndex = 35
+        '
+        'lblSituacionEspecial
+        '
+        Me.lblSituacionEspecial.Anchor = System.Windows.Forms.AnchorStyles.Right
+        Me.lblSituacionEspecial.AutoSize = True
+        Me.lblSituacionEspecial.Location = New System.Drawing.Point(3, 257)
+        Me.lblSituacionEspecial.Margin = New System.Windows.Forms.Padding(3, 6, 10, 6)
+        Me.lblSituacionEspecial.Name = "lblSituacionEspecial"
+        Me.lblSituacionEspecial.Size = New System.Drawing.Size(109, 20)
+        Me.lblSituacionEspecial.TabIndex = 8
+        Me.lblSituacionEspecial.Text = "Sit. especial:"
+        '
+        'txtSituacionEspecial
+        '
+        Me.txtSituacionEspecial.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.txtSituacionEspecial.Location = New System.Drawing.Point(125, 253)
+        Me.txtSituacionEspecial.Margin = New System.Windows.Forms.Padding(3, 3, 3, 3)
+        Me.txtSituacionEspecial.MaxLength = 500
+        Me.txtSituacionEspecial.Name = "txtSituacionEspecial"
+        Me.txtSituacionEspecial.Size = New System.Drawing.Size(676, 26)
+        Me.txtSituacionEspecial.TabIndex = 36
+        '
+        'lblImei
+        '
+        Me.lblImei.Anchor = System.Windows.Forms.AnchorStyles.Right
+        Me.lblImei.AutoSize = True
+        Me.lblImei.Location = New System.Drawing.Point(77, 294)
+        Me.lblImei.Margin = New System.Windows.Forms.Padding(3, 6, 10, 6)
+        Me.lblImei.Name = "lblImei"
+        Me.lblImei.Size = New System.Drawing.Size(35, 20)
+        Me.lblImei.TabIndex = 10
+        Me.lblImei.Text = "IMEI:"
+        '
+        'txtImei
+        '
+        Me.txtImei.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.txtImei.Location = New System.Drawing.Point(125, 285)
+        Me.txtImei.Margin = New System.Windows.Forms.Padding(3, 3, 3, 3)
+        Me.txtImei.MaxLength = 500
+        Me.txtImei.Name = "txtImei"
+        Me.txtImei.Size = New System.Drawing.Size(676, 26)
+        Me.txtImei.TabIndex = 37
         '
         'lblTurno
         '
@@ -3236,6 +3428,9 @@ Partial Class frmFuncionarioCrear
         Me.TabPageGeneral.ResumeLayout(False)
         Me.TableLayoutPanelGeneral.ResumeLayout(False)
         CType(Me.pbFoto, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.TableLayoutPanelCamposAdicionales.ResumeLayout(False)
+        Me.TableLayoutPanelCamposAdicionales.PerformLayout()
+        Me.grpDatosAdicionales.ResumeLayout(False)
         Me.TableLayoutPanelDatosGenerales.ResumeLayout(False)
         Me.TableLayoutPanelDatosGenerales.PerformLayout()
         Me.TabControlMain.ResumeLayout(False)
@@ -3297,6 +3492,20 @@ Partial Class frmFuncionarioCrear
     Friend WithEvents pbFoto As PictureBox
     Friend WithEvents btnSeleccionarFoto As Button
     Friend WithEvents TableLayoutPanelDatosGenerales As TableLayoutPanel
+    Friend WithEvents grpDatosAdicionales As GroupBox
+    Friend WithEvents TableLayoutPanelCamposAdicionales As TableLayoutPanel
+    Friend WithEvents lblFechaBaja As Label
+    Friend WithEvents dtpBaja As DateTimePicker
+    Friend WithEvents lblResAlta As Label
+    Friend WithEvents txtResAlta As TextBox
+    Friend WithEvents lblResBaja As Label
+    Friend WithEvents txtResBaja As TextBox
+    Friend WithEvents lblDescripcionAdicional As Label
+    Friend WithEvents txtDescripcion As TextBox
+    Friend WithEvents lblSituacionEspecial As Label
+    Friend WithEvents txtSituacionEspecial As TextBox
+    Friend WithEvents lblImei As Label
+    Friend WithEvents txtImei As TextBox
     Friend WithEvents lblTurno As Label
     Friend WithEvents lblSemana As Label
     Friend WithEvents cboSemana As ComboBox

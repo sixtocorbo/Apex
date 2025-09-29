@@ -280,10 +280,94 @@ BEGIN TRY
     =================================================================*/
     PRINT '--- PASO 3: Migrando funcionarios... ---';
 
-    ;WITH PoliciasStg AS (SELECT p.id_policia, RIGHT('00000000' + CAST(p.num_cedula AS VARCHAR(8)),8) AS CI, LEFT(LTRIM(RTRIM(p.nom_policia)), 60) AS Nombre, p.alta AS FechaIngreso, CASE WHEN p.id_estado = 1 THEN 1 ELSE 0 END AS Activo, p.id_seccion, p.id_puesto, p.id_turno, p.id_semana, p.id_horario, CASE LTRIM(RTRIM(UPPER(p.genero))) WHEN 'M' THEN 1 WHEN 'F' THEN 2 ELSE 4 END AS GeneroId, p.nivelestudio, p.estadocivil, p.id_grado, p.fecha_registro, p.fecha_actualizado, p.fecha_nacimiento, LEFT(LTRIM(RTRIM(p.domicilio)), 250) AS Domicilio, LEFT(LTRIM(RTRIM(p.correo)), 255) AS Email, LEFT(LTRIM(RTRIM(p.telefono)), 50) AS Telefono, LTRIM(RTRIM(p.escalafon)) AS EscalafonTxt, LTRIM(RTRIM(p.funcion)) AS FuncionTxt, p.departamento AS Ciudad, p.seccional, p.credencial, CASE WHEN UPPER(LTRIM(RTRIM(ISNULL(p.estudia, 'NO')))) = 'SI' THEN 1 ELSE 0 END AS Estudia, LTRIM(RTRIM(p.sub_direccion)) as SubDireccionTxt, LTRIM(RTRIM(p.subescalafon)) as SubEscalafonTxt, LTRIM(RTRIM(p.prestador_salud)) as PrestadorSaludTxt FROM Personal.dbo.tblPolicias p),
-    PoliciasMapeadas AS (SELECT s.CI, s.Nombre, s.FechaIngreso, s.Activo, s.id_seccion AS SeccionId, s.id_puesto AS PuestoTrabajoId, s.id_turno AS TurnoId, s.id_semana AS SemanaId, s.id_horario AS HorarioId, s.GeneroId, ne.Id AS NivelEstudioId, ec.Id AS EstadoCivilId, mg.IdGradoDestino AS CargoId, s.fecha_registro AS CreatedAt, s.fecha_actualizado AS UpdatedAt, s.fecha_nacimiento AS FechaNacimiento, s.Domicilio, s.Email, s.Telefono, e.Id AS EscalafonId, f.Id AS FuncionId, s.Ciudad, s.seccional AS Seccional, s.credencial AS Credencial, s.Estudia, sd.Id as SubDireccionId, se.Id as SubEscalafonId, ps.Id as PrestadorSaludId FROM PoliciasStg s LEFT JOIN #MapeoGrado mg ON s.id_grado = mg.IdGradoOrigen LEFT JOIN dbo.NivelEstudio ne ON ne.Nombre = s.nivelestudio COLLATE Modern_Spanish_CI_AS LEFT JOIN dbo.EstadoCivil ec ON ec.Nombre = s.estadocivil COLLATE Modern_Spanish_CI_AS LEFT JOIN dbo.Escalafon e ON e.Nombre = s.EscalafonTxt COLLATE Modern_Spanish_CI_AS LEFT JOIN dbo.Funcion f ON f.Nombre = s.FuncionTxt COLLATE Modern_Spanish_CI_AS LEFT JOIN dbo.SubDireccion sd ON sd.Nombre = s.SubDireccionTxt COLLATE Modern_Spanish_CI_AS LEFT JOIN dbo.SubEscalafon se ON se.Nombre = s.SubEscalafonTxt COLLATE Modern_Spanish_CI_AS LEFT JOIN dbo.PrestadorSalud ps ON ps.Nombre = s.PrestadorSaludTxt COLLATE Modern_Spanish_CI_AS)
+    ;WITH PoliciasStg AS (
+        SELECT
+            p.id_policia,
+            RIGHT('00000000' + CAST(p.num_cedula AS VARCHAR(8)), 8) AS CI,
+            LEFT(LTRIM(RTRIM(p.nom_policia)), 60) AS Nombre,
+            p.alta AS FechaIngreso,
+            CASE WHEN p.id_estado = 1 THEN 1 ELSE 0 END AS Activo,
+            p.id_seccion,
+            p.id_puesto,
+            p.id_turno,
+            p.id_semana,
+            p.id_horario,
+            CASE LTRIM(RTRIM(UPPER(p.genero))) WHEN 'M' THEN 1 WHEN 'F' THEN 2 ELSE 4 END AS GeneroId,
+            p.nivelestudio,
+            p.estadocivil,
+            p.id_grado,
+            p.fecha_registro,
+            p.fecha_actualizado,
+            p.fecha_nacimiento,
+            LEFT(LTRIM(RTRIM(p.domicilio)), 250) AS Domicilio,
+            LEFT(LTRIM(RTRIM(p.correo)), 255) AS Email,
+            LEFT(LTRIM(RTRIM(p.telefono)), 50) AS Telefono,
+            LTRIM(RTRIM(p.escalafon)) AS EscalafonTxt,
+            LTRIM(RTRIM(p.funcion)) AS FuncionTxt,
+            p.departamento AS Ciudad,
+            p.seccional,
+            p.credencial,
+            CASE WHEN UPPER(LTRIM(RTRIM(ISNULL(p.estudia, 'NO')))) = 'SI' THEN 1 ELSE 0 END AS Estudia,
+            LTRIM(RTRIM(p.sub_direccion)) AS SubDireccionTxt,
+            LTRIM(RTRIM(p.subescalafon)) AS SubEscalafonTxt,
+            LTRIM(RTRIM(p.prestador_salud)) AS PrestadorSaludTxt,
+            TRY_CAST(p.baja AS DATE) AS Baja,
+            CASE WHEN p.resalta IS NULL THEN NULL ELSE LTRIM(RTRIM(CAST(p.resalta AS NVARCHAR(MAX)))) END AS ResAlta,
+            CASE WHEN p.resbaja IS NULL THEN NULL ELSE LTRIM(RTRIM(CAST(p.resbaja AS NVARCHAR(MAX)))) END AS ResBaja,
+            CASE WHEN p.descripcion IS NULL THEN NULL ELSE LTRIM(RTRIM(CAST(p.descripcion AS NVARCHAR(MAX)))) END AS Descripcion,
+            CASE WHEN p.situacion_especial IS NULL THEN NULL ELSE LEFT(LTRIM(RTRIM(CAST(p.situacion_especial AS NVARCHAR(500)))), 500) END AS SituacionEspecial,
+            CASE WHEN p.imei IS NULL THEN NULL ELSE LEFT(LTRIM(RTRIM(CAST(p.imei AS NVARCHAR(500)))), 500) END AS Imei
+        FROM Personal.dbo.tblPolicias p
+    ),
+    PoliciasMapeadas AS (
+        SELECT
+            s.CI,
+            s.Nombre,
+            s.FechaIngreso,
+            s.Activo,
+            s.id_seccion AS SeccionId,
+            s.id_puesto AS PuestoTrabajoId,
+            s.id_turno AS TurnoId,
+            s.id_semana AS SemanaId,
+            s.id_horario AS HorarioId,
+            s.GeneroId,
+            ne.Id AS NivelEstudioId,
+            ec.Id AS EstadoCivilId,
+            mg.IdGradoDestino AS CargoId,
+            s.fecha_registro AS CreatedAt,
+            s.fecha_actualizado AS UpdatedAt,
+            s.fecha_nacimiento AS FechaNacimiento,
+            s.Domicilio,
+            s.Email,
+            s.Telefono,
+            e.Id AS EscalafonId,
+            f.Id AS FuncionId,
+            s.Ciudad,
+            s.seccional AS Seccional,
+            s.credencial AS Credencial,
+            s.Estudia,
+            sd.Id AS SubDireccionId,
+            se.Id AS SubEscalafonId,
+            ps.Id AS PrestadorSaludId,
+            s.Baja,
+            s.ResAlta,
+            s.ResBaja,
+            s.Descripcion,
+            s.SituacionEspecial,
+            s.Imei
+        FROM PoliciasStg s
+        LEFT JOIN #MapeoGrado mg ON s.id_grado = mg.IdGradoOrigen
+        LEFT JOIN dbo.NivelEstudio ne ON ne.Nombre = s.nivelestudio COLLATE Modern_Spanish_CI_AS
+        LEFT JOIN dbo.EstadoCivil ec ON ec.Nombre = s.estadocivil COLLATE Modern_Spanish_CI_AS
+        LEFT JOIN dbo.Escalafon e ON e.Nombre = s.EscalafonTxt COLLATE Modern_Spanish_CI_AS
+        LEFT JOIN dbo.Funcion f ON f.Nombre = s.FuncionTxt COLLATE Modern_Spanish_CI_AS
+        LEFT JOIN dbo.SubDireccion sd ON sd.Nombre = s.SubDireccionTxt COLLATE Modern_Spanish_CI_AS
+        LEFT JOIN dbo.SubEscalafon se ON se.Nombre = s.SubEscalafonTxt COLLATE Modern_Spanish_CI_AS
+        LEFT JOIN dbo.PrestadorSalud ps ON ps.Nombre = s.PrestadorSaludTxt COLLATE Modern_Spanish_CI_AS
+    )
     MERGE dbo.Funcionario AS T USING PoliciasMapeadas AS S ON T.CI = S.CI COLLATE DATABASE_DEFAULT
-    WHEN NOT MATCHED BY TARGET THEN INSERT (CI,Nombre,FechaIngreso,Activo,CreatedAt,UpdatedAt,SeccionId,PuestoTrabajoId,TurnoId,SemanaId,HorarioId,GeneroId,NivelEstudioId,EstadoCivilId,CargoId,FechaNacimiento,Domicilio,Email,Telefono,EscalafonId,FuncionId,TipoFuncionarioId,Ciudad,Seccional,Credencial,Estudia,SubDireccionId,SubEscalafonId,PrestadorSaludId) VALUES (S.CI,S.Nombre,S.FechaIngreso,S.Activo,S.CreatedAt,S.UpdatedAt,S.SeccionId,S.PuestoTrabajoId,S.TurnoId,S.SemanaId,S.HorarioId,S.GeneroId,S.NivelEstudioId,S.EstadoCivilId,S.CargoId,S.FechaNacimiento,S.Domicilio,S.Email,S.Telefono,S.EscalafonId,S.FuncionId,1,S.Ciudad,S.Seccional,S.Credencial,S.Estudia,S.SubDireccionId,S.SubEscalafonId,S.PrestadorSaludId);
+    WHEN NOT MATCHED BY TARGET THEN INSERT (CI,Nombre,FechaIngreso,Activo,CreatedAt,UpdatedAt,SeccionId,PuestoTrabajoId,TurnoId,SemanaId,HorarioId,GeneroId,NivelEstudioId,EstadoCivilId,CargoId,FechaNacimiento,Domicilio,Email,Telefono,EscalafonId,FuncionId,TipoFuncionarioId,Ciudad,Seccional,Credencial,Estudia,SubDireccionId,SubEscalafonId,PrestadorSaludId,Baja,ResAlta,ResBaja,Descripcion,SituacionEspecial,Imei)
+        VALUES (S.CI,S.Nombre,S.FechaIngreso,S.Activo,S.CreatedAt,S.UpdatedAt,S.SeccionId,S.PuestoTrabajoId,S.TurnoId,S.SemanaId,S.HorarioId,S.GeneroId,S.NivelEstudioId,S.EstadoCivilId,S.CargoId,S.FechaNacimiento,S.Domicilio,S.Email,S.Telefono,S.EscalafonId,S.FuncionId,1,S.Ciudad,S.Seccional,S.Credencial,S.Estudia,S.SubDireccionId,S.SubEscalafonId,S.PrestadorSaludId,S.Baja,S.ResAlta,S.ResBaja,S.Descripcion,S.SituacionEspecial,S.Imei);
 
     INSERT INTO dbo.MapPoliciaFunc (id_policia,FuncionarioId) SELECT p.id_policia,f.Id FROM Personal.dbo.tblPolicias p JOIN dbo.Funcionario f ON f.CI = RIGHT('00000000' + CAST(p.num_cedula AS VARCHAR(8)),8);
     PRINT '✔ Funcionarios migrados.';
