@@ -204,10 +204,12 @@ Public Class frmFuncionarioSituacion
 
             ' 3) Notificaciones PENDIENTES dentro del rango
             Dim estadoPendienteId As Byte = CByte(ModConstantesApex.EstadoNotificacionPersonal.Pendiente)
+            Dim estadoVencidaId As Byte = CByte(ModConstantesApex.EstadoNotificacionPersonal.Vencida)
             Dim notificacionesEnPeriodo = Await _uow.Context.Set(Of NotificacionPersonal)() _
                 .Include(Function(n) n.TipoNotificacion) _
+                .Include(Function(n) n.NotificacionEstado) _
                 .Where(Function(n) n.FuncionarioId = _funcionarioId AndAlso
-                                     n.EstadoId = estadoPendienteId AndAlso
+                                     (n.EstadoId = estadoPendienteId OrElse n.EstadoId = estadoVencidaId) AndAlso
                                      n.FechaProgramada >= fechaInicio AndAlso
                                      n.FechaProgramada < fechaFin) _
                 .AsNoTracking().ToListAsync()
@@ -615,7 +617,12 @@ Public Class frmFuncionarioSituacion
         Public Sub New(notificacion As NotificacionPersonal)
             Me.Id = notificacion.Id
             Me.TipoEvento = "Notificación"
-            Me.Tipo = notificacion.TipoNotificacion.Nombre
+
+            Dim estadoDescripcion = notificacion.NotificacionEstado?.Nombre?.Trim()
+            Dim tipoBase = notificacion.TipoNotificacion?.Nombre?.Trim()
+            If String.IsNullOrWhiteSpace(tipoBase) Then tipoBase = "Notificación"
+            Me.Tipo = If(String.IsNullOrWhiteSpace(estadoDescripcion), tipoBase, $"{tipoBase} ({estadoDescripcion})")
+
             Me.Desde = notificacion.FechaProgramada
             Me.Hasta = Nothing
 
@@ -627,7 +634,9 @@ Public Class frmFuncionarioSituacion
             If Not String.IsNullOrWhiteSpace(notificacion.Oficina) Then sb.AppendLine($"Oficina: {notificacion.Oficina.Trim()}")
 
             Me.Detalles = sb.ToString().Trim()
-            Me.Severidad = EstadoVisualHelper.EventoSeveridad.Media
+
+            Dim estadoVencidaId As Byte = CByte(ModConstantesApex.EstadoNotificacionPersonal.Vencida)
+            Me.Severidad = If(notificacion.EstadoId = estadoVencidaId, EstadoVisualHelper.EventoSeveridad.Alta, EstadoVisualHelper.EventoSeveridad.Media)
         End Sub
 
         Public Sub New(auditoria As AuditoriaCambios)
