@@ -568,9 +568,8 @@ Fin:
                 d.FechaResolucion = fechaResolucionSel
                 Estado.Funcionario.CargoId = cargoNuevoId
 
-                ' ▼▼▼ LÍNEA A AGREGAR ▼▼▼
-                ' Notificamos al UnitOfWork que la entidad Funcionario ha cambiado
-                ' para que guarde la modificación del CargoId.
+                ' Informa al UnitOfWork que la entidad Funcionario fue modificada
+                ' para que persista el nuevo CargoId.
                 _unitOfWork.Repository(Of Funcionario).Update(Estado.Funcionario)
 
             Case ModConstantesApex.TipoEstadoTransitorioId.ReactivacionDeFuncionario

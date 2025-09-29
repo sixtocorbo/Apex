@@ -720,11 +720,12 @@ Partial Public Class frmFiltros
 #End Region
 #Region "Lógica de Exportación"
 
-    ' 2. AGREGA ESTE NUEVO MÉTODO COMPLETO A TU FORMULARIO
-    ' --- Exportar un PDF por funcionario filtrado ---
+    ''' <summary>
+    ''' Exporta un archivo PDF por cada funcionario listado actualmente en la grilla.
+    ''' </summary>
     Private Async Sub btnExportarFichasPDF_Click(sender As Object, e As EventArgs) Handles btnExportarFichasPDF.Click
         Try
-            ' 1) Validaciones básicas
+            ' Valida que el origen de datos sea el esperado y que existan registros para exportar.
             If cmbOrigenDatos.SelectedItem Is Nothing OrElse
            Not cmbOrigenDatos.SelectedItem.Equals(TipoOrigenDatos.Funcionarios) Then
                 MessageBox.Show("Seleccioná 'Funcionarios' como origen de datos.", "Apex",
@@ -739,7 +740,7 @@ Partial Public Class frmFiltros
                 Return
             End If
 
-            ' 2) Elegir carpeta destino
+            ' Solicita la carpeta donde se almacenarán los archivos generados.
             Using fbd As New FolderBrowserDialog()
                 fbd.Description = "Elegí la carpeta donde guardar un PDF por funcionario"
                 If fbd.ShowDialog(Me) <> DialogResult.OK Then Return
@@ -750,10 +751,10 @@ Partial Public Class frmFiltros
                 Me.Text = "Exportando fichas... (Preparando datos...)"
                 Me.Refresh()
 
-                ' Toast persistente de progreso
+                ' Muestra un mensaje persistente para indicar el progreso de la exportación.
                 Dim toast As Toast = Toast.ShowSticky(Me, "Preparando exportación...", ToastType.Info)
 
-                ' 3) Traer todos los datos en una sola consulta
+                ' Recupera todos los datos necesarios en una única consulta para optimizar el proceso.
                 Dim todosLosDatos As List(Of FichaFuncionalDTO)
                 Using svc As New ReportesService()
                     todosLosDatos = Await svc.ObtenerDatosParaFichasAsync(ids)
@@ -767,7 +768,7 @@ Partial Public Class frmFiltros
                     Return
                 End If
 
-                ' 4) Exportar un PDF por funcionario
+                ' Genera un PDF independiente por cada funcionario encontrado.
                 Dim totalAExportar As Integer = ids.Count
                 Dim exportados As Integer = 0
                 Dim noEncontrados As New List(Of Integer)
@@ -778,7 +779,7 @@ Partial Public Class frmFiltros
                     Me.Text = $"Exportando fichas... {i + 1}/{totalAExportar}"
                     Application.DoEvents()
 
-                    ' Filtrar el/los DTO del funcionario actual (requiere FichaFuncionalDTO.FuncionarioId)
+                    ' Obtiene los datos asociados al funcionario actual.
                     Dim datosUno = todosLosDatos.Where(Function(d) d.FuncionarioId = id).ToList()
                     If datosUno.Count = 0 Then
                         noEncontrados.Add(id)
@@ -787,20 +788,20 @@ Partial Public Class frmFiltros
 
                     Dim dto = datosUno(0)
 
-                    ' Actualizar toast (antes de renderizar)
+                    ' Actualiza el mensaje del toast antes de generar el archivo.
                     toast.UpdateMessage($"Exportando {i + 1}/{totalAExportar} — {dto.NombreCompleto} (CI {dto.Cedula})")
 
-                    ' Nombre de archivo: "Nombre Completo - CI ... .pdf" (o fallback Ficha_{id}.pdf)
+                    ' Construye un nombre de archivo descriptivo y evita colisiones en disco.
                     Dim nombreArchivo As String = ConstruirNombreArchivo(dto, id)
                     Dim ruta As String = ObtenerRutaUnica(carpeta, nombreArchivo)
 
                     Try
-                        ' Render en segundo plano usando LocalReport (sin ReportViewer)
+                        ' Renderiza el reporte en segundo plano utilizando LocalReport.
                         Await Task.Run(
                         Sub()
                             Dim lr As New Microsoft.Reporting.WinForms.LocalReport()
 
-                            ' RDLC: Embedded → BaseDirectory\Reportes → StartupPath\Reportes → ClickOnce → extra (..\..)
+                            ' Carga la definición del reporte desde recursos embebidos o rutas alternativas.
                             CargarDefinicionRDLC(lr, "FichaFuncional.rdlc", "..\..\Reportes\FichaFuncional.rdlc")
 
                             lr.DataSources.Clear()
@@ -822,7 +823,7 @@ Partial Public Class frmFiltros
                     End Try
                 Next
 
-                ' 5) Mensaje final (toast + MessageBox opcional)
+                ' Restablece el estado de la interfaz y prepara un resumen del proceso.
                 Me.Text = tituloOriginal
                 Cursor = Cursors.Default
 
@@ -836,16 +837,16 @@ Partial Public Class frmFiltros
                     resumen.AppendLine().AppendLine("Errores:").AppendLine(" - " & String.Join(Environment.NewLine & " - ", fallos))
                 End If
 
-                ' Actualizar y cerrar toast
+                ' Actualiza el mensaje final del toast y lo cierra tras unos segundos.
                 toast.UpdateMessage($"Listo: {exportados}/{totalAExportar} guardados en: {carpeta}")
                 toast.CloseAfter(3000)
 
-                ' (Opcional) también mostrar MessageBox resumen
+                ' Informa el resultado mediante un cuadro de diálogo.
                 MessageBox.Show(resumen.ToString(), "Apex",
                             MessageBoxButtons.OK,
                             If(fallos.Any(), MessageBoxIcon.Warning, MessageBoxIcon.Information))
 
-                ' (Opcional) abrir la carpeta al terminar
+                ' Intenta abrir la carpeta destino al finalizar la exportación.
                 Try : Process.Start("explorer.exe", carpeta) : Catch : End Try
             End Using
 
@@ -865,21 +866,21 @@ Partial Public Class frmFiltros
         If lr Is Nothing Then Throw New ArgumentNullException(NameOf(lr))
         If String.IsNullOrWhiteSpace(nombreCorto) Then Throw New ArgumentNullException(NameOf(nombreCorto))
 
-        ' armar nombre de recurso embebido: Apex.Reportes.<archivo>.rdlc
+        ' Genera el nombre del recurso embebido con el formato Apex.Reportes.<archivo>.rdlc.
         Dim asmName As String = Me.GetType().Assembly.GetName().Name ' "Apex"
         Dim embeddedResourceName As String = $"{asmName}.Reportes.{nombreCorto}"
 
-        ' rutas extra (debug o alternativa)
+        ' Define rutas alternativas para entornos donde el recurso no esté embebido.
         Dim extras As String() = Nothing
         If Not String.IsNullOrWhiteSpace(rutaRelativa) Then
-            extras = New String() {rutaRelativa} ' ej: "..\..\Reportes\FichaFuncional.rdlc" o "Reportes\FichaFuncional.rdlc"
+            extras = New String() {rutaRelativa}
         End If
 
         ReportResourceLoader.LoadLocalReportDefinition(
         lr,
         Me.GetType(),
-        embeddedResourceName,   ' <<-- NO Nothing
-        nombreCorto,            ' <<-- solo el filename, p.ej. "FichaFuncional.rdlc"
+        embeddedResourceName,
+        nombreCorto,
         extras
     )
     End Sub
@@ -927,7 +928,7 @@ Partial Public Class frmFiltros
         Return ruta
     End Function
 
-    ' ------------------ Exportar a Excel (CSV) ------------------
+    ' Exporta los datos visibles en la grilla a un archivo CSV.
     Private Sub btnExportarExcel_Click(sender As Object, e As EventArgs) Handles btnExportarExcel.Click
         Try
             If _dvDatos Is Nothing OrElse _dvDatos.Count = 0 Then
@@ -935,7 +936,7 @@ Partial Public Class frmFiltros
                 Return
             End If
 
-            ' Columnas: solo las VISIBLES en la grilla y en su ORDEN actual
+            ' Obtiene las columnas visibles respetando el orden mostrado en la grilla.
             Dim cols = dgvDatos.Columns.Cast(Of DataGridViewColumn)().
                        Where(Function(c) c.Visible AndAlso Not String.IsNullOrEmpty(c.DataPropertyName) AndAlso
                                           _dvDatos.Table.Columns.Contains(c.DataPropertyName)).
@@ -949,7 +950,7 @@ Partial Public Class frmFiltros
                 Return
             End If
 
-            ' File dialog
+            ' Solicita la ubicación donde se guardará el archivo CSV.
             Using sfd As New SaveFileDialog()
                 sfd.Title = "Guardar como"
                 sfd.Filter = "CSV (separado por comas)|*.csv|Todos los archivos|*.*"
@@ -958,13 +959,13 @@ Partial Public Class frmFiltros
 
                 Cursor = Cursors.WaitCursor
 
-                ' Construir CSV
+                ' Construye el contenido del archivo CSV.
                 Dim sb As New System.Text.StringBuilder(1024)
 
-                ' Encabezados
+                ' Escribe la fila de encabezados.
                 sb.AppendLine(String.Join(",", cols.Select(Function(c) CsvEscape(c.Header))))
 
-                ' Filas visibles (según _dvDatos con filtros aplicados)
+                ' Exporta las filas visibles según los filtros aplicados.
                 For Each rv As DataRowView In _dvDatos
                     Dim fields As New List(Of String)(cols.Count)
                     For Each c In cols
@@ -978,14 +979,14 @@ Partial Public Class frmFiltros
                     sb.AppendLine(String.Join(",", fields))
                 Next
 
-                ' Escribir con UTF-8 BOM para que Excel detecte bien la codificación
+                ' Guarda el archivo con codificación UTF-8 (incluyendo BOM) para compatibilidad con Excel.
                 Dim bytes = New System.Text.UTF8Encoding(encoderShouldEmitUTF8Identifier:=True).GetBytes(sb.ToString())
                 System.IO.File.WriteAllBytes(sfd.FileName, bytes)
 
                 Cursor = Cursors.Default
                 Notifier.Success(Me, "Datos exportados a CSV.", 2000)
 
-                ' (Opcional) Abrir el archivo
+                ' Intenta resaltar el archivo generado en el explorador de archivos.
                 Try : Process.Start("explorer.exe", "/select," & sfd.FileName) : Catch : End Try
             End Using
 

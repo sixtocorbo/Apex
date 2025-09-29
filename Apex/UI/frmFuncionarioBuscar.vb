@@ -464,22 +464,24 @@ Public Class frmFuncionarioBuscar
 #End Region
 
 #Region "Búsqueda con Full-Text y CONTAINS"
-    ' --- MÉTODO CENTRAL MODIFICADO ---
+    ''' <summary>
+    ''' Ejecuta una búsqueda asíncrona de funcionarios utilizando consultas Full-Text.
+    ''' </summary>
     Private Async Function BuscarAsync(token As CancellationToken) As Task
         If _estaBuscando Then Return
         _estaBuscando = True
 
-        ' Feedback visual no bloqueante
+        ' Proporciona retroalimentación visual sin bloquear la interfaz.
         txtBusqueda.BackColor = Color.Gold
         Me.Cursor = Cursors.WaitCursor
         dgvFuncionarios.Enabled = False
 
         Try
-            ' Si no hay texto, limpiamos y salimos.
+            ' Si no hay texto, se limpia la grilla y se abandona la búsqueda.
             If String.IsNullOrWhiteSpace(txtBusqueda.Text) Then
                 dgvFuncionarios.DataSource = New List(Of FuncionarioMin)()
                 LimpiarDetalle()
-                Return ' Usamos Return en lugar de Exit Function en métodos Async
+                Return
             End If
 
             token.ThrowIfCancellationRequested()
@@ -494,20 +496,18 @@ Public Class frmFuncionarioBuscar
                 Dim terminos = filtro.Split(" "c).Where(Function(w) Not String.IsNullOrWhiteSpace(w)).Select(Function(w) $"""{w}*""")
                 Dim expresionFts = String.Join(" AND ", terminos)
 
-                ' ▼▼▼ CÓDIGO A MODIFICAR ▼▼▼
                 Dim sb As New StringBuilder()
                 sb.AppendLine("SELECT TOP (@limite) f.Id, f.CI, f.Nombre, ISNULL(c.Nombre, 'N/A') AS CargoNombre")
                 sb.AppendLine("FROM dbo.Funcionario f WITH (NOLOCK)")
                 sb.AppendLine("LEFT JOIN dbo.Cargo c ON f.CargoId = c.Id")
                 sb.AppendLine("WHERE CONTAINS((f.CI, f.Nombre), @patron)")
                 sb.AppendLine("ORDER BY f.Nombre;")
-                ' ▲▲▲ FIN DE LA MODIFICACIÓN ▲▲▲
 
                 Dim sql = sb.ToString()
                 Dim pLimite = New SqlParameter("@limite", LIMITE_FILAS)
                 Dim pPatron = New SqlParameter("@patron", expresionFts)
 
-                ' Usamos el WaitAsync con el CancellationToken
+                ' Ejecuta la consulta respetando el token de cancelación.
                 lista = Await ctx.Database.SqlQuery(Of FuncionarioMin)(sql, pLimite, pPatron).ToListAsync().WaitAsync(token)
             End Using
 
@@ -528,13 +528,13 @@ Public Class frmFuncionarioBuscar
             End If
 
         Catch ex As OperationCanceledException
-            ' Búsqueda cancelada por el usuario. Silencioso.
+            ' La cancelación es esperada cuando se inicia una nueva búsqueda.
         Catch ex As SqlException When ex.Number = -2
             Notifier.Warn(Me, "La consulta excedió el tiempo de espera.")
         Catch ex As Exception
             Notifier.Error(Me, "Ocurrió un error inesperado: " & ex.Message)
         Finally
-            ' Restaurar la UI a su estado normal
+            ' Restaura la interfaz a su estado inicial.
             If Not Me.IsDisposed Then
                 txtBusqueda.BackColor = _colorOriginalBusqueda
                 Me.Cursor = Cursors.Default
@@ -545,18 +545,15 @@ Public Class frmFuncionarioBuscar
         End Try
     End Function
 
-
-    ' --- MODIFICADO: Búsqueda al presionar Enter ---
+    ' Permite iniciar la búsqueda o seleccionar un funcionario con la tecla Enter.
     Private Async Sub txtBusqueda_KeyDown(sender As Object, e As KeyEventArgs) Handles txtBusqueda.KeyDown
         Select Case e.KeyCode
             Case Keys.Enter
                 e.Handled = True
                 e.SuppressKeyPress = True
-                _searchTimer.Stop() ' Detenemos el timer para que no se dispare
+                _searchTimer.Stop()
 
-                ' --- LÓGICA MODIFICADA ---
-                ' Si estamos en modo de selección, Enter elige al funcionario.
-                ' Si estamos en modo de navegación, Enter ejecuta la búsqueda.
+                ' En modo selección se elige el funcionario; en modo navegación se ejecuta la búsqueda.
                 If _modo = ModoApertura.Seleccion Then
                     AbrirOSeleccionarActual()
                 Else
@@ -693,9 +690,7 @@ Public Class frmFuncionarioBuscar
             End If
         End Using
 
-        ' ▼▼▼ LÍNEA FINAL PARA CORREGIR EL FOCO ▼▼▼
-        ' Después de que toda la actualización visual ha terminado,
-        ' forzamos el foco de vuelta al TextBox de búsqueda.
+        ' Después de actualizar la vista, devuelve el foco al cuadro de búsqueda.
         txtBusqueda.Focus()
     End Sub
 
@@ -802,7 +797,7 @@ Public Class frmFuncionarioBuscar
         lblHorarioCompleto.Text = "Horario: -"
         _detallesEstadoActual.Clear()
 
-        ' ▼▼▼ AQUÍ OCULTAS TODO ▼▼▼
+        ' Oculta los botones de acción y el panel de detalle.
         btnGenerarFicha.Visible = False
         btnVerSituacion.Visible = False
         btnSancionar.Visible = False
