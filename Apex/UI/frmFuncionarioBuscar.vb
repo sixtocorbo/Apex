@@ -15,6 +15,7 @@ Public Class frmFuncionarioBuscar
     Private ReadOnly _modo As ModoApertura
     Private Const LIMITE_FILAS As Integer = 500
     Private _detallesEstadoActual As New List(Of String)
+    Private Const CONSULTA_SITUACION_ACTUAL_SQL As String = "SELECT Prioridad, Tipo, ColorIndicador FROM dbo.vw_FuncionarioSituacionActual WHERE FuncionarioId = @p0 ORDER BY Prioridad"
 
     ' --- INICIO DE CAMBIOS: Variables para la búsqueda mejorada ---
     Private WithEvents _searchTimer As New System.Windows.Forms.Timer()
@@ -641,40 +642,9 @@ Public Class frmFuncionarioBuscar
                 lblEstadoActividad.ForeColor = Color.Maroon
             End If
 
-            Dim situaciones = Await uow.Context.Database.SqlQuery(Of SituacionParaBoton)(
-            "SELECT Prioridad, Tipo, ColorIndicador FROM dbo.vw_FuncionarioSituacionActual WHERE FuncionarioId = @p0 ORDER BY Prioridad",
-            id
-        ).ToListAsync()
+            Dim situaciones = Await ObtenerSituacionesAsync(uow, id)
 
-            If situaciones IsNot Nothing AndAlso situaciones.Any() Then
-                btnVerSituacion.Visible = True
-                Dim primeraSituacion = situaciones.First()
-
-                If _modo = ModoApertura.Seleccion Then
-                    btnVerSituacion.Enabled = False
-                    btnGenerarFicha.Enabled = False
-                    ToolTip1.SetToolTip(btnVerSituacion, "No disponible en modo de selección")
-                Else
-                    btnVerSituacion.Enabled = True
-                    btnGenerarFicha.Enabled = True
-                End If
-
-                If situaciones.Count > 1 Then
-                    btnVerSituacion.Text = "Situación Múltiple"
-                Else
-                    btnVerSituacion.Text = primeraSituacion.Tipo
-                End If
-
-                Dim severidadSituacion = EstadoVisualHelper.DeterminarSeveridad(primeraSituacion.Tipo)
-                Dim colorSituacion = EstadoVisualHelper.ObtenerColor(severidadSituacion)
-                Dim colorTexto = EstadoVisualHelper.ObtenerColorTexto(severidadSituacion)
-
-                btnVerSituacion.BackColor = colorSituacion
-                btnVerSituacion.ForeColor = colorTexto
-                btnVerSituacion.UseVisualStyleBackColor = False
-            Else
-                btnVerSituacion.Visible = False
-            End If
+            AplicarSituacionesAlBoton(situaciones)
 
             lblPresencia.Text = Await ObtenerPresenciaAsync(id, Date.Today)
             If Not f.Activo AndAlso (situaciones Is Nothing OrElse Not situaciones.Any()) Then
@@ -694,6 +664,74 @@ Public Class frmFuncionarioBuscar
         txtBusqueda.Focus()
     End Sub
 
+    Private Sub AplicarSituacionesAlBoton(situaciones As List(Of SituacionParaBoton))
+        If situaciones IsNot Nothing AndAlso situaciones.Any() Then
+            btnVerSituacion.Visible = True
+            Dim primeraSituacion = situaciones.First()
+
+            If _modo = ModoApertura.Seleccion Then
+                btnVerSituacion.Enabled = False
+                btnGenerarFicha.Enabled = False
+                ToolTip1.SetToolTip(btnVerSituacion, "No disponible en modo de selección")
+            Else
+                btnVerSituacion.Enabled = True
+                btnGenerarFicha.Enabled = True
+            End If
+
+            If situaciones.Count > 1 Then
+                btnVerSituacion.Text = "Situación Múltiple"
+            Else
+                btnVerSituacion.Text = primeraSituacion.Tipo
+            End If
+
+            Dim severidadSituacion = EstadoVisualHelper.DeterminarSeveridad(primeraSituacion.Tipo)
+            Dim colorSituacion = EstadoVisualHelper.ObtenerColor(severidadSituacion)
+            Dim colorTexto = EstadoVisualHelper.ObtenerColorTexto(severidadSituacion)
+
+            btnVerSituacion.BackColor = colorSituacion
+            btnVerSituacion.ForeColor = colorTexto
+            btnVerSituacion.UseVisualStyleBackColor = False
+        Else
+            btnVerSituacion.Visible = False
+        End If
+    End Sub
+
+    Private Shared Async Function ObtenerSituacionesAsync(uow As UnitOfWork, funcionarioId As Integer) As Task(Of List(Of SituacionParaBoton))
+        Return Await uow.Context.Database.SqlQuery(Of SituacionParaBoton)(CONSULTA_SITUACION_ACTUAL_SQL, funcionarioId).ToListAsync()
+    End Function
+
+    Private Async Function RefrescarBotonSituacionAsync(funcionarioId As Integer) As Task
+        Try
+            Using uow As New UnitOfWork()
+                Dim situaciones = Await ObtenerSituacionesAsync(uow, funcionarioId)
+                ActualizarBotonSituacion(funcionarioId, situaciones)
+            End Using
+        Catch ex As Exception
+            ' Ignoramos errores para no interrumpir la experiencia del usuario.
+        End Try
+    End Function
+
+    Private Sub ActualizarBotonSituacion(funcionarioId As Integer, situaciones As List(Of SituacionParaBoton))
+        If Me.IsDisposed OrElse Not Me.IsHandleCreated Then Return
+
+        Dim actualizar As Action = Sub()
+                                       If Me.IsDisposed Then Return
+                                       If dgvFuncionarios.CurrentRow Is Nothing Then Return
+                                       Dim idActual As Integer = CInt(dgvFuncionarios.CurrentRow.Cells("Id").Value)
+                                       If idActual <> funcionarioId Then Return
+                                       AplicarSituacionesAlBoton(situaciones)
+                                   End Sub
+
+        If Me.InvokeRequired Then
+            Try
+                Me.BeginInvoke(actualizar)
+            Catch ex As ObjectDisposedException
+            End Try
+        Else
+            actualizar()
+        End If
+    End Sub
+
 
     ' Este código funciona bien si quieres abrir múltiples ventanas de situación.
     Private Sub btnVerSituacion_Click(sender As Object, e As EventArgs) Handles btnVerSituacion.Click
@@ -702,6 +740,15 @@ Public Class frmFuncionarioBuscar
         Dim frm As New frmFuncionarioSituacion(id)
         NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
     End Sub
+
+    Protected Overrides Async Function RefrescarSegunEstadoAsync(e As EstadoCambiadoEventArgs) As Task
+        Await MyBase.RefrescarSegunEstadoAsync(e)
+
+        If e Is Nothing Then Return
+        If Me.IsDisposed OrElse Not Me.IsHandleCreated Then Return
+
+        Await RefrescarBotonSituacionAsync(e.FuncionarioId)
+    End Function
 
     Private Class SituacionParaBoton
         Public Property Prioridad As Integer

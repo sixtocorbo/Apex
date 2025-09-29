@@ -168,6 +168,8 @@ Public Class frmSancionCrear
                 Await _svc.UpdateAsync(_sancion)
             End If
 
+            NotificadorEventos.NotificarCambioEnEstado(_sancion.FuncionarioId)
+
             DialogResult = DialogResult.OK
             Close()
         Catch ex As Exception
