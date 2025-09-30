@@ -544,6 +544,7 @@ Public Class frmFuncionarioSituacion
         AplicarEstiloModernoGrilla(dgvEstados)
         dgvEstados.AutoGenerateColumns = False
         dgvEstados.Columns.Clear()
+        dgvEstados.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells
 
         dgvEstados.Columns.Add(New DataGridViewTextBoxColumn With {
             .Name = "Tipo", .DataPropertyName = "Tipo", .HeaderText = "Tipo de Evento",
@@ -571,6 +572,8 @@ Public Class frmFuncionarioSituacion
         }
         colHasta.DefaultCellStyle.Format = "dd/MM/yyyy"
         dgvEstados.Columns.Add(colHasta)
+        colAcciones.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
+        colAcciones.MinimumWidth = 120
         dgvEstados.Columns.Add(colAcciones)
     End Sub
 
