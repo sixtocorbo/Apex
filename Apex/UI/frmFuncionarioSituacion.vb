@@ -84,7 +84,12 @@ Public Class frmFuncionarioSituacion
 
     Private Async Function ActualizarTodo() As Task
         Dim fechaInicio = dtpDesde.Value.Date
-        Dim fechaFin = dtpHasta.Value.Date.AddDays(1) ' Rango semi-abierto [inicio, fin)
+        Dim fechaFin = dtpHasta.Value.Date
+
+        ' Evitar desbordes al trabajar con fechas máximas permitidas por el control.
+        If fechaFin < DateTime.MaxValue.Date Then
+            fechaFin = fechaFin.AddDays(1) ' Rango semi-abierto [inicio, fin)
+        End If
 
         GenerarTimeline(fechaInicio, fechaFin)
         Await PoblarGrillaEstados(fechaInicio, fechaFin)
@@ -279,7 +284,8 @@ Public Class frmFuncionarioSituacion
         Dim eliminarItem = menu.Items.Add("Eliminar")
 
         AddHandler cambiarEstadoItem.Click, Async Sub()
-                                                Using frm As New frmNotificacionCambiarEstado(evento.Id)
+                                                Dim estadoActual As Byte = If(evento.EstadoActualId.HasValue, evento.EstadoActualId.Value, CType(0, Byte))
+                                                Using frm As New frmNotificacionCambiarEstado(estadoActual)
                                                     If frm.ShowDialog() = DialogResult.OK Then
                                                         Using svc As New NotificacionService()
                                                             Dim success = Await svc.UpdateEstadoAsync(evento.Id, frm.SelectedEstadoId)
@@ -563,12 +569,14 @@ Public Class frmFuncionarioSituacion
         Public Property Desde As Date?
         Public Property Hasta As Date?
         Public Property Severidad As EstadoVisualHelper.EventoSeveridad
+        Public Property EstadoActualId As Byte?
 
         Public Sub New(estado As EstadoTransitorio)
             Me.Id = estado.Id
             Me.TipoEvento = "Estado"
             Me.Tipo = estado.TipoEstadoTransitorio.Nombre
             Me.Severidad = EstadoVisualHelper.DeterminarSeveridad(Me.Tipo)
+            Me.EstadoActualId = Nothing
 
             Dim sb As New StringBuilder()
 
@@ -695,6 +703,7 @@ Public Class frmFuncionarioSituacion
             Me.Hasta = licencia.finaliza
             Me.Detalles = licencia.Comentario?.Trim()
             Me.Severidad = EstadoVisualHelper.DeterminarSeveridad(Me.Tipo)
+            Me.EstadoActualId = Nothing
         End Sub
 
         Public Sub New(notificacion As NotificacionPersonal)
@@ -722,6 +731,7 @@ Public Class frmFuncionarioSituacion
 
             Dim estadoVencidaId As Byte = CByte(ModConstantesApex.EstadoNotificacionPersonal.Vencida)
             Me.Severidad = If(notificacion.EstadoId = estadoVencidaId, EstadoVisualHelper.EventoSeveridad.Alta, EstadoVisualHelper.EventoSeveridad.Media)
+            Me.EstadoActualId = notificacion.EstadoId
         End Sub
 
         Public Sub New(auditoria As AuditoriaCambios)
@@ -734,6 +744,7 @@ Public Class frmFuncionarioSituacion
             Dim valNue = If(String.IsNullOrWhiteSpace(auditoria.ValorNuevo), "[vacío]", auditoria.ValorNuevo)
             Me.Detalles = $"El campo '{auditoria.CampoNombre}' cambió de '{valAnt}' a '{valNue}'."
             Me.Severidad = EstadoVisualHelper.EventoSeveridad.Info
+            Me.EstadoActualId = Nothing
         End Sub
 
         ' La lógica de severidad se centraliza en EstadoVisualHelper.
