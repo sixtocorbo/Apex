@@ -4,6 +4,7 @@ Option Explicit On
 Imports System.ComponentModel
 Imports System.Data.Entity
 Imports System.IO
+Imports System.Linq
 Imports System.Linq.Expressions
 
 Public Class frmFuncionarioCrear
@@ -715,17 +716,135 @@ Public Class frmFuncionarioCrear
     End Sub
 
     Private Sub SincronizarEstados()
-        ' Borrados: ya están marcados como Deleted en el click
+        Dim ctx = _uow.Context
+
         For Each row In _estadoRows
             Dim estado = row.EntityRef
+            If estado Is Nothing Then Continue For
+
+            PrepararRelacionesEstado(estado)
+
+            Dim entry = ctx.Entry(estado)
+
             If estado.Id <= 0 Then
-                _funcionario.EstadoTransitorio.Add(estado)
+                ' Nuevos: aseguramos que estén en el contexto como Added
+                If entry.State = EntityState.Detached Then
+                    ctx.Set(Of EstadoTransitorio)().Add(estado)
+                ElseIf entry.State <> EntityState.Added Then
+                    entry.State = EntityState.Added
+                End If
             Else
-                estado.Funcionario = _funcionario
-                _uow.Context.Entry(estado).State = EntityState.Modified
+                ' Existentes: evitamos duplicados y los marcamos como modificados
+                DetachDuplicadoLocal(ctx, estado)
+
+                If entry.State = EntityState.Detached Then
+                    ctx.Set(Of EstadoTransitorio)().Attach(estado)
+                    entry = ctx.Entry(estado)
+                End If
+
+                entry.State = EntityState.Modified
+            End If
+
+            PrepararDetallesEstado(ctx, estado)
+        Next
+    End Sub
+
+    Private Sub PrepararRelacionesEstado(estado As EstadoTransitorio)
+        If _funcionario Is Nothing Then Return
+
+        estado.Funcionario = _funcionario
+        If _funcionario.Id > 0 Then
+            estado.FuncionarioId = _funcionario.Id
+        End If
+    End Sub
+
+    Private Shared Sub DetachDuplicadoLocal(ctx As DbContext, estado As EstadoTransitorio)
+        If estado Is Nothing OrElse estado.Id <= 0 Then Return
+
+        Dim duplicados = ctx.Set(Of EstadoTransitorio)().Local.
+            Where(Function(e) e.Id = estado.Id AndAlso Not ReferenceEquals(e, estado)).
+            ToList()
+
+        For Each duplicado In duplicados
+            ctx.Entry(duplicado).State = EntityState.Detached
+        Next
+    End Sub
+
+    Private Sub PrepararDetallesEstado(ctx As DbContext, estado As EstadoTransitorio)
+        For Each detalle In ObtenerDetallesEstado(estado)
+            Dim entry = ctx.Entry(detalle)
+
+            If estado.Id <= 0 Then
+                If entry.State = EntityState.Detached Then
+                    ctx.Set(detalle.GetType()).Add(detalle)
+                ElseIf entry.State <> EntityState.Added Then
+                    entry.State = EntityState.Added
+                End If
+            Else
+                If entry.State = EntityState.Detached Then
+                    ctx.Set(detalle.GetType()).Attach(detalle)
+                    entry = ctx.Entry(detalle)
+                End If
+
+                entry.State = EntityState.Modified
             End If
         Next
     End Sub
+
+    Private Shared Iterator Function ObtenerDetallesEstado(estado As EstadoTransitorio) As IEnumerable(Of Object)
+        If estado.BajaDeFuncionarioDetalle IsNot Nothing Then
+            estado.BajaDeFuncionarioDetalle.EstadoTransitorio = estado
+            Yield estado.BajaDeFuncionarioDetalle
+        End If
+        If estado.CambioDeCargoDetalle IsNot Nothing Then
+            estado.CambioDeCargoDetalle.EstadoTransitorio = estado
+            Yield estado.CambioDeCargoDetalle
+        End If
+        If estado.DesarmadoDetalle IsNot Nothing Then
+            estado.DesarmadoDetalle.EstadoTransitorio = estado
+            Yield estado.DesarmadoDetalle
+        End If
+        If estado.DesignacionDetalle IsNot Nothing Then
+            estado.DesignacionDetalle.EstadoTransitorio = estado
+            Yield estado.DesignacionDetalle
+        End If
+        If estado.EnfermedadDetalle IsNot Nothing Then
+            estado.EnfermedadDetalle.EstadoTransitorio = estado
+            Yield estado.EnfermedadDetalle
+        End If
+        If estado.InicioDeProcesamientoDetalle IsNot Nothing Then
+            estado.InicioDeProcesamientoDetalle.EstadoTransitorio = estado
+            Yield estado.InicioDeProcesamientoDetalle
+        End If
+        If estado.OrdenCincoDetalle IsNot Nothing Then
+            estado.OrdenCincoDetalle.EstadoTransitorio = estado
+            Yield estado.OrdenCincoDetalle
+        End If
+        If estado.RetenDetalle IsNot Nothing Then
+            estado.RetenDetalle.EstadoTransitorio = estado
+            Yield estado.RetenDetalle
+        End If
+        If estado.SancionDetalle IsNot Nothing Then
+            estado.SancionDetalle.EstadoTransitorio = estado
+            Yield estado.SancionDetalle
+        End If
+        If estado.SeparacionDelCargoDetalle IsNot Nothing Then
+            estado.SeparacionDelCargoDetalle.EstadoTransitorio = estado
+            Yield estado.SeparacionDelCargoDetalle
+        End If
+        If estado.SumarioDetalle IsNot Nothing Then
+            estado.SumarioDetalle.EstadoTransitorio = estado
+            Yield estado.SumarioDetalle
+        End If
+        If estado.TrasladoDetalle IsNot Nothing Then
+            estado.TrasladoDetalle.EstadoTransitorio = estado
+            Yield estado.TrasladoDetalle
+        End If
+        If estado.ReactivacionDeFuncionarioDetalle IsNot Nothing Then
+            estado.ReactivacionDeFuncionarioDetalle.EstadoTransitorio = estado
+            Yield estado.ReactivacionDeFuncionarioDetalle
+        End If
+    End Function
 
 #End Region
 
