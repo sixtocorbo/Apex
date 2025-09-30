@@ -544,15 +544,16 @@ Public Class frmFuncionarioSituacion
         AplicarEstiloModernoGrilla(dgvEstados)
         dgvEstados.AutoGenerateColumns = False
         dgvEstados.Columns.Clear()
+        dgvEstados.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
 
         dgvEstados.Columns.Add(New DataGridViewTextBoxColumn With {
             .Name = "Tipo", .DataPropertyName = "Tipo", .HeaderText = "Tipo de Evento",
-            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells, .MinimumWidth = 180
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, .FillWeight = 110, .MinimumWidth = 110
         })
 
         Dim colDetalles As New DataGridViewTextBoxColumn With {
             .Name = "Detalles", .DataPropertyName = "Detalles", .HeaderText = "Detalles del Evento",
-            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, .MinimumWidth = 400
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, .FillWeight = 180, .MinimumWidth = 150
         }
         colDetalles.DefaultCellStyle.WrapMode = DataGridViewTriState.True
         dgvEstados.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells
@@ -560,17 +561,20 @@ Public Class frmFuncionarioSituacion
 
         Dim colDesde As New DataGridViewTextBoxColumn With {
             .Name = "Desde", .DataPropertyName = "Desde", .HeaderText = "Desde",
-            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells, .MinimumWidth = 110
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, .FillWeight = 90, .MinimumWidth = 90
         }
         colDesde.DefaultCellStyle.Format = "dd/MM/yyyy"
         dgvEstados.Columns.Add(colDesde)
 
         Dim colHasta As New DataGridViewTextBoxColumn With {
             .Name = "Hasta", .DataPropertyName = "Hasta", .HeaderText = "Hasta",
-            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells, .MinimumWidth = 110
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, .FillWeight = 90, .MinimumWidth = 90
         }
         colHasta.DefaultCellStyle.Format = "dd/MM/yyyy"
         dgvEstados.Columns.Add(colHasta)
+        colAcciones.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+        colAcciones.FillWeight = 60
+        colAcciones.MinimumWidth = 90
         dgvEstados.Columns.Add(colAcciones)
     End Sub
 
