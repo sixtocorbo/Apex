@@ -261,22 +261,17 @@ Public Class frmFuncionarioCrear
         txtCiudad.Text = If(_funcionario.Ciudad, String.Empty).Trim()
         txtSeccional.Text = If(_funcionario.Seccional, String.Empty).Trim()
         txtCredencial.Text = If(_funcionario.Credencial, String.Empty).Trim()
-        If _funcionario.Baja.HasValue Then
-            dtpBaja.Value = SafePickerDate(dtpBaja, _funcionario.Baja)
-            dtpBaja.Checked = True
-        Else
-            dtpBaja.Value = SafePickerDate(dtpBaja, Date.Today)
-            dtpBaja.Checked = False
-        End If
+        chkActivo.Checked = _funcionario.Activo
+        chkEstudia.Checked = _funcionario.Estudia
+
+        Dim fechaBaseBaja = If(_funcionario.Baja, Date.Today)
+        dtpBaja.Value = SafePickerDate(dtpBaja, fechaBaseBaja)
+        dtpBaja.Checked = (Not _funcionario.Activo) AndAlso _funcionario.Baja.HasValue
         txtResAlta.Text = If(_funcionario.ResAlta, String.Empty).Trim()
         txtResBaja.Text = If(_funcionario.ResBaja, String.Empty).Trim()
         txtDescripcion.Text = If(_funcionario.Descripcion, String.Empty).Trim()
         txtSituacionEspecial.Text = If(_funcionario.SituacionEspecial, String.Empty).Trim()
         txtImei.Text = If(_funcionario.Imei, String.Empty).Trim()
-
-        ' Checkboxes
-        chkActivo.Checked = _funcionario.Activo
-        chkEstudia.Checked = _funcionario.Estudia
 
         ' Fechas (defensivo con rango del DateTimePicker)
         dtpFechaIngreso.Value = SafePickerDate(dtpFechaIngreso, _funcionario.FechaIngreso)
