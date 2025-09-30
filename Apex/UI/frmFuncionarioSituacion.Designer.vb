@@ -30,6 +30,7 @@ Partial Class frmFuncionarioSituacion
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
         Me.grpEstados = New System.Windows.Forms.GroupBox()
         Me.dgvEstados = New System.Windows.Forms.DataGridView()
+        Me.colAcciones = New System.Windows.Forms.DataGridViewButtonColumn()
         Me.SplitContainerRight = New System.Windows.Forms.SplitContainer()
         Me.grpNovedades = New System.Windows.Forms.GroupBox()
         Me.dgvNovedades = New System.Windows.Forms.DataGridView()
@@ -71,7 +72,7 @@ Partial Class frmFuncionarioSituacion
         'dtpDesde
         '
         Me.dtpDesde.Anchor = System.Windows.Forms.AnchorStyles.Left
-        Me.dtpDesde.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
+        Me.dtpDesde.Format = System.Windows.Forms.DateTimePickerFormat.Short
         Me.dtpDesde.Location = New System.Drawing.Point(232, 13)
         Me.dtpDesde.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.dtpDesde.Name = "dtpDesde"
@@ -103,7 +104,7 @@ Partial Class frmFuncionarioSituacion
         'dtpHasta
         '
         Me.dtpHasta.Anchor = System.Windows.Forms.AnchorStyles.Left
-        Me.dtpHasta.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
+        Me.dtpHasta.Format = System.Windows.Forms.DateTimePickerFormat.Short
         Me.dtpHasta.Location = New System.Drawing.Point(456, 13)
         Me.dtpHasta.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.dtpHasta.Name = "dtpHasta"
@@ -166,7 +167,7 @@ Partial Class frmFuncionarioSituacion
         DataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.ControlText
         DataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight
         DataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.[True]
+        DataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True
         Me.dgvEstados.DefaultCellStyle = DataGridViewCellStyle1
         Me.dgvEstados.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgvEstados.Location = New System.Drawing.Point(8, 27)
@@ -178,6 +179,15 @@ Partial Class frmFuncionarioSituacion
         Me.dgvEstados.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
         Me.dgvEstados.Size = New System.Drawing.Size(642, 398)
         Me.dgvEstados.TabIndex = 2
+        '
+        'colAcciones
+        '
+        Me.colAcciones.HeaderText = "Acciones"
+        Me.colAcciones.MinimumWidth = 8
+        Me.colAcciones.Name = "colAcciones"
+        Me.colAcciones.ReadOnly = True
+        Me.colAcciones.Text = "Acciones"
+        Me.colAcciones.UseColumnTextForButtonValue = True
         '
         'SplitContainerRight
         '
@@ -224,7 +234,7 @@ Partial Class frmFuncionarioSituacion
         DataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText
         DataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight
         DataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        DataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False
         Me.dgvNovedades.DefaultCellStyle = DataGridViewCellStyle2
         Me.dgvNovedades.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgvNovedades.Location = New System.Drawing.Point(8, 27)
@@ -371,4 +381,5 @@ Partial Class frmFuncionarioSituacion
     Friend WithEvents pnlHeader As FlowLayoutPanel
     Friend WithEvents btnImprimir As Button
     Friend WithEvents btnCerrar As Button
+    Friend WithEvents colAcciones As DataGridViewButtonColumn
 End Class
