@@ -302,11 +302,11 @@ Public Class frmFuncionarioSituacion
                                             End Sub
         AddHandler imprimirItem.Click, Sub()
                                            Dim frm As New frmNotificacionRPT(evento.Id)
-                                           NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
+                                           AbrirChildEnDashboard(frm)
                                        End Sub
         AddHandler editarItem.Click, Sub()
                                          Dim frm As New frmNotificacionCrear(evento.Id)
-                                         NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
+                                         AbrirChildEnDashboard(frm)
                                      End Sub
         AddHandler eliminarItem.Click, Async Sub()
                                            If MessageBox.Show("¿Está seguro que desea eliminar esta notificación?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
@@ -371,37 +371,37 @@ Public Class frmFuncionarioSituacion
                 Return
             End If
 
-            Dim cambiosGuardados = False
+            Dim frm As New frmFuncionarioEstadoTransitorio(estado, _uow, False)
 
-            Using frm As New frmFuncionarioEstadoTransitorio(estado, _uow, False)
-                AddHandler frm.EstadoConfigurado,
-                    Sub(estadoConfigurado As EstadoTransitorio)
-                        Try
-                            _uow.Context.SaveChanges()
-                            cambiosGuardados = True
-                        Catch ex As Exception
-                            MessageBox.Show($"No se pudo guardar el estado: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                        End Try
-                    End Sub
+            AddHandler frm.EstadoConfigurado,
+                Async Sub(estadoConfigurado As EstadoTransitorio)
+                    Await ProcesarEstadoTransitorioActualizadoAsync(estadoConfigurado)
+                End Sub
 
-                frm.ShowDialog(Me)
-            End Using
-
-            If cambiosGuardados Then
-                Notifier.Success(Me, "Estado actualizado.")
-                Await ActualizarTodo()
-                NotificarActualizacionFuncionario()
-            Else
-                If estado.Id > 0 Then
-                    Try
-                        _uow.Context.Entry(estado).Reload()
-                    Catch
-                    End Try
-                End If
-            End If
+            AbrirChildEnDashboard(frm)
 
         Catch ex As Exception
             MessageBox.Show($"Ocurrió un error al editar el estado transitorio: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Function
+
+    Private Async Function ProcesarEstadoTransitorioActualizadoAsync(estado As EstadoTransitorio) As Task
+        If estado Is Nothing Then Return
+
+        Try
+            Await _uow.Context.SaveChangesAsync()
+            Notifier.Success(Me, "Estado actualizado.")
+            Await ActualizarTodo()
+            NotificarActualizacionFuncionario()
+        Catch ex As Exception
+            MessageBox.Show($"No se pudo guardar el estado: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+
+            If estado.Id > 0 Then
+                Try
+                    _uow.Context.Entry(estado).Reload()
+                Catch
+                End Try
+            End If
         End Try
     End Function
 
@@ -457,7 +457,7 @@ Public Class frmFuncionarioSituacion
                     End If
                 Case "Notificación"
                     Dim frm As New frmNotificacionRPT(evento.Id)
-                    NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
+                    AbrirChildEnDashboard(frm)
             End Select
 
         Catch ex As Exception
@@ -470,7 +470,7 @@ Public Class frmFuncionarioSituacion
         Try
             If estadoIdEspecifico > 0 Then
                 Dim frm As New frmDesignacionRPT(estadoIdEspecifico)
-                NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
+                AbrirChildEnDashboard(frm)
                 Return
             End If
 
@@ -515,7 +515,7 @@ Public Class frmFuncionarioSituacion
 
             If idParaReporte > 0 Then
                 Dim frm As New frmDesignacionRPT(idParaReporte)
-                NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
+                AbrirChildEnDashboard(frm)
             End If
 
         Catch ex As Exception
@@ -618,11 +618,42 @@ Public Class frmFuncionarioSituacion
         Dim fechaInicio = dtpDesde.Value.Date
         Dim fechaFin = dtpHasta.Value.Date
         Dim frm As New frmFuncionarioSituacionRPT(_funcionarioId, fechaInicio, fechaFin)
-        NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
+        AbrirChildEnDashboard(frm)
     End Sub
 
     Private Sub btnCerrar_Click(sender As Object, e As EventArgs) Handles btnCerrar.Click
         Close()
+    End Sub
+
+    Private Function GetDashboard() As frmDashboard
+        Return Application.OpenForms.OfType(Of frmDashboard)().FirstOrDefault()
+    End Function
+
+    Private Sub AbrirChildEnDashboard(formHijo As Form)
+        If formHijo Is Nothing Then
+            Notifier.Warn(Me, "No hay formulario para abrir.")
+            Return
+        End If
+
+        Dim dash = GetDashboard()
+        If dash Is Nothing OrElse dash.IsDisposed Then
+            Notifier.Warn(Me, "No se encontró el Dashboard activo.")
+            Return
+        End If
+
+        If dash.InvokeRequired Then
+            dash.BeginInvoke(CType(Sub() AbrirChildEnDashboard(formHijo), MethodInvoker))
+            Return
+        End If
+
+        Try
+            dash.Activate()
+            dash.BringToFront()
+            dash.AbrirChild(formHijo)
+            Notifier.Info(dash, $"Abierto: {formHijo.Text}")
+        Catch ex As Exception
+            Notifier.[Error](dash, $"No se pudo abrir la ventana: {ex.Message}")
+        End Try
     End Sub
 
     Private Sub AplicarEstiloModernoGrilla(dgv As DataGridView)
