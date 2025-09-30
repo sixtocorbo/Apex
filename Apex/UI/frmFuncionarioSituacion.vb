@@ -371,37 +371,37 @@ Public Class frmFuncionarioSituacion
                 Return
             End If
 
-            Dim cambiosGuardados = False
+            Dim frm As New frmFuncionarioEstadoTransitorio(estado, _uow, False)
 
-            Using frm As New frmFuncionarioEstadoTransitorio(estado, _uow, False)
-                AddHandler frm.EstadoConfigurado,
-                    Sub(estadoConfigurado As EstadoTransitorio)
-                        Try
-                            _uow.Context.SaveChanges()
-                            cambiosGuardados = True
-                        Catch ex As Exception
-                            MessageBox.Show($"No se pudo guardar el estado: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                        End Try
-                    End Sub
+            AddHandler frm.EstadoConfigurado,
+                Async Sub(estadoConfigurado As EstadoTransitorio)
+                    Await ProcesarEstadoTransitorioActualizadoAsync(estadoConfigurado)
+                End Sub
 
-                frm.ShowDialog(Me)
-            End Using
-
-            If cambiosGuardados Then
-                Notifier.Success(Me, "Estado actualizado.")
-                Await ActualizarTodo()
-                NotificarActualizacionFuncionario()
-            Else
-                If estado.Id > 0 Then
-                    Try
-                        _uow.Context.Entry(estado).Reload()
-                    Catch
-                    End Try
-                End If
-            End If
+            AbrirChildEnDashboard(frm)
 
         Catch ex As Exception
             MessageBox.Show($"Ocurrió un error al editar el estado transitorio: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Function
+
+    Private Async Function ProcesarEstadoTransitorioActualizadoAsync(estado As EstadoTransitorio) As Task
+        If estado Is Nothing Then Return
+
+        Try
+            Await _uow.Context.SaveChangesAsync()
+            Notifier.Success(Me, "Estado actualizado.")
+            Await ActualizarTodo()
+            NotificarActualizacionFuncionario()
+        Catch ex As Exception
+            MessageBox.Show($"No se pudo guardar el estado: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+
+            If estado.Id > 0 Then
+                Try
+                    _uow.Context.Entry(estado).Reload()
+                Catch
+                End Try
+            End If
         End Try
     End Function
 
