@@ -41,6 +41,7 @@ Public Class frmFuncionarioCrear
     Private ReadOnly bsEstados As New BindingSource()
     Private _seGuardo As Boolean = False
     Private _cerrandoPorCodigo As Boolean = False
+    Private _bloquearEventosBaja As Boolean = True
 
 #End Region
 
@@ -129,6 +130,9 @@ Public Class frmFuncionarioCrear
             dtpBaja.Checked = False
             dtpBaja.Value = SafePickerDate(dtpBaja, Date.Today)
         End If
+
+        _bloquearEventosBaja = False
+        SincronizarEstadoBajaDesdePicker()
 
     End Sub
     ' Llamar después de InitializeComponent()
@@ -729,6 +733,10 @@ Public Class frmFuncionarioCrear
         AddHandler dgvEstadosTransitorios.CellDoubleClick, AddressOf DgvEstadosTransitorios_CellDoubleClick
     End Sub
 
+    Private Sub dtpBaja_ValueChanged(sender As Object, e As EventArgs) Handles dtpBaja.ValueChanged, dtpBaja.CheckedChanged
+        SincronizarEstadoBajaDesdePicker()
+    End Sub
+
     Private Sub ConfigurarGrillas()
         ConfigurarGrillaDotacion()
         ConfigurarGrillaEstados()
@@ -766,6 +774,130 @@ Public Class frmFuncionarioCrear
         row.TipoEstado = updated.TipoEstado : row.FechaDesde = updated.FechaDesde
         row.FechaHasta = updated.FechaHasta : row.Observaciones = updated.Observaciones
     End Sub
+
+    Private Sub SincronizarEstadoBajaDesdePicker()
+        If _bloquearEventosBaja Then Return
+
+        If dtpBaja.Checked Then
+            If chkActivo.Checked Then chkActivo.Checked = False
+            AplicarBajaDesdePicker()
+        Else
+            EliminarEstadoBajaAsociado()
+        End If
+    End Sub
+
+    Private Sub AplicarBajaDesdePicker()
+        Dim row = AsegurarEstadoBajaRow()
+        If row Is Nothing Then Return
+
+        Dim estado = row.EntityRef
+        If estado Is Nothing Then
+            estado = New EstadoTransitorio() With {
+                .Funcionario = _funcionario,
+                .TipoEstadoTransitorioId = ModConstantesApex.TipoEstadoTransitorioId.BajaDeFuncionario,
+                .BajaDeFuncionarioDetalle = New BajaDeFuncionarioDetalle()
+            }
+            row.EntityRef = estado
+        End If
+
+        estado.TipoEstadoTransitorioId = ModConstantesApex.TipoEstadoTransitorioId.BajaDeFuncionario
+        estado.Funcionario = _funcionario
+        If _funcionario IsNot Nothing AndAlso _funcionario.Id > 0 Then
+            estado.FuncionarioId = _funcionario.Id
+        End If
+
+        Dim detalle = estado.BajaDeFuncionarioDetalle
+        If detalle Is Nothing Then
+            detalle = New BajaDeFuncionarioDetalle()
+            estado.BajaDeFuncionarioDetalle = detalle
+        End If
+
+        detalle.FechaDesde = dtpBaja.Value.Date
+        detalle.FechaHasta = Nothing
+
+        If _funcionario IsNot Nothing AndAlso _funcionario.EstadoTransitorio IsNot Nothing Then
+            If Not _funcionario.EstadoTransitorio.Contains(estado) Then
+                _funcionario.EstadoTransitorio.Add(estado)
+            End If
+        End If
+
+        UpdateRowFromEntity(row, estado)
+        bsEstados.ResetBindings(False)
+    End Sub
+
+    Private Sub EliminarEstadoBajaAsociado()
+        Dim row = BuscarEstadoBajaRow()
+        If row Is Nothing Then Return
+
+        Dim estado = row.EntityRef
+        If estado IsNot Nothing Then
+            If estado.Id > 0 Then
+                MarcarParaEliminar(estado)
+                If Not _estadosParaEliminar.Contains(estado) Then
+                    _estadosParaEliminar.Add(estado)
+                End If
+            Else
+                Dim entry = _uow.Context.Entry(estado)
+                If entry IsNot Nothing AndAlso entry.State <> EntityState.Detached Then
+                    entry.State = EntityState.Detached
+                End If
+            End If
+
+            If _funcionario IsNot Nothing AndAlso _funcionario.EstadoTransitorio IsNot Nothing Then
+                _funcionario.EstadoTransitorio.Remove(estado)
+            End If
+        End If
+
+        _estadoRows.Remove(row)
+        bsEstados.ResetBindings(False)
+    End Sub
+
+    Private Function BuscarEstadoBajaRow() As EstadoRow
+        If _estadoRows Is Nothing Then Return Nothing
+        For Each row In _estadoRows
+            Dim estado = row?.EntityRef
+            If estado IsNot Nothing AndAlso estado.TipoEstadoTransitorioId = ModConstantesApex.TipoEstadoTransitorioId.BajaDeFuncionario Then
+                Return row
+            End If
+        Next
+        Return Nothing
+    End Function
+
+    Private Function AsegurarEstadoBajaRow() As EstadoRow
+        Dim row = BuscarEstadoBajaRow()
+        If row IsNot Nothing Then Return row
+
+        Dim estadoExistente As EstadoTransitorio = Nothing
+
+        If _funcionario IsNot Nothing AndAlso _funcionario.EstadoTransitorio IsNot Nothing Then
+            For Each estado In _funcionario.EstadoTransitorio
+                If estado.TipoEstadoTransitorioId = ModConstantesApex.TipoEstadoTransitorioId.BajaDeFuncionario Then
+                    estadoExistente = estado
+                    Exit For
+                End If
+            Next
+        End If
+
+        If estadoExistente Is Nothing Then
+            estadoExistente = New EstadoTransitorio() With {
+                .Funcionario = _funcionario,
+                .TipoEstadoTransitorioId = ModConstantesApex.TipoEstadoTransitorioId.BajaDeFuncionario,
+                .BajaDeFuncionarioDetalle = New BajaDeFuncionarioDetalle()
+            }
+
+            If _funcionario IsNot Nothing AndAlso _funcionario.EstadoTransitorio IsNot Nothing Then
+                _funcionario.EstadoTransitorio.Add(estadoExistente)
+            End If
+
+            row = BuildEstadoRow(estadoExistente, "Baja automática")
+        Else
+            LoadEstadoTransitorioDetails(estadoExistente)
+            row = BuildEstadoRow(estadoExistente, "Estado")
+        End If
+
+        _estadoRows.Add(row)
+        Return row
+    End Function
 
     Private _estaCargandoHistorial As Boolean = False
     Private Async Sub chkVerHistorial_CheckedChanged(sender As Object, e As EventArgs) Handles chkVerHistorial.CheckedChanged
