@@ -42,6 +42,8 @@ Public Class frmFuncionarioCrear
     Private _seGuardo As Boolean = False
     Private _cerrandoPorCodigo As Boolean = False
     Private _bloquearEventosBaja As Boolean = True
+    Private _ultimoValorFechaBaja As Date?
+    Private _ultimoEstadoCheckBaja As Boolean
 
 #End Region
 
@@ -130,6 +132,10 @@ Public Class frmFuncionarioCrear
             dtpBaja.Checked = False
             dtpBaja.Value = SafePickerDate(dtpBaja, Date.Today)
         End If
+        _ultimoEstadoCheckBaja = dtpBaja.Checked
+        _ultimoValorFechaBaja = If(dtpBaja.Checked, dtpBaja.Value.Date, CType(Nothing, Date?))
+        _bloquearEventosBaja = False
+        SincronizarEstadoBajaDesdePicker()
 
         _bloquearEventosBaja = False
         SincronizarEstadoBajaDesdePicker()
@@ -733,8 +739,21 @@ Public Class frmFuncionarioCrear
         AddHandler dgvEstadosTransitorios.CellDoubleClick, AddressOf DgvEstadosTransitorios_CellDoubleClick
     End Sub
 
-    Private Sub dtpBaja_ValueChanged(sender As Object, e As EventArgs) Handles dtpBaja.ValueChanged, dtpBaja.CheckedChanged
-        SincronizarEstadoBajaDesdePicker()
+
+    Private Sub dtpBaja_ValueChanged(sender As Object, e As EventArgs) Handles dtpBaja.ValueChanged
+        ProcesarCambioFechaBaja()
+    End Sub
+
+    Private Sub dtpBaja_MouseUp(sender As Object, e As MouseEventArgs) Handles dtpBaja.MouseUp
+        If e.Button = MouseButtons.Left Then
+            ProcesarCambioFechaBaja()
+        End If
+    End Sub
+
+    Private Sub dtpBaja_KeyUp(sender As Object, e As KeyEventArgs) Handles dtpBaja.KeyUp
+        If e.KeyCode = Keys.Space OrElse e.KeyCode = Keys.Delete OrElse e.KeyCode = Keys.Back Then
+            ProcesarCambioFechaBaja()
+        End If
     End Sub
 
     Private Sub ConfigurarGrillas()
@@ -774,7 +793,7 @@ Public Class frmFuncionarioCrear
         row.TipoEstado = updated.TipoEstado : row.FechaDesde = updated.FechaDesde
         row.FechaHasta = updated.FechaHasta : row.Observaciones = updated.Observaciones
     End Sub
-
+    '============================================================
     Private Sub SincronizarEstadoBajaDesdePicker()
         If _bloquearEventosBaja Then Return
 
@@ -784,7 +803,28 @@ Public Class frmFuncionarioCrear
         Else
             EliminarEstadoBajaAsociado()
         End If
+
+        ActualizarEstadoBajaCache()
     End Sub
+
+    Private Sub ProcesarCambioFechaBaja()
+        If _bloquearEventosBaja Then Return
+
+        Dim fechaActual As Date? = If(dtpBaja.Checked, dtpBaja.Value.Date, CType(Nothing, Date?))
+        If _ultimoEstadoCheckBaja = dtpBaja.Checked AndAlso FechasIguales(_ultimoValorFechaBaja, fechaActual) Then Return
+
+        SincronizarEstadoBajaDesdePicker()
+    End Sub
+
+    Private Sub ActualizarEstadoBajaCache()
+        _ultimoEstadoCheckBaja = dtpBaja.Checked
+        _ultimoValorFechaBaja = If(dtpBaja.Checked, dtpBaja.Value.Date, CType(Nothing, Date?))
+    End Sub
+
+    Private Shared Function FechasIguales(fecha1 As Date?, fecha2 As Date?) As Boolean
+        If fecha1.HasValue <> fecha2.HasValue Then Return False
+        Return Not fecha1.HasValue OrElse fecha1.Value.Date = fecha2.Value.Date
+    End Function
 
     Private Sub AplicarBajaDesdePicker()
         Dim row = AsegurarEstadoBajaRow()
@@ -898,6 +938,8 @@ Public Class frmFuncionarioCrear
         _estadoRows.Add(row)
         Return row
     End Function
+
+    '============================================================
 
     Private _estaCargandoHistorial As Boolean = False
     Private Async Sub chkVerHistorial_CheckedChanged(sender As Object, e As EventArgs) Handles chkVerHistorial.CheckedChanged
