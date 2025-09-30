@@ -29,6 +29,7 @@ Partial Class frmLicencias
         Me.chkSoloVigentes = New System.Windows.Forms.CheckBox()
         Me.txtBusquedaLicencia = New System.Windows.Forms.TextBox()
         Me.Label1 = New System.Windows.Forms.Label()
+        Me.Label2 = New System.Windows.Forms.Label()
         CType(Me.dgvLicencias, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.PanelLicencias.SuspendLayout()
         Me.PanelBusquedaLicencias.SuspendLayout()
@@ -98,6 +99,7 @@ Partial Class frmLicencias
         '
         'PanelBusquedaLicencias
         '
+        Me.PanelBusquedaLicencias.Controls.Add(Me.Label2)
         Me.PanelBusquedaLicencias.Controls.Add(Me.dtpFechaVigencia)
         Me.PanelBusquedaLicencias.Controls.Add(Me.lblFechaVigencia)
         Me.PanelBusquedaLicencias.Controls.Add(Me.chkSoloVigentes)
@@ -110,52 +112,62 @@ Partial Class frmLicencias
         Me.PanelBusquedaLicencias.Size = New System.Drawing.Size(900, 62)
         Me.PanelBusquedaLicencias.TabIndex = 5
         '
-        'chkSoloVigentes
-        '
-        Me.chkSoloVigentes.AutoSize = True
-        Me.chkSoloVigentes.Location = New System.Drawing.Point(517, 16)
-        Me.chkSoloVigentes.Name = "chkSoloVigentes"
-        Me.chkSoloVigentes.Size = New System.Drawing.Size(133, 24)
-        Me.chkSoloVigentes.TabIndex = 2
-        Me.chkSoloVigentes.Text = "Sólo vigentes"
-        Me.chkSoloVigentes.UseVisualStyleBackColor = True
-        '
-        'lblFechaVigencia
-        '
-        Me.lblFechaVigencia.AutoSize = True
-        Me.lblFechaVigencia.Location = New System.Drawing.Point(656, 18)
-        Me.lblFechaVigencia.Name = "lblFechaVigencia"
-        Me.lblFechaVigencia.Size = New System.Drawing.Size(55, 20)
-        Me.lblFechaVigencia.TabIndex = 3
-        Me.lblFechaVigencia.Text = "Fecha:"
-        '
         'dtpFechaVigencia
         '
         Me.dtpFechaVigencia.Enabled = False
         Me.dtpFechaVigencia.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.dtpFechaVigencia.Location = New System.Drawing.Point(717, 14)
+        Me.dtpFechaVigencia.Location = New System.Drawing.Point(651, 15)
         Me.dtpFechaVigencia.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.dtpFechaVigencia.Name = "dtpFechaVigencia"
         Me.dtpFechaVigencia.Size = New System.Drawing.Size(135, 26)
         Me.dtpFechaVigencia.TabIndex = 4
         '
+        'lblFechaVigencia
+        '
+        Me.lblFechaVigencia.AutoSize = True
+        Me.lblFechaVigencia.Location = New System.Drawing.Point(590, 21)
+        Me.lblFechaVigencia.Name = "lblFechaVigencia"
+        Me.lblFechaVigencia.Size = New System.Drawing.Size(58, 20)
+        Me.lblFechaVigencia.TabIndex = 3
+        Me.lblFechaVigencia.Text = "Fecha:"
+        '
+        'chkSoloVigentes
+        '
+        Me.chkSoloVigentes.AutoSize = True
+        Me.chkSoloVigentes.Location = New System.Drawing.Point(451, 17)
+        Me.chkSoloVigentes.Name = "chkSoloVigentes"
+        Me.chkSoloVigentes.Size = New System.Drawing.Size(130, 24)
+        Me.chkSoloVigentes.TabIndex = 2
+        Me.chkSoloVigentes.Text = "Sólo vigentes"
+        Me.chkSoloVigentes.UseVisualStyleBackColor = True
+        '
         'txtBusquedaLicencia
         '
         Me.txtBusquedaLicencia.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
-        Me.txtBusquedaLicencia.Location = New System.Drawing.Point(131, 14)
+        Me.txtBusquedaLicencia.Location = New System.Drawing.Point(131, 15)
         Me.txtBusquedaLicencia.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.txtBusquedaLicencia.Name = "txtBusquedaLicencia"
-        Me.txtBusquedaLicencia.Size = New System.Drawing.Size(380, 26)
+        Me.txtBusquedaLicencia.Size = New System.Drawing.Size(314, 26)
         Me.txtBusquedaLicencia.TabIndex = 1
         '
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(11, 18)
+        Me.Label1.Location = New System.Drawing.Point(11, 21)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(96, 20)
         Me.Label1.TabIndex = 0
         Me.Label1.Text = "Funcionario:"
+        '
+        'Label2
+        '
+        Me.Label2.AutoSize = True
+        Me.Label2.ForeColor = System.Drawing.Color.Red
+        Me.Label2.Location = New System.Drawing.Point(792, 21)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(263, 20)
+        Me.Label2.TabIndex = 5
+        Me.Label2.Text = "Filas en rojo, funcionarios no activos"
         '
         'frmLicencias
         '
@@ -188,4 +200,5 @@ Partial Class frmLicencias
     Friend WithEvents chkSoloVigentes As CheckBox
     Friend WithEvents lblFechaVigencia As Label
     Friend WithEvents dtpFechaVigencia As DateTimePicker
+    Friend WithEvents Label2 As Label
 End Class

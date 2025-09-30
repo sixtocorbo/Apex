@@ -444,21 +444,21 @@ Public Class frmFuncionarioBuscar
             .Name = "CI", .DataPropertyName = "CI", .HeaderText = "Cédula",
             .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
             .FillWeight = 30,
-            .MinimumWidth = 100
+            .MinimumWidth = 75
         })
 
             .Columns.Add(New DataGridViewTextBoxColumn With {
             .Name = "Nombre", .DataPropertyName = "Nombre", .HeaderText = "Nombre",
             .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
-            .FillWeight = 45,
-            .MinimumWidth = 200
+            .FillWeight = 40,
+            .MinimumWidth = 165
         })
 
             .Columns.Add(New DataGridViewTextBoxColumn With {
             .Name = "Cargo", .DataPropertyName = "CargoNombre", .HeaderText = "Cargo",
             .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
-            .FillWeight = 25,
-            .MinimumWidth = 150
+            .FillWeight = 30,
+            .MinimumWidth = 110
         })
         End With
 
