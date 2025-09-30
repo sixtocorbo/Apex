@@ -204,8 +204,8 @@ Public Class frmFuncionarioSituacion
             Dim licenciasEnPeriodo = Await _uow.Context.Set(Of HistoricoLicencia)() _
                 .Include(Function(l) l.TipoLicencia) _
                 .Where(Function(l) l.FuncionarioId = _funcionarioId AndAlso
-                                     l.inicio < fechaFin AndAlso
-                                     l.finaliza >= fechaInicio) _
+                                        l.inicio < fechaFin AndAlso
+                                        l.finaliza >= fechaInicio) _
                 .AsNoTracking().ToListAsync()
 
             ' 3) Notificaciones PENDIENTES dentro del rango
@@ -215,18 +215,18 @@ Public Class frmFuncionarioSituacion
                 .Include(Function(n) n.TipoNotificacion) _
                 .Include(Function(n) n.NotificacionEstado) _
                 .Where(Function(n) n.FuncionarioId = _funcionarioId AndAlso
-                                     (n.EstadoId = estadoPendienteId OrElse n.EstadoId = estadoVencidaId) AndAlso
-                                     (n.FechaProgramada >= fechaInicio OrElse n.EstadoId = estadoVencidaId) AndAlso
-                                     n.FechaProgramada < fechaFin) _
+                                        (n.EstadoId = estadoPendienteId OrElse n.EstadoId = estadoVencidaId) AndAlso
+                                        (n.FechaProgramada >= fechaInicio OrElse n.EstadoId = estadoVencidaId) AndAlso
+                                        n.FechaProgramada < fechaFin) _
                 .AsNoTracking().ToListAsync()
 
             ' 4) Cambios de Auditoría dentro del rango
             Dim funcionarioIdStr = _funcionarioId.ToString()
             Dim cambiosAuditados = Await _uow.Context.Set(Of AuditoriaCambios)() _
                 .Where(Function(a) a.TablaNombre = "Funcionario" AndAlso
-                                     a.RegistroId = funcionarioIdStr AndAlso
-                                     a.FechaHora >= fechaInicio AndAlso
-                                     a.FechaHora < fechaFin) _
+                                        a.RegistroId = funcionarioIdStr AndAlso
+                                        a.FechaHora >= fechaInicio AndAlso
+                                        a.FechaHora < fechaFin) _
                 .AsNoTracking().ToListAsync()
 
             ' Unificar todos los tipos de eventos en una sola lista DTO
@@ -235,8 +235,8 @@ Public Class frmFuncionarioSituacion
             eventosUnificados.AddRange(estadosEnPeriodo _
                 .Select(Function(et) New EventoSituacionDTO(et)) _
                 .Where(Function(dto) dto.Desde.HasValue AndAlso
-                                     dto.Desde.Value < fechaFin AndAlso
-                                     (Not dto.Hasta.HasValue OrElse dto.Hasta.Value >= fechaInicio)))
+                                        dto.Desde.Value < fechaFin AndAlso
+                                        (Not dto.Hasta.HasValue OrElse dto.Hasta.Value >= fechaInicio)))
 
             eventosUnificados.AddRange(licenciasEnPeriodo.Select(Function(l) New EventoSituacionDTO(l)))
             eventosUnificados.AddRange(notificacionesEnPeriodo.Select(Function(n) New EventoSituacionDTO(n)))
@@ -322,35 +322,115 @@ Public Class frmFuncionarioSituacion
 
 
     Private Sub AccionesEstado(evento As EventoSituacionDTO)
+        If evento Is Nothing OrElse Not evento.EsEstadoTransitorio Then
+            MessageBox.Show("La opción seleccionada sólo está disponible para estados transitorios.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return
+        End If
+
         Dim menu As New ContextMenuStrip()
         Dim editarItem = menu.Items.Add("Editar")
         Dim quitarItem = menu.Items.Add("Quitar")
 
-        AddHandler editarItem.Click, Sub()
-                                         ' TODO: Implementar la lógica para editar el estado
-                                         MessageBox.Show("Funcionalidad para editar estados no implementada.")
+        AddHandler editarItem.Click, Async Sub()
+                                         Await EditarEstadoTransitorioAsync(evento)
                                      End Sub
+
         AddHandler quitarItem.Click, Async Sub()
-                                         If MessageBox.Show("¿Está seguro que desea quitar este estado?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
-                                             Dim estado = Await _uow.Context.Set(Of EstadoTransitorio)().FindAsync(evento.Id)
-                                             If estado IsNot Nothing Then
-                                                 _uow.Context.Set(Of EstadoTransitorio)().Remove(estado)
-                                                 Await _uow.Context.SaveChangesAsync()
-                                                 Notifier.Success(Me, "Estado quitado.")
-                                                 Await ActualizarTodo()
-                                             End If
-                                         End If
+                                         Await QuitarEstadoTransitorioAsync(evento)
                                      End Sub
+
         menu.Show(Cursor.Position)
 
     End Sub
+
+    Private Async Function EditarEstadoTransitorioAsync(evento As EventoSituacionDTO) As Task
+        Try
+            Dim estado = Await _uow.Context.Set(Of EstadoTransitorio)() _
+                .Include(Function(et) et.TipoEstadoTransitorio) _
+                .Include(Function(et) et.BajaDeFuncionarioDetalle) _
+                .Include(Function(et) et.CambioDeCargoDetalle) _
+                .Include(Function(et) et.CambioDeCargoDetalle.Cargo) _
+                .Include(Function(et) et.CambioDeCargoDetalle.Cargo1) _
+                .Include(Function(et) et.DesarmadoDetalle) _
+                .Include(Function(et) et.DesignacionDetalle) _
+                .Include(Function(et) et.EnfermedadDetalle) _
+                .Include(Function(et) et.InicioDeProcesamientoDetalle) _
+                .Include(Function(et) et.OrdenCincoDetalle) _
+                .Include(Function(et) et.ReactivacionDeFuncionarioDetalle) _
+                .Include(Function(et) et.RetenDetalle) _
+                .Include(Function(et) et.SancionDetalle) _
+                .Include(Function(et) et.SeparacionDelCargoDetalle) _
+                .Include(Function(et) et.SumarioDetalle) _
+                .Include(Function(et) et.TrasladoDetalle) _
+                .FirstOrDefaultAsync(Function(et) et.Id = evento.Id)
+
+            If estado Is Nothing Then
+                MessageBox.Show("No se encontró el estado transitorio seleccionado.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                Return
+            End If
+
+            Dim cambiosGuardados = False
+
+            Using frm As New frmFuncionarioEstadoTransitorio(estado, _uow, False)
+                AddHandler frm.EstadoConfigurado,
+                    Sub(estadoConfigurado As EstadoTransitorio)
+                        Try
+                            _uow.Context.SaveChanges()
+                            cambiosGuardados = True
+                        Catch ex As Exception
+                            MessageBox.Show($"No se pudo guardar el estado: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                        End Try
+                    End Sub
+
+                frm.ShowDialog(Me)
+            End Using
+
+            If cambiosGuardados Then
+                Notifier.Success(Me, "Estado actualizado.")
+                Await ActualizarTodo()
+            Else
+                If estado.Id > 0 Then
+                    Try
+                        _uow.Context.Entry(estado).Reload()
+                    Catch
+                    End Try
+                End If
+            End If
+
+        Catch ex As Exception
+            MessageBox.Show($"Ocurrió un error al editar el estado transitorio: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Function
+
+    Private Async Function QuitarEstadoTransitorioAsync(evento As EventoSituacionDTO) As Task
+        If MessageBox.Show("¿Está seguro que desea quitar este estado transitorio?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then
+            Return
+        End If
+
+        Try
+            Dim estado = Await _uow.Context.Set(Of EstadoTransitorio)().FindAsync(evento.Id)
+            If estado Is Nothing Then
+                MessageBox.Show("El estado transitorio ya no se encuentra en la base de datos.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                Return
+            End If
+
+            _uow.Context.Set(Of EstadoTransitorio)().Remove(estado)
+            Await _uow.Context.SaveChangesAsync()
+            Notifier.Success(Me, "Estado transitorio eliminado.")
+            Await ActualizarTodo()
+
+        Catch ex As Exception
+            Notifier.Error(Me, $"No se pudo quitar el estado transitorio: {ex.Message}")
+        End Try
+    End Function
+
     Private Async Sub dgvEstados_CellDoubleClick(sender As Object, e As DataGridViewCellEventArgs)
         If e.RowIndex < 0 OrElse dgvEstados.CurrentRow Is Nothing Then Return
         Try
             Dim evento = TryCast(dgvEstados.CurrentRow.DataBoundItem, EventoSituacionDTO)
             If evento Is Nothing OrElse evento.Id = 0 Then
                 MessageBox.Show("No se pudo identificar el ID del registro seleccionado.", "Aviso",
-                                 MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                                MessageBoxButtons.OK, MessageBoxIcon.Warning)
                 Return
             End If
 
@@ -360,7 +440,7 @@ Public Class frmFuncionarioSituacion
                         Await MostrarReporteDesignacionAsync(evento.Id)
                     Else
                         MessageBox.Show("No hay una acción específica definida para este tipo de estado.", "Información",
-                                         MessageBoxButtons.OK, MessageBoxIcon.Information)
+                                        MessageBoxButtons.OK, MessageBoxIcon.Information)
                     End If
                 Case "Notificación"
                     Dim frm As New frmNotificacionRPT(evento.Id)
@@ -391,7 +471,7 @@ Public Class frmFuncionarioSituacion
 
             If estadosDesignacion Is Nothing OrElse Not estadosDesignacion.Any() Then
                 MessageBox.Show("No se encontraron estados de 'Designación' para este funcionario.", "Aviso",
-                                 MessageBoxButtons.OK, MessageBoxIcon.Information)
+                                MessageBoxButtons.OK, MessageBoxIcon.Information)
                 Return
             End If
 
@@ -570,6 +650,13 @@ Public Class frmFuncionarioSituacion
         Public Property Hasta As Date?
         Public Property Severidad As EstadoVisualHelper.EventoSeveridad
         Public Property EstadoActualId As Byte?
+        Public Property TipoEstadoTransitorioId As Integer?
+
+        Public ReadOnly Property EsEstadoTransitorio As Boolean
+            Get
+                Return TipoEstadoTransitorioId.HasValue
+            End Get
+        End Property
 
         Public Sub New(estado As EstadoTransitorio)
             Me.Id = estado.Id
@@ -577,6 +664,7 @@ Public Class frmFuncionarioSituacion
             Me.Tipo = estado.TipoEstadoTransitorio.Nombre
             Me.Severidad = EstadoVisualHelper.DeterminarSeveridad(Me.Tipo)
             Me.EstadoActualId = Nothing
+            Me.TipoEstadoTransitorioId = estado.TipoEstadoTransitorioId
 
             Dim sb As New StringBuilder()
 
@@ -704,6 +792,7 @@ Public Class frmFuncionarioSituacion
             Me.Detalles = licencia.Comentario?.Trim()
             Me.Severidad = EstadoVisualHelper.DeterminarSeveridad(Me.Tipo)
             Me.EstadoActualId = Nothing
+            Me.TipoEstadoTransitorioId = Nothing
         End Sub
 
         Public Sub New(notificacion As NotificacionPersonal)
@@ -732,6 +821,7 @@ Public Class frmFuncionarioSituacion
             Dim estadoVencidaId As Byte = CByte(ModConstantesApex.EstadoNotificacionPersonal.Vencida)
             Me.Severidad = If(notificacion.EstadoId = estadoVencidaId, EstadoVisualHelper.EventoSeveridad.Alta, EstadoVisualHelper.EventoSeveridad.Media)
             Me.EstadoActualId = notificacion.EstadoId
+            Me.TipoEstadoTransitorioId = Nothing
         End Sub
 
         Public Sub New(auditoria As AuditoriaCambios)
@@ -745,6 +835,7 @@ Public Class frmFuncionarioSituacion
             Me.Detalles = $"El campo '{auditoria.CampoNombre}' cambió de '{valAnt}' a '{valNue}'."
             Me.Severidad = EstadoVisualHelper.EventoSeveridad.Info
             Me.EstadoActualId = Nothing
+            Me.TipoEstadoTransitorioId = Nothing
         End Sub
 
         ' La lógica de severidad se centraliza en EstadoVisualHelper.
