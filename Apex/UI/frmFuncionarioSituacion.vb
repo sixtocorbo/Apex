@@ -84,7 +84,12 @@ Public Class frmFuncionarioSituacion
 
     Private Async Function ActualizarTodo() As Task
         Dim fechaInicio = dtpDesde.Value.Date
-        Dim fechaFin = dtpHasta.Value.Date.AddDays(1) ' Rango semi-abierto [inicio, fin)
+        Dim fechaFin = dtpHasta.Value.Date
+
+        ' Evitar desbordes al trabajar con fechas máximas permitidas por el control.
+        If fechaFin < DateTime.MaxValue.Date Then
+            fechaFin = fechaFin.AddDays(1) ' Rango semi-abierto [inicio, fin)
+        End If
 
         GenerarTimeline(fechaInicio, fechaFin)
         Await PoblarGrillaEstados(fechaInicio, fechaFin)
