@@ -292,6 +292,7 @@ Public Class frmFuncionarioSituacion
                                                             If success Then
                                                                 Notifier.Success(Me, "Estado actualizado.")
                                                                 Await ActualizarTodo()
+                                                                NotificarActualizacionFuncionario()
                                                             Else
                                                                 Notifier.Error(Me, "No se pudo actualizar el estado.")
                                                             End If
@@ -313,6 +314,7 @@ Public Class frmFuncionarioSituacion
                                                    Await svc.DeleteNotificacionAsync(evento.Id)
                                                    Notifier.Success(Me, "Notificación eliminada.")
                                                    Await ActualizarTodo()
+                                                   NotificarActualizacionFuncionario()
                                                End Using
                                            End If
                                        End Sub
@@ -388,6 +390,7 @@ Public Class frmFuncionarioSituacion
             If cambiosGuardados Then
                 Notifier.Success(Me, "Estado actualizado.")
                 Await ActualizarTodo()
+                NotificarActualizacionFuncionario()
             Else
                 If estado.Id > 0 Then
                     Try
@@ -418,11 +421,21 @@ Public Class frmFuncionarioSituacion
             Await _uow.Context.SaveChangesAsync()
             Notifier.Success(Me, "Estado transitorio eliminado.")
             Await ActualizarTodo()
+            NotificarActualizacionFuncionario()
 
         Catch ex As Exception
             Notifier.Error(Me, $"No se pudo quitar el estado transitorio: {ex.Message}")
         End Try
     End Function
+
+    Private Sub NotificarActualizacionFuncionario()
+        Try
+            NotificadorEventos.NotificarCambioEnEstado(_funcionarioId)
+            NotificadorEventos.NotificarCambiosEnFuncionario(_funcionarioId)
+        Catch
+            ' Si la notificación falla no queremos interrumpir el flujo del usuario.
+        End Try
+    End Sub
 
     Private Async Sub dgvEstados_CellDoubleClick(sender As Object, e As DataGridViewCellEventArgs)
         If e.RowIndex < 0 OrElse dgvEstados.CurrentRow Is Nothing Then Return
