@@ -84,7 +84,12 @@ Public Class frmFuncionarioSituacion
 
     Private Async Function ActualizarTodo() As Task
         Dim fechaInicio = dtpDesde.Value.Date
-        Dim fechaFin = dtpHasta.Value.Date.AddDays(1) ' Rango semi-abierto [inicio, fin)
+        Dim fechaFin = dtpHasta.Value.Date
+
+        ' Evitar desbordes al trabajar con fechas máximas permitidas por el control.
+        If fechaFin < DateTime.MaxValue.Date Then
+            fechaFin = fechaFin.AddDays(1) ' Rango semi-abierto [inicio, fin)
+        End If
 
         GenerarTimeline(fechaInicio, fechaFin)
         Await PoblarGrillaEstados(fechaInicio, fechaFin)
@@ -279,7 +284,8 @@ Public Class frmFuncionarioSituacion
         Dim eliminarItem = menu.Items.Add("Eliminar")
 
         AddHandler cambiarEstadoItem.Click, Async Sub()
-                                                Using frm As New frmNotificacionCambiarEstado(evento.Id)
+                                                Dim estadoActual As Byte = If(evento.EstadoActualId.HasValue, evento.EstadoActualId.Value, CType(0, Byte))
+                                                Using frm As New frmNotificacionCambiarEstado(estadoActual)
                                                     If frm.ShowDialog() = DialogResult.OK Then
                                                         Using svc As New NotificacionService()
                                                             Dim success = Await svc.UpdateEstadoAsync(evento.Id, frm.SelectedEstadoId)
@@ -316,28 +322,107 @@ Public Class frmFuncionarioSituacion
 
 
     Private Sub AccionesEstado(evento As EventoSituacionDTO)
+        If evento Is Nothing OrElse Not evento.EsEstadoTransitorio Then
+            MessageBox.Show("La opción seleccionada sólo está disponible para estados transitorios.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return
+        End If
+
         Dim menu As New ContextMenuStrip()
         Dim editarItem = menu.Items.Add("Editar")
         Dim quitarItem = menu.Items.Add("Quitar")
 
-        AddHandler editarItem.Click, Sub()
-                                         ' TODO: Implementar la lógica para editar el estado
-                                         MessageBox.Show("Funcionalidad para editar estados no implementada.")
+        AddHandler editarItem.Click, Async Sub()
+                                         Await EditarEstadoTransitorioAsync(evento)
                                      End Sub
+
         AddHandler quitarItem.Click, Async Sub()
-                                         If MessageBox.Show("¿Está seguro que desea quitar este estado?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
-                                             Dim estado = Await _uow.Context.Set(Of EstadoTransitorio)().FindAsync(evento.Id)
-                                             If estado IsNot Nothing Then
-                                                 _uow.Context.Set(Of EstadoTransitorio)().Remove(estado)
-                                                 Await _uow.Context.SaveChangesAsync()
-                                                 Notifier.Success(Me, "Estado quitado.")
-                                                 Await ActualizarTodo()
-                                             End If
-                                         End If
+                                         Await QuitarEstadoTransitorioAsync(evento)
                                      End Sub
+
         menu.Show(Cursor.Position)
 
     End Sub
+
+    Private Async Function EditarEstadoTransitorioAsync(evento As EventoSituacionDTO) As Task
+        Try
+            Dim estado = Await _uow.Context.Set(Of EstadoTransitorio)() _
+                .Include(Function(et) et.TipoEstadoTransitorio) _
+                .Include(Function(et) et.BajaDeFuncionarioDetalle) _
+                .Include(Function(et) et.CambioDeCargoDetalle) _
+                .Include(Function(et) et.CambioDeCargoDetalle.Cargo) _
+                .Include(Function(et) et.CambioDeCargoDetalle.Cargo1) _
+                .Include(Function(et) et.DesarmadoDetalle) _
+                .Include(Function(et) et.DesignacionDetalle) _
+                .Include(Function(et) et.EnfermedadDetalle) _
+                .Include(Function(et) et.InicioDeProcesamientoDetalle) _
+                .Include(Function(et) et.OrdenCincoDetalle) _
+                .Include(Function(et) et.ReactivacionDeFuncionarioDetalle) _
+                .Include(Function(et) et.RetenDetalle) _
+                .Include(Function(et) et.SancionDetalle) _
+                .Include(Function(et) et.SeparacionDelCargoDetalle) _
+                .Include(Function(et) et.SumarioDetalle) _
+                .Include(Function(et) et.TrasladoDetalle) _
+                .FirstOrDefaultAsync(Function(et) et.Id = evento.Id)
+
+            If estado Is Nothing Then
+                MessageBox.Show("No se encontró el estado transitorio seleccionado.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                Return
+            End If
+
+            Dim cambiosGuardados = False
+
+            Using frm As New frmFuncionarioEstadoTransitorio(estado, _uow, False)
+                AddHandler frm.EstadoConfigurado, _
+                    Sub(estadoConfigurado As EstadoTransitorio)
+                        Try
+                            _uow.Context.SaveChanges()
+                            cambiosGuardados = True
+                        Catch ex As Exception
+                            MessageBox.Show($"No se pudo guardar el estado: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                        End Try
+                    End Sub
+
+                frm.ShowDialog(Me)
+            End Using
+
+            If cambiosGuardados Then
+                Notifier.Success(Me, "Estado actualizado.")
+                Await ActualizarTodo()
+            Else
+                If estado.Id > 0 Then
+                    Try
+                        _uow.Context.Entry(estado).Reload()
+                    Catch
+                    End Try
+                End If
+            End If
+
+        Catch ex As Exception
+            MessageBox.Show($"Ocurrió un error al editar el estado transitorio: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Function
+
+    Private Async Function QuitarEstadoTransitorioAsync(evento As EventoSituacionDTO) As Task
+        If MessageBox.Show("¿Está seguro que desea quitar este estado transitorio?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then
+            Return
+        End If
+
+        Try
+            Dim estado = Await _uow.Context.Set(Of EstadoTransitorio)().FindAsync(evento.Id)
+            If estado Is Nothing Then
+                MessageBox.Show("El estado transitorio ya no se encuentra en la base de datos.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                Return
+            End If
+
+            _uow.Context.Set(Of EstadoTransitorio)().Remove(estado)
+            Await _uow.Context.SaveChangesAsync()
+            Notifier.Success(Me, "Estado transitorio eliminado.")
+            Await ActualizarTodo()
+
+        Catch ex As Exception
+            Notifier.Error(Me, $"No se pudo quitar el estado transitorio: {ex.Message}")
+        End Try
+    End Function
     Private Async Sub dgvEstados_CellDoubleClick(sender As Object, e As DataGridViewCellEventArgs)
         If e.RowIndex < 0 OrElse dgvEstados.CurrentRow Is Nothing Then Return
         Try
@@ -563,12 +648,22 @@ Public Class frmFuncionarioSituacion
         Public Property Desde As Date?
         Public Property Hasta As Date?
         Public Property Severidad As EstadoVisualHelper.EventoSeveridad
+        Public Property EstadoActualId As Byte?
+        Public Property TipoEstadoTransitorioId As Integer?
+
+        Public ReadOnly Property EsEstadoTransitorio As Boolean
+            Get
+                Return TipoEstadoTransitorioId.HasValue
+            End Get
+        End Property
 
         Public Sub New(estado As EstadoTransitorio)
             Me.Id = estado.Id
             Me.TipoEvento = "Estado"
             Me.Tipo = estado.TipoEstadoTransitorio.Nombre
             Me.Severidad = EstadoVisualHelper.DeterminarSeveridad(Me.Tipo)
+            Me.EstadoActualId = Nothing
+            Me.TipoEstadoTransitorioId = estado.TipoEstadoTransitorioId
 
             Dim sb As New StringBuilder()
 
@@ -695,6 +790,8 @@ Public Class frmFuncionarioSituacion
             Me.Hasta = licencia.finaliza
             Me.Detalles = licencia.Comentario?.Trim()
             Me.Severidad = EstadoVisualHelper.DeterminarSeveridad(Me.Tipo)
+            Me.EstadoActualId = Nothing
+            Me.TipoEstadoTransitorioId = Nothing
         End Sub
 
         Public Sub New(notificacion As NotificacionPersonal)
@@ -722,6 +819,8 @@ Public Class frmFuncionarioSituacion
 
             Dim estadoVencidaId As Byte = CByte(ModConstantesApex.EstadoNotificacionPersonal.Vencida)
             Me.Severidad = If(notificacion.EstadoId = estadoVencidaId, EstadoVisualHelper.EventoSeveridad.Alta, EstadoVisualHelper.EventoSeveridad.Media)
+            Me.EstadoActualId = notificacion.EstadoId
+            Me.TipoEstadoTransitorioId = Nothing
         End Sub
 
         Public Sub New(auditoria As AuditoriaCambios)
@@ -734,6 +833,8 @@ Public Class frmFuncionarioSituacion
             Dim valNue = If(String.IsNullOrWhiteSpace(auditoria.ValorNuevo), "[vacío]", auditoria.ValorNuevo)
             Me.Detalles = $"El campo '{auditoria.CampoNombre}' cambió de '{valAnt}' a '{valNue}'."
             Me.Severidad = EstadoVisualHelper.EventoSeveridad.Info
+            Me.EstadoActualId = Nothing
+            Me.TipoEstadoTransitorioId = Nothing
         End Sub
 
         ' La lógica de severidad se centraliza en EstadoVisualHelper.
