@@ -413,6 +413,7 @@ Public Class frmFuncionarioBuscar
             .AllowUserToResizeRows = False
             .AutoGenerateColumns = False
             .BackgroundColor = Color.White
+            .AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
 
             ' --- ESTILO DE ENCABEZADOS (Headers) ---
             .EnableHeadersVisualStyles = False
@@ -441,20 +442,23 @@ Public Class frmFuncionarioBuscar
 
             .Columns.Add(New DataGridViewTextBoxColumn With {
             .Name = "CI", .DataPropertyName = "CI", .HeaderText = "Cédula",
-            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells, ' Se ajusta al contenido
-            .MinimumWidth = 90
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
+            .FillWeight = 30,
+            .MinimumWidth = 75
         })
 
             .Columns.Add(New DataGridViewTextBoxColumn With {
             .Name = "Nombre", .DataPropertyName = "Nombre", .HeaderText = "Nombre",
-            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, ' Ocupa el espacio restante
-            .MinimumWidth = 200
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
+            .FillWeight = 40,
+            .MinimumWidth = 165
         })
 
             .Columns.Add(New DataGridViewTextBoxColumn With {
             .Name = "Cargo", .DataPropertyName = "CargoNombre", .HeaderText = "Cargo",
-            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells, ' Se ajusta al contenido
-            .MinimumWidth = 150
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
+            .FillWeight = 30,
+            .MinimumWidth = 110
         })
         End With
 
