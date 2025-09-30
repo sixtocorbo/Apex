@@ -136,10 +136,12 @@ Public Class frmFuncionarioCrear
         _ultimoEstadoCheckBaja = dtpBaja.Checked
         _ultimoValorFechaBaja = If(dtpBaja.Checked, dtpBaja.Value.Date, CType(Nothing, Date?))
         _bloquearEventosBaja = False
-        SincronizarEstadoBajaDesdePicker()
 
-        _bloquearEventosBaja = False
-        SincronizarEstadoBajaDesdePicker()
+        If dtpBaja.Checked Then
+            SincronizarEstadoBajaDesdePicker()
+        Else
+            ActualizarEstadoBajaCache()
+        End If
 
     End Sub
     ' Llamar después de InitializeComponent()
