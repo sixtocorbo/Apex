@@ -910,26 +910,120 @@ Public Class frmFuncionarioCrear
         row.FechaHasta = updated.FechaHasta : row.Observaciones = updated.Observaciones
     End Sub
     '============================================================
+    '============================================================
+    '       NUEVA LÓGICA CENTRALIZADA PARA MANEJAR LA BAJA
+    '============================================================
     Private Sub SincronizarEstadoBajaDesdePicker()
         If _bloquearEventosBaja Then Return
 
+        ' Primero, busca si ya existe un estado de baja en la colección del funcionario, sin importar su estado actual.
+        Dim estadoBaja As EstadoTransitorio = _funcionario.EstadoTransitorio.FirstOrDefault(
+        Function(et) et.TipoEstadoTransitorioId = ModConstantesApex.TipoEstadoTransitorioId.BajaDeFuncionario
+    )
+
         If dtpBaja.Checked Then
+            ' --- El usuario QUIERE que el funcionario esté de baja ---
+
+            ' Sincroniza el checkbox "Activo"
             If chkActivo.Checked Then chkActivo.Checked = False
-            AplicarBajaDesdePicker()
+
+
+            If estadoBaja Is Nothing Then
+                ' No existe un estado de baja. Lo creamos desde cero.
+                estadoBaja = New EstadoTransitorio With {
+                .Funcionario = _funcionario,
+                .TipoEstadoTransitorioId = ModConstantesApex.TipoEstadoTransitorioId.BajaDeFuncionario
+            }
+                Dim detalle = New BajaDeFuncionarioDetalle With {
+                .EstadoTransitorio = estadoBaja, ' 1. Enlazar el detalle con el padre
+                .FechaDesde = dtpBaja.Value.Date,
+                .FechaHasta = Nothing
+            }
+                estadoBaja.BajaDeFuncionarioDetalle = detalle ' 2. Enlazar el padre con el detalle
+
+                ' Añadir el nuevo estado a la colección principal del funcionario.
+                _funcionario.EstadoTransitorio.Add(estadoBaja)
+            Else
+                ' Ya existía un estado de baja. Solo actualizamos la fecha.
+                If estadoBaja.BajaDeFuncionarioDetalle Is Nothing Then
+                    ' Medida de seguridad: si el detalle es nulo por alguna razón, lo creamos.
+                    estadoBaja.BajaDeFuncionarioDetalle = New BajaDeFuncionarioDetalle()
+                    estadoBaja.BajaDeFuncionarioDetalle.EstadoTransitorio = estadoBaja
+                End If
+                estadoBaja.BajaDeFuncionarioDetalle.FechaDesde = dtpBaja.Value.Date
+                estadoBaja.BajaDeFuncionarioDetalle.FechaHasta = Nothing
+            End If
+
+            ' Ahora, nos aseguramos de que este estado esté visible en la grilla de la UI.
+            Dim row = _estadoRows.FirstOrDefault(Function(r) r.EntityRef Is estadoBaja)
+            If row Is Nothing Then
+                ' Si no está en la grilla, lo añadimos.
+                _estadoRows.Add(BuildEstadoRow(estadoBaja, "Baja automática"))
+            Else
+                ' Si ya estaba, refrescamos sus datos por si cambiaron.
+                UpdateRowFromEntity(row, estadoBaja)
+            End If
+
         Else
-            EliminarEstadoBajaAsociado()
+            ' --- El usuario NO QUIERE que el funcionario esté de baja (lo está reactivando) ---
+
+            ' Sincroniza el checkbox "Activo"
+            If Not chkActivo.Checked Then chkActivo.Checked = True
+
+            If estadoBaja IsNot Nothing Then
+                ' Si encontramos un estado de baja, procedemos a eliminarlo.
+
+                ' 1. Quitar de la grilla de la UI.
+                Dim row = _estadoRows.FirstOrDefault(Function(r) r.EntityRef Is estadoBaja)
+                If row IsNot Nothing Then
+                    _estadoRows.Remove(row)
+                End If
+
+                ' 2. Quitarlo de la colección principal del funcionario.
+                _funcionario.EstadoTransitorio.Remove(estadoBaja)
+
+                ' 3. Si tiene un ID, significa que existe en la DB y debe ser marcado para eliminación.
+                '    Si no tiene ID (Id=0), con quitarlo de la colección es suficiente, el recolector de basura se encarga.
+                If estadoBaja.Id > 0 Then
+                    MarcarParaEliminar(estadoBaja) ' Reutilizamos la lógica de borrado profundo que ya tenías.
+                    If Not _estadosParaEliminar.Contains(estadoBaja) Then
+                        _estadosParaEliminar.Add(estadoBaja)
+                    End If
+                End If
+            End If
         End If
 
+        ' Refresca la grilla y actualiza el caché del estado del control.
+        bsEstados.ResetBindings(False)
         ActualizarEstadoBajaCache()
     End Sub
+    Private Sub chkActivo_CheckedChanged(sender As Object, e As EventArgs) Handles chkActivo.CheckedChanged
+        ' Si los eventos están bloqueados (por ejemplo, durante la carga inicial), no hacemos nada.
+        If _bloquearEventosBaja Then Return
 
+        ' La lógica es que "Activo" y "Baja" son estados mutuamente excluyentes.
+        ' Si el estado del checkbox de baja (dtpBaja.Checked) no es el inverso
+        ' del de "Activo", lo sincronizamos.
+        If chkActivo.Checked = dtpBaja.Checked Then
+
+            ' Forzamos a que el checkbox de baja sea el opuesto al de activo.
+            dtpBaja.Checked = Not chkActivo.Checked
+
+            ' IMPORTANTE:
+            ' Al cambiar dtpBaja.Checked, se dispararán automáticamente sus propios
+            ' eventos (ValueChanged, etc.), los cuales llaman a la lógica central
+            ' SincronizarEstadoBajaDesdePicker que ya corregimos.
+            ' Esa lógica se encargará de crear o eliminar el estado de baja según corresponda.
+            ' No necesitamos hacer nada más aquí.
+        End If
+    End Sub
     Private Sub ProcesarCambioFechaBaja()
         If _bloquearEventosBaja Then Return
 
         Dim fechaActual As Date? = If(dtpBaja.Checked, dtpBaja.Value.Date, CType(Nothing, Date?))
         If _ultimoEstadoCheckBaja = dtpBaja.Checked AndAlso FechasIguales(_ultimoValorFechaBaja, fechaActual) Then Return
 
-        SincronizarEstadoBajaDesdePicker()
+        SincronizarEstadoBajaDesdePicker() ' <--- Asegúrate que llame al método nuevo/refactorizado.
     End Sub
 
     Private Sub ActualizarEstadoBajaCache()
@@ -949,10 +1043,10 @@ Public Class frmFuncionarioCrear
         Dim estado = row.EntityRef
         If estado Is Nothing Then
             estado = New EstadoTransitorio() With {
-                .Funcionario = _funcionario,
-                .TipoEstadoTransitorioId = ModConstantesApex.TipoEstadoTransitorioId.BajaDeFuncionario,
-                .BajaDeFuncionarioDetalle = New BajaDeFuncionarioDetalle()
-            }
+            .Funcionario = _funcionario,
+            .TipoEstadoTransitorioId = ModConstantesApex.TipoEstadoTransitorioId.BajaDeFuncionario,
+            .BajaDeFuncionarioDetalle = New BajaDeFuncionarioDetalle()
+        }
             row.EntityRef = estado
         End If
 
@@ -967,6 +1061,9 @@ Public Class frmFuncionarioCrear
             detalle = New BajaDeFuncionarioDetalle()
             estado.BajaDeFuncionarioDetalle = detalle
         End If
+
+        ' Añadir esta línea para establecer la referencia al EstadoTransitorio padre
+        detalle.EstadoTransitorio = estado
 
         detalle.FechaDesde = dtpBaja.Value.Date
         detalle.FechaHasta = Nothing
