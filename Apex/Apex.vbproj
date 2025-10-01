@@ -907,6 +907,9 @@
     <EmbeddedResource Include="UI\frmLicencias.resx">
       <DependentUpon>frmLicencias.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmLogin.resx">
+      <DependentUpon>frmLogin.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\frmNomenclaturas.resx">
       <DependentUpon>frmNomenclaturas.vb</DependentUpon>
     </EmbeddedResource>
