@@ -1313,6 +1313,12 @@ Public Class frmFuncionarioBuscar
             lbl.MaximumSize = New Size(anchoDisponible, 0) ' 0 = altura auto
             lbl.AutoEllipsis = True
         Next
+
+        Dim preferido = lblNombreCompleto.GetPreferredSize(New Size(anchoDisponible, 0))
+        lblNombreCompleto.MinimumSize = New Size(anchoDisponible, 0)
+        lblNombreCompleto.MaximumSize = New Size(anchoDisponible, 0)
+        lblNombreCompleto.Size = New Size(anchoDisponible, preferido.Height)
+        lblNombreCompleto.TextAlign = ContentAlignment.MiddleCenter
     End Sub
 
     ' Reduce el flicker en la grilla cuando se redimensiona

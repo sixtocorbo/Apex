@@ -211,14 +211,15 @@ Partial Class frmFuncionarioBuscar
         'lblNombreCompleto
         '
         Me.lblNombreCompleto.Anchor = System.Windows.Forms.AnchorStyles.Left
-        Me.lblNombreCompleto.AutoSize = True
+        Me.lblNombreCompleto.AutoSize = False
         Me.lblNombreCompleto.Font = New System.Drawing.Font("Segoe UI", 14.0!, System.Drawing.FontStyle.Bold)
         Me.lblNombreCompleto.Location = New System.Drawing.Point(3, 8)
         Me.lblNombreCompleto.Margin = New System.Windows.Forms.Padding(3, 8, 3, 8)
         Me.lblNombreCompleto.Name = "lblNombreCompleto"
-        Me.lblNombreCompleto.Size = New System.Drawing.Size(288, 38)
+        Me.lblNombreCompleto.Size = New System.Drawing.Size(624, 38)
         Me.lblNombreCompleto.TabIndex = 2
         Me.lblNombreCompleto.Text = "Nombre Funcionario"
+        Me.lblNombreCompleto.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
         'lblCI
         '
