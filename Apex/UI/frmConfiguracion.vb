@@ -19,7 +19,7 @@
         ' ---- Normalizar botones (texto, tamaño mínimo, márgenes)
         Dim botones() As Button = {
         btnCargos, btnSecciones, btnAreasTrabajo, btnTurnos,
-        btnGestionarIncidencias, btnNomenclaturas
+        btnGestionarIncidencias, btnSubDirecciones, btnNomenclaturas
     }
 
         For i = 0 To botones.Length - 1
@@ -100,6 +100,10 @@
         ' Antes: abrías y cerrabas este formulario.
         ' Ahora: lo abrimos como “child”; este queda oculto y se restaura al cerrar el hijo.
         AbrirHijoEnDashboard(Of frmNomenclaturas)()
+    End Sub
+
+    Private Sub btnSubDirecciones_Click(sender As Object, e As EventArgs) Handles btnSubDirecciones.Click
+        AbrirHijoEnDashboard(Of frmSubDirecciones)()
     End Sub
 
 End Class

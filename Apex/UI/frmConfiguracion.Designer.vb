@@ -28,6 +28,7 @@ Partial Class frmConfiguracion
         Me.btnCargos = New System.Windows.Forms.Button()
         Me.btnGestionarIncidencias = New System.Windows.Forms.Button()
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
+        Me.btnSubDirecciones = New System.Windows.Forms.Button()
         Me.btnNomenclaturas = New System.Windows.Forms.Button()
         Me.FlowLayoutPanel1.SuspendLayout()
         Me.SuspendLayout()
@@ -89,6 +90,7 @@ Partial Class frmConfiguracion
         Me.FlowLayoutPanel1.Controls.Add(Me.btnAreasTrabajo)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnTurnos)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnGestionarIncidencias)
+        Me.FlowLayoutPanel1.Controls.Add(Me.btnSubDirecciones)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnNomenclaturas)
         Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.FlowLayoutPanel1.Location = New System.Drawing.Point(0, 0)
@@ -96,9 +98,19 @@ Partial Class frmConfiguracion
         Me.FlowLayoutPanel1.Size = New System.Drawing.Size(717, 375)
         Me.FlowLayoutPanel1.TabIndex = 8
         '
+        'btnSubDirecciones
+        '
+        Me.btnSubDirecciones.Location = New System.Drawing.Point(297, 95)
+        Me.btnSubDirecciones.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnSubDirecciones.Name = "btnSubDirecciones"
+        Me.btnSubDirecciones.Size = New System.Drawing.Size(285, 35)
+        Me.btnSubDirecciones.TabIndex = 9
+        Me.btnSubDirecciones.Text = "Gestionar Subdirecciones"
+        Me.btnSubDirecciones.UseVisualStyleBackColor = True
+        '
         'btnNomenclaturas
         '
-        Me.btnNomenclaturas.Location = New System.Drawing.Point(297, 95)
+        Me.btnNomenclaturas.Location = New System.Drawing.Point(4, 140)
         Me.btnNomenclaturas.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnNomenclaturas.Name = "btnNomenclaturas"
         Me.btnNomenclaturas.Size = New System.Drawing.Size(285, 35)
@@ -127,5 +139,6 @@ Partial Class frmConfiguracion
     Friend WithEvents btnCargos As Button
     Friend WithEvents btnGestionarIncidencias As Button
     Friend WithEvents FlowLayoutPanel1 As FlowLayoutPanel
+    Friend WithEvents btnSubDirecciones As Button
     Friend WithEvents btnNomenclaturas As Button
 End Class

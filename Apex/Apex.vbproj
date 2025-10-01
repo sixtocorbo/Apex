@@ -497,6 +497,7 @@
     <Compile Include="Services\ReportesService.vb" />
     <Compile Include="Services\SancionService.vb" />
     <Compile Include="Services\SeccionService.vb" />
+    <Compile Include="Services\SubDireccionService.vb" />
     <Compile Include="Services\TipoEstadoTransitorioService.vb" />
     <Compile Include="Services\TiposEstadoCatalog.vb" />
     <Compile Include="Services\TurnoService.vb" />
@@ -571,6 +572,12 @@
       <DependentUpon>frmConfiguracion.vb</DependentUpon>
     </Compile>
     <Compile Include="UI\frmConfiguracion.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\frmSubDirecciones.Designer.vb">
+      <DependentUpon>frmSubDirecciones.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmSubDirecciones.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="UI\frmDashboard.Designer.vb">
@@ -852,6 +859,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmConfiguracion.resx">
       <DependentUpon>frmConfiguracion.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmSubDirecciones.resx">
+      <DependentUpon>frmSubDirecciones.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmDashboard.resx">
       <DependentUpon>frmDashboard.vb</DependentUpon>
