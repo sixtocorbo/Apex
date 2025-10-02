@@ -30,6 +30,7 @@ Partial Class frmConfiguracion
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
         Me.btnSubDirecciones = New System.Windows.Forms.Button()
         Me.btnNomenclaturas = New System.Windows.Forms.Button()
+        Me.btnEscalafones = New System.Windows.Forms.Button()
         Me.FlowLayoutPanel1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -92,6 +93,7 @@ Partial Class frmConfiguracion
         Me.FlowLayoutPanel1.Controls.Add(Me.btnGestionarIncidencias)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnSubDirecciones)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnNomenclaturas)
+        Me.FlowLayoutPanel1.Controls.Add(Me.btnEscalafones)
         Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.FlowLayoutPanel1.Location = New System.Drawing.Point(0, 0)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
@@ -118,6 +120,16 @@ Partial Class frmConfiguracion
         Me.btnNomenclaturas.Text = "Nomenclaturas"
         Me.btnNomenclaturas.UseVisualStyleBackColor = True
         '
+        'btnEscalafones
+        '
+        Me.btnEscalafones.Location = New System.Drawing.Point(297, 140)
+        Me.btnEscalafones.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnEscalafones.Name = "btnEscalafones"
+        Me.btnEscalafones.Size = New System.Drawing.Size(285, 35)
+        Me.btnEscalafones.TabIndex = 10
+        Me.btnEscalafones.Text = "Gestionar Escalafones"
+        Me.btnEscalafones.UseVisualStyleBackColor = True
+        '
         'frmConfiguracion
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -141,4 +153,5 @@ Partial Class frmConfiguracion
     Friend WithEvents FlowLayoutPanel1 As FlowLayoutPanel
     Friend WithEvents btnSubDirecciones As Button
     Friend WithEvents btnNomenclaturas As Button
+    Friend WithEvents btnEscalafones As Button
 End Class
