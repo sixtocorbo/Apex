@@ -504,15 +504,16 @@ Public Class frmFuncionarioBuscar
         ' 2. Se calcula el ancho total del panel disponible
         Dim anchoPanel = Math.Max(0, splitContenedor.Panel1.ClientSize.Width)
 
-        ' 3. Se establece un límite MÁXIMO para el ListBox (ej. el 40% del panel)
-        '    Esto evita que un cargo con un nombre extremadamente largo ocupe toda la pantalla.
-        Dim anchoMaximoPermitido = CInt(anchoPanel * 0.4)
+        ' 3. Se establece un límite MÁXIMO para el ListBox.
+        '    - Se reduce el porcentaje máximo para darle más espacio a la grilla.
+        '    - Se añade además un tope absoluto para evitar que crezca demasiado.
+        Dim anchoMaximoPermitido = Math.Min(CInt(anchoPanel * 0.28), 260)
 
         ' 4. Se determina el ancho final:
         '    - Será el ancho del contenido.
         '    - Pero nunca superará el límite máximo permitido.
-        '    - Y nunca será menor a un mínimo razonable (ej. 160px).
-        Dim anchoCalculado = Math.Max(160, Math.Min(anchoContenido, anchoMaximoPermitido))
+        '    - Y nunca será menor a un mínimo razonable (ej. 140px).
+        Dim anchoCalculado = Math.Max(140, Math.Min(anchoContenido, anchoMaximoPermitido))
 
         ' 5. Se aplica el ancho calculado a la columna que contiene el ListBox.
         Dim margenHorizontal = lstCargos.Margin.Left + lstCargos.Margin.Right
