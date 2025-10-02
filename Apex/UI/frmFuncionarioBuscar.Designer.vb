@@ -26,6 +26,8 @@ Partial Class frmFuncionarioBuscar
         Me.components = New System.ComponentModel.Container()
         Me.splitContenedor = New System.Windows.Forms.SplitContainer()
         Me.dgvFuncionarios = New System.Windows.Forms.DataGridView()
+        Me.tlpResultados = New System.Windows.Forms.TableLayoutPanel()
+        Me.lstCargos = New System.Windows.Forms.ListBox()
         Me.PanelBusquedaLista = New System.Windows.Forms.Panel()
         Me.tlpBusqueda = New System.Windows.Forms.TableLayoutPanel()
         Me.lblBuscar = New System.Windows.Forms.Label()
@@ -55,6 +57,7 @@ Partial Class frmFuncionarioBuscar
         Me.splitContenedor.Panel2.SuspendLayout()
         Me.splitContenedor.SuspendLayout()
         CType(Me.dgvFuncionarios, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.tlpResultados.SuspendLayout()
         Me.PanelBusquedaLista.SuspendLayout()
         Me.tlpBusqueda.SuspendLayout()
         Me.panelDetalle.SuspendLayout()
@@ -72,16 +75,16 @@ Partial Class frmFuncionarioBuscar
         '
         'splitContenedor.Panel1
         '
-        Me.splitContenedor.Panel1.Controls.Add(Me.dgvFuncionarios)
+        Me.splitContenedor.Panel1.Controls.Add(Me.tlpResultados)
         Me.splitContenedor.Panel1.Controls.Add(Me.PanelBusquedaLista)
-        Me.splitContenedor.Panel1MinSize = 280
+        Me.splitContenedor.Panel1MinSize = 320
         '
         'splitContenedor.Panel2
         '
         Me.splitContenedor.Panel2.Controls.Add(Me.panelDetalle)
         Me.splitContenedor.Panel2MinSize = 400
         Me.splitContenedor.Size = New System.Drawing.Size(944, 695)
-        Me.splitContenedor.SplitterDistance = 280
+        Me.splitContenedor.SplitterDistance = 320
         Me.splitContenedor.TabIndex = 0
         '
         'dgvFuncionarios
@@ -92,12 +95,39 @@ Partial Class frmFuncionarioBuscar
         Me.dgvFuncionarios.AllowUserToResizeRows = False
         Me.dgvFuncionarios.ColumnHeadersHeight = 34
         Me.dgvFuncionarios.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.dgvFuncionarios.Location = New System.Drawing.Point(0, 115)
+        Me.dgvFuncionarios.Location = New System.Drawing.Point(3, 3)
         Me.dgvFuncionarios.Name = "dgvFuncionarios"
         Me.dgvFuncionarios.ReadOnly = True
         Me.dgvFuncionarios.RowHeadersWidth = 62
-        Me.dgvFuncionarios.Size = New System.Drawing.Size(280, 580)
+        Me.dgvFuncionarios.Size = New System.Drawing.Size(92, 574)
         Me.dgvFuncionarios.TabIndex = 1
+        '
+        'tlpResultados
+        '
+        Me.tlpResultados.ColumnCount = 2
+        Me.tlpResultados.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+        Me.tlpResultados.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 180.0!))
+        Me.tlpResultados.Controls.Add(Me.dgvFuncionarios, 0, 0)
+        Me.tlpResultados.Controls.Add(Me.lstCargos, 1, 0)
+        Me.tlpResultados.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.tlpResultados.Location = New System.Drawing.Point(0, 115)
+        Me.tlpResultados.Name = "tlpResultados"
+        Me.tlpResultados.RowCount = 1
+        Me.tlpResultados.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+        Me.tlpResultados.Size = New System.Drawing.Size(280, 580)
+        Me.tlpResultados.TabIndex = 1
+        '
+        'lstCargos
+        '
+        Me.lstCargos.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.lstCargos.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.lstCargos.FormattingEnabled = True
+        Me.lstCargos.IntegralHeight = False
+        Me.lstCargos.ItemHeight = 25
+        Me.lstCargos.Location = New System.Drawing.Point(98, 3)
+        Me.lstCargos.Name = "lstCargos"
+        Me.lstCargos.Size = New System.Drawing.Size(179, 574)
+        Me.lstCargos.TabIndex = 2
         '
         'PanelBusquedaLista
         '
@@ -421,6 +451,7 @@ Partial Class frmFuncionarioBuscar
         CType(Me.splitContenedor, System.ComponentModel.ISupportInitialize).EndInit()
         Me.splitContenedor.ResumeLayout(False)
         CType(Me.dgvFuncionarios, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.tlpResultados.ResumeLayout(False)
         Me.PanelBusquedaLista.ResumeLayout(False)
         Me.tlpBusqueda.ResumeLayout(False)
         Me.tlpBusqueda.PerformLayout()
@@ -441,6 +472,8 @@ Partial Class frmFuncionarioBuscar
     Friend WithEvents pbFotoDetalle As PictureBox
     Friend WithEvents ToolTip1 As ToolTip
     Friend WithEvents PanelBusquedaLista As Panel
+    Friend WithEvents tlpResultados As TableLayoutPanel
+    Friend WithEvents lstCargos As ListBox
     Friend WithEvents txtBusqueda As TextBox
     Friend WithEvents lblBuscar As Label
     Friend WithEvents tlpBusqueda As TableLayoutPanel
