@@ -497,6 +497,7 @@
     <Compile Include="Services\ReportesService.vb" />
     <Compile Include="Services\SancionService.vb" />
     <Compile Include="Services\SeccionService.vb" />
+    <Compile Include="Services\EscalafonService.vb" />
     <Compile Include="Services\SubDireccionService.vb" />
     <Compile Include="Services\TipoEstadoTransitorioService.vb" />
     <Compile Include="Services\TiposEstadoCatalog.vb" />
@@ -572,6 +573,12 @@
       <DependentUpon>frmConfiguracion.vb</DependentUpon>
     </Compile>
     <Compile Include="UI\frmConfiguracion.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\frmEscalafones.Designer.vb">
+      <DependentUpon>frmEscalafones.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmEscalafones.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="UI\frmSubDirecciones.Designer.vb">
@@ -859,6 +866,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmConfiguracion.resx">
       <DependentUpon>frmConfiguracion.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmEscalafones.resx">
+      <DependentUpon>frmEscalafones.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmSubDirecciones.resx">
       <DependentUpon>frmSubDirecciones.vb</DependentUpon>
