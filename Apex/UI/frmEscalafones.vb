@@ -247,7 +247,7 @@ Public Class frmEscalafones
 
             Await CargarDatosAsync()
             If _ultimoIdSeleccionado = 0 Then
-                Dim fila = _listaCompleta.FirstOrDefault(Function(e) String.Equals(e.Nombre, nombre, StringComparison.OrdinalIgnoreCase))
+                Dim fila = _listaCompleta.FirstOrDefault(Function(r) String.Equals(r.Nombre, nombre, StringComparison.OrdinalIgnoreCase))
                 If fila IsNot Nothing Then
                     _ultimoIdSeleccionado = fila.Id
                 End If
