@@ -151,7 +151,6 @@ Public Class frmFuncionarioBuscar
                 .ColumnStyles(0).SizeType = SizeType.Percent
                 .ColumnStyles(0).Width = 100
                 .ColumnStyles(1).SizeType = SizeType.Absolute
-                .ColumnStyles(1).Width = 190
             End If
             If .RowStyles.Count > 0 Then
                 .RowStyles(0).SizeType = SizeType.Percent
@@ -437,8 +436,7 @@ Public Class frmFuncionarioBuscar
             .AutoGenerateColumns = False
             .BackgroundColor = Color.White
 
-            ' Importante: desactivar Fill global para que respeten los AutoSizeMode por columna
-            .AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None
+            .AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells
 
             ' Estilos…
             .EnableHeadersVisualStyles = False
@@ -470,9 +468,8 @@ Public Class frmFuncionarioBuscar
                 .Name = "Nombre",
                 .DataPropertyName = "Nombre",
                 .HeaderText = "Nombre",
-                .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,           ' <- clave
-                .FillWeight = 100,                                             ' peso relativo
-                .MinimumWidth = 280,                                           ' evitá que se angoste de más
+                .AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells,
+                .MinimumWidth = 220,
                 .DefaultCellStyle = New DataGridViewCellStyle With {
                     .WrapMode = DataGridViewTriState.False
                 }
@@ -486,14 +483,54 @@ Public Class frmFuncionarioBuscar
     Private Sub AjustarColumnasVisibles(Optional sender As Object = Nothing, Optional e As EventArgs = Nothing)
         If dgvFuncionarios.Columns.Count = 0 Then Exit Sub
 
-        Dim colNombre = dgvFuncionarios.Columns("Nombre")
-        If colNombre Is Nothing Then Exit Sub
+        dgvFuncionarios.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells)
 
-        ' Nombre siempre Fill; asegurá un mínimo cómodo
-        colNombre.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-        colNombre.MinimumWidth = 280
-        colNombre.FillWeight = 100
+        For Each columna In dgvFuncionarios.Columns.Cast(Of DataGridViewColumn)().Where(Function(c) c.Visible)
+            If columna.MinimumWidth > 0 AndAlso columna.Width < columna.MinimumWidth Then
+                columna.Width = columna.MinimumWidth
+            End If
+        Next
+
+        AjustarAnchoListaCargos()
     End Sub
+
+    Private Sub AjustarAnchoListaCargos()
+        If tlpResultados Is Nothing OrElse lstCargos Is Nothing Then Return
+        If tlpResultados.ColumnStyles.Count < 2 Then Return
+
+        Dim anchoContenido = CalcularAnchoContenidoListBox(lstCargos)
+        Dim anchoPanel = Math.Max(0, splitContenedor.Panel1.ClientSize.Width)
+
+        Dim anchoMaximoPermitido = If(anchoPanel = 0, anchoContenido, CInt(Math.Max(180, anchoPanel * 0.45)))
+        Dim anchoCalculado = Math.Max(160, Math.Min(anchoContenido, anchoMaximoPermitido))
+
+        Dim margenHorizontal = lstCargos.Margin.Left + lstCargos.Margin.Right
+        tlpResultados.ColumnStyles(1).Width = anchoCalculado + margenHorizontal
+    End Sub
+
+    Private Shared Function CalcularAnchoContenidoListBox(list As ListBox) As Integer
+        If list.Items.Count = 0 Then
+            Return 160
+        End If
+
+        Dim maxWidth As Integer = 0
+
+        Using g = list.CreateGraphics()
+            For Each item In list.Items
+                Dim texto = list.GetItemText(item)
+                If Not String.IsNullOrEmpty(texto) Then
+                    Dim medida = System.Windows.Forms.TextRenderer.MeasureText(g, texto, list.Font)
+                    If medida.Width > maxWidth Then
+                        maxWidth = medida.Width
+                    End If
+                End If
+            Next
+        End Using
+
+        Dim espacioScroll = If(list.Items.Count * Math.Max(1, list.ItemHeight) > Math.Max(1, list.ClientSize.Height), System.Windows.Forms.SystemInformation.VerticalScrollBarWidth, 0)
+
+        Return maxWidth + espacioScroll + 24
+    End Function
 
     Private Sub EstablecerCeldaActualEnPrimeraColumnaVisible(fila As DataGridViewRow)
         If fila Is Nothing Then Return
@@ -690,6 +727,7 @@ Public Class frmFuncionarioBuscar
         Finally
             lstCargos.EndUpdate()
             _suspendCargoEvents = False
+            AjustarAnchoListaCargos()
         End Try
     End Sub
 
@@ -1407,7 +1445,7 @@ Public Class frmFuncionarioBuscar
         End If
 
         ' --- Grilla (izquierda) ---
-        dgvFuncionarios.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+        dgvFuncionarios.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells
         dgvFuncionarios.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCells
         dgvFuncionarios.RowHeadersVisible = False
         dgvFuncionarios.SelectionMode = DataGridViewSelectionMode.FullRowSelect
@@ -1452,6 +1490,7 @@ Public Class frmFuncionarioBuscar
     Private Sub frmFuncionarioBuscar_Resize(sender As Object, e As EventArgs)
         AjustarSplitter()
         AjustarAnchosTexto()
+        AjustarAnchoListaCargos()
     End Sub
 
     Private Sub splitContenedor_SplitterMoved(sender As Object, e As SplitterEventArgs)
