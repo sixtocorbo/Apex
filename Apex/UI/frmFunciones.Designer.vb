@@ -215,9 +215,9 @@ Partial Class frmFunciones
         Me.btnNuevo.TabIndex = 0
         Me.btnNuevo.Text = "Nuevo"
         Me.btnNuevo.UseVisualStyleBackColor = True
-
+        '
         'btnFusionar
-
+        '
         Me.pnlBotones.SetColumnSpan(Me.btnFusionar, 2)
         Me.btnFusionar.Dock = System.Windows.Forms.DockStyle.Fill
         Me.btnFusionar.Location = New System.Drawing.Point(4, 117)
