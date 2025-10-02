@@ -22,7 +22,7 @@ Public Class frmNovedades
         InitializeComponent()
     End Sub
 
-    Public Sub ConfigurarParaFuncionario(funcionarioId As Integer, funcionarioNombre As String)
+    Public Async Sub ConfigurarParaFuncionario(funcionarioId As Integer, funcionarioNombre As String)
         If funcionarioId <= 0 Then Return
 
         chkFiltrarPorFecha.Checked = False
@@ -33,9 +33,10 @@ Public Class frmNovedades
 
         If Me.IsHandleCreated Then
             Dim tk = ReiniciarToken()
-            _ = BuscarAsync(tk)
+            Await BuscarAsync(tk) ' <-- llamar sin asignar a "_"
         End If
     End Sub
+
 
 #Region "Ciclo de Vida y Eventos Principales"
 
