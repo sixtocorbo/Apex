@@ -34,6 +34,9 @@ Public Class frmFuncionarioBuscar
     Private _ctsBusqueda As CancellationTokenSource
     Private _colorOriginalBusqueda As Color
     Private _estaBuscando As Boolean = False
+    Private _resultadosBusqueda As New List(Of FuncionarioMin)()
+    Private _cargoSeleccionado As String = Nothing
+    Private _suspendCargoEvents As Boolean = False
     ' --- FIN DE CAMBIOS ---
 
 
@@ -83,6 +86,9 @@ Public Class frmFuncionarioBuscar
         dgvFuncionarios.ActivarDobleBuffer(True) ' <-- LÍNEA AÑADIDA
         ConfigurarGrilla()
 
+        lstCargos.DisplayMember = "DisplayText"
+        lstCargos.Enabled = False
+
         ' --- INICIO DE CAMBIOS: Configuración de la nueva búsqueda ---
         ' (El resto de tu código sigue igual)
         _searchTimer.Interval = 700 ' Aumentamos el intervalo
@@ -110,7 +116,7 @@ Public Class frmFuncionarioBuscar
         ' ===============================
         With splitContenedor
             .Dock = DockStyle.Fill
-            .Panel1MinSize = 240
+            .Panel1MinSize = 320
             .Panel2MinSize = 380
             If .SplitterDistance < .Panel1MinSize Then
                 .SplitterDistance = .Panel1MinSize
@@ -138,6 +144,23 @@ Public Class frmFuncionarioBuscar
         End With
 
         txtBusqueda.Anchor = AnchorStyles.Left Or AnchorStyles.Right
+
+        With tlpResultados
+            .Dock = DockStyle.Fill
+            If .ColumnStyles.Count >= 2 Then
+                .ColumnStyles(0).SizeType = SizeType.Percent
+                .ColumnStyles(0).Width = 100
+                .ColumnStyles(1).SizeType = SizeType.Absolute
+                .ColumnStyles(1).Width = 190
+            End If
+            If .RowStyles.Count > 0 Then
+                .RowStyles(0).SizeType = SizeType.Percent
+                .RowStyles(0).Height = 100
+            End If
+        End With
+
+        lstCargos.Dock = DockStyle.Fill
+        lstCargos.Margin = New Padding(8, 0, 12, 12)
 
         ' ===============================
         ' 3) Detalle (derecha)
@@ -454,13 +477,6 @@ Public Class frmFuncionarioBuscar
             .FillWeight = 40,
             .MinimumWidth = 165
         })
-
-            .Columns.Add(New DataGridViewTextBoxColumn With {
-            .Name = "Cargo", .DataPropertyName = "CargoNombre", .HeaderText = "Cargo",
-            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
-            .FillWeight = 30,
-            .MinimumWidth = 110
-        })
         End With
 
         ' Manejador de errores para evitar que la app crashee si hay un problema al bindear datos
@@ -497,8 +513,10 @@ Public Class frmFuncionarioBuscar
         Try
             ' Si no hay texto, se limpia la grilla y se abandona la búsqueda.
             If String.IsNullOrWhiteSpace(txtBusqueda.Text) Then
-                dgvFuncionarios.DataSource = New List(Of FuncionarioMin)()
-                LimpiarDetalle()
+                _resultadosBusqueda = New List(Of FuncionarioMin)()
+                _cargoSeleccionado = Nothing
+                ActualizarListaCargos(_resultadosBusqueda)
+                AplicarFiltroCargo(False)
                 Return
             End If
 
@@ -531,17 +549,12 @@ Public Class frmFuncionarioBuscar
 
             token.ThrowIfCancellationRequested()
 
-            dgvFuncionarios.DataSource = lista
+            _resultadosBusqueda = lista
 
-            If lista.Any() Then
-                dgvFuncionarios.ClearSelection()
-                dgvFuncionarios.Rows(0).Selected = True
-                dgvFuncionarios.CurrentCell = dgvFuncionarios.Rows(0).Cells("CI")
-            Else
-                LimpiarDetalle()
-            End If
+            ActualizarListaCargos(_resultadosBusqueda)
+            AplicarFiltroCargo(False)
 
-            If lista.Count = LIMITE_FILAS Then
+            If _resultadosBusqueda.Count = LIMITE_FILAS Then
                 Notifier.Info(Me, $"Mostrando los primeros {LIMITE_FILAS} resultados.")
             End If
 
@@ -562,6 +575,139 @@ Public Class frmFuncionarioBuscar
             _estaBuscando = False
         End Try
     End Function
+
+    Private Sub lstCargos_SelectedIndexChanged(sender As Object, e As EventArgs) Handles lstCargos.SelectedIndexChanged
+        If _suspendCargoEvents Then Return
+
+        Dim item = TryCast(lstCargos.SelectedItem, CargoItem)
+        If item Is Nothing OrElse item.EsTodos Then
+            _cargoSeleccionado = Nothing
+        Else
+            _cargoSeleccionado = item.Nombre
+        End If
+
+        AplicarFiltroCargo(True)
+    End Sub
+
+    Private Sub AplicarFiltroCargo(Optional mantenerSeleccion As Boolean = False)
+        Dim fuente As List(Of FuncionarioMin) = If(_resultadosBusqueda, New List(Of FuncionarioMin)())
+        Dim filtrados As List(Of FuncionarioMin)
+
+        If String.IsNullOrEmpty(_cargoSeleccionado) Then
+            filtrados = fuente.ToList()
+        Else
+            filtrados = fuente.Where(Function(f) String.Equals(NormalizarCargo(f.CargoNombre), _cargoSeleccionado, StringComparison.OrdinalIgnoreCase)).ToList()
+        End If
+
+        Dim idSeleccionado As Integer? = Nothing
+        If mantenerSeleccion AndAlso dgvFuncionarios.CurrentRow IsNot Nothing Then
+            idSeleccionado = CInt(dgvFuncionarios.CurrentRow.Cells("Id").Value)
+        End If
+
+        dgvFuncionarios.DataSource = Nothing
+        dgvFuncionarios.DataSource = filtrados
+
+        If filtrados.Any() Then
+            Dim indiceSeleccion As Integer = 0
+
+            If mantenerSeleccion AndAlso idSeleccionado.HasValue Then
+                Dim encontrado = filtrados.FindIndex(Function(f) f.Id = idSeleccionado.Value)
+                If encontrado >= 0 Then
+                    indiceSeleccion = encontrado
+                End If
+            End If
+
+            dgvFuncionarios.ClearSelection()
+            If indiceSeleccion >= 0 AndAlso indiceSeleccion < dgvFuncionarios.Rows.Count Then
+                dgvFuncionarios.Rows(indiceSeleccion).Selected = True
+                dgvFuncionarios.CurrentCell = dgvFuncionarios.Rows(indiceSeleccion).Cells("CI")
+            End If
+        Else
+            LimpiarDetalle()
+        End If
+    End Sub
+
+    Private Sub ActualizarListaCargos(funcionarios As IList(Of FuncionarioMin))
+        _suspendCargoEvents = True
+        lstCargos.BeginUpdate()
+
+        Try
+            lstCargos.Items.Clear()
+
+            If funcionarios Is Nothing OrElse funcionarios.Count = 0 Then
+                lstCargos.Enabled = False
+                lstCargos.SelectedIndex = -1
+                _cargoSeleccionado = Nothing
+                Return
+            End If
+
+            lstCargos.Enabled = True
+
+            Dim grupos = funcionarios _
+                .GroupBy(Function(f) NormalizarCargo(f.CargoNombre), StringComparer.OrdinalIgnoreCase) _
+                .Select(Function(g) New With {.Nombre = g.Key, .Cantidad = g.Count()}) _
+                .OrderByDescending(Function(g) g.Cantidad) _
+                .ThenBy(Function(g) g.Nombre, StringComparer.CurrentCultureIgnoreCase) _
+                .ToList()
+
+            Dim total = funcionarios.Count
+            lstCargos.Items.Add(New CargoItem("Todos", total, True))
+
+            Dim indiceSeleccion As Integer = 0
+            Dim anterior = _cargoSeleccionado
+            Dim indiceActual As Integer = 1
+
+            For Each grupo In grupos
+                Dim item = New CargoItem(grupo.Nombre, grupo.Cantidad, False)
+                lstCargos.Items.Add(item)
+
+                If Not String.IsNullOrEmpty(anterior) AndAlso anterior.Equals(grupo.Nombre, StringComparison.OrdinalIgnoreCase) Then
+                    indiceSeleccion = indiceActual
+                End If
+
+                indiceActual += 1
+            Next
+
+            If indiceSeleccion = 0 Then
+                _cargoSeleccionado = Nothing
+            End If
+
+            lstCargos.SelectedIndex = indiceSeleccion
+        Finally
+            lstCargos.EndUpdate()
+            _suspendCargoEvents = False
+        End Try
+    End Sub
+
+    Private Shared Function NormalizarCargo(nombre As String) As String
+        If String.IsNullOrWhiteSpace(nombre) OrElse nombre.Equals("N/A", StringComparison.OrdinalIgnoreCase) Then
+            Return "Sin cargo"
+        End If
+
+        Return nombre.Trim()
+    End Function
+
+    Private NotInheritable Class CargoItem
+        Public Sub New(nombre As String, cantidad As Integer, esTodos As Boolean)
+            Me.Nombre = nombre
+            Me.Cantidad = cantidad
+            Me.EsTodos = esTodos
+        End Sub
+
+        Public ReadOnly Property Nombre As String
+        Public ReadOnly Property Cantidad As Integer
+        Public ReadOnly Property EsTodos As Boolean
+
+        Public ReadOnly Property DisplayText As String
+            Get
+                If EsTodos Then
+                    Return $"Todos ({Cantidad})"
+                End If
+
+                Return $"{Nombre} ({Cantidad})"
+            End Get
+        End Property
+    End Class
 
     ' Permite iniciar la búsqueda o seleccionar un funcionario con la tecla Enter.
     Private Async Sub txtBusqueda_KeyDown(sender As Object, e As KeyEventArgs) Handles txtBusqueda.KeyDown
