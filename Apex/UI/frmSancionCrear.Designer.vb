@@ -36,10 +36,12 @@ Partial Class frmSancionCrear
         Me.cmbTipoSancion = New System.Windows.Forms.ComboBox()
         Me.lblObservaciones = New System.Windows.Forms.Label()
         Me.txtObservaciones = New System.Windows.Forms.TextBox()
+        Me.flpFechaHasta = New System.Windows.Forms.FlowLayoutPanel()
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
         Me.btnGuardar = New System.Windows.Forms.Button()
         Me.btnCancelar = New System.Windows.Forms.Button()
         Me.TableLayoutPanel1.SuspendLayout()
+        Me.flpFechaHasta.SuspendLayout()
         Me.FlowLayoutPanel1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -54,8 +56,7 @@ Partial Class frmSancionCrear
         Me.TableLayoutPanel1.Controls.Add(Me.lblFechaDesde, 0, 1)
         Me.TableLayoutPanel1.Controls.Add(Me.dtpFechaDesde, 1, 1)
         Me.TableLayoutPanel1.Controls.Add(Me.lblFechaHasta, 0, 2)
-        Me.TableLayoutPanel1.Controls.Add(Me.dtpFechaHasta, 1, 2)
-        Me.TableLayoutPanel1.Controls.Add(Me.chkFechaHasta, 2, 2)
+        Me.TableLayoutPanel1.Controls.Add(Me.flpFechaHasta, 1, 2)
         Me.TableLayoutPanel1.Controls.Add(Me.lblResolucion, 0, 3)
         Me.TableLayoutPanel1.Controls.Add(Me.txtResolucion, 1, 3)
         Me.TableLayoutPanel1.Controls.Add(Me.lblTipoSancion, 0, 4)
@@ -125,11 +126,28 @@ Partial Class frmSancionCrear
         Me.lblFechaHasta.TabIndex = 4
         Me.lblFechaHasta.Text = "Fecha Hasta:"
         '
+        'flpFechaHasta
+        '
+        Me.TableLayoutPanel1.SetColumnSpan(Me.flpFechaHasta, 2)
+        Me.flpFechaHasta.Anchor = System.Windows.Forms.AnchorStyles.Left
+        Me.flpFechaHasta.AutoSize = True
+        Me.flpFechaHasta.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+        Me.flpFechaHasta.Controls.Add(Me.dtpFechaHasta)
+        Me.flpFechaHasta.Controls.Add(Me.chkFechaHasta)
+        Me.flpFechaHasta.FlowDirection = System.Windows.Forms.FlowDirection.LeftToRight
+        Me.flpFechaHasta.Location = New System.Drawing.Point(141, 60)
+        Me.flpFechaHasta.Margin = New System.Windows.Forms.Padding(0)
+        Me.flpFechaHasta.Name = "flpFechaHasta"
+        Me.flpFechaHasta.Size = New System.Drawing.Size(275, 30)
+        Me.flpFechaHasta.TabIndex = 12
+        Me.flpFechaHasta.WrapContents = False
+        '
         'dtpFechaHasta
         '
         Me.dtpFechaHasta.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.dtpFechaHasta.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.dtpFechaHasta.Location = New System.Drawing.Point(141, 63)
+        Me.dtpFechaHasta.Location = New System.Drawing.Point(3, 3)
+        Me.dtpFechaHasta.Margin = New System.Windows.Forms.Padding(3, 3, 6, 3)
         Me.dtpFechaHasta.Name = "dtpFechaHasta"
         Me.dtpFechaHasta.Size = New System.Drawing.Size(138, 31)
         Me.dtpFechaHasta.TabIndex = 5
@@ -138,7 +156,8 @@ Partial Class frmSancionCrear
         '
         Me.chkFechaHasta.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.chkFechaHasta.AutoSize = True
-        Me.chkFechaHasta.Location = New System.Drawing.Point(387, 63)
+        Me.chkFechaHasta.Location = New System.Drawing.Point(153, 3)
+        Me.chkFechaHasta.Margin = New System.Windows.Forms.Padding(6, 3, 3, 3)
         Me.chkFechaHasta.Name = "chkFechaHasta"
         Me.chkFechaHasta.Size = New System.Drawing.Size(134, 24)
         Me.chkFechaHasta.TabIndex = 6
@@ -258,6 +277,8 @@ Partial Class frmSancionCrear
         Me.Text = "Nueva Sanción"
         Me.TableLayoutPanel1.ResumeLayout(False)
         Me.TableLayoutPanel1.PerformLayout()
+        Me.flpFechaHasta.ResumeLayout(False)
+        Me.flpFechaHasta.PerformLayout()
         Me.FlowLayoutPanel1.ResumeLayout(False)
         Me.ResumeLayout(False)
 
@@ -275,6 +296,7 @@ Partial Class frmSancionCrear
     Friend WithEvents txtResolucion As TextBox
     Friend WithEvents lblObservaciones As Label
     Friend WithEvents txtObservaciones As TextBox
+    Friend WithEvents flpFechaHasta As FlowLayoutPanel
     Friend WithEvents FlowLayoutPanel1 As FlowLayoutPanel
     Friend WithEvents btnGuardar As Button
     Friend WithEvents btnCancelar As Button
