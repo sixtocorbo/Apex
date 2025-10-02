@@ -1016,6 +1016,10 @@ Public Class frmFuncionarioCrear
             ' Esa lógica se encargará de crear o eliminar el estado de baja según corresponda.
             ' No necesitamos hacer nada más aquí.
         End If
+
+        ' Aseguramos la sincronización incluso si el evento de dtpBaja no se dispara
+        ' (p. ej. cuando el check se modificó programáticamente).
+        SincronizarEstadoBajaDesdePicker()
     End Sub
     Private Sub ProcesarCambioFechaBaja()
         If _bloquearEventosBaja Then Return
@@ -1676,28 +1680,35 @@ Public Class frmFuncionarioCrear
 
     Private Sub MarcarParaEliminar(estado As EstadoTransitorio)
         Dim ctx = _uow.Context
+        Dim entry = ctx.Entry(estado)
 
         ' Adjuntar si viniera detached
-        If ctx.Entry(estado).State = EntityState.Detached Then
+        If entry.State = EntityState.Detached Then
             ctx.Set(Of EstadoTransitorio)().Attach(estado)
+            entry = ctx.Entry(estado)
+        End If
+
+        ' Si el estado ya se encuentra marcado como eliminado, evitamos volver a procesarlo.
+        If entry.State = EntityState.Deleted Then
+            Return
         End If
 
         ' Cargar dependientes mínimos (evita que EF intente nullear FKs no anulables)
-        ctx.Entry(estado).Collection(Function(e) e.EstadoTransitorioAdjunto).Load()
+        entry.Collection(Function(e) e.EstadoTransitorioAdjunto).Load()
 
-        ctx.Entry(estado).Reference(Function(e) e.DesignacionDetalle).Load()
-        ctx.Entry(estado).Reference(Function(e) e.EnfermedadDetalle).Load()
-        ctx.Entry(estado).Reference(Function(e) e.SancionDetalle).Load()
-        ctx.Entry(estado).Reference(Function(e) e.OrdenCincoDetalle).Load()
-        ctx.Entry(estado).Reference(Function(e) e.RetenDetalle).Load()
-        ctx.Entry(estado).Reference(Function(e) e.SumarioDetalle).Load()
-        ctx.Entry(estado).Reference(Function(e) e.TrasladoDetalle).Load()
-        ctx.Entry(estado).Reference(Function(e) e.BajaDeFuncionarioDetalle).Load()
-        ctx.Entry(estado).Reference(Function(e) e.CambioDeCargoDetalle).Load()
-        ctx.Entry(estado).Reference(Function(e) e.ReactivacionDeFuncionarioDetalle).Load()
-        ctx.Entry(estado).Reference(Function(e) e.SeparacionDelCargoDetalle).Load()
-        ctx.Entry(estado).Reference(Function(e) e.InicioDeProcesamientoDetalle).Load()
-        ctx.Entry(estado).Reference(Function(e) e.DesarmadoDetalle).Load()
+        entry.Reference(Function(e) e.DesignacionDetalle).Load()
+        entry.Reference(Function(e) e.EnfermedadDetalle).Load()
+        entry.Reference(Function(e) e.SancionDetalle).Load()
+        entry.Reference(Function(e) e.OrdenCincoDetalle).Load()
+        entry.Reference(Function(e) e.RetenDetalle).Load()
+        entry.Reference(Function(e) e.SumarioDetalle).Load()
+        entry.Reference(Function(e) e.TrasladoDetalle).Load()
+        entry.Reference(Function(e) e.BajaDeFuncionarioDetalle).Load()
+        entry.Reference(Function(e) e.CambioDeCargoDetalle).Load()
+        entry.Reference(Function(e) e.ReactivacionDeFuncionarioDetalle).Load()
+        entry.Reference(Function(e) e.SeparacionDelCargoDetalle).Load()
+        entry.Reference(Function(e) e.InicioDeProcesamientoDetalle).Load()
+        entry.Reference(Function(e) e.DesarmadoDetalle).Load()
 
         ' 1) Borrar ADJUNTOS (1-N)
         If estado.EstadoTransitorioAdjunto IsNot Nothing AndAlso estado.EstadoTransitorioAdjunto.Any() Then
