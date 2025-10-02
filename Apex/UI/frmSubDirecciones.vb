@@ -182,7 +182,7 @@ Public Class frmSubDirecciones
     Private Async Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
         Dim nombre = txtNombre.Text.Trim()
         If String.IsNullOrWhiteSpace(nombre) Then
-            Notifier.Warning(Me, "Debes ingresar un nombre para la subdirección.")
+            Notifier.Warn(Me, "Debes ingresar un nombre para la subdirección.")
             txtNombre.Focus()
             Return
         End If
