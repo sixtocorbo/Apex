@@ -28,6 +28,7 @@ Partial Class frmSancionCrear
         Me.lblFechaDesde = New System.Windows.Forms.Label()
         Me.dtpFechaDesde = New System.Windows.Forms.DateTimePicker()
         Me.lblFechaHasta = New System.Windows.Forms.Label()
+        Me.flpFechaHasta = New System.Windows.Forms.FlowLayoutPanel()
         Me.dtpFechaHasta = New System.Windows.Forms.DateTimePicker()
         Me.chkFechaHasta = New System.Windows.Forms.CheckBox()
         Me.lblResolucion = New System.Windows.Forms.Label()
@@ -36,7 +37,6 @@ Partial Class frmSancionCrear
         Me.cmbTipoSancion = New System.Windows.Forms.ComboBox()
         Me.lblObservaciones = New System.Windows.Forms.Label()
         Me.txtObservaciones = New System.Windows.Forms.TextBox()
-        Me.flpFechaHasta = New System.Windows.Forms.FlowLayoutPanel()
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
         Me.btnGuardar = New System.Windows.Forms.Button()
         Me.btnCancelar = New System.Windows.Forms.Button()
@@ -128,17 +128,16 @@ Partial Class frmSancionCrear
         '
         'flpFechaHasta
         '
-        Me.TableLayoutPanel1.SetColumnSpan(Me.flpFechaHasta, 2)
         Me.flpFechaHasta.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.flpFechaHasta.AutoSize = True
         Me.flpFechaHasta.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+        Me.TableLayoutPanel1.SetColumnSpan(Me.flpFechaHasta, 2)
         Me.flpFechaHasta.Controls.Add(Me.dtpFechaHasta)
         Me.flpFechaHasta.Controls.Add(Me.chkFechaHasta)
-        Me.flpFechaHasta.FlowDirection = System.Windows.Forms.FlowDirection.LeftToRight
-        Me.flpFechaHasta.Location = New System.Drawing.Point(141, 60)
+        Me.flpFechaHasta.Location = New System.Drawing.Point(138, 60)
         Me.flpFechaHasta.Margin = New System.Windows.Forms.Padding(0)
         Me.flpFechaHasta.Name = "flpFechaHasta"
-        Me.flpFechaHasta.Size = New System.Drawing.Size(275, 30)
+        Me.flpFechaHasta.Size = New System.Drawing.Size(290, 30)
         Me.flpFechaHasta.TabIndex = 12
         Me.flpFechaHasta.WrapContents = False
         '
@@ -156,10 +155,10 @@ Partial Class frmSancionCrear
         '
         Me.chkFechaHasta.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.chkFechaHasta.AutoSize = True
-        Me.chkFechaHasta.Location = New System.Drawing.Point(153, 3)
+        Me.chkFechaHasta.Location = New System.Drawing.Point(153, 4)
         Me.chkFechaHasta.Margin = New System.Windows.Forms.Padding(6, 3, 3, 3)
         Me.chkFechaHasta.Name = "chkFechaHasta"
-        Me.chkFechaHasta.Size = New System.Drawing.Size(134, 24)
+        Me.chkFechaHasta.Size = New System.Drawing.Size(134, 29)
         Me.chkFechaHasta.TabIndex = 6
         Me.chkFechaHasta.Text = "Sin fecha fin"
         Me.chkFechaHasta.UseVisualStyleBackColor = True
