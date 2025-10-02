@@ -355,10 +355,11 @@ Public Class frmFuncionarioBuscar
     End Sub
 
     Private Sub btnNovedades_Click(sender As Object, e As EventArgs) Handles btnNovedades.Click
-        If FuncionarioSeleccionado IsNot Nothing Then
+        Dim funcionario = FuncionarioSeleccionado
+        If funcionario IsNot Nothing Then
             ' Abre el formulario de novedades, idealmente filtrando por el funcionario.
             Dim frm As New frmNovedades()
-            ' frm.FiltrarPorFuncionario(FuncionarioSeleccionado.Id) ' (Si el form lo soporta)
+            frm.ConfigurarParaFuncionario(funcionario.Id, funcionario.Nombre)
             NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
         End If
     End Sub

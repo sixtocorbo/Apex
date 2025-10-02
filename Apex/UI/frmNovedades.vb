@@ -22,6 +22,21 @@ Public Class frmNovedades
         InitializeComponent()
     End Sub
 
+    Public Sub ConfigurarParaFuncionario(funcionarioId As Integer, funcionarioNombre As String)
+        If funcionarioId <= 0 Then Return
+
+        chkFiltrarPorFecha.Checked = False
+
+        _funcionariosSeleccionadosFiltro.Clear()
+        _funcionariosSeleccionadosFiltro(funcionarioId) = funcionarioNombre
+        ActualizarListaFuncionarios()
+
+        If Me.IsHandleCreated Then
+            Dim tk = ReiniciarToken()
+            _ = BuscarAsync(tk)
+        End If
+    End Sub
+
 #Region "Ciclo de Vida y Eventos Principales"
 
     Private Async Sub frmNovedades_Load(sender As Object, e As EventArgs) Handles MyBase.Load
