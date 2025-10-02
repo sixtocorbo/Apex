@@ -31,6 +31,7 @@ Partial Class frmConfiguracion
         Me.btnSubDirecciones = New System.Windows.Forms.Button()
         Me.btnNomenclaturas = New System.Windows.Forms.Button()
         Me.btnEscalafones = New System.Windows.Forms.Button()
+        Me.btnFunciones = New System.Windows.Forms.Button()
         Me.FlowLayoutPanel1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -94,6 +95,7 @@ Partial Class frmConfiguracion
         Me.FlowLayoutPanel1.Controls.Add(Me.btnSubDirecciones)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnNomenclaturas)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnEscalafones)
+        Me.FlowLayoutPanel1.Controls.Add(Me.btnFunciones)
         Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.FlowLayoutPanel1.Location = New System.Drawing.Point(0, 0)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
@@ -130,6 +132,16 @@ Partial Class frmConfiguracion
         Me.btnEscalafones.Text = "Gestionar Escalafones"
         Me.btnEscalafones.UseVisualStyleBackColor = True
         '
+        'btnFunciones
+        '
+        Me.btnFunciones.Location = New System.Drawing.Point(4, 185)
+        Me.btnFunciones.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnFunciones.Name = "btnFunciones"
+        Me.btnFunciones.Size = New System.Drawing.Size(285, 35)
+        Me.btnFunciones.TabIndex = 11
+        Me.btnFunciones.Text = "Gestionar Funciones"
+        Me.btnFunciones.UseVisualStyleBackColor = True
+        '
         'frmConfiguracion
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -154,4 +166,5 @@ Partial Class frmConfiguracion
     Friend WithEvents btnSubDirecciones As Button
     Friend WithEvents btnNomenclaturas As Button
     Friend WithEvents btnEscalafones As Button
+    Friend WithEvents btnFunciones As Button
 End Class
