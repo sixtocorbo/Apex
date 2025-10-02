@@ -460,34 +460,23 @@ Public Class frmFuncionarioBuscar
             .Columns.Clear()
 
             .Columns.Add(New DataGridViewTextBoxColumn With {
-            .Name = "Id", .DataPropertyName = "Id", .Visible = False
-        })
-
-            ' CI: se ajusta al contenido mostrado y no crece de más
-            .Columns.Add(New DataGridViewTextBoxColumn With {
-            .Name = "CI",
-            .DataPropertyName = "CI",
-            .HeaderText = "Cédula",
-            .AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells, ' <- clave
-            .MinimumWidth = 90,
-            .DefaultCellStyle = New DataGridViewCellStyle With {
-                .Alignment = DataGridViewContentAlignment.MiddleLeft,
-                .WrapMode = DataGridViewTriState.False
-            }
-        })
+                .Name = "Id",
+                .DataPropertyName = "Id",
+                .Visible = False
+            })
 
             ' Nombre: llena el resto del ancho disponible
             .Columns.Add(New DataGridViewTextBoxColumn With {
-            .Name = "Nombre",
-            .DataPropertyName = "Nombre",
-            .HeaderText = "Nombre",
-            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,           ' <- clave
-            .FillWeight = 100,                                             ' peso relativo
-            .MinimumWidth = 280,                                           ' evitá que se angoste de más
-            .DefaultCellStyle = New DataGridViewCellStyle With {
-                .WrapMode = DataGridViewTriState.False
-            }
-        })
+                .Name = "Nombre",
+                .DataPropertyName = "Nombre",
+                .HeaderText = "Nombre",
+                .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,           ' <- clave
+                .FillWeight = 100,                                             ' peso relativo
+                .MinimumWidth = 280,                                           ' evitá que se angoste de más
+                .DefaultCellStyle = New DataGridViewCellStyle With {
+                    .WrapMode = DataGridViewTriState.False
+                }
+            })
         End With
 
         AddHandler dgvFuncionarios.DataError, Sub(s, ev) ev.ThrowException = False
@@ -497,21 +486,25 @@ Public Class frmFuncionarioBuscar
     Private Sub AjustarColumnasVisibles(Optional sender As Object = Nothing, Optional e As EventArgs = Nothing)
         If dgvFuncionarios.Columns.Count = 0 Then Exit Sub
 
-        Dim colCI = dgvFuncionarios.Columns("CI")
         Dim colNombre = dgvFuncionarios.Columns("Nombre")
-
-        ' Forzá un autosize de CI según contenido actualmente visible
-        colCI.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
-        dgvFuncionarios.AutoResizeColumn(colCI.Index, DataGridViewAutoSizeColumnMode.DisplayedCells)
-
-        ' Acotá un máximo “razonable” para CI (si querés limitar aún más)
-        Dim maxCI As Integer = 140
-        If colCI.Width > maxCI Then colCI.Width = maxCI
+        If colNombre Is Nothing Then Exit Sub
 
         ' Nombre siempre Fill; asegurá un mínimo cómodo
         colNombre.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
         colNombre.MinimumWidth = 280
         colNombre.FillWeight = 100
+    End Sub
+
+    Private Sub EstablecerCeldaActualEnPrimeraColumnaVisible(fila As DataGridViewRow)
+        If fila Is Nothing Then Return
+
+        Dim columnaVisible = dgvFuncionarios.Columns _
+            .Cast(Of DataGridViewColumn)() _
+            .FirstOrDefault(Function(col) col.Visible)
+
+        If columnaVisible IsNot Nothing Then
+            dgvFuncionarios.CurrentCell = fila.Cells(columnaVisible.Index)
+        End If
     End Sub
 
 
@@ -639,8 +632,9 @@ Public Class frmFuncionarioBuscar
 
             dgvFuncionarios.ClearSelection()
             If indiceSeleccion >= 0 AndAlso indiceSeleccion < dgvFuncionarios.Rows.Count Then
-                dgvFuncionarios.Rows(indiceSeleccion).Selected = True
-                dgvFuncionarios.CurrentCell = dgvFuncionarios.Rows(indiceSeleccion).Cells("CI")
+                Dim filaSeleccionada = dgvFuncionarios.Rows(indiceSeleccion)
+                filaSeleccionada.Selected = True
+                EstablecerCeldaActualEnPrimeraColumnaVisible(filaSeleccionada)
             End If
         Else
             LimpiarDetalle()
@@ -772,8 +766,9 @@ Public Class frmFuncionarioBuscar
         Dim nuevoIndex = Math.Max(0, Math.Min(total - 1, indexActual + direccion))
 
         dgvFuncionarios.ClearSelection()
-        dgvFuncionarios.Rows(nuevoIndex).Selected = True
-        dgvFuncionarios.CurrentCell = dgvFuncionarios.Rows(nuevoIndex).Cells("CI")
+        Dim filaSeleccionada = dgvFuncionarios.Rows(nuevoIndex)
+        filaSeleccionada.Selected = True
+        EstablecerCeldaActualEnPrimeraColumnaVisible(filaSeleccionada)
     End Sub
 #End Region
 
