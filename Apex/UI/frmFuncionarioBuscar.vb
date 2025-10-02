@@ -427,7 +427,6 @@ Public Class frmFuncionarioBuscar
     ' Reemplaza este método en la región "Diseño de grilla"
     Private Sub ConfigurarGrilla()
         With dgvFuncionarios
-            ' --- CONFIGURACIÓN GENERAL ---
             .BorderStyle = BorderStyle.None
             .CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal
             .GridColor = Color.FromArgb(230, 230, 230)
@@ -437,9 +436,11 @@ Public Class frmFuncionarioBuscar
             .AllowUserToResizeRows = False
             .AutoGenerateColumns = False
             .BackgroundColor = Color.White
-            .AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
 
-            ' --- ESTILO DE ENCABEZADOS (Headers) ---
+            ' Importante: desactivar Fill global para que respeten los AutoSizeMode por columna
+            .AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None
+
+            ' Estilos…
             .EnableHeadersVisualStyles = False
             .ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None
             .ColumnHeadersHeight = 40
@@ -449,7 +450,6 @@ Public Class frmFuncionarioBuscar
             .ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft
             .ColumnHeadersDefaultCellStyle.Padding = New Padding(5, 0, 0, 0)
 
-            ' --- ESTILO DE FILAS (Rows) ---
             .DefaultCellStyle.Font = New Font("Segoe UI", 9.5F)
             .DefaultCellStyle.Padding = New Padding(5, 0, 5, 0)
             .DefaultCellStyle.SelectionBackColor = Color.FromArgb(51, 153, 255)
@@ -457,32 +457,63 @@ Public Class frmFuncionarioBuscar
             .RowsDefaultCellStyle.BackColor = Color.White
             .AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(242, 245, 247)
 
-            ' --- DEFINICIÓN DE COLUMNAS ---
             .Columns.Clear()
 
             .Columns.Add(New DataGridViewTextBoxColumn With {
             .Name = "Id", .DataPropertyName = "Id", .Visible = False
         })
 
+            ' CI: se ajusta al contenido mostrado y no crece de más
             .Columns.Add(New DataGridViewTextBoxColumn With {
-            .Name = "CI", .DataPropertyName = "CI", .HeaderText = "Cédula",
-            .AutoSizeMode = DataGridViewAutoSizeColumnMode.None,
-            .Width = 115,
-            .MinimumWidth = 100
+            .Name = "CI",
+            .DataPropertyName = "CI",
+            .HeaderText = "Cédula",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells, ' <- clave
+            .MinimumWidth = 90,
+            .DefaultCellStyle = New DataGridViewCellStyle With {
+                .Alignment = DataGridViewContentAlignment.MiddleLeft,
+                .WrapMode = DataGridViewTriState.False
+            }
         })
 
+            ' Nombre: llena el resto del ancho disponible
             .Columns.Add(New DataGridViewTextBoxColumn With {
-            .Name = "Nombre", .DataPropertyName = "Nombre", .HeaderText = "Nombre",
-            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
-            .FillWeight = 100,
-            .MinimumWidth = 220,
-            .DefaultCellStyle = New DataGridViewCellStyle With {.WrapMode = DataGridViewTriState.False}
+            .Name = "Nombre",
+            .DataPropertyName = "Nombre",
+            .HeaderText = "Nombre",
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,           ' <- clave
+            .FillWeight = 100,                                             ' peso relativo
+            .MinimumWidth = 280,                                           ' evitá que se angoste de más
+            .DefaultCellStyle = New DataGridViewCellStyle With {
+                .WrapMode = DataGridViewTriState.False
+            }
         })
         End With
 
-        ' Manejador de errores para evitar que la app crashee si hay un problema al bindear datos
         AddHandler dgvFuncionarios.DataError, Sub(s, ev) ev.ThrowException = False
+        AddHandler dgvFuncionarios.DataBindingComplete, AddressOf AjustarColumnasVisibles
+        AddHandler dgvFuncionarios.Resize, AddressOf AjustarColumnasVisibles
     End Sub
+    Private Sub AjustarColumnasVisibles(Optional sender As Object = Nothing, Optional e As EventArgs = Nothing)
+        If dgvFuncionarios.Columns.Count = 0 Then Exit Sub
+
+        Dim colCI = dgvFuncionarios.Columns("CI")
+        Dim colNombre = dgvFuncionarios.Columns("Nombre")
+
+        ' Forzá un autosize de CI según contenido actualmente visible
+        colCI.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
+        dgvFuncionarios.AutoResizeColumn(colCI.Index, DataGridViewAutoSizeColumnMode.DisplayedCells)
+
+        ' Acotá un máximo “razonable” para CI (si querés limitar aún más)
+        Dim maxCI As Integer = 140
+        If colCI.Width > maxCI Then colCI.Width = maxCI
+
+        ' Nombre siempre Fill; asegurá un mínimo cómodo
+        colNombre.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+        colNombre.MinimumWidth = 280
+        colNombre.FillWeight = 100
+    End Sub
+
 
 #End Region
 
