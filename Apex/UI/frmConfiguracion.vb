@@ -19,7 +19,8 @@
         ' ---- Normalizar botones (texto, tamaño mínimo, márgenes)
         Dim botones() As Button = {
         btnCargos, btnSecciones, btnAreasTrabajo, btnTurnos,
-        btnGestionarIncidencias, btnSubDirecciones, btnNomenclaturas, btnEscalafones
+        btnGestionarIncidencias, btnSubDirecciones, btnNomenclaturas, btnEscalafones,
+        btnFunciones
     }
 
         For i = 0 To botones.Length - 1
@@ -108,6 +109,10 @@
 
     Private Sub btnEscalafones_Click(sender As Object, e As EventArgs) Handles btnEscalafones.Click
         AbrirHijoEnDashboard(Of frmEscalafones)()
+    End Sub
+
+    Private Sub btnFunciones_Click(sender As Object, e As EventArgs) Handles btnFunciones.Click
+        AbrirHijoEnDashboard(Of frmFunciones)()
     End Sub
 
 End Class
