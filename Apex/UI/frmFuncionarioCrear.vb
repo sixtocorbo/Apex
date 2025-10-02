@@ -1016,6 +1016,10 @@ Public Class frmFuncionarioCrear
             ' Esa lógica se encargará de crear o eliminar el estado de baja según corresponda.
             ' No necesitamos hacer nada más aquí.
         End If
+
+        ' Aseguramos la sincronización incluso si el evento de dtpBaja no se dispara
+        ' (p. ej. cuando el check se modificó programáticamente).
+        SincronizarEstadoBajaDesdePicker()
     End Sub
     Private Sub ProcesarCambioFechaBaja()
         If _bloquearEventosBaja Then Return
