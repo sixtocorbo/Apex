@@ -588,6 +588,12 @@
     <Compile Include="UI\frmFunciones.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="UI\frmFusionarFunciones.Designer.vb">
+      <DependentUpon>frmFusionarFunciones.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmFusionarFunciones.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="UI\frmSubDirecciones.Designer.vb">
       <DependentUpon>frmSubDirecciones.vb</DependentUpon>
     </Compile>
@@ -879,6 +885,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmFunciones.resx">
       <DependentUpon>frmFunciones.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmFusionarFunciones.resx">
+      <DependentUpon>frmFusionarFunciones.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmSubDirecciones.resx">
       <DependentUpon>frmSubDirecciones.vb</DependentUpon>

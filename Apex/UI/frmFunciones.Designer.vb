@@ -28,6 +28,7 @@ Partial Class frmFunciones
         Me.btnGuardar = New System.Windows.Forms.Button()
         Me.btnEliminar = New System.Windows.Forms.Button()
         Me.btnNuevo = New System.Windows.Forms.Button()
+        Me.btnFusionar = New System.Windows.Forms.Button()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -161,12 +162,14 @@ Partial Class frmFunciones
         Me.pnlBotones.Controls.Add(Me.btnGuardar, 0, 1)
         Me.pnlBotones.Controls.Add(Me.btnEliminar, 1, 0)
         Me.pnlBotones.Controls.Add(Me.btnNuevo, 0, 0)
+        Me.pnlBotones.Controls.Add(Me.btnFusionar, 0, 2)
         Me.pnlBotones.Location = New System.Drawing.Point(3, 105)
         Me.pnlBotones.Name = "pnlBotones"
-        Me.pnlBotones.RowCount = 2
-        Me.pnlBotones.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-        Me.pnlBotones.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-        Me.pnlBotones.Size = New System.Drawing.Size(424, 112)
+        Me.pnlBotones.RowCount = 3
+        Me.pnlBotones.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 40.0!))
+        Me.pnlBotones.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 40.0!))
+        Me.pnlBotones.RowStyles.Add(New System.Windows.Forms.RowStyle())
+        Me.pnlBotones.Size = New System.Drawing.Size(424, 170)
         Me.pnlBotones.TabIndex = 1
         '
         'btnVolver
@@ -212,6 +215,18 @@ Partial Class frmFunciones
         Me.btnNuevo.TabIndex = 0
         Me.btnNuevo.Text = "Nuevo"
         Me.btnNuevo.UseVisualStyleBackColor = True
+
+        'btnFusionar
+
+        Me.pnlBotones.SetColumnSpan(Me.btnFusionar, 2)
+        Me.btnFusionar.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.btnFusionar.Location = New System.Drawing.Point(4, 117)
+        Me.btnFusionar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnFusionar.Name = "btnFusionar"
+        Me.btnFusionar.Size = New System.Drawing.Size(416, 48)
+        Me.btnFusionar.TabIndex = 4
+        Me.btnFusionar.Text = "Fusionar funciones..."
+        Me.btnFusionar.UseVisualStyleBackColor = True
         '
         'frmFunciones
         '
@@ -254,4 +269,5 @@ Partial Class frmFunciones
     Friend WithEvents btnGuardar As Button
     Friend WithEvents btnEliminar As Button
     Friend WithEvents btnNuevo As Button
+    Friend WithEvents btnFusionar As Button
 End Class

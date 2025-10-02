@@ -46,10 +46,12 @@ Public Class frmFunciones
 
             _listaFunciones = New BindingList(Of Funcion)(lista)
             dgvFunciones.DataSource = _listaFunciones
+            btnFusionar.Enabled = (_listaFunciones.Count >= 2)
             RestaurarSeleccion()
         Catch ex As Exception
             Notifier.Error(Me, $"No se pudieron cargar las funciones: {ex.Message}")
             dgvFunciones.DataSource = New BindingList(Of Funcion)()
+            btnFusionar.Enabled = False
         Finally
             Cursor = Cursors.Default
             dgvFunciones.Enabled = True
@@ -378,5 +380,42 @@ Public Class frmFunciones
     Private Sub btnVolver_Click(sender As Object, e As EventArgs) Handles btnVolver.Click
         Close()
     End Sub
+
+    Private Async Sub btnFusionar_Click(sender As Object, e As EventArgs) Handles btnFusionar.Click
+        If _listaFunciones Is Nothing OrElse _listaFunciones.Count < 2 Then
+            Notifier.Warn(Me, "Debe existir al menos dos funciones para poder fusionar.")
+            Return
+        End If
+
+        Using frm As New frmFusionarFunciones(_listaFunciones.ToList())
+            If frm.ShowDialog(Me) = DialogResult.OK Then
+                Await FusionarFuncionesAsync(frm.FuncionDestinoId, frm.FuncionesSeleccionadasIds, frm.NombreDestino)
+            End If
+        End Using
+    End Sub
+
+    Private Async Function FusionarFuncionesAsync(funcionDestinoId As Integer,
+                                                  funcionesSeleccionadasIds As IList(Of Integer),
+                                                  nombreDestino As String) As Task
+        If funcionesSeleccionadasIds Is Nothing OrElse funcionesSeleccionadasIds.Count = 0 Then Return
+
+        Cursor = Cursors.WaitCursor
+        btnFusionar.Enabled = False
+        Try
+            Using svc As New FuncionService()
+                Await svc.FusionarFuncionesAsync(funcionDestinoId, funcionesSeleccionadasIds, nombreDestino)
+            End Using
+
+            _ultimoIdSeleccionado = funcionDestinoId
+            Await CargarDatosAsync()
+            RestaurarSeleccion()
+            Notifier.Success(Me, "Funciones fusionadas correctamente.")
+        Catch ex As Exception
+            Notifier.Error(Me, "No se pudieron fusionar las funciones: " & ex.Message)
+        Finally
+            Cursor = Cursors.Default
+            btnFusionar.Enabled = (_listaFunciones IsNot Nothing AndAlso _listaFunciones.Count >= 2)
+        End Try
+    End Function
 
 End Class
