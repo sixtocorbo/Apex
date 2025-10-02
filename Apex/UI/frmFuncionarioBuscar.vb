@@ -466,16 +466,17 @@ Public Class frmFuncionarioBuscar
 
             .Columns.Add(New DataGridViewTextBoxColumn With {
             .Name = "CI", .DataPropertyName = "CI", .HeaderText = "Cédula",
-            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
-            .FillWeight = 30,
-            .MinimumWidth = 75
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.None,
+            .Width = 115,
+            .MinimumWidth = 100
         })
 
             .Columns.Add(New DataGridViewTextBoxColumn With {
             .Name = "Nombre", .DataPropertyName = "Nombre", .HeaderText = "Nombre",
             .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
-            .FillWeight = 40,
-            .MinimumWidth = 165
+            .FillWeight = 100,
+            .MinimumWidth = 220,
+            .DefaultCellStyle = New DataGridViewCellStyle With {.WrapMode = DataGridViewTriState.False}
         })
         End With
 
