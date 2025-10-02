@@ -468,7 +468,7 @@ Public Class frmFuncionarioBuscar
                 .Name = "Nombre",
                 .DataPropertyName = "Nombre",
                 .HeaderText = "Nombre",
-                .AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells,
+                .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
                 .MinimumWidth = 220,
                 .DefaultCellStyle = New DataGridViewCellStyle With {
                     .WrapMode = DataGridViewTriState.False
@@ -498,12 +498,23 @@ Public Class frmFuncionarioBuscar
         If tlpResultados Is Nothing OrElse lstCargos Is Nothing Then Return
         If tlpResultados.ColumnStyles.Count < 2 Then Return
 
+        ' 1. Se calcula el ancho exacto que necesita el contenido del ListBox
         Dim anchoContenido = CalcularAnchoContenidoListBox(lstCargos)
+
+        ' 2. Se calcula el ancho total del panel disponible
         Dim anchoPanel = Math.Max(0, splitContenedor.Panel1.ClientSize.Width)
 
-        Dim anchoMaximoPermitido = If(anchoPanel = 0, anchoContenido, CInt(Math.Max(180, anchoPanel * 0.45)))
+        ' 3. Se establece un límite MÁXIMO para el ListBox (ej. el 40% del panel)
+        '    Esto evita que un cargo con un nombre extremadamente largo ocupe toda la pantalla.
+        Dim anchoMaximoPermitido = CInt(anchoPanel * 0.4)
+
+        ' 4. Se determina el ancho final:
+        '    - Será el ancho del contenido.
+        '    - Pero nunca superará el límite máximo permitido.
+        '    - Y nunca será menor a un mínimo razonable (ej. 160px).
         Dim anchoCalculado = Math.Max(160, Math.Min(anchoContenido, anchoMaximoPermitido))
 
+        ' 5. Se aplica el ancho calculado a la columna que contiene el ListBox.
         Dim margenHorizontal = lstCargos.Margin.Left + lstCargos.Margin.Right
         tlpResultados.ColumnStyles(1).Width = anchoCalculado + margenHorizontal
     End Sub
