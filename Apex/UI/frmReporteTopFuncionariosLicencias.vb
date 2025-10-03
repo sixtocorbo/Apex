@@ -84,6 +84,10 @@ Public Class frmReporteTopFuncionariosLicencias
         chartArea.AxisX.MajorGrid.LineDashStyle = ChartDashStyle.Dash
         chartArea.AxisY.Interval = 1
         chartArea.AxisY.MajorGrid.Enabled = False
+        chartArea.AxisY.IsLabelAutoFit = False
+        chartArea.AxisY.LabelStyle.Interval = 1
+        chartArea.AxisY.LabelStyle.Font = New Font("Segoe UI", 9.0!)
+        chartArea.AxisY.LabelStyle.IsEndLabelVisible = True
         chartFuncionarios.ChartAreas.Add(chartArea)
         chartFuncionarios.Dock = DockStyle.Fill
         legend.Enabled = False
@@ -156,8 +160,15 @@ Public Class frmReporteTopFuncionariosLicencias
             .IsValueShownAsLabel = True
         }
 
+        Dim chartAreaConfig As ChartArea = chartFuncionarios.ChartAreas(0)
+        chartAreaConfig.AxisY.MaximumAutoSize = 100.0R
+
         For Each item In datos
-            series.Points.AddXY(item.Etiqueta, item.Valor)
+            Dim point = New DataPoint()
+            point.AxisLabel = item.Etiqueta
+            point.YValues = New Double() {CDbl(item.Valor)}
+            point.Label = item.Valor.ToString()
+            series.Points.Add(point)
         Next
 
         chartFuncionarios.Series.Add(series)
