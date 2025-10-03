@@ -897,10 +897,15 @@ Public Class frmFuncionarioBuscar
             Dim f = Await uow.Repository(Of Funcionario)() _
             .GetAll() _
             .Include(Function(x) x.Cargo) _
+            .Include(Function(x) x.Escalafon) _
+            .Include(Function(x) x.SubEscalafon) _
             .Include(Function(x) x.TipoFuncionario) _
             .Include(Function(x) x.Semana) _
             .Include(Function(x) x.Turno) _
             .Include(Function(x) x.Horario) _
+            .Include(Function(x) x.Seccion) _
+            .Include(Function(x) x.PuestoTrabajo) _
+            .Include(Function(x) x.SubDireccion) _
             .AsNoTracking() _
             .FirstOrDefaultAsync(Function(x) x.Id = id)
 
@@ -916,10 +921,15 @@ Public Class frmFuncionarioBuscar
             ' Concatenamos el texto fijo con el valor
             lblCI.Text = "CI: " & f.CI
             lblNombreCompleto.Text = f.Nombre ' El nombre principal no lleva etiqueta
-            lblCargo.Text = "Cargo: " & If(f.Cargo Is Nothing, "-", f.Cargo.Nombre)
+            Dim escalafonNombre = If(f.Escalafon IsNot Nothing, f.Escalafon.Nombre, "-")
+            Dim subEscalafonNombre = If(f.SubEscalafon IsNot Nothing, f.SubEscalafon.Nombre, "-")
+            Dim cargoNombre = If(f.Cargo IsNot Nothing, f.Cargo.Nombre, "-")
+            lblCargo.Text = $"Escalafon / SubEscalafon / Cargo: {escalafonNombre} / {subEscalafonNombre} / {cargoNombre}"
             lblTipo.Text = "Tipo: " & f.TipoFuncionario.Nombre
             lblFechaIngreso.Text = "Fecha Ingreso: " & f.FechaIngreso.ToShortDateString()
             lblHorarioCompleto.Text = $"Horario: {If(f.Semana IsNot Nothing, f.Semana.Nombre, "-")} / {If(f.Turno IsNot Nothing, f.Turno.Nombre, "-")} / {If(f.Horario IsNot Nothing, f.Horario.Nombre, "-")}"
+            lblUbicacion.Text = $"Ubicación: {If(f.Seccion IsNot Nothing, f.Seccion.Nombre, "-")} / {If(f.PuestoTrabajo Is Not Nothing, f.PuestoTrabajo.Nombre, "-")}"
+            lblSubDireccion.Text = "SubDireccion: " & If(f.SubDireccion IsNot Nothing, f.SubDireccion.Nombre, "-")
 
             ' El estado ya estaba correcto, lo mantenemos igual
             If f.Activo Then
@@ -1300,13 +1310,15 @@ Public Class frmFuncionarioBuscar
     Private Sub LimpiarDetalle()
         lblCI.Text = "CI: -"
         lblNombreCompleto.Text = "Seleccione un funcionario"
-        lblCargo.Text = "Cargo: -"
+        lblCargo.Text = "Escalafon / SubEscalafon / Cargo: - / - / -"
         lblTipo.Text = "Tipo: -"
         lblFechaIngreso.Text = "Fecha Ingreso: -"
         lblEstadoActividad.Text = "Estado: -"
         lblPresencia.Text = ""
         pbFotoDetalle.Image = Nothing
         lblHorarioCompleto.Text = "Horario: -"
+        lblUbicacion.Text = "Ubicación: Seccion / Puesto de Trabajo"
+        lblSubDireccion.Text = "SubDireccion: -"
         _detallesEstadoActual.Clear()
 
         ' Oculta los botones de acción y el panel de detalle.
