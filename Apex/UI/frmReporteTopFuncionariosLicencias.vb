@@ -2,6 +2,7 @@ Option Strict On
 Option Explicit On
 
 Imports System.Drawing
+Imports System.Globalization
 Imports System.Linq
 Imports System.Threading.Tasks
 Imports System.Windows.Forms.DataVisualization.Charting
@@ -47,7 +48,7 @@ Public Class frmReporteTopFuncionariosLicencias
         lblDesde.Text = "Desde:"
         lblDesde.Margin = New Padding(0, 8, 5, 0)
 
-        dtpDesde.Format = DateTimePickerFormat.[Short]
+        dtpDesde.Format = DateTimePickerFormat.Short
         dtpDesde.Width = 120
         dtpDesde.Margin = New Padding(0, 5, 15, 0)
 
@@ -55,12 +56,12 @@ Public Class frmReporteTopFuncionariosLicencias
         lblHasta.Text = "Hasta:"
         lblHasta.Margin = New Padding(0, 8, 5, 0)
 
-        dtpHasta.Format = DateTimePickerFormat.[Short]
+        dtpHasta.Format = DateTimePickerFormat.Short
         dtpHasta.Width = 120
         dtpHasta.Margin = New Padding(0, 5, 15, 0)
 
         lblTop.AutoSize = True
-        lblTop.Text = "Top:" 
+        lblTop.Text = "Top:"
         lblTop.Margin = New Padding(0, 8, 5, 0)
 
         nudTop.Minimum = 3
@@ -162,6 +163,22 @@ Public Class frmReporteTopFuncionariosLicencias
 
         Dim chartAreaConfig As ChartArea = chartFuncionarios.ChartAreas(0)
         chartAreaConfig.AxisY.MaximumAutoSize = 100.0R
+        chartAreaConfig.AxisY.ScaleView.ZoomReset(0)
+        chartAreaConfig.AxisY.Minimum = Double.NaN
+        chartAreaConfig.AxisY.Maximum = Double.NaN
+
+        Dim totalFuncionarios = datos.Count
+        Dim labelFontSize As Single
+
+        If totalFuncionarios <= 6 Then
+            labelFontSize = 9.0!
+        ElseIf totalFuncionarios <= 12 Then
+            labelFontSize = 8.0!
+        Else
+            labelFontSize = 7.0!
+        End If
+
+        chartAreaConfig.AxisY.LabelStyle.Font = New Font("Segoe UI", labelFontSize)
 
         For Each item In datos
             Dim point = New DataPoint()
@@ -170,6 +187,9 @@ Public Class frmReporteTopFuncionariosLicencias
             point.Label = item.Valor.ToString()
             series.Points.Add(point)
         Next
+
+        Dim pointWidth = If(totalFuncionarios <= 5, 0.6R, Math.Max(0.2R, 0.6R - (totalFuncionarios - 5) * 0.04R))
+        series("PointWidth") = pointWidth.ToString(CultureInfo.InvariantCulture)
 
         chartFuncionarios.Series.Add(series)
     End Function
