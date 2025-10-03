@@ -13,9 +13,9 @@ Imports System.Collections.Generic
 Partial Public Class vw_FuncionarioEstadosActivos
     Public Property FuncionarioId As Integer
     Public Property Prioridad As Integer
+    Public Property PrioridadRango As Nullable(Of Long)
     Public Property Tipo As String
     Public Property Detalles As String
     Public Property ColorIndicador As String
-    Public Property PrioridadRango As Nullable(Of Long)
 
 End Class
