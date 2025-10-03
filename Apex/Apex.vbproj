@@ -845,6 +845,9 @@
     <Compile Include="UI\frmRenombrarPDF.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="UI\frmResumenCantidades.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="UI\frmSancionCrear.Designer.vb">
       <DependentUpon>frmSancionCrear.vb</DependentUpon>
     </Compile>
