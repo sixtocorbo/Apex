@@ -315,7 +315,7 @@ Partial Class frmFuncionarioBuscar
         Me.lblFechaIngreso.Text = "Fecha Ingreso: -"
         '
         'flpHorarioDetalle
-
+        '
         Me.flpHorarioDetalle.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.flpHorarioDetalle.AutoSize = True
         Me.flpHorarioDetalle.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
@@ -325,89 +325,84 @@ Partial Class frmFuncionarioBuscar
         Me.flpHorarioDetalle.Controls.Add(Me.lblTurnoValor)
         Me.flpHorarioDetalle.Controls.Add(Me.lblPlantillaTitulo)
         Me.flpHorarioDetalle.Controls.Add(Me.lblPlantillaValor)
-        Me.flpHorarioDetalle.FlowDirection = System.Windows.Forms.FlowDirection.LeftToRight
         Me.flpHorarioDetalle.Location = New System.Drawing.Point(3, 144)
         Me.flpHorarioDetalle.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
         Me.flpHorarioDetalle.Name = "flpHorarioDetalle"
-        Me.flpHorarioDetalle.Size = New System.Drawing.Size(362, 25)
+        Me.flpHorarioDetalle.Size = New System.Drawing.Size(353, 25)
         Me.flpHorarioDetalle.TabIndex = 13
-        Me.flpHorarioDetalle.WrapContents = True
         '
         'lblHorarioTitulo
-
+        '
         Me.lblHorarioTitulo.AutoSize = True
         Me.lblHorarioTitulo.Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)
         Me.lblHorarioTitulo.ForeColor = System.Drawing.Color.DimGray
         Me.lblHorarioTitulo.Location = New System.Drawing.Point(3, 0)
-        Me.lblHorarioTitulo.Margin = New System.Windows.Forms.Padding(3, 0, 3, 0)
         Me.lblHorarioTitulo.Name = "lblHorarioTitulo"
         Me.lblHorarioTitulo.Size = New System.Drawing.Size(87, 25)
         Me.lblHorarioTitulo.TabIndex = 0
         Me.lblHorarioTitulo.Text = "Semana:"
-
+        '
         'lblSemanaValor
-
+        '
         Me.lblSemanaValor.AutoSize = True
         Me.lblSemanaValor.Font = New System.Drawing.Font("Segoe UI", 9.5!)
         Me.lblSemanaValor.ForeColor = System.Drawing.Color.DimGray
         Me.lblSemanaValor.Location = New System.Drawing.Point(96, 0)
         Me.lblSemanaValor.Margin = New System.Windows.Forms.Padding(3, 0, 12, 0)
         Me.lblSemanaValor.Name = "lblSemanaValor"
-        Me.lblSemanaValor.Size = New System.Drawing.Size(19, 25)
+        Me.lblSemanaValor.Size = New System.Drawing.Size(20, 25)
         Me.lblSemanaValor.TabIndex = 1
         Me.lblSemanaValor.Text = "-"
-
+        '
         'lblTurnoTitulo
-
+        '
         Me.lblTurnoTitulo.AutoSize = True
         Me.lblTurnoTitulo.Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)
         Me.lblTurnoTitulo.ForeColor = System.Drawing.Color.DimGray
-        Me.lblTurnoTitulo.Location = New System.Drawing.Point(130, 0)
+        Me.lblTurnoTitulo.Location = New System.Drawing.Point(128, 0)
         Me.lblTurnoTitulo.Margin = New System.Windows.Forms.Padding(0, 0, 3, 0)
         Me.lblTurnoTitulo.Name = "lblTurnoTitulo"
-        Me.lblTurnoTitulo.Size = New System.Drawing.Size(70, 25)
+        Me.lblTurnoTitulo.Size = New System.Drawing.Size(71, 25)
         Me.lblTurnoTitulo.TabIndex = 2
         Me.lblTurnoTitulo.Text = "Turno:"
-
+        '
         'lblTurnoValor
-
+        '
         Me.lblTurnoValor.AutoSize = True
         Me.lblTurnoValor.Font = New System.Drawing.Font("Segoe UI", 9.5!)
         Me.lblTurnoValor.ForeColor = System.Drawing.Color.DimGray
-        Me.lblTurnoValor.Location = New System.Drawing.Point(206, 0)
+        Me.lblTurnoValor.Location = New System.Drawing.Point(205, 0)
         Me.lblTurnoValor.Margin = New System.Windows.Forms.Padding(3, 0, 12, 0)
         Me.lblTurnoValor.Name = "lblTurnoValor"
-        Me.lblTurnoValor.Size = New System.Drawing.Size(19, 25)
+        Me.lblTurnoValor.Size = New System.Drawing.Size(20, 25)
         Me.lblTurnoValor.TabIndex = 3
         Me.lblTurnoValor.Text = "-"
-
+        '
         'lblPlantillaTitulo
-
+        '
         Me.lblPlantillaTitulo.AutoSize = True
         Me.lblPlantillaTitulo.Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)
         Me.lblPlantillaTitulo.ForeColor = System.Drawing.Color.DimGray
-        Me.lblPlantillaTitulo.Location = New System.Drawing.Point(240, 0)
+        Me.lblPlantillaTitulo.Location = New System.Drawing.Point(237, 0)
         Me.lblPlantillaTitulo.Margin = New System.Windows.Forms.Padding(0, 0, 3, 0)
         Me.lblPlantillaTitulo.Name = "lblPlantillaTitulo"
-        Me.lblPlantillaTitulo.Size = New System.Drawing.Size(88, 25)
+        Me.lblPlantillaTitulo.Size = New System.Drawing.Size(87, 25)
         Me.lblPlantillaTitulo.TabIndex = 4
         Me.lblPlantillaTitulo.Text = "Horario:"
-
+        '
         'lblPlantillaValor
-
+        '
         Me.lblPlantillaValor.AutoSize = True
         Me.lblPlantillaValor.Font = New System.Drawing.Font("Segoe UI", 9.5!)
         Me.lblPlantillaValor.ForeColor = System.Drawing.Color.DimGray
-        Me.lblPlantillaValor.Location = New System.Drawing.Point(334, 0)
-        Me.lblPlantillaValor.Margin = New System.Windows.Forms.Padding(3, 0, 3, 0)
+        Me.lblPlantillaValor.Location = New System.Drawing.Point(330, 0)
         Me.lblPlantillaValor.Name = "lblPlantillaValor"
-        Me.lblPlantillaValor.Size = New System.Drawing.Size(19, 25)
+        Me.lblPlantillaValor.Size = New System.Drawing.Size(20, 25)
         Me.lblPlantillaValor.TabIndex = 5
         Me.lblPlantillaValor.Text = "-"
         '
-        '
         'flpUbicacionDetalle
-
+        '
         Me.flpUbicacionDetalle.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.flpUbicacionDetalle.AutoSize = True
         Me.flpUbicacionDetalle.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
@@ -415,64 +410,73 @@ Partial Class frmFuncionarioBuscar
         Me.flpUbicacionDetalle.Controls.Add(Me.lblUnidadValor)
         Me.flpUbicacionDetalle.Controls.Add(Me.lblPuestoTitulo)
         Me.flpUbicacionDetalle.Controls.Add(Me.lblPuestoValor)
-        Me.flpUbicacionDetalle.FlowDirection = System.Windows.Forms.FlowDirection.LeftToRight
         Me.flpUbicacionDetalle.Location = New System.Drawing.Point(3, 171)
         Me.flpUbicacionDetalle.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
         Me.flpUbicacionDetalle.Name = "flpUbicacionDetalle"
-        Me.flpUbicacionDetalle.Size = New System.Drawing.Size(286, 25)
+        Me.flpUbicacionDetalle.Size = New System.Drawing.Size(253, 25)
         Me.flpUbicacionDetalle.TabIndex = 23
-        Me.flpUbicacionDetalle.WrapContents = True
-
+        '
         'lblUbicacionTitulo
-
+        '
         Me.lblUbicacionTitulo.AutoSize = True
         Me.lblUbicacionTitulo.Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)
         Me.lblUbicacionTitulo.ForeColor = System.Drawing.Color.DimGray
         Me.lblUbicacionTitulo.Location = New System.Drawing.Point(3, 0)
-        Me.lblUbicacionTitulo.Margin = New System.Windows.Forms.Padding(3, 0, 3, 0)
         Me.lblUbicacionTitulo.Name = "lblUbicacionTitulo"
-        Me.lblUbicacionTitulo.Size = New System.Drawing.Size(102, 25)
+        Me.lblUbicacionTitulo.Size = New System.Drawing.Size(105, 25)
         Me.lblUbicacionTitulo.TabIndex = 0
         Me.lblUbicacionTitulo.Text = "Ubicación:"
-
+        '
         'lblUnidadValor
-
+        '
         Me.lblUnidadValor.AutoSize = True
         Me.lblUnidadValor.Font = New System.Drawing.Font("Segoe UI", 9.5!)
         Me.lblUnidadValor.ForeColor = System.Drawing.Color.DimGray
-        Me.lblUnidadValor.Location = New System.Drawing.Point(86, 0)
+        Me.lblUnidadValor.Location = New System.Drawing.Point(114, 0)
         Me.lblUnidadValor.Margin = New System.Windows.Forms.Padding(3, 0, 12, 0)
         Me.lblUnidadValor.Name = "lblUnidadValor"
-        Me.lblUnidadValor.Size = New System.Drawing.Size(19, 25)
+        Me.lblUnidadValor.Size = New System.Drawing.Size(20, 25)
         Me.lblUnidadValor.TabIndex = 1
         Me.lblUnidadValor.Text = "-"
-
+        '
         'lblPuestoTitulo
-
+        '
         Me.lblPuestoTitulo.AutoSize = True
         Me.lblPuestoTitulo.Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)
         Me.lblPuestoTitulo.ForeColor = System.Drawing.Color.DimGray
-        Me.lblPuestoTitulo.Location = New System.Drawing.Point(121, 0)
+        Me.lblPuestoTitulo.Location = New System.Drawing.Point(146, 0)
         Me.lblPuestoTitulo.Margin = New System.Windows.Forms.Padding(0, 0, 3, 0)
         Me.lblPuestoTitulo.Name = "lblPuestoTitulo"
-        Me.lblPuestoTitulo.Size = New System.Drawing.Size(72, 25)
+        Me.lblPuestoTitulo.Size = New System.Drawing.Size(78, 25)
         Me.lblPuestoTitulo.TabIndex = 2
         Me.lblPuestoTitulo.Text = "Puesto:"
-
+        '
         'lblPuestoValor
-
+        '
         Me.lblPuestoValor.AutoSize = True
         Me.lblPuestoValor.Font = New System.Drawing.Font("Segoe UI", 9.5!)
         Me.lblPuestoValor.ForeColor = System.Drawing.Color.DimGray
-        Me.lblPuestoValor.Location = New System.Drawing.Point(199, 0)
-        Me.lblPuestoValor.Margin = New System.Windows.Forms.Padding(3, 0, 3, 0)
+        Me.lblPuestoValor.Location = New System.Drawing.Point(230, 0)
         Me.lblPuestoValor.Name = "lblPuestoValor"
-        Me.lblPuestoValor.Size = New System.Drawing.Size(19, 25)
+        Me.lblPuestoValor.Size = New System.Drawing.Size(20, 25)
         Me.lblPuestoValor.TabIndex = 3
         Me.lblPuestoValor.Text = "-"
-
+        '
+        'lblSubDireccion
+        '
+        Me.lblSubDireccion.Anchor = System.Windows.Forms.AnchorStyles.Left
+        Me.lblSubDireccion.AutoSize = True
+        Me.lblSubDireccion.Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)
+        Me.lblSubDireccion.ForeColor = System.Drawing.Color.DimGray
+        Me.lblSubDireccion.Location = New System.Drawing.Point(3, 198)
+        Me.lblSubDireccion.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
+        Me.lblSubDireccion.Name = "lblSubDireccion"
+        Me.lblSubDireccion.Size = New System.Drawing.Size(149, 25)
+        Me.lblSubDireccion.TabIndex = 24
+        Me.lblSubDireccion.Text = "SubDireccion: -"
+        '
         'flpCargoDetalle
-
+        '
         Me.flpCargoDetalle.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.flpCargoDetalle.AutoSize = True
         Me.flpCargoDetalle.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
@@ -482,98 +486,81 @@ Partial Class frmFuncionarioBuscar
         Me.flpCargoDetalle.Controls.Add(Me.lblSubEscalafonValor)
         Me.flpCargoDetalle.Controls.Add(Me.lblJerarquiaTitulo)
         Me.flpCargoDetalle.Controls.Add(Me.lblJerarquiaValor)
-        Me.flpCargoDetalle.FlowDirection = System.Windows.Forms.FlowDirection.LeftToRight
-        Me.flpCargoDetalle.Location = New System.Drawing.Point(3, 225)
+        Me.flpCargoDetalle.Location = New System.Drawing.Point(633, 0)
         Me.flpCargoDetalle.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
         Me.flpCargoDetalle.Name = "flpCargoDetalle"
-        Me.flpCargoDetalle.Size = New System.Drawing.Size(358, 25)
+        Me.flpCargoDetalle.Size = New System.Drawing.Size(138, 125)
         Me.flpCargoDetalle.TabIndex = 4
-        Me.flpCargoDetalle.WrapContents = True
-
+        '
         'lblEscalafonTitulo
-
+        '
         Me.lblEscalafonTitulo.AutoSize = True
         Me.lblEscalafonTitulo.Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)
         Me.lblEscalafonTitulo.ForeColor = System.Drawing.Color.DimGray
         Me.lblEscalafonTitulo.Location = New System.Drawing.Point(3, 0)
-        Me.lblEscalafonTitulo.Margin = New System.Windows.Forms.Padding(3, 0, 3, 0)
         Me.lblEscalafonTitulo.Name = "lblEscalafonTitulo"
-        Me.lblEscalafonTitulo.Size = New System.Drawing.Size(99, 25)
+        Me.lblEscalafonTitulo.Size = New System.Drawing.Size(100, 25)
         Me.lblEscalafonTitulo.TabIndex = 0
         Me.lblEscalafonTitulo.Text = "Escalafón:"
-
+        '
         'lblEscalafonValor
-
+        '
         Me.lblEscalafonValor.AutoSize = True
         Me.lblEscalafonValor.Font = New System.Drawing.Font("Segoe UI", 9.5!)
         Me.lblEscalafonValor.ForeColor = System.Drawing.Color.DimGray
-        Me.lblEscalafonValor.Location = New System.Drawing.Point(108, 0)
+        Me.lblEscalafonValor.Location = New System.Drawing.Point(3, 25)
         Me.lblEscalafonValor.Margin = New System.Windows.Forms.Padding(3, 0, 12, 0)
         Me.lblEscalafonValor.Name = "lblEscalafonValor"
-        Me.lblEscalafonValor.Size = New System.Drawing.Size(19, 25)
+        Me.lblEscalafonValor.Size = New System.Drawing.Size(20, 25)
         Me.lblEscalafonValor.TabIndex = 1
         Me.lblEscalafonValor.Text = "-"
-
+        '
         'lblSubEscalafonTitulo
-
+        '
         Me.lblSubEscalafonTitulo.AutoSize = True
         Me.lblSubEscalafonTitulo.Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)
         Me.lblSubEscalafonTitulo.ForeColor = System.Drawing.Color.DimGray
-        Me.lblSubEscalafonTitulo.Location = New System.Drawing.Point(142, 0)
+        Me.lblSubEscalafonTitulo.Location = New System.Drawing.Point(0, 50)
         Me.lblSubEscalafonTitulo.Margin = New System.Windows.Forms.Padding(0, 0, 3, 0)
         Me.lblSubEscalafonTitulo.Name = "lblSubEscalafonTitulo"
         Me.lblSubEscalafonTitulo.Size = New System.Drawing.Size(135, 25)
         Me.lblSubEscalafonTitulo.TabIndex = 2
         Me.lblSubEscalafonTitulo.Text = "SubEscalafón:"
-
+        '
         'lblSubEscalafonValor
-
+        '
         Me.lblSubEscalafonValor.AutoSize = True
         Me.lblSubEscalafonValor.Font = New System.Drawing.Font("Segoe UI", 9.5!)
         Me.lblSubEscalafonValor.ForeColor = System.Drawing.Color.DimGray
-        Me.lblSubEscalafonValor.Location = New System.Drawing.Point(280, 0)
+        Me.lblSubEscalafonValor.Location = New System.Drawing.Point(3, 75)
         Me.lblSubEscalafonValor.Margin = New System.Windows.Forms.Padding(3, 0, 12, 0)
         Me.lblSubEscalafonValor.Name = "lblSubEscalafonValor"
-        Me.lblSubEscalafonValor.Size = New System.Drawing.Size(19, 25)
+        Me.lblSubEscalafonValor.Size = New System.Drawing.Size(20, 25)
         Me.lblSubEscalafonValor.TabIndex = 3
         Me.lblSubEscalafonValor.Text = "-"
-
+        '
         'lblJerarquiaTitulo
-
+        '
         Me.lblJerarquiaTitulo.AutoSize = True
         Me.lblJerarquiaTitulo.Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)
         Me.lblJerarquiaTitulo.ForeColor = System.Drawing.Color.DimGray
-        Me.lblJerarquiaTitulo.Location = New System.Drawing.Point(315, 0)
+        Me.lblJerarquiaTitulo.Location = New System.Drawing.Point(35, 75)
         Me.lblJerarquiaTitulo.Margin = New System.Windows.Forms.Padding(0, 0, 3, 0)
         Me.lblJerarquiaTitulo.Name = "lblJerarquiaTitulo"
-        Me.lblJerarquiaTitulo.Size = New System.Drawing.Size(96, 25)
+        Me.lblJerarquiaTitulo.Size = New System.Drawing.Size(100, 25)
         Me.lblJerarquiaTitulo.TabIndex = 4
         Me.lblJerarquiaTitulo.Text = "Jerarquía:"
-
+        '
         'lblJerarquiaValor
-
+        '
         Me.lblJerarquiaValor.AutoSize = True
         Me.lblJerarquiaValor.Font = New System.Drawing.Font("Segoe UI", 9.5!)
         Me.lblJerarquiaValor.ForeColor = System.Drawing.Color.DimGray
-        Me.lblJerarquiaValor.Location = New System.Drawing.Point(417, 0)
-        Me.lblJerarquiaValor.Margin = New System.Windows.Forms.Padding(3, 0, 3, 0)
+        Me.lblJerarquiaValor.Location = New System.Drawing.Point(3, 100)
         Me.lblJerarquiaValor.Name = "lblJerarquiaValor"
-        Me.lblJerarquiaValor.Size = New System.Drawing.Size(19, 25)
+        Me.lblJerarquiaValor.Size = New System.Drawing.Size(20, 25)
         Me.lblJerarquiaValor.TabIndex = 5
         Me.lblJerarquiaValor.Text = "-"
-
-        'lblSubDireccion
-        '
-        Me.lblSubDireccion.Anchor = System.Windows.Forms.AnchorStyles.Left
-        Me.lblSubDireccion.AutoSize = True
-        Me.lblSubDireccion.Font = New System.Drawing.Font("Segoe UI", 9.5!)
-        Me.lblSubDireccion.ForeColor = System.Drawing.Color.DimGray
-        Me.lblSubDireccion.Location = New System.Drawing.Point(3, 198)
-        Me.lblSubDireccion.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
-        Me.lblSubDireccion.Name = "lblSubDireccion"
-        Me.lblSubDireccion.Size = New System.Drawing.Size(152, 25)
-        Me.lblSubDireccion.TabIndex = 24
-        Me.lblSubDireccion.Text = "SubDireccion: -"
         '
         'lblPresencia
         '
@@ -581,7 +568,7 @@ Partial Class frmFuncionarioBuscar
         Me.lblPresencia.AutoSize = True
         Me.lblPresencia.Font = New System.Drawing.Font("Segoe UI", 9.5!)
         Me.lblPresencia.ForeColor = System.Drawing.Color.DimGray
-        Me.lblPresencia.Location = New System.Drawing.Point(3, 252)
+        Me.lblPresencia.Location = New System.Drawing.Point(633, 127)
         Me.lblPresencia.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
         Me.lblPresencia.Name = "lblPresencia"
         Me.lblPresencia.Size = New System.Drawing.Size(110, 25)
@@ -594,7 +581,7 @@ Partial Class frmFuncionarioBuscar
         Me.lblEstadoActividad.AutoSize = True
         Me.lblEstadoActividad.Font = New System.Drawing.Font("Segoe UI", 9.5!)
         Me.lblEstadoActividad.ForeColor = System.Drawing.Color.DimGray
-        Me.lblEstadoActividad.Location = New System.Drawing.Point(3, 279)
+        Me.lblEstadoActividad.Location = New System.Drawing.Point(633, 154)
         Me.lblEstadoActividad.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
         Me.lblEstadoActividad.Name = "lblEstadoActividad"
         Me.lblEstadoActividad.Size = New System.Drawing.Size(85, 25)
@@ -605,7 +592,7 @@ Partial Class frmFuncionarioBuscar
         '
         Me.btnVerSituacion.Dock = System.Windows.Forms.DockStyle.Fill
         Me.btnVerSituacion.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.btnVerSituacion.Location = New System.Drawing.Point(3, 410)
+        Me.btnVerSituacion.Location = New System.Drawing.Point(3, 356)
         Me.btnVerSituacion.Name = "btnVerSituacion"
         Me.btnVerSituacion.Size = New System.Drawing.Size(371, 36)
         Me.btnVerSituacion.TabIndex = 17
