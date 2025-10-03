@@ -178,15 +178,16 @@ Public Class frmResumenCantidades
         ResumeLayout(False)
     End Sub
 
-    Private Sub frmResumenCantidades_Load(sender As Object, e As EventArgs)
+    Private Async Sub frmResumenCantidades_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Try
             AppTheme.Aplicar(Me)
         Catch
         End Try
 
         _dtpFecha.Value = Date.Today
-        _ = ActualizarDatosAsync()
+        Await ActualizarDatosAsync() ' espera a que termine
     End Sub
+
 
     Private Async Function ActualizarDatosAsync() As Task
         If Not _btnActualizar.Enabled Then
