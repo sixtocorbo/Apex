@@ -128,10 +128,10 @@ Partial Class frmFuncionarioEstadoTransitorio
         '
         'dtpFechaHasta
         '
-        Me.dtpFechaHasta.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.dtpFechaHasta.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.dtpFechaHasta.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.dtpFechaHasta.Location = New System.Drawing.Point(3, 3)
-        Me.dtpFechaHasta.Margin = New System.Windows.Forms.Padding(3, 3, 0, 3)
+        Me.dtpFechaHasta.Location = New System.Drawing.Point(0, 3)
+        Me.dtpFechaHasta.Margin = New System.Windows.Forms.Padding(0, 3, 4, 3)
         Me.dtpFechaHasta.Name = "dtpFechaHasta"
         Me.dtpFechaHasta.Size = New System.Drawing.Size(153, 26)
         Me.dtpFechaHasta.TabIndex = 0
@@ -150,9 +150,9 @@ Partial Class frmFuncionarioEstadoTransitorio
         'chkFechaHasta
         '
         Me.chkFechaHasta.AutoSize = True
-        Me.chkFechaHasta.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.chkFechaHasta.Location = New System.Drawing.Point(160, 5)
-        Me.chkFechaHasta.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.chkFechaHasta.Anchor = System.Windows.Forms.AnchorStyles.Left
+        Me.chkFechaHasta.Location = New System.Drawing.Point(164, 5)
+        Me.chkFechaHasta.Margin = New System.Windows.Forms.Padding(0, 5, 4, 5)
         Me.chkFechaHasta.Name = "chkFechaHasta"
         Me.chkFechaHasta.Size = New System.Drawing.Size(121, 24)
         Me.chkFechaHasta.TabIndex = 1
@@ -264,6 +264,8 @@ Partial Class frmFuncionarioEstadoTransitorio
         Me.SplitContainer1.Location = New System.Drawing.Point(4, 24)
         Me.SplitContainer1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.SplitContainer1.Name = "SplitContainer1"
+        Me.SplitContainer1.Panel1MinSize = 220
+        Me.SplitContainer1.Panel2MinSize = 220
         '
         'SplitContainer1.Panel1
         '
@@ -437,10 +439,10 @@ Partial Class frmFuncionarioEstadoTransitorio
         '
         'dtpFechaResolucion
         '
-        Me.dtpFechaResolucion.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.dtpFechaResolucion.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.dtpFechaResolucion.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.dtpFechaResolucion.Location = New System.Drawing.Point(3, 3)
-        Me.dtpFechaResolucion.Margin = New System.Windows.Forms.Padding(3, 3, 0, 3)
+        Me.dtpFechaResolucion.Location = New System.Drawing.Point(0, 3)
+        Me.dtpFechaResolucion.Margin = New System.Windows.Forms.Padding(0, 3, 4, 3)
         Me.dtpFechaResolucion.Name = "dtpFechaResolucion"
         Me.dtpFechaResolucion.Size = New System.Drawing.Size(139, 26)
         Me.dtpFechaResolucion.TabIndex = 0
@@ -448,9 +450,9 @@ Partial Class frmFuncionarioEstadoTransitorio
         'chkSinFechaResolucion
         '
         Me.chkSinFechaResolucion.AutoSize = True
-        Me.chkSinFechaResolucion.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.chkSinFechaResolucion.Location = New System.Drawing.Point(146, 5)
-        Me.chkSinFechaResolucion.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.chkSinFechaResolucion.Anchor = System.Windows.Forms.AnchorStyles.Left
+        Me.chkSinFechaResolucion.Location = New System.Drawing.Point(148, 5)
+        Me.chkSinFechaResolucion.Margin = New System.Windows.Forms.Padding(0, 5, 4, 5)
         Me.chkSinFechaResolucion.Name = "chkSinFechaResolucion"
         Me.chkSinFechaResolucion.Size = New System.Drawing.Size(107, 24)
         Me.chkSinFechaResolucion.TabIndex = 1
@@ -477,6 +479,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         'pnlDatos
         '
         Me.pnlDatos.AutoSize = True
+        Me.pnlDatos.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
         Me.pnlDatos.ColumnCount = 4
         Me.pnlDatos.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
         Me.pnlDatos.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 32.92683!))
@@ -523,25 +526,33 @@ Partial Class frmFuncionarioEstadoTransitorio
         '
         'FlowLayoutPanel1
         '
-        Me.FlowLayoutPanel1.Anchor = System.Windows.Forms.AnchorStyles.Left
-        Me.FlowLayoutPanel1.AutoSize = True
+        Me.FlowLayoutPanel1.AutoScroll = True
+        Me.FlowLayoutPanel1.AutoSize = False
+        Me.FlowLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
         Me.FlowLayoutPanel1.Controls.Add(Me.dtpFechaHasta)
         Me.FlowLayoutPanel1.Controls.Add(Me.chkFechaHasta)
+        Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.FlowLayoutPanel1.Location = New System.Drawing.Point(131, 81)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
-        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(285, 34)
+        Me.FlowLayoutPanel1.Padding = New System.Windows.Forms.Padding(0, 2, 0, 0)
+        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(295, 34)
         Me.FlowLayoutPanel1.TabIndex = 2
+        Me.FlowLayoutPanel1.WrapContents = False
         '
         'FlowLayoutPanel2
         '
-        Me.FlowLayoutPanel2.Anchor = System.Windows.Forms.AnchorStyles.Left
-        Me.FlowLayoutPanel2.AutoSize = True
+        Me.FlowLayoutPanel2.AutoScroll = True
+        Me.FlowLayoutPanel2.AutoSize = False
+        Me.FlowLayoutPanel2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
         Me.FlowLayoutPanel2.Controls.Add(Me.dtpFechaResolucion)
         Me.FlowLayoutPanel2.Controls.Add(Me.chkSinFechaResolucion)
+        Me.FlowLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill
         Me.FlowLayoutPanel2.Location = New System.Drawing.Point(539, 41)
         Me.FlowLayoutPanel2.Name = "FlowLayoutPanel2"
-        Me.FlowLayoutPanel2.Size = New System.Drawing.Size(257, 34)
+        Me.FlowLayoutPanel2.Padding = New System.Windows.Forms.Padding(0, 2, 0, 0)
+        Me.FlowLayoutPanel2.Size = New System.Drawing.Size(599, 34)
         Me.FlowLayoutPanel2.TabIndex = 2
+        Me.FlowLayoutPanel2.WrapContents = False
         '
         'lblAsignadoPor
         '
@@ -583,6 +594,8 @@ Partial Class frmFuncionarioEstadoTransitorio
         '
         Me.pnlAcciones.Anchor = System.Windows.Forms.AnchorStyles.Right
         Me.pnlAcciones.AutoSize = True
+        Me.pnlAcciones.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+        Me.pnlAcciones.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
         Me.pnlAcciones.Controls.Add(Me.btnGuardar)
         Me.pnlAcciones.Controls.Add(Me.btnCancelar)
         Me.pnlAcciones.Location = New System.Drawing.Point(914, 641)
