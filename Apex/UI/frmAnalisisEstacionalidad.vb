@@ -23,7 +23,7 @@ Public Class frmAnalisisEstacionalidad
         Dim anios = _licenciaService.GetAvailableYears()
         chkAnios.DataSource = anios
         For i As Integer = 0 To chkAnios.Items.Count - 1
-            chkAnios.SetItemChecked(i, True)
+            chkAnios.SetItemChecked(i, False)
         Next
     End Sub
 

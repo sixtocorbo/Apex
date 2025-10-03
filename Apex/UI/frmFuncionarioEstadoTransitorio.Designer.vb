@@ -130,7 +130,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         '
         Me.dtpFechaHasta.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.dtpFechaHasta.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.dtpFechaHasta.Location = New System.Drawing.Point(0, 3)
+        Me.dtpFechaHasta.Location = New System.Drawing.Point(0, 6)
         Me.dtpFechaHasta.Margin = New System.Windows.Forms.Padding(0, 3, 4, 3)
         Me.dtpFechaHasta.Name = "dtpFechaHasta"
         Me.dtpFechaHasta.Size = New System.Drawing.Size(153, 26)
@@ -149,9 +149,9 @@ Partial Class frmFuncionarioEstadoTransitorio
         '
         'chkFechaHasta
         '
-        Me.chkFechaHasta.AutoSize = True
         Me.chkFechaHasta.Anchor = System.Windows.Forms.AnchorStyles.Left
-        Me.chkFechaHasta.Location = New System.Drawing.Point(164, 5)
+        Me.chkFechaHasta.AutoSize = True
+        Me.chkFechaHasta.Location = New System.Drawing.Point(157, 7)
         Me.chkFechaHasta.Margin = New System.Windows.Forms.Padding(0, 5, 4, 5)
         Me.chkFechaHasta.Name = "chkFechaHasta"
         Me.chkFechaHasta.Size = New System.Drawing.Size(121, 24)
@@ -170,7 +170,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         Me.txtObservaciones.Name = "txtObservaciones"
         Me.pnlDatos.SetRowSpan(Me.txtObservaciones, 2)
         Me.txtObservaciones.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.txtObservaciones.Size = New System.Drawing.Size(1005, 64)
+        Me.txtObservaciones.Size = New System.Drawing.Size(1005, 61)
         Me.txtObservaciones.TabIndex = 4
         '
         'Label4
@@ -187,7 +187,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         '
         Me.lblResolucion.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.lblResolucion.AutoSize = True
-        Me.lblResolucion.Location = New System.Drawing.Point(429, 200)
+        Me.lblResolucion.Location = New System.Drawing.Point(429, 197)
         Me.lblResolucion.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblResolucion.Name = "lblResolucion"
         Me.lblResolucion.Size = New System.Drawing.Size(92, 20)
@@ -198,7 +198,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         '
         Me.txtResolucion.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtResolucion.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.txtResolucion.Location = New System.Drawing.Point(540, 197)
+        Me.txtResolucion.Location = New System.Drawing.Point(540, 194)
         Me.txtResolucion.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtResolucion.Name = "txtResolucion"
         Me.txtResolucion.Size = New System.Drawing.Size(597, 26)
@@ -229,7 +229,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         '
         Me.lblTurnoReten.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.lblTurnoReten.AutoSize = True
-        Me.lblTurnoReten.Location = New System.Drawing.Point(4, 200)
+        Me.lblTurnoReten.Location = New System.Drawing.Point(4, 197)
         Me.lblTurnoReten.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblTurnoReten.Name = "lblTurnoReten"
         Me.lblTurnoReten.Size = New System.Drawing.Size(54, 20)
@@ -239,7 +239,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         'txtTurnoReten
         '
         Me.txtTurnoReten.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.txtTurnoReten.Location = New System.Drawing.Point(132, 197)
+        Me.txtTurnoReten.Location = New System.Drawing.Point(132, 194)
         Me.txtTurnoReten.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtTurnoReten.Name = "txtTurnoReten"
         Me.txtTurnoReten.Size = New System.Drawing.Size(289, 26)
@@ -249,11 +249,11 @@ Partial Class frmFuncionarioEstadoTransitorio
         '
         Me.GroupBox1.Controls.Add(Me.SplitContainer1)
         Me.GroupBox1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.GroupBox1.Location = New System.Drawing.Point(4, 305)
+        Me.GroupBox1.Location = New System.Drawing.Point(4, 302)
         Me.GroupBox1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.GroupBox1.Size = New System.Drawing.Size(1139, 328)
+        Me.GroupBox1.Size = New System.Drawing.Size(1139, 331)
         Me.GroupBox1.TabIndex = 1
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Archivos Adjuntos"
@@ -264,18 +264,18 @@ Partial Class frmFuncionarioEstadoTransitorio
         Me.SplitContainer1.Location = New System.Drawing.Point(4, 24)
         Me.SplitContainer1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.SplitContainer1.Name = "SplitContainer1"
-        Me.SplitContainer1.Panel1MinSize = 220
-        Me.SplitContainer1.Panel2MinSize = 220
         '
         'SplitContainer1.Panel1
         '
         Me.SplitContainer1.Panel1.Controls.Add(Me.dgvAdjuntos)
         Me.SplitContainer1.Panel1.Controls.Add(Me.pnlAdjuntosAcciones)
+        Me.SplitContainer1.Panel1MinSize = 220
         '
         'SplitContainer1.Panel2
         '
         Me.SplitContainer1.Panel2.Controls.Add(Me.pnlPreview)
-        Me.SplitContainer1.Size = New System.Drawing.Size(1131, 299)
+        Me.SplitContainer1.Panel2MinSize = 220
+        Me.SplitContainer1.Size = New System.Drawing.Size(1131, 302)
         Me.SplitContainer1.SplitterDistance = 539
         Me.SplitContainer1.SplitterWidth = 6
         Me.SplitContainer1.TabIndex = 0
@@ -295,7 +295,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         Me.dgvAdjuntos.ReadOnly = True
         Me.dgvAdjuntos.RowHeadersWidth = 62
         Me.dgvAdjuntos.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgvAdjuntos.Size = New System.Drawing.Size(539, 254)
+        Me.dgvAdjuntos.Size = New System.Drawing.Size(539, 257)
         Me.dgvAdjuntos.TabIndex = 0
         '
         'pnlAdjuntosAcciones
@@ -305,7 +305,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         Me.pnlAdjuntosAcciones.Controls.Add(Me.btnVerAdjunto)
         Me.pnlAdjuntosAcciones.Controls.Add(Me.btnEliminarAdjunto)
         Me.pnlAdjuntosAcciones.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.pnlAdjuntosAcciones.Location = New System.Drawing.Point(0, 254)
+        Me.pnlAdjuntosAcciones.Location = New System.Drawing.Point(0, 257)
         Me.pnlAdjuntosAcciones.Name = "pnlAdjuntosAcciones"
         Me.pnlAdjuntosAcciones.Size = New System.Drawing.Size(539, 45)
         Me.pnlAdjuntosAcciones.TabIndex = 4
@@ -348,7 +348,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         Me.pnlPreview.Dock = System.Windows.Forms.DockStyle.Fill
         Me.pnlPreview.Location = New System.Drawing.Point(0, 0)
         Me.pnlPreview.Name = "pnlPreview"
-        Me.pnlPreview.Size = New System.Drawing.Size(586, 299)
+        Me.pnlPreview.Size = New System.Drawing.Size(586, 302)
         Me.pnlPreview.TabIndex = 3
         '
         'lblPreviewNotAvailable
@@ -358,7 +358,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         Me.lblPreviewNotAvailable.Location = New System.Drawing.Point(0, 0)
         Me.lblPreviewNotAvailable.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblPreviewNotAvailable.Name = "lblPreviewNotAvailable"
-        Me.lblPreviewNotAvailable.Size = New System.Drawing.Size(586, 299)
+        Me.lblPreviewNotAvailable.Size = New System.Drawing.Size(586, 302)
         Me.lblPreviewNotAvailable.TabIndex = 2
         Me.lblPreviewNotAvailable.Text = "Seleccione un archivo para previsualizar"
         Me.lblPreviewNotAvailable.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
@@ -370,7 +370,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         Me.wbPreview.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.wbPreview.MinimumSize = New System.Drawing.Size(30, 31)
         Me.wbPreview.Name = "wbPreview"
-        Me.wbPreview.Size = New System.Drawing.Size(586, 299)
+        Me.wbPreview.Size = New System.Drawing.Size(586, 302)
         Me.wbPreview.TabIndex = 1
         Me.wbPreview.Visible = False
         '
@@ -380,7 +380,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         Me.pbPreview.Location = New System.Drawing.Point(0, 0)
         Me.pbPreview.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.pbPreview.Name = "pbPreview"
-        Me.pbPreview.Size = New System.Drawing.Size(586, 299)
+        Me.pbPreview.Size = New System.Drawing.Size(586, 302)
         Me.pbPreview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
         Me.pbPreview.TabIndex = 0
         Me.pbPreview.TabStop = False
@@ -390,7 +390,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         '
         Me.lblCargoAnterior.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.lblCargoAnterior.AutoSize = True
-        Me.lblCargoAnterior.Location = New System.Drawing.Point(3, 267)
+        Me.lblCargoAnterior.Location = New System.Drawing.Point(3, 264)
         Me.lblCargoAnterior.Name = "lblCargoAnterior"
         Me.lblCargoAnterior.Size = New System.Drawing.Size(116, 20)
         Me.lblCargoAnterior.TabIndex = 18
@@ -401,7 +401,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         Me.cboCargoAnterior.Dock = System.Windows.Forms.DockStyle.Fill
         Me.cboCargoAnterior.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboCargoAnterior.FormattingEnabled = True
-        Me.cboCargoAnterior.Location = New System.Drawing.Point(131, 263)
+        Me.cboCargoAnterior.Location = New System.Drawing.Point(131, 260)
         Me.cboCargoAnterior.Name = "cboCargoAnterior"
         Me.cboCargoAnterior.Size = New System.Drawing.Size(291, 28)
         Me.cboCargoAnterior.TabIndex = 7
@@ -410,7 +410,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         '
         Me.lblCargoNuevo.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.lblCargoNuevo.AutoSize = True
-        Me.lblCargoNuevo.Location = New System.Drawing.Point(428, 267)
+        Me.lblCargoNuevo.Location = New System.Drawing.Point(428, 264)
         Me.lblCargoNuevo.Name = "lblCargoNuevo"
         Me.lblCargoNuevo.Size = New System.Drawing.Size(105, 20)
         Me.lblCargoNuevo.TabIndex = 20
@@ -421,7 +421,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         Me.cboCargoNuevo.Dock = System.Windows.Forms.DockStyle.Fill
         Me.cboCargoNuevo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboCargoNuevo.FormattingEnabled = True
-        Me.cboCargoNuevo.Location = New System.Drawing.Point(539, 263)
+        Me.cboCargoNuevo.Location = New System.Drawing.Point(539, 260)
         Me.cboCargoNuevo.Name = "cboCargoNuevo"
         Me.cboCargoNuevo.Size = New System.Drawing.Size(599, 28)
         Me.cboCargoNuevo.TabIndex = 8
@@ -441,7 +441,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         '
         Me.dtpFechaResolucion.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.dtpFechaResolucion.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.dtpFechaResolucion.Location = New System.Drawing.Point(0, 3)
+        Me.dtpFechaResolucion.Location = New System.Drawing.Point(0, 6)
         Me.dtpFechaResolucion.Margin = New System.Windows.Forms.Padding(0, 3, 4, 3)
         Me.dtpFechaResolucion.Name = "dtpFechaResolucion"
         Me.dtpFechaResolucion.Size = New System.Drawing.Size(139, 26)
@@ -449,9 +449,9 @@ Partial Class frmFuncionarioEstadoTransitorio
         '
         'chkSinFechaResolucion
         '
-        Me.chkSinFechaResolucion.AutoSize = True
         Me.chkSinFechaResolucion.Anchor = System.Windows.Forms.AnchorStyles.Left
-        Me.chkSinFechaResolucion.Location = New System.Drawing.Point(148, 5)
+        Me.chkSinFechaResolucion.AutoSize = True
+        Me.chkSinFechaResolucion.Location = New System.Drawing.Point(143, 7)
         Me.chkSinFechaResolucion.Margin = New System.Windows.Forms.Padding(0, 5, 4, 5)
         Me.chkSinFechaResolucion.Name = "chkSinFechaResolucion"
         Me.chkSinFechaResolucion.Size = New System.Drawing.Size(107, 24)
@@ -521,13 +521,12 @@ Partial Class frmFuncionarioEstadoTransitorio
         Me.pnlDatos.RowStyles.Add(New System.Windows.Forms.RowStyle())
         Me.pnlDatos.RowStyles.Add(New System.Windows.Forms.RowStyle())
         Me.pnlDatos.RowStyles.Add(New System.Windows.Forms.RowStyle())
-        Me.pnlDatos.Size = New System.Drawing.Size(1141, 294)
+        Me.pnlDatos.Size = New System.Drawing.Size(1141, 291)
         Me.pnlDatos.TabIndex = 0
         '
         'FlowLayoutPanel1
         '
         Me.FlowLayoutPanel1.AutoScroll = True
-        Me.FlowLayoutPanel1.AutoSize = False
         Me.FlowLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
         Me.FlowLayoutPanel1.Controls.Add(Me.dtpFechaHasta)
         Me.FlowLayoutPanel1.Controls.Add(Me.chkFechaHasta)
@@ -535,14 +534,13 @@ Partial Class frmFuncionarioEstadoTransitorio
         Me.FlowLayoutPanel1.Location = New System.Drawing.Point(131, 81)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
         Me.FlowLayoutPanel1.Padding = New System.Windows.Forms.Padding(0, 2, 0, 0)
-        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(295, 34)
+        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(291, 34)
         Me.FlowLayoutPanel1.TabIndex = 2
         Me.FlowLayoutPanel1.WrapContents = False
         '
         'FlowLayoutPanel2
         '
         Me.FlowLayoutPanel2.AutoScroll = True
-        Me.FlowLayoutPanel2.AutoSize = False
         Me.FlowLayoutPanel2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
         Me.FlowLayoutPanel2.Controls.Add(Me.dtpFechaResolucion)
         Me.FlowLayoutPanel2.Controls.Add(Me.chkSinFechaResolucion)
@@ -558,7 +556,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         '
         Me.lblAsignadoPor.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.lblAsignadoPor.AutoSize = True
-        Me.lblAsignadoPor.Location = New System.Drawing.Point(3, 234)
+        Me.lblAsignadoPor.Location = New System.Drawing.Point(3, 231)
         Me.lblAsignadoPor.Name = "lblAsignadoPor"
         Me.lblAsignadoPor.Size = New System.Drawing.Size(108, 20)
         Me.lblAsignadoPor.TabIndex = 25
@@ -567,7 +565,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         'txtAsignadoPor
         '
         Me.txtAsignadoPor.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.txtAsignadoPor.Location = New System.Drawing.Point(131, 231)
+        Me.txtAsignadoPor.Location = New System.Drawing.Point(131, 228)
         Me.txtAsignadoPor.Name = "txtAsignadoPor"
         Me.txtAsignadoPor.Size = New System.Drawing.Size(291, 26)
         Me.txtAsignadoPor.TabIndex = 6
@@ -576,7 +574,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         '
         Me.lblTipoSancion.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.lblTipoSancion.AutoSize = True
-        Me.lblTipoSancion.Location = New System.Drawing.Point(428, 234)
+        Me.lblTipoSancion.Location = New System.Drawing.Point(428, 231)
         Me.lblTipoSancion.Name = "lblTipoSancion"
         Me.lblTipoSancion.Size = New System.Drawing.Size(105, 20)
         Me.lblTipoSancion.TabIndex = 27
@@ -585,7 +583,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         'txtTipoSancion
         '
         Me.txtTipoSancion.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.txtTipoSancion.Location = New System.Drawing.Point(539, 231)
+        Me.txtTipoSancion.Location = New System.Drawing.Point(539, 228)
         Me.txtTipoSancion.Name = "txtTipoSancion"
         Me.txtTipoSancion.Size = New System.Drawing.Size(599, 26)
         Me.txtTipoSancion.TabIndex = 28
@@ -595,9 +593,9 @@ Partial Class frmFuncionarioEstadoTransitorio
         Me.pnlAcciones.Anchor = System.Windows.Forms.AnchorStyles.Right
         Me.pnlAcciones.AutoSize = True
         Me.pnlAcciones.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-        Me.pnlAcciones.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
         Me.pnlAcciones.Controls.Add(Me.btnGuardar)
         Me.pnlAcciones.Controls.Add(Me.btnCancelar)
+        Me.pnlAcciones.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
         Me.pnlAcciones.Location = New System.Drawing.Point(914, 641)
         Me.pnlAcciones.Name = "pnlAcciones"
         Me.pnlAcciones.Size = New System.Drawing.Size(230, 45)
@@ -605,7 +603,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         '
         'btnGuardar
         '
-        Me.btnGuardar.Location = New System.Drawing.Point(4, 5)
+        Me.btnGuardar.Location = New System.Drawing.Point(114, 5)
         Me.btnGuardar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnGuardar.Name = "btnGuardar"
         Me.btnGuardar.Size = New System.Drawing.Size(112, 35)
@@ -616,7 +614,7 @@ Partial Class frmFuncionarioEstadoTransitorio
         'btnCancelar
         '
         Me.btnCancelar.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancelar.Location = New System.Drawing.Point(124, 5)
+        Me.btnCancelar.Location = New System.Drawing.Point(4, 5)
         Me.btnCancelar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnCancelar.Name = "btnCancelar"
         Me.btnCancelar.Size = New System.Drawing.Size(102, 35)
