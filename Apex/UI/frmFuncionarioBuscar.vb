@@ -5,6 +5,7 @@ Imports System.IO
 Imports System.Linq
 Imports System.Text
 Imports System.Threading
+Imports System.Windows.Forms
 
 Public Class frmFuncionarioBuscar
     Inherits FormActualizable
@@ -36,6 +37,7 @@ Public Class frmFuncionarioBuscar
     Private _estaBuscando As Boolean = False
     Private _resultadosBusqueda As New List(Of FuncionarioMin)()
     Private _cargoSeleccionado As String = Nothing
+    Private _cargoResaltado As String = Nothing
     Private _suspendCargoEvents As Boolean = False
     ' --- FIN DE CAMBIOS ---
 
@@ -87,6 +89,7 @@ Public Class frmFuncionarioBuscar
         ConfigurarGrilla()
 
         lstCargos.DisplayMember = "DisplayText"
+        lstCargos.DrawMode = DrawMode.OwnerDrawFixed
         lstCargos.Enabled = False
 
         ' --- INICIO DE CAMBIOS: Configuración de la nueva búsqueda ---
@@ -740,7 +743,53 @@ Public Class frmFuncionarioBuscar
             lstCargos.EndUpdate()
             _suspendCargoEvents = False
             AjustarAnchoListaCargos()
+            lstCargos.Invalidate()
         End Try
+    End Sub
+
+    Private Sub ActualizarResaltadoCargo(cargoNormalizado As String)
+        Dim nuevoValor = If(String.IsNullOrWhiteSpace(cargoNormalizado), Nothing, cargoNormalizado)
+
+        Dim haCambiado As Boolean
+
+        If nuevoValor Is Nothing Then
+            haCambiado = _cargoResaltado IsNot Nothing
+        Else
+            haCambiado = Not String.Equals(_cargoResaltado, nuevoValor, StringComparison.OrdinalIgnoreCase)
+        End If
+
+        If haCambiado Then
+            _cargoResaltado = nuevoValor
+            lstCargos.Invalidate()
+        End If
+    End Sub
+
+    Private Sub lstCargos_DrawItem(sender As Object, e As DrawItemEventArgs) Handles lstCargos.DrawItem
+        e.DrawBackground()
+
+        If e.Index < 0 OrElse e.Index >= lstCargos.Items.Count Then
+            e.DrawFocusRectangle()
+            Return
+        End If
+
+        Dim item = TryCast(lstCargos.Items(e.Index), CargoItem)
+        If item IsNot Nothing Then
+            Dim estaSeleccionado = (e.State And DrawItemState.Selected) = DrawItemState.Selected
+            Dim colorTexto = If(estaSeleccionado, SystemColors.HighlightText, SystemColors.ControlText)
+
+            If Not item.EsTodos AndAlso Not String.IsNullOrEmpty(_cargoResaltado) AndAlso
+                item.Nombre.Equals(_cargoResaltado, StringComparison.OrdinalIgnoreCase) Then
+
+                If Not estaSeleccionado Then
+                    colorTexto = Color.DarkGreen
+                End If
+            End If
+
+            TextRenderer.DrawText(e.Graphics, item.DisplayText, e.Font, e.Bounds, colorTexto,
+                                  TextFormatFlags.Left Or TextFormatFlags.VerticalCenter)
+        End If
+
+        e.DrawFocusRectangle()
     End Sub
 
     Private Shared Function NormalizarCargo(nombre As String) As String
@@ -825,6 +874,17 @@ Public Class frmFuncionarioBuscar
 
 #Region "Detalle lateral (Foto on-demand)"
     Private Async Sub MostrarDetalle(sender As Object, e As EventArgs)
+        Dim cargoActual As String = Nothing
+
+        If dgvFuncionarios.CurrentRow IsNot Nothing AndAlso dgvFuncionarios.CurrentRow.DataBoundItem IsNot Nothing Then
+            Dim funcionarioActual = TryCast(dgvFuncionarios.CurrentRow.DataBoundItem, FuncionarioMin)
+            If funcionarioActual IsNot Nothing Then
+                cargoActual = NormalizarCargo(funcionarioActual.CargoNombre)
+            End If
+        End If
+
+        ActualizarResaltadoCargo(cargoActual)
+
         If dgvFuncionarios.CurrentRow Is Nothing OrElse dgvFuncionarios.CurrentRow.DataBoundItem Is Nothing Then
             LimpiarDetalle()
             Return
@@ -1256,6 +1316,8 @@ Public Class frmFuncionarioBuscar
         btnNovedades.Visible = False
         btnNotificar.Visible = False
         panelDetalle.Visible = False
+
+        ActualizarResaltadoCargo(Nothing)
     End Sub
 
     'Private Sub lblEstadoTransitorio_DoubleClick(sender As Object, e As EventArgs)
