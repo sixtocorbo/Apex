@@ -910,11 +910,16 @@ Public Class frmFuncionarioBuscar
             Dim escalafonNombre = If(f.Escalafon IsNot Nothing, f.Escalafon.Nombre, "-")
             Dim subEscalafonNombre = If(f.SubEscalafon IsNot Nothing, f.SubEscalafon.Nombre, "-")
             Dim cargoNombre = If(f.Cargo IsNot Nothing, f.Cargo.Nombre, "-")
-            lblCargo.Text = $"Escalafon: {escalafonNombre}   SubEscalafón: {subEscalafonNombre}   Jerarquía: {cargoNombre}"
+            lblEscalafonValor.Text = escalafonNombre
+            lblSubEscalafonValor.Text = subEscalafonNombre
+            lblJerarquiaValor.Text = cargoNombre
             lblTipo.Text = "Tipo: " & f.TipoFuncionario.Nombre
             lblFechaIngreso.Text = "Fecha Ingreso: " & f.FechaIngreso.ToShortDateString()
-            lblHorarioCompleto.Text = $"Horario: {If(f.Semana IsNot Nothing, f.Semana.Nombre, "-")}   {If(f.Turno IsNot Nothing, f.Turno.Nombre, "-")}   {If(f.Horario IsNot Nothing, f.Horario.Nombre, "-")}"
-            lblUbicacion.Text = $"Ubicación: Unidad: {If(f.Seccion IsNot Nothing, f.Seccion.Nombre, "-")}   Puesto: {If(f.PuestoTrabajo IsNot Nothing, f.PuestoTrabajo.Nombre, "-")}"
+            lblSemanaValor.Text = If(f.Semana IsNot Nothing, f.Semana.Nombre, "-")
+            lblTurnoValor.Text = If(f.Turno IsNot Nothing, f.Turno.Nombre, "-")
+            lblPlantillaValor.Text = If(f.Horario IsNot Nothing, f.Horario.Nombre, "-")
+            lblUnidadValor.Text = If(f.Seccion IsNot Nothing, f.Seccion.Nombre, "-")
+            lblPuestoValor.Text = If(f.PuestoTrabajo IsNot Nothing, f.PuestoTrabajo.Nombre, "-")
             lblSubDireccion.Text = "SubDireccion: " & If(f.SubDireccion IsNot Nothing, f.SubDireccion.Nombre, "-")
 
             ' El estado ya estaba correcto, lo mantenemos igual
@@ -1222,14 +1227,19 @@ Public Class frmFuncionarioBuscar
     Private Sub LimpiarDetalle()
         lblCI.Text = "CI: -"
         lblNombreCompleto.Text = "Seleccione un funcionario"
-        lblCargo.Text = "Escalafon / SubEscalafon / Cargo: - / - / -"
+        lblEscalafonValor.Text = "-"
+        lblSubEscalafonValor.Text = "-"
+        lblJerarquiaValor.Text = "-"
         lblTipo.Text = "Tipo: -"
         lblFechaIngreso.Text = "Fecha Ingreso: -"
         lblEstadoActividad.Text = "Estado: -"
         lblPresencia.Text = ""
         pbFotoDetalle.Image = Nothing
-        lblHorarioCompleto.Text = "Horario: -"
-        lblUbicacion.Text = "Ubicación: Seccion / Puesto de Trabajo"
+        lblSemanaValor.Text = "-"
+        lblTurnoValor.Text = "-"
+        lblPlantillaValor.Text = "-"
+        lblUnidadValor.Text = "-"
+        lblPuestoValor.Text = "-"
         lblSubDireccion.Text = "SubDireccion: -"
         _detallesEstadoActual.Clear()
 
@@ -1507,10 +1517,15 @@ Public Class frmFuncionarioBuscar
         Dim anchoDisponible As Integer = Math.Max(120, flpDetalles.ClientSize.Width - margen)
         For Each lbl As Label In New Label() {
             lblNombreCompleto, lblCI, lblTipo, lblFechaIngreso,
-            lblHorarioCompleto, lblCargo, lblPresencia, lblEstadoActividad
+            lblSemanaValor, lblTurnoValor, lblPlantillaValor,
+            lblUnidadValor, lblPuestoValor, lblPresencia, lblEstadoActividad
         }
             lbl.MaximumSize = New Size(anchoDisponible, 0) ' 0 = altura auto
             lbl.AutoEllipsis = True
+        Next
+
+        For Each panel In New FlowLayoutPanel() {flpHorarioDetalle, flpUbicacionDetalle, flpCargoDetalle}
+            panel.MaximumSize = New Size(anchoDisponible, 0)
         Next
 
         Dim preferido = lblNombreCompleto.GetPreferredSize(New Size(anchoDisponible, 0))
