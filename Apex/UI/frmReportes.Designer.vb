@@ -22,7 +22,6 @@ Partial Class frmReportes
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Me.btnAnalisisFuncionarios = New System.Windows.Forms.Button()
         Me.btnAnalisisEstacional = New System.Windows.Forms.Button()
         Me.btnFuncionariosGenero = New System.Windows.Forms.Button()
         Me.btnFuncionariosEdad = New System.Windows.Forms.Button()
@@ -34,16 +33,6 @@ Partial Class frmReportes
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
         Me.FlowLayoutPanel1.SuspendLayout()
         Me.SuspendLayout()
-        '
-        'btnAnalisisFuncionarios
-        '
-        Me.btnAnalisisFuncionarios.Location = New System.Drawing.Point(4, 50)
-        Me.btnAnalisisFuncionarios.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnAnalisisFuncionarios.Name = "btnAnalisisFuncionarios"
-        Me.btnAnalisisFuncionarios.Size = New System.Drawing.Size(330, 35)
-        Me.btnAnalisisFuncionarios.TabIndex = 2
-        Me.btnAnalisisFuncionarios.Text = "👥 Análisis de Personal"
-        Me.btnAnalisisFuncionarios.UseVisualStyleBackColor = True
         '
         'btnAnalisisEstacional
         '
@@ -57,7 +46,7 @@ Partial Class frmReportes
         '
         'btnFuncionariosGenero
         '
-        Me.btnFuncionariosGenero.Location = New System.Drawing.Point(4, 95)
+        Me.btnFuncionariosGenero.Location = New System.Drawing.Point(4, 50)
         Me.btnFuncionariosGenero.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnFuncionariosGenero.Name = "btnFuncionariosGenero"
         Me.btnFuncionariosGenero.Size = New System.Drawing.Size(330, 35)
@@ -67,7 +56,7 @@ Partial Class frmReportes
         '
         'btnFuncionariosEdad
         '
-        Me.btnFuncionariosEdad.Location = New System.Drawing.Point(4, 140)
+        Me.btnFuncionariosEdad.Location = New System.Drawing.Point(4, 95)
         Me.btnFuncionariosEdad.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnFuncionariosEdad.Name = "btnFuncionariosEdad"
         Me.btnFuncionariosEdad.Size = New System.Drawing.Size(330, 35)
@@ -77,7 +66,7 @@ Partial Class frmReportes
         '
         'btnFuncionariosArea
         '
-        Me.btnFuncionariosArea.Location = New System.Drawing.Point(4, 185)
+        Me.btnFuncionariosArea.Location = New System.Drawing.Point(4, 140)
         Me.btnFuncionariosArea.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnFuncionariosArea.Name = "btnFuncionariosArea"
         Me.btnFuncionariosArea.Size = New System.Drawing.Size(330, 35)
@@ -87,7 +76,7 @@ Partial Class frmReportes
         '
         'btnFuncionariosCargo
         '
-        Me.btnFuncionariosCargo.Location = New System.Drawing.Point(4, 230)
+        Me.btnFuncionariosCargo.Location = New System.Drawing.Point(4, 185)
         Me.btnFuncionariosCargo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnFuncionariosCargo.Name = "btnFuncionariosCargo"
         Me.btnFuncionariosCargo.Size = New System.Drawing.Size(330, 35)
@@ -97,7 +86,7 @@ Partial Class frmReportes
         '
         'btnLicenciasPorTipo
         '
-        Me.btnLicenciasPorTipo.Location = New System.Drawing.Point(4, 275)
+        Me.btnLicenciasPorTipo.Location = New System.Drawing.Point(4, 230)
         Me.btnLicenciasPorTipo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnLicenciasPorTipo.Name = "btnLicenciasPorTipo"
         Me.btnLicenciasPorTipo.Size = New System.Drawing.Size(330, 35)
@@ -107,7 +96,7 @@ Partial Class frmReportes
         '
         'btnLicenciasPorEstado
         '
-        Me.btnLicenciasPorEstado.Location = New System.Drawing.Point(4, 320)
+        Me.btnLicenciasPorEstado.Location = New System.Drawing.Point(4, 275)
         Me.btnLicenciasPorEstado.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnLicenciasPorEstado.Name = "btnLicenciasPorEstado"
         Me.btnLicenciasPorEstado.Size = New System.Drawing.Size(330, 35)
@@ -117,7 +106,7 @@ Partial Class frmReportes
         '
         'btnLicenciasTopFuncionarios
         '
-        Me.btnLicenciasTopFuncionarios.Location = New System.Drawing.Point(4, 365)
+        Me.btnLicenciasTopFuncionarios.Location = New System.Drawing.Point(4, 320)
         Me.btnLicenciasTopFuncionarios.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnLicenciasTopFuncionarios.Name = "btnLicenciasTopFuncionarios"
         Me.btnLicenciasTopFuncionarios.Size = New System.Drawing.Size(330, 35)
@@ -129,7 +118,6 @@ Partial Class frmReportes
         '
         Me.FlowLayoutPanel1.AutoScroll = True
         Me.FlowLayoutPanel1.Controls.Add(Me.btnAnalisisEstacional)
-        Me.FlowLayoutPanel1.Controls.Add(Me.btnAnalisisFuncionarios)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnFuncionariosGenero)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnFuncionariosEdad)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnFuncionariosArea)
@@ -161,7 +149,6 @@ Partial Class frmReportes
         Me.ResumeLayout(False)
 
     End Sub
-    Friend WithEvents btnAnalisisFuncionarios As Button
     Friend WithEvents btnAnalisisEstacional As Button
     Friend WithEvents btnFuncionariosGenero As Button
     Friend WithEvents btnFuncionariosEdad As Button

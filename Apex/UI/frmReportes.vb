@@ -5,10 +5,6 @@ Public Class frmReportes
         AbrirFormularioReporte(Of frmAnalisisEstacionalidad)()
     End Sub
 
-    Private Sub btnAnalisisFuncionarios_Click(sender As Object, e As EventArgs) Handles btnAnalisisFuncionarios.Click
-        AbrirFormularioReporte(Of frmAnalisisFuncionarios)()
-    End Sub
-
     Private Sub btnFuncionariosGenero_Click(sender As Object, e As EventArgs) Handles btnFuncionariosGenero.Click
         AbrirFormularioReporte(Of frmReporteFuncionariosGenero)()
     End Sub
@@ -54,7 +50,6 @@ Public Class frmReportes
 
         Dim botones() As Button = {
             btnAnalisisEstacional,
-            btnAnalisisFuncionarios,
             btnFuncionariosGenero,
             btnFuncionariosEdad,
             btnFuncionariosArea,
