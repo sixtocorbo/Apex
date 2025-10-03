@@ -168,7 +168,7 @@ Public Class LicenciaService
                                                     Optional fechaFin As Date? = Nothing) As List(Of EstadisticaItem)
         Using context As New ApexEntities()
             Dim query = context.HistoricoLicencia.AsNoTracking().
-                Where(Function(l) l.FuncionarioId.HasValue)
+                Where(Function(l) l.FuncionarioId > 0)
 
             query = AplicarFiltroFechas(query, fechaInicio, fechaFin)
 
@@ -177,7 +177,7 @@ Public Class LicenciaService
             Return query.
                 GroupBy(Function(l) New With {
                              Key .Id = l.FuncionarioId,
-                             Key .Nombre = l.Funcionario.Nombre
+                             Key .Nombre = If(l.Funcionario IsNot Nothing, l.Funcionario.Nombre, Nothing)
                          }).
                 Select(Function(g) New EstadisticaItem With {
                     .Etiqueta = If(Not String.IsNullOrWhiteSpace(g.Key.Nombre), g.Key.Nombre, $"Funcionario #{g.Key.Id}"),
