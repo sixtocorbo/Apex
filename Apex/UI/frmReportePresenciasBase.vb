@@ -215,6 +215,8 @@ Public MustInherit Class frmReportePresenciasBase
             .AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None
             .BackgroundColor = Color.White
             .BorderStyle = BorderStyle.None
+            .ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize
+            .ColumnHeadersDefaultCellStyle.WrapMode = DataGridViewTriState.[True]
         End With
     End Sub
 
