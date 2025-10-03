@@ -208,6 +208,8 @@ Partial Class frmFusionarFunciones
         '
         'pnlBotones
         '
+        Me.pnlBotones.AutoSize = True
+        Me.pnlBotones.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
         Me.pnlBotones.Controls.Add(Me.btnAceptar)
         Me.pnlBotones.Controls.Add(Me.btnCancelar)
         Me.pnlBotones.Dock = System.Windows.Forms.DockStyle.Fill
@@ -215,7 +217,7 @@ Partial Class frmFusionarFunciones
         Me.pnlBotones.Location = New System.Drawing.Point(3, 489)
         Me.pnlBotones.Name = "pnlBotones"
         Me.pnlBotones.Padding = New System.Windows.Forms.Padding(0, 10, 0, 0)
-        Me.pnlBotones.Size = New System.Drawing.Size(538, 40)
+        Me.pnlBotones.Size = New System.Drawing.Size(538, 46)
         Me.pnlBotones.TabIndex = 6
         '
         'btnAceptar
