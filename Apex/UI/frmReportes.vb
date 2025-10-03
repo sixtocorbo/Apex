@@ -5,6 +5,10 @@ Public Class frmReportes
         AbrirFormularioReporte(Of frmAnalisisEstacionalidad)()
     End Sub
 
+    Private Sub btnResumenCantidades_Click(sender As Object, e As EventArgs) Handles btnResumenCantidades.Click
+        AbrirFormularioReporte(Of frmResumenCantidades)()
+    End Sub
+
     Private Sub btnFuncionariosGenero_Click(sender As Object, e As EventArgs) Handles btnFuncionariosGenero.Click
         AbrirFormularioReporte(Of frmReporteFuncionariosGenero)()
     End Sub
@@ -61,6 +65,7 @@ Public Class frmReportes
         End With
 
         Dim botones() As Button = {
+            btnResumenCantidades,
             btnAnalisisEstacional,
             btnFuncionariosGenero,
             btnFuncionariosEdad,
