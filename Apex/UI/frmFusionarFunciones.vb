@@ -106,6 +106,8 @@ Public Class frmFusionarFunciones
         End If
 
         cboFuncionPrincipal.DataSource = seleccionadas
+        cboFuncionPrincipal.DisplayMember = NameOf(Funcion.Nombre)
+        cboFuncionPrincipal.ValueMember = NameOf(Funcion.Id)
 
         Dim indiceSeleccion = -1
         If destinoActual.HasValue Then
