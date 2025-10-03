@@ -138,7 +138,7 @@ Public MustInherit Class frmReportePresenciasBase
         _dgvGrupos.Columns.Add(New DataGridViewTextBoxColumn() With {
             .DataPropertyName = NameOf(PresenciaAgrupada.Grupo),
             .HeaderText = EtiquetaGrupo,
-            .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
         })
         _dgvGrupos.Columns.Add(New DataGridViewTextBoxColumn() With {
             .DataPropertyName = NameOf(PresenciaAgrupada.Cantidad),
