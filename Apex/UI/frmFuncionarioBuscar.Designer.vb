@@ -109,11 +109,13 @@ Partial Class frmFuncionarioBuscar
         Me.dgvFuncionarios.AllowUserToResizeColumns = False
         Me.dgvFuncionarios.AllowUserToResizeRows = False
         Me.dgvFuncionarios.ColumnHeadersHeight = 34
+        Me.dgvFuncionarios.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing
         Me.dgvFuncionarios.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgvFuncionarios.Location = New System.Drawing.Point(3, 3)
         Me.dgvFuncionarios.Name = "dgvFuncionarios"
         Me.dgvFuncionarios.ReadOnly = True
         Me.dgvFuncionarios.RowHeadersWidth = 62
+        Me.dgvFuncionarios.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing
         Me.dgvFuncionarios.Size = New System.Drawing.Size(431, 574)
         Me.dgvFuncionarios.TabIndex = 1
         '
