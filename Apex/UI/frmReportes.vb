@@ -1,47 +1,40 @@
-﻿Public Class frmReportes
+Imports System.Linq
+
+Public Class frmReportes
     Private Sub btnAnalisisEstacional_Click(sender As Object, e As EventArgs) Handles btnAnalisisEstacional.Click
-        Dim frm As New frmAnalisisEstacionalidad
-        NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
+        AbrirFormularioReporte(Of frmAnalisisEstacionalidad)()
     End Sub
 
     Private Sub btnAnalisisFuncionarios_Click(sender As Object, e As EventArgs) Handles btnAnalisisFuncionarios.Click
-        Dim frm As New frmAnalisisFuncionarios
-        NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
+        AbrirFormularioReporte(Of frmAnalisisFuncionarios)()
     End Sub
 
     Private Sub btnFuncionariosGenero_Click(sender As Object, e As EventArgs) Handles btnFuncionariosGenero.Click
-        Dim frm As New frmReporteFuncionariosGenero
-        NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
+        AbrirFormularioReporte(Of frmReporteFuncionariosGenero)()
     End Sub
 
     Private Sub btnFuncionariosEdad_Click(sender As Object, e As EventArgs) Handles btnFuncionariosEdad.Click
-        Dim frm As New frmReporteFuncionariosEdad
-        NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
+        AbrirFormularioReporte(Of frmReporteFuncionariosEdad)()
     End Sub
 
     Private Sub btnFuncionariosArea_Click(sender As Object, e As EventArgs) Handles btnFuncionariosArea.Click
-        Dim frm As New frmReporteFuncionariosAreaTrabajo
-        NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
+        AbrirFormularioReporte(Of frmReporteFuncionariosAreaTrabajo)()
     End Sub
 
     Private Sub btnFuncionariosCargo_Click(sender As Object, e As EventArgs) Handles btnFuncionariosCargo.Click
-        Dim frm As New frmReporteFuncionariosCargo
-        NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
+        AbrirFormularioReporte(Of frmReporteFuncionariosCargo)()
     End Sub
 
     Private Sub btnLicenciasPorTipo_Click(sender As Object, e As EventArgs) Handles btnLicenciasPorTipo.Click
-        Dim frm As New frmReporteLicenciasPorTipo
-        NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
+        AbrirFormularioReporte(Of frmReporteLicenciasPorTipo)()
     End Sub
 
     Private Sub btnLicenciasPorEstado_Click(sender As Object, e As EventArgs) Handles btnLicenciasPorEstado.Click
-        Dim frm As New frmReporteLicenciasPorEstado
-        NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
+        AbrirFormularioReporte(Of frmReporteLicenciasPorEstado)()
     End Sub
 
     Private Sub btnLicenciasTopFuncionarios_Click(sender As Object, e As EventArgs) Handles btnLicenciasTopFuncionarios.Click
-        Dim frm As New frmReporteTopFuncionariosLicencias
-        NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
+        AbrirFormularioReporte(Of frmReporteTopFuncionariosLicencias)()
     End Sub
 
     Private Sub frmReportes_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -84,6 +77,38 @@
 
         AddHandler FlowLayoutPanel1.Resize, AddressOf AjustarAnchoBotones
         AjustarAnchoBotones(Nothing, EventArgs.Empty)
+    End Sub
+
+    Private Sub AbrirFormularioReporte(Of T As {Form, New})()
+        Dim frm = New T()
+        PrepararFormularioParaEscape(frm)
+        MostrarEnDashboard(frm)
+    End Sub
+
+    Private Sub PrepararFormularioParaEscape(frm As Form)
+        If frm Is Nothing Then Return
+
+        frm.KeyPreview = True
+        AddHandler frm.KeyDown, AddressOf FormularioReporte_KeyDown
+    End Sub
+
+    Private Sub FormularioReporte_KeyDown(sender As Object, e As KeyEventArgs)
+        If e.KeyCode <> Keys.Escape Then Return
+
+        e.Handled = True
+        Dim frm = TryCast(sender, Form)
+        frm?.Close()
+    End Sub
+
+    Private Sub MostrarEnDashboard(frm As Form)
+        If frm Is Nothing Then Return
+
+        Dim dashboard = Application.OpenForms.OfType(Of frmDashboard)().FirstOrDefault()
+        If dashboard IsNot Nothing Then
+            dashboard.AbrirChild(frm)
+        Else
+            frm.Show()
+        End If
     End Sub
 
     Private Sub AjustarAnchoBotones(sender As Object, e As EventArgs)
