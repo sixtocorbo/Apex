@@ -1,16 +1,12 @@
 Imports System.Collections.Generic
 Imports System.Linq
 
-Public Class frmFusionarFunciones
+Partial Public Class frmFusionarFunciones
 
     Private ReadOnly _funciones As List(Of Funcion)
     Private _ultimaSeleccionDestinoId As Integer
     Private _nombreEditadoManual As Boolean
     Private _cambiandoNombreProgramaticamente As Boolean
-
-    Private _funcionesSeleccionadasIds As List(Of Integer)
-    Private _funcionDestinoId As Integer
-    Private _nombreDestino As String
 
     Public Sub New(funciones As IEnumerable(Of Funcion))
         InitializeComponent()
@@ -27,24 +23,6 @@ Public Class frmFusionarFunciones
         cboFuncionPrincipal.DisplayMember = NameOf(Funcion.Nombre)
         cboFuncionPrincipal.ValueMember = NameOf(Funcion.Id)
     End Sub
-
-    Public ReadOnly Property FuncionesSeleccionadasIds As List(Of Integer)
-        Get
-            Return If(_funcionesSeleccionadasIds, New List(Of Integer)())
-        End Get
-    End Property
-
-    Public ReadOnly Property FuncionDestinoId As Integer
-        Get
-            Return _funcionDestinoId
-        End Get
-    End Property
-
-    Public ReadOnly Property NombreDestino As String
-        Get
-            Return _nombreDestino
-        End Get
-    End Property
 
     Private Sub frmFusionarFunciones_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
@@ -148,7 +126,7 @@ Public Class frmFusionarFunciones
         _nombreEditadoManual = True
     End Sub
 
-    Private Sub btnAceptar_Click(sender As Object, e As EventArgs) Handles btnAceptar.Click
+    Private Async Sub btnAceptar_Click(sender As Object, e As EventArgs) Handles btnAceptar.Click
         Dim seleccion = clbFunciones.CheckedItems.Cast(Of Object)().
             Select(Function(o) CType(o, Funcion).Id).
             Distinct().
@@ -177,15 +155,35 @@ Public Class frmFusionarFunciones
             Return
         End If
 
-        _funcionesSeleccionadasIds = seleccion
-        _funcionDestinoId = destino
-        _nombreDestino = nombre
-
-        DialogResult = DialogResult.OK
+        Await FusionarFuncionesAsync(destino, seleccion, nombre)
     End Sub
 
     Private Sub btnCancelar_Click(sender As Object, e As EventArgs) Handles btnCancelar.Click
-        DialogResult = DialogResult.Cancel
+        Close()
     End Sub
+
+    Private Async Function FusionarFuncionesAsync(funcionDestinoId As Integer,
+                                                  funcionesSeleccionadasIds As IList(Of Integer),
+                                                  nombreDestino As String) As Task
+        Cursor = Cursors.WaitCursor
+        btnAceptar.Enabled = False
+        btnCancelar.Enabled = False
+
+        Try
+            Using svc As New FuncionService()
+                Await svc.FusionarFuncionesAsync(funcionDestinoId, funcionesSeleccionadasIds, nombreDestino)
+            End Using
+
+            NotificadorEventos.NotificarCambiosEnFuncionario(funcionDestinoId)
+            Notifier.Success(Me, "Funciones fusionadas correctamente.")
+            Close()
+        Catch ex As Exception
+            Notifier.Error(Me, "No se pudieron fusionar las funciones: " & ex.Message)
+        Finally
+            Cursor = Cursors.Default
+            btnAceptar.Enabled = True
+            btnCancelar.Enabled = True
+        End Try
+    End Function
 
 End Class
