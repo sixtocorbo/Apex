@@ -85,7 +85,7 @@ Public Class frmReporteTopFuncionariosLicencias
         chartArea.AxisX.MajorGrid.LineDashStyle = ChartDashStyle.Dash
         chartArea.AxisY.Interval = 1
         chartArea.AxisY.MajorGrid.Enabled = False
-        chartArea.AxisY.IsLabelAutoFit = False
+        chartArea.AxisY.IsLabelAutoFit = True
         chartArea.AxisY.LabelStyle.Interval = 1
         chartArea.AxisY.LabelStyle.Font = New Font("Segoe UI", 9.0!)
         chartArea.AxisY.LabelStyle.IsEndLabelVisible = True
@@ -157,9 +157,9 @@ Public Class frmReporteTopFuncionariosLicencias
         End If
 
         Dim series As New Series("Funcionarios") With {
-            .ChartType = SeriesChartType.Bar,
-            .IsValueShownAsLabel = True
-        }
+        .ChartType = SeriesChartType.Bar,
+        .IsValueShownAsLabel = True
+    }
 
         Dim chartAreaConfig As ChartArea = chartFuncionarios.ChartAreas(0)
         chartAreaConfig.AxisY.MaximumAutoSize = 100.0R
@@ -178,7 +178,13 @@ Public Class frmReporteTopFuncionariosLicencias
             labelFontSize = 7.0!
         End If
 
-        chartAreaConfig.AxisY.LabelStyle.Font = New Font("Segoe UI", labelFontSize)
+        ' --- FIX ---
+        ' Set the font for the data point labels (the values shown on the bars).
+        series.Font = New Font("Segoe UI", labelFontSize)
+
+        ' The line below was applying the font to the Y-axis labels (the official's name), not the bar value.
+        ' chartAreaConfig.AxisY.LabelStyle.Font = New Font("Segoe UI", labelFontSize)
+        ' -----------
 
         For Each item In datos
             Dim point = New DataPoint()
