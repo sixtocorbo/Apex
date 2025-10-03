@@ -58,12 +58,6 @@ Public Class frmFuncionarioBuscar
         Return 0
     End Function
 
-    ''=============
-    '' Variables para guardar el estado original
-    'Private originalFormSize As Size
-    'Private originalControlBounds As New Dictionary(Of Control, Rectangle)
-    'Private originalFontSizes As New Dictionary(Of Control, Single)
-    ''=============
     Public Sub New()
         InitializeComponent()
         ConfigurarLayoutResponsivoBuscar()
@@ -403,14 +397,6 @@ Public Class frmFuncionarioBuscar
         Await BuscarAsync(tk)
     End Sub
 
-    '''' <summary>
-    '''' Este método se ejecutará automáticamente cuando otro formulario notifique un cambio.
-    '''' </summary>
-    'Private Async Sub OnDatosActualizados(sender As Object, e As EventArgs)
-    '    If Me.IsHandleCreated Then
-    '        Await BuscarAsync()
-    '    End If
-    'End Sub
 
     ' Es una buena práctica desuscribirse para evitar fugas de memoria.
     Private Sub frmFuncionarioBuscar_FormClosed(sender As Object, e As FormClosedEventArgs) Handles Me.FormClosed
@@ -1086,74 +1072,6 @@ Public Class frmFuncionarioBuscar
             .ThenBy(Function(s) s.Tipo) _
             .ToList()
     End Function
-    'Private Shared Async Function ObtenerSituacionesAsync(uow As UnitOfWork, funcionarioId As Integer) As Task(Of List(Of SituacionParaBoton))
-    '    Dim fechaInicio = RangoSituacionInicio
-    '    Dim fechaFin = RangoSituacionFin
-
-    '    Dim situaciones As New List(Of SituacionParaBoton)()
-
-    '    Dim estados = Await uow.Context.Set(Of vw_EstadosTransitoriosCompletos)() _
-    '        .Where(Function(e) e.FuncionarioId = funcionarioId AndAlso
-    '                                e.FechaDesde.HasValue AndAlso
-    '                                e.FechaDesde.Value < fechaFin AndAlso
-    '                                (Not e.FechaHasta.HasValue OrElse e.FechaHasta.Value >= fechaInicio)) _
-    '        .AsNoTracking() _
-    '        .ToListAsync()
-
-    '    situaciones.AddRange(estados.Select(Function(e)
-    '                                            Dim severidad = EstadoVisualHelper.DeterminarSeveridad(e.TipoEstadoNombre)
-    '                                            Return New SituacionParaBoton With {
-    '                                                .Tipo = e.TipoEstadoNombre,
-    '                                                .Desde = e.FechaDesde,
-    '                                                .Hasta = e.FechaHasta,
-    '                                                .Severidad = severidad
-    '                                            }
-    '                                        End Function))
-
-    '    Dim licencias = Await uow.Context.Set(Of HistoricoLicencia)() _
-    '        .Include(Function(l) l.TipoLicencia) _
-    '        .Where(Function(l) l.FuncionarioId = funcionarioId AndAlso
-    '                                l.inicio < fechaFin AndAlso
-    '                                l.finaliza >= fechaInicio) _
-    '        .AsNoTracking() _
-    '        .ToListAsync()
-
-    '    situaciones.AddRange(licencias.Select(Function(l)
-    '                                                Dim tipo = l.TipoLicencia.Nombre
-    '                                                Dim severidad = EstadoVisualHelper.DeterminarSeveridad(tipo)
-    '                                                Return New SituacionParaBoton With {
-    '                                                    .Tipo = tipo,
-    '                                                    .Desde = l.inicio,
-    '                                                    .Hasta = l.finaliza,
-    '                                                    .Severidad = severidad
-    '                                                }
-    '                                            End Function))
-
-    '    Dim notificaciones = Await uow.Context.Set(Of NotificacionPersonal)() _
-    '        .Include(Function(n) n.TipoNotificacion) _
-    '        .Where(Function(n) n.FuncionarioId = funcionarioId AndAlso
-    '                                n.FechaProgramada >= fechaInicio AndAlso
-    '                                n.FechaProgramada < fechaFin) _
-    '        .AsNoTracking() _
-    '        .ToListAsync()
-
-    '    situaciones.AddRange(notificaciones.Select(Function(n)
-    '                                                        Dim tipo = $"NOTIFICACIÓN PENDIENTE: {n.TipoNotificacion.Nombre}"
-    '                                                        Dim severidad = EstadoVisualHelper.DeterminarSeveridad(tipo)
-    '                                                        Return New SituacionParaBoton With {
-    '                                                            .Tipo = tipo,
-    '                                                            .Desde = n.FechaProgramada,
-    '                                                            .Hasta = Nothing,
-    '                                                            .Severidad = severidad
-    '                                                        }
-    '                                                    End Function))
-
-    '    Return situaciones _
-    '        .OrderByDescending(Function(s) s.Severidad) _
-    '        .ThenByDescending(Function(s) s.Desde.GetValueOrDefault(fechaInicio)) _
-    '        .ThenBy(Function(s) s.Tipo) _
-    '        .ToList()
-    'End Function
 
     Private Async Function RefrescarBotonSituacionAsync(funcionarioId As Integer) As Task
         Try
@@ -1278,12 +1196,6 @@ Public Class frmFuncionarioBuscar
             Return
         End If
 
-        'If e.KeyCode = Keys.Escape Then
-        '    e.Handled = True
-        '    e.SuppressKeyPress = True
-        '    CancelarYCerrar()
-        '    Return
-        'End If
     End Sub
     Private Sub CancelarYCerrar()
         ' Si te abrieron con ShowDialog, devolvés Cancel; si es dentro del dashboard igual cierra.
