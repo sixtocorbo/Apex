@@ -740,7 +740,16 @@
     <Compile Include="UI\frmReporteFuncionariosEdad.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="UI\frmReporteFuncionariosEstado.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="UI\frmReporteFuncionariosGenero.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\frmReporteFuncionariosNivelEstudio.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\frmReporteFuncionariosTurno.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="UI\frmReporteLicenciasPorEstado.vb">

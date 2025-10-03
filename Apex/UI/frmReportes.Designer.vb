@@ -27,6 +27,9 @@ Partial Class frmReportes
         Me.btnFuncionariosEdad = New System.Windows.Forms.Button()
         Me.btnFuncionariosArea = New System.Windows.Forms.Button()
         Me.btnFuncionariosCargo = New System.Windows.Forms.Button()
+        Me.btnFuncionariosEstado = New System.Windows.Forms.Button()
+        Me.btnFuncionariosTurno = New System.Windows.Forms.Button()
+        Me.btnFuncionariosNivelEstudio = New System.Windows.Forms.Button()
         Me.btnLicenciasPorTipo = New System.Windows.Forms.Button()
         Me.btnLicenciasPorEstado = New System.Windows.Forms.Button()
         Me.btnLicenciasTopFuncionarios = New System.Windows.Forms.Button()
@@ -84,33 +87,63 @@ Partial Class frmReportes
         Me.btnFuncionariosCargo.Text = "🧭 Top Cargos con más Personal"
         Me.btnFuncionariosCargo.UseVisualStyleBackColor = True
         '
+        'btnFuncionariosEstado
+        '
+        Me.btnFuncionariosEstado.Location = New System.Drawing.Point(4, 230)
+        Me.btnFuncionariosEstado.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnFuncionariosEstado.Name = "btnFuncionariosEstado"
+        Me.btnFuncionariosEstado.Size = New System.Drawing.Size(330, 35)
+        Me.btnFuncionariosEstado.TabIndex = 7
+        Me.btnFuncionariosEstado.Text = "🟢 Activos vs. Inactivos"
+        Me.btnFuncionariosEstado.UseVisualStyleBackColor = True
+        '
+        'btnFuncionariosTurno
+        '
+        Me.btnFuncionariosTurno.Location = New System.Drawing.Point(4, 275)
+        Me.btnFuncionariosTurno.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnFuncionariosTurno.Name = "btnFuncionariosTurno"
+        Me.btnFuncionariosTurno.Size = New System.Drawing.Size(330, 35)
+        Me.btnFuncionariosTurno.TabIndex = 8
+        Me.btnFuncionariosTurno.Text = "⏰ Distribución por Turno"
+        Me.btnFuncionariosTurno.UseVisualStyleBackColor = True
+        '
+        'btnFuncionariosNivelEstudio
+        '
+        Me.btnFuncionariosNivelEstudio.Location = New System.Drawing.Point(4, 320)
+        Me.btnFuncionariosNivelEstudio.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnFuncionariosNivelEstudio.Name = "btnFuncionariosNivelEstudio"
+        Me.btnFuncionariosNivelEstudio.Size = New System.Drawing.Size(330, 35)
+        Me.btnFuncionariosNivelEstudio.TabIndex = 9
+        Me.btnFuncionariosNivelEstudio.Text = "🎓 Nivel de Estudios"
+        Me.btnFuncionariosNivelEstudio.UseVisualStyleBackColor = True
+        '
         'btnLicenciasPorTipo
         '
-        Me.btnLicenciasPorTipo.Location = New System.Drawing.Point(4, 230)
+        Me.btnLicenciasPorTipo.Location = New System.Drawing.Point(4, 365)
         Me.btnLicenciasPorTipo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnLicenciasPorTipo.Name = "btnLicenciasPorTipo"
         Me.btnLicenciasPorTipo.Size = New System.Drawing.Size(330, 35)
-        Me.btnLicenciasPorTipo.TabIndex = 7
+        Me.btnLicenciasPorTipo.TabIndex = 10
         Me.btnLicenciasPorTipo.Text = "🗂️ Licencias por Tipo"
         Me.btnLicenciasPorTipo.UseVisualStyleBackColor = True
         '
         'btnLicenciasPorEstado
         '
-        Me.btnLicenciasPorEstado.Location = New System.Drawing.Point(4, 275)
+        Me.btnLicenciasPorEstado.Location = New System.Drawing.Point(4, 410)
         Me.btnLicenciasPorEstado.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnLicenciasPorEstado.Name = "btnLicenciasPorEstado"
         Me.btnLicenciasPorEstado.Size = New System.Drawing.Size(330, 35)
-        Me.btnLicenciasPorEstado.TabIndex = 8
+        Me.btnLicenciasPorEstado.TabIndex = 11
         Me.btnLicenciasPorEstado.Text = "📑 Licencias por Estado"
         Me.btnLicenciasPorEstado.UseVisualStyleBackColor = True
         '
         'btnLicenciasTopFuncionarios
         '
-        Me.btnLicenciasTopFuncionarios.Location = New System.Drawing.Point(4, 320)
+        Me.btnLicenciasTopFuncionarios.Location = New System.Drawing.Point(4, 455)
         Me.btnLicenciasTopFuncionarios.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnLicenciasTopFuncionarios.Name = "btnLicenciasTopFuncionarios"
         Me.btnLicenciasTopFuncionarios.Size = New System.Drawing.Size(330, 35)
-        Me.btnLicenciasTopFuncionarios.TabIndex = 9
+        Me.btnLicenciasTopFuncionarios.TabIndex = 12
         Me.btnLicenciasTopFuncionarios.Text = "🏅 Funcionarios con más Licencias"
         Me.btnLicenciasTopFuncionarios.UseVisualStyleBackColor = True
         '
@@ -122,6 +155,9 @@ Partial Class frmReportes
         Me.FlowLayoutPanel1.Controls.Add(Me.btnFuncionariosEdad)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnFuncionariosArea)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnFuncionariosCargo)
+        Me.FlowLayoutPanel1.Controls.Add(Me.btnFuncionariosEstado)
+        Me.FlowLayoutPanel1.Controls.Add(Me.btnFuncionariosTurno)
+        Me.FlowLayoutPanel1.Controls.Add(Me.btnFuncionariosNivelEstudio)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnLicenciasPorTipo)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnLicenciasPorEstado)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnLicenciasTopFuncionarios)
@@ -157,5 +193,8 @@ Partial Class frmReportes
     Friend WithEvents btnLicenciasPorTipo As Button
     Friend WithEvents btnLicenciasPorEstado As Button
     Friend WithEvents btnLicenciasTopFuncionarios As Button
+    Friend WithEvents btnFuncionariosEstado As Button
+    Friend WithEvents btnFuncionariosTurno As Button
+    Friend WithEvents btnFuncionariosNivelEstudio As Button
     Friend WithEvents FlowLayoutPanel1 As FlowLayoutPanel
 End Class
