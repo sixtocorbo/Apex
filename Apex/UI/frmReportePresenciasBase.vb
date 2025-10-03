@@ -69,6 +69,9 @@ Public MustInherit Class frmReportePresenciasBase
         _splitContainer = New SplitContainer()
 
         InitializeComponent()
+
+        AddHandler _dgvGrupos.DataBindingComplete, AddressOf dgvGrupos_DataBindingComplete
+        AddHandler _splitContainer.SizeChanged, AddressOf splitContainer_SizeChanged
     End Sub
 
     Protected MustOverride ReadOnly Property Agrupacion As AgrupacionPresencia
@@ -340,5 +343,71 @@ Public MustInherit Class frmReportePresenciasBase
             _dgvFuncionarios.ClearSelection()
             _dgvFuncionarios.Rows(0).Selected = True
         End If
+    End Sub
+
+    Private Sub dgvGrupos_DataBindingComplete(sender As Object, e As DataGridViewBindingCompleteEventArgs)
+        AjustarDistribucion()
+    End Sub
+
+    Private Sub splitContainer_SizeChanged(sender As Object, e As EventArgs)
+        AjustarDistribucion()
+    End Sub
+
+    Private Sub AjustarDistribucion()
+        Const anchoMinReporte As Integer = 180
+        Const anchoMinListado As Integer = 360
+
+        If _splitContainer Is Nothing OrElse _splitContainer.IsHandleCreated = False Then
+            Return
+        End If
+
+        Dim anchoDisponible = _splitContainer.ClientSize.Width
+        If anchoDisponible <= 0 Then
+            Return
+        End If
+
+        Dim anchoContenido = 0
+        If _dgvGrupos IsNot Nothing Then
+            If _dgvGrupos.RowHeadersVisible Then
+                anchoContenido += _dgvGrupos.RowHeadersWidth
+            End If
+
+            For Each columna As DataGridViewColumn In _dgvGrupos.Columns
+                If columna.Visible Then
+                    anchoContenido += columna.Width
+                End If
+            Next
+
+            If _dgvGrupos.Controls.OfType(Of VScrollBar)().Any(Function(sb) sb.Visible) Then
+                anchoContenido += SystemInformation.VerticalScrollBarWidth
+            End If
+        End If
+
+        Dim anchoDeseado = Math.Max(anchoMinReporte, anchoContenido + 12)
+        Dim anchoMaximoReporte = Math.Max(anchoMinReporte, anchoDisponible - anchoMinListado)
+
+        If anchoMaximoReporte < anchoMinReporte Then
+            anchoMaximoReporte = anchoMinReporte
+        End If
+
+        If anchoDeseado > anchoMaximoReporte Then
+            anchoDeseado = anchoMaximoReporte
+        End If
+
+        Dim anchoListado = anchoDisponible - anchoDeseado
+        If anchoListado < anchoMinListado Then
+            anchoDeseado = Math.Max(anchoMinReporte, anchoDisponible - anchoMinListado)
+            anchoListado = anchoDisponible - anchoDeseado
+        End If
+
+        If anchoListado < anchoMinListado Then
+            anchoDeseado = Math.Max(anchoMinReporte, Math.Min(anchoDeseado, anchoDisponible - anchoMinReporte))
+        End If
+
+        If anchoDeseado <= 0 OrElse anchoDeseado >= anchoDisponible Then
+            Return
+        End If
+
+        _splitContainer.SplitterDistance = anchoDeseado
     End Sub
 End Class
