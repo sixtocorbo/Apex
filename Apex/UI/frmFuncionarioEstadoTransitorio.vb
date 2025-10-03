@@ -10,6 +10,8 @@ Public Class frmFuncionarioEstadoTransitorio
     Private _tempFiles As New List(Of String)
     Private _readOnly As Boolean = False
     Private _listaCargos As List(Of Cargo)
+    Private _splitterRatio As Double = 0.5
+    Private _suspendSplitterSync As Boolean = False
 
     ' Propiedades para todos los detalles (se mantienen para compatibilidad)
     Public DesignacionDetalle As DesignacionDetalle
@@ -81,7 +83,52 @@ Public Class frmFuncionarioEstadoTransitorio
 
         AddHandler cboTipoEstado.SelectedIndexChanged, AddressOf TipoEstado_Changed
         AddHandler dgvAdjuntos.SelectionChanged, AddressOf dgvAdjuntos_SelectionChanged
+        AddHandler SplitContainer1.SplitterMoved, AddressOf SplitContainer1_SplitterMoved
+        AddHandler SplitContainer1.SizeChanged, AddressOf SplitContainer1_SizeChanged
+
+        _splitterRatio = ObtenerSplitterRatio()
+        BeginInvoke(CType(Sub()
+                              AjustarSplitterPorProporcion()
+                          End Sub, MethodInvoker))
+
         TipoEstado_Changed(Nothing, EventArgs.Empty)
+    End Sub
+
+    Private Sub SplitContainer1_SizeChanged(sender As Object, e As EventArgs)
+        AjustarSplitterPorProporcion()
+    End Sub
+
+    Private Sub SplitContainer1_SplitterMoved(sender As Object, e As SplitterEventArgs)
+        If _suspendSplitterSync Then Return
+        _splitterRatio = ObtenerSplitterRatio()
+    End Sub
+
+    Private Function ObtenerSplitterRatio() As Double
+        If SplitContainer1.Width <= 0 Then Return _splitterRatio
+
+        Dim ratio = SplitContainer1.SplitterDistance / CDbl(SplitContainer1.Width)
+        ratio = Math.Max(0.15R, Math.Min(0.85R, ratio))
+        Return ratio
+    End Function
+
+    Private Sub AjustarSplitterPorProporcion()
+        If SplitContainer1.Width <= 0 Then Return
+
+        Dim disponible = SplitContainer1.Width
+        Dim nuevaDistancia = CInt(Math.Round(disponible * _splitterRatio))
+        Dim maximo = Math.Max(0, disponible - SplitContainer1.SplitterWidth - SplitContainer1.Panel2MinSize)
+        Dim minimo = Math.Min(SplitContainer1.Panel1MinSize, maximo)
+
+        If maximo <= 0 Then Return
+
+        nuevaDistancia = Math.Max(minimo, Math.Min(nuevaDistancia, maximo))
+
+        _suspendSplitterSync = True
+        Try
+            SplitContainer1.SplitterDistance = nuevaDistancia
+        Finally
+            _suspendSplitterSync = False
+        End Try
     End Sub
 
     Private Sub SetReadOnlyMode()
