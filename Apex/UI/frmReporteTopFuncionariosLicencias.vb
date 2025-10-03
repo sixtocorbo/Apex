@@ -2,6 +2,7 @@ Option Strict On
 Option Explicit On
 
 Imports System.Drawing
+Imports System.Globalization
 Imports System.Linq
 Imports System.Threading.Tasks
 Imports System.Windows.Forms.DataVisualization.Charting
@@ -84,6 +85,10 @@ Public Class frmReporteTopFuncionariosLicencias
         chartArea.AxisX.MajorGrid.LineDashStyle = ChartDashStyle.Dash
         chartArea.AxisY.Interval = 1
         chartArea.AxisY.MajorGrid.Enabled = False
+        chartArea.AxisY.IsLabelAutoFit = False
+        chartArea.AxisY.LabelStyle.Interval = 1
+        chartArea.AxisY.LabelStyle.Font = New Font("Segoe UI", 9.0!)
+        chartArea.AxisY.LabelStyle.IsEndLabelVisible = True
         chartFuncionarios.ChartAreas.Add(chartArea)
         chartFuncionarios.Dock = DockStyle.Fill
         legend.Enabled = False
@@ -156,9 +161,35 @@ Public Class frmReporteTopFuncionariosLicencias
             .IsValueShownAsLabel = True
         }
 
+        Dim chartAreaConfig As ChartArea = chartFuncionarios.ChartAreas(0)
+        chartAreaConfig.AxisY.MaximumAutoSize = 100.0R
+        chartAreaConfig.AxisY.ScaleView.ZoomReset(0)
+        chartAreaConfig.AxisY.Minimum = Double.NaN
+        chartAreaConfig.AxisY.Maximum = Double.NaN
+
+        Dim totalFuncionarios = datos.Count
+        Dim labelFontSize As Single
+
+        If totalFuncionarios <= 6 Then
+            labelFontSize = 9.0!
+        ElseIf totalFuncionarios <= 12 Then
+            labelFontSize = 8.0!
+        Else
+            labelFontSize = 7.0!
+        End If
+
+        chartAreaConfig.AxisY.LabelStyle.Font = New Font("Segoe UI", labelFontSize)
+
         For Each item In datos
-            series.Points.AddXY(item.Etiqueta, item.Valor)
+            Dim point = New DataPoint()
+            point.AxisLabel = item.Etiqueta
+            point.YValues = New Double() {CDbl(item.Valor)}
+            point.Label = item.Valor.ToString()
+            series.Points.Add(point)
         Next
+
+        Dim pointWidth = If(totalFuncionarios <= 5, 0.6R, Math.Max(0.2R, 0.6R - (totalFuncionarios - 5) * 0.04R))
+        series("PointWidth") = pointWidth.ToString(CultureInfo.InvariantCulture)
 
         chartFuncionarios.Series.Add(series)
     End Function
