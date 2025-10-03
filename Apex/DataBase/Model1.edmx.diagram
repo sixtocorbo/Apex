@@ -146,6 +146,7 @@
         <AssociationConnector Association="ApexModel.FK_PuestoTrabajo_TipoViatico" ManuallyRouted="false" />
         <AssociationConnector Association="ApexModel.FK_RegimenDetalle_RegimenTrabajo" ManuallyRouted="false" />
         <AssociationConnector Association="ApexModel.UsuarioRol" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="ApexModel.UnidadGeneral" Width="1.5" PointX="0.75" PointY="12.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

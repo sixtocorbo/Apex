@@ -10,12 +10,16 @@
 Imports System
 Imports System.Collections.Generic
 
-Partial Public Class vw_FuncionarioEstadosActivos
-    Public Property FuncionarioId As Integer
-    Public Property Prioridad As Integer
-    Public Property Tipo As String
-    Public Property Detalles As String
-    Public Property ColorIndicador As String
-    Public Property PrioridadRango As Nullable(Of Long)
+Partial Public Class UnidadGeneral
+    Public Property UnidadGeneralId As Integer
+    Public Property Nombre As String
+    Public Property Codigo As String
+    Public Property Descripcion As String
+    Public Property EsActivo As Boolean
+    Public Property FechaCreacion As Date
+    Public Property FechaActualizacion As Nullable(Of Date)
+    Public Property UsuarioCreacion As String
+    Public Property UsuarioActualizacion As String
+    Public Property Nombre_Normalizado As String
 
 End Class
