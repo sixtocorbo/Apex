@@ -5,7 +5,7 @@ Imports System.Reflection
 Imports System.Threading
 Imports System.Threading.Tasks
 
-Public Class frmFunciones
+Partial Public Class frmFunciones
 
     Private _listaFunciones As BindingList(Of Funcion)
     Private _funcionSeleccionada As Funcion
@@ -381,41 +381,50 @@ Public Class frmFunciones
         Close()
     End Sub
 
-    Private Async Sub btnFusionar_Click(sender As Object, e As EventArgs) Handles btnFusionar.Click
+    Private Sub btnFusionar_Click(sender As Object, e As EventArgs) Handles btnFusionar.Click
         If _listaFunciones Is Nothing OrElse _listaFunciones.Count < 2 Then
             Notifier.Warn(Me, "Debe existir al menos dos funciones para poder fusionar.")
             Return
         End If
 
-        Using frm As New frmFusionarFunciones(_listaFunciones.ToList())
-            If frm.ShowDialog(Me) = DialogResult.OK Then
-                Await FusionarFuncionesAsync(frm.FuncionDestinoId, frm.FuncionesSeleccionadasIds, frm.NombreDestino)
-            End If
-        End Using
+        Dim frm As New frmFusionarFunciones(_listaFunciones.ToList())
+        AbrirChildEnDashboard(frm)
     End Sub
 
-    Private Async Function FusionarFuncionesAsync(funcionDestinoId As Integer,
-                                                  funcionesSeleccionadasIds As IList(Of Integer),
-                                                  nombreDestino As String) As Task
-        If funcionesSeleccionadasIds Is Nothing OrElse funcionesSeleccionadasIds.Count = 0 Then Return
+    Private Sub AbrirChildEnDashboard(formHijo As Form)
+        If formHijo Is Nothing Then
+            Notifier.Warn(Me, "No hay formulario para abrir.")
+            Return
+        End If
 
-        Cursor = Cursors.WaitCursor
-        btnFusionar.Enabled = False
+        Dim dash = GetDashboard()
+        If dash Is Nothing OrElse dash.IsDisposed Then
+            formHijo.Show(Me)
+            Return
+        End If
+
+        If dash.InvokeRequired Then
+            dash.BeginInvoke(CType(Sub() AbrirChildEnDashboard(formHijo), MethodInvoker))
+            Return
+        End If
+
         Try
-            Using svc As New FuncionService()
-                Await svc.FusionarFuncionesAsync(funcionDestinoId, funcionesSeleccionadasIds, nombreDestino)
-            End Using
-
-            _ultimoIdSeleccionado = funcionDestinoId
-            Await CargarDatosAsync()
-            RestaurarSeleccion()
-            Notifier.Success(Me, "Funciones fusionadas correctamente.")
+            dash.AbrirChild(formHijo)
         Catch ex As Exception
-            Notifier.Error(Me, "No se pudieron fusionar las funciones: " & ex.Message)
-        Finally
-            Cursor = Cursors.Default
-            btnFusionar.Enabled = (_listaFunciones IsNot Nothing AndAlso _listaFunciones.Count >= 2)
+            Notifier.Error(dash, $"No se pudo abrir la ventana: {ex.Message}")
         End Try
+    End Sub
+
+    Private Function GetDashboard() As frmDashboard
+        Return Application.OpenForms.OfType(Of frmDashboard)().FirstOrDefault()
+    End Function
+
+    Protected Overrides Async Function RefrescarSegunFuncionarioAsync(e As FuncionarioCambiadoEventArgs) As Task
+        If e IsNot Nothing AndAlso e.FuncionarioId.HasValue Then
+            _ultimoIdSeleccionado = e.FuncionarioId.Value
+        End If
+
+        Await CargarDatosAsync()
     End Function
 
 End Class
