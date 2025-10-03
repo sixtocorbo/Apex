@@ -21,6 +21,18 @@ Public Class frmReportes
         AbrirFormularioReporte(Of frmReporteFuncionariosCargo)()
     End Sub
 
+    Private Sub btnFuncionariosEstado_Click(sender As Object, e As EventArgs) Handles btnFuncionariosEstado.Click
+        AbrirFormularioReporte(Of frmReporteFuncionariosEstado)()
+    End Sub
+
+    Private Sub btnFuncionariosTurno_Click(sender As Object, e As EventArgs) Handles btnFuncionariosTurno.Click
+        AbrirFormularioReporte(Of frmReporteFuncionariosTurno)()
+    End Sub
+
+    Private Sub btnFuncionariosNivelEstudio_Click(sender As Object, e As EventArgs) Handles btnFuncionariosNivelEstudio.Click
+        AbrirFormularioReporte(Of frmReporteFuncionariosNivelEstudio)()
+    End Sub
+
     Private Sub btnLicenciasPorTipo_Click(sender As Object, e As EventArgs) Handles btnLicenciasPorTipo.Click
         AbrirFormularioReporte(Of frmReporteLicenciasPorTipo)()
     End Sub
@@ -54,6 +66,9 @@ Public Class frmReportes
             btnFuncionariosEdad,
             btnFuncionariosArea,
             btnFuncionariosCargo,
+            btnFuncionariosEstado,
+            btnFuncionariosTurno,
+            btnFuncionariosNivelEstudio,
             btnLicenciasPorTipo,
             btnLicenciasPorEstado,
             btnLicenciasTopFuncionarios

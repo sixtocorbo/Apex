@@ -370,6 +370,47 @@ Public Class FuncionarioService
         End Using
     End Function
 
+    Public Function GetDistribucionPorEstado() As List(Of EstadisticaItem)
+        Using context As New ApexEntities()
+            Return context.Funcionario.
+                GroupBy(Function(f) f.Activo).
+                Select(Function(g) New EstadisticaItem With {
+                    .Etiqueta = If(g.Key, "Activos", "Inactivos"),
+                    .Valor = g.Count()
+                }).
+                OrderByDescending(Function(item) item.Valor).
+                ToList()
+        End Using
+    End Function
+
+    Public Function GetDistribucionPorTurno() As List(Of EstadisticaItem)
+        Using context As New ApexEntities()
+            Return context.Funcionario.
+                Where(Function(f) f.Activo).
+                GroupBy(Function(f) f.Turno.Nombre).
+                Select(Function(g) New EstadisticaItem With {
+                    .Etiqueta = If(g.Key IsNot Nothing, g.Key, "Sin especificar"),
+                    .Valor = g.Count()
+                }).
+                OrderByDescending(Function(item) item.Valor).
+                ToList()
+        End Using
+    End Function
+
+    Public Function GetDistribucionPorNivelEstudio() As List(Of EstadisticaItem)
+        Using context As New ApexEntities()
+            Return context.Funcionario.
+                Where(Function(f) f.Activo).
+                GroupBy(Function(f) f.NivelEstudio.Nombre).
+                Select(Function(g) New EstadisticaItem With {
+                    .Etiqueta = If(g.Key IsNot Nothing, g.Key, "Sin especificar"),
+                    .Valor = g.Count()
+                }).
+                OrderByDescending(Function(item) item.Valor).
+                ToList()
+        End Using
+    End Function
+
 
     Public Async Function ObtenerPresenciasParaFechaAsync(fecha As Date) As Task(Of List(Of PresenciaDTO))
         Using uow As New UnitOfWork()
