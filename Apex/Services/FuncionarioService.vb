@@ -2,12 +2,38 @@
 Option Strict On
 Option Explicit On
 
+Imports System.Collections.Generic
 Imports System.Data.Entity
 Imports System.Data.SqlClient
+Imports System.Linq
 
 Public Class EstadisticaItem
     Public Property Etiqueta As String
     Public Property Valor As Integer
+End Class
+
+Public Enum AgrupacionPresencia
+    Seccion
+    PuestoTrabajo
+End Enum
+
+Public Enum FiltroPresencia
+    Presentes
+    Ausentes
+End Enum
+
+Public Class PresenciaFuncionarioDetalle
+    Public Property FuncionarioId As Integer
+    Public Property Nombre As String
+    Public Property Seccion As String
+    Public Property PuestoTrabajo As String
+    Public Property Estado As String
+End Class
+
+Public Class PresenciaAgrupada
+    Public Property Grupo As String
+    Public Property Cantidad As Integer
+    Public Property Funcionarios As List(Of PresenciaFuncionarioDetalle)
 End Class
 
 Public Class FuncionarioService
@@ -422,6 +448,129 @@ Public Class FuncionarioService
             Return lista
         End Using
     End Function
+
+    Public Async Function ObtenerPresenciasAgrupadasAsync(
+        fecha As Date,
+        filtro As FiltroPresencia,
+        agrupacion As AgrupacionPresencia
+    ) As Task(Of List(Of PresenciaAgrupada))
+
+        Dim presencias = Await ObtenerPresenciasParaFechaAsync(fecha)
+        Dim presenciasDict = presencias.
+            GroupBy(Function(p) p.FuncionarioId).
+            ToDictionary(Function(g) g.Key, Function(g) g.Select(Function(p) p.Resultado).FirstOrDefault())
+
+        Using uow As New UnitOfWork()
+            Dim ctx = uow.Context
+
+            Dim funcionarios = Await ctx.Set(Of Funcionario)().
+                AsNoTracking().
+                Where(Function(f) f.Activo).
+                Select(Function(f) New With {
+                    .Id = f.Id,
+                    .Nombre = f.Nombre,
+                    .Seccion = If(f.Seccion IsNot Nothing, f.Seccion.Nombre, Nothing),
+                    .Puesto = If(f.PuestoTrabajo IsNot Nothing, f.PuestoTrabajo.Nombre, Nothing)
+                }).
+                ToListAsync()
+
+            Dim grupos = New Dictionary(Of String, PresenciaAgrupada)(StringComparer.OrdinalIgnoreCase)
+
+            For Each funcionario In funcionarios
+                Dim estadoRaw As String = Nothing
+                If presenciasDict.TryGetValue(funcionario.Id, estadoRaw) Then
+                    estadoRaw = If(estadoRaw, String.Empty)
+                Else
+                    estadoRaw = String.Empty
+                End If
+
+                Dim estadoNormalizado = If(String.IsNullOrWhiteSpace(estadoRaw), "Sin información", estadoRaw.Trim())
+                Dim categoria = ClasificarPresencia(estadoNormalizado)
+
+                Dim incluir = False
+                Select Case filtro
+                    Case FiltroPresencia.Presentes
+                        incluir = (categoria = CategoriaPresencia.Presente)
+                    Case FiltroPresencia.Ausentes
+                        incluir = (categoria <> CategoriaPresencia.Presente AndAlso categoria <> CategoriaPresencia.Inactivo)
+                End Select
+
+                If Not incluir Then
+                    Continue For
+                End If
+
+                Dim seccionNombre = NormalizarGrupo(funcionario.Seccion, "Sin sección")
+                Dim puestoNombre = NormalizarGrupo(funcionario.Puesto, "Sin puesto")
+                Dim clave = If(agrupacion = AgrupacionPresencia.Seccion, seccionNombre, puestoNombre)
+
+                Dim grupo As PresenciaAgrupada = Nothing
+                If Not grupos.TryGetValue(clave, grupo) Then
+                    grupo = New PresenciaAgrupada With {
+                        .Grupo = clave,
+                        .Funcionarios = New List(Of PresenciaFuncionarioDetalle)()
+                    }
+                    grupos.Add(clave, grupo)
+                End If
+
+                grupo.Funcionarios.Add(New PresenciaFuncionarioDetalle With {
+                    .FuncionarioId = funcionario.Id,
+                    .Nombre = funcionario.Nombre,
+                    .Seccion = seccionNombre,
+                    .PuestoTrabajo = puestoNombre,
+                    .Estado = estadoNormalizado
+                })
+            Next
+
+            For Each grupo In grupos.Values
+                grupo.Funcionarios = grupo.Funcionarios.
+                    OrderBy(Function(f) f.Nombre).
+                    ToList()
+                grupo.Cantidad = grupo.Funcionarios.Count
+            Next
+
+            Return grupos.Values.
+                OrderByDescending(Function(g) g.Cantidad).
+                ThenBy(Function(g) g.Grupo).
+                ToList()
+        End Using
+    End Function
+
+    Private Shared Function NormalizarGrupo(valor As String, reemplazo As String) As String
+        If String.IsNullOrWhiteSpace(valor) Then
+            Return reemplazo
+        End If
+        Return valor.Trim()
+    End Function
+
+    Private Shared Function ClasificarPresencia(resultado As String) As CategoriaPresencia
+        If String.IsNullOrWhiteSpace(resultado) Then
+            Return CategoriaPresencia.SinDatos
+        End If
+
+        Dim valor = resultado.Trim()
+
+        If valor.StartsWith("Inactivo", StringComparison.OrdinalIgnoreCase) Then
+            Return CategoriaPresencia.Inactivo
+        End If
+
+        If valor.Equals("Franco", StringComparison.OrdinalIgnoreCase) Then
+            Return CategoriaPresencia.Franco
+        End If
+
+        If valor.StartsWith("Presente", StringComparison.OrdinalIgnoreCase) Then
+            Return CategoriaPresencia.Presente
+        End If
+
+        Return CategoriaPresencia.Licencia
+    End Function
+
+    Private Enum CategoriaPresencia
+        Presente
+        Franco
+        Licencia
+        Inactivo
+        SinDatos
+    End Enum
 
     ' --- INICIO DEL NUEVO CÓDIGO ---
     Public Async Function GuardarFuncionarioAsync(funcionario As Funcionario, uow As IUnitOfWork) As Task

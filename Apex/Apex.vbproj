@@ -752,6 +752,13 @@
     <Compile Include="UI\frmReporteFuncionariosTurno.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="UI\frmReportePresenciasBase.vb" />
+    <Compile Include="UI\frmReportePresenciasPorPuestoTrabajo.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\frmReportePresenciasPorSeccion.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="UI\frmReporteLicenciasPorEstado.vb">
       <SubType>Form</SubType>
     </Compile>
