@@ -41,6 +41,8 @@ Partial Class frmFuncionarioBuscar
         Me.lblTipo = New System.Windows.Forms.Label()
         Me.lblFechaIngreso = New System.Windows.Forms.Label()
         Me.lblHorarioCompleto = New System.Windows.Forms.Label()
+        Me.lblUbicacion = New System.Windows.Forms.Label()
+        Me.lblSubDireccion = New System.Windows.Forms.Label()
         Me.lblCargo = New System.Windows.Forms.Label()
         Me.lblPresencia = New System.Windows.Forms.Label()
         Me.lblEstadoActividad = New System.Windows.Forms.Label()
@@ -231,6 +233,8 @@ Partial Class frmFuncionarioBuscar
         Me.flpDetalles.Controls.Add(Me.lblTipo)
         Me.flpDetalles.Controls.Add(Me.lblFechaIngreso)
         Me.flpDetalles.Controls.Add(Me.lblHorarioCompleto)
+        Me.flpDetalles.Controls.Add(Me.lblUbicacion)
+        Me.flpDetalles.Controls.Add(Me.lblSubDireccion)
         Me.flpDetalles.Controls.Add(Me.lblCargo)
         Me.flpDetalles.Controls.Add(Me.lblPresencia)
         Me.flpDetalles.Controls.Add(Me.lblEstadoActividad)
@@ -304,18 +308,44 @@ Partial Class frmFuncionarioBuscar
         Me.lblHorarioCompleto.TabIndex = 13
         Me.lblHorarioCompleto.Text = "Horario: -"
         '
+        'lblUbicacion
+        '
+        Me.lblUbicacion.Anchor = System.Windows.Forms.AnchorStyles.Left
+        Me.lblUbicacion.AutoSize = True
+        Me.lblUbicacion.Font = New System.Drawing.Font("Segoe UI", 9.5!)
+        Me.lblUbicacion.ForeColor = System.Drawing.Color.DimGray
+        Me.lblUbicacion.Location = New System.Drawing.Point(3, 171)
+        Me.lblUbicacion.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
+        Me.lblUbicacion.Name = "lblUbicacion"
+        Me.lblUbicacion.Size = New System.Drawing.Size(325, 25)
+        Me.lblUbicacion.TabIndex = 23
+        Me.lblUbicacion.Text = "Ubicación: Seccion / Puesto de Trabajo"
+        '
+        'lblSubDireccion
+        '
+        Me.lblSubDireccion.Anchor = System.Windows.Forms.AnchorStyles.Left
+        Me.lblSubDireccion.AutoSize = True
+        Me.lblSubDireccion.Font = New System.Drawing.Font("Segoe UI", 9.5!)
+        Me.lblSubDireccion.ForeColor = System.Drawing.Color.DimGray
+        Me.lblSubDireccion.Location = New System.Drawing.Point(3, 198)
+        Me.lblSubDireccion.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
+        Me.lblSubDireccion.Name = "lblSubDireccion"
+        Me.lblSubDireccion.Size = New System.Drawing.Size(152, 25)
+        Me.lblSubDireccion.TabIndex = 24
+        Me.lblSubDireccion.Text = "SubDireccion: -"
+        '
         'lblCargo
         '
         Me.lblCargo.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.lblCargo.AutoSize = True
         Me.lblCargo.Font = New System.Drawing.Font("Segoe UI", 9.5!)
         Me.lblCargo.ForeColor = System.Drawing.Color.DimGray
-        Me.lblCargo.Location = New System.Drawing.Point(3, 171)
+        Me.lblCargo.Location = New System.Drawing.Point(3, 225)
         Me.lblCargo.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
         Me.lblCargo.Name = "lblCargo"
-        Me.lblCargo.Size = New System.Drawing.Size(80, 25)
+        Me.lblCargo.Size = New System.Drawing.Size(271, 25)
         Me.lblCargo.TabIndex = 4
-        Me.lblCargo.Text = "Cargo: -"
+        Me.lblCargo.Text = "Escalafon / SubEscalafon / Cargo: -"
         '
         'lblPresencia
         '
@@ -323,7 +353,7 @@ Partial Class frmFuncionarioBuscar
         Me.lblPresencia.AutoSize = True
         Me.lblPresencia.Font = New System.Drawing.Font("Segoe UI", 9.5!)
         Me.lblPresencia.ForeColor = System.Drawing.Color.DimGray
-        Me.lblPresencia.Location = New System.Drawing.Point(3, 198)
+        Me.lblPresencia.Location = New System.Drawing.Point(3, 252)
         Me.lblPresencia.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
         Me.lblPresencia.Name = "lblPresencia"
         Me.lblPresencia.Size = New System.Drawing.Size(110, 25)
@@ -336,7 +366,7 @@ Partial Class frmFuncionarioBuscar
         Me.lblEstadoActividad.AutoSize = True
         Me.lblEstadoActividad.Font = New System.Drawing.Font("Segoe UI", 9.5!)
         Me.lblEstadoActividad.ForeColor = System.Drawing.Color.DimGray
-        Me.lblEstadoActividad.Location = New System.Drawing.Point(3, 225)
+        Me.lblEstadoActividad.Location = New System.Drawing.Point(3, 279)
         Me.lblEstadoActividad.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
         Me.lblEstadoActividad.Name = "lblEstadoActividad"
         Me.lblEstadoActividad.Size = New System.Drawing.Size(85, 25)
@@ -347,7 +377,7 @@ Partial Class frmFuncionarioBuscar
         '
         Me.btnVerSituacion.Dock = System.Windows.Forms.DockStyle.Fill
         Me.btnVerSituacion.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.btnVerSituacion.Location = New System.Drawing.Point(3, 356)
+        Me.btnVerSituacion.Location = New System.Drawing.Point(3, 410)
         Me.btnVerSituacion.Name = "btnVerSituacion"
         Me.btnVerSituacion.Size = New System.Drawing.Size(371, 36)
         Me.btnVerSituacion.TabIndex = 17
@@ -484,6 +514,8 @@ Partial Class frmFuncionarioBuscar
     Friend WithEvents btnVerSituacion As Button
     Friend WithEvents lblFechaIngreso As Label
     Friend WithEvents lblCI As Label
+    Friend WithEvents lblUbicacion As Label
+    Friend WithEvents lblSubDireccion As Label
     Friend WithEvents lblCargo As Label
     Friend WithEvents lblPresencia As Label
     Friend WithEvents lblEstadoActividad As Label
