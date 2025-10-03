@@ -14,6 +14,7 @@ Public MustInherit Class frmReportePresenciasBase
     Private ReadOnly _funcionarioService As New FuncionarioService()
     Private ReadOnly _rbPresentes As RadioButton
     Private ReadOnly _rbAusentes As RadioButton
+    Private ReadOnly _dtpFecha As DateTimePicker
     Private ReadOnly _lblEstado As Label
     Private ReadOnly _bsGrupos As BindingSource
     Private ReadOnly _bsFuncionarios As BindingSource
@@ -23,6 +24,8 @@ Public MustInherit Class frmReportePresenciasBase
     Private ReadOnly _splitContainer As SplitContainer
 
     Private _cargando As Boolean
+    Private _refrescarPendiente As Boolean
+    Private _ignorarCambioFecha As Boolean = True
 
     Protected Sub New()
         DoubleBuffered = True
@@ -37,6 +40,12 @@ Public MustInherit Class frmReportePresenciasBase
             .Text = "Ausentes",
             .AutoSize = True,
             .Margin = New Padding(18, 0, 0, 0)
+        }
+
+        _dtpFecha = New DateTimePicker() With {
+            .Format = DateTimePickerFormat.Custom,
+            .CustomFormat = "dddd dd 'de' MMMM yyyy",
+            .Width = 260
         }
 
         _lblEstado = New Label() With {
@@ -73,6 +82,14 @@ Public MustInherit Class frmReportePresenciasBase
     End Property
 
     Protected Overridable Function ObtenerFechaConsulta() As Date
+        If _dtpFecha IsNot Nothing Then
+            Return _dtpFecha.Value.Date
+        End If
+
+        Return Date.Today
+    End Function
+
+    Protected Overridable Function ObtenerFechaInicial() As Date
         Return Date.Today
     End Function
 
@@ -96,6 +113,16 @@ Public MustInherit Class frmReportePresenciasBase
             .FlowDirection = FlowDirection.LeftToRight,
             .Margin = New Padding(0)
         }
+        Dim lblFecha As New Label() With {
+            .AutoSize = True,
+            .Text = "Fecha:",
+            .Margin = New Padding(0, 6, 8, 0)
+        }
+
+        _dtpFecha.Margin = New Padding(0, 0, 18, 0)
+
+        panelFiltros.Controls.Add(lblFecha)
+        panelFiltros.Controls.Add(_dtpFecha)
         panelFiltros.Controls.Add(_rbPresentes)
         panelFiltros.Controls.Add(_rbAusentes)
 
@@ -166,7 +193,9 @@ Public MustInherit Class frmReportePresenciasBase
         AddHandler _rbAusentes.CheckedChanged, AddressOf Filtro_CheckedChanged
         AddHandler _bsGrupos.CurrentChanged, AddressOf bsGrupos_CurrentChanged
         AddHandler _dgvGrupos.SelectionChanged, AddressOf dgvGrupos_SelectionChanged
+        AddHandler _dtpFecha.ValueChanged, AddressOf dtpFecha_ValueChanged
 
+        _toolTip.SetToolTip(_dtpFecha, "Seleccione la fecha a consultar")
         _toolTip.SetToolTip(_rbAusentes, TooltipAusentes)
 
         ResumeLayout(False)
@@ -192,7 +221,31 @@ Public MustInherit Class frmReportePresenciasBase
         Catch
         End Try
 
-        Await CargarDatosAsync()
+        If _dtpFecha IsNot Nothing Then
+            _ignorarCambioFecha = True
+
+            Dim fechaInicial = ObtenerFechaInicial()
+
+            Try
+                If fechaInicial < _dtpFecha.MinDate Then
+                    _dtpFecha.MinDate = fechaInicial
+                End If
+
+                If fechaInicial > _dtpFecha.MaxDate Then
+                    _dtpFecha.MaxDate = fechaInicial
+                End If
+
+                _dtpFecha.Value = fechaInicial
+            Catch
+                _dtpFecha.Value = Date.Today
+            End Try
+        End If
+
+        Try
+            Await CargarDatosAsync()
+        Finally
+            _ignorarCambioFecha = False
+        End Try
     End Sub
 
     Private Async Sub Filtro_CheckedChanged(sender As Object, e As EventArgs)
@@ -201,8 +254,19 @@ Public MustInherit Class frmReportePresenciasBase
         Await CargarDatosAsync()
     End Sub
 
+    Private Async Sub dtpFecha_ValueChanged(sender As Object, e As EventArgs)
+        If _ignorarCambioFecha Then
+            Return
+        End If
+
+        Await CargarDatosAsync()
+    End Sub
+
     Private Async Function CargarDatosAsync() As Task
-        If _cargando Then Return
+        If _cargando Then
+            _refrescarPendiente = True
+            Return
+        End If
 
         _cargando = True
         Cursor = Cursors.WaitCursor
@@ -247,6 +311,11 @@ Public MustInherit Class frmReportePresenciasBase
             Cursor = Cursors.Default
             _cargando = False
         End Try
+
+        If _refrescarPendiente Then
+            _refrescarPendiente = False
+            Await CargarDatosAsync()
+        End If
     End Function
 
     Private Sub bsGrupos_CurrentChanged(sender As Object, e As EventArgs)
