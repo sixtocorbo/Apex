@@ -152,11 +152,18 @@ Public Class LicenciaService
             Dim query = context.HistoricoLicencia.AsNoTracking().AsQueryable()
             query = AplicarFiltroFechas(query, fechaInicio, fechaFin)
 
-            Return query.
+            Dim agrupados = query.
                 GroupBy(Function(l) l.estado).
+                Select(Function(g) New With {
+                    .Estado = g.Key,
+                    .Cantidad = g.Count()
+                }).
+                ToList()
+
+            Return agrupados.
                 Select(Function(g) New EstadisticaItem With {
-                    .Etiqueta = If(Not String.IsNullOrWhiteSpace(g.Key), g.Key, "Sin especificar"),
-                    .Valor = g.Count()
+                    .Etiqueta = If(String.IsNullOrWhiteSpace(g.Estado), "Sin especificar", g.Estado),
+                    .Valor = g.Cantidad
                 }).
                 OrderByDescending(Function(item) item.Valor).
                 ToList()
@@ -174,14 +181,22 @@ Public Class LicenciaService
 
             Dim limite = If(topN > 0, topN, 10)
 
-            Return query.
+            Dim agrupados = query.
                 GroupBy(Function(l) New With {
                              Key .Id = l.FuncionarioId,
                              Key .Nombre = If(l.Funcionario IsNot Nothing, l.Funcionario.Nombre, Nothing)
                          }).
+                Select(Function(g) New With {
+                    .Nombre = g.Key.Nombre,
+                    .Id = g.Key.Id,
+                    .Cantidad = g.Count()
+                }).
+                ToList()
+
+            Return agrupados.
                 Select(Function(g) New EstadisticaItem With {
-                    .Etiqueta = If(Not String.IsNullOrWhiteSpace(g.Key.Nombre), g.Key.Nombre, $"Funcionario #{g.Key.Id}"),
-                    .Valor = g.Count()
+                    .Etiqueta = If(String.IsNullOrWhiteSpace(g.Nombre), $"Funcionario #{g.Id}", g.Nombre),
+                    .Valor = g.Cantidad
                 }).
                 OrderByDescending(Function(item) item.Valor).
                 Take(limite).
