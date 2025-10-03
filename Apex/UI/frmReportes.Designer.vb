@@ -34,6 +34,8 @@ Partial Class frmReportes
         Me.btnLicenciasPorTipo = New System.Windows.Forms.Button()
         Me.btnLicenciasPorEstado = New System.Windows.Forms.Button()
         Me.btnLicenciasTopFuncionarios = New System.Windows.Forms.Button()
+        Me.btnPresentesPorSeccion = New System.Windows.Forms.Button()
+        Me.btnPresentesPorPuesto = New System.Windows.Forms.Button()
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
         Me.FlowLayoutPanel1.SuspendLayout()
         Me.SuspendLayout()
@@ -173,6 +175,8 @@ Partial Class frmReportes
         Me.FlowLayoutPanel1.Controls.Add(Me.btnLicenciasPorTipo)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnLicenciasPorEstado)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnLicenciasTopFuncionarios)
+        Me.FlowLayoutPanel1.Controls.Add(Me.btnPresentesPorSeccion)
+        Me.FlowLayoutPanel1.Controls.Add(Me.btnPresentesPorPuesto)
         Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.FlowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.TopDown
         Me.FlowLayoutPanel1.Location = New System.Drawing.Point(0, 0)
@@ -181,6 +185,26 @@ Partial Class frmReportes
         Me.FlowLayoutPanel1.Size = New System.Drawing.Size(717, 375)
         Me.FlowLayoutPanel1.TabIndex = 8
         Me.FlowLayoutPanel1.WrapContents = False
+        '
+        'btnPresentesPorSeccion
+        '
+        Me.btnPresentesPorSeccion.Location = New System.Drawing.Point(4, 545)
+        Me.btnPresentesPorSeccion.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnPresentesPorSeccion.Name = "btnPresentesPorSeccion"
+        Me.btnPresentesPorSeccion.Size = New System.Drawing.Size(330, 35)
+        Me.btnPresentesPorSeccion.TabIndex = 12
+        Me.btnPresentesPorSeccion.Text = "👥 Presentes por Sección"
+        Me.btnPresentesPorSeccion.UseVisualStyleBackColor = True
+        '
+        'btnPresentesPorPuesto
+        '
+        Me.btnPresentesPorPuesto.Location = New System.Drawing.Point(4, 590)
+        Me.btnPresentesPorPuesto.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnPresentesPorPuesto.Name = "btnPresentesPorPuesto"
+        Me.btnPresentesPorPuesto.Size = New System.Drawing.Size(330, 35)
+        Me.btnPresentesPorPuesto.TabIndex = 13
+        Me.btnPresentesPorPuesto.Text = "🛠️ Presentes por Puesto"
+        Me.btnPresentesPorPuesto.UseVisualStyleBackColor = True
         '
         'frmReportes
         '
@@ -210,4 +234,6 @@ Partial Class frmReportes
     Friend WithEvents btnFuncionariosNivelEstudio As Button
     Friend WithEvents FlowLayoutPanel1 As FlowLayoutPanel
     Friend WithEvents btnResumenCantidades As Button
+    Friend WithEvents btnPresentesPorSeccion As Button
+    Friend WithEvents btnPresentesPorPuesto As Button
 End Class

@@ -76,7 +76,9 @@ Public Class frmReportes
             btnFuncionariosNivelEstudio,
             btnLicenciasPorTipo,
             btnLicenciasPorEstado,
-            btnLicenciasTopFuncionarios
+            btnLicenciasTopFuncionarios,
+            btnPresentesPorSeccion,
+            btnPresentesPorPuesto
         }
 
         For i = 0 To botones.Length - 1
@@ -144,5 +146,13 @@ Public Class frmReportes
                 b.Height = 44
             End If
         Next
+    End Sub
+
+    Private Sub btnPresentesPorSeccion_Click(sender As Object, e As EventArgs) Handles btnPresentesPorSeccion.Click
+        AbrirFormularioReporte(Of frmReportePresenciasPorSeccion)()
+    End Sub
+
+    Private Sub btnPresentesPorPuesto_Click(sender As Object, e As EventArgs) Handles btnPresentesPorPuesto.Click
+        AbrirFormularioReporte(Of frmReportePresenciasPorPuestoTrabajo)()
     End Sub
 End Class
