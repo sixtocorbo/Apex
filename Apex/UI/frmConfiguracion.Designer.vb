@@ -29,6 +29,7 @@ Partial Class frmConfiguracion
         Me.btnGestionarIncidencias = New System.Windows.Forms.Button()
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
         Me.btnSubDirecciones = New System.Windows.Forms.Button()
+        Me.btnUnidadesGenerales = New System.Windows.Forms.Button()
         Me.btnNomenclaturas = New System.Windows.Forms.Button()
         Me.btnEscalafones = New System.Windows.Forms.Button()
         Me.btnFunciones = New System.Windows.Forms.Button()
@@ -93,6 +94,7 @@ Partial Class frmConfiguracion
         Me.FlowLayoutPanel1.Controls.Add(Me.btnTurnos)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnGestionarIncidencias)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnSubDirecciones)
+        Me.FlowLayoutPanel1.Controls.Add(Me.btnUnidadesGenerales)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnNomenclaturas)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnEscalafones)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnFunciones)
@@ -112,9 +114,19 @@ Partial Class frmConfiguracion
         Me.btnSubDirecciones.Text = "Gestionar Subdirecciones"
         Me.btnSubDirecciones.UseVisualStyleBackColor = True
         '
+        'btnUnidadesGenerales
+        '
+        Me.btnUnidadesGenerales.Location = New System.Drawing.Point(4, 140)
+        Me.btnUnidadesGenerales.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnUnidadesGenerales.Name = "btnUnidadesGenerales"
+        Me.btnUnidadesGenerales.Size = New System.Drawing.Size(285, 35)
+        Me.btnUnidadesGenerales.TabIndex = 12
+        Me.btnUnidadesGenerales.Text = "Gestionar Unidades Generales"
+        Me.btnUnidadesGenerales.UseVisualStyleBackColor = True
+        '
         'btnNomenclaturas
         '
-        Me.btnNomenclaturas.Location = New System.Drawing.Point(4, 140)
+        Me.btnNomenclaturas.Location = New System.Drawing.Point(297, 140)
         Me.btnNomenclaturas.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnNomenclaturas.Name = "btnNomenclaturas"
         Me.btnNomenclaturas.Size = New System.Drawing.Size(285, 35)
@@ -124,7 +136,7 @@ Partial Class frmConfiguracion
         '
         'btnEscalafones
         '
-        Me.btnEscalafones.Location = New System.Drawing.Point(297, 140)
+        Me.btnEscalafones.Location = New System.Drawing.Point(4, 185)
         Me.btnEscalafones.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnEscalafones.Name = "btnEscalafones"
         Me.btnEscalafones.Size = New System.Drawing.Size(285, 35)
@@ -134,7 +146,7 @@ Partial Class frmConfiguracion
         '
         'btnFunciones
         '
-        Me.btnFunciones.Location = New System.Drawing.Point(4, 185)
+        Me.btnFunciones.Location = New System.Drawing.Point(297, 185)
         Me.btnFunciones.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnFunciones.Name = "btnFunciones"
         Me.btnFunciones.Size = New System.Drawing.Size(285, 35)
@@ -164,6 +176,7 @@ Partial Class frmConfiguracion
     Friend WithEvents btnGestionarIncidencias As Button
     Friend WithEvents FlowLayoutPanel1 As FlowLayoutPanel
     Friend WithEvents btnSubDirecciones As Button
+    Friend WithEvents btnUnidadesGenerales As Button
     Friend WithEvents btnNomenclaturas As Button
     Friend WithEvents btnEscalafones As Button
     Friend WithEvents btnFunciones As Button

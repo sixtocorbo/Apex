@@ -37,7 +37,8 @@ Public Class frmDashboard
         {GetType(frmRenombrarPDF), New String() {"txtCarpeta", "txtRuta", "txtPrefijo", "btnSeleccionarCarpeta"}},
         {GetType(frmAsistenteImportacion), New String() {"txtArchivo", "btnSeleccionarArchivo"}},
         {GetType(frmViaticosListas), New String() {"txtBuscar", "txtBusqueda", "txtFiltro"}},
-        {GetType(frmConfiguracion), New String() {"txtBuscar", "txtBusqueda", "txtRuta", "txtCarpeta"}}
+        {GetType(frmConfiguracion), New String() {"txtBuscar", "txtBusqueda", "txtRuta", "txtCarpeta"}},
+        {GetType(frmUnidadesGenerales), New String() {"txtBuscar", "txtNombre"}}
     }
 
     ' ========= NAVEGACIÓN ACTUAL =========

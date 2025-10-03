@@ -423,6 +423,7 @@
     <Compile Include="DataBase\Turno.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
+    <Compile Include="DataBase\UnidadGeneral.Metadata.vb" />
     <Compile Include="DataBase\UnidadGeneral.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
@@ -502,6 +503,7 @@
     <Compile Include="Services\SeccionService.vb" />
     <Compile Include="Services\EscalafonService.vb" />
     <Compile Include="Services\SubDireccionService.vb" />
+    <Compile Include="Services\UnidadGeneralService.vb" />
     <Compile Include="Services\FuncionService.vb" />
     <Compile Include="Services\TipoEstadoTransitorioService.vb" />
     <Compile Include="Services\TiposEstadoCatalog.vb" />
@@ -601,6 +603,12 @@
       <DependentUpon>frmSubDirecciones.vb</DependentUpon>
     </Compile>
     <Compile Include="UI\frmSubDirecciones.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\frmUnidadesGenerales.Designer.vb">
+      <DependentUpon>frmUnidadesGenerales.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmUnidadesGenerales.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="UI\frmDashboard.Designer.vb">
@@ -894,6 +902,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmSubDirecciones.resx">
       <DependentUpon>frmSubDirecciones.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\frmUnidadesGenerales.resx">
+      <DependentUpon>frmUnidadesGenerales.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\frmDashboard.resx">
       <DependentUpon>frmDashboard.vb</DependentUpon>
