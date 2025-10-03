@@ -191,6 +191,10 @@ Public Class LicenciaService
                     .Id = g.Key.Id,
                     .Cantidad = g.Count()
                 }).
+                OrderByDescending(Function(g) g.Cantidad).
+                ThenBy(Function(g) g.Nombre).
+                ThenBy(Function(g) g.Id).
+                Take(limite).
                 ToList()
 
             Return agrupados.
@@ -198,8 +202,6 @@ Public Class LicenciaService
                     .Etiqueta = If(String.IsNullOrWhiteSpace(g.Nombre), $"Funcionario #{g.Id}", g.Nombre),
                     .Valor = g.Cantidad
                 }).
-                OrderByDescending(Function(item) item.Valor).
-                Take(limite).
                 ToList()
         End Using
     End Function
