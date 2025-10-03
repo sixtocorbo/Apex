@@ -122,7 +122,7 @@ Partial Class frmFusionarFunciones
         Me.clbFunciones.FormattingEnabled = True
         Me.clbFunciones.Location = New System.Drawing.Point(3, 136)
         Me.clbFunciones.Name = "clbFunciones"
-        Me.clbFunciones.Size = New System.Drawing.Size(538, 197)
+        Me.clbFunciones.Size = New System.Drawing.Size(538, 183)
         Me.clbFunciones.TabIndex = 2
         '
         'pnlPrincipal
@@ -133,7 +133,7 @@ Partial Class frmFusionarFunciones
         Me.pnlPrincipal.Controls.Add(Me.lblPrincipal, 0, 0)
         Me.pnlPrincipal.Controls.Add(Me.cboFuncionPrincipal, 1, 0)
         Me.pnlPrincipal.Dock = System.Windows.Forms.DockStyle.Top
-        Me.pnlPrincipal.Location = New System.Drawing.Point(3, 339)
+        Me.pnlPrincipal.Location = New System.Drawing.Point(3, 325)
         Me.pnlPrincipal.Name = "pnlPrincipal"
         Me.pnlPrincipal.RowCount = 1
         Me.pnlPrincipal.RowStyles.Add(New System.Windows.Forms.RowStyle())
@@ -168,7 +168,7 @@ Partial Class frmFusionarFunciones
         Me.pnlNombre.Controls.Add(Me.lblNombreFinal, 0, 0)
         Me.pnlNombre.Controls.Add(Me.txtNombreFinal, 1, 0)
         Me.pnlNombre.Dock = System.Windows.Forms.DockStyle.Top
-        Me.pnlNombre.Location = New System.Drawing.Point(3, 383)
+        Me.pnlNombre.Location = New System.Drawing.Point(3, 369)
         Me.pnlNombre.Name = "pnlNombre"
         Me.pnlNombre.RowCount = 1
         Me.pnlNombre.RowStyles.Add(New System.Windows.Forms.RowStyle())
@@ -199,7 +199,7 @@ Partial Class frmFusionarFunciones
         Me.lblNota.AutoSize = True
         Me.lblNota.Dock = System.Windows.Forms.DockStyle.Top
         Me.lblNota.ForeColor = System.Drawing.SystemColors.GrayText
-        Me.lblNota.Location = New System.Drawing.Point(3, 427)
+        Me.lblNota.Location = New System.Drawing.Point(3, 413)
         Me.lblNota.Margin = New System.Windows.Forms.Padding(3)
         Me.lblNota.Name = "lblNota"
         Me.lblNota.Size = New System.Drawing.Size(538, 56)
@@ -214,10 +214,10 @@ Partial Class frmFusionarFunciones
         Me.pnlBotones.Controls.Add(Me.btnCancelar)
         Me.pnlBotones.Dock = System.Windows.Forms.DockStyle.Fill
         Me.pnlBotones.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
-        Me.pnlBotones.Location = New System.Drawing.Point(3, 489)
+        Me.pnlBotones.Location = New System.Drawing.Point(3, 475)
         Me.pnlBotones.Name = "pnlBotones"
         Me.pnlBotones.Padding = New System.Windows.Forms.Padding(0, 10, 0, 0)
-        Me.pnlBotones.Size = New System.Drawing.Size(538, 46)
+        Me.pnlBotones.Size = New System.Drawing.Size(538, 54)
         Me.pnlBotones.TabIndex = 6
         '
         'btnAceptar
