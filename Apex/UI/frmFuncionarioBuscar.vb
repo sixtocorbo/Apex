@@ -924,11 +924,11 @@ Public Class frmFuncionarioBuscar
             Dim escalafonNombre = If(f.Escalafon IsNot Nothing, f.Escalafon.Nombre, "-")
             Dim subEscalafonNombre = If(f.SubEscalafon IsNot Nothing, f.SubEscalafon.Nombre, "-")
             Dim cargoNombre = If(f.Cargo IsNot Nothing, f.Cargo.Nombre, "-")
-            lblCargo.Text = $"Escalafon / SubEscalafon / Cargo: {escalafonNombre} / {subEscalafonNombre} / {cargoNombre}"
+            lblCargo.Text = $"Escalafon: {escalafonNombre}   SubEscalafón: {subEscalafonNombre}   Jerarquía: {cargoNombre}"
             lblTipo.Text = "Tipo: " & f.TipoFuncionario.Nombre
             lblFechaIngreso.Text = "Fecha Ingreso: " & f.FechaIngreso.ToShortDateString()
-            lblHorarioCompleto.Text = $"Horario: {If(f.Semana IsNot Nothing, f.Semana.Nombre, "-")} / {If(f.Turno IsNot Nothing, f.Turno.Nombre, "-")} / {If(f.Horario IsNot Nothing, f.Horario.Nombre, "-")}"
-            lblUbicacion.Text = $"Ubicación: {If(f.Seccion IsNot Nothing, f.Seccion.Nombre, "-")} / {If(f.PuestoTrabajo Is Not Nothing, f.PuestoTrabajo.Nombre, "-")}"
+            lblHorarioCompleto.Text = $"Horario: {If(f.Semana IsNot Nothing, f.Semana.Nombre, "-")}   {If(f.Turno IsNot Nothing, f.Turno.Nombre, "-")}   {If(f.Horario IsNot Nothing, f.Horario.Nombre, "-")}"
+            lblUbicacion.Text = $"Ubicación: Unidad: {If(f.Seccion IsNot Nothing, f.Seccion.Nombre, "-")}   Puesto: {If(f.PuestoTrabajo IsNot Nothing, f.PuestoTrabajo.Nombre, "-")}"
             lblSubDireccion.Text = "SubDireccion: " & If(f.SubDireccion IsNot Nothing, f.SubDireccion.Nombre, "-")
 
             ' El estado ya estaba correcto, lo mantenemos igual
