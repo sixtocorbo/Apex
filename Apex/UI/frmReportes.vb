@@ -43,4 +43,8 @@
         Dim frm As New frmReporteTopFuncionariosLicencias
         NavegacionHelper.AbrirNuevaInstanciaEnDashboard(frm)
     End Sub
+
+    Private Sub frmReportes_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        AppTheme.Aplicar(Me)
+    End Sub
 End Class

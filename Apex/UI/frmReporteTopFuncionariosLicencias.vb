@@ -116,10 +116,7 @@ Public Class frmReporteTopFuncionariosLicencias
     End Sub
 
     Private Async Sub frmReporteTopFuncionariosLicencias_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Try
-            AppTheme.Aplicar(Me)
-        Catch
-        End Try
+        AppTheme.Aplicar(Me)
 
         dtpHasta.Value = Date.Today
         dtpDesde.Value = Date.Today.AddMonths(-12)

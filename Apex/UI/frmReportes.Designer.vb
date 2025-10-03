@@ -37,7 +37,7 @@ Partial Class frmReportes
         '
         'btnAnalisisFuncionarios
         '
-        Me.btnAnalisisFuncionarios.Location = New System.Drawing.Point(4, 47)
+        Me.btnAnalisisFuncionarios.Location = New System.Drawing.Point(4, 50)
         Me.btnAnalisisFuncionarios.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnAnalisisFuncionarios.Name = "btnAnalisisFuncionarios"
         Me.btnAnalisisFuncionarios.Size = New System.Drawing.Size(330, 35)
@@ -54,70 +54,70 @@ Partial Class frmReportes
         Me.btnAnalisisEstacional.TabIndex = 0
         Me.btnAnalisisEstacional.Text = "   📊 Análisis de Licencias"
         Me.btnAnalisisEstacional.UseVisualStyleBackColor = True
-
+        '
         'btnFuncionariosGenero
-
-        Me.btnFuncionariosGenero.Location = New System.Drawing.Point(4, 92)
+        '
+        Me.btnFuncionariosGenero.Location = New System.Drawing.Point(4, 95)
         Me.btnFuncionariosGenero.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnFuncionariosGenero.Name = "btnFuncionariosGenero"
         Me.btnFuncionariosGenero.Size = New System.Drawing.Size(330, 35)
         Me.btnFuncionariosGenero.TabIndex = 3
         Me.btnFuncionariosGenero.Text = "♀️ Distribución por Género"
         Me.btnFuncionariosGenero.UseVisualStyleBackColor = True
-
+        '
         'btnFuncionariosEdad
-
-        Me.btnFuncionariosEdad.Location = New System.Drawing.Point(4, 137)
+        '
+        Me.btnFuncionariosEdad.Location = New System.Drawing.Point(4, 140)
         Me.btnFuncionariosEdad.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnFuncionariosEdad.Name = "btnFuncionariosEdad"
         Me.btnFuncionariosEdad.Size = New System.Drawing.Size(330, 35)
         Me.btnFuncionariosEdad.TabIndex = 4
         Me.btnFuncionariosEdad.Text = "🎂 Distribución por Edad"
         Me.btnFuncionariosEdad.UseVisualStyleBackColor = True
-
+        '
         'btnFuncionariosArea
-
-        Me.btnFuncionariosArea.Location = New System.Drawing.Point(4, 182)
+        '
+        Me.btnFuncionariosArea.Location = New System.Drawing.Point(4, 185)
         Me.btnFuncionariosArea.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnFuncionariosArea.Name = "btnFuncionariosArea"
         Me.btnFuncionariosArea.Size = New System.Drawing.Size(330, 35)
         Me.btnFuncionariosArea.TabIndex = 5
         Me.btnFuncionariosArea.Text = "🏢 Distribución por Área"
         Me.btnFuncionariosArea.UseVisualStyleBackColor = True
-
+        '
         'btnFuncionariosCargo
-
-        Me.btnFuncionariosCargo.Location = New System.Drawing.Point(4, 227)
+        '
+        Me.btnFuncionariosCargo.Location = New System.Drawing.Point(4, 230)
         Me.btnFuncionariosCargo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnFuncionariosCargo.Name = "btnFuncionariosCargo"
         Me.btnFuncionariosCargo.Size = New System.Drawing.Size(330, 35)
         Me.btnFuncionariosCargo.TabIndex = 6
         Me.btnFuncionariosCargo.Text = "🧭 Top Cargos con más Personal"
         Me.btnFuncionariosCargo.UseVisualStyleBackColor = True
-
+        '
         'btnLicenciasPorTipo
-
-        Me.btnLicenciasPorTipo.Location = New System.Drawing.Point(4, 272)
+        '
+        Me.btnLicenciasPorTipo.Location = New System.Drawing.Point(4, 275)
         Me.btnLicenciasPorTipo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnLicenciasPorTipo.Name = "btnLicenciasPorTipo"
         Me.btnLicenciasPorTipo.Size = New System.Drawing.Size(330, 35)
         Me.btnLicenciasPorTipo.TabIndex = 7
         Me.btnLicenciasPorTipo.Text = "🗂️ Licencias por Tipo"
         Me.btnLicenciasPorTipo.UseVisualStyleBackColor = True
-
+        '
         'btnLicenciasPorEstado
-
-        Me.btnLicenciasPorEstado.Location = New System.Drawing.Point(4, 317)
+        '
+        Me.btnLicenciasPorEstado.Location = New System.Drawing.Point(4, 320)
         Me.btnLicenciasPorEstado.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnLicenciasPorEstado.Name = "btnLicenciasPorEstado"
         Me.btnLicenciasPorEstado.Size = New System.Drawing.Size(330, 35)
         Me.btnLicenciasPorEstado.TabIndex = 8
         Me.btnLicenciasPorEstado.Text = "📑 Licencias por Estado"
         Me.btnLicenciasPorEstado.UseVisualStyleBackColor = True
-
+        '
         'btnLicenciasTopFuncionarios
-
-        Me.btnLicenciasTopFuncionarios.Location = New System.Drawing.Point(4, 362)
+        '
+        Me.btnLicenciasTopFuncionarios.Location = New System.Drawing.Point(4, 365)
         Me.btnLicenciasTopFuncionarios.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnLicenciasTopFuncionarios.Name = "btnLicenciasTopFuncionarios"
         Me.btnLicenciasTopFuncionarios.Size = New System.Drawing.Size(330, 35)
