@@ -4,6 +4,7 @@ Option Explicit On
 
 Imports System.Data.Entity
 Imports System.Data.SqlClient
+Imports System.Linq
 
 ' ---- Clases auxiliares ----
 Public Class LicenciaEstacional
@@ -111,6 +112,82 @@ Public Class LicenciaService
     ' ============================================================
     ' Analítica (LINQ sobre EF): nuevo UoW por método
     ' ============================================================
+
+    Private Shared Function AplicarFiltroFechas(query As IQueryable(Of HistoricoLicencia),
+                                                fechaInicio As Date?,
+                                                fechaFin As Date?) As IQueryable(Of HistoricoLicencia)
+        If fechaInicio.HasValue Then
+            Dim inicio = fechaInicio.Value.Date
+            query = query.Where(Function(l) l.finaliza >= inicio)
+        End If
+
+        If fechaFin.HasValue Then
+            Dim fin = fechaFin.Value.Date
+            query = query.Where(Function(l) l.inicio <= fin)
+        End If
+
+        Return query
+    End Function
+
+    Public Function GetDistribucionPorTipoLicencia(Optional fechaInicio As Date? = Nothing,
+                                                    Optional fechaFin As Date? = Nothing) As List(Of EstadisticaItem)
+        Using context As New ApexEntities()
+            Dim query = context.HistoricoLicencia.AsNoTracking().AsQueryable()
+            query = AplicarFiltroFechas(query, fechaInicio, fechaFin)
+
+            Return query.
+                GroupBy(Function(l) l.TipoLicencia.Nombre).
+                Select(Function(g) New EstadisticaItem With {
+                    .Etiqueta = If(g.Key IsNot Nothing, g.Key, "Sin especificar"),
+                    .Valor = g.Count()
+                }).
+                OrderByDescending(Function(item) item.Valor).
+                ToList()
+        End Using
+    End Function
+
+    Public Function GetDistribucionPorEstadoLicencia(Optional fechaInicio As Date? = Nothing,
+                                                      Optional fechaFin As Date? = Nothing) As List(Of EstadisticaItem)
+        Using context As New ApexEntities()
+            Dim query = context.HistoricoLicencia.AsNoTracking().AsQueryable()
+            query = AplicarFiltroFechas(query, fechaInicio, fechaFin)
+
+            Return query.
+                GroupBy(Function(l) l.estado).
+                Select(Function(g) New EstadisticaItem With {
+                    .Etiqueta = If(Not String.IsNullOrWhiteSpace(g.Key), g.Key, "Sin especificar"),
+                    .Valor = g.Count()
+                }).
+                OrderByDescending(Function(item) item.Valor).
+                ToList()
+        End Using
+    End Function
+
+    Public Function GetTopFuncionariosConLicencias(Optional topN As Integer = 10,
+                                                    Optional fechaInicio As Date? = Nothing,
+                                                    Optional fechaFin As Date? = Nothing) As List(Of EstadisticaItem)
+        Using context As New ApexEntities()
+            Dim query = context.HistoricoLicencia.AsNoTracking().
+                Where(Function(l) l.FuncionarioId > 0)
+
+            query = AplicarFiltroFechas(query, fechaInicio, fechaFin)
+
+            Dim limite = If(topN > 0, topN, 10)
+
+            Return query.
+                GroupBy(Function(l) New With {
+                             Key .Id = l.FuncionarioId,
+                             Key .Nombre = If(l.Funcionario IsNot Nothing, l.Funcionario.Nombre, Nothing)
+                         }).
+                Select(Function(g) New EstadisticaItem With {
+                    .Etiqueta = If(Not String.IsNullOrWhiteSpace(g.Key.Nombre), g.Key.Nombre, $"Funcionario #{g.Key.Id}"),
+                    .Valor = g.Count()
+                }).
+                OrderByDescending(Function(item) item.Valor).
+                Take(limite).
+                ToList()
+        End Using
+    End Function
 
     Public Function ObtenerDatosEstacionalidad(tipoLicenciaIDs As List(Of Integer),
                                                  aniosSeleccionados As List(Of Integer)) As List(Of LicenciaEstacional)

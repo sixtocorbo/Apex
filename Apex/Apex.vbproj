@@ -731,6 +731,13 @@
     <Compile Include="UI\frmReportes.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="UI\frmReporteFuncionariosAreaTrabajo.vb" />
+    <Compile Include="UI\frmReporteFuncionariosCargo.vb" />
+    <Compile Include="UI\frmReporteFuncionariosEdad.vb" />
+    <Compile Include="UI\frmReporteFuncionariosGenero.vb" />
+    <Compile Include="UI\frmReporteLicenciasPorEstado.vb" />
+    <Compile Include="UI\frmReporteLicenciasPorTipo.vb" />
+    <Compile Include="UI\frmReporteTopFuncionariosLicencias.vb" />
     <Compile Include="UI\frmSanciones.Designer.vb">
       <DependentUpon>frmSanciones.vb</DependentUpon>
     </Compile>
