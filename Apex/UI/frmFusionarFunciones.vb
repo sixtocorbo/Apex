@@ -185,4 +185,5 @@ Public Class frmFusionarFunciones
     Private Sub btnCancelar_Click(sender As Object, e As EventArgs) Handles btnCancelar.Click
         DialogResult = DialogResult.Cancel
     End Sub
+
 End Class

@@ -1,8 +1,9 @@
-<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class frmFusionarFunciones
     Inherits System.Windows.Forms.Form
 
-    <System.Diagnostics.DebuggerNonUserCode()> _
+    'Form overrides dispose to clean up the component list.
+    <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
@@ -13,9 +14,13 @@ Partial Class frmFusionarFunciones
         End Try
     End Sub
 
+    'Required by the Windows Form Designer
     Private components As System.ComponentModel.IContainer
 
-    <System.Diagnostics.DebuggerStepThrough()> _
+    'NOTE: The following procedure is required by the Windows Form Designer
+    'It can be modified using the Windows Form Designer.  
+    'Do not modify it using the code editor.
+    <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
         Me.lblDescripcion = New System.Windows.Forms.Label()
@@ -62,7 +67,7 @@ Partial Class frmFusionarFunciones
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle())
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle())
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle())
-        Me.TableLayoutPanel1.Size = New System.Drawing.Size(544, 540)
+        Me.TableLayoutPanel1.Size = New System.Drawing.Size(544, 532)
         Me.TableLayoutPanel1.TabIndex = 0
         '
         'lblDescripcion
@@ -72,10 +77,9 @@ Partial Class frmFusionarFunciones
         Me.lblDescripcion.Location = New System.Drawing.Point(3, 0)
         Me.lblDescripcion.Name = "lblDescripcion"
         Me.lblDescripcion.Padding = New System.Windows.Forms.Padding(0, 0, 0, 5)
-        Me.lblDescripcion.Size = New System.Drawing.Size(538, 45)
+        Me.lblDescripcion.Size = New System.Drawing.Size(538, 89)
         Me.lblDescripcion.TabIndex = 0
-        Me.lblDescripcion.Text = "Seleccione las funciones que desea fusionar y elija cuál quedará como principal." & _
-            Environment.NewLine & "Las referencias existentes se actualizarán automáticamente."
+        Me.lblDescripcion.Text = "Seleccione las funciones que desea fusionar y elija cuál quedará como principal." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "Las referencias existentes se actualizarán automáticamente."
         '
         'pnlBusqueda
         '
@@ -85,7 +89,7 @@ Partial Class frmFusionarFunciones
         Me.pnlBusqueda.Controls.Add(Me.lblBuscar, 0, 0)
         Me.pnlBusqueda.Controls.Add(Me.txtBuscar, 1, 0)
         Me.pnlBusqueda.Dock = System.Windows.Forms.DockStyle.Top
-        Me.pnlBusqueda.Location = New System.Drawing.Point(3, 48)
+        Me.pnlBusqueda.Location = New System.Drawing.Point(3, 92)
         Me.pnlBusqueda.Name = "pnlBusqueda"
         Me.pnlBusqueda.RowCount = 1
         Me.pnlBusqueda.RowStyles.Add(New System.Windows.Forms.RowStyle())
@@ -96,9 +100,9 @@ Partial Class frmFusionarFunciones
         '
         Me.lblBuscar.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.lblBuscar.AutoSize = True
-        Me.lblBuscar.Location = New System.Drawing.Point(3, 6)
+        Me.lblBuscar.Location = New System.Drawing.Point(3, 5)
         Me.lblBuscar.Name = "lblBuscar"
-        Me.lblBuscar.Size = New System.Drawing.Size(69, 25)
+        Me.lblBuscar.Size = New System.Drawing.Size(72, 28)
         Me.lblBuscar.TabIndex = 0
         Me.lblBuscar.Text = "Buscar:"
         '
@@ -106,9 +110,9 @@ Partial Class frmFusionarFunciones
         '
         Me.txtBuscar.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtBuscar.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.txtBuscar.Location = New System.Drawing.Point(78, 3)
+        Me.txtBuscar.Location = New System.Drawing.Point(81, 3)
         Me.txtBuscar.Name = "txtBuscar"
-        Me.txtBuscar.Size = New System.Drawing.Size(457, 31)
+        Me.txtBuscar.Size = New System.Drawing.Size(454, 33)
         Me.txtBuscar.TabIndex = 1
         '
         'clbFunciones
@@ -116,9 +120,9 @@ Partial Class frmFusionarFunciones
         Me.clbFunciones.CheckOnClick = True
         Me.clbFunciones.Dock = System.Windows.Forms.DockStyle.Fill
         Me.clbFunciones.FormattingEnabled = True
-        Me.clbFunciones.Location = New System.Drawing.Point(3, 92)
+        Me.clbFunciones.Location = New System.Drawing.Point(3, 136)
         Me.clbFunciones.Name = "clbFunciones"
-        Me.clbFunciones.Size = New System.Drawing.Size(538, 298)
+        Me.clbFunciones.Size = New System.Drawing.Size(538, 197)
         Me.clbFunciones.TabIndex = 2
         '
         'pnlPrincipal
@@ -129,7 +133,7 @@ Partial Class frmFusionarFunciones
         Me.pnlPrincipal.Controls.Add(Me.lblPrincipal, 0, 0)
         Me.pnlPrincipal.Controls.Add(Me.cboFuncionPrincipal, 1, 0)
         Me.pnlPrincipal.Dock = System.Windows.Forms.DockStyle.Top
-        Me.pnlPrincipal.Location = New System.Drawing.Point(3, 396)
+        Me.pnlPrincipal.Location = New System.Drawing.Point(3, 339)
         Me.pnlPrincipal.Name = "pnlPrincipal"
         Me.pnlPrincipal.RowCount = 1
         Me.pnlPrincipal.RowStyles.Add(New System.Windows.Forms.RowStyle())
@@ -140,9 +144,9 @@ Partial Class frmFusionarFunciones
         '
         Me.lblPrincipal.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.lblPrincipal.AutoSize = True
-        Me.lblPrincipal.Location = New System.Drawing.Point(3, 6)
+        Me.lblPrincipal.Location = New System.Drawing.Point(3, 5)
         Me.lblPrincipal.Name = "lblPrincipal"
-        Me.lblPrincipal.Size = New System.Drawing.Size(160, 25)
+        Me.lblPrincipal.Size = New System.Drawing.Size(200, 28)
         Me.lblPrincipal.TabIndex = 0
         Me.lblPrincipal.Text = "Función que quedará:"
         '
@@ -151,9 +155,9 @@ Partial Class frmFusionarFunciones
         Me.cboFuncionPrincipal.Dock = System.Windows.Forms.DockStyle.Fill
         Me.cboFuncionPrincipal.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboFuncionPrincipal.FormattingEnabled = True
-        Me.cboFuncionPrincipal.Location = New System.Drawing.Point(169, 3)
+        Me.cboFuncionPrincipal.Location = New System.Drawing.Point(209, 3)
         Me.cboFuncionPrincipal.Name = "cboFuncionPrincipal"
-        Me.cboFuncionPrincipal.Size = New System.Drawing.Size(366, 33)
+        Me.cboFuncionPrincipal.Size = New System.Drawing.Size(326, 36)
         Me.cboFuncionPrincipal.TabIndex = 1
         '
         'pnlNombre
@@ -164,7 +168,7 @@ Partial Class frmFusionarFunciones
         Me.pnlNombre.Controls.Add(Me.lblNombreFinal, 0, 0)
         Me.pnlNombre.Controls.Add(Me.txtNombreFinal, 1, 0)
         Me.pnlNombre.Dock = System.Windows.Forms.DockStyle.Top
-        Me.pnlNombre.Location = New System.Drawing.Point(3, 440)
+        Me.pnlNombre.Location = New System.Drawing.Point(3, 383)
         Me.pnlNombre.Name = "pnlNombre"
         Me.pnlNombre.RowCount = 1
         Me.pnlNombre.RowStyles.Add(New System.Windows.Forms.RowStyle())
@@ -175,9 +179,9 @@ Partial Class frmFusionarFunciones
         '
         Me.lblNombreFinal.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.lblNombreFinal.AutoSize = True
-        Me.lblNombreFinal.Location = New System.Drawing.Point(3, 6)
+        Me.lblNombreFinal.Location = New System.Drawing.Point(3, 5)
         Me.lblNombreFinal.Name = "lblNombreFinal"
-        Me.lblNombreFinal.Size = New System.Drawing.Size(128, 25)
+        Me.lblNombreFinal.Size = New System.Drawing.Size(131, 28)
         Me.lblNombreFinal.TabIndex = 0
         Me.lblNombreFinal.Text = "Nombre final:"
         '
@@ -185,9 +189,9 @@ Partial Class frmFusionarFunciones
         '
         Me.txtNombreFinal.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtNombreFinal.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.txtNombreFinal.Location = New System.Drawing.Point(137, 3)
+        Me.txtNombreFinal.Location = New System.Drawing.Point(140, 3)
         Me.txtNombreFinal.Name = "txtNombreFinal"
-        Me.txtNombreFinal.Size = New System.Drawing.Size(398, 31)
+        Me.txtNombreFinal.Size = New System.Drawing.Size(395, 33)
         Me.txtNombreFinal.TabIndex = 1
         '
         'lblNota
@@ -195,10 +199,10 @@ Partial Class frmFusionarFunciones
         Me.lblNota.AutoSize = True
         Me.lblNota.Dock = System.Windows.Forms.DockStyle.Top
         Me.lblNota.ForeColor = System.Drawing.SystemColors.GrayText
-        Me.lblNota.Location = New System.Drawing.Point(3, 481)
-        Me.lblNota.Margin = New System.Windows.Forms.Padding(3, 3, 3, 3)
+        Me.lblNota.Location = New System.Drawing.Point(3, 427)
+        Me.lblNota.Margin = New System.Windows.Forms.Padding(3)
         Me.lblNota.Name = "lblNota"
-        Me.lblNota.Size = New System.Drawing.Size(538, 25)
+        Me.lblNota.Size = New System.Drawing.Size(538, 56)
         Me.lblNota.TabIndex = 5
         Me.lblNota.Text = "Las funciones seleccionadas que no queden como destino serán eliminadas."
         '
@@ -208,10 +212,10 @@ Partial Class frmFusionarFunciones
         Me.pnlBotones.Controls.Add(Me.btnCancelar)
         Me.pnlBotones.Dock = System.Windows.Forms.DockStyle.Fill
         Me.pnlBotones.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
-        Me.pnlBotones.Location = New System.Drawing.Point(3, 510)
+        Me.pnlBotones.Location = New System.Drawing.Point(3, 489)
         Me.pnlBotones.Name = "pnlBotones"
         Me.pnlBotones.Padding = New System.Windows.Forms.Padding(0, 10, 0, 0)
-        Me.pnlBotones.Size = New System.Drawing.Size(538, 27)
+        Me.pnlBotones.Size = New System.Drawing.Size(538, 40)
         Me.pnlBotones.TabIndex = 6
         '
         'btnAceptar
@@ -220,7 +224,7 @@ Partial Class frmFusionarFunciones
         Me.btnAceptar.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
         Me.btnAceptar.Location = New System.Drawing.Point(445, 13)
         Me.btnAceptar.Name = "btnAceptar"
-        Me.btnAceptar.Size = New System.Drawing.Size(90, 35)
+        Me.btnAceptar.Size = New System.Drawing.Size(90, 38)
         Me.btnAceptar.TabIndex = 0
         Me.btnAceptar.Text = "Aceptar"
         Me.btnAceptar.UseVisualStyleBackColor = True
@@ -230,9 +234,9 @@ Partial Class frmFusionarFunciones
         Me.btnCancelar.AutoSize = True
         Me.btnCancelar.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
         Me.btnCancelar.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancelar.Location = New System.Drawing.Point(349, 13)
+        Me.btnCancelar.Location = New System.Drawing.Point(343, 13)
         Me.btnCancelar.Name = "btnCancelar"
-        Me.btnCancelar.Size = New System.Drawing.Size(90, 35)
+        Me.btnCancelar.Size = New System.Drawing.Size(96, 38)
         Me.btnCancelar.TabIndex = 1
         Me.btnCancelar.Text = "Cancelar"
         Me.btnCancelar.UseVisualStyleBackColor = True
@@ -240,14 +244,14 @@ Partial Class frmFusionarFunciones
         'frmFusionarFunciones
         '
         Me.AcceptButton = Me.btnAceptar
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 25.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(11.0!, 28.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnCancelar
-        Me.ClientSize = New System.Drawing.Size(564, 560)
+        Me.ClientSize = New System.Drawing.Size(564, 552)
         Me.Controls.Add(Me.TableLayoutPanel1)
         Me.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
-        Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.Margin = New System.Windows.Forms.Padding(4)
         Me.MaximizeBox = False
         Me.MinimizeBox = False
         Me.Name = "frmFusionarFunciones"
@@ -268,20 +272,20 @@ Partial Class frmFusionarFunciones
 
     End Sub
 
-    Friend WithEvents TableLayoutPanel1 As System.Windows.Forms.TableLayoutPanel
-    Friend WithEvents lblDescripcion As System.Windows.Forms.Label
-    Friend WithEvents pnlBusqueda As System.Windows.Forms.TableLayoutPanel
-    Friend WithEvents lblBuscar As System.Windows.Forms.Label
-    Friend WithEvents txtBuscar As System.Windows.Forms.TextBox
-    Friend WithEvents clbFunciones As System.Windows.Forms.CheckedListBox
-    Friend WithEvents pnlPrincipal As System.Windows.Forms.TableLayoutPanel
-    Friend WithEvents lblPrincipal As System.Windows.Forms.Label
-    Friend WithEvents cboFuncionPrincipal As System.Windows.Forms.ComboBox
-    Friend WithEvents pnlNombre As System.Windows.Forms.TableLayoutPanel
-    Friend WithEvents lblNombreFinal As System.Windows.Forms.Label
-    Friend WithEvents txtNombreFinal As System.Windows.Forms.TextBox
-    Friend WithEvents lblNota As System.Windows.Forms.Label
-    Friend WithEvents pnlBotones As System.Windows.Forms.FlowLayoutPanel
-    Friend WithEvents btnAceptar As System.Windows.Forms.Button
-    Friend WithEvents btnCancelar As System.Windows.Forms.Button
+    Friend WithEvents TableLayoutPanel1 As TableLayoutPanel
+    Friend WithEvents lblDescripcion As Label
+    Friend WithEvents pnlBusqueda As TableLayoutPanel
+    Friend WithEvents lblBuscar As Label
+    Friend WithEvents txtBuscar As TextBox
+    Friend WithEvents clbFunciones As CheckedListBox
+    Friend WithEvents pnlPrincipal As TableLayoutPanel
+    Friend WithEvents lblPrincipal As Label
+    Friend WithEvents cboFuncionPrincipal As ComboBox
+    Friend WithEvents pnlNombre As TableLayoutPanel
+    Friend WithEvents lblNombreFinal As Label
+    Friend WithEvents txtNombreFinal As TextBox
+    Friend WithEvents lblNota As Label
+    Friend WithEvents pnlBotones As FlowLayoutPanel
+    Friend WithEvents btnAceptar As Button
+    Friend WithEvents btnCancelar As Button
 End Class
