@@ -145,61 +145,12 @@ Public Class frmViaticosListas
         Dim visor = AbrirHijoEnDashboard(Of frmViaticosRPT)(
             Sub(f)
                 f.Preparar(dtpPeriodo.Value, dtReporte)
-                AddHandler f.FormClosed, AddressOf Visor_FormClosed
             End Sub)
 
         If visor Is Nothing Then
             Return
         End If
     End Sub
-
-    Private Sub Visor_FormClosed(sender As Object, e As FormClosedEventArgs)
-        Dim visor = TryCast(sender, Form)
-        If visor IsNot Nothing Then
-            RemoveHandler visor.FormClosed, AddressOf Visor_FormClosed
-        End If
-
-        VolverAListadoFuncionarios()
-    End Sub
-
-    Private Sub VolverAListadoFuncionarios()
-        Dim dash = GetDashboard()
-
-        If dash Is Nothing OrElse dash.IsDisposed Then
-            If Not Me.IsDisposed Then
-                Try
-                    Me.Close()
-                Catch
-                End Try
-            End If
-            Return
-        End If
-
-        Dim accion As MethodInvoker = Sub()
-                                          Try
-                                              If Not Me.IsDisposed Then
-                                                  Me.Close()
-                                              End If
-                                          Catch
-                                          End Try
-
-                                          Try
-                                              dash.btnBuscarFuncionario.PerformClick()
-                                          Catch ex As Exception
-                                              Notifier.Warn(dash, "No se pudo volver al listado de funcionarios.")
-                                          End Try
-                                      End Sub
-
-        If dash.InvokeRequired Then
-            dash.BeginInvoke(accion)
-        Else
-            accion()
-        End If
-    End Sub
-
-    Private Function GetDashboard() As frmDashboard
-        Return Application.OpenForms.OfType(Of frmDashboard)().FirstOrDefault()
-    End Function
 
     Private Function AbrirHijoEnDashboard(Of TForm As {Form, New})(Optional configurar As Action(Of TForm) = Nothing) As TForm
         Dim dash = Application.OpenForms.OfType(Of frmDashboard)().FirstOrDefault()
