@@ -7,23 +7,44 @@ Imports Microsoft.Reporting.WinForms
 
 Public Class frmViaticosRPT
 
-    Private ReadOnly _periodo As Date
-    Private ReadOnly _datos As DataTable
+    Private _periodo As Date
+    Private _datos As DataTable
+    Private _estaPreparado As Boolean
 
-    Public Sub New(periodo As Date, datos As DataTable)
-        If datos Is Nothing Then Throw New ArgumentNullException(NameOf(datos))
+    Public Sub New()
         InitializeComponent()
-        _periodo = periodo
-        _datos = datos
         Me.KeyPreview = True
     End Sub
 
+    Public Sub New(periodo As Date, datos As DataTable)
+        Me.New()
+        Preparar(periodo, datos)
+    End Sub
+
+    Public Sub Preparar(periodo As Date, datos As DataTable)
+        If datos Is Nothing Then Throw New ArgumentNullException(NameOf(datos))
+
+        _periodo = periodo
+        _datos = datos
+        _estaPreparado = True
+    End Sub
+
     Private Sub frmViaticosRPT_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        If Not _estaPreparado OrElse _datos Is Nothing Then
+            Notifier.Warn(Me, "No se proporcionaron datos para el reporte.")
+            Me.Close()
+            Return
+        End If
+
         ConfigurarReporte()
         AppTheme.Aplicar(Me)
     End Sub
 
     Private Sub ConfigurarReporte()
+        If Not _estaPreparado OrElse _datos Is Nothing Then
+            Throw New InvalidOperationException("El reporte no fue configurado correctamente antes de mostrarse.")
+        End If
+
         Dim cursorAnterior = Me.Cursor
         Me.Cursor = Cursors.WaitCursor
 
