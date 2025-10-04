@@ -52,7 +52,9 @@ Partial Class frmFuncionarioBuscar
         Me.lblUnidadValor = New System.Windows.Forms.Label()
         Me.lblPuestoTitulo = New System.Windows.Forms.Label()
         Me.lblPuestoValor = New System.Windows.Forms.Label()
-        Me.lblSubDireccion = New System.Windows.Forms.Label()
+        Me.flpSubDireccionDetalle = New System.Windows.Forms.FlowLayoutPanel()
+        Me.lblSubDireccionTitulo = New System.Windows.Forms.Label()
+        Me.lblSubDireccionValor = New System.Windows.Forms.Label()
         Me.flpCargoDetalle = New System.Windows.Forms.FlowLayoutPanel()
         Me.lblEscalafonTitulo = New System.Windows.Forms.Label()
         Me.lblEscalafonValor = New System.Windows.Forms.Label()
@@ -83,6 +85,7 @@ Partial Class frmFuncionarioBuscar
         Me.flpDetalles.SuspendLayout()
         Me.flpHorarioDetalle.SuspendLayout()
         Me.flpUbicacionDetalle.SuspendLayout()
+        Me.flpSubDireccionDetalle.SuspendLayout()
         Me.flpCargoDetalle.SuspendLayout()
         Me.tlpAcciones.SuspendLayout()
         CType(Me.pbFotoDetalle, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -253,7 +256,7 @@ Partial Class frmFuncionarioBuscar
         Me.flpDetalles.Controls.Add(Me.lblFechaIngreso)
         Me.flpDetalles.Controls.Add(Me.flpHorarioDetalle)
         Me.flpDetalles.Controls.Add(Me.flpUbicacionDetalle)
-        Me.flpDetalles.Controls.Add(Me.lblSubDireccion)
+        Me.flpDetalles.Controls.Add(Me.flpSubDireccionDetalle)
         Me.flpDetalles.Controls.Add(Me.flpCargoDetalle)
         Me.flpDetalles.Controls.Add(Me.lblPresencia)
         Me.flpDetalles.Controls.Add(Me.lblEstadoActividad)
@@ -462,18 +465,41 @@ Partial Class frmFuncionarioBuscar
         Me.lblPuestoValor.TabIndex = 3
         Me.lblPuestoValor.Text = "-"
         '
-        'lblSubDireccion
+        'flpSubDireccionDetalle
         '
-        Me.lblSubDireccion.Anchor = System.Windows.Forms.AnchorStyles.Left
-        Me.lblSubDireccion.AutoSize = True
-        Me.lblSubDireccion.Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)
-        Me.lblSubDireccion.ForeColor = System.Drawing.Color.DimGray
-        Me.lblSubDireccion.Location = New System.Drawing.Point(3, 198)
-        Me.lblSubDireccion.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
-        Me.lblSubDireccion.Name = "lblSubDireccion"
-        Me.lblSubDireccion.Size = New System.Drawing.Size(149, 25)
-        Me.lblSubDireccion.TabIndex = 24
-        Me.lblSubDireccion.Text = "SubDireccion: -"
+        Me.flpSubDireccionDetalle.Anchor = System.Windows.Forms.AnchorStyles.Left
+        Me.flpSubDireccionDetalle.AutoSize = True
+        Me.flpSubDireccionDetalle.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+        Me.flpSubDireccionDetalle.Controls.Add(Me.lblSubDireccionTitulo)
+        Me.flpSubDireccionDetalle.Controls.Add(Me.lblSubDireccionValor)
+        Me.flpSubDireccionDetalle.Location = New System.Drawing.Point(3, 198)
+        Me.flpSubDireccionDetalle.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
+        Me.flpSubDireccionDetalle.Name = "flpSubDireccionDetalle"
+        Me.flpSubDireccionDetalle.Size = New System.Drawing.Size(150, 25)
+        Me.flpSubDireccionDetalle.TabIndex = 24
+        '
+        'lblSubDireccionTitulo
+        '
+        Me.lblSubDireccionTitulo.AutoSize = True
+        Me.lblSubDireccionTitulo.Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)
+        Me.lblSubDireccionTitulo.ForeColor = System.Drawing.Color.DimGray
+        Me.lblSubDireccionTitulo.Location = New System.Drawing.Point(3, 0)
+        Me.lblSubDireccionTitulo.Margin = New System.Windows.Forms.Padding(0, 0, 3, 0)
+        Me.lblSubDireccionTitulo.Name = "lblSubDireccionTitulo"
+        Me.lblSubDireccionTitulo.Size = New System.Drawing.Size(120, 25)
+        Me.lblSubDireccionTitulo.TabIndex = 0
+        Me.lblSubDireccionTitulo.Text = "SubDireccion:"
+        '
+        'lblSubDireccionValor
+        '
+        Me.lblSubDireccionValor.AutoSize = True
+        Me.lblSubDireccionValor.Font = New System.Drawing.Font("Segoe UI", 9.5!)
+        Me.lblSubDireccionValor.ForeColor = System.Drawing.Color.DimGray
+        Me.lblSubDireccionValor.Location = New System.Drawing.Point(126, 0)
+        Me.lblSubDireccionValor.Name = "lblSubDireccionValor"
+        Me.lblSubDireccionValor.Size = New System.Drawing.Size(21, 25)
+        Me.lblSubDireccionValor.TabIndex = 1
+        Me.lblSubDireccionValor.Text = "-"
         '
         'flpCargoDetalle
         '
@@ -710,6 +736,8 @@ Partial Class frmFuncionarioBuscar
         Me.flpHorarioDetalle.PerformLayout()
         Me.flpUbicacionDetalle.ResumeLayout(False)
         Me.flpUbicacionDetalle.PerformLayout()
+        Me.flpSubDireccionDetalle.ResumeLayout(False)
+        Me.flpSubDireccionDetalle.PerformLayout()
         Me.flpCargoDetalle.ResumeLayout(False)
         Me.flpCargoDetalle.PerformLayout()
         Me.tlpAcciones.ResumeLayout(False)
@@ -746,7 +774,9 @@ Partial Class frmFuncionarioBuscar
     Friend WithEvents lblUnidadValor As Label
     Friend WithEvents lblPuestoTitulo As Label
     Friend WithEvents lblPuestoValor As Label
-    Friend WithEvents lblSubDireccion As Label
+    Friend WithEvents flpSubDireccionDetalle As FlowLayoutPanel
+    Friend WithEvents lblSubDireccionTitulo As Label
+    Friend WithEvents lblSubDireccionValor As Label
     Friend WithEvents flpCargoDetalle As FlowLayoutPanel
     Friend WithEvents lblEscalafonTitulo As Label
     Friend WithEvents lblEscalafonValor As Label
