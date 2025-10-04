@@ -28,15 +28,20 @@ Public Class frmResumenCantidades
     Private _lblLicenciasSinDatos As Label
     Private _lblPresenciasSinDatos As Label
 
-    Private ReadOnly _lblTotalFuncionarios As Label
-    Private ReadOnly _lblActivos As Label
-    Private ReadOnly _lblInactivos As Label
-    Private ReadOnly _lblPresentes As Label
-    Private ReadOnly _lblFrancos As Label
-    Private ReadOnly _lblLicencias As Label
-    Private ReadOnly _lblAusentes As Label
+    Private _lblTotalFuncionarios As Label
+    Private _lblActivos As Label
+    Private _lblInactivos As Label
+    Private _lblPresentes As Label
+    Private _lblFrancos As Label
+    Private _lblLicencias As Label
+    Private _lblAusentes As Label
 
     Public Sub New()
+        InitializeComponent()
+        AddHandler _btnActualizar.Click, AddressOf BtnActualizar_Click
+    End Sub
+
+    Private Sub InitializeComponent()
         _lblTotalFuncionarios = CrearEtiquetaValor()
         _lblActivos = CrearEtiquetaValor()
         _lblInactivos = CrearEtiquetaValor()
@@ -45,11 +50,6 @@ Public Class frmResumenCantidades
         _lblLicencias = CrearEtiquetaValor()
         _lblAusentes = CrearEtiquetaValor()
 
-        InitializeComponent()
-        AddHandler _btnActualizar.Click, AddressOf BtnActualizar_Click
-    End Sub
-
-    Private Sub InitializeComponent()
         _dtpFecha = New DateTimePicker()
         _btnActualizar = New Button()
         _lblUltimaActualizacion = New Label()
