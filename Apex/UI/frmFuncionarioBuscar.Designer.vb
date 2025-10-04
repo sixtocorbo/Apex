@@ -107,7 +107,7 @@ Partial Class frmFuncionarioBuscar
         '
         Me.splitContenedor.Panel2.Controls.Add(Me.panelDetalle)
         Me.splitContenedor.Panel2MinSize = 400
-        Me.splitContenedor.Size = New System.Drawing.Size(944, 695)
+        Me.splitContenedor.Size = New System.Drawing.Size(944, 699)
         Me.splitContenedor.SplitterDistance = 539
         Me.splitContenedor.TabIndex = 0
         '
@@ -123,7 +123,7 @@ Partial Class frmFuncionarioBuscar
         Me.tlpResultados.Name = "tlpResultados"
         Me.tlpResultados.RowCount = 1
         Me.tlpResultados.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-        Me.tlpResultados.Size = New System.Drawing.Size(539, 580)
+        Me.tlpResultados.Size = New System.Drawing.Size(539, 584)
         Me.tlpResultados.TabIndex = 1
         '
         'dgvFuncionarios
@@ -140,7 +140,7 @@ Partial Class frmFuncionarioBuscar
         Me.dgvFuncionarios.ReadOnly = True
         Me.dgvFuncionarios.RowHeadersWidth = 62
         Me.dgvFuncionarios.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing
-        Me.dgvFuncionarios.Size = New System.Drawing.Size(431, 574)
+        Me.dgvFuncionarios.Size = New System.Drawing.Size(431, 578)
         Me.dgvFuncionarios.TabIndex = 1
         '
         'lstCargos
@@ -152,7 +152,7 @@ Partial Class frmFuncionarioBuscar
         Me.lstCargos.ItemHeight = 25
         Me.lstCargos.Location = New System.Drawing.Point(440, 3)
         Me.lstCargos.Name = "lstCargos"
-        Me.lstCargos.Size = New System.Drawing.Size(96, 574)
+        Me.lstCargos.Size = New System.Drawing.Size(96, 578)
         Me.lstCargos.TabIndex = 2
         '
         'PanelBusquedaLista
@@ -224,7 +224,7 @@ Partial Class frmFuncionarioBuscar
         Me.panelDetalle.Location = New System.Drawing.Point(0, 0)
         Me.panelDetalle.Name = "panelDetalle"
         Me.panelDetalle.Padding = New System.Windows.Forms.Padding(12)
-        Me.panelDetalle.Size = New System.Drawing.Size(401, 695)
+        Me.panelDetalle.Size = New System.Drawing.Size(401, 699)
         Me.panelDetalle.TabIndex = 0
         '
         'tlpDetalleVertical
@@ -243,7 +243,7 @@ Partial Class frmFuncionarioBuscar
         Me.tlpDetalleVertical.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
         Me.tlpDetalleVertical.RowStyles.Add(New System.Windows.Forms.RowStyle())
         Me.tlpDetalleVertical.RowStyles.Add(New System.Windows.Forms.RowStyle())
-        Me.tlpDetalleVertical.Size = New System.Drawing.Size(377, 671)
+        Me.tlpDetalleVertical.Size = New System.Drawing.Size(377, 675)
         Me.tlpDetalleVertical.TabIndex = 1
         '
         'flpDetalles
@@ -261,7 +261,7 @@ Partial Class frmFuncionarioBuscar
         Me.flpDetalles.Controls.Add(Me.lblPresencia)
         Me.flpDetalles.Controls.Add(Me.lblEstadoActividad)
         Me.flpDetalles.FlowDirection = System.Windows.Forms.FlowDirection.TopDown
-        Me.flpDetalles.Location = New System.Drawing.Point(3, 398)
+        Me.flpDetalles.Location = New System.Drawing.Point(3, 402)
         Me.flpDetalles.Name = "flpDetalles"
         Me.flpDetalles.Size = New System.Drawing.Size(371, 270)
         Me.flpDetalles.TabIndex = 22
@@ -618,7 +618,7 @@ Partial Class frmFuncionarioBuscar
         '
         Me.btnVerSituacion.Dock = System.Windows.Forms.DockStyle.Fill
         Me.btnVerSituacion.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.btnVerSituacion.Location = New System.Drawing.Point(3, 356)
+        Me.btnVerSituacion.Location = New System.Drawing.Point(3, 360)
         Me.btnVerSituacion.Name = "btnVerSituacion"
         Me.btnVerSituacion.Size = New System.Drawing.Size(371, 36)
         Me.btnVerSituacion.TabIndex = 17
@@ -702,7 +702,7 @@ Partial Class frmFuncionarioBuscar
         Me.pbFotoDetalle.Location = New System.Drawing.Point(3, 47)
         Me.pbFotoDetalle.Margin = New System.Windows.Forms.Padding(3, 3, 3, 16)
         Me.pbFotoDetalle.Name = "pbFotoDetalle"
-        Me.pbFotoDetalle.Size = New System.Drawing.Size(371, 290)
+        Me.pbFotoDetalle.Size = New System.Drawing.Size(371, 294)
         Me.pbFotoDetalle.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
         Me.pbFotoDetalle.TabIndex = 0
         Me.pbFotoDetalle.TabStop = False
@@ -711,7 +711,7 @@ Partial Class frmFuncionarioBuscar
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 25.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(944, 695)
+        Me.ClientSize = New System.Drawing.Size(944, 699)
         Me.Controls.Add(Me.splitContenedor)
         Me.Font = New System.Drawing.Font("Segoe UI", 9.0!)
         Me.MinimumSize = New System.Drawing.Size(800, 600)
