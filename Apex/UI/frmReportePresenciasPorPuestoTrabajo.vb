@@ -24,7 +24,7 @@ Public Class frmReportePresenciasPorPuestoTrabajo
 
     Protected Overrides ReadOnly Property TooltipAusentes As String
         Get
-            Return "Funcionarios activos sin presencia registrada en la fecha consultada (incluye francos, licencias y sin registro)."
+            Return "Funcionarios activos sin presencia registrada en la fecha consultada (excluye francos)."
         End Get
     End Property
 End Class

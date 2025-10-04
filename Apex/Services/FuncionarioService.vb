@@ -492,7 +492,11 @@ Public Class FuncionarioService
                     Case FiltroPresencia.Presentes
                         incluir = (categoria = CategoriaPresencia.Presente)
                     Case FiltroPresencia.Ausentes
-                        incluir = (categoria <> CategoriaPresencia.Presente AndAlso categoria <> CategoriaPresencia.Inactivo)
+                        incluir = (
+                            categoria <> CategoriaPresencia.Presente AndAlso
+                            categoria <> CategoriaPresencia.Inactivo AndAlso
+                            categoria <> CategoriaPresencia.Franco
+                        )
                 End Select
 
                 If Not incluir Then
@@ -553,7 +557,7 @@ Public Class FuncionarioService
             Return CategoriaPresencia.Inactivo
         End If
 
-        If valor.Equals("Franco", StringComparison.OrdinalIgnoreCase) Then
+        If valor.IndexOf("franco", StringComparison.OrdinalIgnoreCase) >= 0 Then
             Return CategoriaPresencia.Franco
         End If
 
