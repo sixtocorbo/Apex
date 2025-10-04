@@ -57,13 +57,18 @@ Public Class frmGrados
     End Sub
 
     ' ------------------ CARGA DE DATOS ------------------
-    Private Async Function CargarDatosAsync() As Task
+    Private Async Function CargarDatosAsync(Optional idASeleccionar As Integer? = Nothing) As Task
         If _estaCargando Then Return
         _estaCargando = True
 
         Me.Cursor = Cursors.WaitCursor
         dgvCargos.Enabled = False
-        RecordarSeleccion()
+
+        If idASeleccionar.HasValue AndAlso idASeleccionar.Value > 0 Then
+            _ultimoIdSeleccionado = idASeleccionar.Value
+        Else
+            RecordarSeleccion()
+        End If
 
         Try
             Dim lista As List(Of Cargo)
@@ -183,6 +188,7 @@ Public Class frmGrados
         txtGrado.Clear()
         btnEliminar.Enabled = False
         dgvCargos.ClearSelection()
+        _ultimoIdSeleccionado = 0
         txtNombre.Focus()
     End Sub
 
@@ -200,6 +206,7 @@ Public Class frmGrados
     Private Sub dgvCargos_SelectionChanged(sender As Object, e As EventArgs) Handles dgvCargos.SelectionChanged
         If dgvCargos.CurrentRow IsNot Nothing AndAlso dgvCargos.CurrentRow.DataBoundItem IsNot Nothing Then
             _cargoSeleccionado = CType(dgvCargos.CurrentRow.DataBoundItem, Cargo)
+            _ultimoIdSeleccionado = _cargoSeleccionado.Id
             MostrarDetalles()
         End If
     End Sub
@@ -242,20 +249,50 @@ Public Class frmGrados
 
         Me.Cursor = Cursors.WaitCursor
         btnGuardar.Enabled = False
+
+        Dim idSeleccionar As Integer = 0
+        Dim nombreSeleccionar = _cargoSeleccionado.Nombre
+
         Try
             Using svc As New CargoService()
                 If _cargoSeleccionado.Id = 0 Then
                     _cargoSeleccionado.CreatedAt = DateTime.Now
-                    Await svc.CreateAsync(_cargoSeleccionado)
+                    Dim nuevoId As Integer = 0
+                    Try
+                        nuevoId = Await svc.CreateAsync(_cargoSeleccionado)
+                    Catch
+                        nuevoId = 0
+                    End Try
+                    If nuevoId > 0 Then
+                        _cargoSeleccionado.Id = nuevoId
+                        idSeleccionar = nuevoId
+                    End If
                     Notifier.Success(Me, "Cargo creado correctamente.")
                 Else
                     _cargoSeleccionado.UpdatedAt = DateTime.Now
                     Await svc.UpdateAsync(_cargoSeleccionado)
+                    idSeleccionar = _cargoSeleccionado.Id
                     Notifier.Success(Me, "Cargo actualizado correctamente.")
                 End If
             End Using
-            Await CargarDatosAsync()
-            LimpiarCampos()
+
+            Dim idObjetivo = If(idSeleccionar > 0, idSeleccionar, _cargoSeleccionado.Id)
+            If idObjetivo > 0 Then
+                Await CargarDatosAsync(idObjetivo)
+            Else
+                Await CargarDatosAsync()
+            End If
+
+            If idObjetivo <= 0 AndAlso Not String.IsNullOrWhiteSpace(nombreSeleccionar) Then
+                Dim fila = _listaCargos?.FirstOrDefault(Function(c) c IsNot Nothing AndAlso
+                                                            String.Equals(c.Nombre, nombreSeleccionar, StringComparison.OrdinalIgnoreCase))
+                If fila IsNot Nothing Then
+                    _ultimoIdSeleccionado = fila.Id
+                    RestaurarSeleccion()
+                End If
+            End If
+
+            MostrarDetalles()
         Catch ex As Exception
             Notifier.Error(Me, $"Ocurrió un error al guardar el cargo: {ex.Message}")
         Finally

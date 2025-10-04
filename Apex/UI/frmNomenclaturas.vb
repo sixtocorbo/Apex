@@ -4,6 +4,7 @@ Public Class frmNomenclaturas
     Private _unitOfWork As New UnitOfWork()
     Private _listaNomenclaturas As List(Of Nomenclatura)
     Private _nomenclaturaSeleccionada As Nomenclatura
+    Private _ultimoIdSeleccionado As Integer = 0
     Public Sub New()
         InitializeComponent()
         ConfigurarLayoutResponsivoNomenclaturas()
@@ -148,14 +149,19 @@ Public Class frmNomenclaturas
     End Sub
 
 
-    Private Async Function CargarDatosAsync() As Task
+    Private Async Function CargarDatosAsync(Optional idSeleccionar As Integer? = Nothing) As Task
         Dim oldCursor = Me.Cursor
         Me.Cursor = Cursors.WaitCursor
         Try
             Dim repo = _unitOfWork.Repository(Of Nomenclatura)()
             _listaNomenclaturas = Await repo.GetAll().OrderBy(Function(n) n.Nombre).ToListAsync()
             dgvNomenclaturas.DataSource = _listaNomenclaturas
-            dgvNomenclaturas.ClearSelection()
+
+            If idSeleccionar.HasValue AndAlso idSeleccionar.Value > 0 Then
+                _ultimoIdSeleccionado = idSeleccionar.Value
+            End If
+
+            RestaurarSeleccion()
         Catch ex As Exception
             Notifier.[Error](Me, $"No se pudieron cargar las nomenclaturas: {ex.Message}")
             dgvNomenclaturas.DataSource = New List(Of Nomenclatura)()
@@ -251,6 +257,7 @@ Public Class frmNomenclaturas
         If item Is Nothing Then Return
 
         _nomenclaturaSeleccionada = item
+        _ultimoIdSeleccionado = item.Id
         MostrarDetalles()
     End Sub
 
@@ -266,7 +273,7 @@ Public Class frmNomenclaturas
             txtObservaciones.Text = _nomenclaturaSeleccionada.Observaciones
             chkUsaFecha.Checked = _nomenclaturaSeleccionada.UsaFecha
             chkUsaNomenclaturaCodigo.Checked = _nomenclaturaSeleccionada.UsaNomenclaturaCodigo
-            btnEliminar.Enabled = True
+            btnEliminar.Enabled = (_nomenclaturaSeleccionada.Id > 0)
         Else
             LimpiarCampos()
         End If
@@ -285,7 +292,36 @@ Public Class frmNomenclaturas
         chkUsaNomenclaturaCodigo.Checked = False
         btnEliminar.Enabled = False
         dgvNomenclaturas.ClearSelection()
+        _ultimoIdSeleccionado = 0
         txtNombre.Focus()
+    End Sub
+
+    Private Sub RestaurarSeleccion(Optional idForzar As Integer? = Nothing)
+        Dim idObjetivo = If(idForzar.HasValue AndAlso idForzar.Value > 0, idForzar.Value, _ultimoIdSeleccionado)
+        If idObjetivo <= 0 OrElse dgvNomenclaturas.Rows.Count = 0 Then
+            dgvNomenclaturas.ClearSelection()
+            Return
+        End If
+
+        For Each row As DataGridViewRow In dgvNomenclaturas.Rows
+            Dim item = TryCast(row.DataBoundItem, Nomenclatura)
+            If item IsNot Nothing AndAlso item.Id = idObjetivo Then
+                row.Selected = True
+                Dim firstVisible = dgvNomenclaturas.Columns.GetFirstColumn(DataGridViewElementStates.Visible)
+                If firstVisible IsNot Nothing Then
+                    dgvNomenclaturas.CurrentCell = row.Cells(firstVisible.Index)
+                ElseIf row.Cells.Count > 0 Then
+                    dgvNomenclaturas.CurrentCell = row.Cells(0)
+                End If
+                dgvNomenclaturas.FirstDisplayedScrollingRowIndex = Math.Max(0, row.Index)
+                _nomenclaturaSeleccionada = item
+                _ultimoIdSeleccionado = item.Id
+                MostrarDetalles()
+                Exit Sub
+            End If
+        Next
+
+        dgvNomenclaturas.ClearSelection()
     End Sub
 
     Private Sub btnNuevo_Click(sender As Object, e As EventArgs) Handles btnNuevo.Click
@@ -325,8 +361,25 @@ Public Class frmNomenclaturas
             Await _unitOfWork.CommitAsync()
             Notifier.Success(Me, "Nomenclatura guardada correctamente.")
 
-            Await CargarDatosAsync()
-            LimpiarCampos()
+            Dim idGuardado = _nomenclaturaSeleccionada.Id
+
+            If idGuardado > 0 Then
+                _ultimoIdSeleccionado = idGuardado
+                Await CargarDatosAsync(idGuardado)
+            Else
+                Await CargarDatosAsync()
+                Dim fila = _listaNomenclaturas?.FirstOrDefault(Function(n) n IsNot Nothing AndAlso
+                                                                    String.Equals(n.Nombre, _nomenclaturaSeleccionada.Nombre, StringComparison.OrdinalIgnoreCase) AndAlso
+                                                                    String.Equals(n.Codigo, _nomenclaturaSeleccionada.Codigo, StringComparison.OrdinalIgnoreCase))
+                If fila IsNot Nothing Then
+                    _ultimoIdSeleccionado = fila.Id
+                    RestaurarSeleccion()
+                Else
+                    _ultimoIdSeleccionado = 0
+                End If
+            End If
+
+            MostrarDetalles()
 
         Catch ex As Exception
             Notifier.[Error](Me, $"Ocurrió un error al guardar: {ex.Message}")
@@ -378,7 +431,7 @@ Public Class frmNomenclaturas
         Dim q = If(txtBuscar.Text, String.Empty).Trim().ToUpperInvariant()
         If q.Length = 0 Then
             dgvNomenclaturas.DataSource = _listaNomenclaturas
-            dgvNomenclaturas.ClearSelection()
+            RestaurarSeleccion()
             Return
         End If
 
@@ -391,7 +444,7 @@ Public Class frmNomenclaturas
                                   End Function).ToList()
 
         dgvNomenclaturas.DataSource = resultado
-        dgvNomenclaturas.ClearSelection()
+        RestaurarSeleccion()
     End Sub
 
     Private Sub Cerrando(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
