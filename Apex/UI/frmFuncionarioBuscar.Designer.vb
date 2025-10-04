@@ -267,14 +267,14 @@ Partial Class frmFuncionarioBuscar
         Me.flpDetalles.AutoScroll = True
         Me.flpDetalles.Controls.Add(Me.lblNombreCompleto)
         Me.flpDetalles.Controls.Add(Me.flpCIDetalle)
+        Me.flpDetalles.Controls.Add(Me.flpEstadoDetalle)
         Me.flpDetalles.Controls.Add(Me.flpTipoDetalle)
         Me.flpDetalles.Controls.Add(Me.flpFechaIngresoDetalle)
-        Me.flpDetalles.Controls.Add(Me.flpHorarioDetalle)
-        Me.flpDetalles.Controls.Add(Me.flpUbicacionDetalle)
-        Me.flpDetalles.Controls.Add(Me.flpSubDireccionDetalle)
         Me.flpDetalles.Controls.Add(Me.flpCargoDetalle)
+        Me.flpDetalles.Controls.Add(Me.flpSubDireccionDetalle)
+        Me.flpDetalles.Controls.Add(Me.flpUbicacionDetalle)
+        Me.flpDetalles.Controls.Add(Me.flpHorarioDetalle)
         Me.flpDetalles.Controls.Add(Me.flpPresenciaDetalle)
-        Me.flpDetalles.Controls.Add(Me.flpEstadoDetalle)
         Me.flpDetalles.FlowDirection = System.Windows.Forms.FlowDirection.TopDown
         Me.flpDetalles.Location = New System.Drawing.Point(3, 402)
         Me.flpDetalles.Name = "flpDetalles"
@@ -337,11 +337,11 @@ Partial Class frmFuncionarioBuscar
         Me.flpTipoDetalle.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
         Me.flpTipoDetalle.Controls.Add(Me.lblTipoTitulo)
         Me.flpTipoDetalle.Controls.Add(Me.lblTipoValor)
-        Me.flpTipoDetalle.Location = New System.Drawing.Point(3, 81)
+        Me.flpTipoDetalle.Location = New System.Drawing.Point(3, 108)
         Me.flpTipoDetalle.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
         Me.flpTipoDetalle.Name = "flpTipoDetalle"
         Me.flpTipoDetalle.Size = New System.Drawing.Size(92, 25)
-        Me.flpTipoDetalle.TabIndex = 4
+        Me.flpTipoDetalle.TabIndex = 5
         '
         'lblTipoTitulo
         '
@@ -374,11 +374,11 @@ Partial Class frmFuncionarioBuscar
         Me.flpFechaIngresoDetalle.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
         Me.flpFechaIngresoDetalle.Controls.Add(Me.lblFechaIngresoTitulo)
         Me.flpFechaIngresoDetalle.Controls.Add(Me.lblFechaIngresoValor)
-        Me.flpFechaIngresoDetalle.Location = New System.Drawing.Point(3, 108)
-        Me.flpFechaIngresoDetalle.Margin = New System.Windows.Forms.Padding(3, 0, 3, 4)
+        Me.flpFechaIngresoDetalle.Location = New System.Drawing.Point(3, 143)
+        Me.flpFechaIngresoDetalle.Margin = New System.Windows.Forms.Padding(3, 8, 3, 2)
         Me.flpFechaIngresoDetalle.Name = "flpFechaIngresoDetalle"
         Me.flpFechaIngresoDetalle.Size = New System.Drawing.Size(175, 25)
-        Me.flpFechaIngresoDetalle.TabIndex = 5
+        Me.flpFechaIngresoDetalle.TabIndex = 6
         '
         'lblFechaIngresoTitulo
         '
@@ -415,11 +415,11 @@ Partial Class frmFuncionarioBuscar
         Me.flpHorarioDetalle.Controls.Add(Me.lblTurnoValor)
         Me.flpHorarioDetalle.Controls.Add(Me.lblPlantillaTitulo)
         Me.flpHorarioDetalle.Controls.Add(Me.lblPlantillaValor)
-        Me.flpHorarioDetalle.Location = New System.Drawing.Point(3, 137)
-        Me.flpHorarioDetalle.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
+        Me.flpHorarioDetalle.Location = New System.Drawing.Point(3, 267)
+        Me.flpHorarioDetalle.Margin = New System.Windows.Forms.Padding(3, 8, 3, 2)
         Me.flpHorarioDetalle.Name = "flpHorarioDetalle"
         Me.flpHorarioDetalle.Size = New System.Drawing.Size(353, 25)
-        Me.flpHorarioDetalle.TabIndex = 13
+        Me.flpHorarioDetalle.TabIndex = 10
         '
         'lblHorarioTitulo
         '
@@ -500,11 +500,11 @@ Partial Class frmFuncionarioBuscar
         Me.flpUbicacionDetalle.Controls.Add(Me.lblUnidadValor)
         Me.flpUbicacionDetalle.Controls.Add(Me.lblPuestoTitulo)
         Me.flpUbicacionDetalle.Controls.Add(Me.lblPuestoValor)
-        Me.flpUbicacionDetalle.Location = New System.Drawing.Point(3, 164)
+        Me.flpUbicacionDetalle.Location = New System.Drawing.Point(3, 232)
         Me.flpUbicacionDetalle.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
         Me.flpUbicacionDetalle.Name = "flpUbicacionDetalle"
         Me.flpUbicacionDetalle.Size = New System.Drawing.Size(253, 25)
-        Me.flpUbicacionDetalle.TabIndex = 23
+        Me.flpUbicacionDetalle.TabIndex = 9
         '
         'lblUbicacionTitulo
         '
@@ -559,11 +559,11 @@ Partial Class frmFuncionarioBuscar
         Me.flpSubDireccionDetalle.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
         Me.flpSubDireccionDetalle.Controls.Add(Me.lblSubDireccionTitulo)
         Me.flpSubDireccionDetalle.Controls.Add(Me.lblSubDireccionValor)
-        Me.flpSubDireccionDetalle.Location = New System.Drawing.Point(3, 191)
-        Me.flpSubDireccionDetalle.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
+        Me.flpSubDireccionDetalle.Location = New System.Drawing.Point(3, 205)
+        Me.flpSubDireccionDetalle.Margin = New System.Windows.Forms.Padding(3, 8, 3, 2)
         Me.flpSubDireccionDetalle.Name = "flpSubDireccionDetalle"
         Me.flpSubDireccionDetalle.Size = New System.Drawing.Size(165, 25)
-        Me.flpSubDireccionDetalle.TabIndex = 24
+        Me.flpSubDireccionDetalle.TabIndex = 8
         '
         'lblSubDireccionTitulo
         '
@@ -599,11 +599,11 @@ Partial Class frmFuncionarioBuscar
         Me.flpCargoDetalle.Controls.Add(Me.lblSubEscalafonValor)
         Me.flpCargoDetalle.Controls.Add(Me.lblJerarquiaTitulo)
         Me.flpCargoDetalle.Controls.Add(Me.lblJerarquiaValor)
-        Me.flpCargoDetalle.Location = New System.Drawing.Point(3, 218)
+        Me.flpCargoDetalle.Location = New System.Drawing.Point(3, 170)
         Me.flpCargoDetalle.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
         Me.flpCargoDetalle.Name = "flpCargoDetalle"
         Me.flpCargoDetalle.Size = New System.Drawing.Size(443, 25)
-        Me.flpCargoDetalle.TabIndex = 4
+        Me.flpCargoDetalle.TabIndex = 7
         '
         'lblEscalafonTitulo
         '
@@ -682,11 +682,12 @@ Partial Class frmFuncionarioBuscar
         Me.flpPresenciaDetalle.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
         Me.flpPresenciaDetalle.Controls.Add(Me.lblPresenciaTitulo)
         Me.flpPresenciaDetalle.Controls.Add(Me.lblPresenciaValor)
-        Me.flpPresenciaDetalle.Location = New System.Drawing.Point(633, 0)
+        Me.flpPresenciaDetalle.Location = New System.Drawing.Point(3, 294)
         Me.flpPresenciaDetalle.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
         Me.flpPresenciaDetalle.Name = "flpPresenciaDetalle"
-        Me.flpPresenciaDetalle.Size = New System.Drawing.Size(104, 50)
-        Me.flpPresenciaDetalle.TabIndex = 20
+        Me.flpPresenciaDetalle.Size = New System.Drawing.Size(167, 25)
+        Me.flpPresenciaDetalle.WrapContents = False
+        Me.flpPresenciaDetalle.TabIndex = 11
         '
         'lblPresenciaTitulo
         '
@@ -705,7 +706,7 @@ Partial Class frmFuncionarioBuscar
         Me.lblPresenciaValor.AutoSize = True
         Me.lblPresenciaValor.Font = New System.Drawing.Font("Segoe UI", 9.5!)
         Me.lblPresenciaValor.ForeColor = System.Drawing.Color.DimGray
-        Me.lblPresenciaValor.Location = New System.Drawing.Point(0, 25)
+        Me.lblPresenciaValor.Location = New System.Drawing.Point(104, 0)
         Me.lblPresenciaValor.Margin = New System.Windows.Forms.Padding(0, 0, 12, 0)
         Me.lblPresenciaValor.Name = "lblPresenciaValor"
         Me.lblPresenciaValor.Size = New System.Drawing.Size(20, 25)
@@ -719,11 +720,12 @@ Partial Class frmFuncionarioBuscar
         Me.flpEstadoDetalle.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
         Me.flpEstadoDetalle.Controls.Add(Me.lblEstadoTitulo)
         Me.flpEstadoDetalle.Controls.Add(Me.lblEstadoValor)
-        Me.flpEstadoDetalle.Location = New System.Drawing.Point(633, 52)
+        Me.flpEstadoDetalle.Location = New System.Drawing.Point(3, 81)
         Me.flpEstadoDetalle.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
         Me.flpEstadoDetalle.Name = "flpEstadoDetalle"
-        Me.flpEstadoDetalle.Size = New System.Drawing.Size(79, 50)
-        Me.flpEstadoDetalle.TabIndex = 21
+        Me.flpEstadoDetalle.Size = New System.Drawing.Size(129, 25)
+        Me.flpEstadoDetalle.WrapContents = False
+        Me.flpEstadoDetalle.TabIndex = 4
         '
         'lblEstadoTitulo
         '
@@ -742,7 +744,7 @@ Partial Class frmFuncionarioBuscar
         Me.lblEstadoValor.AutoSize = True
         Me.lblEstadoValor.Font = New System.Drawing.Font("Segoe UI", 9.5!)
         Me.lblEstadoValor.ForeColor = System.Drawing.Color.DimGray
-        Me.lblEstadoValor.Location = New System.Drawing.Point(0, 25)
+        Me.lblEstadoValor.Location = New System.Drawing.Point(79, 0)
         Me.lblEstadoValor.Margin = New System.Windows.Forms.Padding(0, 0, 12, 0)
         Me.lblEstadoValor.Name = "lblEstadoValor"
         Me.lblEstadoValor.Size = New System.Drawing.Size(20, 25)
@@ -869,22 +871,22 @@ Partial Class frmFuncionarioBuscar
         Me.flpDetalles.PerformLayout()
         Me.flpCIDetalle.ResumeLayout(False)
         Me.flpCIDetalle.PerformLayout()
+        Me.flpEstadoDetalle.ResumeLayout(False)
+        Me.flpEstadoDetalle.PerformLayout()
         Me.flpTipoDetalle.ResumeLayout(False)
         Me.flpTipoDetalle.PerformLayout()
         Me.flpFechaIngresoDetalle.ResumeLayout(False)
         Me.flpFechaIngresoDetalle.PerformLayout()
-        Me.flpHorarioDetalle.ResumeLayout(False)
-        Me.flpHorarioDetalle.PerformLayout()
-        Me.flpUbicacionDetalle.ResumeLayout(False)
-        Me.flpUbicacionDetalle.PerformLayout()
-        Me.flpSubDireccionDetalle.ResumeLayout(False)
-        Me.flpSubDireccionDetalle.PerformLayout()
         Me.flpCargoDetalle.ResumeLayout(False)
         Me.flpCargoDetalle.PerformLayout()
+        Me.flpSubDireccionDetalle.ResumeLayout(False)
+        Me.flpSubDireccionDetalle.PerformLayout()
+        Me.flpUbicacionDetalle.ResumeLayout(False)
+        Me.flpUbicacionDetalle.PerformLayout()
+        Me.flpHorarioDetalle.ResumeLayout(False)
+        Me.flpHorarioDetalle.PerformLayout()
         Me.flpPresenciaDetalle.ResumeLayout(False)
         Me.flpPresenciaDetalle.PerformLayout()
-        Me.flpEstadoDetalle.ResumeLayout(False)
-        Me.flpEstadoDetalle.PerformLayout()
         Me.tlpAcciones.ResumeLayout(False)
         CType(Me.pbFotoDetalle, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
