@@ -107,6 +107,13 @@ Public Class frmResumenCantidades
                 tabla.Rows.Add(item.Key, item.Value)
             Next
             _dgvLicencias.DataSource = tabla
+
+            ' --- AÑADIR ESTAS LÍNEAS AQUÍ ---
+            _dgvLicencias.Columns(0).HeaderText = "Tipo de licencia"
+            _dgvLicencias.Columns(1).HeaderText = "Cantidad"
+            _dgvLicencias.Columns(0).AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+            _dgvLicencias.Columns(1).AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            ' -----------------------------------
         Else
             _dgvLicencias.DataSource = Nothing
         End If
@@ -127,6 +134,13 @@ Public Class frmResumenCantidades
                 tabla.Rows.Add(item.Key, item.Value)
             Next
             _dgvPresencias.DataSource = tabla
+
+            ' --- AÑADIR ESTAS LÍNEAS AQUÍ ---
+            _dgvPresencias.Columns(0).HeaderText = "Estado reportado"
+            _dgvPresencias.Columns(1).HeaderText = "Cantidad"
+            _dgvPresencias.Columns(0).AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+            _dgvPresencias.Columns(1).AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            ' -----------------------------------
         Else
             _dgvPresencias.DataSource = Nothing
         End If
@@ -249,8 +263,6 @@ Public Class frmResumenCantidades
             .DefaultCellStyle.Font = New Font("Segoe UI", 9.0F)
             .DefaultCellStyle.SelectionBackColor = Color.FromArgb(51, 153, 255)
             .AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(242, 245, 247)
-            .Columns(0).AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-            .Columns(1).AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
         End With
     End Sub
 
