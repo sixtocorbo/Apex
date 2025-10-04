@@ -1,6 +1,9 @@
 ﻿Imports System.Data
 Imports System.Globalization
 Imports Microsoft.Reporting.WinForms
+' No necesitamos los imports de IO y Reflection si usamos el Loader
+' Imports System.IO
+' Imports System.Reflection
 
 Public Class frmViaticosRPT
 
@@ -8,9 +11,7 @@ Public Class frmViaticosRPT
     Private ReadOnly _datos As DataTable
 
     Public Sub New(periodo As Date, datos As DataTable)
-        ' El constructor se mantiene igual
         If datos Is Nothing Then Throw New ArgumentNullException(NameOf(datos))
-
         InitializeComponent()
         _periodo = periodo
         _datos = datos
@@ -31,16 +32,25 @@ Public Class frmViaticosRPT
             ReportViewer1.ProcessingMode = ProcessingMode.Local
             ReportViewer1.LocalReport.DataSources.Clear()
 
-            ' --- INICIO DE LA CORRECCIÓN ---
-            ' 1. Se elimina la llamada a 'ReportResourceLoader'.
-            ' 2. Se establece el recurso incrustado directamente.
-            '
-            ' Este nombre DEBE coincidir con: <NamespaceRaízDelProyecto>.<Carpeta>.<NombreDelArchivo>.rdlc
-            ' Asumiendo que tu Namespace es "Apex" y el archivo está en la carpeta "Reportes".
-            ReportViewer1.LocalReport.ReportEmbeddedResource = "Apex.Reportes.ViaticosListado.rdlc"
-            ' --- FIN DE LA CORRECCIÓN ---
+            Dim nombreRecursoCorrecto As String = "Apex.ViaticosListado.rdlc"
 
-            ' El resto de la configuración se mantiene igual
+            Dim definicion = ReportResourceLoader.LoadLocalReportDefinition(
+                ReportViewer1.LocalReport,
+                Me.GetType(),
+                nombreRecursoCorrecto,      ' <-- ¡ESTA ES LA CORRECCIÓN!
+                "ViaticosListado.rdlc")
+
+            ' Si por alguna razón el código llega aquí, es porque encontró el reporte.
+            ' El resto de la configuración se mantiene.
+            Select Case definicion.Source
+                Case ReportDefinitionSource.Embedded
+                    ReportViewer1.LocalReport.ReportEmbeddedResource = definicion.ResourceName
+                Case ReportDefinitionSource.File
+                    ReportViewer1.LocalReport.ReportPath = definicion.FilePath
+            End Select
+            ' --- FIN DEL CÓDIGO DE DIAGNÓSTICO ---
+
+
             ReportViewer1.LocalReport.DataSources.Add(New ReportDataSource("DataSetViaticos", _datos))
 
             Dim cultura = CultureInfo.GetCultureInfo("es-UY")
@@ -60,7 +70,9 @@ Public Class frmViaticosRPT
             ReportViewer1.RefreshReport()
 
         Catch ex As Exception
-            MessageBox.Show($"No fue posible generar el informe: {ex.ToString()}", "Reporte de viáticos", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            ' ¡ESTA ES LA PARTE IMPORTANTE!
+            ' El mensaje de error ahora contendrá la lista que necesitamos.
+            MessageBox.Show($"Diagnóstico del Reporte:" & vbCrLf & vbCrLf & ex.ToString(), "Error Cargando Reporte", MessageBoxButtons.OK, MessageBoxIcon.Error)
         Finally
             Me.Cursor = cursorAnterior
         End Try
