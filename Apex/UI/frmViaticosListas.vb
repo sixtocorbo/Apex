@@ -142,9 +142,80 @@ Public Class frmViaticosListas
             Return
         End If
 
-        Using visor As New frmViaticosRPT(dtpPeriodo.Value, dtReporte)
-            visor.ShowDialog(Me)
-        End Using
+        Dim visor As New frmViaticosRPT(dtpPeriodo.Value, dtReporte)
+        AddHandler visor.FormClosed, AddressOf Visor_FormClosed
+
+        AbrirChildEnDashboard(visor)
+    End Sub
+
+    Private Sub Visor_FormClosed(sender As Object, e As FormClosedEventArgs)
+        Dim visor = TryCast(sender, Form)
+        If visor IsNot Nothing Then
+            RemoveHandler visor.FormClosed, AddressOf Visor_FormClosed
+        End If
+
+        VolverAListadoFuncionarios()
+    End Sub
+
+    Private Sub VolverAListadoFuncionarios()
+        Dim dash = GetDashboard()
+
+        If dash Is Nothing OrElse dash.IsDisposed Then
+            If Not Me.IsDisposed Then
+                Try
+                    Me.Close()
+                Catch
+                End Try
+            End If
+            Return
+        End If
+
+        Dim accion As MethodInvoker = Sub()
+                                           Try
+                                               If Not Me.IsDisposed Then
+                                                   Me.Close()
+                                               End If
+                                           Catch
+                                           End Try
+
+                                           Try
+                                               dash.btnBuscarFuncionario.PerformClick()
+                                           Catch ex As Exception
+                                               Notifier.Warn(dash, "No se pudo volver al listado de funcionarios.")
+                                           End Try
+                                       End Sub
+
+        If dash.InvokeRequired Then
+            dash.BeginInvoke(accion)
+        Else
+            accion()
+        End If
+    End Sub
+
+    Private Function GetDashboard() As frmDashboard
+        Return Application.OpenForms.OfType(Of frmDashboard)().FirstOrDefault()
+    End Function
+
+    Private Sub AbrirChildEnDashboard(formHijo As Form)
+        If formHijo Is Nothing Then Return
+
+        Dim dash = GetDashboard()
+
+        If dash Is Nothing OrElse dash.IsDisposed Then
+            formHijo.Show(Me)
+            Return
+        End If
+
+        If dash.InvokeRequired Then
+            dash.BeginInvoke(CType(Sub() AbrirChildEnDashboard(formHijo), MethodInvoker))
+            Return
+        End If
+
+        Try
+            dash.AbrirChild(formHijo)
+        Catch ex As Exception
+            Notifier.Error(dash, $"No se pudo abrir la ventana: {ex.Message}")
+        End Try
     End Sub
 
     Private Async Function CargarViaticosAsync(token As CancellationToken) As Task
