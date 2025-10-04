@@ -242,6 +242,7 @@ Public Module ConsultasGenericas
                                                              End If
 
                                                              Return New With {
+                                                                 .FuncionarioId = lic.FuncionarioId,
                                                                  .NombreCompleto = NormalizarValorReporte(lic.NombreFuncionario, "N/A"),
                                                                  .Cedula = NormalizarValorReporte(lic.CI, "N/A"),
                                                                  .TipoLicenciaId = lic.TipoLicenciaId,
