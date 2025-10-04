@@ -899,7 +899,7 @@ Public Class frmFuncionarioBuscar
             lblPlantillaValor.Text = If(f.Horario IsNot Nothing, f.Horario.Nombre, "-")
             lblUnidadValor.Text = If(f.Seccion IsNot Nothing, f.Seccion.Nombre, "-")
             lblPuestoValor.Text = If(f.PuestoTrabajo IsNot Nothing, f.PuestoTrabajo.Nombre, "-")
-            lblSubDireccion.Text = "SubDireccion: " & If(f.SubDireccion IsNot Nothing, f.SubDireccion.Nombre, "-")
+            lblSubDireccionValor.Text = If(f.SubDireccion IsNot Nothing, f.SubDireccion.Nombre, "-")
 
             ' El estado ya estaba correcto, lo mantenemos igual
             If f.Activo Then
@@ -1216,7 +1216,7 @@ Public Class frmFuncionarioBuscar
         lblPlantillaValor.Text = "-"
         lblUnidadValor.Text = "-"
         lblPuestoValor.Text = "-"
-        lblSubDireccion.Text = "SubDireccion: -"
+        lblSubDireccionValor.Text = "-"
         _detallesEstadoActual.Clear()
 
         ' Oculta los botones de acción y el panel de detalle.
