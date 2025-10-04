@@ -188,7 +188,7 @@ Partial Class frmResumenCantidades
         Me._groupPresencias.Size = New System.Drawing.Size(525, 614)
         Me._groupPresencias.TabIndex = 1
         Me._groupPresencias.TabStop = False
-        Me._groupPresencias.Text = "Presencias por estado"
+        Me._groupPresencias.Text = "Presencias por categoría"
         '
         '_lblPresenciasSinDatos
         '
@@ -199,7 +199,7 @@ Partial Class frmResumenCantidades
         Me._lblPresenciasSinDatos.Name = "_lblPresenciasSinDatos"
         Me._lblPresenciasSinDatos.Size = New System.Drawing.Size(501, 574)
         Me._lblPresenciasSinDatos.TabIndex = 1
-        Me._lblPresenciasSinDatos.Text = "No se registran datos de presencia para la fecha seleccionada."
+        Me._lblPresenciasSinDatos.Text = "No se registran datos de presencias por categoría para la fecha seleccionada."
         Me._lblPresenciasSinDatos.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         Me._lblPresenciasSinDatos.Visible = False
         '
