@@ -142,10 +142,15 @@ Public Class frmViaticosListas
             Return
         End If
 
-        Dim visor As New frmViaticosRPT(dtpPeriodo.Value, dtReporte)
-        AddHandler visor.FormClosed, AddressOf Visor_FormClosed
+        Dim visor = AbrirHijoEnDashboard(Of frmViaticosRPT)(
+            Sub(f)
+                f.Preparar(dtpPeriodo.Value, dtReporte)
+                AddHandler f.FormClosed, AddressOf Visor_FormClosed
+            End Sub)
 
-        AbrirChildEnDashboard(visor)
+        If visor Is Nothing Then
+            Return
+        End If
     End Sub
 
     Private Sub Visor_FormClosed(sender As Object, e As FormClosedEventArgs)
@@ -196,27 +201,43 @@ Public Class frmViaticosListas
         Return Application.OpenForms.OfType(Of frmDashboard)().FirstOrDefault()
     End Function
 
-    Private Sub AbrirChildEnDashboard(formHijo As Form)
-        If formHijo Is Nothing Then Return
-
-        Dim dash = GetDashboard()
+    Private Function AbrirHijoEnDashboard(Of TForm As {Form, New})(Optional configurar As Action(Of TForm) = Nothing) As TForm
+        Dim dash = Application.OpenForms.OfType(Of frmDashboard)().FirstOrDefault()
 
         If dash Is Nothing OrElse dash.IsDisposed Then
-            formHijo.Show(Me)
-            Return
+            MessageBox.Show("No se encontró el Dashboard activo.", "Navegación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return Nothing
         End If
 
-        If dash.InvokeRequired Then
-            dash.BeginInvoke(CType(Sub() AbrirChildEnDashboard(formHijo), MethodInvoker))
-            Return
+        Dim formHijo As TForm
+
+        Try
+            formHijo = New TForm()
+        Catch ex As Exception
+            Notifier.Error(Me, $"No se pudo crear la ventana: {ex.Message}")
+            Return Nothing
+        End Try
+
+        If configurar IsNot Nothing Then
+            Try
+                configurar(formHijo)
+            Catch ex As Exception
+                formHijo.Dispose()
+                Notifier.Error(Me, $"No se pudo preparar la ventana: {ex.Message}")
+                Return Nothing
+            End Try
         End If
 
         Try
             dash.AbrirChild(formHijo)
         Catch ex As Exception
+            formHijo.Dispose()
             Notifier.Error(dash, $"No se pudo abrir la ventana: {ex.Message}")
+            Return Nothing
         End Try
-    End Sub
+
+        Return formHijo
+    End Function
 
     Private Async Function CargarViaticosAsync(token As CancellationToken) As Task
         If _estaBuscando Then Return
