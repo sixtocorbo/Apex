@@ -26,16 +26,26 @@ Public Class frmViaticosRPT
         Me.Cursor = Cursors.WaitCursor
 
         Try
+            ReportViewer1.Reset()
             ReportViewer1.ProcessingMode = ProcessingMode.Local
             ReportViewer1.LocalReport.DataSources.Clear()
 
-            ReportResourceLoader.LoadLocalReportDefinition(
+            Dim definicion = ReportResourceLoader.LoadLocalReportDefinition(
                 ReportViewer1.LocalReport,
                 GetType(frmViaticosRPT),
                 "Apex.Reportes.ViaticosListado.rdlc",
                 "ViaticosListado.rdlc",
                 New String() {"..\\..\\Reportes\\ViaticosListado.rdlc"}
             )
+
+            Select Case definicion.Source
+                Case ReportDefinitionSource.Embedded
+                    ReportViewer1.LocalReport.ReportEmbeddedResource = definicion.ResourceName
+                    ReportViewer1.LocalReport.ReportPath = Nothing
+                Case ReportDefinitionSource.File
+                    ReportViewer1.LocalReport.ReportPath = definicion.FilePath
+                    ReportViewer1.LocalReport.ReportEmbeddedResource = Nothing
+            End Select
 
             ReportViewer1.LocalReport.DataSources.Add(New ReportDataSource("DataSetViaticos", _datos))
 
