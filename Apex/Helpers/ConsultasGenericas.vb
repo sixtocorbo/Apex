@@ -771,7 +771,9 @@ Public Module ConsultasGenericas
         If String.IsNullOrWhiteSpace(funcionariosCadena) Then
             Return 0
         End If
-        Dim tokens = funcionariosCadena.Split(New Char() {","c, ";"c, ControlChars.Lf, ControlChars.Cr, "|"c}, StringSplitOptions.RemoveEmptyEntries)
+        Dim separadores = New String() {",", ";", ControlChars.Lf, ControlChars.Cr, "|", Environment.NewLine}
+
+        Dim tokens = funcionariosCadena.Split(separadores, StringSplitOptions.RemoveEmptyEntries)
         Return tokens.Select(Function(t) t.Trim()).Count(Function(t) Not String.IsNullOrWhiteSpace(t))
     End Function
 
