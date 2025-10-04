@@ -98,11 +98,7 @@ Public Class frmResumenCantidades
         _panelHeader.Controls.Add(_btnActualizar)
         _panelHeader.Controls.Add(_lblUltimaActualizacion)
 
-        AddHandler _panelHeader.Layout, Sub(sender, args)
-                                            _dtpFecha.Location = New Point(0, (_panelHeader.Height - _dtpFecha.Height) \ 2)
-                                            _btnActualizar.Location = New Point(_dtpFecha.Right + 16, (_panelHeader.Height - _btnActualizar.Height) \ 2)
-                                            _lblUltimaActualizacion.Location = New Point(_panelHeader.Width - _lblUltimaActualizacion.Width, (_panelHeader.Height - _lblUltimaActualizacion.Height) \ 2)
-                                        End Sub
+        AddHandler _panelHeader.Layout, AddressOf PanelHeaderLayout
 
         _flowCards.Dock = DockStyle.Fill
         _flowCards.AutoSize = True
@@ -176,6 +172,12 @@ Public Class frmResumenCantidades
         AddHandler _btnActualizar.Click, Async Sub(sender, args) Await ActualizarDatosAsync()
 
         ResumeLayout(False)
+    End Sub
+
+    Private Sub PanelHeaderLayout(sender As Object, e As LayoutEventArgs)
+        _dtpFecha.Location = New Point(0, (_panelHeader.Height - _dtpFecha.Height) \ 2)
+        _btnActualizar.Location = New Point(_dtpFecha.Right + 16, (_panelHeader.Height - _btnActualizar.Height) \ 2)
+        _lblUltimaActualizacion.Location = New Point(_panelHeader.Width - _lblUltimaActualizacion.Width, (_panelHeader.Height - _lblUltimaActualizacion.Height) \ 2)
     End Sub
 
     Private Async Sub frmResumenCantidades_Load(sender As Object, e As EventArgs) Handles MyBase.Load
