@@ -599,6 +599,12 @@
     <Compile Include="UI\frmFusionarFunciones.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="UI\frmResumenCantidades.Designer.vb">
+      <DependentUpon>frmResumenCantidades.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UI\frmResumenCantidades.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="UI\frmSubDirecciones.Designer.vb">
       <DependentUpon>frmSubDirecciones.vb</DependentUpon>
     </Compile>
@@ -858,9 +864,6 @@
       <DependentUpon>frmRenombrarPDF.vb</DependentUpon>
     </Compile>
     <Compile Include="UI\frmRenombrarPDF.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="UI\frmResumenCantidades.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="UI\frmSancionCrear.Designer.vb">
