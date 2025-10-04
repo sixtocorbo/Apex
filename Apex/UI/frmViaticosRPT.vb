@@ -32,7 +32,7 @@ Public Class frmViaticosRPT
             ReportViewer1.ProcessingMode = ProcessingMode.Local
             ReportViewer1.LocalReport.DataSources.Clear()
 
-            Dim nombreRecursoCorrecto As String = "Apex.ViaticosListado.rdlc"
+            Dim nombreRecursoCorrecto As String = "Apex.Reportes.ViaticosListado.rdlc"
 
             Dim definicion = ReportResourceLoader.LoadLocalReportDefinition(
                 ReportViewer1.LocalReport,
