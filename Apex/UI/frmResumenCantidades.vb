@@ -41,7 +41,6 @@ Public Class frmResumenCantidades
         ' Se crean y añaden las tarjetas de resumen aquí para mantener el designer limpio.
         _flowCards.Controls.Add(CrearCard("Total de funcionarios", _lblTotalFuncionarios, "Cantidad total de funcionarios registrados."))
         _flowCards.Controls.Add(CrearCard("Funcionarios activos", _lblActivos, "Funcionarios con estado activo."))
-        _flowCards.Controls.Add(CrearCard("Funcionarios inactivos", _lblInactivos, "Funcionarios marcados como inactivos."))
         _flowCards.Controls.Add(CrearCard("Presentes", _lblPresentes, "Funcionarios activos clasificados como presentes según la presencia del día."))
         _flowCards.Controls.Add(CrearCard("Francos", _lblFrancos, "Funcionarios activos asignados como franco en la fecha seleccionada."))
         _flowCards.Controls.Add(CrearCard("Licencias vigentes", _lblLicencias, "Funcionarios activos con licencias vigentes de categoría General (excluye francos y salud)."))
@@ -70,7 +69,7 @@ Public Class frmResumenCantidades
 
             ActualizarTarjetas(resumen)
             ActualizarDetalleLicencias(resumen)
-            ActualizarDetallePresencias(resumen)
+            ActualizarDetalleCategorias(resumen)
 
             _lblUltimaActualizacion.Text = $"Actualizado: {DateTime.Now:G}"
             _toolTip.SetToolTip(_lblUltimaActualizacion, $"Datos calculados para {fechaConsulta:D}.")
@@ -85,7 +84,6 @@ Public Class frmResumenCantidades
     Private Sub ActualizarTarjetas(resumen As ResumenDatos)
         _lblTotalFuncionarios.Text = FormatearNumero(resumen.TotalFuncionarios)
         _lblActivos.Text = FormatearNumero(resumen.Activos)
-        _lblInactivos.Text = FormatearNumero(resumen.Inactivos)
         _lblPresentes.Text = FormatearNumero(resumen.Presentes)
         _lblFrancos.Text = FormatearNumero(resumen.Francos)
         _lblLicencias.Text = FormatearNumero(resumen.LicenciasTotales)
@@ -129,8 +127,8 @@ Public Class frmResumenCantidades
         End If
     End Sub
 
-    Private Sub ActualizarDetallePresencias(resumen As ResumenDatos)
-        Dim presencias = resumen.PresenciasPorEstado.OrderByDescending(Function(p) p.Value).ThenBy(Function(p) p.Key, StringComparer.OrdinalIgnoreCase).ToList()
+    Private Sub ActualizarDetalleCategorias(resumen As ResumenDatos)
+        Dim presencias = resumen.PresenciasPorCategoria.OrderByDescending(Function(p) p.Value).ThenBy(Function(p) p.Key, StringComparer.OrdinalIgnoreCase).ToList()
         Dim hayDatos = presencias.Any()
 
         _lblPresenciasSinDatos.Visible = Not hayDatos
@@ -138,7 +136,7 @@ Public Class frmResumenCantidades
 
         If hayDatos Then
             Dim tabla = New DataTable()
-            tabla.Columns.Add("Estado", GetType(String))
+            tabla.Columns.Add("Categoría", GetType(String))
             tabla.Columns.Add("Cantidad", GetType(Integer))
             For Each item In presencias
                 tabla.Rows.Add(item.Key, item.Value)
@@ -146,7 +144,7 @@ Public Class frmResumenCantidades
             _dgvPresencias.DataSource = tabla
 
             ' --- AÑADIR ESTAS LÍNEAS AQUÍ ---
-            _dgvPresencias.Columns(0).HeaderText = "Estado reportado"
+            _dgvPresencias.Columns(0).HeaderText = "Categoría"
             _dgvPresencias.Columns(1).HeaderText = "Cantidad"
             _dgvPresencias.Columns(0).AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
             _dgvPresencias.Columns(1).AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
@@ -161,7 +159,7 @@ Public Class frmResumenCantidades
             .FechaConsulta = fecha,
             .LicenciasPorTipo = New Dictionary(Of String, Integer)(StringComparer.OrdinalIgnoreCase),
             .LicenciasMedicasPorTipo = New Dictionary(Of String, Integer)(StringComparer.OrdinalIgnoreCase),
-            .PresenciasPorEstado = New Dictionary(Of String, Integer)(StringComparer.OrdinalIgnoreCase)
+            .PresenciasPorCategoria = New Dictionary(Of String, Integer)(StringComparer.OrdinalIgnoreCase)
         }
 
         Using uow As New UnitOfWork()
@@ -177,14 +175,9 @@ Public Class frmResumenCantidades
             Dim presencias = Await ctx.Database.SqlQuery(Of PresenciaDTO)("EXEC dbo.usp_PresenciaFecha_Apex @Fecha", pFecha).ToListAsync()
 
             For Each registro In presencias
-                Dim estado = If(String.IsNullOrWhiteSpace(registro.Resultado), "Sin información", registro.Resultado.Trim())
-                If resumen.PresenciasPorEstado.ContainsKey(estado) Then
-                    resumen.PresenciasPorEstado(estado) += 1
-                Else
-                    resumen.PresenciasPorEstado(estado) = 1
-                End If
-
                 If Not activosSet.Contains(registro.FuncionarioId) Then Continue For
+
+                Dim estado = If(String.IsNullOrWhiteSpace(registro.Resultado), "Sin información", registro.Resultado.Trim())
 
                 Select Case ClasificarResultado(estado)
                     Case CategoriaPresencia.Presente : resumen.Presentes += 1
@@ -202,6 +195,13 @@ Public Class frmResumenCantidades
         If licenciasClasificadas.LicenciasMedicas.Any() Then
             resumen.LicenciasMedicasPorTipo = licenciasClasificadas.LicenciasMedicas
             resumen.LicenciasMedicasTotales = licenciasClasificadas.LicenciasMedicas.Values.Sum()
+        End If
+
+        If licenciasClasificadas.Categorias.Any() Then
+            resumen.PresenciasPorCategoria = licenciasClasificadas.Categorias.
+                ToDictionary(Function(par) ObtenerNombreCategoria(par.Key),
+                             Function(par) par.Value,
+                             StringComparer.OrdinalIgnoreCase)
         End If
 
         resumen.Ausentes = Math.Max(0, resumen.Activos - resumen.Presentes - resumen.Francos - resumen.LicenciasTotales - resumen.LicenciasMedicasTotales)
@@ -233,11 +233,23 @@ Public Class frmResumenCantidades
 
             Dim tipoNormalizado = ModConstantesApex.Normalizar(tipo)
 
-            If categoriaId.HasValue AndAlso categoriaId.Value = ModConstantesApex.CategoriaAusenciaId.Salud Then
-                AgregarONuevo(resultado.LicenciasMedicas, tipo, 1)
-            ElseIf categoriaId.HasValue AndAlso categoriaId.Value = ModConstantesApex.CategoriaAusenciaId.General Then
-                If tipoNormalizado.Contains("franco") Then Continue For
-                AgregarONuevo(resultado.LicenciasGenerales, tipo, 1)
+            If Not categoriaId.HasValue Then Continue For
+
+            Dim contarCategoria = True
+
+            Select Case categoriaId.Value
+                Case ModConstantesApex.CategoriaAusenciaId.Salud
+                    AgregarONuevo(resultado.LicenciasMedicas, tipo, 1)
+                Case ModConstantesApex.CategoriaAusenciaId.General
+                    If tipoNormalizado.Contains("franco") Then
+                        contarCategoria = False
+                    Else
+                        AgregarONuevo(resultado.LicenciasGenerales, tipo, 1)
+                    End If
+            End Select
+
+            If contarCategoria Then
+                AgregarONuevo(resultado.Categorias, categoriaId.Value, 1)
             End If
         Next
 
@@ -317,6 +329,31 @@ Public Class frmResumenCantidades
         End If
     End Sub
 
+    Private Shared Sub AgregarONuevo(diccionario As Dictionary(Of Integer, Integer), clave As Integer, incremento As Integer)
+        If diccionario.ContainsKey(clave) Then
+            diccionario(clave) += incremento
+        Else
+            diccionario(clave) = incremento
+        End If
+    End Sub
+
+    Private Shared Function ObtenerNombreCategoria(categoriaId As Integer) As String
+        Select Case categoriaId
+            Case ModConstantesApex.CategoriaAusenciaId.General
+                Return ModConstantesApex.CategoriaAusenciaNombre.General
+            Case ModConstantesApex.CategoriaAusenciaId.Salud
+                Return ModConstantesApex.CategoriaAusenciaNombre.Salud
+            Case ModConstantesApex.CategoriaAusenciaId.Especial
+                Return ModConstantesApex.CategoriaAusenciaNombre.Especial
+            Case ModConstantesApex.CategoriaAusenciaId.SancionLeve
+                Return ModConstantesApex.CategoriaAusenciaNombre.SancionLeve
+            Case ModConstantesApex.CategoriaAusenciaId.SancionGrave
+                Return ModConstantesApex.CategoriaAusenciaNombre.SancionGrave
+            Case Else
+                Return $"Categoría {categoriaId}"
+        End Select
+    End Function
+
     Private Class ResumenDatos
         Public Property FechaConsulta As Date
         Public Property TotalFuncionarios As Integer
@@ -329,17 +366,19 @@ Public Class frmResumenCantidades
         Public Property Ausentes As Integer
         Public Property LicenciasPorTipo As Dictionary(Of String, Integer)
         Public Property LicenciasMedicasPorTipo As Dictionary(Of String, Integer)
-        Public Property PresenciasPorEstado As Dictionary(Of String, Integer)
+        Public Property PresenciasPorCategoria As Dictionary(Of String, Integer)
     End Class
 
     Private Class LicenciasClasificadas
         Public Sub New()
             LicenciasGenerales = New Dictionary(Of String, Integer)(StringComparer.OrdinalIgnoreCase)
             LicenciasMedicas = New Dictionary(Of String, Integer)(StringComparer.OrdinalIgnoreCase)
+            Categorias = New Dictionary(Of Integer, Integer)()
         End Sub
 
         Public Property LicenciasGenerales As Dictionary(Of String, Integer)
         Public Property LicenciasMedicas As Dictionary(Of String, Integer)
+        Public Property Categorias As Dictionary(Of Integer, Integer)
     End Class
 
     Private Enum CategoriaPresencia
