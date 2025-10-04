@@ -14,19 +14,19 @@ Public Class frmResumenCantidades
     Inherits Form
 
     Private ReadOnly _toolTip As New ToolTip()
-    Private ReadOnly _dtpFecha As DateTimePicker
-    Private ReadOnly _btnActualizar As Button
-    Private ReadOnly _lblUltimaActualizacion As Label
-    Private ReadOnly _panelHeader As Panel
-    Private ReadOnly _flowCards As FlowLayoutPanel
-    Private ReadOnly _layoutRoot As TableLayoutPanel
-    Private ReadOnly _tableDetalles As TableLayoutPanel
-    Private ReadOnly _groupLicencias As GroupBox
-    Private ReadOnly _groupPresencias As GroupBox
-    Private ReadOnly _dgvLicencias As DataGridView
-    Private ReadOnly _dgvPresencias As DataGridView
-    Private ReadOnly _lblLicenciasSinDatos As Label
-    Private ReadOnly _lblPresenciasSinDatos As Label
+    Private _dtpFecha As DateTimePicker
+    Private _btnActualizar As Button
+    Private _lblUltimaActualizacion As Label
+    Private _panelHeader As Panel
+    Private _flowCards As FlowLayoutPanel
+    Private _layoutRoot As TableLayoutPanel
+    Private _tableDetalles As TableLayoutPanel
+    Private _groupLicencias As GroupBox
+    Private _groupPresencias As GroupBox
+    Private _dgvLicencias As DataGridView
+    Private _dgvPresencias As DataGridView
+    Private _lblLicenciasSinDatos As Label
+    Private _lblPresenciasSinDatos As Label
 
     Private ReadOnly _lblTotalFuncionarios As Label
     Private ReadOnly _lblActivos As Label
@@ -37,6 +37,19 @@ Public Class frmResumenCantidades
     Private ReadOnly _lblAusentes As Label
 
     Public Sub New()
+        _lblTotalFuncionarios = CrearEtiquetaValor()
+        _lblActivos = CrearEtiquetaValor()
+        _lblInactivos = CrearEtiquetaValor()
+        _lblPresentes = CrearEtiquetaValor()
+        _lblFrancos = CrearEtiquetaValor()
+        _lblLicencias = CrearEtiquetaValor()
+        _lblAusentes = CrearEtiquetaValor()
+
+        InitializeComponent()
+        AddHandler _btnActualizar.Click, AddressOf BtnActualizar_Click
+    End Sub
+
+    Private Sub InitializeComponent()
         _dtpFecha = New DateTimePicker()
         _btnActualizar = New Button()
         _lblUltimaActualizacion = New Label()
@@ -51,19 +64,6 @@ Public Class frmResumenCantidades
         _lblLicenciasSinDatos = New Label()
         _lblPresenciasSinDatos = New Label()
 
-        _lblTotalFuncionarios = CrearEtiquetaValor()
-        _lblActivos = CrearEtiquetaValor()
-        _lblInactivos = CrearEtiquetaValor()
-        _lblPresentes = CrearEtiquetaValor()
-        _lblFrancos = CrearEtiquetaValor()
-        _lblLicencias = CrearEtiquetaValor()
-        _lblAusentes = CrearEtiquetaValor()
-
-        InitializeComponent()
-        AddHandler _btnActualizar.Click, AddressOf BtnActualizar_Click
-    End Sub
-
-    Private Sub InitializeComponent()
         SuspendLayout()
 
         Text = "Resumen de Cantidades"
