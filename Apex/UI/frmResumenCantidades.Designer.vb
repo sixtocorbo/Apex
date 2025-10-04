@@ -41,6 +41,7 @@ Partial Class frmResumenCantidades
         Me._lblPresentes = New System.Windows.Forms.Label()
         Me._lblFrancos = New System.Windows.Forms.Label()
         Me._lblLicencias = New System.Windows.Forms.Label()
+        Me._lblLicenciasMedicas = New System.Windows.Forms.Label()
         Me._lblAusentes = New System.Windows.Forms.Label()
         Me._layoutRoot.SuspendLayout()
         Me._panelHeader.SuspendLayout()
@@ -275,6 +276,17 @@ Partial Class frmResumenCantidades
         Me._lblLicencias.Text = "0"
         Me._lblLicencias.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
+        '_lblLicenciasMedicas
+        '
+        Me._lblLicenciasMedicas.AutoSize = False
+        Me._lblLicenciasMedicas.Dock = System.Windows.Forms.DockStyle.Fill
+        Me._lblLicenciasMedicas.Font = New System.Drawing.Font("Segoe UI", 22.0!, System.Drawing.FontStyle.Bold)
+        Me._lblLicenciasMedicas.ForeColor = System.Drawing.Color.FromArgb(28, 41, 56)
+        Me._lblLicenciasMedicas.MinimumSize = New System.Drawing.Size(0, 60)
+        Me._lblLicenciasMedicas.Name = "_lblLicenciasMedicas"
+        Me._lblLicenciasMedicas.Text = "0"
+        Me._lblLicenciasMedicas.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        '
         '_lblAusentes
         '
         Me._lblAusentes.AutoSize = False
@@ -329,5 +341,6 @@ Partial Class frmResumenCantidades
     Friend WithEvents _lblPresentes As Label
     Friend WithEvents _lblFrancos As Label
     Friend WithEvents _lblLicencias As Label
+    Friend WithEvents _lblLicenciasMedicas As Label
     Friend WithEvents _lblAusentes As Label
 End Class
