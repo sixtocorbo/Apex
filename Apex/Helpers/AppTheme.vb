@@ -1,5 +1,6 @@
 ﻿' Apex/Services/AppTheme.vb
 Imports System.Runtime.InteropServices
+Imports System.Runtime.CompilerServices
 
 Public Module AppTheme
 
@@ -33,35 +34,61 @@ Public Module AppTheme
         form.BackColor = Palette.Background
         form.Font = Palette.BaseFont
         form.ForeColor = Palette.Foreground
+
+        HookControlAdded(form)
         ApplyRecursive(form.Controls)
     End Sub
 
     ' ===== Recorrido de controles =====
     Private Sub ApplyRecursive(controls As Control.ControlCollection)
         For Each ctrl As Control In controls
-            If TypeOf ctrl Is Panel Then
-                StylePanel(DirectCast(ctrl, Panel))
-
-            ElseIf TypeOf ctrl Is Button Then
-                StyleButton(DirectCast(ctrl, Button))
-
-            ElseIf TypeOf ctrl Is DataGridView Then
-                StyleDataGridView(DirectCast(ctrl, DataGridView))
-
-            ElseIf TypeOf ctrl Is Label Then
-                Dim nameLower = ctrl.Name.ToLower()
-                If nameLower.Contains("header") OrElse nameLower.Contains("titulo") Then
-                    ctrl.Font = Palette.TitleFont
-                End If
-
-            ElseIf TypeOf ctrl Is GroupBox Then
-                ctrl.Font = Palette.TitleFont
-            End If
+            StyleControl(ctrl)
+            HookControlAdded(ctrl)
 
             If ctrl.HasChildren Then
                 ApplyRecursive(ctrl.Controls)
             End If
         Next
+    End Sub
+
+    Private Sub HookControlAdded(ctrl As Control)
+        If ctrl Is Nothing Then Return
+
+        RemoveHandler ctrl.ControlAdded, AddressOf OnControlAdded
+        AddHandler ctrl.ControlAdded, AddressOf OnControlAdded
+    End Sub
+
+    Private Sub OnControlAdded(sender As Object, e As ControlEventArgs)
+        Dim added = e.Control
+        If added Is Nothing Then Return
+
+        StyleControl(added)
+        HookControlAdded(added)
+
+        If added.HasChildren Then
+            ApplyRecursive(added.Controls)
+        End If
+    End Sub
+
+    Private Sub StyleControl(ctrl As Control)
+        If TypeOf ctrl Is Panel Then
+            StylePanel(DirectCast(ctrl, Panel))
+
+        ElseIf TypeOf ctrl Is Button Then
+            StyleButton(DirectCast(ctrl, Button))
+
+        ElseIf TypeOf ctrl Is DataGridView Then
+            StyleDataGridView(DirectCast(ctrl, DataGridView))
+
+        ElseIf TypeOf ctrl Is Label Then
+            Dim nameLower = ctrl.Name.ToLower()
+            If nameLower.Contains("header") OrElse nameLower.Contains("titulo") Then
+                ctrl.Font = Palette.TitleFont
+            End If
+
+        ElseIf TypeOf ctrl Is GroupBox Then
+            ctrl.Font = Palette.TitleFont
+        End If
     End Sub
 
     ' ===== Estilos específicos =====
@@ -78,17 +105,17 @@ Public Module AppTheme
         End If
     End Sub
 
-    Private Const StyledMarker As String = "|_styled"
+    Private ReadOnly StyledControls As New ConditionalWeakTable(Of Control, Object)()
+    Private ReadOnly StyledMarkerValue As New Object()
 
-    Private Function IsStyled(btn As Button) As Boolean
-        Dim tagStr = If(btn.Tag, "").ToString()
-        Return tagStr.Contains(StyledMarker)
+    Private Function IsStyled(ctrl As Control) As Boolean
+        Dim dummy As Object = Nothing
+        Return StyledControls.TryGetValue(ctrl, dummy)
     End Function
 
-    Private Sub MarkStyled(btn As Button)
-        Dim tagStr = If(btn.Tag, "").ToString()
-        If Not tagStr.Contains(StyledMarker) Then
-            btn.Tag = tagStr & StyledMarker
+    Private Sub MarkStyled(ctrl As Control)
+        If Not IsStyled(ctrl) Then
+            StyledControls.Add(ctrl, StyledMarkerValue)
         End If
     End Sub
 
@@ -99,6 +126,7 @@ Public Module AppTheme
                                        btn.Parent.Name.ToLower().Contains("sidebar")))
         Dim isNav As Boolean = parentIsNav OrElse tagStr.IndexOf("Nav", StringComparison.OrdinalIgnoreCase) >= 0
         Dim keepBack As Boolean = tagStr.IndexOf("KeepBackColor", StringComparison.OrdinalIgnoreCase) >= 0
+        Dim isTile As Boolean = IsTileButton(btn, tagStr)
 
         btn.FlatStyle = FlatStyle.Flat
         btn.UseVisualStyleBackColor = False
@@ -107,6 +135,7 @@ Public Module AppTheme
         If isNav Then
             ApplyNavButtonStyle(btn)
             btn.FlatAppearance.BorderSize = 0 ' Como en tu dashboard
+            MarkStyled(btn)
             Return
         End If
 
@@ -117,17 +146,13 @@ Public Module AppTheme
             Return
         End If
 
-        ' Botón estándar (azul) con borde reactivo
-        btn.BackColor = Palette.Primary
-        btn.ForeColor = Color.White
-        btn.Font = Palette.BaseFont
-
-        If Not IsStyled(btn) Then
-            AddHandler btn.MouseEnter, Sub(s, e) btn.BackColor = Darken(Palette.Primary, 0.1F)
-            AddHandler btn.MouseLeave, Sub(s, e) btn.BackColor = Palette.Primary
+        If isTile Then
+            ApplyTileButtonStyle(btn)
+            Return
         End If
 
-        SetupReactiveBorder(btn, 1, 0.25F, 0.45F, True)
+        ' Botón estándar (azul) con borde reactivo
+        ApplyPrimaryButtonStyle(btn)
     End Sub
 
     Private Sub ApplyNavButtonStyle(btn As Button)
@@ -142,6 +167,66 @@ Public Module AppTheme
         End If
         btn.FlatAppearance.MouseOverBackColor = Lighten(btn.BackColor, 0.08F)
         btn.FlatAppearance.MouseDownBackColor = Lighten(btn.BackColor, 0.12F)
+    End Sub
+
+    Private Function IsTileButton(btn As Button, tagStr As String) As Boolean
+        If tagStr.IndexOf("Tile", StringComparison.OrdinalIgnoreCase) >= 0 Then
+            Return True
+        End If
+
+        Dim parentFlow = TryCast(btn.Parent, FlowLayoutPanel)
+        Dim hasLargeMinimum = btn.MinimumSize.Width >= 200 OrElse btn.MinimumSize.Height >= 44
+        Dim approxWidth = Math.Max(Math.Max(btn.Width, btn.PreferredSize.Width), btn.MinimumSize.Width)
+
+        If hasLargeMinimum OrElse approxWidth >= 200 Then
+            If parentFlow IsNot Nothing Then
+                Return True
+            End If
+        End If
+
+        Return False
+    End Function
+
+    Private Sub ApplyTileButtonStyle(btn As Button)
+        btn.BackColor = Color.White
+        btn.ForeColor = Palette.Foreground
+        btn.Font = Palette.BaseFont
+
+        If btn.Padding.Left < 16 Then
+            btn.Padding = New Padding(16, btn.Padding.Top, Math.Max(16, btn.Padding.Right), btn.Padding.Bottom)
+        End If
+
+        Dim hoverBack = Palette.PrimaryLight
+        Dim baseBack = btn.BackColor
+
+        btn.FlatAppearance.BorderSize = 1
+        btn.FlatAppearance.BorderColor = Darken(btn.BackColor, 0.25F)
+        btn.FlatAppearance.MouseOverBackColor = hoverBack
+        btn.FlatAppearance.MouseDownBackColor = Lighten(hoverBack, 0.08F)
+
+        If Not IsStyled(btn) Then
+            AddHandler btn.MouseEnter, Sub(s, e) btn.BackColor = hoverBack
+            AddHandler btn.MouseLeave, Sub(s, e) btn.BackColor = baseBack
+            AddHandler btn.GotFocus, Sub(s, e) btn.BackColor = hoverBack
+            AddHandler btn.LostFocus, Sub(s, e) btn.BackColor = baseBack
+        End If
+
+        SetupReactiveBorder(btn, 1, 0.18F, 0.35F, True)
+    End Sub
+
+    Private Sub ApplyPrimaryButtonStyle(btn As Button)
+        btn.BackColor = Palette.Primary
+        btn.ForeColor = Color.White
+        btn.Font = Palette.BaseFont
+
+        If Not IsStyled(btn) Then
+            AddHandler btn.MouseEnter, Sub(s, e) btn.BackColor = Darken(Palette.Primary, 0.1F)
+            AddHandler btn.MouseLeave, Sub(s, e) btn.BackColor = Palette.Primary
+            AddHandler btn.GotFocus, Sub(s, e) btn.BackColor = Darken(Palette.Primary, 0.1F)
+            AddHandler btn.LostFocus, Sub(s, e) btn.BackColor = Palette.Primary
+        End If
+
+        SetupReactiveBorder(btn, 1, 0.25F, 0.45F, True)
     End Sub
 
     ' Mantiene el hover con el mismo BackColor actual del botón
