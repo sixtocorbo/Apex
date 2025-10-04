@@ -130,7 +130,7 @@ Public Class frmConfiguracion
 
         For Each c In pnl.Controls
             Dim b = TryCast(c, Button)
-            If b Is Not Nothing Then
+            If b IsNot Nothing Then
                 b.Width = anchoBtn
                 b.Height = 44
             End If
