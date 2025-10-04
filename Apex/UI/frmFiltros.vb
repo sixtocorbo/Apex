@@ -31,7 +31,7 @@ Partial Public Class frmFiltros
         Public Overrides Function ToString() As String
             Dim opStr = System.Enum.GetName(GetType(OperadorComparacion), Me.Operador)
             If Operador = OperadorComparacion.EnLista Then
-                Return $"{Columna} {opStr} ({Valor1.Split("|"c).Length} valores)"
+                Return $"{Columna} {opStr} ({Valor1.Split("|").Length} valores)"
             Else
                 Return $"{Columna} {opStr} {Valor1}"
             End If
@@ -68,7 +68,7 @@ Partial Public Class frmFiltros
                     End If
 
                 Case OperadorComparacion.EnLista
-                    Dim items = Valor1.Split("|"c).Select(AddressOf FormatearValor)
+                    Dim items = Valor1.Split("|").Select(AddressOf FormatearValor)
                     Return $"{colName} IN ({String.Join(",", items)})"
 
                 Case Else
@@ -365,7 +365,7 @@ Partial Public Class frmFiltros
         Dim searchText = txtBusquedaGlobal.Text.Trim()
         If String.IsNullOrWhiteSpace(searchText) Then Return String.Empty
 
-        Dim palabras = searchText.Split({" "c}, StringSplitOptions.RemoveEmptyEntries).
+        Dim palabras = searchText.Split({" "}, StringSplitOptions.RemoveEmptyEntries).
                                 Select(Function(p) $"GlobalSearch LIKE '%{p.Replace("'", "''")}%'")
         Return $"({String.Join(" AND ", palabras)})"
     End Function
@@ -396,7 +396,7 @@ Partial Public Class frmFiltros
         lstColumnas.SelectedItem = regla.Columna
         ActualizarListaDeValores()
 
-        Dim valoresParaSeleccionar = New HashSet(Of String)(regla.Valor1.Split("|"c))
+        Dim valoresParaSeleccionar = New HashSet(Of String)(regla.Valor1.Split("|"))
         For i = 0 To lstValores.Items.Count - 1
             If valoresParaSeleccionar.Contains(lstValores.Items(i).ToString()) Then
                 lstValores.SetSelected(i, True)
@@ -624,7 +624,7 @@ Partial Public Class frmFiltros
 
         Dim list As New List(Of String)
         For Each t In trozos
-            Dim s = t.Trim().Trim("."c) ' limpiar puntitos al final
+            Dim s = t.Trim().Trim(New Char() {"."c})
             If IsValidEmail(s) Then list.Add(s)
         Next
         Return list
@@ -635,7 +635,7 @@ Partial Public Class frmFiltros
         If String.IsNullOrWhiteSpace(s) Then Return False
 
         ' Evita strings muy largos y espacios, que son inválidos y pueden hacer que el Regex sea lento.
-        If s.Length > 254 OrElse s.Contains(" "c) Then Return False
+        If s.Length > 254 OrElse s.Contains(" ") Then Return False
 
         Try
             ' Usamos una expresión regular para validar el formato del email.
@@ -920,7 +920,8 @@ Partial Public Class frmFiltros
     Private Function QuitarCaracteresInvalidos(s As String) As String
         If s Is Nothing Then Return ""
         For Each ch In IO.Path.GetInvalidFileNameChars()
-            s = s.Replace(ch, "_"c)
+            ' CORRECCIÓN: Se convierte el Char a String para usar la sobrecarga Replace(String, String).
+            s = s.Replace(ch.ToString(), "_")
         Next
         ' colapsar espacios múltiples
         s = System.Text.RegularExpressions.Regex.Replace(s, "\s+", " ").Trim()
