@@ -137,17 +137,33 @@ Public Class frmResumenCantidades
         If hayDatos Then
             Dim tabla = New DataTable()
             tabla.Columns.Add("Categoría", GetType(String))
+            tabla.Columns.Add("Registro", GetType(String))
             tabla.Columns.Add("Cantidad", GetType(Integer))
-            For Each item In presencias
-                tabla.Rows.Add(item.Key, item.Value)
+
+            For Each categoria In presencias
+                Dim registros As Dictionary(Of String, Integer) = Nothing
+                If resumen.PresenciasDetallePorCategoria IsNot Nothing Then
+                    resumen.PresenciasDetallePorCategoria.TryGetValue(categoria.Key, registros)
+                End If
+
+                If registros Is Nothing OrElse registros.Count = 0 Then
+                    tabla.Rows.Add(categoria.Key, "Sin detalle", categoria.Value)
+                    Continue For
+                End If
+
+                For Each registro In registros.OrderByDescending(Function(p) p.Value).ThenBy(Function(p) p.Key, StringComparer.OrdinalIgnoreCase)
+                    tabla.Rows.Add(categoria.Key, registro.Key, registro.Value)
+                Next
             Next
             _dgvPresencias.DataSource = tabla
 
             ' --- AÑADIR ESTAS LÍNEAS AQUÍ ---
             _dgvPresencias.Columns(0).HeaderText = "Categoría"
-            _dgvPresencias.Columns(1).HeaderText = "Cantidad"
-            _dgvPresencias.Columns(0).AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-            _dgvPresencias.Columns(1).AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            _dgvPresencias.Columns(1).HeaderText = "Registro"
+            _dgvPresencias.Columns(2).HeaderText = "Cantidad"
+            _dgvPresencias.Columns(0).AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            _dgvPresencias.Columns(1).AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+            _dgvPresencias.Columns(2).AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             ' -----------------------------------
         Else
             _dgvPresencias.DataSource = Nothing
@@ -159,7 +175,8 @@ Public Class frmResumenCantidades
             .FechaConsulta = fecha,
             .LicenciasPorTipo = New Dictionary(Of String, Integer)(StringComparer.OrdinalIgnoreCase),
             .LicenciasMedicasPorTipo = New Dictionary(Of String, Integer)(StringComparer.OrdinalIgnoreCase),
-            .PresenciasPorCategoria = New Dictionary(Of String, Integer)(StringComparer.OrdinalIgnoreCase)
+            .PresenciasPorCategoria = New Dictionary(Of String, Integer)(StringComparer.OrdinalIgnoreCase),
+            .PresenciasDetallePorCategoria = New Dictionary(Of String, Dictionary(Of String, Integer))(StringComparer.OrdinalIgnoreCase)
         }
 
         Using uow As New UnitOfWork()
@@ -199,6 +216,11 @@ Public Class frmResumenCantidades
 
         If licenciasClasificadas.Categorias.Any() Then
             resumen.PresenciasPorCategoria = licenciasClasificadas.Categorias.
+                ToDictionary(Function(par) ObtenerNombreCategoria(par.Key),
+                             Function(par) par.Value,
+                             StringComparer.OrdinalIgnoreCase)
+
+            resumen.PresenciasDetallePorCategoria = licenciasClasificadas.CategoriasDetalle.
                 ToDictionary(Function(par) ObtenerNombreCategoria(par.Key),
                              Function(par) par.Value,
                              StringComparer.OrdinalIgnoreCase)
@@ -250,6 +272,7 @@ Public Class frmResumenCantidades
 
             If contarCategoria Then
                 AgregarONuevo(resultado.Categorias, categoriaId.Value, 1)
+                AgregarDetalleCategoria(resultado.CategoriasDetalle, categoriaId.Value, tipo, 1)
             End If
         Next
 
@@ -337,6 +360,22 @@ Public Class frmResumenCantidades
         End If
     End Sub
 
+    Private Shared Sub AgregarDetalleCategoria(diccionario As Dictionary(Of Integer, Dictionary(Of String, Integer)),
+                                               categoriaId As Integer,
+                                               registro As String,
+                                               incremento As Integer)
+        If Not diccionario.ContainsKey(categoriaId) Then
+            diccionario(categoriaId) = New Dictionary(Of String, Integer)(StringComparer.OrdinalIgnoreCase)
+        End If
+
+        Dim registros = diccionario(categoriaId)
+        If registros.ContainsKey(registro) Then
+            registros(registro) += incremento
+        Else
+            registros(registro) = incremento
+        End If
+    End Sub
+
     Private Shared Function ObtenerNombreCategoria(categoriaId As Integer) As String
         Select Case categoriaId
             Case ModConstantesApex.CategoriaAusenciaId.General
@@ -367,6 +406,7 @@ Public Class frmResumenCantidades
         Public Property LicenciasPorTipo As Dictionary(Of String, Integer)
         Public Property LicenciasMedicasPorTipo As Dictionary(Of String, Integer)
         Public Property PresenciasPorCategoria As Dictionary(Of String, Integer)
+        Public Property PresenciasDetallePorCategoria As Dictionary(Of String, Dictionary(Of String, Integer))
     End Class
 
     Private Class LicenciasClasificadas
@@ -374,11 +414,13 @@ Public Class frmResumenCantidades
             LicenciasGenerales = New Dictionary(Of String, Integer)(StringComparer.OrdinalIgnoreCase)
             LicenciasMedicas = New Dictionary(Of String, Integer)(StringComparer.OrdinalIgnoreCase)
             Categorias = New Dictionary(Of Integer, Integer)()
+            CategoriasDetalle = New Dictionary(Of Integer, Dictionary(Of String, Integer))()
         End Sub
 
         Public Property LicenciasGenerales As Dictionary(Of String, Integer)
         Public Property LicenciasMedicas As Dictionary(Of String, Integer)
         Public Property Categorias As Dictionary(Of Integer, Integer)
+        Public Property CategoriasDetalle As Dictionary(Of Integer, Dictionary(Of String, Integer))
     End Class
 
     Private Enum CategoriaPresencia
