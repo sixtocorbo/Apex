@@ -21,6 +21,7 @@ Partial Class frmViaticosListas
         Me.lblRegistros = New System.Windows.Forms.Label()
         Me.txtFiltroDinamico = New System.Windows.Forms.TextBox()
         Me.Label1 = New System.Windows.Forms.Label()
+        Me.btnVerReporte = New System.Windows.Forms.Button()
         Me.btnGenerar = New System.Windows.Forms.Button()
         Me.dtpPeriodo = New System.Windows.Forms.DateTimePicker()
         Me.lblPeriodo = New System.Windows.Forms.Label()
@@ -35,6 +36,7 @@ Partial Class frmViaticosListas
         Me.pnlFiltros.Controls.Add(Me.lblRegistros)
         Me.pnlFiltros.Controls.Add(Me.txtFiltroDinamico)
         Me.pnlFiltros.Controls.Add(Me.Label1)
+        Me.pnlFiltros.Controls.Add(Me.btnVerReporte)
         Me.pnlFiltros.Controls.Add(Me.btnGenerar)
         Me.pnlFiltros.Controls.Add(Me.dtpPeriodo)
         Me.pnlFiltros.Controls.Add(Me.lblPeriodo)
@@ -62,7 +64,7 @@ Partial Class frmViaticosListas
         Me.txtFiltroDinamico.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtFiltroDinamico.Location = New System.Drawing.Point(121, 58)
         Me.txtFiltroDinamico.Name = "txtFiltroDinamico"
-        Me.txtFiltroDinamico.Size = New System.Drawing.Size(417, 31)
+        Me.txtFiltroDinamico.Size = New System.Drawing.Size(360, 31)
         Me.txtFiltroDinamico.TabIndex = 4
         '
         'Label1
@@ -78,10 +80,20 @@ Partial Class frmViaticosListas
         '
         Me.btnGenerar.Location = New System.Drawing.Point(334, 16)
         Me.btnGenerar.Name = "btnGenerar"
-        Me.btnGenerar.Size = New System.Drawing.Size(204, 33)
+        Me.btnGenerar.Size = New System.Drawing.Size(180, 33)
         Me.btnGenerar.TabIndex = 2
         Me.btnGenerar.Text = "Generar lista"
         Me.btnGenerar.UseVisualStyleBackColor = True
+
+        'btnVerReporte
+        '
+        Me.btnVerReporte.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnVerReporte.Location = New System.Drawing.Point(520, 16)
+        Me.btnVerReporte.Name = "btnVerReporte"
+        Me.btnVerReporte.Size = New System.Drawing.Size(241, 33)
+        Me.btnVerReporte.TabIndex = 3
+        Me.btnVerReporte.Text = "Ver informe"
+        Me.btnVerReporte.UseVisualStyleBackColor = True
         '
         'dtpPeriodo
         '
@@ -138,6 +150,7 @@ Partial Class frmViaticosListas
 
     Friend WithEvents pnlFiltros As Panel
     Friend WithEvents btnGenerar As Button
+    Friend WithEvents btnVerReporte As Button
     Friend WithEvents dtpPeriodo As DateTimePicker
     Friend WithEvents lblPeriodo As Label
     Friend WithEvents dgvResultados As DataGridView

@@ -1,4 +1,5 @@
-﻿Imports System.Threading
+﻿Imports System.Data
+Imports System.Threading
 Imports System.Linq ' <-- AÑADIDO: Necesario para el método .Any()
 
 Public Class frmViaticosListas
@@ -116,6 +117,34 @@ Public Class frmViaticosListas
     Private Async Sub btnGenerar_Click(sender As Object, e As EventArgs) Handles btnGenerar.Click
         Dim tk = ReiniciarToken()
         Await CargarViaticosAsync(tk)
+    End Sub
+
+    Private Sub btnVerReporte_Click(sender As Object, e As EventArgs) Handles btnVerReporte.Click
+        If _bsViaticos.Count = 0 Then
+            Notifier.Info(Me, "No hay datos para mostrar en el informe.")
+            Return
+        End If
+
+        Dim dtReporte As DataTable = Nothing
+        Dim vista = TryCast(_bsViaticos.List, DataView)
+
+        If vista IsNot Nothing Then
+            dtReporte = vista.ToTable()
+        Else
+            Dim dtOriginal = TryCast(_bsViaticos.DataSource, DataTable)
+            If dtOriginal IsNot Nothing Then
+                dtReporte = dtOriginal.Copy()
+            End If
+        End If
+
+        If dtReporte Is Nothing OrElse dtReporte.Rows.Count = 0 Then
+            Notifier.Info(Me, "No hay datos para mostrar en el informe.")
+            Return
+        End If
+
+        Using visor As New frmViaticosRPT(dtpPeriodo.Value, dtReporte)
+            visor.ShowDialog(Me)
+        End Using
     End Sub
 
     Private Async Function CargarViaticosAsync(token As CancellationToken) As Task
