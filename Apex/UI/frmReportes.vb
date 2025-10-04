@@ -1,61 +1,20 @@
 Imports System.Linq
 
 Public Class frmReportes
-    Private Sub btnAnalisisEstacional_Click(sender As Object, e As EventArgs) Handles btnAnalisisEstacional.Click
-        AbrirFormularioReporte(Of frmAnalisisEstacionalidad)()
-    End Sub
-
-    Private Sub btnResumenCantidades_Click(sender As Object, e As EventArgs) Handles btnResumenCantidades.Click
-        AbrirFormularioReporte(Of frmResumenCantidades)()
-    End Sub
-
-    Private Sub btnFuncionariosGenero_Click(sender As Object, e As EventArgs) Handles btnFuncionariosGenero.Click
-        AbrirFormularioReporte(Of frmReporteFuncionariosGenero)()
-    End Sub
-
-    Private Sub btnFuncionariosEdad_Click(sender As Object, e As EventArgs) Handles btnFuncionariosEdad.Click
-        AbrirFormularioReporte(Of frmReporteFuncionariosEdad)()
-    End Sub
-
-    Private Sub btnFuncionariosArea_Click(sender As Object, e As EventArgs) Handles btnFuncionariosArea.Click
-        AbrirFormularioReporte(Of frmReporteFuncionariosAreaTrabajo)()
-    End Sub
-
-    Private Sub btnFuncionariosCargo_Click(sender As Object, e As EventArgs) Handles btnFuncionariosCargo.Click
-        AbrirFormularioReporte(Of frmReporteFuncionariosCargo)()
-    End Sub
-
-    Private Sub btnFuncionariosEstado_Click(sender As Object, e As EventArgs) Handles btnFuncionariosEstado.Click
-        AbrirFormularioReporte(Of frmReporteFuncionariosEstado)()
-    End Sub
-
-    Private Sub btnFuncionariosTurno_Click(sender As Object, e As EventArgs) Handles btnFuncionariosTurno.Click
-        AbrirFormularioReporte(Of frmReporteFuncionariosTurno)()
-    End Sub
-
-    Private Sub btnFuncionariosNivelEstudio_Click(sender As Object, e As EventArgs) Handles btnFuncionariosNivelEstudio.Click
-        AbrirFormularioReporte(Of frmReporteFuncionariosNivelEstudio)()
-    End Sub
-
-    Private Sub btnLicenciasPorTipo_Click(sender As Object, e As EventArgs) Handles btnLicenciasPorTipo.Click
-        AbrirFormularioReporte(Of frmReporteLicenciasPorTipo)()
-    End Sub
-
-    Private Sub btnLicenciasPorEstado_Click(sender As Object, e As EventArgs) Handles btnLicenciasPorEstado.Click
-        AbrirFormularioReporte(Of frmReporteLicenciasPorEstado)()
-    End Sub
-
-    Private Sub btnLicenciasTopFuncionarios_Click(sender As Object, e As EventArgs) Handles btnLicenciasTopFuncionarios.Click
-        AbrirFormularioReporte(Of frmReporteTopFuncionariosLicencias)()
-    End Sub
+    Private Shared ReadOnly CatalogosDinamicos As New List(Of CatalogoReporte)()
+    Private Shared ReadOnly CatalogosSyncRoot As New Object()
 
     Private Sub frmReportes_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AppTheme.Aplicar(Me)
         ConfigurarLayoutReportes()
+        ConstruirCatalogos()
     End Sub
 
     Private Sub ConfigurarLayoutReportes()
-        With FlowLayoutPanel1
+        Dim panel = FlowLayoutPanel1
+        If panel Is Nothing Then Return
+
+        With panel
             .Dock = DockStyle.Fill
             .AutoScroll = True
             .WrapContents = True
@@ -64,40 +23,92 @@ Public Class frmReportes
             .Margin = New Padding(0)
         End With
 
-        Dim botones() As Button = {
-            btnResumenCantidades,
-            btnAnalisisEstacional,
-            btnFuncionariosGenero,
-            btnFuncionariosEdad,
-            btnFuncionariosArea,
-            btnFuncionariosCargo,
-            btnFuncionariosEstado,
-            btnFuncionariosTurno,
-            btnFuncionariosNivelEstudio,
-            btnLicenciasPorTipo,
-            btnLicenciasPorEstado,
-            btnLicenciasTopFuncionarios,
-            btnPresentesPorSeccion,
-            btnPresentesPorPuesto
-        }
+        RemoveHandler panel.Resize, AddressOf AjustarAnchoBotones
+        AddHandler panel.Resize, AddressOf AjustarAnchoBotones
+    End Sub
 
-        For i = 0 To botones.Length - 1
-            Dim b = botones(i)
-            b.AutoSize = False
-            b.Height = 44
-            b.MinimumSize = New Size(220, 44)
-            b.Margin = New Padding(12)
-            b.FlatStyle = FlatStyle.Standard
-            b.TextAlign = ContentAlignment.MiddleCenter
-            b.TabIndex = i
+    Private Sub ConstruirCatalogos()
+        Dim panel = FlowLayoutPanel1
+        If panel Is Nothing OrElse panel.IsDisposed Then Return
+
+        panel.SuspendLayout()
+        panel.Controls.Clear()
+
+        Dim catalogos = ObtenerCatalogos().ToList()
+        For i = 0 To catalogos.Count - 1
+            Dim catalogo = catalogos(i)
+            Dim boton = CrearBotonCatalogo(catalogo, i)
+            panel.Controls.Add(boton)
         Next
 
-        AddHandler FlowLayoutPanel1.Resize, AddressOf AjustarAnchoBotones
+        panel.ResumeLayout()
         AjustarAnchoBotones(Nothing, EventArgs.Empty)
     End Sub
 
-    Private Sub AbrirFormularioReporte(Of T As {Form, New})()
-        Dim frm = New T()
+    Private Iterator Function ObtenerCatalogosPredeterminados() As IEnumerable(Of CatalogoReporte)
+        Yield CrearCatalogo(Of frmResumenCantidades)("📋 Resumen de Cantidades")
+        Yield CrearCatalogo(Of frmAnalisisEstacionalidad)("   📊 Análisis de Licencias")
+        Yield CrearCatalogo(Of frmReporteFuncionariosGenero)("♀️ Distribución por Género")
+        Yield CrearCatalogo(Of frmReporteFuncionariosEdad)(" Distribución por Edad")
+        Yield CrearCatalogo(Of frmReporteFuncionariosAreaTrabajo)("🏢 Distribución por Área")
+        Yield CrearCatalogo(Of frmReporteFuncionariosCargo)("🧭 Top Cargos con más Personal")
+        Yield CrearCatalogo(Of frmReporteFuncionariosEstado)("🟢 Activos vs. Inactivos")
+        Yield CrearCatalogo(Of frmReporteFuncionariosTurno)("⏰ Distribución por Turno")
+        Yield CrearCatalogo(Of frmReporteFuncionariosNivelEstudio)("🎓 Nivel de Estudios")
+        Yield CrearCatalogo(Of frmReporteLicenciasPorTipo)("🗂️ Licencias por Tipo")
+        Yield CrearCatalogo(Of frmReporteLicenciasPorEstado)("📑 Licencias por Estado")
+        Yield CrearCatalogo(Of frmReporteTopFuncionariosLicencias)("🏅 Funcionarios con más Licencias")
+        Yield CrearCatalogo(Of frmReportePresenciasPorSeccion)("👥 Presentes por Sección")
+        Yield CrearCatalogo(Of frmReportePresenciasPorPuestoTrabajo)("🛠️ Presentes por Puesto")
+    End Function
+
+    Private Function ObtenerCatalogos() As IEnumerable(Of CatalogoReporte)
+        Dim lista = New List(Of CatalogoReporte)()
+        lista.AddRange(ObtenerCatalogosPredeterminados())
+
+        SyncLock CatalogosSyncRoot
+            lista.AddRange(CatalogosDinamicos)
+        End SyncLock
+
+        Return lista
+    End Function
+
+    Private Function CrearBotonCatalogo(catalogo As CatalogoReporte, tabIndex As Integer) As Button
+        Dim boton = New Button()
+
+        With boton
+            .AutoSize = False
+            .Height = 44
+            .MinimumSize = New Size(220, 44)
+            .Margin = New Padding(12)
+            .FlatStyle = FlatStyle.Standard
+            .TextAlign = ContentAlignment.MiddleCenter
+            .Text = catalogo.Titulo
+            .TabIndex = tabIndex
+        End With
+
+        AddHandler boton.Click,
+            Sub(sender, e)
+                AbrirCatalogo(catalogo)
+            End Sub
+
+        Return boton
+    End Function
+
+    Private Shared Function CrearCatalogo(Of T As {Form, New})(titulo As String) As CatalogoReporte
+        Return New CatalogoReporte(titulo, Function() New T())
+    End Function
+
+    Private Sub AbrirCatalogo(catalogo As CatalogoReporte)
+        If catalogo Is Nothing Then Return
+
+        Dim frm = catalogo.CrearFormulario()
+        AbrirFormularioReporte(frm)
+    End Sub
+
+    Private Sub AbrirFormularioReporte(frm As Form)
+        If frm Is Nothing Then Return
+
         PrepararFormularioParaEscape(frm)
         MostrarEnDashboard(frm)
     End Sub
@@ -148,11 +159,37 @@ Public Class frmReportes
         Next
     End Sub
 
-    Private Sub btnPresentesPorSeccion_Click(sender As Object, e As EventArgs) Handles btnPresentesPorSeccion.Click
-        AbrirFormularioReporte(Of frmReportePresenciasPorSeccion)()
+    Public Shared Sub RegistrarCatalogo(titulo As String, creador As Func(Of Form))
+        If String.IsNullOrWhiteSpace(titulo) Then Throw New ArgumentException("El título no puede ser vacío", NameOf(titulo))
+        If creador Is Nothing Then Throw New ArgumentNullException(NameOf(creador))
+
+        Dim catalogo = New CatalogoReporte(titulo.Trim(), creador)
+
+        SyncLock CatalogosSyncRoot
+            CatalogosDinamicos.RemoveAll(Function(c) String.Equals(c.Titulo, catalogo.Titulo, StringComparison.OrdinalIgnoreCase))
+            CatalogosDinamicos.Add(catalogo)
+        End SyncLock
+
+        For Each frm In Application.OpenForms.OfType(Of frmReportes)().ToArray()
+            frm.ConstruirCatalogos()
+        Next
     End Sub
 
-    Private Sub btnPresentesPorPuesto_Click(sender As Object, e As EventArgs) Handles btnPresentesPorPuesto.Click
-        AbrirFormularioReporte(Of frmReportePresenciasPorPuestoTrabajo)()
+    Public Shared Sub RegistrarCatalogo(Of T As {Form, New})(titulo As String)
+        RegistrarCatalogo(titulo, Function() New T())
     End Sub
+
+    Private NotInheritable Class CatalogoReporte
+        Public ReadOnly Property Titulo As String
+        Private ReadOnly creador As Func(Of Form)
+
+        Public Sub New(titulo As String, creador As Func(Of Form))
+            Me.Titulo = titulo
+            Me.creador = creador
+        End Sub
+
+        Public Function CrearFormulario() As Form
+            Return creador?.Invoke()
+        End Function
+    End Class
 End Class
