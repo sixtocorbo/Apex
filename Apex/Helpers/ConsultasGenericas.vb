@@ -205,20 +205,61 @@ Public Module ConsultasGenericas
                         Return CrearTablaLicenciasVacia()
                     End If
 
-                    Dim resultadoFinal = licencias.Select(Function(lic) New With {
-                        .NombreCompleto = NormalizarValorReporte(lic.NombreFuncionario, "N/A"),
-                        .Cedula = NormalizarValorReporte(lic.CI, "N/A"),
-                        .TipoLicencia = NormalizarValorReporte(lic.TipoLicencia),
-                        .FechaInicio = lic.FechaInicio,
-                        .FechaFin = lic.FechaFin,
-                        .Dias = lic.DuracionDias,
-                        .Observaciones = NormalizarValorReporte(lic.Observaciones, String.Empty),
-                        .Activo = lic.Activo,
-                        .TipoDeFuncionario = NormalizarValorReporte(lic.TipoDeFuncionario),
-                        .Cargo = NormalizarValorReporte(lic.Cargo),
-                        .Seccion = NormalizarValorReporte(lic.Seccion),
-                        .Escalafon = NormalizarValorReporte(lic.Escalafon)
-                    }).ToList()
+                    Dim tipoIds = licencias.
+                        Where(Function(l) l.TipoLicenciaId.HasValue).
+                        Select(Function(l) l.TipoLicenciaId.Value).
+                        Distinct().
+                        ToList()
+
+                    Dim infoPorTipo As New Dictionary(Of Integer, Tuple(Of Integer?, String))()
+                    If tipoIds.Any() Then
+                        Dim datosTipos = Await uow.Context.Set(Of TipoLicencia)().
+                            AsNoTracking().
+                            Where(Function(tl) tipoIds.Contains(tl.Id)).
+                            Select(Function(tl) New With {
+                                .Id = tl.Id,
+                                .CategoriaId = CType(tl.CategoriaAusenciaId, Integer?),
+                                .CategoriaNombre = tl.CategoriaAusencia.Nombre
+                            }).
+                            ToListAsync()
+
+                        infoPorTipo = datosTipos.ToDictionary(
+                            keySelector:=Function(t) t.Id,
+                            elementSelector:=Function(t) Tuple.Create(t.CategoriaId, t.CategoriaNombre)
+                        )
+                    End If
+
+                    Dim resultadoFinal = licencias.Select(Function(lic)
+                                                             Dim categoriaId As Integer? = Nothing
+                                                             Dim categoriaNombre As String = Nothing
+
+                                                             If lic.TipoLicenciaId.HasValue Then
+                                                                 Dim info As Tuple(Of Integer?, String) = Nothing
+                                                                 If infoPorTipo.TryGetValue(lic.TipoLicenciaId.Value, info) Then
+                                                                     categoriaId = info.Item1
+                                                                     categoriaNombre = info.Item2
+                                                                 End If
+                                                             End If
+
+                                                             Return New With {
+                                                                 .NombreCompleto = NormalizarValorReporte(lic.NombreFuncionario, "N/A"),
+                                                                 .Cedula = NormalizarValorReporte(lic.CI, "N/A"),
+                                                                 .TipoLicenciaId = lic.TipoLicenciaId,
+                                                                 .TipoLicencia = NormalizarValorReporte(lic.TipoLicencia),
+                                                                 .CategoriaAusenciaId = categoriaId,
+                                                                 .CategoriaAusencia = NormalizarValorReporte(categoriaNombre),
+                                                                 .FechaInicio = lic.FechaInicio,
+                                                                 .FechaFin = lic.FechaFin,
+                                                                 .Dias = lic.DuracionDias,
+                                                                 .Observaciones = NormalizarValorReporte(lic.Observaciones, String.Empty),
+                                                                 .Activo = lic.Activo,
+                                                                 .TipoDeFuncionario = NormalizarValorReporte(lic.TipoDeFuncionario),
+                                                                 .Cargo = NormalizarValorReporte(lic.Cargo),
+                                                                 .Seccion = NormalizarValorReporte(lic.Seccion),
+                                                                 .Escalafon = NormalizarValorReporte(lic.Escalafon)
+                                                             }
+                                                         End Function).
+                                                         ToList()
 
                     dt = resultadoFinal.ToDataTable()
 
