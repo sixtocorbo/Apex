@@ -176,19 +176,19 @@ Public Class frmViaticosListas
         End If
 
         Dim accion As MethodInvoker = Sub()
-                                           Try
-                                               If Not Me.IsDisposed Then
-                                                   Me.Close()
-                                               End If
-                                           Catch
-                                           End Try
+                                          Try
+                                              If Not Me.IsDisposed Then
+                                                  Me.Close()
+                                              End If
+                                          Catch
+                                          End Try
 
-                                           Try
-                                               dash.btnBuscarFuncionario.PerformClick()
-                                           Catch ex As Exception
-                                               Notifier.Warn(dash, "No se pudo volver al listado de funcionarios.")
-                                           End Try
-                                       End Sub
+                                          Try
+                                              dash.btnBuscarFuncionario.PerformClick()
+                                          Catch ex As Exception
+                                              Notifier.Warn(dash, "No se pudo volver al listado de funcionarios.")
+                                          End Try
+                                      End Sub
 
         If dash.InvokeRequired Then
             dash.BeginInvoke(accion)
