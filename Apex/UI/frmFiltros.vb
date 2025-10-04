@@ -609,8 +609,18 @@ Partial Public Class frmFiltros
         If String.IsNullOrWhiteSpace(input) Then Return Enumerable.Empty(Of String)()
 
         ' separadores comunes
-        Dim trozos = input.Split(New Char() {";"c, ","c, "/"c, " "c, ControlChars.Cr, ControlChars.Lf, ControlChars.Tab},
-                             StringSplitOptions.RemoveEmptyEntries)
+        Dim separadores = New String() {
+            ";",
+            ",",
+            "/",
+            " ",
+            ControlChars.Cr,
+            ControlChars.Lf,
+            ControlChars.Tab,
+            Environment.NewLine
+        }
+
+        Dim trozos = input.Split(separadores, StringSplitOptions.RemoveEmptyEntries)
 
         Dim list As New List(Of String)
         For Each t In trozos

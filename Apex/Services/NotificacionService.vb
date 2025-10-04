@@ -129,7 +129,9 @@ Public Class NotificacionService
         End If
 
         If Not String.IsNullOrWhiteSpace(funcionarioFiltro) Then
-            Dim terminos = funcionarioFiltro.Split({" "c, vbTab, ControlChars.Lf, ControlChars.Cr}, StringSplitOptions.RemoveEmptyEntries).
+            Dim separadores = New String() {" ", vbTab, ControlChars.Lf, ControlChars.Cr, Environment.NewLine}
+
+            Dim terminos = funcionarioFiltro.Split(separadores, StringSplitOptions.RemoveEmptyEntries).
                 Select(Function(t) t.Trim()).
                 Where(Function(t) t.Length > 0).
                 ToArray()
