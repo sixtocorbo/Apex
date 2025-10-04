@@ -125,7 +125,7 @@ Public Class frmViaticosListas
             Return
         End If
 
-        Dim dtReporte As DataTable
+        Dim dtReporte As DataTable = Nothing
         Dim vista = TryCast(_bsViaticos.List, DataView)
 
         If vista IsNot Nothing Then
@@ -141,10 +141,6 @@ Public Class frmViaticosListas
             Notifier.Info(Me, "No hay datos para mostrar en el informe.")
             Return
         End If
-
-        ' --- LÍNEA DE DIAGNÓSTICO AÑADIDA ---
-        ' Esta línea es crucial. Nos dirá cuántas filas se están enviando.
-        MessageBox.Show($"Se enviarán {dtReporte.Rows.Count} filas al informe.", "Diagnóstico de Reporte")
 
         Using visor As New frmViaticosRPT(dtpPeriodo.Value, dtReporte)
             visor.ShowDialog(Me)
