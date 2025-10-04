@@ -60,6 +60,7 @@ Public Class frmResumenCantidades
         _lblAusentes = CrearEtiquetaValor()
 
         InitializeComponent()
+        AddHandler _btnActualizar.Click, AddressOf BtnActualizar_Click
     End Sub
 
     Private Sub InitializeComponent()
@@ -169,7 +170,6 @@ Public Class frmResumenCantidades
         Controls.Add(_layoutRoot)
 
         AddHandler Load, AddressOf frmResumenCantidades_Load
-        AddHandler _btnActualizar.Click, Async Sub(sender, args) Await ActualizarDatosAsync()
 
         ResumeLayout(False)
     End Sub
@@ -178,6 +178,10 @@ Public Class frmResumenCantidades
         _dtpFecha.Location = New Point(0, (_panelHeader.Height - _dtpFecha.Height) \ 2)
         _btnActualizar.Location = New Point(_dtpFecha.Right + 16, (_panelHeader.Height - _btnActualizar.Height) \ 2)
         _lblUltimaActualizacion.Location = New Point(_panelHeader.Width - _lblUltimaActualizacion.Width, (_panelHeader.Height - _lblUltimaActualizacion.Height) \ 2)
+    End Sub
+
+    Private Async Sub BtnActualizar_Click(sender As Object, e As EventArgs)
+        Await ActualizarDatosAsync()
     End Sub
 
     Private Async Sub frmResumenCantidades_Load(sender As Object, e As EventArgs) Handles MyBase.Load
