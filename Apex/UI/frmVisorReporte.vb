@@ -242,11 +242,45 @@ Public Class frmVisorReporte
 
     Private Shared Function EscapeXml(texto As String) As String
         If String.IsNullOrEmpty(texto) Then Return String.Empty
-        Return texto.Replace("&", "&amp;") _
-                    .Replace("<", "&lt;") _
-                    .Replace(">", "&gt;") _
-                    .Replace("""", "&quot;") _
-                    .Replace("'", "&apos;")
+
+        Dim limpio = LimpiarCaracteresInvalidosXml(texto)
+
+        Return limpio.Replace("&", "&amp;") _
+                     .Replace("<", "&lt;") _
+                     .Replace(">", "&gt;") _
+                     .Replace("""", "&quot;") _
+                     .Replace("'", "&apos;")
+    End Function
+
+    Private Shared Function LimpiarCaracteresInvalidosXml(texto As String) As String
+        If String.IsNullOrEmpty(texto) Then Return String.Empty
+
+        Dim sb As New StringBuilder(texto.Length)
+        Dim i As Integer = 0
+
+        While i < texto.Length
+            Dim ch = texto(i)
+
+            If Char.IsHighSurrogate(ch) AndAlso i + 1 < texto.Length AndAlso Char.IsLowSurrogate(texto(i + 1)) Then
+                Dim codigo = Char.ConvertToUtf32(ch, texto(i + 1))
+
+                If XmlConvert.IsXmlChar(codigo) Then
+                    sb.Append(ch)
+                    sb.Append(texto(i + 1))
+                End If
+
+                i += 2
+                Continue While
+            End If
+
+            If Not Char.IsSurrogate(ch) AndAlso XmlConvert.IsXmlChar(ch) Then
+                sb.Append(ch)
+            End If
+
+            i += 1
+        End While
+
+        Return sb.ToString()
     End Function
 
     Private Shared Function ObtenerSubtituloCantidades(cantidadesDisponibles As String) As String
