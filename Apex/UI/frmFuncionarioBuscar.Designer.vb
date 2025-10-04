@@ -37,9 +37,15 @@ Partial Class frmFuncionarioBuscar
         Me.tlpDetalleVertical = New System.Windows.Forms.TableLayoutPanel()
         Me.flpDetalles = New System.Windows.Forms.FlowLayoutPanel()
         Me.lblNombreCompleto = New System.Windows.Forms.Label()
-        Me.lblCI = New System.Windows.Forms.Label()
-        Me.lblTipo = New System.Windows.Forms.Label()
-        Me.lblFechaIngreso = New System.Windows.Forms.Label()
+        Me.flpCIDetalle = New System.Windows.Forms.FlowLayoutPanel()
+        Me.lblCITitulo = New System.Windows.Forms.Label()
+        Me.lblCIValor = New System.Windows.Forms.Label()
+        Me.flpTipoDetalle = New System.Windows.Forms.FlowLayoutPanel()
+        Me.lblTipoTitulo = New System.Windows.Forms.Label()
+        Me.lblTipoValor = New System.Windows.Forms.Label()
+        Me.flpFechaIngresoDetalle = New System.Windows.Forms.FlowLayoutPanel()
+        Me.lblFechaIngresoTitulo = New System.Windows.Forms.Label()
+        Me.lblFechaIngresoValor = New System.Windows.Forms.Label()
         Me.flpHorarioDetalle = New System.Windows.Forms.FlowLayoutPanel()
         Me.lblHorarioTitulo = New System.Windows.Forms.Label()
         Me.lblSemanaValor = New System.Windows.Forms.Label()
@@ -62,8 +68,12 @@ Partial Class frmFuncionarioBuscar
         Me.lblSubEscalafonValor = New System.Windows.Forms.Label()
         Me.lblJerarquiaTitulo = New System.Windows.Forms.Label()
         Me.lblJerarquiaValor = New System.Windows.Forms.Label()
-        Me.lblPresencia = New System.Windows.Forms.Label()
-        Me.lblEstadoActividad = New System.Windows.Forms.Label()
+        Me.flpPresenciaDetalle = New System.Windows.Forms.FlowLayoutPanel()
+        Me.lblPresenciaTitulo = New System.Windows.Forms.Label()
+        Me.lblPresenciaValor = New System.Windows.Forms.Label()
+        Me.flpEstadoDetalle = New System.Windows.Forms.FlowLayoutPanel()
+        Me.lblEstadoTitulo = New System.Windows.Forms.Label()
+        Me.lblEstadoValor = New System.Windows.Forms.Label()
         Me.btnVerSituacion = New System.Windows.Forms.Button()
         Me.tlpAcciones = New System.Windows.Forms.TableLayoutPanel()
         Me.btnGenerarFicha = New System.Windows.Forms.Button()
@@ -83,10 +93,15 @@ Partial Class frmFuncionarioBuscar
         Me.panelDetalle.SuspendLayout()
         Me.tlpDetalleVertical.SuspendLayout()
         Me.flpDetalles.SuspendLayout()
+        Me.flpCIDetalle.SuspendLayout()
+        Me.flpTipoDetalle.SuspendLayout()
+        Me.flpFechaIngresoDetalle.SuspendLayout()
         Me.flpHorarioDetalle.SuspendLayout()
         Me.flpUbicacionDetalle.SuspendLayout()
         Me.flpSubDireccionDetalle.SuspendLayout()
         Me.flpCargoDetalle.SuspendLayout()
+        Me.flpPresenciaDetalle.SuspendLayout()
+        Me.flpEstadoDetalle.SuspendLayout()
         Me.tlpAcciones.SuspendLayout()
         CType(Me.pbFotoDetalle, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
@@ -251,15 +266,15 @@ Partial Class frmFuncionarioBuscar
         Me.flpDetalles.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.flpDetalles.AutoScroll = True
         Me.flpDetalles.Controls.Add(Me.lblNombreCompleto)
-        Me.flpDetalles.Controls.Add(Me.lblCI)
-        Me.flpDetalles.Controls.Add(Me.lblTipo)
-        Me.flpDetalles.Controls.Add(Me.lblFechaIngreso)
+        Me.flpDetalles.Controls.Add(Me.flpCIDetalle)
+        Me.flpDetalles.Controls.Add(Me.flpTipoDetalle)
+        Me.flpDetalles.Controls.Add(Me.flpFechaIngresoDetalle)
         Me.flpDetalles.Controls.Add(Me.flpHorarioDetalle)
         Me.flpDetalles.Controls.Add(Me.flpUbicacionDetalle)
         Me.flpDetalles.Controls.Add(Me.flpSubDireccionDetalle)
         Me.flpDetalles.Controls.Add(Me.flpCargoDetalle)
-        Me.flpDetalles.Controls.Add(Me.lblPresencia)
-        Me.flpDetalles.Controls.Add(Me.lblEstadoActividad)
+        Me.flpDetalles.Controls.Add(Me.flpPresenciaDetalle)
+        Me.flpDetalles.Controls.Add(Me.flpEstadoDetalle)
         Me.flpDetalles.FlowDirection = System.Windows.Forms.FlowDirection.TopDown
         Me.flpDetalles.Location = New System.Drawing.Point(3, 402)
         Me.flpDetalles.Name = "flpDetalles"
@@ -278,44 +293,116 @@ Partial Class frmFuncionarioBuscar
         Me.lblNombreCompleto.Text = "Nombre Funcionario"
         Me.lblNombreCompleto.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
-        'lblCI
+        'flpCIDetalle
+
+        Me.flpCIDetalle.Anchor = System.Windows.Forms.AnchorStyles.Left
+        Me.flpCIDetalle.AutoSize = True
+        Me.flpCIDetalle.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+        Me.flpCIDetalle.Controls.Add(Me.lblCITitulo)
+        Me.flpCIDetalle.Controls.Add(Me.lblCIValor)
+        Me.flpCIDetalle.Location = New System.Drawing.Point(3, 54)
+        Me.flpCIDetalle.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
+        Me.flpCIDetalle.Name = "flpCIDetalle"
+        Me.flpCIDetalle.Size = New System.Drawing.Size(69, 25)
+        Me.flpCIDetalle.TabIndex = 3
         '
-        Me.lblCI.Anchor = System.Windows.Forms.AnchorStyles.Left
-        Me.lblCI.AutoSize = True
-        Me.lblCI.Font = New System.Drawing.Font("Segoe UI", 10.0!)
-        Me.lblCI.ForeColor = System.Drawing.SystemColors.ControlDarkDark
-        Me.lblCI.Location = New System.Drawing.Point(3, 54)
-        Me.lblCI.Margin = New System.Windows.Forms.Padding(3, 0, 3, 8)
-        Me.lblCI.Name = "lblCI"
-        Me.lblCI.Size = New System.Drawing.Size(46, 28)
-        Me.lblCI.TabIndex = 1
-        Me.lblCI.Text = "CI: -"
+        'lblCITitulo
+
+        Me.lblCITitulo.AutoSize = True
+        Me.lblCITitulo.Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)
+        Me.lblCITitulo.ForeColor = System.Drawing.Color.DimGray
+        Me.lblCITitulo.Location = New System.Drawing.Point(3, 0)
+        Me.lblCITitulo.Margin = New System.Windows.Forms.Padding(0, 0, 3, 0)
+        Me.lblCITitulo.Name = "lblCITitulo"
+        Me.lblCITitulo.Size = New System.Drawing.Size(36, 25)
+        Me.lblCITitulo.TabIndex = 0
+        Me.lblCITitulo.Text = "CI:"
         '
-        'lblTipo
+        'lblCIValor
+
+        Me.lblCIValor.AutoSize = True
+        Me.lblCIValor.Font = New System.Drawing.Font("Segoe UI", 9.5!)
+        Me.lblCIValor.ForeColor = System.Drawing.Color.DimGray
+        Me.lblCIValor.Location = New System.Drawing.Point(42, 0)
+        Me.lblCIValor.Margin = New System.Windows.Forms.Padding(0, 0, 12, 0)
+        Me.lblCIValor.Name = "lblCIValor"
+        Me.lblCIValor.Size = New System.Drawing.Size(20, 25)
+        Me.lblCIValor.TabIndex = 1
+        Me.lblCIValor.Text = "-"
         '
-        Me.lblTipo.Anchor = System.Windows.Forms.AnchorStyles.Left
-        Me.lblTipo.AutoSize = True
-        Me.lblTipo.Font = New System.Drawing.Font("Segoe UI", 9.5!)
-        Me.lblTipo.ForeColor = System.Drawing.Color.DimGray
-        Me.lblTipo.Location = New System.Drawing.Point(3, 90)
-        Me.lblTipo.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
-        Me.lblTipo.Name = "lblTipo"
-        Me.lblTipo.Size = New System.Drawing.Size(66, 25)
-        Me.lblTipo.TabIndex = 6
-        Me.lblTipo.Text = "Tipo: -"
+        'flpTipoDetalle
+
+        Me.flpTipoDetalle.Anchor = System.Windows.Forms.AnchorStyles.Left
+        Me.flpTipoDetalle.AutoSize = True
+        Me.flpTipoDetalle.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+        Me.flpTipoDetalle.Controls.Add(Me.lblTipoTitulo)
+        Me.flpTipoDetalle.Controls.Add(Me.lblTipoValor)
+        Me.flpTipoDetalle.Location = New System.Drawing.Point(3, 81)
+        Me.flpTipoDetalle.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
+        Me.flpTipoDetalle.Name = "flpTipoDetalle"
+        Me.flpTipoDetalle.Size = New System.Drawing.Size(78, 25)
+        Me.flpTipoDetalle.TabIndex = 4
         '
-        'lblFechaIngreso
+        'lblTipoTitulo
+
+        Me.lblTipoTitulo.AutoSize = True
+        Me.lblTipoTitulo.Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)
+        Me.lblTipoTitulo.ForeColor = System.Drawing.Color.DimGray
+        Me.lblTipoTitulo.Location = New System.Drawing.Point(0, 0)
+        Me.lblTipoTitulo.Margin = New System.Windows.Forms.Padding(0, 0, 3, 0)
+        Me.lblTipoTitulo.Name = "lblTipoTitulo"
+        Me.lblTipoTitulo.Size = New System.Drawing.Size(48, 25)
+        Me.lblTipoTitulo.TabIndex = 0
+        Me.lblTipoTitulo.Text = "Tipo:"
         '
-        Me.lblFechaIngreso.Anchor = System.Windows.Forms.AnchorStyles.Left
-        Me.lblFechaIngreso.AutoSize = True
-        Me.lblFechaIngreso.Font = New System.Drawing.Font("Segoe UI", 9.5!)
-        Me.lblFechaIngreso.ForeColor = System.Drawing.Color.DimGray
-        Me.lblFechaIngreso.Location = New System.Drawing.Point(3, 117)
-        Me.lblFechaIngreso.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
-        Me.lblFechaIngreso.Name = "lblFechaIngreso"
-        Me.lblFechaIngreso.Size = New System.Drawing.Size(146, 25)
-        Me.lblFechaIngreso.TabIndex = 8
-        Me.lblFechaIngreso.Text = "Fecha Ingreso: -"
+        'lblTipoValor
+
+        Me.lblTipoValor.AutoSize = True
+        Me.lblTipoValor.Font = New System.Drawing.Font("Segoe UI", 9.5!)
+        Me.lblTipoValor.ForeColor = System.Drawing.Color.DimGray
+        Me.lblTipoValor.Location = New System.Drawing.Point(51, 0)
+        Me.lblTipoValor.Margin = New System.Windows.Forms.Padding(0, 0, 12, 0)
+        Me.lblTipoValor.Name = "lblTipoValor"
+        Me.lblTipoValor.Size = New System.Drawing.Size(20, 25)
+        Me.lblTipoValor.TabIndex = 1
+        Me.lblTipoValor.Text = "-"
+        '
+        'flpFechaIngresoDetalle
+
+        Me.flpFechaIngresoDetalle.Anchor = System.Windows.Forms.AnchorStyles.Left
+        Me.flpFechaIngresoDetalle.AutoSize = True
+        Me.flpFechaIngresoDetalle.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+        Me.flpFechaIngresoDetalle.Controls.Add(Me.lblFechaIngresoTitulo)
+        Me.flpFechaIngresoDetalle.Controls.Add(Me.lblFechaIngresoValor)
+        Me.flpFechaIngresoDetalle.Location = New System.Drawing.Point(3, 108)
+        Me.flpFechaIngresoDetalle.Margin = New System.Windows.Forms.Padding(3, 0, 3, 4)
+        Me.flpFechaIngresoDetalle.Name = "flpFechaIngresoDetalle"
+        Me.flpFechaIngresoDetalle.Size = New System.Drawing.Size(164, 25)
+        Me.flpFechaIngresoDetalle.TabIndex = 5
+        '
+        'lblFechaIngresoTitulo
+
+        Me.lblFechaIngresoTitulo.AutoSize = True
+        Me.lblFechaIngresoTitulo.Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)
+        Me.lblFechaIngresoTitulo.ForeColor = System.Drawing.Color.DimGray
+        Me.lblFechaIngresoTitulo.Location = New System.Drawing.Point(0, 0)
+        Me.lblFechaIngresoTitulo.Margin = New System.Windows.Forms.Padding(0, 0, 3, 0)
+        Me.lblFechaIngresoTitulo.Name = "lblFechaIngresoTitulo"
+        Me.lblFechaIngresoTitulo.Size = New System.Drawing.Size(133, 25)
+        Me.lblFechaIngresoTitulo.TabIndex = 0
+        Me.lblFechaIngresoTitulo.Text = "Fecha Ingreso:"
+        '
+        'lblFechaIngresoValor
+
+        Me.lblFechaIngresoValor.AutoSize = True
+        Me.lblFechaIngresoValor.Font = New System.Drawing.Font("Segoe UI", 9.5!)
+        Me.lblFechaIngresoValor.ForeColor = System.Drawing.Color.DimGray
+        Me.lblFechaIngresoValor.Location = New System.Drawing.Point(136, 0)
+        Me.lblFechaIngresoValor.Margin = New System.Windows.Forms.Padding(0, 0, 12, 0)
+        Me.lblFechaIngresoValor.Name = "lblFechaIngresoValor"
+        Me.lblFechaIngresoValor.Size = New System.Drawing.Size(20, 25)
+        Me.lblFechaIngresoValor.TabIndex = 1
+        Me.lblFechaIngresoValor.Text = "-"
         '
         'flpHorarioDetalle
         '
@@ -588,31 +675,79 @@ Partial Class frmFuncionarioBuscar
         Me.lblJerarquiaValor.TabIndex = 5
         Me.lblJerarquiaValor.Text = "-"
         '
-        'lblPresencia
+        'flpPresenciaDetalle
+
+        Me.flpPresenciaDetalle.Anchor = System.Windows.Forms.AnchorStyles.Left
+        Me.flpPresenciaDetalle.AutoSize = True
+        Me.flpPresenciaDetalle.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+        Me.flpPresenciaDetalle.Controls.Add(Me.lblPresenciaTitulo)
+        Me.flpPresenciaDetalle.Controls.Add(Me.lblPresenciaValor)
+        Me.flpPresenciaDetalle.Location = New System.Drawing.Point(633, 127)
+        Me.flpPresenciaDetalle.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
+        Me.flpPresenciaDetalle.Name = "flpPresenciaDetalle"
+        Me.flpPresenciaDetalle.Size = New System.Drawing.Size(149, 25)
+        Me.flpPresenciaDetalle.TabIndex = 20
         '
-        Me.lblPresencia.Anchor = System.Windows.Forms.AnchorStyles.Left
-        Me.lblPresencia.AutoSize = True
-        Me.lblPresencia.Font = New System.Drawing.Font("Segoe UI", 9.5!)
-        Me.lblPresencia.ForeColor = System.Drawing.Color.DimGray
-        Me.lblPresencia.Location = New System.Drawing.Point(633, 127)
-        Me.lblPresencia.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
-        Me.lblPresencia.Name = "lblPresencia"
-        Me.lblPresencia.Size = New System.Drawing.Size(110, 25)
-        Me.lblPresencia.TabIndex = 20
-        Me.lblPresencia.Text = "Presencia: -"
+        'lblPresenciaTitulo
+
+        Me.lblPresenciaTitulo.AutoSize = True
+        Me.lblPresenciaTitulo.Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)
+        Me.lblPresenciaTitulo.ForeColor = System.Drawing.Color.DimGray
+        Me.lblPresenciaTitulo.Location = New System.Drawing.Point(0, 0)
+        Me.lblPresenciaTitulo.Margin = New System.Windows.Forms.Padding(0, 0, 3, 0)
+        Me.lblPresenciaTitulo.Name = "lblPresenciaTitulo"
+        Me.lblPresenciaTitulo.Size = New System.Drawing.Size(103, 25)
+        Me.lblPresenciaTitulo.TabIndex = 0
+        Me.lblPresenciaTitulo.Text = "Presencia:"
         '
-        'lblEstadoActividad
+        'lblPresenciaValor
+
+        Me.lblPresenciaValor.AutoSize = True
+        Me.lblPresenciaValor.Font = New System.Drawing.Font("Segoe UI", 9.5!)
+        Me.lblPresenciaValor.ForeColor = System.Drawing.Color.DimGray
+        Me.lblPresenciaValor.Location = New System.Drawing.Point(106, 0)
+        Me.lblPresenciaValor.Margin = New System.Windows.Forms.Padding(0, 0, 12, 0)
+        Me.lblPresenciaValor.Name = "lblPresenciaValor"
+        Me.lblPresenciaValor.Size = New System.Drawing.Size(20, 25)
+        Me.lblPresenciaValor.TabIndex = 1
+        Me.lblPresenciaValor.Text = "-"
         '
-        Me.lblEstadoActividad.Anchor = System.Windows.Forms.AnchorStyles.Left
-        Me.lblEstadoActividad.AutoSize = True
-        Me.lblEstadoActividad.Font = New System.Drawing.Font("Segoe UI", 9.5!)
-        Me.lblEstadoActividad.ForeColor = System.Drawing.Color.DimGray
-        Me.lblEstadoActividad.Location = New System.Drawing.Point(633, 154)
-        Me.lblEstadoActividad.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
-        Me.lblEstadoActividad.Name = "lblEstadoActividad"
-        Me.lblEstadoActividad.Size = New System.Drawing.Size(85, 25)
-        Me.lblEstadoActividad.TabIndex = 21
-        Me.lblEstadoActividad.Text = "Estado: -"
+        'flpEstadoDetalle
+
+        Me.flpEstadoDetalle.Anchor = System.Windows.Forms.AnchorStyles.Left
+        Me.flpEstadoDetalle.AutoSize = True
+        Me.flpEstadoDetalle.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+        Me.flpEstadoDetalle.Controls.Add(Me.lblEstadoTitulo)
+        Me.flpEstadoDetalle.Controls.Add(Me.lblEstadoValor)
+        Me.flpEstadoDetalle.Location = New System.Drawing.Point(633, 154)
+        Me.flpEstadoDetalle.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
+        Me.flpEstadoDetalle.Name = "flpEstadoDetalle"
+        Me.flpEstadoDetalle.Size = New System.Drawing.Size(124, 25)
+        Me.flpEstadoDetalle.TabIndex = 21
+        '
+        'lblEstadoTitulo
+
+        Me.lblEstadoTitulo.AutoSize = True
+        Me.lblEstadoTitulo.Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)
+        Me.lblEstadoTitulo.ForeColor = System.Drawing.Color.DimGray
+        Me.lblEstadoTitulo.Location = New System.Drawing.Point(0, 0)
+        Me.lblEstadoTitulo.Margin = New System.Windows.Forms.Padding(0, 0, 3, 0)
+        Me.lblEstadoTitulo.Name = "lblEstadoTitulo"
+        Me.lblEstadoTitulo.Size = New System.Drawing.Size(76, 25)
+        Me.lblEstadoTitulo.TabIndex = 0
+        Me.lblEstadoTitulo.Text = "Estado:"
+        '
+        'lblEstadoValor
+
+        Me.lblEstadoValor.AutoSize = True
+        Me.lblEstadoValor.Font = New System.Drawing.Font("Segoe UI", 9.5!)
+        Me.lblEstadoValor.ForeColor = System.Drawing.Color.DimGray
+        Me.lblEstadoValor.Location = New System.Drawing.Point(79, 0)
+        Me.lblEstadoValor.Margin = New System.Windows.Forms.Padding(0, 0, 12, 0)
+        Me.lblEstadoValor.Name = "lblEstadoValor"
+        Me.lblEstadoValor.Size = New System.Drawing.Size(20, 25)
+        Me.lblEstadoValor.TabIndex = 1
+        Me.lblEstadoValor.Text = "-"
         '
         'btnVerSituacion
         '
@@ -732,6 +867,12 @@ Partial Class frmFuncionarioBuscar
         Me.tlpDetalleVertical.PerformLayout()
         Me.flpDetalles.ResumeLayout(False)
         Me.flpDetalles.PerformLayout()
+        Me.flpCIDetalle.ResumeLayout(False)
+        Me.flpCIDetalle.PerformLayout()
+        Me.flpTipoDetalle.ResumeLayout(False)
+        Me.flpTipoDetalle.PerformLayout()
+        Me.flpFechaIngresoDetalle.ResumeLayout(False)
+        Me.flpFechaIngresoDetalle.PerformLayout()
         Me.flpHorarioDetalle.ResumeLayout(False)
         Me.flpHorarioDetalle.PerformLayout()
         Me.flpUbicacionDetalle.ResumeLayout(False)
@@ -740,6 +881,10 @@ Partial Class frmFuncionarioBuscar
         Me.flpSubDireccionDetalle.PerformLayout()
         Me.flpCargoDetalle.ResumeLayout(False)
         Me.flpCargoDetalle.PerformLayout()
+        Me.flpPresenciaDetalle.ResumeLayout(False)
+        Me.flpPresenciaDetalle.PerformLayout()
+        Me.flpEstadoDetalle.ResumeLayout(False)
+        Me.flpEstadoDetalle.PerformLayout()
         Me.tlpAcciones.ResumeLayout(False)
         CType(Me.pbFotoDetalle, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
@@ -765,10 +910,16 @@ Partial Class frmFuncionarioBuscar
     Friend WithEvents lblTurnoValor As Label
     Friend WithEvents lblPlantillaTitulo As Label
     Friend WithEvents lblPlantillaValor As Label
-    Friend WithEvents lblTipo As Label
+    Friend WithEvents flpCIDetalle As FlowLayoutPanel
+    Friend WithEvents lblCITitulo As Label
+    Friend WithEvents lblCIValor As Label
+    Friend WithEvents flpTipoDetalle As FlowLayoutPanel
+    Friend WithEvents lblTipoTitulo As Label
+    Friend WithEvents lblTipoValor As Label
+    Friend WithEvents flpFechaIngresoDetalle As FlowLayoutPanel
+    Friend WithEvents lblFechaIngresoTitulo As Label
+    Friend WithEvents lblFechaIngresoValor As Label
     Friend WithEvents btnVerSituacion As Button
-    Friend WithEvents lblFechaIngreso As Label
-    Friend WithEvents lblCI As Label
     Friend WithEvents flpUbicacionDetalle As FlowLayoutPanel
     Friend WithEvents lblUbicacionTitulo As Label
     Friend WithEvents lblUnidadValor As Label
@@ -784,8 +935,12 @@ Partial Class frmFuncionarioBuscar
     Friend WithEvents lblSubEscalafonValor As Label
     Friend WithEvents lblJerarquiaTitulo As Label
     Friend WithEvents lblJerarquiaValor As Label
-    Friend WithEvents lblPresencia As Label
-    Friend WithEvents lblEstadoActividad As Label
+    Friend WithEvents flpPresenciaDetalle As FlowLayoutPanel
+    Friend WithEvents lblPresenciaTitulo As Label
+    Friend WithEvents lblPresenciaValor As Label
+    Friend WithEvents flpEstadoDetalle As FlowLayoutPanel
+    Friend WithEvents lblEstadoTitulo As Label
+    Friend WithEvents lblEstadoValor As Label
     Friend WithEvents btnCopiarContenido As Button
     Friend WithEvents flpDetalles As FlowLayoutPanel
     Friend WithEvents tlpDetalleVertical As TableLayoutPanel
