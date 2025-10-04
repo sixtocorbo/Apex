@@ -475,7 +475,7 @@ Partial Class frmFuncionarioBuscar
         Me.flpSubDireccionDetalle.Location = New System.Drawing.Point(3, 198)
         Me.flpSubDireccionDetalle.Margin = New System.Windows.Forms.Padding(3, 0, 3, 2)
         Me.flpSubDireccionDetalle.Name = "flpSubDireccionDetalle"
-        Me.flpSubDireccionDetalle.Size = New System.Drawing.Size(150, 25)
+        Me.flpSubDireccionDetalle.Size = New System.Drawing.Size(165, 25)
         Me.flpSubDireccionDetalle.TabIndex = 24
         '
         'lblSubDireccionTitulo
@@ -483,10 +483,10 @@ Partial Class frmFuncionarioBuscar
         Me.lblSubDireccionTitulo.AutoSize = True
         Me.lblSubDireccionTitulo.Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)
         Me.lblSubDireccionTitulo.ForeColor = System.Drawing.Color.DimGray
-        Me.lblSubDireccionTitulo.Location = New System.Drawing.Point(3, 0)
+        Me.lblSubDireccionTitulo.Location = New System.Drawing.Point(0, 0)
         Me.lblSubDireccionTitulo.Margin = New System.Windows.Forms.Padding(0, 0, 3, 0)
         Me.lblSubDireccionTitulo.Name = "lblSubDireccionTitulo"
-        Me.lblSubDireccionTitulo.Size = New System.Drawing.Size(120, 25)
+        Me.lblSubDireccionTitulo.Size = New System.Drawing.Size(136, 25)
         Me.lblSubDireccionTitulo.TabIndex = 0
         Me.lblSubDireccionTitulo.Text = "SubDireccion:"
         '
@@ -495,9 +495,9 @@ Partial Class frmFuncionarioBuscar
         Me.lblSubDireccionValor.AutoSize = True
         Me.lblSubDireccionValor.Font = New System.Drawing.Font("Segoe UI", 9.5!)
         Me.lblSubDireccionValor.ForeColor = System.Drawing.Color.DimGray
-        Me.lblSubDireccionValor.Location = New System.Drawing.Point(126, 0)
+        Me.lblSubDireccionValor.Location = New System.Drawing.Point(142, 0)
         Me.lblSubDireccionValor.Name = "lblSubDireccionValor"
-        Me.lblSubDireccionValor.Size = New System.Drawing.Size(21, 25)
+        Me.lblSubDireccionValor.Size = New System.Drawing.Size(20, 25)
         Me.lblSubDireccionValor.TabIndex = 1
         Me.lblSubDireccionValor.Text = "-"
         '
