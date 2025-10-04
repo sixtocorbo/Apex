@@ -6,6 +6,7 @@ Imports System.ComponentModel
 Imports System.Globalization
 Imports System.Linq
 Imports System.Text
+Imports System.Xml
 
 Partial Public Class frmFiltros
     Inherits FormActualizable
@@ -1212,7 +1213,7 @@ Partial Public Class frmFiltros
             If headers IsNot Nothing Then
                 Dim headerText As String = Nothing
                 If headers.TryGetValue(col.ColumnName, headerText) AndAlso Not String.IsNullOrWhiteSpace(headerText) Then
-                    nuevaColumna.Caption = headerText
+                    nuevaColumna.Caption = LimpiarCaracteresInvalidosXml(headerText)
                 End If
             End If
         Next
@@ -1234,34 +1235,73 @@ Partial Public Class frmFiltros
         Dim tipoReal = Nullable.GetUnderlyingType(tipo)
         If tipoReal Is Nothing Then tipoReal = tipo
 
+        Dim textoFormateado As String
+
         Select Case Type.GetTypeCode(tipoReal)
             Case TypeCode.DateTime
                 Dim fecha = CType(valor, DateTime)
-                Return fecha.ToString("dd/MM/yyyy", CultureInfo.CurrentCulture)
+                textoFormateado = fecha.ToString("dd/MM/yyyy", CultureInfo.CurrentCulture)
             Case TypeCode.Boolean
-                Return If(CBool(valor), "Sí", "No")
+                textoFormateado = If(CBool(valor), "Sí", "No")
             Case TypeCode.Decimal
-                Return Convert.ToDecimal(valor).ToString("N2", CultureInfo.CurrentCulture)
+                textoFormateado = Convert.ToDecimal(valor).ToString("N2", CultureInfo.CurrentCulture)
             Case TypeCode.Double, TypeCode.Single
-                Return Convert.ToDouble(valor).ToString("N2", CultureInfo.CurrentCulture)
+                textoFormateado = Convert.ToDouble(valor).ToString("N2", CultureInfo.CurrentCulture)
             Case TypeCode.Byte, TypeCode.Int16, TypeCode.Int32, TypeCode.Int64
-                Return Convert.ToInt64(valor).ToString("N0", CultureInfo.CurrentCulture)
+                textoFormateado = Convert.ToInt64(valor).ToString("N0", CultureInfo.CurrentCulture)
             Case Else
                 If TypeOf valor Is Byte() Then
                     Dim bytes = DirectCast(valor, Byte())
-                    Return $"[{bytes.Length} bytes]"
+                    textoFormateado = $"[{bytes.Length} bytes]"
                 ElseIf TypeOf valor Is TimeSpan Then
                     Dim intervalo = DirectCast(valor, TimeSpan)
-                    Return intervalo.ToString()
+                    textoFormateado = intervalo.ToString()
+                Else
+                    Dim formateable = TryCast(valor, IFormattable)
+                    If formateable IsNot Nothing Then
+                        textoFormateado = formateable.ToString(Nothing, CultureInfo.CurrentCulture)
+                    Else
+                        textoFormateado = valor.ToString()
+                    End If
                 End If
-
-                Dim formateable = TryCast(valor, IFormattable)
-                If formateable IsNot Nothing Then
-                    Return formateable.ToString(Nothing, CultureInfo.CurrentCulture)
-                End If
-
-                Return valor.ToString()
         End Select
+
+        If textoFormateado Is Nothing Then
+            textoFormateado = Convert.ToString(valor, CultureInfo.CurrentCulture)
+        End If
+
+        Return LimpiarCaracteresInvalidosXml(textoFormateado)
+    End Function
+
+    Private Shared Function LimpiarCaracteresInvalidosXml(texto As String) As String
+        If String.IsNullOrEmpty(texto) Then Return String.Empty
+
+        Dim sb As New StringBuilder(texto.Length)
+        Dim i As Integer = 0
+
+        While i < texto.Length
+            Dim ch = texto(i)
+
+            If Char.IsHighSurrogate(ch) AndAlso i + 1 < texto.Length AndAlso Char.IsLowSurrogate(texto(i + 1)) Then
+                Dim codigo = Char.ConvertToUtf32(ch, texto(i + 1))
+
+                If XmlConvert.IsXmlChar(codigo) Then
+                    sb.Append(ch)
+                    sb.Append(texto(i + 1))
+                End If
+
+                i += 2
+                Continue While
+            End If
+
+            If Not Char.IsSurrogate(ch) AndAlso XmlConvert.IsXmlChar(ch) Then
+                sb.Append(ch)
+            End If
+
+            i += 1
+        End While
+
+        Return sb.ToString()
     End Function
 
     Private Shared Function AppendConteosPorColumna(sb As System.Text.StringBuilder,
