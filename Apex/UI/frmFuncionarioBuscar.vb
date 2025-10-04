@@ -884,7 +884,7 @@ Public Class frmFuncionarioBuscar
             btnGenerarFicha.Visible = True
 
             ' Concatenamos el texto fijo con el valor
-            lblCI.Text = "CI: " & f.CI
+            lblCIValor.Text = If(String.IsNullOrWhiteSpace(f.CI), "-", f.CI)
             lblNombreCompleto.Text = f.Nombre ' El nombre principal no lleva etiqueta
             Dim escalafonNombre = If(f.Escalafon IsNot Nothing, f.Escalafon.Nombre, "-")
             Dim subEscalafonNombre = If(f.SubEscalafon IsNot Nothing, f.SubEscalafon.Nombre, "-")
@@ -892,31 +892,31 @@ Public Class frmFuncionarioBuscar
             lblEscalafonValor.Text = escalafonNombre
             lblSubEscalafonValor.Text = subEscalafonNombre
             lblJerarquiaValor.Text = cargoNombre
-            lblTipo.Text = "Tipo: " & f.TipoFuncionario.Nombre
-            lblFechaIngreso.Text = "Fecha Ingreso: " & f.FechaIngreso.ToShortDateString()
+            lblTipoValor.Text = If(f.TipoFuncionario IsNot Nothing, f.TipoFuncionario.Nombre, "-")
+            lblFechaIngresoValor.Text = f.FechaIngreso.ToShortDateString()
             lblSemanaValor.Text = If(f.Semana IsNot Nothing, f.Semana.Nombre, "-")
             lblTurnoValor.Text = If(f.Turno IsNot Nothing, f.Turno.Nombre, "-")
             lblPlantillaValor.Text = If(f.Horario IsNot Nothing, f.Horario.Nombre, "-")
             lblUnidadValor.Text = If(f.Seccion IsNot Nothing, f.Seccion.Nombre, "-")
             lblPuestoValor.Text = If(f.PuestoTrabajo IsNot Nothing, f.PuestoTrabajo.Nombre, "-")
-            lblSubDireccion.Text = "SubDireccion: " & If(f.SubDireccion IsNot Nothing, f.SubDireccion.Nombre, "-")
+            lblSubDireccionValor.Text = If(f.SubDireccion IsNot Nothing, f.SubDireccion.Nombre, "-")
 
             ' El estado ya estaba correcto, lo mantenemos igual
             If f.Activo Then
-                lblEstadoActividad.Text = "Estado: Activo"
-                lblEstadoActividad.ForeColor = Color.DarkGreen
+                lblEstadoActividadValor.Text = "Activo"
+                lblEstadoActividadValor.ForeColor = Color.DarkGreen
             Else
-                lblEstadoActividad.Text = "Estado: Inactivo"
-                lblEstadoActividad.ForeColor = Color.Maroon
+                lblEstadoActividadValor.Text = "Inactivo"
+                lblEstadoActividadValor.ForeColor = Color.Maroon
             End If
 
             Dim situaciones = Await ObtenerSituacionesAsync(uow, id)
 
             AplicarSituacionesAlBoton(situaciones)
 
-            lblPresencia.Text = Await ObtenerPresenciaAsync(id, Date.Today)
+            lblPresenciaValor.Text = Await ObtenerPresenciaAsync(id, Date.Today)
             If Not f.Activo AndAlso (situaciones Is Nothing OrElse Not situaciones.Any()) Then
-                lblPresencia.Text = Await ObtenerPresenciaAsync(id, Date.Today)
+                lblPresenciaValor.Text = Await ObtenerPresenciaAsync(id, Date.Today)
             End If
 
             If f.Foto Is Nothing OrElse f.Foto.Length = 0 Then
@@ -1201,22 +1201,23 @@ Public Class frmFuncionarioBuscar
     End Function
 
     Private Sub LimpiarDetalle()
-        lblCI.Text = "CI: -"
+        lblCIValor.Text = "-"
         lblNombreCompleto.Text = "Seleccione un funcionario"
         lblEscalafonValor.Text = "-"
         lblSubEscalafonValor.Text = "-"
         lblJerarquiaValor.Text = "-"
-        lblTipo.Text = "Tipo: -"
-        lblFechaIngreso.Text = "Fecha Ingreso: -"
-        lblEstadoActividad.Text = "Estado: -"
-        lblPresencia.Text = ""
+        lblTipoValor.Text = "-"
+        lblFechaIngresoValor.Text = "-"
+        lblEstadoActividadValor.Text = "-"
+        lblEstadoActividadValor.ForeColor = Color.DimGray
+        lblPresenciaValor.Text = ""
         pbFotoDetalle.Image = Nothing
         lblSemanaValor.Text = "-"
         lblTurnoValor.Text = "-"
         lblPlantillaValor.Text = "-"
         lblUnidadValor.Text = "-"
         lblPuestoValor.Text = "-"
-        lblSubDireccion.Text = "SubDireccion: -"
+        lblSubDireccionValor.Text = "-"
         _detallesEstadoActual.Clear()
 
         ' Oculta los botones de acción y el panel de detalle.
@@ -1485,15 +1486,19 @@ Public Class frmFuncionarioBuscar
         Dim margen As Integer = 24
         Dim anchoDisponible As Integer = Math.Max(120, flpDetalles.ClientSize.Width - margen)
         For Each lbl As Label In New Label() {
-            lblNombreCompleto, lblCI, lblTipo, lblFechaIngreso,
+            lblNombreCompleto, lblCIValor, lblTipoValor, lblFechaIngresoValor,
             lblSemanaValor, lblTurnoValor, lblPlantillaValor,
-            lblUnidadValor, lblPuestoValor, lblPresencia, lblEstadoActividad
+            lblUnidadValor, lblPuestoValor, lblPresenciaValor, lblEstadoActividadValor
         }
             lbl.MaximumSize = New Size(anchoDisponible, 0) ' 0 = altura auto
             lbl.AutoEllipsis = True
         Next
 
-        For Each panel In New FlowLayoutPanel() {flpHorarioDetalle, flpUbicacionDetalle, flpCargoDetalle}
+        For Each panel In New FlowLayoutPanel() {
+            flpCIDetalle, flpTipoDetalle, flpFechaIngresoDetalle,
+            flpHorarioDetalle, flpUbicacionDetalle, flpSubDireccionDetalle,
+            flpCargoDetalle, flpPresenciaDetalle, flpEstadoActividadDetalle
+        }
             panel.MaximumSize = New Size(anchoDisponible, 0)
         Next
 
