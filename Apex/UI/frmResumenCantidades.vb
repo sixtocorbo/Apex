@@ -186,13 +186,14 @@ Public Class frmResumenCantidades
 
         Dim presentesSet = New HashSet(Of Integer)()
         Dim francosSet = New HashSet(Of Integer)()
+        Dim activosSet As HashSet(Of Integer)
 
         Using uow As New UnitOfWork()
             Dim ctx = uow.Context
             resumen.TotalFuncionarios = Await ctx.Set(Of Funcionario)().CountAsync()
 
             Dim activosIds = Await ctx.Set(Of Funcionario)().Where(Function(f) f.Activo).Select(Function(f) f.Id).ToListAsync()
-            Dim activosSet = New HashSet(Of Integer)(activosIds)
+            activosSet = New HashSet(Of Integer)(activosIds)
             resumen.Activos = activosSet.Count
             resumen.Inactivos = resumen.TotalFuncionarios - resumen.Activos
 
