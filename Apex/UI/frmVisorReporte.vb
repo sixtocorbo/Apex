@@ -259,14 +259,14 @@ Public Class frmVisorReporte
         Dim i As Integer = 0
 
         While i < texto.Length
-            Dim ch = texto(i)
+            Dim ch As Char = texto(i)
 
             If Char.IsHighSurrogate(ch) AndAlso i + 1 < texto.Length AndAlso Char.IsLowSurrogate(texto(i + 1)) Then
-                Dim codigo = Char.ConvertToUtf32(ch, texto(i + 1))
+                Dim siguiente As Char = texto(i + 1)
 
-                If XmlConvert.IsXmlChar(codigo) Then
+                If XmlConvert.IsXmlSurrogatePair(ch, siguiente) Then
                     sb.Append(ch)
-                    sb.Append(texto(i + 1))
+                    sb.Append(siguiente)
                 End If
 
                 i += 2
