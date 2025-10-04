@@ -72,8 +72,7 @@
             <Top>0.25in</Top>
             <Left>0.25in</Left>
             <Height>0.3in</Height>
-            <Width>10.5in</Width>
-            <ZIndex>1</ZIndex>
+            <Width>8.95833in</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -101,8 +100,8 @@
             <Top>0.65in</Top>
             <Left>0.25in</Left>
             <Height>0.25in</Height>
-            <Width>5in</Width>
-            <ZIndex>2</ZIndex>
+            <Width>4.2in</Width>
+            <ZIndex>1</ZIndex>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -132,8 +131,8 @@
             <Top>0.65in</Top>
             <Left>5.75in</Left>
             <Height>0.25in</Height>
-            <Width>5in</Width>
-            <ZIndex>3</ZIndex>
+            <Width>3.45833in</Width>
+            <ZIndex>2</ZIndex>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -143,33 +142,28 @@
             </Style>
           </Textbox>
           <Tablix Name="TablixViaticos">
-            <Top>1.1in</Top>
-            <Left>0.25in</Left>
-            <Height>1.4in</Height>
-            <Width>10.5in</Width>
-            <ZIndex>4</ZIndex>
             <TablixBody>
               <TablixColumns>
                 <TablixColumn>
-                  <Width>0.6in</Width>
+                  <Width>0.44722in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1in</Width>
+                  <Width>0.91667in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>2.6in</Width>
+                  <Width>2.38472in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1.2in</Width>
+                  <Width>0.85278in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>0.8in</Width>
+                  <Width>0.59167in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1.2in</Width>
+                  <Width>1.15139in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>3.1in</Width>
+                  <Width>2.61389in</Width>
                 </TablixColumn>
               </TablixColumns>
               <TablixRows>
@@ -202,7 +196,7 @@
                               <Color>#d0d0d0</Color>
                               <Style>Solid</Style>
                             </Border>
-                            <BackgroundColor>#1C2938</BackgroundColor>
+                            <BackgroundColor>#1c2938</BackgroundColor>
                             <PaddingLeft>4pt</PaddingLeft>
                             <PaddingRight>4pt</PaddingRight>
                             <PaddingTop>4pt</PaddingTop>
@@ -237,7 +231,7 @@
                               <Color>#d0d0d0</Color>
                               <Style>Solid</Style>
                             </Border>
-                            <BackgroundColor>#1C2938</BackgroundColor>
+                            <BackgroundColor>#1c2938</BackgroundColor>
                             <PaddingLeft>4pt</PaddingLeft>
                             <PaddingRight>4pt</PaddingRight>
                             <PaddingTop>4pt</PaddingTop>
@@ -272,7 +266,7 @@
                               <Color>#d0d0d0</Color>
                               <Style>Solid</Style>
                             </Border>
-                            <BackgroundColor>#1C2938</BackgroundColor>
+                            <BackgroundColor>#1c2938</BackgroundColor>
                             <PaddingLeft>4pt</PaddingLeft>
                             <PaddingRight>4pt</PaddingRight>
                             <PaddingTop>4pt</PaddingTop>
@@ -307,7 +301,7 @@
                               <Color>#d0d0d0</Color>
                               <Style>Solid</Style>
                             </Border>
-                            <BackgroundColor>#1C2938</BackgroundColor>
+                            <BackgroundColor>#1c2938</BackgroundColor>
                             <PaddingLeft>4pt</PaddingLeft>
                             <PaddingRight>4pt</PaddingRight>
                             <PaddingTop>4pt</PaddingTop>
@@ -342,7 +336,7 @@
                               <Color>#d0d0d0</Color>
                               <Style>Solid</Style>
                             </Border>
-                            <BackgroundColor>#1C2938</BackgroundColor>
+                            <BackgroundColor>#1c2938</BackgroundColor>
                             <PaddingLeft>4pt</PaddingLeft>
                             <PaddingRight>4pt</PaddingRight>
                             <PaddingTop>4pt</PaddingTop>
@@ -377,7 +371,7 @@
                               <Color>#d0d0d0</Color>
                               <Style>Solid</Style>
                             </Border>
-                            <BackgroundColor>#1C2938</BackgroundColor>
+                            <BackgroundColor>#1c2938</BackgroundColor>
                             <PaddingLeft>4pt</PaddingLeft>
                             <PaddingRight>4pt</PaddingRight>
                             <PaddingTop>4pt</PaddingTop>
@@ -412,7 +406,7 @@
                               <Color>#d0d0d0</Color>
                               <Style>Solid</Style>
                             </Border>
-                            <BackgroundColor>#1C2938</BackgroundColor>
+                            <BackgroundColor>#1c2938</BackgroundColor>
                             <PaddingLeft>4pt</PaddingLeft>
                             <PaddingRight>4pt</PaddingRight>
                             <PaddingTop>4pt</PaddingTop>
@@ -436,6 +430,7 @@
                               <TextRuns>
                                 <TextRun>
                                   <Value>=Fields!Grado.Value</Value>
+                                  <Style />
                                 </TextRun>
                               </TextRuns>
                               <Style>
@@ -466,6 +461,7 @@
                               <TextRuns>
                                 <TextRun>
                                   <Value>=Fields!Cedula.Value</Value>
+                                  <Style />
                                 </TextRun>
                               </TextRuns>
                               <Style>
@@ -496,6 +492,7 @@
                               <TextRuns>
                                 <TextRun>
                                   <Value>=Fields!NombreFuncionario.Value</Value>
+                                  <Style />
                                 </TextRun>
                               </TextRuns>
                               <Style>
@@ -526,6 +523,7 @@
                               <TextRuns>
                                 <TextRun>
                                   <Value>=Fields!Seccion.Value</Value>
+                                  <Style />
                                 </TextRun>
                               </TextRuns>
                               <Style>
@@ -589,6 +587,7 @@
                               <TextRuns>
                                 <TextRun>
                                   <Value>=Fields!Motivo.Value</Value>
+                                  <Style />
                                 </TextRun>
                               </TextRuns>
                               <Style>
@@ -619,6 +618,7 @@
                               <TextRuns>
                                 <TextRun>
                                   <Value>=Fields!Observaciones.Value</Value>
+                                  <Style />
                                 </TextRun>
                               </TextRuns>
                               <Style>
@@ -660,10 +660,17 @@
                   <KeepWithGroup>After</KeepWithGroup>
                   <RepeatOnNewPage>true</RepeatOnNewPage>
                 </TablixMember>
-                <TablixMember />
+                <TablixMember>
+                  <Group Name="Details" />
+                </TablixMember>
               </TablixMembers>
             </TablixRowHierarchy>
             <DataSetName>DataSetViaticos</DataSetName>
+            <Top>1.1in</Top>
+            <Left>0.25in</Left>
+            <Height>0.58in</Height>
+            <Width>8.95833in</Width>
+            <ZIndex>3</ZIndex>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -701,6 +708,12 @@
       <Prompt>TotalRegistros</Prompt>
     </ReportParameter>
   </ReportParameters>
+  <ReportParametersLayout>
+    <GridLayoutDefinition>
+      <NumberOfColumns>4</NumberOfColumns>
+      <NumberOfRows>2</NumberOfRows>
+    </GridLayoutDefinition>
+  </ReportParametersLayout>
   <Language>es-UY</Language>
   <rd:ReportUnitType>Inch</rd:ReportUnitType>
   <rd:ReportID>3e6f546d-6e15-43f0-92c5-5ec145b2c37c</rd:ReportID>

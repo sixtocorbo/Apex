@@ -8,6 +8,7 @@ Public Class frmViaticosRPT
     Private ReadOnly _datos As DataTable
 
     Public Sub New(periodo As Date, datos As DataTable)
+        ' El constructor se mantiene igual
         If datos Is Nothing Then Throw New ArgumentNullException(NameOf(datos))
 
         InitializeComponent()
@@ -30,23 +31,16 @@ Public Class frmViaticosRPT
             ReportViewer1.ProcessingMode = ProcessingMode.Local
             ReportViewer1.LocalReport.DataSources.Clear()
 
-            Dim definicion = ReportResourceLoader.LoadLocalReportDefinition(
-                ReportViewer1.LocalReport,
-                GetType(frmViaticosRPT),
-                "Apex.Reportes.ViaticosListado.rdlc",
-                "ViaticosListado.rdlc",
-                New String() {"..\\..\\Reportes\\ViaticosListado.rdlc"}
-            )
+            ' --- INICIO DE LA CORRECCIÓN ---
+            ' 1. Se elimina la llamada a 'ReportResourceLoader'.
+            ' 2. Se establece el recurso incrustado directamente.
+            '
+            ' Este nombre DEBE coincidir con: <NamespaceRaízDelProyecto>.<Carpeta>.<NombreDelArchivo>.rdlc
+            ' Asumiendo que tu Namespace es "Apex" y el archivo está en la carpeta "Reportes".
+            ReportViewer1.LocalReport.ReportEmbeddedResource = "Apex.Reportes.ViaticosListado.rdlc"
+            ' --- FIN DE LA CORRECCIÓN ---
 
-            Select Case definicion.Source
-                Case ReportDefinitionSource.Embedded
-                    ReportViewer1.LocalReport.ReportEmbeddedResource = definicion.ResourceName
-                    ReportViewer1.LocalReport.ReportPath = Nothing
-                Case ReportDefinitionSource.File
-                    ReportViewer1.LocalReport.ReportPath = definicion.FilePath
-                    ReportViewer1.LocalReport.ReportEmbeddedResource = Nothing
-            End Select
-
+            ' El resto de la configuración se mantiene igual
             ReportViewer1.LocalReport.DataSources.Add(New ReportDataSource("DataSetViaticos", _datos))
 
             Dim cultura = CultureInfo.GetCultureInfo("es-UY")
@@ -64,8 +58,9 @@ Public Class frmViaticosRPT
             ReportViewer1.SetDisplayMode(DisplayMode.PrintLayout)
             ReportViewer1.ZoomMode = ZoomMode.PageWidth
             ReportViewer1.RefreshReport()
+
         Catch ex As Exception
-            MessageBox.Show($"No fue posible generar el informe: {ex.Message}", "Reporte de viáticos", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            MessageBox.Show($"No fue posible generar el informe: {ex.ToString()}", "Reporte de viáticos", MessageBoxButtons.OK, MessageBoxIcon.Error)
         Finally
             Me.Cursor = cursorAnterior
         End Try
@@ -77,4 +72,5 @@ Public Class frmViaticosRPT
             e.Handled = True
         End If
     End Sub
+
 End Class
