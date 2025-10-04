@@ -394,7 +394,7 @@ Public Class frmResumenCantidades
         Return resultado
     End Function
 
-    Private Shared Function CrearEtiquetaValor() As Label
+    Private Function CrearEtiquetaValor() As Label
         Return New Label() With {
             .AutoSize = False,
             .Font = New Font("Segoe UI", 22.0F, FontStyle.Bold),
@@ -435,7 +435,7 @@ Public Class frmResumenCantidades
         Return panel
     End Function
 
-    Private Shared Sub ConfigurarDataGridView(grid As DataGridView)
+    Private Sub ConfigurarDataGridView(grid As DataGridView)
         With grid
             .Dock = DockStyle.Fill
             .ReadOnly = True
