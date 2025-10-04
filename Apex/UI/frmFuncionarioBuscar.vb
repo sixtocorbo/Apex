@@ -158,12 +158,6 @@ Public Class frmFuncionarioBuscar
         lstCargos.Dock = DockStyle.Fill
         lstCargos.Margin = New Padding(8, 0, 12, 12)
 
-        ' ===============================
-        ' 3) Detalle (derecha)
-        '     - Reemplazamos tlpAcciones por un FlowLayoutPanel para permitir WRAP.
-        '     - Hacemos que el bloque de detalles (labels) llene con scroll vertical.
-        ' ===============================
-        ' --- RowStyles del contenedor vertical: [Acciones=Auto] [Foto=50%] [Botón=Auto] [Detalles=50%]
         With tlpDetalleVertical
             .Dock = DockStyle.Fill
             If .RowStyles.Count >= 4 Then
@@ -486,25 +480,10 @@ Public Class frmFuncionarioBuscar
     Private Sub AjustarAnchoListaCargos()
         If tlpResultados Is Nothing OrElse lstCargos Is Nothing Then Return
         If tlpResultados.ColumnStyles.Count < 2 Then Return
-
-        ' 1. Se calcula el ancho exacto que necesita el contenido del ListBox
         Dim anchoContenido = CalcularAnchoContenidoListBox(lstCargos)
-
-        ' 2. Se calcula el ancho total del panel disponible
         Dim anchoPanel = Math.Max(0, splitContenedor.Panel1.ClientSize.Width)
-
-        ' 3. Se establece un límite MÁXIMO para el ListBox.
-        '    - Se reduce el porcentaje máximo para darle más espacio a la grilla.
-        '    - Se añade además un tope absoluto para evitar que crezca demasiado.
         Dim anchoMaximoPermitido = Math.Min(CInt(anchoPanel * 0.28), 260)
-
-        ' 4. Se determina el ancho final:
-        '    - Será el ancho del contenido.
-        '    - Pero nunca superará el límite máximo permitido.
-        '    - Y nunca será menor a un mínimo razonable (ej. 140px).
         Dim anchoCalculado = Math.Max(140, Math.Min(anchoContenido, anchoMaximoPermitido))
-
-        ' 5. Se aplica el ancho calculado a la columna que contiene el ListBox.
         Dim margenHorizontal = lstCargos.Margin.Left + lstCargos.Margin.Right
         tlpResultados.ColumnStyles(1).Width = anchoCalculado + margenHorizontal
     End Sub
@@ -1207,9 +1186,6 @@ Public Class frmFuncionarioBuscar
         Me.DialogResult = DialogResult.Cancel
         Me.Close()
     End Sub
-
-
-
     Private Async Function ObtenerPresenciaAsync(id As Integer, fecha As Date) As Task(Of String)
         Using uow As New UnitOfWork()
             Dim ctx = uow.Context
@@ -1253,13 +1229,6 @@ Public Class frmFuncionarioBuscar
 
         ActualizarResaltadoCargo(Nothing)
     End Sub
-
-    'Private Sub lblEstadoTransitorio_DoubleClick(sender As Object, e As EventArgs)
-    '    If _detallesEstadoActual IsNot Nothing AndAlso _detallesEstadoActual.Any() Then
-    '        Dim detalleTexto = String.Join(Environment.NewLine, _detallesEstadoActual.Distinct())
-    '        MessageBox.Show(detalleTexto, "Detalle del Estado Actual", MessageBoxButtons.OK, MessageBoxIcon.Information)
-    '    End If
-    'End Sub
 
 #End Region
 
