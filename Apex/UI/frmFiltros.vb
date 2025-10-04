@@ -31,7 +31,8 @@ Partial Public Class frmFiltros
         Public Overrides Function ToString() As String
             Dim opStr = System.Enum.GetName(GetType(OperadorComparacion), Me.Operador)
             If Operador = OperadorComparacion.EnLista Then
-                Return $"{Columna} {opStr} ({Valor1.Split("|").Length} valores)"
+                Dim valores As String() = Valor1.Split(New String() {"|"}, StringSplitOptions.None)
+                Return $"{Columna} {opStr} ({valores.Length} valores)"
             Else
                 Return $"{Columna} {opStr} {Valor1}"
             End If
@@ -68,7 +69,7 @@ Partial Public Class frmFiltros
                     End If
 
                 Case OperadorComparacion.EnLista
-                    Dim items = Valor1.Split("|").Select(AddressOf FormatearValor)
+                    Dim items = Valor1.Split(New String() {"|"}, StringSplitOptions.None).Select(AddressOf FormatearValor)
                     Return $"{colName} IN ({String.Join(",", items)})"
 
                 Case Else
@@ -396,7 +397,7 @@ Partial Public Class frmFiltros
         lstColumnas.SelectedItem = regla.Columna
         ActualizarListaDeValores()
 
-        Dim valoresParaSeleccionar = New HashSet(Of String)(regla.Valor1.Split("|"))
+        Dim valoresParaSeleccionar = New HashSet(Of String)(regla.Valor1.Split(New String() {"|"}, StringSplitOptions.None))
         For i = 0 To lstValores.Items.Count - 1
             If valoresParaSeleccionar.Contains(lstValores.Items(i).ToString()) Then
                 lstValores.SetSelected(i, True)
@@ -1291,14 +1292,14 @@ Partial Public Class frmFiltros
         Dim i As Integer = 0
 
         While i < texto.Length
-            Dim ch = texto(i)
+            Dim ch As Char = texto(i)
 
             If Char.IsHighSurrogate(ch) AndAlso i + 1 < texto.Length AndAlso Char.IsLowSurrogate(texto(i + 1)) Then
-                Dim codigo = Char.ConvertToUtf32(ch, texto(i + 1))
+                Dim siguiente As Char = texto(i + 1)
 
-                If XmlConvert.IsXmlChar(codigo) Then
+                If XmlConvert.IsXmlSurrogatePair(ch, siguiente) Then
                     sb.Append(ch)
-                    sb.Append(texto(i + 1))
+                    sb.Append(siguiente)
                 End If
 
                 i += 2
